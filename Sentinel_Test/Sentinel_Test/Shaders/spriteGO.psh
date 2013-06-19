@@ -1,0 +1,14 @@
+#version 330
+
+uniform sampler2D tex0;
+
+in vec2 vTex0;
+in vec4 vColor;
+
+out vec4 vFragColor;
+
+void main()
+{
+	// Final fragment color
+	vFragColor = clamp(texture2D(tex0, vTex0) * vColor, 0.0, 1.0);
+}

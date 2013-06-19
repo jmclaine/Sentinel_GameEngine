@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{1EE3427C-254C-4472-AE26-9078FA0A65D2}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Sentinel_Test</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Engine\tinyxml;$(SolutionDir)\..\Engine\bullet-2.81-rev2613\src;$(SolutionDir)\..\Engine\glew\include; $(SolutionDir)\..\Engine\src\;$(SolutionDir)\..\Engine\DirectX11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;BulletCollision_vs2010_debug.lib;BulletDynamics_vs2010_debug.lib;LinearMath_vs2010_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\Engine\bullet-2.81-rev2613\lib;$(SolutionDir)\..\Engine\glew\lib;$(SolutionDir)\..\Engine\DirectX11\Debug;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Engine\tinyxml;$(SolutionDir)\..\Engine\bullet-2.81-rev2613\src;$(SolutionDir)\..\Engine\glew\include; $(SolutionDir)\..\Engine\src\;$(SolutionDir)\..\Engine\DirectX11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;BulletCollision_vs2010.lib;BulletDynamics_vs2010.lib;LinearMath_vs2010.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\Engine\bullet-2.81-rev2613\lib;$(SolutionDir)\..\Engine\glew\lib;$(SolutionDir)\..\Engine\DirectX11\Release;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="..\..\Engine\src\sin16.inl" />
+    <None Include="..\..\Engine\src\sin8.inl" />
+    <None Include="ClassDiagram1.cd" />
+    <None Include="config.xml" />
+    <None Include="Sentinel_Test.ico" />
+    <None Include="Shaders\colnorm.fx" />
+    <None Include="Shaders\colnorm.psh" />
+    <None Include="Shaders\colnorm.vsh" />
+    <None Include="Shaders\normmap.fx" />
+    <None Include="Shaders\normmap.psh" />
+    <None Include="Shaders\normmap.vsh" />
+    <None Include="Shaders\spriteGO.fx" />
+    <None Include="Shaders\spriteGO.gsh" />
+    <None Include="Shaders\spriteGO.psh" />
+    <None Include="Shaders\spriteGO.vsh" />
+    <None Include="Shaders\texture.fx" />
+    <None Include="Shaders\texture.vsh" />
+    <None Include="small.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Engine\src\OrthographicCameraComponent.h" />
+    <ClInclude Include="..\..\Engine\src\PerspectiveCameraComponent.h" />
+    <ClInclude Include="..\..\Engine\src\AIControllerComponent.h" />
+    <ClInclude Include="..\..\Engine\src\CameraComponent.h" />
+    <ClInclude Include="..\..\Engine\src\PhysicsSystem.h" />
+    <ClInclude Include="..\..\Engine\src\ControllerComponent.h" />
+    <ClInclude Include="..\..\Engine\src\DrawableComponent.h" />
+    <ClInclude Include="..\..\Engine\src\FixedPoint.h" />
+    <ClInclude Include="..\..\Engine\src\GameComponent.h" />
+    <ClInclude Include="..\..\Engine\src\GameObject.h" />
+    <ClInclude Include="..\..\Engine\src\GameWorld.h" />
+    <ClInclude Include="..\..\Engine\src\Input.h" />
+    <ClInclude Include="..\..\Engine\src\LightComponent.h" />
+    <ClInclude Include="..\..\Engine\src\MathLib.h" />
+    <ClInclude Include="..\..\Engine\src\Mesh.h" />
+    <ClInclude Include="..\..\Engine\src\MeshComponent.h" />
+    <ClInclude Include="..\..\Engine\src\MeshBuilder.h" />
+    <ClInclude Include="..\..\Engine\src\Model.h" />
+    <ClInclude Include="..\..\Engine\src\ModelComponent.h" />
+    <ClInclude Include="..\..\Engine\src\NetworkPacket.h" />
+    <ClInclude Include="..\..\Engine\src\PhysicsComponent.h" />
+    <ClInclude Include="..\..\Engine\src\PlayerControllerComponent.h" />
+    <ClInclude Include="..\..\Engine\src\Renderer.h" />
+    <ClInclude Include="..\..\Engine\src\Shader.h" />
+    <ClInclude Include="..\..\Engine\src\Singleton.h" />
+    <ClInclude Include="..\..\Engine\src\NetworkSocket.h" />
+    <ClInclude Include="..\..\Engine\src\Sprite.h" />
+    <ClInclude Include="..\..\Engine\src\SpriteComponent.h" />
+    <ClInclude Include="..\..\Engine\src\Texture.h" />
+    <ClInclude Include="..\..\Engine\src\Timing.h" />
+    <ClInclude Include="..\..\Engine\src\TransformComponent.h" />
+    <ClInclude Include="..\..\Engine\src\Util.h" />
+    <ClInclude Include="..\..\Engine\tinyxml\tinystr.h" />
+    <ClInclude Include="..\..\Engine\tinyxml\tinyxml.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="Sentinel_Test.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Engine\src\CameraComponent.cpp" />
+    <ClCompile Include="..\..\Engine\src\OrthographicCameraComponent.cpp" />
+    <ClCompile Include="..\..\Engine\src\PerspectiveCameraComponent.cpp" />
+    <ClCompile Include="..\..\Engine\src\PhysicsSystem.cpp" />
+    <ClCompile Include="..\..\Engine\src\ControllerComponent.cpp" />
+    <ClCompile Include="..\..\Engine\src\DrawableComponent.cpp" />
+    <ClCompile Include="..\..\Engine\src\GameObject.cpp" />
+    <ClCompile Include="..\..\Engine\src\GameWorld.cpp" />
+    <ClCompile Include="..\..\Engine\src\Input.cpp" />
+    <ClCompile Include="..\..\Engine\src\LightComponent.cpp" />
+    <ClCompile Include="..\..\Engine\src\Mesh.cpp" />
+    <ClCompile Include="..\..\Engine\src\MeshComponent.cpp" />
+    <ClCompile Include="..\..\Engine\src\MeshBuilder.cpp" />
+    <ClCompile Include="..\..\Engine\src\Model.cpp" />
+    <ClCompile Include="..\..\Engine\src\ModelComponent.cpp" />
+    <ClCompile Include="..\..\Engine\src\ModelM3D.cpp" />
+    <ClCompile Include="..\..\Engine\src\NetworkPacket.cpp" />
+    <ClCompile Include="..\..\Engine\src\PhysicsComponent.cpp" />
+    <ClCompile Include="..\..\Engine\src\PlayerControllerComponent.cpp" />
+    <ClCompile Include="..\..\Engine\src\Renderer.cpp" />
+    <ClCompile Include="..\..\Engine\src\RendererDX.cpp" />
+    <ClCompile Include="..\..\Engine\src\RendererGL.cpp" />
+    <ClCompile Include="..\..\Engine\src\Shader.cpp" />
+    <ClCompile Include="..\..\Engine\src\NetworkSocket.cpp" />
+    <ClCompile Include="..\..\Engine\src\Sprite.cpp" />
+    <ClCompile Include="..\..\Engine\src\stb_image.c" />
+    <ClCompile Include="..\..\Engine\src\Timing.cpp" />
+    <ClCompile Include="..\..\Engine\src\TransformComponent.cpp" />
+    <ClCompile Include="..\..\Engine\src\Util.cpp" />
+    <ClCompile Include="..\..\Engine\tinyxml\tinystr.cpp" />
+    <ClCompile Include="..\..\Engine\tinyxml\tinyxml.cpp" />
+    <ClCompile Include="..\..\Engine\tinyxml\tinyxmlerror.cpp" />
+    <ClCompile Include="..\..\Engine\tinyxml\tinyxmlparser.cpp" />
+    <ClCompile Include="Sentinel_Test.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Sentinel_Test.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

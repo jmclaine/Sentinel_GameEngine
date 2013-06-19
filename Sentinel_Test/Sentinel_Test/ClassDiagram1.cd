@@ -1,0 +1,1187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="MainApp" Collapsed="true">
+    <Position X="36.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAACgAQAAAAAAAACAAQAAIAAAAABAAAAAAAAQAAI=</HashCode>
+      <FileName>Sentinel_Test.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::BoundingSphereComponent" Collapsed="true">
+    <Position X="8.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAEAAAAAAAAAAAAAACAAAAAAAAAAAAoA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\BoundingSphereComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::SweptSphereComponent" Collapsed="true">
+    <Position X="8.5" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAYAAQAAAAAgAAAAAAAAAAAAAAgAAAAAAAgAAAAAAIA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\SweptSphereComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::BoundingBoxComponent" Collapsed="true">
+    <Position X="10.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQQAABEAAECAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\BoundingBoxComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::CollisionComponent" Collapsed="true">
+    <Position X="9.75" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgQAAABAAAAAAAAAAAAAAQAAAAAAIAAAAAAAAAAAAIA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\CollisionComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::PhysicsComponent" Collapsed="true">
+    <Position X="15.25" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>hAQBEABAAAAAAAAAAAAAAQAAAARAIAIAAggAAIQAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\PhysicsComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::GameObject" Collapsed="true">
+    <Position X="41.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AhAAEAQgAOAiAAABAAAAAQBAAAEAIAANgAiAAAIAAIA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\GameObject.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::GameComponent" Collapsed="true">
+    <Position X="15.25" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAQAAAANAAAAAAAAAAAAAQAAAAAAIAAAAQgCAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\GameComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::TransformComponent" Collapsed="true">
+    <Position X="24.25" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAABEAAAAAAAAAAAQAAAAAAKAAAAAAAAAAAAgA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\TransformComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::CameraComponent" Collapsed="true">
+    <Position X="27.75" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAQAAABhAAAAIAAAAAAAAQAAAAAAIAAAAAAAAAACAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\CameraComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::LightComponent" Collapsed="true">
+    <Position X="1.75" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAQAAABAAAAAAAAAAAAAAQAIAAAAIAAAAAAAAAAAAgA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\LightComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::OrthographicCameraComponent" Collapsed="true">
+    <Position X="26.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAACAAAAQAAAAAAIAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\OrthographicCameraComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::ControllerComponent" Collapsed="true">
+    <Position X="4" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAABAAAAgAAAAAAAAASAAAAAAIAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\ControllerComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::PlayerControllerComponent" Collapsed="true">
+    <Position X="4" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQQAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\PlayerControllerComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::WeaponComponent" Collapsed="true">
+    <Position X="6.25" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAABAAAAAAAAAAAAAAQAAAAAAIAAAgAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\WeaponComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::AmmoComponent" Collapsed="true">
+    <Position X="13" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAABABAAAAAAAAAAAAQAAAAAAIQAAIAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\AmmoComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::DrawableComponent" Collapsed="true">
+    <Position X="18.75" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAABAAAAAAAIEAAAAAQAAAAAEIAABAAAAAAACAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\DrawableComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::MeshComponent" Collapsed="true">
+    <Position X="17.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAQAAAAgAIAAAIAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MeshComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::ModelComponent" Collapsed="true">
+    <Position X="19.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAIAAAAAEAAQAAAAAAIAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\ModelComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::SpriteComponent" Collapsed="true">
+    <Position X="22" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAkAAAAJAAEIAAQAAAAAAIAAAABAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\SpriteComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::GameWorld" Collapsed="true">
+    <Position X="24" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABRoAAAAAIAAAAAAAAABAQAAAAAAIAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\GameWorld.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::Buffer" Collapsed="true">
+    <Position X="1.75" Y="16" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAQAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAABAQQAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Renderer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::Renderer" Collapsed="true">
+    <Position X="11.5" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAEBIoAAFAIRAAEAQQhBAYgIMJGBABAREBAQQA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Renderer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::TextureDX" Collapsed="true">
+    <Position X="0.5" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAABABAIAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\RendererDX.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::ShaderDX" Collapsed="true">
+    <Position X="5.5" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAABAAEAAAAAgAAAAAAAgCADCAQIAAAAgAAJBgAABA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\RendererDX.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::BufferDX" Collapsed="true">
+    <Position X="0.5" Y="17.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAQAAAAAAAAAACEQAAAAAAAAAAQAAAAAAAAABAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\RendererDX.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::RendererDX" Collapsed="true">
+    <Position X="12.75" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAEAAJEBEgAAFBABAEFAUQBAAAwIIBOBAFIJEBAQAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\RendererDX.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::TextureGL" Collapsed="true">
+    <Position X="2.75" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAABAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\RendererGL.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::ShaderGL" Collapsed="true">
+    <Position X="7.75" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CBAAgIACAAAEggAggABAAECAACBAIAAAAgAEABAAABA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\RendererGL.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::BufferGL" Collapsed="true">
+    <Position X="2.75" Y="17.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAQEAAAAAAAAAAACAAAAAAAAAAAIAAAAAAAABAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\RendererGL.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::RendererGL" Collapsed="true">
+    <Position X="10.5" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAEAAAkBAgAgFBgRACFAQQBAAAkIIBGBABIBEBAQAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\RendererGL.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::Mouse" Collapsed="true">
+    <Position X="6" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAgAgAiAAAAgQQAAAAAAAAAAEAgAIAAEAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Input.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::Keyboard" Collapsed="true">
+    <Position X="15" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAwAAAAAIAAAAAgAAAAAAAAAAAAEAAEIAAEAIAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Input.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::ScriptLexer" Collapsed="true">
+    <Position X="45.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AkEAgAAAAAAAAAAAAAAAAQAAAQAAIAKAAAARAAAACAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Script.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::ScriptParser" Collapsed="true">
+    <Position X="43.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAFqgBAAIAAAAAAIAESJAwCAABAAIYAIAAAAAACAIAI=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Script.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::ScriptCompiler" Collapsed="true">
+    <Position X="38.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgIAAgEECAAAAAAoMAQAACAEgIAAIAAAYBIAAIAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Script.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::Script" Collapsed="true">
+    <Position X="45.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAgAAAAAAAAAUEAAAMAQAQMIAAIZAAAEAAAAEhAAM=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Script.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::ScriptException" Collapsed="true">
+    <Position X="36.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQACAAAAAAAAAAAAAAAAAAAAAAAwAAAAACAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Script.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::Shader" Collapsed="true">
+    <Position X="6.75" Y="15" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>SCAQAAAAAABAAgAAAAAIAACAACAAAAAABgQAARAAABA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Shader.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::Texture" Collapsed="true">
+    <Position X="1.75" Y="13" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAAhAAAAAAAAAAAAAAAAAAAAAIAABAAAAI=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Texture.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::MeshBuilder" Collapsed="true">
+    <Position X="41.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAACFAAQAAAAAJgYAAiASAAKAABCJAIgQAAAASAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MeshBuilder.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::Mesh" Collapsed="true">
+    <Position X="40" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAIAAAAAAEAAgJgYAAAABAAIAAgAIAAAQAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Mesh.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::Model" Collapsed="true">
+    <Position X="10.5" Y="16" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ARwAgAAAAAAAAgAAAAAAAEAAAAAgAEEEBBEAABAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Model.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::ModelM3D" Collapsed="true">
+    <Position X="10.5" Y="17.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ARQAAAAAAAAAAgAIAAAgQAAAABAAAEEFBgEAABAAIAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\ModelM3D.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::Sprite" Collapsed="true">
+    <Position X="3.75" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIICAAAAAAAAgAIAAAAAQAAAAAAMAAQIAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Sprite.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::NetworkSocket" Collapsed="true">
+    <Position X="8.25" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAIIEAAEEAAQAAAIAAIAAAAIAIOkAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\NetworkSocket.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::NetworkPacket" Collapsed="true">
+    <Position X="0.5" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIQAAgAAABAAAAAAEAAAAQACAAAAIAAAAAAAAABQAqA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\NetworkPacket.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::NetworkPacketSender" Collapsed="true">
+    <Position X="7.5" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAIUAAAAAQAAAAAAAAAAAgAAAACAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\NetworkPacket.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::NetworkPacketReceiver" Collapsed="true">
+    <Position X="15.5" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAKAAAAAAAAEAABAAAAIAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\NetworkPacket.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::FixedPoint&lt;p&gt;" Collapsed="true">
+    <Position X="5.5" Y="24" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAIAAAAAAAECAA8QAAAAAACAAAAggAAAABQA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\FixedPoint.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::Singleton&lt;T&gt;" Collapsed="true">
+    <Position X="11.5" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAABAAAEAAAAiAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Singleton.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::SingletonAbstract&lt;T&gt;" Collapsed="true">
+    <Position X="11.5" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAACAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Singleton.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::Timing" Collapsed="true">
+    <Position X="17.25" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgQAAMAAAAAAAEAhQAAAAQAEAAAAAAAAAAAAAAwAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Timing.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::InitFailed" Collapsed="true">
+    <Position X="43.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Util.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::AppException" Collapsed="true">
+    <Position X="36.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgBAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Util.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::Material" Collapsed="true">
+    <Position X="38.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAgAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAgAAAAAg=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Util.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::RefCounter" Collapsed="true">
+    <Position X="0.5" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAAAABAAAAAAAAAAAAAAABAAABAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Util.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::RefObject&lt;T&gt;" Collapsed="true">
+    <Position X="0.5" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAEAAAAAAAAAgAAAIAAAAAAAAAQAAQAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Util.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::FloatCompressor" Collapsed="true">
+    <Position X="40" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>hAEADAAACFAAAAIAIASAAAAAAAAAAAACAAAAhIkAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Util.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sentinel::PerspectiveCameraComponent" Collapsed="true">
+    <Position X="28.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAEAgAAAAAAAAAAAAAQAAgCAAIAEAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\PerspectiveCameraComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="RECT" Collapsed="true">
+    <Position X="40" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAABAAAAAAAAgAAAAIAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\CameraComponent.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_013a_2" Collapsed="true">
+    <Position X="25.5" Y="29" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAACAEAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_013a_3" Collapsed="true">
+    <Position X="21.5" Y="29" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAEAAAEAAAYAgAAgAAAAAAAhAAAAABACA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_013a_5" Collapsed="true">
+    <Position X="5.5" Y="29" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAIIAAAAAAIAAACCAAAAAAAEAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_013a_6" Collapsed="true">
+    <Position X="1.5" Y="29" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAABAAAIAAEDEAgIAAABAAAgAAABAoAAAAAgAgA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_013a_8" Collapsed="true">
+    <Position X="24.5" Y="24" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEEAAAAAAAAAAQAAAAAAAACAIABAIAAAgAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_013a_9" Collapsed="true">
+    <Position X="17.5" Y="28" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAIIAAAAgIAAAACCAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_013a_10" Collapsed="true">
+    <Position X="24.5" Y="19" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAEAQAAAIEAJAAgAgAAAgAAAAAAIAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_013a_11" Collapsed="true">
+    <Position X="13.5" Y="27" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAEAAAAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_013a_12" Collapsed="true">
+    <Position X="23.5" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAQAAAAAAAAAAAAAAAIAAAIAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_013a_14" Collapsed="true">
+    <Position X="9.5" Y="27" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAAAIAAAAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stbi_gif_lzw_struct" Collapsed="true">
+    <Position X="20.5" Y="23" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAEAAAAAAAAAAgAAAAAAAAAgAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stbi_gif_struct" Collapsed="true">
+    <Position X="20.5" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAEICAgAIAAARAQAgAEBAYAAgAAAAQAggAAAAJAQ=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Sentinel::ScriptNode" Collapsed="true">
+    <Position X="41.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAACIAQAAAAABAAAAAAAAAAAAQAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Script.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Sentinel::Value" Collapsed="true">
+    <Position X="43.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAAAAAAAAAAAAAAAAABAAAAAAAgABAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Script.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Sentinel::FuncVars" Collapsed="true">
+    <Position X="36.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAgAAABAAAAACAAAEAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Script.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Sentinel::NativeFunction" Collapsed="true">
+    <Position X="38.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Script.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Sentinel::vec2&lt;Real&gt;" Collapsed="true">
+    <Position X="6.5" Y="19.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIAAAAAAEAAAAQBAQAEAAQAAAABgAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Sentinel::vec3&lt;Real&gt;" Collapsed="true">
+    <Position X="14.5" Y="17.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAABAAAAEAIAAQBASAEAAQAAAEDgAQAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Sentinel::vec4&lt;Real&gt;" Collapsed="true">
+    <Position X="31" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIAAAAAEAIAAQBASAEAAQAAAAjgAQAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Sentinel::mat3&lt;Real&gt;" Collapsed="true">
+    <Position X="1.5" Y="24" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgACAAAIAAAQAEQEAAAAAAkAgAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Sentinel::mat4&lt;Real&gt;" Collapsed="true">
+    <Position X="19.5" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAQAeBAAAAAAAAGAAAIIAAQAEQEAEAAAAkCkEAgAAII=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Sentinel::quat&lt;Real&gt;" Collapsed="true">
+    <Position X="13.5" Y="22" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAEhAAAAAAhhAQAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Sentinel::ColorRGB" Collapsed="true">
+    <Position X="31" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Util.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Typedef Name="Sentinel::FuncMap" Collapsed="true">
+    <Position X="40" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Script.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::FuncPair" Collapsed="true">
+    <Position X="41.75" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Script.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::FuncPtr0" Collapsed="true">
+    <Position X="43.5" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Script.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::FuncPtr1" Collapsed="true">
+    <Position X="45.25" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Script.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::FuncPtr2" Collapsed="true">
+    <Position X="36.5" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Script.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::FuncPtr3" Collapsed="true">
+    <Position X="38.25" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Script.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::FuncPtr4" Collapsed="true">
+    <Position X="40" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Script.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="UINT" Collapsed="true">
+    <Position X="41.75" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>c:\program files (x86)\microsoft sdks\windows\v7.0a\include\windef.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="SOCKET" Collapsed="true">
+    <Position X="40" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>c:\program files (x86)\microsoft sdks\windows\v7.0a\include\winsock.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="SOCKADDR" Collapsed="true">
+    <Position X="38.25" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>c:\program files (x86)\microsoft sdks\windows\v7.0a\include\winsock.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::Fixed16" Collapsed="true">
+    <Position X="8.5" Y="24" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\FixedPoint.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::Fixed8" Collapsed="true">
+    <Position X="5.5" Y="26" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\FixedPoint.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::vec2f" Collapsed="true">
+    <Position X="9.5" Y="21.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::vec2d" Collapsed="true">
+    <Position X="3.5" Y="21.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::vec2i" Collapsed="true">
+    <Position X="3.5" Y="19.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::vec2s" Collapsed="true">
+    <Position X="6.5" Y="21.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::vec3f" Collapsed="true">
+    <Position X="11.5" Y="19.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::vec3d" Collapsed="true">
+    <Position X="17.5" Y="17.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::vec3i" Collapsed="true">
+    <Position X="15.5" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::vec3s" Collapsed="true">
+    <Position X="14.5" Y="19.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::vec4f" Collapsed="true">
+    <Position X="31" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::vec4d" Collapsed="true">
+    <Position X="31" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::vec4i" Collapsed="true">
+    <Position X="34" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::vec4s" Collapsed="true">
+    <Position X="28" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::mat3f" Collapsed="true">
+    <Position X="0.5" Y="22" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::mat3d" Collapsed="true">
+    <Position X="1.5" Y="26" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::mat4f" Collapsed="true">
+    <Position X="19.5" Y="16" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::mat4d" Collapsed="true">
+    <Position X="19.5" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::quatf" Collapsed="true">
+    <Position X="16.5" Y="22" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::quatd" Collapsed="true">
+    <Position X="13.5" Y="24" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi_uc" Collapsed="true">
+    <Position X="45.25" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi_io_callbacks" Collapsed="true">
+    <Position X="25.5" Y="31" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi_idct_8x8" Collapsed="true">
+    <Position X="43.5" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi_YCbCr_to_RGB_run" Collapsed="true">
+    <Position X="36.5" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="uint8" Collapsed="true">
+    <Position X="36.5" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="uint16" Collapsed="true">
+    <Position X="43.5" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="int16" Collapsed="true">
+    <Position X="41.75" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="uint32" Collapsed="true">
+    <Position X="45.25" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="int32" Collapsed="true">
+    <Position X="43.5" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="uint" Collapsed="true">
+    <Position X="40" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="validate_uint32" Collapsed="true">
+    <Position X="38.25" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi" Collapsed="true">
+    <Position X="21.5" Y="27" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="huffman" Collapsed="true">
+    <Position X="5.5" Y="31" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="jpeg" Collapsed="true">
+    <Position X="1.5" Y="31" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi_dequantize_t" Collapsed="true">
+    <Position X="41.75" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="resample_row_func" Collapsed="true">
+    <Position X="36.5" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi_resample" Collapsed="true">
+    <Position X="24.5" Y="26" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="zhuffman" Collapsed="true">
+    <Position X="17.5" Y="26" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="zbuf" Collapsed="true">
+    <Position X="24.5" Y="21" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="chunk" Collapsed="true">
+    <Position X="13.5" Y="29" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="png" Collapsed="true">
+    <Position X="23.5" Y="16" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="pic_packet_t" Collapsed="true">
+    <Position X="9.5" Y="29" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi_gif_lzw" Collapsed="true">
+    <Position X="20.5" Y="25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi_gif" Collapsed="true">
+    <Position X="20.5" Y="18" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="LARGE_INTEGER" Collapsed="true">
+    <Position X="45.25" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>c:\program files (x86)\microsoft sdks\windows\v7.0a\include\winnt.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="DWORD" Collapsed="true">
+    <Position X="38.25" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>c:\program files (x86)\microsoft sdks\windows\v7.0a\include\windef.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="WORD" Collapsed="true">
+    <Position X="40" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>c:\program files (x86)\microsoft sdks\windows\v7.0a\include\windef.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="UCHAR" Collapsed="true">
+    <Position X="38.25" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>c:\program files (x86)\microsoft sdks\windows\v7.0a\include\windef.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="BYTE" Collapsed="true">
+    <Position X="36.5" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>c:\program files (x86)\microsoft sdks\windows\v7.0a\include\windef.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Sentinel::ColorRGBA" Collapsed="true">
+    <Position X="31" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Util.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Enum Name="ShaderTypes" Collapsed="true">
+    <Position X="38.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAggAAAAAAAAAAAAAAAAAEAAAAAAABAAAAEAAAAAAAA=</HashCode>
+      <FileName>Sentinel_Test.cpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ShapeTypes" Collapsed="true">
+    <Position X="40" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAIAAAAkAAAAAAIAQAAAAAAAIBAAAAAAAAAAA=</HashCode>
+      <FileName>Sentinel_Test.cpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="NetworkPacketInstructions" Collapsed="true">
+    <Position X="40" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAAAAAACAAAAAAAAAgAJAiAgAAAAAAAggA=</HashCode>
+      <FileName>Sentinel_Test.cpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="__unnamed_enum_013a_1" Collapsed="true">
+    <Position X="36.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAAABAAAAAAAAAAEAAABAAAAAAAIAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="__unnamed_enum_013a_4" Collapsed="true">
+    <Position X="40" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAACAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="__unnamed_enum_013a_13" Collapsed="true">
+    <Position X="38.25" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACBAAIAAABAAAAAAAACAAAAAAAAAEAAAAAAABAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\stb_image.c</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Sentinel::ComponentType" Collapsed="true">
+    <Position X="45.25" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAoAAgQAAAAAAAABAAAAAAAAAAAABAAAAAAABAABA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\GameComponent.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Sentinel::BufferType" Collapsed="true">
+    <Position X="43.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAACEAAAAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Renderer.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Sentinel::PrimitiveType" Collapsed="true">
+    <Position X="45.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAAAAAACAAAAAAAAAAAAAIAAAAAAAAQAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Renderer.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Sentinel::ImageFormatType" Collapsed="true">
+    <Position X="41.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAAAAAAAABACAAAAAAAAAAQAAAAABA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Renderer.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Sentinel::CullType" Collapsed="true">
+    <Position X="38.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAABABoundingBoxAAACAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Renderer.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Sentinel::BlendType" Collapsed="true">
+    <Position X="41.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgCAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Renderer.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Sentinel::StencilType" Collapsed="true">
+    <Position X="41.75" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAAAAAAAAAAAAAAAAAAAACAQAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Renderer.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Sentinel::MouseButtonStatus" Collapsed="true">
+    <Position X="36.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAAUAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Input.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Sentinel::MouseButton" Collapsed="true">
+    <Position X="45.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAACAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAACAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Input.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Sentinel::KeyStatus" Collapsed="true">
+    <Position X="43.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAABAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Input.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Sentinel::ScriptExecution" Collapsed="true">
+    <Position X="36.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Script.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Sentinel::TokenTypes" Collapsed="true">
+    <Position X="45.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAMGAQCIIABCAIAAEJIQCYABBQiUBDAgEECCQRIMMhQ=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Script.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Sentinel::Operations" Collapsed="true">
+    <Position X="43.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABABkgKAgIQSAARsAgkAACgAAAAAAAyRxEkwEBAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Script.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Sentinel::ValueTypes" Collapsed="true">
+    <Position X="36.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAIAAAAAAAABAQAAgAAAAAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Script.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Sentinel::NativeGlobals" Collapsed="true">
+    <Position X="38.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Script.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Sentinel::TextureType" Collapsed="true">
+    <Position X="43.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAIAAAAAAAAAAAAAAAAQAAAAAAAAAAAI=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\Mesh.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Sentinel::NetworkType" Collapsed="true">
+    <Position X="41.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAAAAAAZAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\NetworkSocket.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Sentinel::ConnectionStatus" Collapsed="true">
+    <Position X="36.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\NetworkSocket.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Sentinel::HeaderType" Collapsed="true">
+    <Position X="40" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAAAAQAIAACABAAAAAAAAAAIAAAAACAEAAAAA=</HashCode>
+      <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\NetworkPacket.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

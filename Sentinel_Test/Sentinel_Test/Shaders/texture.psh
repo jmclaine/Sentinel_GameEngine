@@ -1,0 +1,53 @@
+uniform sampler2D tex0;
+
+uniform vec3 light_color0;
+uniform vec4 light_attn0;
+
+uniform vec4 ambient;
+uniform vec4 diffuse;
+uniform vec4 specular;
+uniform float spec_comp;
+
+varying vec2 vTexture0;
+varying vec3 vNormal;
+varying vec3 vCamDir;
+varying vec3 vLPos0;
+
+vec4 GetColor( vec3 LPos, vec3 camDir, vec3 N, vec3 color, vec4 attn )
+{
+	float dist = max(0.0, length(LPos)-attn.w);
+
+	LPos = normalize(LPos);
+	vec3 H = normalize(LPos + camDir);
+
+	// Attenuation
+	float den = attn.x + (attn.y*2.0*dist)/attn.w + (attn.z*dist*dist)/(attn.w*attn.w);
+	float attnFinal = clamp(1.0 / (den*den), 0.0, 1.0);
+
+	// Ambient
+	vec4 ambientFinal = ambient;
+
+	// Diffuse
+	float intensity = clamp(dot(N, LPos), 0.0, 1.0);
+	vec4 diffuseFinal = diffuse * intensity;
+
+	// Specular
+	vec4 specularFinal = max(specular * pow(clamp(dot(N, H), 0.0, 1.0), spec_comp), 0.0);
+
+	return clamp(vec4(ambientFinal.rgb + (diffuseFinal.rgb + specularFinal.rgb) * attnFinal * color, 1.0), 0.0, 1.0);
+}
+
+void main()
+{
+	// Camera Direction
+	vec3 camDir = normalize(vCamDir);
+
+	// Normal
+	vec3 N = normalize(vNormal);
+
+	// Attenuation
+	vec4 color0 = GetColor(vLPos0, camDir, N, light_color0, light_attn0);
+
+	// Final fragment color
+	gl_FragColor = texture2D(tex0, vTexture0) * color0;
+}
