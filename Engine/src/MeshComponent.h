@@ -1,9 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 
-#include "Renderer.h"
 #include "Mesh.h"
 #include "DrawableComponent.h"
 
@@ -11,6 +9,8 @@ namespace Sentinel
 {
 	class MeshComponent : public DrawableComponent
 	{
+	private:
+
 		std::shared_ptr< Mesh > mMesh;
 
 	public:

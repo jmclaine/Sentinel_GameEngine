@@ -10,6 +10,11 @@ namespace Sentinel
 		mTransform = NULL;
 	}
 
+	const TransformComponent* LightComponent::GetTransform()
+	{
+		return mTransform;
+	}
+
 	void LightComponent::Startup()
 	{
 		mTransform = (TransformComponent*)mOwner->FindComponent( COMPONENT_TRANSFORM );

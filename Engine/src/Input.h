@@ -2,12 +2,11 @@
 
 #include <windows.h>
 
-#include "MathLib.h"
 #include "Singleton.h"
 
 namespace Sentinel
 {
-	vec2i CenterHandle( HWND hWnd = NULL );
+	POINT CenterHandle( HWND hWnd = NULL );
 
 	enum MouseButtonStatus
 	{
@@ -40,8 +39,8 @@ namespace Sentinel
 
 		Mouse();
 
-		void  SetPosition( const vec2i& pos );
-		vec2i GetPosition() const;
+		void  SetPosition( const POINT& pos );
+		POINT GetPosition() const;
 
 		bool IsDown( MouseButton button ) const;
 

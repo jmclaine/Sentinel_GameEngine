@@ -4,6 +4,7 @@
 #include <string>
 
 #include "Util.h"
+#include "TransformComponent.h"
 #include "ControllerComponent.h"
 #include "PhysicsComponent.h"
 #include "DrawableComponent.h"
@@ -12,6 +13,8 @@ namespace Sentinel
 {
 	class GameObject
 	{
+	protected:
+
 		TransformComponent*					mTransform;
 		ControllerComponent*				mController;
 		PhysicsComponent*					mPhysics;

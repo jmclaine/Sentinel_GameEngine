@@ -1,3 +1,4 @@
+#include "MathCommon.h"
 #include "Util.h"
 #include "Input.h"
 #include "Timing.h"
@@ -15,76 +16,76 @@ namespace Sentinel
 	{
 		Keyboard* keyboard = Keyboard::Inst();
 
-		vec3f impulse( 0, 0, 0 );
+		Vector3f impulse( 0, 0, 0 );
 
-		mPhysics->mRigidBody->activate( true );
+		mPhysics->GetRigidBody()->activate( true );
 
-		mat4f matRot( mTransform->mOrientation.Matrix() );
+		Matrix4f matRot( mTransform->mOrientation );
 		
 		// Forward.
 		//
 		if( keyboard->IsDown( 'W' ))
-			impulse += matRot.Forward();
+			impulse = impulse.Add( matRot.Forward() );
 		
 		// Backward.
 		//
 		if( keyboard->IsDown( 'S' ))
-			impulse += -matRot.Forward();
+			impulse = impulse.Add( matRot.Forward() * -1.0f );
 		
 		// Left.
 		//
 		if( keyboard->IsDown( 'A' ))
-			impulse += -matRot.Right();
+			impulse = impulse.Add( matRot.Right() * -1.0f );
 		
 		// Right.
 		//
 		if( keyboard->IsDown( 'D' ))
-			impulse += matRot.Right();
+			impulse = impulse.Add( matRot.Right() );
 		
 		// Up.
 		//
 		if( keyboard->IsDown( VK_SPACE ))
-			impulse += matRot.Up();
+			impulse = impulse.Add( matRot.Up() );
 		
 		// Down.
 		//
 		if( keyboard->IsDown( 'C' ))
-			impulse += -matRot.Up();
+			impulse = impulse.Add( matRot.Up() * -1.0f );
 
 		// Move in direction.
 		//
 		if( impulse.LengthSquared() > 0 )
-			mPhysics->mRigidBody->applyCentralImpulse( btVector3( impulse.x, impulse.y, impulse.z ).normalize() * mSpeed );
-
+			mPhysics->GetRigidBody()->applyCentralImpulse( btVector3( impulse.X(), impulse.Y(), impulse.Z() ).normalize() * mSpeed );
+		
 		///////////////////////////////////
 
 		Mouse* mouse = Mouse::Inst();
 		POINT  mousePos;
 
 		GetCursorPos( &mousePos );
-		vec2i center = CenterHandle( Mouse::mHWND );
-		vec3f diff = vec3f( (float)(center.x-mousePos.x), (float)(center.y-mousePos.y), 0 ) * mAngularSpeed;
+		POINT center = CenterHandle( Mouse::mHWND );
+		Vector3f diff = Vector3f( (float)(center.x-mousePos.x), (float)(center.y-mousePos.y), 0 ) * mAngularSpeed;
 
 		if( keyboard->IsDown( VK_UP ))
-			diff.z += 1;
+			diff.SetZ( diff.Z() + 1.0f );
 
 		if( keyboard->IsDown( VK_DOWN ))
-			diff.z -= 1;
+			diff.SetZ( diff.Z() - 1.0f );
 
 		SetCursorPos( center.x, center.y );
 
 		// Rotate in direction with spherical interpolation.
 		//
-		btTransform transform = mPhysics->mRigidBody->getWorldTransform();
+		btTransform transform = mPhysics->GetRigidBody()->getWorldTransform();
 
 		static btQuaternion qFinal = transform.getRotation();
 		
 		if( diff.LengthSquared() > 0 )
 		{
-			static vec3f rot;
-			rot += diff * (float)DEGREES_TO_RADIANS;
+			static Vector3f rot;
+			rot = rot + diff * (float)DEGREES_TO_RADIANS;
 	
-			qFinal = btQuaternion( rot.x, rot.y, rot.z );
+			qFinal = btQuaternion( rot.X(), rot.Y(), rot.Z() );
 		}
 
 		btQuaternion qResult = slerp( transform.getRotation(), qFinal, clamp( Timing::Inst()->DeltaTime()*10.0f, 0.0f, 1.0f ));
@@ -92,6 +93,6 @@ namespace Sentinel
 		if( qResult.length2() > 0 )	// strangely, slerp can end with an invalid rotation
 			transform.setRotation( qResult );
 		
-		mPhysics->mRigidBody->setWorldTransform( transform );
+		mPhysics->GetRigidBody()->setWorldTransform( transform );
 	}
 }

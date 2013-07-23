@@ -12,6 +12,11 @@ namespace Sentinel
 		mRigidBody = body;
 	}
 
+	btRigidBody* PhysicsComponent::GetRigidBody()
+	{
+		return mRigidBody;
+	}
+
 	void PhysicsComponent::Startup()
 	{
 		mTransform = (TransformComponent*)mOwner->FindComponent( COMPONENT_TRANSFORM );
@@ -24,14 +29,14 @@ namespace Sentinel
 	{
 		btVector3 v( mRigidBody->getCenterOfMassPosition() );
 
-		mTransform->mPosition = vec3f( v.x(), v.y(), v.z() );
+		mTransform->mPosition = Vector3f( v.x(), v.y(), v.z() );
 		
 		btQuaternion q( mRigidBody->getOrientation() );
 
-		mTransform->mOrientation.x = q.x();
-		mTransform->mOrientation.y = q.y();
-		mTransform->mOrientation.z = q.z();
-		mTransform->mOrientation.w = q.w();
+		mTransform->mOrientation.SetX( q.x() );
+		mTransform->mOrientation.SetY( q.y() );
+		mTransform->mOrientation.SetZ( q.z() );
+		mTransform->mOrientation.SetW( q.w() );
 	}
 
 	void PhysicsComponent::Shutdown()

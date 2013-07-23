@@ -26,7 +26,7 @@ namespace Sentinel
 
 		struct Vertex
 		{
-			vec3f	mPosition;
+			Vector3f	mPosition;
 
 			// Bones.
 			//
@@ -82,10 +82,7 @@ namespace Sentinel
 			ColorRGB specular = ReadPoint3( file );
 			float spec_comp   = ReadFloat( file ) * 100.0f;
 
-			matTex.mMaterial = Material( ColorRGBA(  ambient.x,  ambient.y,  ambient.z, 1.0f ),
-										 ColorRGBA(  diffuse.x,  diffuse.y,  diffuse.z, 1.0f ),
-										 ColorRGBA( specular.x, specular.y, specular.z, 1.0f ),
-										 spec_comp );
+			matTex.mMaterial = Material( ambient, diffuse, specular, spec_comp );
 
 			// Read filenames of each texture.
 			//
@@ -145,7 +142,7 @@ namespace Sentinel
 			{
 				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
 				{
-					mObject[ x ].mMesh[ y ]->mMaterial = material;
+					mObject[ x ].mMesh[ y ]->SetMaterial( material );
 				}
 			}
 		}
@@ -156,7 +153,7 @@ namespace Sentinel
 			{
 				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
 				{
-					mObject[ x ].mMesh[ y ]->mShader = shader;
+					mObject[ x ].mMesh[ y ]->SetShader( shader );
 				}
 			}
 		}
@@ -215,9 +212,9 @@ namespace Sentinel
 
 		bool Create( const char* filename )
 		{
-			Vertex* vertices  = NULL;
-			vec3f*  normals   = NULL;
-			vec2f*  texCoords = NULL;
+			Vertex*    vertices  = NULL;
+			Vector3f*  normals   = NULL;
+			Vector2f*  texCoords = NULL;
 
 			try
 			{
@@ -242,7 +239,7 @@ namespace Sentinel
 
 				// Read the smallest bounding sphere.
 				//
-				vec3f center = ReadPoint3( file );
+				Vector3f center = ReadPoint3( file );
 				float radius = ReadFloat( file );
 
 				// Read whether any data should be exported using 32-bit.
@@ -286,7 +283,7 @@ namespace Sentinel
 				// Read normals.
 				//
 				int numNormals = ReadInt( file, bNorms32 );
-				normals = new vec3f[ numNormals ];
+				normals = new Vector3f[ numNormals ];
 
 				for( int x = 0; x < numNormals; ++x )
 				{
@@ -296,12 +293,12 @@ namespace Sentinel
 				// Read texture coordinates.
 				//
 				int numTexCoords = ReadInt( file, bTexcs32 );
-				texCoords = new vec2f[ numTexCoords ];
+				texCoords = new Vector2f[ numTexCoords ];
 
 				for( int x = 0; x < numTexCoords; ++x )
 				{
 					texCoords[ x ] = ReadPoint2( file );
-					texCoords[ x ].y = 1.0f - texCoords[ x ].y;
+					texCoords[ x ].SetY( 1.0f - texCoords[ x ].Y() );
 				}
 
 				// Read fat indices.
@@ -340,7 +337,7 @@ namespace Sentinel
 							for( int w = 0; w < 4; ++w )
 							{
 								float f = ReadFloat( file );
-								currKey->mMatrix.m[ (z<<2)+w ] = f;
+								currKey->mMatrix.Set( (z<<2)+w, f );
 							}
 						}
 
@@ -452,7 +449,7 @@ namespace Sentinel
 							}
 
 							meshVertex.mNormal = normals[ normal ];
-							meshVertex.mTextureCoords[ 0 ] = vec2f( texCoords[ texCoord ].x, texCoords[ texCoord ].y );
+							meshVertex.mTextureCoords[ 0 ] = Vector2f( texCoords[ texCoord ].X(), texCoords[ texCoord ].Y() );
 
 							builder.mVertex.push_back( meshVertex );
 
@@ -503,7 +500,7 @@ namespace Sentinel
 			//
 			if( isWeighted )
 			{
-				static mat4f matBone;
+				static Matrix4f matBone;
 
 				Renderer::Inst()->SetShader( SHADER_SKINNING );
 
@@ -544,7 +541,7 @@ namespace Sentinel
 			//
 			for( UINT x = 0; x < mNumObjects; ++x )
 			{
-				static mat4f matWorldObject;
+				static Matrix4f matWorldObject;
 				if( mObject[ x ].mParent == NULL )
 				{
 					matWorldObject = mMatrixWorld * mObject[ x ].mKeyFrame[ mObject[ x ].mCurrKey ].mMatrix;
@@ -560,7 +557,7 @@ namespace Sentinel
 				//
 				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
 				{
-					mObject[ x ].mMesh[ y ]->mMatrixWorld  = matWorldObject;
+					mObject[ x ].mMesh[ y ]->SetWorldTransform( matWorldObject );
 					mObject[ x ].mMesh[ y ]->Draw();
 				}
 			}

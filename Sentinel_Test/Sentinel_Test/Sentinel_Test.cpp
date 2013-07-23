@@ -10,6 +10,7 @@
 
 #include "Renderer.h"
 #include "PhysicsSystem.h"
+#include "ParticleSystem.h"
 #include "NetworkSocket.h"
 
 #include "Input.h"
@@ -18,7 +19,6 @@
 
 #include "MeshBuilder.h"
 #include "Model.h"
-#include "Sprite.h"
 
 #include "GameWorld.h"
 #include "GameObject.h"
@@ -36,9 +36,9 @@ using namespace Sentinel;
 //
 #define MAX_LOADSTRING 100
 
-HINSTANCE hInst;								// current instance
-TCHAR szTitle[ MAX_LOADSTRING ];				// title bar text
-TCHAR szWindowClass[ MAX_LOADSTRING ];			// main window class name
+HINSTANCE	hInst;								// current instance
+TCHAR		szTitle[ MAX_LOADSTRING ];			// title bar text
+TCHAR		szWindowClass[ MAX_LOADSTRING ];	// main window class name
 
 ATOM				MyRegisterClass(HINSTANCE hInstance);
 HWND				InitInstance(HINSTANCE, int);
@@ -90,6 +90,7 @@ public:
 			mShader[ x ] = NULL;
 
 		//////////////////////////////////////////
+		//mat.Identity();
 
 		LoadString( hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING );
 		LoadString( hInstance, IDC_SENTINEL_TEST, szWindowClass, MAX_LOADSTRING );
@@ -97,17 +98,16 @@ public:
 
 		mAccelTable = LoadAccelerators( hInstance, MAKEINTRESOURCE( IDC_SENTINEL_TEST ));
 
-		if( !CreateRenderer( "config.xml" ))
+		if( !Renderer::Load( "config.xml" ))
+		{
 			REPORT_ERROR( "Failed to load 'config.xml'\nDefaulting to OpenGL", "Renderer Setup Failure" );
+
+			if( !Renderer::Inst( BuildRendererGL ))
+				throw AppException( "Failed to BuildRendererGL" );
+		}
 
 		mHWND = InitInstance( hInstance, nCmdShow );
 		TV( mHWND );
-
-		SetFocus( mHWND );
-
-		Mouse::mHWND = mHWND;
-		Mouse::Inst()->SetPosition( CenterHandle( Mouse::mHWND ));
-		ShowCursor( FALSE );
 	}
 
 	~MainApp()
@@ -115,7 +115,13 @@ public:
 
 	int Run()
 	{
-		if( Renderer::Inst()->Startup( mHWND, Renderer::FULLSCREEN, Renderer::SCREEN_WIDTH, Renderer::SCREEN_HEIGHT ) != S_OK )
+		SetFocus( mHWND );
+
+		Mouse::mHWND = mHWND;
+		Mouse::Inst()->SetPosition( CenterHandle( Mouse::mHWND ));
+		ShowCursor( FALSE );
+
+		if( Renderer::Inst()->Startup( mHWND, Renderer::FULLSCREEN, Renderer::WINDOW_WIDTH, Renderer::WINDOW_HEIGHT ) != S_OK )
 			throw AppException( "Failed Renderer::Startup()" );
 
 		PhysicsSystem::Inst()->Startup();
@@ -124,7 +130,7 @@ public:
 		PrepareObjects();
 		PrepareFont();
 
-		Sprite::Inst()->Startup( mShader[ SHADER_SPRITE ], 100 );
+		ParticleSystem::Inst()->Startup( mShader[ SHADER_SPRITE ], 100 );
 
 		GameWorld::Inst()->Startup( "NoMap.MAP" );
 
@@ -217,20 +223,20 @@ public:
 
 		//////////////////////////////
 
-		// Create perspective camera.
+		// Create main perspective camera.
 		//
-		camera = new PerspectiveCameraComponent( mHWND );
+		camera = new PerspectiveCameraComponent( (float)Renderer::WINDOW_WIDTH, (float)Renderer::WINDOW_HEIGHT );
 		
 		transform = new TransformComponent();
-		transform->mPosition = vec3f( 0, 0, 50 );
+		transform->mPosition = Vector3f( 0, 10, 50 );
 		
 		controller = new PlayerControllerComponent();
 		
 		physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateSphere( transform->mPosition, transform->mOrientation, 1, 1 ));
-		physics->mRigidBody->setGravity( btVector3( 0, 0, 0 ));
-		physics->mRigidBody->setDamping( 0.9f, 0.9f );
-		physics->mRigidBody->setRestitution( 1 );
-		physics->mRigidBody->setAngularFactor( 0 );
+		physics->GetRigidBody()->setGravity( btVector3( 0, 0, 0 ));
+		physics->GetRigidBody()->setDamping( 0.9f, 0.9f );
+		physics->GetRigidBody()->setRestitution( 1 );
+		physics->GetRigidBody()->setAngularFactor( 0 );
 
 		obj = GameWorld::Inst()->AddGameObject( new GameObject(), "MainCamera" );
 		obj->AttachComponent( transform,	"Transform" );
@@ -239,15 +245,28 @@ public:
 		obj->AttachComponent( camera,		"Camera" );
 
 		//////////////////////////////
+
+		// Create sprite orthographic camera.
+		//
+		camera = new OrthographicCameraComponent( (float)Renderer::WINDOW_WIDTH, (float)Renderer::WINDOW_HEIGHT );
 		
+		transform = new TransformComponent();
+		transform->mPosition = Vector3f( 0, 0, 0 );
+		
+		obj = GameWorld::Inst()->AddGameObject( new GameObject(), "SpriteCamera" );
+		obj->AttachComponent( transform,	"Transform" );
+		obj->AttachComponent( camera,		"Camera" );
+		
+		//////////////////////////////
+
 		// Create a point light.
 		//
 		transform = new TransformComponent();
-		transform->mPosition = vec3f( 0, 2000, 0 );
+		transform->mPosition = Vector3f( 0, 2000, 0 );
 
 		light = new LightComponent();
-		light->mAttenuation = vec4f( 1, 1, 1, 2000 );
-		light->mColor = ColorRGBA( 1, 1, 1, 1 );
+		light->mAttenuation = Vector4f( 1, 1, 1, 2000 );
+		light->mColor		= ColorRGBA( 1, 1, 1, 1 );
 
 		obj = GameWorld::Inst()->AddGameObject( new GameObject(), "PointLight" );
 		obj->AttachComponent( transform,	"Transform" );
@@ -301,9 +320,9 @@ public:
 		// Create simple box in center of the world.
 		//
 		transform = new TransformComponent();
-		transform->mPosition	= vec3f( 9.9f, 0, 0 );
-		transform->mOrientation = quatf( 0, 0, 1, 15 ).AxisAngle();
-		transform->mScale		= vec3f( 10, 1, 25 );
+		transform->mPosition	= Vector3f( 9.9f, 0, 0 );
+		transform->mOrientation = Quatf( 0, 0, 1, 15 ).AxisAngle();
+		transform->mScale		= Vector3f( 10, 1, 25 );
 		
 		physics   = new PhysicsComponent( PhysicsSystem::Inst()->CreateBox( transform->mPosition, transform->mOrientation, transform->mScale, 0 ));
 
@@ -315,9 +334,9 @@ public:
 		////////////////////////////////
 		
 		transform = new TransformComponent();
-		transform->mPosition	= vec3f( -9.9f, 0, 0 );
-		transform->mOrientation = quatf( 0, 0, 1, -15 ).AxisAngle();
-		transform->mScale		= vec3f( 10, 1, 25 );
+		transform->mPosition	= Vector3f( -9.9f, 0, 0 );
+		transform->mOrientation = Quatf( 0, 0, 1, -15 ).AxisAngle();
+		transform->mScale		= Vector3f( 10, 1, 25 );
 		
 		physics   = new PhysicsComponent( PhysicsSystem::Inst()->CreateBox( transform->mPosition, transform->mOrientation, transform->mScale, 0 ));
 
@@ -331,44 +350,44 @@ public:
 		// Create some random objects from the mesh list.
 		//
 		char name[32];
-		int  count = 25;
+		int  count = 50;
 		for( int x = 0; x < count; ++x )
 		{
-			vec3f scale = vec3f( RandomValue( 0.25f, 1.0f ), RandomValue( 0.25f, 1.0f ), RandomValue( 0.25f, 1.0f ));
+			Vector3f scale = Vector3f( RandomValue( 0.25f, 0.5f ), RandomValue( 0.25f, 0.5f ), RandomValue( 0.25f, 0.5f ));
 			float mass  = scale.Length();
 			UINT  shape = RandomValue( 0, NUM_SHAPES + 1 );
 
 			transform = new TransformComponent();
-			transform->mPosition = vec3f( RandomValue( -20.0f, 20.0f ), 50.0f, RandomValue( -20.0f, 20.0f ));
+			transform->mPosition = Vector3f( RandomValue( -20.0f, 20.0f ), 50.0f, RandomValue( -20.0f, 20.0f ));
 			transform->mScale    = scale;
 				
 			if( shape == SHAPE_CUBE )
 			{
-				physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateBox( transform->mPosition, quatf( 0, 0, 0, 1 ), transform->mScale, mass ));
+				physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateBox( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mass ));
 			}
 			else
 			if( shape == SHAPE_CYLINDER )
 			{
-				transform->mScale.z = transform->mScale.x;
-				transform->mScale.y *= 5;
-				physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateCylinder( transform->mPosition, quatf( 0, 0, 0, 1 ), transform->mScale, mass ));
+				transform->mScale.SetZ( transform->mScale.X() );
+				transform->mScale.SetY( transform->mScale.Y() * 5 );
+				physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateCylinder( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mass ));
 			}
 			else
 			if( shape == SHAPE_SPHERE || shape == SHAPE_WIRE_SPHERE )
 			{
-				transform->mScale = vec3f( mass, mass, mass );
-				physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateSphere( transform->mPosition, quatf( 0, 0, 0, 1 ), mass, mass ));
+				transform->mScale = Vector3f( mass, mass, mass );
+				physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateSphere( transform->mPosition, Quatf( 0, 0, 0, 1 ), mass, mass ));
 			}
 			else
 			{
 				if( shape < NUM_SHAPES )
-					physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateMesh( transform->mPosition, quatf( 0, 0, 0, 1 ), transform->mScale, mesh[ shape ].get(), mass ));
+					physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateMesh( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mesh[ shape ].get(), mass ));
 				else
 				{
 					// Create a sphere for models...for now.
 					//
-					transform->mScale = vec3f( mass, mass, mass ) * 0.025f;
-					physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateSphere( transform->mPosition, quatf( 0, 0, 0, 1 ), mass * 0.6f, mass ));
+					transform->mScale = Vector3f( mass, mass, mass ) * 0.025f;
+					physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateSphere( transform->mPosition, Quatf( 0, 0, 0, 1 ), mass * 0.6f, mass ));
 				}
 			}
 
@@ -376,9 +395,7 @@ public:
 
 			obj = GameWorld::Inst()->AddGameObject( new GameObject(), name );
 			obj->AttachComponent( transform,	"Transform" );
-
-			if( physics )
-				obj->AttachComponent( physics,	"Physics" );
+			obj->AttachComponent( physics,		"Physics" );
 
 			if( shape < NUM_SHAPES )
 				obj->AttachComponent( new MeshComponent( mesh[ shape ] ),	"Mesh" );
@@ -389,7 +406,9 @@ public:
 		//////////////////////////////
 
 		for( UINT x = 0; x < NUM_SHAPES; ++x )
+		{
 			mesh[ x ].reset();
+		}
 
 		model.reset();
 
@@ -400,7 +419,7 @@ public:
 	{
 		SetDirectory( "Font" );
 		
-		// No font...yet.
+		// No font...Y()et.
 
 		SetDirectory( ".." );
 	}
@@ -419,7 +438,7 @@ public:
 
 		PhysicsSystem::Inst()->Shutdown();
 
-		Sprite::Inst()->Shutdown();
+		ParticleSystem::Inst()->Shutdown();
 
 		GameWorld::Inst()->Shutdown();
 
@@ -528,7 +547,7 @@ HWND InitInstance( HINSTANCE hInstance, int nCmdShow )
    hInst = hInstance; // Store instance handle in our global variable
 
    hWnd = CreateWindow( szWindowClass, "Sentinel", (!Renderer::FULLSCREEN) ? WS_OVERLAPPEDWINDOW : WS_POPUP,
-						0, 0, Renderer::SCREEN_WIDTH, Renderer::SCREEN_HEIGHT,
+						0, 0, Renderer::WINDOW_WIDTH, Renderer::WINDOW_HEIGHT,
 						NULL, NULL, hInstance, NULL );
 
    if( !hWnd )

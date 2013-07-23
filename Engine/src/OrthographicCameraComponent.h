@@ -8,7 +8,7 @@ namespace Sentinel
 	{
 	public:
 
-		OrthographicCameraComponent( HWND hWnd );
+		OrthographicCameraComponent( float windowWidth, float windowHeight );
 
 		void Startup();
 

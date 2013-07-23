@@ -7,16 +7,18 @@ namespace Sentinel
 {
 	class LightComponent : public GameComponent
 	{
-	public:
-
 		TransformComponent* mTransform;		// light must possess a position / direction
 
+	public:
+
 		ColorRGBA	mColor;
-		vec4f		mAttenuation;			// radius = w
+		Vector4f	mAttenuation;			// radius = w
 
 		//////////////////////////////
 
 		LightComponent();
+
+		const TransformComponent* GetTransform();
 
 		void Startup();
 

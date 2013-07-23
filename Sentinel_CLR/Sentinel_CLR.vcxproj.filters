@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Sentinel_Engine">
+      <UniqueIdentifier>{af1a52fa-5b3b-4034-97c3-6176d580ae87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sentinel_Engine\Math">
+      <UniqueIdentifier>{a76a2807-84de-4ed2-b7cd-24242569f757}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sentinel_Engine\Systems">
+      <UniqueIdentifier>{609a4140-ff20-4623-b3b1-5effc4d55525}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sentinel_Engine\Assets">
+      <UniqueIdentifier>{16fc0709-130f-4ec6-89b7-85d3f741b9f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sentinel_Engine\Utilities">
+      <UniqueIdentifier>{167d1854-883e-42af-9713-194a9688aa6f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Sentinel_CLR.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\Bufferw.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\Shaderw.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\Texturew.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\Matrix4fw.h">
+      <Filter>Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\Quatfw.h">
+      <Filter>Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\Vector2fw.h">
+      <Filter>Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\Vector3fw.h">
+      <Filter>Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\Vector4fw.h">
+      <Filter>Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\SString.h">
+      <Filter>Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\Rendererw.h">
+      <Filter>Sentinel_Engine\Systems</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Sentinel_CLR.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AssemblyInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\Bufferw.cpp">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\Shaderw.cpp">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\Texturew.cpp">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\Matrix4fw.cpp">
+      <Filter>Sentinel_Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\Quatfw.cpp">
+      <Filter>Sentinel_Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\Vector2fw.cpp">
+      <Filter>Sentinel_Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\Vector3fw.cpp">
+      <Filter>Sentinel_Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\Vector4fw.cpp">
+      <Filter>Sentinel_Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\Rendererw.cpp">
+      <Filter>Sentinel_Engine\Systems</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+    <None Include="app.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\Sentinel_Test\Debug\SCopyD.bat">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\Sentinel_Test\Release\SCopyR.bat">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="app.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

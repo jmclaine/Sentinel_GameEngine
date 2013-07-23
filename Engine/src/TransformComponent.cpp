@@ -6,7 +6,7 @@ namespace Sentinel
 	{
 		mComponentType = COMPONENT_TRANSFORM;
 
-		mScale = vec3f( 1, 1, 1 );
+		mScale = Vector3f( 1, 1, 1 );
 	}
 
 	void TransformComponent::Startup()

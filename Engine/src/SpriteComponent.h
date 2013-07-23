@@ -1,21 +1,35 @@
 #pragma once
 
+#include "Texture.h"
+#include "Util.h"
+#include "ParticleSystem.h"
+
 namespace Sentinel
 {
-	class SpriteComponent : public GameComponent
+	class SpriteComponent : public DrawableComponent
 	{
+		friend class ParticleSystem;
+
+	private:
+
+		TransformComponent*		mTransform;
+		
+		Texture*				mTexture;
+		POINT					mSpriteSize;
+		POINT					mSpriteDimension;
+
+		UINT					mNumFrames;
+
 	public:
 
-		Texture*	mTexture;
-		vec2i		mSpriteSize;
-		vec2i		mSpriteDimension;
+		CameraComponent*		mCamera;
 
-		Material	mMaterial;
+		ColorRGBA				mColor;
+		UINT					mFrame;
 
-		UINT		mFrame;
-		UINT		mNumFrames;
+		/////////////////////////////////
 
-		SpriteComponent();
+		SpriteComponent( Texture* texture, const POINT& spriteSize );
 
 		void Startup();
 

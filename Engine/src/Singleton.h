@@ -7,7 +7,7 @@ namespace Sentinel
 	template< class T >
 	class Singleton
 	{
-	public:
+	protected:
 
 		static std::unique_ptr< T > single;
 
@@ -21,46 +21,52 @@ namespace Sentinel
 		static T* Inst()
 		{
 			if( !single )
-			{
 				single = std::unique_ptr< T >( new T );
-			}
-
+			
 			return single.get();
 		}
 
 		void Destroy()
 		{
 			if( single )
-			{
-				single->release();
-			}
-
+				single->Shutdown();
+			
 			single = NULL;
 		}
 		
-		Singleton( const Singleton& );
-		void operator = ( const Singleton& );
+		//Singleton( const Singleton& );
+		//void operator = ( const Singleton& );
 	};
 
 	//////////////////////////////////////////////////////////////////////////
 
 	template< class T >
-	class SingletonAbstract : public Singleton< T >
+	class SingletonAbstract
 	{
 	protected:
 
+		static std::unique_ptr< T > single;
+
 		SingletonAbstract()
-		{}
+		{
+			single = NULL;
+		}
 
 	public:
 
 		static T* Inst( T*(*func)() )
 		{
 			if( !single )
-			{
 				single = std::unique_ptr< T >( func() );
-			}
+			
+			return single.get();
+		}
 
+		static T* Inst( T* obj )
+		{
+			if( !single )
+				single = std::unique_ptr< T >( obj );
+			
 			return single.get();
 		}
 
@@ -68,7 +74,16 @@ namespace Sentinel
 		{
 			return single.get();
 		}
+
+		void Destroy()
+		{
+			if( single )
+				single->Shutdown();
+			
+			single = NULL;
+		}
 	};
 
-	template< class T > std::unique_ptr< T > Singleton< T >::single;
+	template< class T > std::unique_ptr< T > Singleton< T >::single				= NULL;
+	template< class T > std::unique_ptr< T > SingletonAbstract< T >::single		= NULL;
 }

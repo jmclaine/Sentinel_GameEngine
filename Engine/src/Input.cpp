@@ -2,11 +2,16 @@
 
 namespace Sentinel
 {
-	vec2i CenterHandle( HWND hWnd )
+	POINT CenterHandle( HWND hWnd )
 	{
 		RECT screenRect;
 		GetWindowRect( hWnd, &screenRect );
-		return vec2i( screenRect.left + screenRect.right / 2, screenRect.top + screenRect.bottom / 2 );
+
+		POINT p;
+		p.x = screenRect.left + screenRect.right / 2;
+		p.y = screenRect.top + screenRect.bottom / 2;
+
+		return p;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -22,12 +27,12 @@ namespace Sentinel
 		}
 	}
 
-	void Mouse::SetPosition( const vec2i& pos )
+	void Mouse::SetPosition( const POINT& pos )
 	{
 		SetCursorPos( pos.x, pos.y );
 	}
 
-	vec2i Mouse::GetPosition() const
+	POINT Mouse::GetPosition() const
 	{
 		_ASSERT( mHWND );
 
@@ -40,7 +45,8 @@ namespace Sentinel
 
 		mousePos.x = (LONG)((float)(mousePos.x)*1920.0f/(float)(rc.right));
 		mousePos.y = (LONG)((float)(mousePos.y)*1080.0f/(float)(rc.bottom));
-		return vec2i( mousePos.x, mousePos.y );
+
+		return mousePos;
 	}
 
 	bool Mouse::IsDown( MouseButton button ) const

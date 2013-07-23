@@ -2,7 +2,6 @@
 
 #include <vector>
 
-#include "MathLib.h"
 #include "PhysicsSystem.h"
 #include "TransformComponent.h"
 
@@ -12,13 +11,13 @@ namespace Sentinel
 	{
 		TransformComponent*	mTransform;
 
+		btRigidBody*		mRigidBody;
+
 	public:
 
-		btRigidBody*		mRigidBody;
-		
-		//////////////////////////////
-
 		PhysicsComponent( btRigidBody* body );
+
+		btRigidBody* GetRigidBody();
 		
 		void Startup();
 

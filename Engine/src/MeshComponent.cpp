@@ -1,17 +1,13 @@
 #include <vector>
 
-#include "Renderer.h"
-#include "GameWorld.h"
-#include "Timing.h"
-#include "LightComponent.h"
 #include "MeshComponent.h"
 
 namespace Sentinel
 {
 	MeshComponent::MeshComponent( std::shared_ptr< Mesh > mesh, const Material& material )
 	{
-		mMesh = mesh;
-		mMaterial = material;
+		mMesh		= mesh;
+		mMaterial	= material;
 	}
 
 	void MeshComponent::Startup()
@@ -23,9 +19,9 @@ namespace Sentinel
 	{
 		DrawableComponent::Update();
 
-		mMesh->mMaterial = mMaterial;
+		mMesh->SetMaterial( mMaterial );
 
-		mMesh->mMatrixWorld = mMatrixTranslation * mMatrixRotation * mMatrixScale;
+		mMesh->SetWorldTransform( mMatrixTranslation * mMatrixRotation * mMatrixScale );
 
 		mMesh->Draw();
 	}

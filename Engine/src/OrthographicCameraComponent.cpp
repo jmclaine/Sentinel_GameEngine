@@ -2,9 +2,9 @@
 
 namespace Sentinel
 {
-	OrthographicCameraComponent::OrthographicCameraComponent( HWND hWnd )
+	OrthographicCameraComponent::OrthographicCameraComponent( float windowWidth, float windowHeight )
 	{
-		mHWND = hWnd;
+		mMatrixProjection.ProjectionOrthographic( windowWidth, windowHeight );
 	}
 
 	void OrthographicCameraComponent::Startup()
@@ -14,8 +14,8 @@ namespace Sentinel
 
 	void OrthographicCameraComponent::Update()
 	{
-		mMatrixView.Translate( mTransform->mPosition );
-		mMatrixProjection.ProjectionOrthographic( mHWND );
+		mMatrixView.Translate( GetTransform()->mPosition );
+		
 		mMatrixFinal = mMatrixProjection * mMatrixView;
 	}
 

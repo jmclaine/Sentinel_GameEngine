@@ -105,7 +105,7 @@ namespace Sentinel
 
 	private:
 
-		void Startup( UINT size );
+		void		Startup( UINT size );
 
 	public:
 
@@ -113,7 +113,7 @@ namespace Sentinel
 
 		static void Shutdown();
 
-		void Clear( UINT size = PACKET_SIZE );
+		void		Clear( UINT size = PACKET_SIZE );
 	};
 
 	// Sends constructed packets over the network.

@@ -9,9 +9,10 @@
 #pragma comment (lib, "glew32.lib")
 
 #include <fstream>
-#include <list>
 #include <vector>
 
+#define STBI_HEADER_FILE_ONLY
+#include "stb_image.c"
 
 #ifdef _DEBUG
 inline void HANDLE_GL_ERRORS()
@@ -459,7 +460,7 @@ namespace Sentinel
 			++mTextureLevel;
 		}
 
-		void CreateUniform( char* name )
+		void CreateUniform( const char* name )
 		{
 			GLuint id = glGetUniformLocation( mProgramID, name );
 
@@ -595,6 +596,8 @@ namespace Sentinel
 			mHWND = (HWND)hWnd;
 			mHDC  = GetDC( mHWND );
 
+			Renderer::Startup( hWnd, fullscreen, width, height );
+
 			_ASSERT( mHDC );
 
 			PIXELFORMATDESCRIPTOR pixelFormatDescriptor = {0};
@@ -689,6 +692,7 @@ namespace Sentinel
 			buffer->mType	 = type;
 			buffer->mSize	 = size;
 			buffer->mStride  = stride;
+			buffer->mCount	 = size / stride;
 
 			UINT bufferType;
 			(type == VERTEX_BUFFER) ? bufferType = GL_ARRAY_BUFFER : bufferType = GL_ELEMENT_ARRAY_BUFFER;

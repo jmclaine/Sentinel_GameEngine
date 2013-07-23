@@ -1,7 +1,6 @@
 #include "Util.h"
 #include "Shader.h"
 
-
 namespace Sentinel
 {
 	Shader::Shader()
@@ -12,12 +11,12 @@ namespace Sentinel
 	Shader::~Shader()
 	{}
 
-	std::string Shader::AttributeDecl()
+	const std::string& Shader::AttributeDecl()
 	{
 		return mAttribute;
 	}
 
-	std::string Shader::UniformDecl()
+	const std::string& Shader::UniformDecl()
 	{
 		return mUniform;
 	}

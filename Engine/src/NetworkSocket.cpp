@@ -484,7 +484,7 @@ namespace Sentinel
     #endif
 	}
 
-	const std::string NetworkSocket::Info()
+	std::string NetworkSocket::Info()
 	{
 		std::stringstream str;
 

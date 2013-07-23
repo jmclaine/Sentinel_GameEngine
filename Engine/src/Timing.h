@@ -14,20 +14,22 @@ namespace Sentinel
 {
 	class Timing : public Singleton< Timing >
 	{
-		LARGE_INTEGER mCounter;
-		LARGE_INTEGER mFrequency;
-
-		double mTimeNow;
-		double mTimeLater;
-
-		float  mDeltaTime;
-
 	public:
 
 		static const double DESIRED_FRAME_RATE;
 		static const double INVERSE_FRAME_RATE;
 
-		////////////////////////////////////////////
+	private:
+
+		LARGE_INTEGER	mCounter;
+		LARGE_INTEGER	mFrequency;
+
+		double			mTimeNow;
+		double			mTimeLater;
+
+		float			mDeltaTime;
+
+	public:
 
 		Timing();
 		

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "MathLib.h"
 #include "GameComponent.h"
+#include "Vector3f.h"
+#include "Quatf.h"
 
 namespace Sentinel
 {
@@ -11,9 +12,9 @@ namespace Sentinel
 	{
 	public:
 
-		vec3f mPosition;
-		quatf mOrientation;
-		vec3f mScale;
+		Vector3f	mPosition;
+		Quatf		mOrientation;
+		Vector3f	mScale;
 
 		//////////////////////////////
 

@@ -58,6 +58,9 @@
     <Filter Include="Sentinel_Engine\Systems">
       <UniqueIdentifier>{1f0d00a8-046c-41cb-976e-118efc911668}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sentinel_Engine\Math">
+      <UniqueIdentifier>{716cb6ac-7bd6-4800-a008-3adedc75b1e4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="small.ico">
@@ -106,10 +109,13 @@
     <None Include="Shaders\texture.fx">
       <Filter>Source Files\Shaders\DirectX</Filter>
     </None>
+    <None Include="Shaders\texture.vsh">
+      <Filter>Source Files\Shaders\OpenGL</Filter>
+    </None>
     <None Include="config.xml">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="Shaders\texture.vsh">
+    <None Include="Shaders\texture.psh">
       <Filter>Source Files\Shaders\OpenGL</Filter>
     </None>
   </ItemGroup>
@@ -138,29 +144,14 @@
     <ClInclude Include="..\..\Engine\src\GameWorld.h">
       <Filter>Sentinel_Engine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Engine\src\MathLib.h">
-      <Filter>Sentinel_Engine\Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Engine\src\PhysicsComponent.h">
       <Filter>Sentinel_Engine\Components\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\Shader.h">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\Texture.h">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\Singleton.h">
-      <Filter>Sentinel_Engine\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Engine\src\Timing.h">
       <Filter>Sentinel_Engine\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Engine\src\TransformComponent.h">
       <Filter>Sentinel_Engine\Components\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\Util.h">
-      <Filter>Sentinel_Engine\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Engine\src\Input.h">
       <Filter>Sentinel_Engine\Core</Filter>
@@ -198,9 +189,6 @@
     <ClInclude Include="..\..\Engine\src\SpriteComponent.h">
       <Filter>Sentinel_Engine\Components\Drawables</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Engine\src\Sprite.h">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Engine\src\LightComponent.h">
       <Filter>Sentinel_Engine\Components\Core</Filter>
     </ClInclude>
@@ -216,17 +204,11 @@
     <ClInclude Include="..\..\Engine\src\AIControllerComponent.h">
       <Filter>Sentinel_Engine\Components\Controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Engine\src\Renderer.h">
-      <Filter>Sentinel_Engine\Systems</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Engine\src\PhysicsSystem.h">
       <Filter>Sentinel_Engine\Systems</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Engine\tinyxml\tinyxml.h">
-      <Filter>Sentinel_Engine\Script</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\tinyxml\tinystr.h">
-      <Filter>Sentinel_Engine\Script</Filter>
+    <ClInclude Include="..\..\Engine\src\ParticleSystem.h">
+      <Filter>Sentinel_Engine\Systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -245,20 +227,11 @@
     <ClCompile Include="..\..\Engine\src\PhysicsComponent.cpp">
       <Filter>Sentinel_Engine\Components\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\src\Shader.cpp">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\stb_image.c">
-      <Filter>Sentinel_Engine\Utilities</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Engine\src\Timing.cpp">
       <Filter>Sentinel_Engine\Utilities</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Engine\src\TransformComponent.cpp">
       <Filter>Sentinel_Engine\Components\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\Util.cpp">
-      <Filter>Sentinel_Engine\Utilities</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Engine\src\Input.cpp">
       <Filter>Sentinel_Engine\Core</Filter>
@@ -299,9 +272,6 @@
     <ClCompile Include="..\..\Engine\src\LightComponent.cpp">
       <Filter>Sentinel_Engine\Components\Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\src\Sprite.cpp">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Engine\src\OrthographicCameraComponent.cpp">
       <Filter>Sentinel_Engine\Components\Core</Filter>
     </ClCompile>
@@ -311,29 +281,17 @@
     <ClCompile Include="..\..\Engine\src\PlayerControllerComponent.cpp">
       <Filter>Sentinel_Engine\Components\Controllers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\src\Renderer.cpp">
-      <Filter>Sentinel_Engine\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\RendererDX.cpp">
-      <Filter>Sentinel_Engine\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\RendererGL.cpp">
-      <Filter>Sentinel_Engine\Systems</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Engine\src\PhysicsSystem.cpp">
       <Filter>Sentinel_Engine\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\tinyxml\tinyxml.cpp">
-      <Filter>Sentinel_Engine\Script</Filter>
+    <ClCompile Include="..\..\Engine\src\SpriteComponent.cpp">
+      <Filter>Sentinel_Engine\Components\Drawables</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\tinyxml\tinystr.cpp">
-      <Filter>Sentinel_Engine\Script</Filter>
+    <ClCompile Include="..\..\Engine\src\ParticleSystem.cpp">
+      <Filter>Sentinel_Engine\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\tinyxml\tinyxmlerror.cpp">
-      <Filter>Sentinel_Engine\Script</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\tinyxml\tinyxmlparser.cpp">
-      <Filter>Sentinel_Engine\Script</Filter>
+    <ClCompile Include="..\..\Engine\src\stb_image.c">
+      <Filter>Sentinel_Engine\Utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

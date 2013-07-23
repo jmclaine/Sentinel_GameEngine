@@ -21,18 +21,26 @@ namespace Sentinel
 		switch( component->Type() )
 		{
 			case COMPONENT_TRANSFORM:
+				_ASSERT( !mTransform );
+
 				mTransform = (TransformComponent*)component;
 				return component;
 
 			case COMPONENT_CONTROLLER:
+				_ASSERT( !mController );
+
 				mController = (ControllerComponent*)component;
 				return component;
 
 			case COMPONENT_PHYSICS:
+				_ASSERT( !mPhysics );
+				
 				mPhysics = (PhysicsComponent*)component;
 				return component;
 
 			case COMPONENT_DRAWABLE:
+				_ASSERT( !mDrawable );
+
 				mDrawable = (DrawableComponent*)component;
 				return component;
 
@@ -47,6 +55,7 @@ namespace Sentinel
 	{\
 		obj->Shutdown();\
 		delete obj;\
+		obj = NULL;\
 	}\
 	return;
 
@@ -74,9 +83,10 @@ namespace Sentinel
 					{
 						mComponent[ x ]->Shutdown();
 						delete mComponent[ x ];
+						mComponent.erase( mComponent.begin() + x );
+						return;
 					}
 				}
-				return;
 		}
 	}
 

@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Sentinel_Engine">
+      <UniqueIdentifier>{5fd69101-77e5-489f-b010-45531f94433a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Sentinel_Engine\Systems">
+      <UniqueIdentifier>{28c0d9d3-4f3f-4ebd-9768-62ee33fec75c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Sentinel_Engine\Script">
+      <UniqueIdentifier>{9494a011-9f6f-43c7-9b9a-7d233cda450f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Sentinel_Engine\Utilities">
+      <UniqueIdentifier>{bfbad805-27f3-4734-b80a-261be0a396a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Sentinel_Engine\Assets">
+      <UniqueIdentifier>{8f3e59cb-0ab3-4561-9d4a-92c31731bb09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Sentinel_Engine\Math">
+      <UniqueIdentifier>{08402c7d-d3db-4594-9806-c640f3c4316c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Engine\src\Common.h">
+      <Filter>Source Files\Sentinel_Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Buffer.h">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Texture.h">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Shader.h">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Vector4f.h">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\MathCommon.h">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Matrix4f.h">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Quatf.h">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Shape.h">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Vector2f.h">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Vector3f.h">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Util.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Renderer.h">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\tinyxml\tinystr.h">
+      <Filter>Source Files\Sentinel_Engine\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\tinyxml\tinyxml.h">
+      <Filter>Source Files\Sentinel_Engine\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Color.h">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Engine\src\Shader.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Texture.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\MathCommon.cpp">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Matrix4f.cpp">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Quatf.cpp">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Shape.cpp">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Vector2f.cpp">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Vector3f.cpp">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Vector4f.cpp">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Util.cpp">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\stb_image.c">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Renderer.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\RendererGL.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\RendererDX.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\tinyxml\tinystr.cpp">
+      <Filter>Source Files\Sentinel_Engine\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\tinyxml\tinyxmlparser.cpp">
+      <Filter>Source Files\Sentinel_Engine\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\tinyxml\tinyxml.cpp">
+      <Filter>Source Files\Sentinel_Engine\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\tinyxml\tinyxmlerror.cpp">
+      <Filter>Source Files\Sentinel_Engine\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Color.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -115,19 +115,19 @@ namespace Sentinel
 		// Must use NETWORK_UDP or NETWORK_TCP.
 		// Defaults to Blocking; otherwise use | NETWORK_NONBLOCKING flag.
 		//
-		bool Startup( WORD flags );
-		bool Startup( WORD flags, int port );							// Server
-		bool Startup( WORD flags, const char* ipAddress, int port );	// Client
+		bool		Startup( WORD flags );
+		bool		Startup( WORD flags, int port );						// Server
+		bool		Startup( WORD flags, const char* ipAddress, int port );	// Client
 
-		void Update();
+		void		Update();
 
-		void Shutdown();
+		void		Shutdown();
 
 		///////////////////////////////////////
 
-		bool Send( char* data, int size, int index = -1 );
-		bool Recv( char* data, int size );
+		bool		Send( char* data, int size, int index = -1 );
+		bool		Recv( char* data, int size );
 
-		const std::string Info();
+		std::string Info();
 	};
 };

@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "MathCommon.h"
+
 namespace Sentinel
 {
 	// p = float precision (0-32)

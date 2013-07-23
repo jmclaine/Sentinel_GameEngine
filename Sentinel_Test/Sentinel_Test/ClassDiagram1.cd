@@ -672,7 +672,7 @@
       <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\FixedPoint.h</FileName>
     </TypeIdentifier>
   </Typedef>
-  <Typedef Name="Sentinel::vec2f" Collapsed="true">
+  <Typedef Name="Sentinel::Vector2f" Collapsed="true">
     <Position X="9.5" Y="21.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
@@ -686,7 +686,7 @@
       <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
     </TypeIdentifier>
   </Typedef>
-  <Typedef Name="Sentinel::vec2i" Collapsed="true">
+  <Typedef Name="Sentinel::POINT" Collapsed="true">
     <Position X="3.5" Y="19.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
@@ -700,7 +700,7 @@
       <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
     </TypeIdentifier>
   </Typedef>
-  <Typedef Name="Sentinel::vec3f" Collapsed="true">
+  <Typedef Name="Sentinel::Vector3f" Collapsed="true">
     <Position X="11.5" Y="19.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
@@ -728,7 +728,7 @@
       <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
     </TypeIdentifier>
   </Typedef>
-  <Typedef Name="Sentinel::vec4f" Collapsed="true">
+  <Typedef Name="Sentinel::Vector4f" Collapsed="true">
     <Position X="31" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
@@ -770,7 +770,7 @@
       <FileName>C:\Users\SMUGHC17\Documents\school work\Software\ComponentEngine\Engine\src\MathLib.h</FileName>
     </TypeIdentifier>
   </Typedef>
-  <Typedef Name="Sentinel::mat4f" Collapsed="true">
+  <Typedef Name="Sentinel::Matrix4f" Collapsed="true">
     <Position X="19.5" Y="16" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>

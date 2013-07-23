@@ -60,7 +60,6 @@ namespace Sentinel
 		mShape.clear();
 
 		SAFE_DELETE( mWorld );
-
 		SAFE_DELETE( mDispatcher );
 		SAFE_DELETE( mConfig );
 		SAFE_DELETE( mCache );
@@ -69,49 +68,51 @@ namespace Sentinel
 
 #define CREATE_OBJECT()\
 	return CreateObject( shape, \
-						 btVector3( position.x, position.y, position.z ), \
-						 btQuaternion( orientation.x, orientation.y, orientation.z, orientation.w ), \
+						 btVector3( position.X(), position.Y(), position.Z() ), \
+						 btQuaternion( orientation.X(), orientation.Y(), orientation.Z(), orientation.W() ), \
 						 mass );
 
-	btRigidBody* PhysicsSystem::CreateSphere( const vec3f& position, const quatf& orientation, float radius, float mass )
+	btRigidBody* PhysicsSystem::CreateSphere( const Vector3f& position, const Quatf& orientation, float radius, float mass )
 	{
 		btCollisionShape* shape = new btSphereShape( btScalar( radius ));
 
 		CREATE_OBJECT();
 	}
 
-	btRigidBody* PhysicsSystem::CreateBox( const vec3f& position, const quatf& orientation, const vec3f& scale, float mass )
+	btRigidBody* PhysicsSystem::CreateBox( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, float mass )
 	{
-		btCollisionShape* shape = new btBoxShape( btVector3( scale.x, scale.y, scale.z ));
+		btCollisionShape* shape = new btBoxShape( btVector3( scale.X(), scale.Y(), scale.Z() ));
 
 		CREATE_OBJECT();
 	}
 
-	btRigidBody* PhysicsSystem::CreateCylinder( const vec3f& position, const quatf& orientation, const vec3f& scale, float mass )
+	btRigidBody* PhysicsSystem::CreateCylinder( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, float mass )
 	{
-		// dimension.z is unused
-		btCollisionShape* shape = new btCylinderShape( btVector3( scale.x, scale.y*0.5f, scale.x ));
+		// scale.Z() is unused
+		btCollisionShape* shape = new btCylinderShape( btVector3( scale.X(), scale.Y()*0.5f, scale.X() ));
 
 		CREATE_OBJECT();
 	}
 
-	btRigidBody* PhysicsSystem::CreateMesh( const vec3f& position, const quatf& orientation, const vec3f& scale, Mesh* mesh, float mass )
+	btRigidBody* PhysicsSystem::CreateMesh( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, Mesh* mesh, float mass )
 	{
-		Buffer* vbo = mesh->mVBO;
-		Buffer* ibo = mesh->mIBO;
-				
-		UINT   count		= mesh->NumVertices();
+		Buffer* vbo = mesh->GetVBO();
+		Buffer* ibo = mesh->GetIBO();
+		
+		// Store only the vertex positions.
+		//
+		UINT   count		= vbo->mCount;
 		UCHAR* vboData		= (UCHAR*)vbo->Lock();
-		UCHAR* vboCopy		= new UCHAR[ count * sizeof(vec3f) ];
+		UCHAR* vboCopy		= new UCHAR[ count * sizeof(Vector3f) ];
 		UCHAR* vboCopyData	= vboCopy;
 
 		for( UINT x = 0; x < count; ++x )
 		{
-			// Must be scaled down a little to compensate for the numerical error.
+			// Must be scaled down a little to compensate for bullet shape object numerical error.
 			//
-			*(vec3f*)vboCopyData = *(vec3f*)vboData * 0.935f;
+			*(Vector3f*)vboCopyData = *(Vector3f*)vboData * 0.935f;
 
-			vboCopyData += sizeof(vec3f);
+			vboCopyData += sizeof(Vector3f);
 			vboData += vbo->mStride;
 		}
 		vbo->Unlock();
@@ -122,19 +123,19 @@ namespace Sentinel
 
 		btIndexedMesh iMesh;
 		iMesh.m_vertexType			= PHY_FLOAT;
-		iMesh.m_numVertices			= mesh->NumVertices();
+		iMesh.m_numVertices			= vbo->mCount;
 		iMesh.m_vertexBase			= vboCopy;
-		iMesh.m_vertexStride		= sizeof(vec3f);
+		iMesh.m_vertexStride		= sizeof(Vector3f);
 
 		iMesh.m_indexType			= PHY_INTEGER;
-		iMesh.m_numTriangles		= mesh->NumIndices();
+		iMesh.m_numTriangles		= ibo->mCount;
 		iMesh.m_triangleIndexBase	= iboCopy;
 		iMesh.m_triangleIndexStride = ibo->mStride;
 
 		btTriangleIndexVertexArray* tiva = new btTriangleIndexVertexArray();
 
 		tiva->addIndexedMesh( iMesh, PHY_UCHAR );
-		tiva->setScaling( btVector3( scale.x, scale.y, scale.z ));
+		tiva->setScaling( btVector3( scale.X(), scale.Y(), scale.Z() ));
 
 		mShapeData.push_back( tiva );
 

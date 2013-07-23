@@ -1,36 +1,25 @@
 #pragma once
 
-#include <string>
-
-typedef unsigned int UINT;
+#include "Common.h"
 
 namespace Sentinel
 {
-	class Texture
+	class SENTINEL_DLL Texture
 	{
 	public:
 
-		std::string	mFilename;
-		UINT		mWidth;
-		UINT		mHeight;
-		UINT		mID;
+		std::string		mFilename;
+		UINT			mWidth;
+		UINT			mHeight;
+		UINT			mID;
 
 		//////////////////////////////
 
-		Texture() {}
-		Texture( std::string filename, UINT width, UINT height, UINT id ) :
-			mFilename( filename ),
-			mWidth( width ),
-			mHeight( height ),
-			mID( id )
-		{}
+		Texture();
+		Texture( const std::string& filename, UINT width, UINT height, UINT id );
 
-		virtual ~Texture()
-		{
-			Release();
-		}
+		virtual ~Texture();
 
-		virtual void Release()
-		{}
+		virtual void Release();
 	};
 }

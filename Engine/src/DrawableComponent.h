@@ -9,21 +9,29 @@ namespace Sentinel
 	{
 	protected:
 
-		static mat4f			mMatrixTranslation;
-		static mat4f			mMatrixScale;
-		static mat4f			mMatrixRotation;
+		// Matrices to calculate the final world matrix
+		// without duplicating matrices for every object.
+		//
+		static Matrix4f			mMatrixTranslation;
+		static Matrix4f			mMatrixScale;
+		static Matrix4f			mMatrixRotation;
+
+		//////////////////////////////////////
 
 		TransformComponent*		mTransform;
+
 		Material				mMaterial;
 
-	public:
+		//////////////////////////////////////
 
 		DrawableComponent();
 
-		void Startup();
+	public:
 
-		void Update();
+		virtual void Startup();
 
-		void Shutdown();
+		virtual void Update();
+
+		virtual void Shutdown();
 	};
 }

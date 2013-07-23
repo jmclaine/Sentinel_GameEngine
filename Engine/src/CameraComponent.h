@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MathLib.h"
+#include "Matrix4f.h"
 #include "TransformComponent.h"
 
 #ifndef WIN32
@@ -20,15 +20,13 @@ namespace Sentinel
 {
 	class CameraComponent : public GameComponent
 	{
-	public:
-
 		TransformComponent* mTransform;
 
-		HWND		mHWND;
-		
-		mat4f		mMatrixView;
-		mat4f		mMatrixProjection;
-		mat4f		mMatrixFinal;
+	public:
+
+		Matrix4f	mMatrixView;
+		Matrix4f	mMatrixProjection;
+		Matrix4f	mMatrixFinal;
 
 	protected:
 
@@ -36,10 +34,12 @@ namespace Sentinel
 
 	public:
 
-		void Startup();
+		const TransformComponent* GetTransform();
 
-		void Update();
+		virtual void Startup();
 
-		void Shutdown();
+		virtual void Update();
+
+		virtual void Shutdown();
 	};
 }

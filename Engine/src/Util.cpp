@@ -80,18 +80,18 @@ namespace Sentinel
 		str[ length ] = 0;
 	}
 
-	vec2f ReadPoint2( std::ifstream& file, bool is32bit )
+	Vector2f ReadPoint2( std::ifstream& file, bool is32bit )
 	{
 		float data0 = ReadFloat( file, is32bit );
 		float data1 = ReadFloat( file, is32bit );
-		return vec2f( data0, data1 );
+		return Vector2f( data0, data1 );
 	}
 
-	vec3f ReadPoint3( std::ifstream& file, bool is32bit )
+	Vector3f ReadPoint3( std::ifstream& file, bool is32bit )
 	{
 		float data0 = ReadFloat( file, is32bit );
 		float data1 = ReadFloat( file, is32bit );
 		float data2 = ReadFloat( file, is32bit );
-		return vec3f( data0, data1, data2 );
+		return Vector3f( data0, data1, data2 );
 	}
 }

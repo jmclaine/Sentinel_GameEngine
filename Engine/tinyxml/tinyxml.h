@@ -1496,7 +1496,7 @@ public:
 		@verbatim
 		TiXmlDocument doc;
 		doc.SetTabSize( 8 );
-		doc.Load( "myfile.xml" );
+		doc.Load( "myfile.X()ml" );
 		@endverbatim
 
 		@sa Row, Column

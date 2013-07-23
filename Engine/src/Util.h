@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Common.h"
+
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
@@ -28,7 +30,10 @@
 	#include <windows.h>
 #endif
 
-#include "MathLib.h"
+#include "Vector2f.h"
+#include "Vector3f.h"
+#include "Vector4f.h"
+#include "Color.h"
 
 namespace Sentinel
 {
@@ -125,33 +130,33 @@ namespace Sentinel
 
 	class AppException : public std::exception
 	{
-		std::string mMessage;
+		const char* mMessage;
 
 	public:
 
-		AppException( std::string msg )
+		AppException( const std::string& msg )
 		{
-			mMessage = msg;
+			mMessage = msg.c_str();
 		}
 
 		const char* what() const throw()
 		{
-			return mMessage.c_str();
+			return mMessage;
 		}
 	};
 
 	////////////////////////////////////////////////////////////////////
 
-	void SetDirectory( const char* dest );
+	SENTINEL_DLL void		SetDirectory( const char* dest );
 
-	bool FileToBuffer( const char *filename, char*& buf );
+	SENTINEL_DLL bool		FileToBuffer( const char *filename, char*& buf );
 
-	BYTE  ReadByte(   std::ifstream& file );
-	int	  ReadInt(    std::ifstream& file, bool is32bit = false );
-	float ReadFloat(  std::ifstream& file, bool is32bit = false );
-	void  ReadString( std::ifstream& file, char* str, int length );
-	vec2f ReadPoint2( std::ifstream& file, bool is32bit = false );
-	vec3f ReadPoint3( std::ifstream& file, bool is32bit = false );
+	SENTINEL_DLL BYTE		ReadByte(   std::ifstream& file );
+	SENTINEL_DLL int		ReadInt(    std::ifstream& file, bool is32bit = false );
+	SENTINEL_DLL float		ReadFloat(  std::ifstream& file, bool is32bit = false );
+	SENTINEL_DLL void		ReadString( std::ifstream& file, char* str, int length );
+	SENTINEL_DLL Vector2f	ReadPoint2( std::ifstream& file, bool is32bit = false );
+	SENTINEL_DLL Vector3f	ReadPoint3( std::ifstream& file, bool is32bit = false );
 
 	template< typename Real >
 	inline void CopyArray( Real& dest, const Real& src, UINT size )
@@ -187,11 +192,19 @@ namespace Sentinel
 		return minValue + (maxValue - minValue) * (rand() / static_cast< double >( RAND_MAX ));
 	}
 
-	inline vec3f RandomValue( const vec3f& minValue, const vec3f& maxValue )
+	inline Vector3f RandomValue( const Vector3f& minValue, const Vector3f& maxValue )
 	{
-		return vec3f( RandomValue( minValue.x, maxValue.x ), \
-					  RandomValue( minValue.y, maxValue.y ), \
-					  RandomValue( minValue.z, maxValue.z ));
+		return Vector3f( RandomValue( minValue.X(), maxValue.X() ), \
+						 RandomValue( minValue.Y(), maxValue.Y() ), \
+						 RandomValue( minValue.Z(), maxValue.Z() ));
+	}
+
+	inline ColorRGBA RandomValue( const ColorRGBA& minColor, const ColorRGBA& maxColor )
+	{
+		return ColorRGBA( RandomValue( minColor.R(), maxColor.R() ), \
+						  RandomValue( minColor.G(), maxColor.G() ), \
+						  RandomValue( minColor.B(), maxColor.B() ), \
+						  RandomValue( minColor.A(), maxColor.A() ));
 	}
 
 	////////////////////////////////////////////////////////////////////
@@ -217,8 +230,7 @@ namespace Sentinel
 	template< typename T, typename AlphaT >
 	inline T lerp( const T& start, const T& end, AlphaT alpha )
 	{
-		vec3f v = end - start;
-		return start + v * alpha;
+		return start + end.Sub( start ) * alpha;
 	}
 
 	inline bool IsPowerOfTwo( UINT x )
@@ -234,7 +246,7 @@ namespace Sentinel
 	template< typename Real >
 	void NUMtoBYTES( UCHAR* data, Real value )
 	{
-		unsigned intVal = *(reinterpret_cast< unsigned* >( &value ));
+		UINTVal = *(reinterpret_cast< unsigned* >( &value ));
 
 		for( unsigned i = 0; i < 4; ++i )
 		{
@@ -256,78 +268,6 @@ namespace Sentinel
 
 		type = *(reinterpret_cast< Real* >( &result ));
 	}
-
-	////////////////////////////////////////////////////////////////////
-
-	typedef vec4f ColorRGBA;
-	
-	struct ColorRGB : public ColorRGBA
-	{
-		ColorRGB( float red = 1.0f, float green = 1.0f, float blue = 1.0f )
-		{
-			x = red;
-			y = green;
-			z = blue;
-			w = 1.0f;
-		}
-
-		ColorRGB( const vec3f& v )
-		{
-			x = v.x;
-			y = v.y;
-			z = v.z;
-			w = 1.0f;
-		}
-	};
-
-	inline UINT COLORtoUINT( float red, float green, float blue, float alpha = 1 )
-	{
-		return \
-			((UINT)(alpha * 255.0f) << 24) |
-			((UINT)(blue  * 255.0f) << 16) |
-			((UINT)(green * 255.0f) << 8)  |
-			((UINT)(red   * 255.0f));
-	}
-
-	inline UINT COLORtoUINT( const ColorRGBA& color )
-	{
-		return COLORtoUINT( color.x, color.y, color.z, color.w );
-	}
-
-	inline UINT UCHARtoUINT( UCHAR red, UCHAR green, UCHAR blue, UCHAR alpha = 1 )
-	{
-		return \
-			((UINT)(alpha)	<< 24) |
-			((UINT)(blue)	<< 16) |
-			((UINT)(green)	<< 8)  |
-			((UINT)(red));
-	}
-
-	inline ColorRGBA RandomValue( const ColorRGBA& minColor, const ColorRGBA& maxColor )
-	{
-		return ColorRGBA( RandomValue( minColor.x, maxColor.x ), \
-						  RandomValue( minColor.y, maxColor.y ), \
-						  RandomValue( minColor.z, maxColor.z ), \
-						  RandomValue( minColor.w, maxColor.w ));
-	}
-
-	////////////////////////////////////////////////////////////////////
-
-	class Material
-	{
-	public:
-
-		ColorRGBA mAmbient;
-		ColorRGBA mDiffuse;
-		ColorRGBA mSpecular;
-		float	  mSpecularComponent;
-
-		Material( const ColorRGBA& ambient  = ColorRGBA( 0.2f, 0.2f, 0.2f, 1.0f ),
-				  const ColorRGBA& diffuse  = ColorRGBA( 0.6f, 0.6f, 0.6f, 1.0f ),
-				  const ColorRGBA& specular = ColorRGBA( 0.2f, 0.2f, 0.2f, 1.0f ),
-				  float spec_comp = 32.0f ) :
-			mAmbient( ambient ), mDiffuse( diffuse ), mSpecular( specular ), mSpecularComponent( spec_comp ) {}
-	};
 
 	////////////////////////////////////////////////////////////////////
 

@@ -1,19 +1,13 @@
-#include "PhysicsSystem.h"
 #include "GameWorld.h"
-#include "Util.h"
 
 namespace Sentinel
 {
 	GameWorld::GameWorld()
-	{
-		mCamera = NULL;
-	}
+	{}
 
 	void GameWorld::Startup( const std::string& mapName )
 	{
 		// No map file format to load...yet.
-		
-		// For now, set the size of the Quadtree to some default value.
 
 		TRAVERSE_VECTOR( x, mGameObject )
 		{
@@ -21,17 +15,19 @@ namespace Sentinel
 
 			obj->Startup();
 
-			if( !mCamera )
-			{
-				CameraComponent* camera;
-				camera = (CameraComponent*)obj->FindComponent( COMPONENT_CAMERA );
-
-				if( camera )
-					mCamera = camera;
-			}
+			CameraComponent* camera = (CameraComponent*)obj->FindComponent( COMPONENT_CAMERA );
+		
+			if( camera )
+				mCamera.push_back( camera );
 			
-			obj->FindComponent( COMPONENT_LIGHT, mLight );
+			LightComponent* light = (LightComponent*)obj->FindComponent( COMPONENT_LIGHT );
+			
+			if( light )
+				mLight.push_back( light );
 		}
+
+		if( !mCamera.empty() )
+			mCurrentCamera = mCamera[ 0 ];	// assume first camera created is Main Camera
 	}
 
 	void GameWorld::Update()
@@ -59,11 +55,28 @@ namespace Sentinel
 			mGameObject[ x ]->UpdateComponents();
 		}
 
-		// Update and Render Meshes.
+		// Meshes may contain alpha values.
+		// Put them in order.
 		//
+		// Use distance from camera to center.
+		// This will not be 100% accurate, but is faster than trying to be perfect.
+		//
+		Vector3f camPos = mCurrentCamera->GetTransform()->mPosition;
+		
+		mAlphaOrder.clear();
 		TRAVERSE_VECTOR( x, mGameObject )
 		{
-			mGameObject[ x ]->UpdateDrawable();
+			TransformComponent* transform = (TransformComponent*)mGameObject[ x ]->FindComponent( COMPONENT_TRANSFORM );
+			
+			if( transform )
+				mAlphaOrder.insert( std::pair< float, GameObject* >( -(camPos - transform->mPosition).LengthSquared(), mGameObject[ x ] ));
+		}
+
+		// Update and Render Meshes.
+		//
+		TRAVERSE_LIST( it, mAlphaOrder )
+		{
+			(*it).second->UpdateDrawable();
 		}
 	}
 

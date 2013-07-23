@@ -4,8 +4,8 @@ namespace Sentinel
 {
 	ModelComponent::ModelComponent( std::shared_ptr< Model > model, const Material& material )
 	{
-		mModel = model;
-		mMaterial = material;
+		mModel		= model;
+		mMaterial	= material;
 	}
 
 	void ModelComponent::Startup()
@@ -19,7 +19,7 @@ namespace Sentinel
 
 		mModel->SetMaterial( mMaterial );
 
-		mModel->mMatrixWorld = mMatrixTranslation * mMatrixScale * mMatrixRotation;
+		mModel->SetWorldTransform( mMatrixTranslation * mMatrixScale * mMatrixRotation );
 
 		mModel->Draw();
 	}

@@ -4,9 +4,49 @@
 
 namespace Sentinel
 {
+	void Mesh::SetWorldTransform( const Matrix4f& world )
+	{
+		mMatrixWorld = world;
+	}
+
+	void Mesh::SetShadowTransform( const Matrix4f& shadow )
+	{
+		mMatrixShadow = shadow;
+	}
+
+	void Mesh::SetTextureScale( const Vector4f& scale )
+	{
+		mTextureScale = scale;
+	}
+
+	void Mesh::SetShader( Shader* shader )
+	{
+		mShader = shader;
+	}
+
+	void Mesh::SetMaterial( const Material& material )
+	{
+		mMaterial = material;
+	}
+
+	void Mesh::SetTexture( Texture* texture, TextureType type )
+	{
+		mTexture[ type ] = texture;
+	}
+
+	Buffer*	Mesh::GetVBO()
+	{
+		return mVBO;
+	}
+
+	Buffer* Mesh::GetIBO()
+	{
+		return mIBO;
+	}
+
 	Mesh::Mesh()
 	{
-		mPrimitive   = TRIANGLE_LIST;
+		mPrimitive = TRIANGLE_LIST;
 
 		for( UINT i = 0; i < NUM_TEXTURES; ++i )
 		{
@@ -16,37 +56,21 @@ namespace Sentinel
 		mVBO = NULL;
 		mIBO = NULL;
 
-		mNumVertices = 0;
-		mNumIndices  = 0;
-
 		mMatrixWorld.Identity();
 		mMatrixShadow.Identity();
 		
-		mTextureScale = vec4f( 0, 0, 1, 1 );
+		mTextureScale = Vector4f( 0, 0, 1, 1 );
 	}
 
 	Mesh::~Mesh()
 	{
 		SAFE_RELEASE_DELETE( mVBO );
-		mNumVertices = 0;
-		
 		SAFE_RELEASE_DELETE( mIBO );
-		mNumIndices = 0;
-	}
-
-	UINT Mesh::NumVertices()
-	{
-		return mNumVertices;
-	}
-
-	UINT Mesh::NumIndices()
-	{
-		return mNumIndices;
 	}
 
 	void Mesh::Draw( UINT count )
 	{
-		_ASSERT( GameWorld::Inst()->mCamera != NULL );
+		_ASSERT( GameWorld::Inst()->mCurrentCamera != NULL );
 
 		if( count == 0 )
 			return;
@@ -62,7 +86,7 @@ namespace Sentinel
 			UINT texCount     = 0;
 			UINT lightCount   = 0;
 			UINT uniformIndex = 0;
-			vec3f pos;
+			Vector3f pos;
 
 			std::string uniform = mShader->UniformDecl();
 			
@@ -73,13 +97,13 @@ namespace Sentinel
 					// Model-View-Projection Matrix.
 					//
 					case 'P':
-						mShader->SetMatrix( uniformIndex, (GameWorld::Inst()->mCamera->mMatrixFinal * mMatrixWorld).m );
+						mShader->SetMatrix( uniformIndex, (GameWorld::Inst()->mCurrentCamera->mMatrixFinal * mMatrixWorld).Ptr() );
 						break;
 
 					// World Matrix.
 					//
 					case 'p':
-						mShader->SetMatrix( uniformIndex, mMatrixWorld.m );
+						mShader->SetMatrix( uniformIndex, mMatrixWorld.Ptr() );
 						break;
 
 					// Textures.
@@ -98,7 +122,7 @@ namespace Sentinel
 					// Camera Position.
 					//
 					case 'V':
-						pos = GameWorld::Inst()->mCamera->mTransform->mPosition;
+						pos = GameWorld::Inst()->mCurrentCamera->GetTransform()->mPosition;
 						
 						mShader->SetFloat3( uniformIndex, pos.Ptr() );
 						break;
@@ -106,7 +130,7 @@ namespace Sentinel
 					// Light Position.
 					//
 					case 'L':
-						pos = GameWorld::Inst()->mLight[ lightCount ]->mTransform->mPosition;
+						pos = GameWorld::Inst()->mLight[ lightCount ]->GetTransform()->mPosition;
 						
 						mShader->SetFloat3( uniformIndex, pos.Ptr() );
 						++uniformIndex;
@@ -137,7 +161,7 @@ namespace Sentinel
 					// Shadows.
 					//
 					case 'S':
-						mShader->SetMatrix( uniformIndex, (mMatrixShadow * mMatrixWorld).m );
+						mShader->SetMatrix( uniformIndex, (mMatrixShadow * mMatrixWorld).Ptr() );
 						++uniformIndex;
 
 						mShader->SetFloat( uniformIndex, 0.0f );
@@ -159,12 +183,12 @@ namespace Sentinel
 					//
 					case 'A':
 						{
-						vec2f pixelSize( 1.0f / Renderer::SCREEN_WIDTH, 1.0f / Renderer::SCREEN_HEIGHT );
+						Vector2f pixelSize( 1.0f / Renderer::WINDOW_WIDTH, 1.0f / Renderer::WINDOW_HEIGHT );
 
-						mShader->SetMatrix( uniformIndex, (GameWorld::Inst()->mCamera->mMatrixProjection.Inverse()).m );
+						mShader->SetMatrix( uniformIndex, (GameWorld::Inst()->mCurrentCamera->mMatrixProjection.Inverse()).Ptr() );
 						++uniformIndex;
 
-						mShader->SetMatrix( uniformIndex, GameWorld::Inst()->mCamera->mMatrixView.m );
+						mShader->SetMatrix( uniformIndex, GameWorld::Inst()->mCurrentCamera->mMatrixView.Ptr() );
 						++uniformIndex;
 
 						mShader->SetFloat2( uniformIndex, pixelSize.Ptr() );
@@ -181,7 +205,7 @@ namespace Sentinel
 			}
 
 			Renderer::Inst()->SetRenderType( mPrimitive );
-			Renderer::Inst()->DrawIndexed( (count == UINT_MAX) ? mNumIndices : count, 0, 0 );
+			Renderer::Inst()->DrawIndexed( (count == UINT_MAX) ? mIBO->mCount : count, 0, 0 );
 		}
 	}
 }

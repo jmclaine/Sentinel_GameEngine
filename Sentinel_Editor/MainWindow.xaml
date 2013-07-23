@@ -1,0 +1,27 @@
+﻿<Window x:Class="Sentinel_Editor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="512" Width="512">
+
+    <Canvas>
+        <Menu IsMainMenu="True" Height="24" Width="490" Canvas.Left="0" Canvas.Top="0">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open" Click="Click_Open" />
+                <Separator/>
+                <MenuItem Header="_Save" Click="Click_Save" />
+                <MenuItem Header="_Save As..." Click="Click_SaveAs" />
+                <Separator/>
+                <MenuItem Header="_Exit" Click="Click_Exit" />
+            </MenuItem>
+
+            <MenuItem Header="_Edit">
+            </MenuItem>
+
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About..." Click="Click_About" />
+            </MenuItem>
+        </Menu>
+        
+        <Grid Canvas.Left="0" Canvas.Top="21" Height="452" Name="RenderArea" Width="490"></Grid>
+    </Canvas>
+</Window>

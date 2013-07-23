@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Renderer.h"
+#include "Matrix4f.h"
+#include "Vector4f.h"
 
 namespace Sentinel
 {
@@ -13,20 +15,17 @@ namespace Sentinel
 		NUM_TEXTURES,
 	};
 
-	class MeshBuilder;
-
 	class Mesh
 	{
-		UINT				mNumVertices;
-		UINT				mNumIndices;
+		friend class MeshBuilder;
 
-	public:
+	private:
 
 		PrimitiveType		mPrimitive;
 		
-		mat4f				mMatrixWorld;
-		mat4f				mMatrixShadow;		// camera matrix
-		vec4f				mTextureScale;
+		Matrix4f			mMatrixWorld;
+		Matrix4f			mMatrixShadow;		// camera matrix
+		Vector4f			mTextureScale;
 
 		Shader*				mShader;
 		
@@ -36,18 +35,22 @@ namespace Sentinel
 		Buffer*				mVBO;
 		Buffer*				mIBO;
 
-		//////////////////////////////////////////
+	public:
 
 		Mesh();
 		~Mesh();
 
-		UINT NumVertices();
-		UINT NumIndices();
+		void		SetWorldTransform( const Matrix4f& world );
+		void		SetShadowTransform( const Matrix4f& shadow );
+		void		SetTextureScale( const Vector4f& scale );
 
-		void Draw( UINT count = UINT_MAX );
+		void		SetShader( Shader* shader );
+		void		SetMaterial( const Material& material );
+		void		SetTexture( Texture* texture, TextureType type = TEXTURE_DIFFUSE );
 
-		//////////////////////////////////////////
+		Buffer*		GetVBO();
+		Buffer*		GetIBO();
 
-		friend class MeshBuilder;
+		void		Draw( UINT count = UINT_MAX );
 	};
 }

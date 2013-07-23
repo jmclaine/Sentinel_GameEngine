@@ -11,8 +11,8 @@
 
 	#define SET_DEBUG_NAME( device )\
 	{\
-		const char c_szName[] = #device;\
-		device->SetPrivateData( WKPDID_D3DDebugObjectName, sizeof( c_szName ) - 1, c_szName );\
+		const char name[] = #device;\
+		device->SetPrivateData( WKPDID_D3DDebugObjectName, sizeof( name ) - 1, name );\
 	}
 #endif
 
@@ -23,6 +23,9 @@
 
 #include <vector>
 #include <crtdbg.h>
+
+#define STBI_HEADER_FILE_ONLY
+#include "stb_image.c"
 
 namespace Sentinel
 {
@@ -347,7 +350,7 @@ namespace Sentinel
 			mUniformDX[ uniform ]->AsShaderResource()->SetResource( static_cast< TextureDX* >(texture)->mResource );
 		}
 
-		void CreateUniform( char* name )
+		void CreateUniform( const char* name )
 		{
 			mUniformDX.push_back( mEffect->GetVariableByName( name ));
 		}
@@ -443,9 +446,7 @@ namespace Sentinel
 
 		UINT Startup( void* hWnd, bool fullscreen, UINT width = 1920, UINT height = 1080 )
 		{
-			SCREEN_WIDTH	= width;
-			SCREEN_HEIGHT	= height;
-			FULLSCREEN		= fullscreen;
+			Renderer::Startup( hWnd, fullscreen, width, height );
 
 			D3D_FEATURE_LEVEL featurelevels[] = 
 			{
@@ -666,6 +667,7 @@ namespace Sentinel
 			buffer->mType	 = type;
 			buffer->mSize	 = size;
 			buffer->mStride  = stride;
+			buffer->mCount	 = size / stride;
 			
 			if( mDevice->CreateBuffer( &bufferDesc, &resourceData, &buffer->mBuffer ) == S_FALSE )
 			{
