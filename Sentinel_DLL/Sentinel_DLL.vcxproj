@@ -86,12 +86,14 @@
     <ClInclude Include="..\Engine\src\Buffer.h" />
     <ClInclude Include="..\Engine\src\Color.h" />
     <ClInclude Include="..\Engine\src\Common.h" />
+    <ClInclude Include="..\Engine\src\CriticalSection.h" />
     <ClInclude Include="..\Engine\src\MathCommon.h" />
     <ClInclude Include="..\Engine\src\Matrix4f.h" />
     <ClInclude Include="..\Engine\src\Quatf.h" />
     <ClInclude Include="..\Engine\src\Renderer.h" />
     <ClInclude Include="..\Engine\src\Shader.h" />
     <ClInclude Include="..\Engine\src\Shape.h" />
+    <ClInclude Include="..\Engine\src\Singleton.h" />
     <ClInclude Include="..\Engine\src\Texture.h" />
     <ClInclude Include="..\Engine\src\Util.h" />
     <ClInclude Include="..\Engine\src\Vector2f.h" />

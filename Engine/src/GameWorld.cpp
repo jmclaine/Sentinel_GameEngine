@@ -5,6 +5,11 @@ namespace Sentinel
 	GameWorld::GameWorld()
 	{}
 
+	GameWorld::~GameWorld()
+	{
+		Shutdown();
+	}
+
 	void GameWorld::Startup( const std::string& mapName )
 	{
 		// No map file format to load...yet.

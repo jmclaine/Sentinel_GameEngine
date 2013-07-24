@@ -1,6 +1,6 @@
 #pragma once
 
-#include <memory>
+#include "CriticalSection.h"
 
 namespace Sentinel
 {
@@ -9,29 +9,38 @@ namespace Sentinel
 	{
 	protected:
 
-		static std::unique_ptr< T > single;
+		static CriticalSection		mCS;
 
-		Singleton()
-		{
-			single = NULL;
-		}
+		static volatile T* volatile mSingle;
 
 	public:
 
-		static T* Inst()
+		static T* volatile Inst()
 		{
-			if( !single )
-				single = std::unique_ptr< T >( new T );
+			if( !mSingle )
+			{
+				mCS.Lock();
+
+				if( !mSingle )
+					mSingle = new T();
+
+				mCS.Unlock();
+			}
 			
-			return single.get();
+			return const_cast< T* >(mSingle);
 		}
 
-		void Destroy()
+		static void volatile Destroy()
 		{
-			if( single )
-				single->Shutdown();
-			
-			single = NULL;
+			if( mSingle )
+			{
+				mCS.Lock();
+
+				delete mSingle;
+				mSingle = NULL;
+
+				mCS.Unlock();
+			}
 		}
 		
 		//Singleton( const Singleton& );
@@ -45,45 +54,64 @@ namespace Sentinel
 	{
 	protected:
 
-		static std::unique_ptr< T > single;
+		static CriticalSection		mCS;
 
-		SingletonAbstract()
-		{
-			single = NULL;
-		}
+		static volatile T* volatile mSingle;
 
 	public:
 
-		static T* Inst( T*(*func)() )
+		static T* volatile Inst( T*(*func)() )
 		{
-			if( !single )
-				single = std::unique_ptr< T >( func() );
+			if( !mSingle )
+			{
+				mCS.Lock();
+
+				if( !mSingle )
+					mSingle = func();
+
+				mCS.Unlock();
+			}
 			
-			return single.get();
+			return const_cast< T* >(mSingle);
 		}
 
-		static T* Inst( T* obj )
+		static T* volatile Inst( T* obj )
 		{
-			if( !single )
-				single = std::unique_ptr< T >( obj );
+			if( !mSingle )
+			{
+				mCS.Lock();
+
+				if( !mSingle )
+					mSingle = (volatile T*)( obj );
+
+				mCS.Unlock();
+			}
 			
-			return single.get();
+			return const_cast< T* >(mSingle);
 		}
 
-		static T* Inst()
+		static T* volatile Inst()
 		{
-			return single.get();
+			return const_cast< T* >(mSingle);
 		}
 
-		void Destroy()
+		static void volatile Destroy()
 		{
-			if( single )
-				single->Shutdown();
-			
-			single = NULL;
+			if( mSingle )
+			{
+				mCS.Lock();
+
+				delete mSingle;
+				mSingle = NULL;
+
+				mCS.Unlock();
+			}
 		}
 	};
 
-	template< class T > std::unique_ptr< T > Singleton< T >::single				= NULL;
-	template< class T > std::unique_ptr< T > SingletonAbstract< T >::single		= NULL;
+	template< class T > volatile T* volatile Singleton< T >::mSingle = NULL;
+	template< class T > CriticalSection Singleton< T >::mCS;
+
+	template< class T > volatile T* volatile SingletonAbstract< T >::mSingle = NULL;
+	template< class T > CriticalSection SingletonAbstract< T >::mCS;
 }

@@ -90,8 +90,7 @@ public:
 			mShader[ x ] = NULL;
 
 		//////////////////////////////////////////
-		//mat.Identity();
-
+		
 		LoadString( hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING );
 		LoadString( hInstance, IDC_SENTINEL_TEST, szWindowClass, MAX_LOADSTRING );
 		MyRegisterClass( hInstance );
@@ -436,13 +435,13 @@ public:
 			mShader[ x ] = NULL;
 		}
 
-		PhysicsSystem::Inst()->Shutdown();
-
-		ParticleSystem::Inst()->Shutdown();
-
-		GameWorld::Inst()->Shutdown();
-
-		Renderer::Inst()->Shutdown();
+		Mouse::Destroy();
+		Keyboard::Destroy();
+		Timing::Destroy();
+		PhysicsSystem::Destroy();
+		ParticleSystem::Destroy();
+		GameWorld::Destroy();
+		Renderer::Destroy();
 	}
 };
 
@@ -458,7 +457,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	//
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	_CrtSetReportMode( _CRT_ERROR, _CRTDBG_MODE_DEBUG );
-	//_CrtSetBreakAlloc( 1073 );
+	//_CrtSetBreakAlloc( 209 );
 
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);

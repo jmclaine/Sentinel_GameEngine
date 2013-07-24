@@ -18,6 +18,11 @@ namespace Sentinel { namespace Assets
 	Shaderw::~Shaderw()
 	{}
 
+	Shader* Shaderw::GetRef()
+	{
+		return mRef;
+	}
+
 	System::String^	Shaderw::AttributeDecl()
 	{
 		return gcnew System::String( mRef->AttributeDecl().c_str() );

@@ -3,6 +3,7 @@
 #include "Texturew.h"
 #include "Bufferw.h"
 #include "Shaderw.h"
+#include "Colorw.h"
 
 using namespace Sentinel::Assets;
 
@@ -77,13 +78,13 @@ namespace Sentinel { namespace Systems
 
 		~Rendererw();
 
-		static int			Load( System::String^ filename );
-		static UINT			Startup( void* hWnd, bool fullscreen, UINT width, UINT height );
-		static void			Shutdown();
+		static bool			Load( System::String^ filename );
+		static UINT			Startup( System::IntPtr hWnd, bool fullscreen, UINT width, UINT height );
+		static void			Destroy();
 
 		// Buffers.
 		//
-		static Bufferw^		CreateBuffer( void* data, UINT size, UINT stride, BufferType type );
+		static Bufferw^		CreateBuffer( System::IntPtr data, UINT size, UINT stride, BufferType type );
 
 		static void			SetVBO( Bufferw^ buffer );
 		static void			SetIBO( Bufferw^ buffer );
@@ -92,7 +93,7 @@ namespace Sentinel { namespace Systems
 		//
 		static Texturew^	CreateTexture( UINT width, UINT height, ImageFormatType format, bool createMips );
 		static Texturew^	CreateTextureFromFile( System::String^ filename );
-		static Texturew^	CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormatType format, bool createMips );
+		static Texturew^	CreateTextureFromMemory( System::IntPtr data, UINT width, UINT height, ImageFormatType format, bool createMips );
 	
 		// Special Rendering.
 		//
@@ -112,11 +113,11 @@ namespace Sentinel { namespace Systems
 		// Shaders.
 		//
 		static Shaderw^		CreateShader( System::String^ filename, System::String^ attrib, System::String^ uniform );
-		static void			SetShader( Shader* shader );
+		static void			SetShader( Shaderw^ shader );
 
 		// Rendering.
 		//
-		static void			Clear( float* color );
+		static void			Clear( ColorRGBAw^ color );
 		static void			DrawIndexed( UINT count, UINT startIndex, UINT baseVertex );
 		static void			Present();
 	};

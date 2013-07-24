@@ -81,6 +81,12 @@
     <ClInclude Include="..\Engine\src\Color.h">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\src\Singleton.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CriticalSection.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\Shader.cpp">

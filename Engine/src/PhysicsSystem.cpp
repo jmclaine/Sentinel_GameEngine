@@ -9,6 +9,11 @@ namespace Sentinel
 		mConfig( NULL ), mDispatcher( NULL ), mCache( NULL ), mSolver( NULL ), mWorld( NULL )
 	{}
 
+	PhysicsSystem::~PhysicsSystem()
+	{
+		Shutdown();
+	}
+
 	void PhysicsSystem::Startup()
 	{
 		mConfig		= new btDefaultCollisionConfiguration();

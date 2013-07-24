@@ -29,6 +29,7 @@ namespace Sentinel
 		//////////////////////////////
 
 		GameWorld();
+		~GameWorld();
 		
 		void Startup( const std::string& mapName );
 

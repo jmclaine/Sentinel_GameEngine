@@ -7,26 +7,32 @@ namespace Sentinel { namespace Systems
 	Rendererw::~Rendererw()
 	{}
 
-	int Rendererw::Load( System::String^ filename )
+	bool Rendererw::Load( System::String^ filename )
 	{
-		return Renderer::Load( SString( filename ));
+		// Somehow the pointer created in the DLL SingletonAbstract
+		// is not the same as the SingletonAbstract located here.
+		//
+		if( !Renderer::Inst( const_cast< Renderer* >(Renderer::Load( SString( filename )))))
+			return false;
+		
+		return true;
 	}
 
-	UINT Rendererw::Startup( void* hWnd, bool fullscreen, UINT width, UINT height )
+	UINT Rendererw::Startup( System::IntPtr hWnd, bool fullscreen, UINT width, UINT height )
 	{
-		return Renderer::Inst()->Startup( hWnd, fullscreen, width, height );
+		return Renderer::Inst()->Startup( (HWND)hWnd.ToPointer(), fullscreen, width, height );
 	}
 
-	void Rendererw::Shutdown()
+	void Rendererw::Destroy()
 	{
-		Renderer::Inst()->Shutdown();
+		Renderer::Destroy();
 	}
 
 	// Buffers.
 	//
-	Bufferw^ Rendererw::CreateBuffer( void* data, UINT size, UINT stride, BufferType type )
+	Bufferw^ Rendererw::CreateBuffer( System::IntPtr data, UINT size, UINT stride, BufferType type )
 	{
-		return gcnew Bufferw( Renderer::Inst()->CreateBuffer( data, size, stride, type ));
+		return gcnew Bufferw( Renderer::Inst()->CreateBuffer( data.ToPointer(), size, stride, type ));
 	}
 
 	void Rendererw::SetVBO( Bufferw^ buffer )
@@ -51,9 +57,9 @@ namespace Sentinel { namespace Systems
 		return gcnew Texturew( Renderer::Inst()->CreateTextureFromFile( SString( filename )));
 	}
 
-	Texturew^ Rendererw::CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormatType format, bool createMips )
+	Texturew^ Rendererw::CreateTextureFromMemory( System::IntPtr data, UINT width, UINT height, ImageFormatType format, bool createMips )
 	{
-		return gcnew Texturew( Renderer::Inst()->CreateTextureFromMemory( data, width, height, (Sentinel::ImageFormatType)format, createMips ));
+		return gcnew Texturew( Renderer::Inst()->CreateTextureFromMemory( data.ToPointer(), width, height, (Sentinel::ImageFormatType)format, createMips ));
 	}
 	
 	// Special Rendering.
@@ -120,16 +126,16 @@ namespace Sentinel { namespace Systems
 		return gcnew Shaderw( Renderer::Inst()->CreateShader( SString( filename ), SString( attrib ), SString( uniform )));
 	}
 
-	void Rendererw::SetShader( Shader* shader )
+	void Rendererw::SetShader( Shaderw^ shader )
 	{
-		Renderer::Inst()->SetShader( shader );
+		Renderer::Inst()->SetShader( shader->GetRef() );
 	}
 
 	// Rendering.
 	//
-	void Rendererw::Clear( float* color )
+	void Rendererw::Clear( ColorRGBAw^ color )
 	{
-		Renderer::Inst()->Clear( color );
+		Renderer::Inst()->Clear( color->GetRef()->Ptr() );
 	}
 
 	void Rendererw::DrawIndexed( UINT count, UINT startIndex, UINT baseVertex )

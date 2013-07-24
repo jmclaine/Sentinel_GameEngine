@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -11,13 +12,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Interop;
 
 using System.Runtime.InteropServices;
 
-//using Sentinel;
-//using Sentinel.Math;
-//using Sentinel.Assets;
-//using Sentinel.Systems;
+using Sentinel.Systems;
 using Sentinel.Assets;
 using Sentinel.Math;
 
@@ -33,6 +32,15 @@ namespace Sentinel_Editor
             InitializeComponent();
 
             Sentinel.Math.Vector3fw mTestX = new Sentinel.Math.Vector3fw();
+
+            if (!Rendererw.Load("config.xml"))
+            {
+                MessageBox.Show("Failed to load config.xml", "Application Failure");
+                System.Environment.Exit(0);   
+            }
+
+            Rendererw.SetCull(0);//Sentinel.Systems.CullType.CULL_CCW);
+            Rendererw.Destroy();
         }
 
         ///

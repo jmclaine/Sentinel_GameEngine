@@ -442,6 +442,11 @@ namespace Sentinel
 			mSampleDesc.Quality = 0;
 		}
 
+		~RendererDX()
+		{
+			Shutdown();
+		}
+
 	private:
 
 		UINT Startup( void* hWnd, bool fullscreen, UINT width = 1920, UINT height = 1080 )

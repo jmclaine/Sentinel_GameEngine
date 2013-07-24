@@ -1,5 +1,7 @@
 #include "Renderer.h"
 #include "tinyxml.h"
+#include <iostream>
+#include <fstream>
 
 namespace Sentinel
 {
@@ -16,29 +18,29 @@ namespace Sentinel
 	Texture*	Renderer::NULL_TEXTURE			= NULL;
 	Texture*	Renderer::BASE_TEXTURE			= NULL;
 
-	int Renderer::Load( const char* filename )
+	// This function should create and assign the resulting Renderer*
+	// to the SingletonAbstract instance; however, doing so results
+	// in the pointer being set back to NULL in the CLR wrapper.
+	//
+	const Renderer* Renderer::Load( const char* filename )
 	{
 		TiXmlDocument doc;
 		if( !doc.LoadFile( filename ))
-			return 0;
+			return NULL;
 
 		TiXmlHandle	hDoc( &doc );
 
 		TiXmlElement* pElem = hDoc.FirstChild( "Renderer" ).Element();
 		const char*   pName = pElem->Attribute( "Type" );
 
-		Renderer* result = BuildRendererGL();//(strcmp( "DIRECTX", pName ) == 0) ? BuildRendererDX() : BuildRendererGL();
+		if( !mSingle )
+			mSingle = (strcmp( "DIRECTX", pName ) == 0) ? BuildRendererDX() : BuildRendererGL();
 		
-		if( !result )
-			return 0;
-
 		pElem->QueryBoolAttribute(		"Fullscreen",	&Renderer::FULLSCREEN );
 		pElem->QueryUnsignedAttribute(	"Width",		&Renderer::WINDOW_WIDTH );
 		pElem->QueryUnsignedAttribute(	"Height",		&Renderer::WINDOW_HEIGHT );
 
-		Renderer::Inst( result );
-
-		return 1;
+		return const_cast< Renderer* >(mSingle);
 	}
 
 	UINT Renderer::Startup( void* hWnd, bool fullscreen, UINT width, UINT height )

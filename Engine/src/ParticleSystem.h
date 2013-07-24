@@ -26,6 +26,7 @@ namespace Sentinel
 		/////////////////////////////////
 
 		ParticleSystem();
+		~ParticleSystem();
 		
 		void Startup( Shader* shader, UINT maxSprites = 1000 );
 

@@ -85,9 +85,9 @@ namespace Sentinel
 
 		//////////////////////////////
 
-		virtual ~Renderer() {}
+		virtual ~Renderer() {};
 
-		static int			Load( const char* filename );
+		static const Renderer*	Load( const char* filename );
 
 		virtual UINT		Startup( void* hWnd, bool fullscreen, UINT width = 1920, UINT height = 1080 );
 

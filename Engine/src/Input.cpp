@@ -1,3 +1,5 @@
+#include <crtdbg.h>
+
 #include "Input.h"
 
 namespace Sentinel

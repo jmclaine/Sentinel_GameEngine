@@ -39,9 +39,13 @@ bool TiXmlBase::condenseWhiteSpace = true;
 FILE* TiXmlFOpen( const char* filename, const char* mode )
 {
 	#if defined(_MSC_VER) && (_MSC_VER >= 1400 )
-		FILE* fp = 0;
-		errno_t err = fopen_s( &fp, filename, mode );
-		if ( !err && fp )
+		//FILE* fp = 0;
+		//errno_t err = fopen_s( &fp, filename, mode );
+		//if ( !err && fp )
+		//	return fp;
+		//return 0;
+		FILE* fp = fopen( filename, mode );
+		if ( fp )
 			return fp;
 		return 0;
 	#else

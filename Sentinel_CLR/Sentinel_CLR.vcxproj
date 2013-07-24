@@ -96,6 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Engine\src\CLR\Bufferw.h" />
+    <ClInclude Include="..\Engine\src\CLR\Colorw.h" />
     <ClInclude Include="..\Engine\src\CLR\Matrix4fw.h" />
     <ClInclude Include="..\Engine\src\CLR\Quatfw.h" />
     <ClInclude Include="..\Engine\src\CLR\Rendererw.h" />
@@ -111,6 +112,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\CLR\Bufferw.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\Colorw.cpp" />
     <ClCompile Include="..\Engine\src\CLR\Matrix4fw.cpp" />
     <ClCompile Include="..\Engine\src\CLR\Quatfw.cpp" />
     <ClCompile Include="..\Engine\src\CLR\Rendererw.cpp" />

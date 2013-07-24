@@ -590,6 +590,11 @@ namespace Sentinel
 
 			mCurrShader = NULL;
 		}
+
+		RendererGL::~RendererGL()
+		{
+			Shutdown();
+		}
 		
 		UINT Startup( void* hWnd, bool fullscreen, UINT width = 1920, UINT height = 1080 )
 		{
@@ -672,7 +677,7 @@ namespace Sentinel
 			}
 			mTexture.clear();
 
-			for( UINT i = 0; i < mRenderTarget.size(); ++i )
+			for( UINT i = 1; i < mRenderTarget.size(); ++i )
 			{
 				glDeleteFramebuffers( 1, &mRenderTarget[ i ].mID );
 			}

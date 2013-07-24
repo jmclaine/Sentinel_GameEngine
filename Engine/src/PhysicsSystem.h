@@ -25,6 +25,7 @@ namespace Sentinel
 	public:
 
 		PhysicsSystem();
+		~PhysicsSystem();
 
 		void			Startup();
 

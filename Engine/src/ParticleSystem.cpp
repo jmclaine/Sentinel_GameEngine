@@ -7,6 +7,11 @@ namespace Sentinel
 	ParticleSystem::ParticleSystem() :
 		mMesh( NULL ), mCount( 0 ), mVertex( NULL )
 	{}
+
+	ParticleSystem::~ParticleSystem()
+	{
+		Shutdown();
+	}
 		
 	// Based on a geometry shader that generates quads from points.
 	//

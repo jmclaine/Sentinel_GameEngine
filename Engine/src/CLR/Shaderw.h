@@ -19,6 +19,8 @@ namespace Sentinel { namespace Assets
 		Shaderw( Shader* shader );
 		~Shaderw();
 
+		Shader*				GetRef();
+
 		System::String^		AttributeDecl();
 		System::String^		UniformDecl();
 

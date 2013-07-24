@@ -69,6 +69,9 @@
     <ClInclude Include="..\Engine\src\CLR\Rendererw.h">
       <Filter>Sentinel_Engine\Systems</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\Colorw.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sentinel_CLR.cpp">
@@ -106,6 +109,9 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\CLR\Rendererw.cpp">
       <Filter>Sentinel_Engine\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\Colorw.cpp">
+      <Filter>Sentinel_Engine\Assets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
