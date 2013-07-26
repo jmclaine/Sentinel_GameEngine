@@ -400,11 +400,19 @@ namespace Sentinel
 	{
 	private:
 
-		ID3D11Device*							mDevice;
-		ID3D11DeviceContext*					mContext;
+		class WindowInfoDX : public WindowInfo
+		{
+		public:
 
-		IDXGISwapChain*							mSwapChain;
-		ID3D11RasterizerState*					mRasterizerState;
+			ID3D11Device*				mDevice;
+			ID3D11DeviceContext*		mContext;
+
+			IDXGISwapChain*				mSwapChain;
+			ID3D11RasterizerState*		mRasterizerState;
+		};
+
+		std::vector< WindowInfoDX >				mWindow;
+		WindowInfoDX*							mCurrWindow;
 
 		std::vector< ID3D11DepthStencilView* >	mDepthStencil;
 		ID3D11DepthStencilView*					mCurrStencil;
@@ -433,12 +441,6 @@ namespace Sentinel
 			CULL_TYPE[ CULL_CCW  ]		= D3D11_CULL_BACK;
 			CULL_TYPE[ CULL_CW   ]		= D3D11_CULL_FRONT;
 
-			mDevice				= NULL;
-			mContext			= NULL;
-
-			mSwapChain			= NULL;
-			mRasterizerState	= NULL;
-
 			mSampleDesc.Count   = 1;
 			mSampleDesc.Quality = 0;
 		}
@@ -450,10 +452,8 @@ namespace Sentinel
 
 	private:
 
-		UINT Startup( void* hWnd )
+		UINT Startup( void* hWnd, bool fullscreen, UINT width, UINT height )
 		{
-			Renderer::Startup( hWnd );
-
 			D3D_FEATURE_LEVEL featurelevels[] = 
 			{
 				D3D_FEATURE_LEVEL_11_0,
@@ -464,7 +464,7 @@ namespace Sentinel
 			DXGI_SWAP_CHAIN_DESC sd =
 			{
 				{
-					WINDOW_WIDTH, WINDOW_HEIGHT,
+					width, height,
 					{ 0, 0 },
 					DXGI_FORMAT_R8G8B8A8_UNORM,
 					DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED,
@@ -474,7 +474,7 @@ namespace Sentinel
 				DXGI_USAGE_RENDER_TARGET_OUTPUT,
 				1,
 				(HWND)hWnd,
-				!FULLSCREEN,
+				!fullscreen,
 				DXGI_SWAP_EFFECT_DISCARD,
 				DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH
 			};
@@ -487,54 +487,70 @@ namespace Sentinel
 			//	createdeviceflags |= D3D11_CREATE_DEVICE_DEBUG;
 			//#endif
 	
+			mWindow.push_back( WindowInfoDX() );
+			mCurrWindow = &mWindow.back();
+
+			mCurrWindow->mFullscreen	= fullscreen;
+			mCurrWindow->mWidth			= width;
+			mCurrWindow->mHeight		= height;
+			mCurrWindow->mWidthRatio	= (float)width  / (float)WINDOW_WIDTH_BASE;
+			mCurrWindow->mHeightRatio	= (float)height / (float)WINDOW_HEIGHT_BASE;
+
 			HV( D3D11CreateDeviceAndSwapChain( NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createdeviceflags, 
 											   featurelevels, sizeof(featurelevels)/sizeof(D3D_FEATURE_LEVEL),
-											   D3D11_SDK_VERSION, &sd, &mSwapChain, &mDevice, 0, &mContext ));
+											   D3D11_SDK_VERSION, &sd, &mCurrWindow->mSwapChain, 
+											   &mCurrWindow->mDevice, 0, &mCurrWindow->mContext ));
 
-			if( FULLSCREEN )
+			if( fullscreen )
 			{
-				HV( mSwapChain->ResizeBuffers( 1, WINDOW_WIDTH, WINDOW_HEIGHT, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH ));
-				HV( mSwapChain->SetFullscreenState( TRUE, NULL ));
+				HV( mCurrWindow->mSwapChain->ResizeBuffers( 1, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH ));
+				HV( mCurrWindow->mSwapChain->SetFullscreenState( TRUE, NULL ));
 			}
 
 			D3D11_RASTERIZER_DESC rasterizerstate = { D3D11_FILL_SOLID, D3D11_CULL_BACK, true, 0, 0, 0, true, false, true, false };
-			HV( mDevice->CreateRasterizerState( &rasterizerstate, &mRasterizerState ));
-			mContext->RSSetState( mRasterizerState );
+			HV( mCurrWindow->mDevice->CreateRasterizerState( &rasterizerstate, &mCurrWindow->mRasterizerState ));
+			mCurrWindow->mContext->RSSetState( mCurrWindow->mRasterizerState );
 
 			#ifndef NDEBUG
-				SET_DEBUG_NAME( mSwapChain );
-				SET_DEBUG_NAME( mDevice );
-				SET_DEBUG_NAME( mContext );
-				SET_DEBUG_NAME( mRasterizerState );
+				SET_DEBUG_NAME( mCurrWindow->mSwapChain );
+				SET_DEBUG_NAME( mCurrWindow->mDevice );
+				SET_DEBUG_NAME( mCurrWindow->mContext );
+				SET_DEBUG_NAME( mCurrWindow->mRasterizerState );
 			#endif
 
 			UCHAR* newTex = new UCHAR[ 4 ];
 
 			// Create NULL_TEXTURE (Black).
 			//
-			newTex[ 0 ] = 0;
-			newTex[ 1 ] = 0;
-			newTex[ 2 ] = 0;
-			newTex[ 3 ] = 255;
-			NULL_TEXTURE = CreateTextureFromMemory( newTex, 1, 1, IMAGE_FORMAT_RGBA );
+			if( !NULL_TEXTURE )
+			{
+				newTex[ 0 ] = 0;
+				newTex[ 1 ] = 0;
+				newTex[ 2 ] = 0;
+				newTex[ 3 ] = 255;
+				NULL_TEXTURE = CreateTextureFromMemory( newTex, 1, 1, IMAGE_FORMAT_RGBA );
+			}
 
 			// Create BASE_TEXTURE (White).
 			//
-			newTex[ 0 ] = 255;
-			newTex[ 1 ] = 255;
-			newTex[ 2 ] = 255;
-			BASE_TEXTURE = CreateTextureFromMemory( newTex, 1, 1, IMAGE_FORMAT_RGBA );
+			if( !BASE_TEXTURE )
+			{
+				newTex[ 0 ] = 255;
+				newTex[ 1 ] = 255;
+				newTex[ 2 ] = 255;
+				BASE_TEXTURE = CreateTextureFromMemory( newTex, 1, 1, IMAGE_FORMAT_RGBA );
+			}
 
 			delete newTex;
 
-			CreateDepthStencil( WINDOW_WIDTH, WINDOW_HEIGHT );
+			CreateDepthStencil( width, height );
 			SetDepthStencil( 0 );
 
-			CreateViewport( WINDOW_WIDTH, WINDOW_HEIGHT );
+			CreateViewport( width, height );
 			SetViewport( 0 );
 
 			ID3D11Texture2D *tex = NULL;
-			HV( mSwapChain->GetBuffer( 0, __uuidof(ID3D11Texture2D), (void **)&tex ));
+			HV( mCurrWindow->mSwapChain->GetBuffer( 0, __uuidof(ID3D11Texture2D), (void **)&tex ));
 			CreateRenderTarget( tex );
 			SAFE_RELEASE_PTR( tex );
 			SetRenderTarget( 0 );
@@ -558,7 +574,7 @@ namespace Sentinel
 			}
 
 			ID3D11BlendState* blend_state = NULL;
-			HV( mDevice->CreateBlendState( &blend_desc, &blend_state ));
+			HV( mCurrWindow->mDevice->CreateBlendState( &blend_desc, &blend_state ));
 			mBlendState.push_back( blend_state );
 
 			// Create BLEND_ALPHA.
@@ -567,7 +583,7 @@ namespace Sentinel
 			{
 				blend_desc.RenderTarget[ x ].BlendEnable			= TRUE;
 			}
-			HV( mDevice->CreateBlendState( &blend_desc, &blend_state ));
+			HV( mCurrWindow->mDevice->CreateBlendState( &blend_desc, &blend_state ));
 			mBlendState.push_back( blend_state );
 			
 			// Create BLEND_PARTICLE.
@@ -582,11 +598,11 @@ namespace Sentinel
 				blend_desc.RenderTarget[ x ].BlendOpAlpha			= D3D11_BLEND_OP_ADD;
 				blend_desc.RenderTarget[ x ].RenderTargetWriteMask	= D3D11_COLOR_WRITE_ENABLE_ALL;
 			}
-			HV( mDevice->CreateBlendState( &blend_desc, &blend_state ));
+			HV( mCurrWindow->mDevice->CreateBlendState( &blend_desc, &blend_state ));
 			mBlendState.push_back( blend_state );
 
 			float blend_factor[ 4 ] = { 1, 1, 1, 1 };
-			mContext->OMSetBlendState( mBlendState[ 0 ], blend_factor, 0xFFFFFFFF );
+			mCurrWindow->mContext->OMSetBlendState( mBlendState[ 0 ], blend_factor, 0xFFFFFFFF );
 
 			SetBlend( BLEND_ALPHA );
 
@@ -612,7 +628,7 @@ namespace Sentinel
 			stencilDesc.BackFace.StencilFunc			= D3D11_COMPARISON_ALWAYS;
 
 			ID3D11DepthStencilState* stencilState = NULL;
-			HV( mDevice->CreateDepthStencilState( &stencilDesc, &stencilState ));
+			HV( mCurrWindow->mDevice->CreateDepthStencilState( &stencilDesc, &stencilState ));
 			mDepthStencilState.push_back( stencilState );
 
 			// Create depth STENCIL_PARTICLE.
@@ -620,7 +636,7 @@ namespace Sentinel
 			stencilDesc.DepthEnable						= TRUE;
 			stencilDesc.DepthWriteMask					= D3D11_DEPTH_WRITE_MASK_ZERO;
 			stencilDesc.DepthFunc						= D3D11_COMPARISON_LESS;
-			HV( mDevice->CreateDepthStencilState( &stencilDesc, &stencilState ));
+			HV( mCurrWindow->mDevice->CreateDepthStencilState( &stencilDesc, &stencilState ));
 			mDepthStencilState.push_back( stencilState );
 
 			SetDepthStencilState( STENCIL_DEFAULT );
@@ -630,12 +646,13 @@ namespace Sentinel
 
 		void Shutdown()
 		{
-			if( mSwapChain != NULL )
+			if( mCurrWindow->mSwapChain != NULL )
 			{
-				mSwapChain->SetFullscreenState( FALSE, NULL );
+				mCurrWindow->mSwapChain->SetFullscreenState( FALSE, NULL );
 
-				SAFE_RELEASE_PTR( mSwapChain );
-				SAFE_RELEASE_PTR( mRasterizerState );
+				SAFE_RELEASE_PTR( mCurrWindow->mSwapChain );
+				SAFE_RELEASE_PTR( mCurrWindow->mRasterizerState );
+
 				SAFE_RELEASE_PTR_LIST( mRenderTarget );
 				SAFE_RELEASE_PTR_LIST( mDepthStencil );
 				SAFE_RELEASE_PTR_LIST( mBlendState );
@@ -646,11 +663,27 @@ namespace Sentinel
 					SAFE_DELETE( mTexture[ i ] );
 				}
 				
-				SAFE_RELEASE_PTR( mContext );
-				SAFE_RELEASE_PTR( mDevice );
+				SAFE_RELEASE_PTR( mCurrWindow->mContext );
+				SAFE_RELEASE_PTR( mCurrWindow->mDevice );
 			}
 		}
 
+		// Windows.
+		//
+		void SetWindow( UINT index )
+		{
+			_ASSERT( index < mWindow.size() );
+
+			mCurrWindow = &mWindow[ index ];
+		}
+
+		const WindowInfo* GetWindowInfo() const
+		{
+			return mCurrWindow;
+		}
+
+		// Buffers.
+		//
 		Buffer* CreateBuffer( void* data, UINT size, UINT stride, BufferType type )
 		{
 			_ASSERT( type == VERTEX_BUFFER || type == INDEX_BUFFER );
@@ -669,13 +702,13 @@ namespace Sentinel
 			resourceData.SysMemSlicePitch	= 0;
 
 			BufferDX* buffer = new BufferDX();
-			buffer->mContext = mContext;
+			buffer->mContext = mCurrWindow->mContext;
 			buffer->mType	 = type;
 			buffer->mSize	 = size;
 			buffer->mStride  = stride;
 			buffer->mCount	 = size / stride;
 			
-			if( mDevice->CreateBuffer( &bufferDesc, &resourceData, &buffer->mBuffer ) == S_FALSE )
+			if( mCurrWindow->mDevice->CreateBuffer( &bufferDesc, &resourceData, &buffer->mBuffer ) == S_FALSE )
 			{
 				delete buffer;
 				return NULL;
@@ -688,14 +721,16 @@ namespace Sentinel
 		{
 			UINT offset = 0;
 
-			mContext->IASetVertexBuffers( 0, 1, &static_cast< BufferDX* >(buffer)->mBuffer, &static_cast< BufferDX* >(buffer)->mStride, &offset );
+			mCurrWindow->mContext->IASetVertexBuffers( 0, 1, &static_cast< BufferDX* >(buffer)->mBuffer, &static_cast< BufferDX* >(buffer)->mStride, &offset );
 		}
 
 		void SetIBO( Buffer* buffer )
 		{
-			mContext->IASetIndexBuffer( static_cast< BufferDX* >(buffer)->mBuffer, DXGI_FORMAT_R32_UINT, 0 );
+			mCurrWindow->mContext->IASetIndexBuffer( static_cast< BufferDX* >(buffer)->mBuffer, DXGI_FORMAT_R32_UINT, 0 );
 		}
 
+		// Textures.
+		//
 		Texture* CreateTextureFromFile( const char* filename )
 		{
 			if( strlen( filename ) == 0 )
@@ -724,7 +759,7 @@ namespace Sentinel
 				D3DX11_IMAGE_LOAD_INFO info;
 				ID3D11ShaderResourceView* image;
 
-				if( D3DX11CreateShaderResourceViewFromFileA( mDevice, filename, &info, NULL, &image, NULL ) == S_OK )
+				if( D3DX11CreateShaderResourceViewFromFileA( mCurrWindow->mDevice, filename, &info, NULL, &image, NULL ) == S_OK )
 				{
 					mTexture.push_back( new TextureDX( filename, info.Width, info.Height, mTexture.size() ));
 					mTexture.back()->mResource = image;
@@ -845,7 +880,7 @@ namespace Sentinel
 			desc.MiscFlags		= D3D11_RESOURCE_MISC_GENERATE_MIPS;
 
 			ID3D11Texture2D* tex0;
-			HV_PTR( mDevice->CreateTexture2D( &desc, NULL, &tex0 ));
+			HV_PTR( mCurrWindow->mDevice->CreateTexture2D( &desc, NULL, &tex0 ));
 			
 			D3D11_SHADER_RESOURCE_VIEW_DESC rsv =
 			{
@@ -874,7 +909,7 @@ namespace Sentinel
 				desc.MiscFlags		= D3D11_USAGE_DEFAULT;
 
 				ID3D11Texture2D* tex1;
-				HV_PTR( mDevice->CreateTexture2D( &desc, &res, &tex1 ));
+				HV_PTR( mCurrWindow->mDevice->CreateTexture2D( &desc, &res, &tex1 ));
 			
 				D3D11_BOX box =
 				{
@@ -882,12 +917,12 @@ namespace Sentinel
 					width, height, 1
 				};
 
-				mContext->CopySubresourceRegion( tex0, 0, 0, 0, 0, tex1, 0, &box );
+				mCurrWindow->mContext->CopySubresourceRegion( tex0, 0, 0, 0, 0, tex1, 0, &box );
 				SAFE_RELEASE_PTR( tex1 );
 			}
 
-			HV_PTR( mDevice->CreateShaderResourceView( tex0, &rsv, &(mTexture.back())->mResource ));
-			mContext->GenerateMips( (mTexture.back())->mResource );
+			HV_PTR( mCurrWindow->mDevice->CreateShaderResourceView( tex0, &rsv, &(mTexture.back())->mResource ));
+			mCurrWindow->mContext->GenerateMips( (mTexture.back())->mResource );
 			
 			mTexture.back()->mTexture = tex0;
 
@@ -904,11 +939,13 @@ namespace Sentinel
 			return mTexture.back();
 		}
 
+		// Special Rendering.
+		//
 		UINT CreateRenderTarget( ID3D11Texture2D *backbuffer )
 		{
 			ID3D11RenderTargetView* rendertarget = NULL;
 			
-			HV( mDevice->CreateRenderTargetView( backbuffer, NULL, &rendertarget ));
+			HV( mCurrWindow->mDevice->CreateRenderTargetView( backbuffer, NULL, &rendertarget ));
 			mRenderTarget.push_back( rendertarget );
 			SAFE_RELEASE_PTR( backbuffer );
 
@@ -936,8 +973,8 @@ namespace Sentinel
 			ID3D11Texture2D *stencil = NULL;
 			ID3D11DepthStencilView* stenciltarget = NULL;
 
-			HV( mDevice->CreateTexture2D( &texDesc, NULL, &stencil ));
-			HV( mDevice->CreateDepthStencilView( stencil, NULL, &stenciltarget ));
+			HV( mCurrWindow->mDevice->CreateTexture2D( &texDesc, NULL, &stencil ));
+			HV( mCurrWindow->mDevice->CreateDepthStencilView( stencil, NULL, &stenciltarget ));
 
 			mDepthStencil.push_back( stenciltarget );
 			SAFE_RELEASE_PTR( stencil );
@@ -979,20 +1016,20 @@ namespace Sentinel
 		{
 			mCurrShader->ApplyPass();
 			mCurrShader->ApplyLayout();
-			mContext->IASetPrimitiveTopology( static_cast< D3D11_PRIMITIVE_TOPOLOGY >( PRIMITIVE[ type ] ));
+			mCurrWindow->mContext->IASetPrimitiveTopology( static_cast< D3D11_PRIMITIVE_TOPOLOGY >( PRIMITIVE[ type ] ));
 		}
 
 		void SetRenderTarget( UINT target )
 		{
 			// Unbind render targets.
 			//
-			mContext->OMSetRenderTargets( 0, 0, 0 );
+			mCurrWindow->mContext->OMSetRenderTargets( 0, 0, 0 );
 
 			ID3D11ShaderResourceView* nullViews[ 8 ] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-			mContext->PSSetShaderResources( 0, 8, nullViews );
+			mCurrWindow->mContext->PSSetShaderResources( 0, 8, nullViews );
 
 			mCurrTarget = mRenderTarget[ target ];
-			mContext->OMSetRenderTargets( 1, &mCurrTarget, mCurrStencil );
+			mCurrWindow->mContext->OMSetRenderTargets( 1, &mCurrTarget, mCurrStencil );
 		}
 
 		void SetDepthStencil( UINT stencil )
@@ -1002,21 +1039,21 @@ namespace Sentinel
 
 		void SetDepthStencilState( UINT state )
 		{
-			mContext->OMSetDepthStencilState( mDepthStencilState[ state ], 0 );
+			mCurrWindow->mContext->OMSetDepthStencilState( mDepthStencilState[ state ], 0 );
 		}
 
 		void SetViewport( UINT viewport )
 		{
-			mContext->RSSetViewports( 1, &mViewport[ viewport ] );
+			mCurrWindow->mContext->RSSetViewports( 1, &mViewport[ viewport ] );
 		}
 
 		UINT SetCull( CullType type )
 		{
-			SAFE_RELEASE_PTR( mRasterizerState );
+			SAFE_RELEASE_PTR( mCurrWindow->mRasterizerState );
 			D3D11_RASTERIZER_DESC rasterizerstate = { D3D11_FILL_SOLID, (D3D11_CULL_MODE)CULL_TYPE[ type ], true, 0, 0, 0, true, false, true, false };
 
-			HV( mDevice->CreateRasterizerState( &rasterizerstate, &mRasterizerState ));
-			mContext->RSSetState( mRasterizerState );
+			HV( mCurrWindow->mDevice->CreateRasterizerState( &rasterizerstate, &mCurrWindow->mRasterizerState ));
+			mCurrWindow->mContext->RSSetState( mCurrWindow->mRasterizerState );
 
 			return S_OK;
 		}
@@ -1024,7 +1061,7 @@ namespace Sentinel
 		void SetBlend( BlendType type )
 		{
 			float blend_factor[ 4 ] = { 1, 1, 1, 1 };
-			mContext->OMSetBlendState( mBlendState[ type ], blend_factor, 0xFFFFFFFF );
+			mCurrWindow->mContext->OMSetBlendState( mBlendState[ type ], blend_factor, 0xFFFFFFFF );
 		}
 
 		// Shaders.
@@ -1033,7 +1070,7 @@ namespace Sentinel
 		{
 			ShaderDX* shader = new ShaderDX();
 
-			if( shader->Startup( filename, attrib, uniform, mDevice, mContext ) != S_OK )
+			if( shader->Startup( filename, attrib, uniform, mCurrWindow->mDevice, mCurrWindow->mContext ) != S_OK )
 			{
 				delete shader;
 				return NULL;
@@ -1051,25 +1088,25 @@ namespace Sentinel
 		//
 		void Clear( float* color )
 		{
-			mContext->ClearRenderTargetView( mCurrTarget, color );
-			mContext->ClearDepthStencilView( mCurrStencil, D3D11_CLEAR_DEPTH, 1.0f, 0 );
+			mCurrWindow->mContext->ClearRenderTargetView( mCurrTarget, color );
+			mCurrWindow->mContext->ClearDepthStencilView( mCurrStencil, D3D11_CLEAR_DEPTH, 1.0f, 0 );
 		}
 
 		void DrawIndexed( UINT count, UINT startIndex, UINT baseVertex )
 		{
-			mContext->DrawIndexed( count, startIndex, baseVertex );
+			mCurrWindow->mContext->DrawIndexed( count, startIndex, baseVertex );
 		}
 
 		void Present()
 		{
-			mSwapChain->Present( 0, 0 );
+			mCurrWindow->mSwapChain->Present( 0, 0 );
 			
 			// Unbind render targets.
 			//
-			mContext->OMSetRenderTargets( 0, 0, 0 );
+			mCurrWindow->mContext->OMSetRenderTargets( 0, 0, 0 );
 
 			ID3D11ShaderResourceView* nullViews[ 8 ] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-			mContext->PSSetShaderResources( 0, 8, nullViews );
+			mCurrWindow->mContext->PSSetShaderResources( 0, 8, nullViews );
 		}
 	};
 

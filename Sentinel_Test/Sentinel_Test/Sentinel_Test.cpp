@@ -36,9 +36,10 @@ using namespace Sentinel;
 //
 #define MAX_LOADSTRING 100
 
-HINSTANCE			hInst;								// current instance
-TCHAR				szTitle[ MAX_LOADSTRING ];			// title bar text
-TCHAR				szWindowClass[ MAX_LOADSTRING ];	// main window class name
+HINSTANCE				hInst;								// current instance
+TCHAR					szTitle[ MAX_LOADSTRING ];			// title bar text
+TCHAR					szWindowClass[ MAX_LOADSTRING ];	// main window class name
+Renderer::WindowInfo	gWindowInfo;						// info about window
 
 ATOM				MyRegisterClass( HINSTANCE hInstance );
 HWND				InitInstance( HINSTANCE, int );
@@ -97,7 +98,7 @@ public:
 
 		mAccelTable = LoadAccelerators( hInstance, MAKEINTRESOURCE( IDC_SENTINEL_TEST ));
 
-		if( !Renderer::Load( "config.xml" ))
+		if( !Renderer::Load( "config.xml", gWindowInfo ))
 		{
 			REPORT_ERROR( "Failed to load 'config.xml'\nDefaulting to OpenGL", "Renderer Setup Failure" );
 
@@ -120,7 +121,7 @@ public:
 		Mouse::Inst()->SetPosition( CenterHandle( Mouse::mHWND ));
 		ShowCursor( FALSE );
 
-		if( Renderer::Inst()->Startup( mHWND ) != S_OK )
+		if( Renderer::Inst()->Startup( mHWND, gWindowInfo.mFullscreen, gWindowInfo.mWidth, gWindowInfo.mHeight ) != S_OK )
 			throw AppException( "Failed Renderer::Startup()" );
 
 		PhysicsSystem::Inst()->Startup();
@@ -222,9 +223,11 @@ public:
 
 		//////////////////////////////
 
+		const Renderer::WindowInfo* info = Renderer::Inst()->GetWindowInfo();
+
 		// Create main perspective camera.
 		//
-		camera = new PerspectiveCameraComponent( (float)Renderer::Inst()->WINDOW_WIDTH, (float)Renderer::Inst()->WINDOW_HEIGHT );
+		camera = new PerspectiveCameraComponent( (float)info->mWidth, (float)info->mHeight );
 		
 		transform = new TransformComponent();
 		transform->mPosition = Vector3f( 0, 10, 50 );
@@ -247,7 +250,7 @@ public:
 
 		// Create sprite orthographic camera.
 		//
-		camera = new OrthographicCameraComponent( (float)Renderer::Inst()->WINDOW_WIDTH, (float)Renderer::Inst()->WINDOW_HEIGHT );
+		camera = new OrthographicCameraComponent( (float)info->mWidth, (float)info->mHeight );
 		
 		transform = new TransformComponent();
 		transform->mPosition = Vector3f( 0, 0, 0 );
@@ -418,7 +421,7 @@ public:
 	{
 		SetDirectory( "Font" );
 		
-		// No font...Y()et.
+		// No font...yet.
 
 		SetDirectory( ".." );
 	}
@@ -545,8 +548,8 @@ HWND InitInstance( HINSTANCE hInstance, int nCmdShow )
 
    hInst = hInstance; // Store instance handle in our global variable
 
-   hWnd = CreateWindow( szWindowClass, "Sentinel", (!Renderer::Inst()->FULLSCREEN) ? WS_OVERLAPPEDWINDOW : WS_POPUP,
-						0, 0, Renderer::Inst()->WINDOW_WIDTH, Renderer::Inst()->WINDOW_HEIGHT,
+   hWnd = CreateWindow( szWindowClass, "Sentinel", (!gWindowInfo.mFullscreen) ? WS_OVERLAPPEDWINDOW : WS_POPUP,
+						0, 0, gWindowInfo.mWidth, gWindowInfo.mHeight,
 						NULL, NULL, hInstance, NULL );
 
    if( !hWnd )

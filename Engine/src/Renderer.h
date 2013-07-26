@@ -128,7 +128,7 @@ namespace Sentinel
 
 	// Renderer is a SingletonAbstract as creating multiple instances
 	// of this particular object would unnecessarily complicate the
-	// natural threading ability of the video card interface without
+	// shared context capability of the video card interface without
 	// any gains.  Due to this class being a Singleton, this also
 	// prevents a user from creating both OpenGL and DirectX at the
 	// same time.
@@ -137,6 +137,21 @@ namespace Sentinel
 	//
 	class SENTINEL_DLL Renderer : public SingletonAbstract< Renderer >
 	{
+	public:
+
+		class WindowInfo
+		{
+		public:
+
+			bool		mFullscreen;
+
+			UINT		mWidth;
+			UINT		mHeight;
+
+			float		mWidthRatio;
+			float		mHeightRatio;
+		};
+
 	protected:
 
 		UINT				PRIMITIVE[ NUM_PRIMITIVES ];
@@ -149,19 +164,8 @@ namespace Sentinel
 		static const UINT	WINDOW_WIDTH_BASE  = 1920;
 		static const UINT	WINDOW_HEIGHT_BASE = 1080;
 
-		float				WINDOW_WIDTH_RATIO;
-		float				WINDOW_HEIGHT_RATIO;
-
-		UINT				WINDOW_WIDTH;
-		UINT				WINDOW_HEIGHT;
-		bool				FULLSCREEN;
-
 		Texture*			NULL_TEXTURE;	// black default texture
 		Texture*			BASE_TEXTURE;	// white default texture
-
-	protected:
-
-		Renderer();
 
 	public:
 
@@ -169,12 +173,18 @@ namespace Sentinel
 
 		/////////////////////////////////
 
-		static const void*	Load( const char* filename );
+		static const void*	Load( const char* filename, WindowInfo& info );
 
-		virtual UINT		Startup( void* hWnd );	// void* for multiplatform
+		virtual UINT		Startup( void* hWnd, bool fullscreen, UINT width, UINT height ) = 0; // void* for multiplatform
 
 		virtual void		Shutdown() = 0;
 
+		// Windows.
+		//
+		virtual void		SetWindow( UINT index ) = 0;
+
+		virtual const WindowInfo* GetWindowInfo() const = 0;
+		
 		// Buffers.
 		//
 		virtual Buffer*		CreateBuffer( void* data, UINT size, UINT stride, BufferType type ) = 0;

@@ -91,6 +91,21 @@ namespace Sentinel { namespace Systems
 
 	public:
 
+		ref class WindowInfo
+		{
+		public:
+
+			bool		mFullscreen;
+
+			UINT		mWidth;
+			UINT		mHeight;
+
+			float		mWidthRatio;
+			float		mHeightRatio;
+		};
+
+		WindowInfo			mWindowInfo;
+
 		WTexture^			NULL_TEXTURE;	// black default texture
 		WTexture^			BASE_TEXTURE;	// white default texture
 
@@ -99,10 +114,14 @@ namespace Sentinel { namespace Systems
 		WRenderer();
 		~WRenderer();
 
-		static bool			Load( String^ filename );
+		bool				Load( String^ filename );
 		UINT				Startup( IntPtr hWnd );
 		void				Update( Object^ sender, EventArgs^ e );
 		void				Destroy();
+
+		// Windows.
+		//
+		WindowInfo^			GetWindowInfo();
 
 		// Buffers.
 		//

@@ -479,7 +479,7 @@ namespace Sentinel
 	{
 	public:
 
-		GLuint mID;
+		GLuint	mID;
 
 		BufferGL()
 		{
@@ -527,8 +527,8 @@ namespace Sentinel
 		{
 		public:
 
-			Texture* mTexture;
-			GLuint   mID;
+			Texture*	mTexture;
+			GLuint		mID;
 			
 			RenderTarget( Texture* texture, GLuint id )
 			{
@@ -541,7 +541,8 @@ namespace Sentinel
 		{
 		public:
 
-			GLuint mWidth, mHeight;
+			GLuint		mWidth;
+			GLuint		mHeight;
 
 			Viewport( GLuint width, GLuint height )
 			{
@@ -550,14 +551,19 @@ namespace Sentinel
 			}
 		};
 
-		HWND	mHWND;
-		HDC		mHDC;
+		class WindowInfoGL : public WindowInfo
+		{
+		public:
 
-		HGLRC	mRenderingContext;
-		GLenum	mRenderMode;
+			HWND		mHWND;
+			HDC			mHDC;
+			HGLRC		mContext;
 
-		std::vector< GLuint >			mVBO;
-		std::vector< GLuint >			mIBO;
+			GLenum		mRenderMode;
+		};
+
+		std::vector< WindowInfoGL >		mWindow;
+		WindowInfoGL*					mCurrWindow;
 
 		std::vector< RenderTarget >		mRenderTarget;
 		std::vector< GLuint >			mDepthStencil;
@@ -596,14 +602,21 @@ namespace Sentinel
 			Shutdown();
 		}
 		
-		UINT Startup( void* hWnd )
+		UINT Startup( void* hWnd, bool fullscreen, UINT width, UINT height )
 		{
-			mHWND = (HWND)hWnd;
-			mHDC  = GetDC( mHWND );
+			mWindow.push_back( WindowInfoGL() );
+			mCurrWindow = &mWindow.back();
 
-			Renderer::Startup( hWnd );
+			mCurrWindow->mFullscreen	= fullscreen;
+			mCurrWindow->mWidth			= width;
+			mCurrWindow->mHeight		= height;
+			mCurrWindow->mWidthRatio	= (float)width  / (float)WINDOW_WIDTH_BASE;
+			mCurrWindow->mHeightRatio	= (float)height / (float)WINDOW_HEIGHT_BASE;
 
-			_ASSERT( mHDC );
+			mCurrWindow->mHWND			= (HWND)hWnd;
+			mCurrWindow->mHDC			= GetDC( mCurrWindow->mHWND );
+
+			_ASSERT( mCurrWindow->mHDC );
 
 			PIXELFORMATDESCRIPTOR pixelFormatDescriptor = {0};
 			pixelFormatDescriptor.nSize			= sizeof( pixelFormatDescriptor );
@@ -614,26 +627,26 @@ namespace Sentinel
 			pixelFormatDescriptor.cColorBits	= 32;
 			pixelFormatDescriptor.cDepthBits	= 16;
 			
-			int pixelFormat = ChoosePixelFormat( mHDC, &pixelFormatDescriptor );
+			int pixelFormat = ChoosePixelFormat( mCurrWindow->mHDC, &pixelFormatDescriptor );
 			_ASSERT( pixelFormat != 0 );
-			SetPixelFormat( mHDC, pixelFormat, &pixelFormatDescriptor );
+			SetPixelFormat( mCurrWindow->mHDC, pixelFormat, &pixelFormatDescriptor );
 
-			mRenderingContext = wglCreateContext( mHDC );
-			wglMakeCurrent( mHDC, mRenderingContext );
+			mCurrWindow->mContext = wglCreateContext( mCurrWindow->mHDC );
+			wglMakeCurrent( mCurrWindow->mHDC, mCurrWindow->mContext );
 
-			if( FULLSCREEN )
+			if( fullscreen )
 			{
 				DEVMODE dmScreenSettings;
 				memset( &dmScreenSettings, 0, sizeof( dmScreenSettings ));
 
 				dmScreenSettings.dmSize			= sizeof( dmScreenSettings );
-				dmScreenSettings.dmPelsWidth	= WINDOW_WIDTH;
-				dmScreenSettings.dmPelsHeight	= WINDOW_HEIGHT;
+				dmScreenSettings.dmPelsWidth	= width;
+				dmScreenSettings.dmPelsHeight	= height;
 				dmScreenSettings.dmBitsPerPel	= 32;
 				dmScreenSettings.dmFields		= DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
 				if( ChangeDisplaySettings( &dmScreenSettings, CDS_FULLSCREEN ) != DISP_CHANGE_SUCCESSFUL )
-					return S_FALSE;
+					return 0;
 			}
 
 			glewInit();
@@ -643,7 +656,7 @@ namespace Sentinel
 			glEnable( GL_CULL_FACE );
 			glFrontFace( GL_CCW );
 
-			CreateViewport( WINDOW_WIDTH, WINDOW_HEIGHT );
+			CreateViewport( width, height );
 
 			SetRenderTarget( 0 );
 			SetViewport( 0 );
@@ -651,23 +664,29 @@ namespace Sentinel
 
 			// Create initial white texture as BASE_TEXTURE.
 			//
-			UCHAR* newTex = new UCHAR[ 4 ];
-			newTex[ 0 ] = 255;
-			newTex[ 1 ] = 255;
-			newTex[ 2 ] = 255;
-			newTex[ 3 ] = 255;
+			if( !BASE_TEXTURE )
+			{
+				UCHAR* newTex = new UCHAR[ 4 ];
+				newTex[ 0 ] = 255;
+				newTex[ 1 ] = 255;
+				newTex[ 2 ] = 255;
+				newTex[ 3 ] = 255;
 
-			BASE_TEXTURE = CreateTextureFromMemory( newTex, 1, 1, IMAGE_FORMAT_RGBA, false );
-			delete newTex;
+				BASE_TEXTURE = CreateTextureFromMemory( newTex, 1, 1, IMAGE_FORMAT_RGBA, false );
+				delete newTex;
+			}
+			// Share resources with the initial context.
+			//
+			else
+			{
+				wglShareLists( mWindow[ 0 ].mContext, mCurrWindow->mContext );
+			}
 
 			return S_OK;
 		}
 
 		void Shutdown()
 		{
-			ClearBuffer( mVBO );
-			ClearBuffer( mIBO );
-
 			mCurrShader = NULL;
 
 			for( UINT i = 0; i < mTexture.size(); ++i )
@@ -683,12 +702,28 @@ namespace Sentinel
 			}
 
 			wglMakeCurrent( NULL, NULL );
-			wglDeleteContext( mRenderingContext );
-			mRenderingContext = 0;
+			wglDeleteContext( mCurrWindow->mContext );
+			mCurrWindow->mContext = 0;
 
-			ReleaseDC( mHWND, mHDC );
+			ReleaseDC( mCurrWindow->mHWND, mCurrWindow->mHDC );
 		}
 
+		// Windows.
+		//
+		void SetWindow( UINT index )
+		{
+			_ASSERT( index < mWindow.size() );
+
+			mCurrWindow = &mWindow[ index ];
+		}
+
+		const WindowInfo* GetWindowInfo() const
+		{
+			return mCurrWindow;
+		}
+
+		// Buffers.
+		//
 		Buffer* CreateBuffer( void* data, UINT size, UINT stride, BufferType type )
 		{
 			_ASSERT( type == VERTEX_BUFFER || type == INDEX_BUFFER );
@@ -721,6 +756,8 @@ namespace Sentinel
 			glIndexPointer( GL_UNSIGNED_INT, sizeof( UINT ), 0 );
 		}
 
+		// Textures.
+		//
 		Texture* CreateTextureFromFile( const char* filename )
 		{
 			_ASSERT( strlen( filename ) > 0 );
@@ -795,6 +832,8 @@ namespace Sentinel
 			return mTexture.back();
 		}
 
+		// Special Rendering.
+		//
 		UINT CreateRenderTarget( Texture* texture )
 		{
 			UINT renderID = mRenderTarget.size();
@@ -838,7 +877,7 @@ namespace Sentinel
 		void SetRenderType( PrimitiveType type )
 		{
 			mCurrShader->ApplyLayout();
-			mRenderMode = type;
+			mCurrWindow->mRenderMode = type;
 		}
 
 		void SetRenderTarget( UINT target )
@@ -926,7 +965,7 @@ namespace Sentinel
 				glEnableVertexAttribArray( i );
 			}
 
-			glDrawRangeElementsBaseVertex( PRIMITIVE[ mRenderMode ], startIndex, startIndex + count, count, GL_UNSIGNED_INT, \
+			glDrawRangeElementsBaseVertex( PRIMITIVE[ mCurrWindow->mRenderMode ], startIndex, startIndex + count, count, GL_UNSIGNED_INT, \
 										   reinterpret_cast< void* >( startIndex * sizeof( UINT ) ), baseVertex );
 			
 			for( UINT i = 0; i < static_cast< ShaderGL* >(mCurrShader)->AttributeSize(); ++i )
@@ -937,18 +976,7 @@ namespace Sentinel
 
 		void Present()
 		{
-			SwapBuffers( mHDC );
-		}
-
-	private:
-
-		void ClearBuffer( std::vector< GLuint >& buffer )
-		{
-			for( UINT i = 0; i < buffer.size(); ++i )
-			{
-				glDeleteBuffers( 1, &buffer[ i ] );
-			}
-			buffer.clear();
+			SwapBuffers( mCurrWindow->mHDC );
 		}
 	};
 

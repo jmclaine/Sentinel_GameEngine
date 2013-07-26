@@ -31,15 +31,20 @@ namespace Sentinel { namespace Systems
 		// is not the same as the SingletonAbstract located here,
 		// which is nullptr.
 		//
-		if( !Renderer::Inst( (Renderer*)(Renderer::Load( SString( filename )))))
+		Renderer::WindowInfo info;
+		if( !Renderer::Inst( (Renderer*)(Renderer::Load( SString( filename ), info ))))
 			return false;
 		
+		mWindowInfo.mFullscreen = info.mFullscreen;
+		mWindowInfo.mWidth		= info.mWidth;
+		mWindowInfo.mHeight		= info.mHeight;
+
 		return true;
 	}
 
 	UINT WRenderer::Startup( IntPtr hWnd )
 	{
-		return Renderer::Inst()->Startup( hWnd.ToPointer() );
+		return Renderer::Inst()->Startup( hWnd.ToPointer(), mWindowInfo.mFullscreen, mWindowInfo.mWidth, mWindowInfo.mHeight );
 	}
 
 	void WRenderer::Update( Object^ sender, EventArgs^ e )
@@ -54,6 +59,13 @@ namespace Sentinel { namespace Systems
 	void WRenderer::Destroy()
 	{
 		Renderer::Destroy();
+	}
+
+	// Windows.
+	//
+	WRenderer::WindowInfo^ WRenderer::GetWindowInfo()
+	{
+		return %mWindowInfo;
 	}
 
 	// Buffers.
@@ -200,8 +212,7 @@ namespace Sentinel { namespace Systems
 
 	void WRenderer::OnRender( DrawingContext^ drawingContext )
 	{
-		// Better to do nothing as the rendering
-		// should be taking place in app.
+		// Better to do nothing as the rendering should be taking place in app.
 	}
 
 	void WRenderer::OnMouseDown( MouseButtonEventArgs^ e )
@@ -259,17 +270,17 @@ namespace Sentinel { namespace Systems
 			RECT screenRect;
 			GetWindowRect( hWnd, &screenRect );
 
-			Renderer::Inst()->WINDOW_WIDTH  = screenRect.right  - screenRect.left;
-			Renderer::Inst()->WINDOW_HEIGHT = screenRect.bottom - screenRect.top;
+			mWindowInfo.mWidth  = screenRect.right  - screenRect.left;
+			mWindowInfo.mHeight = screenRect.bottom - screenRect.top;
 			
 			mHWND = CreateWindowEx( 0, (LPCSTR)mWindowClass, (LPCSTR)mTitle, WS_CHILD | WS_VISIBLE, 
-									0, 0, Renderer::Inst()->WINDOW_WIDTH, Renderer::Inst()->WINDOW_HEIGHT,
+									0, 0, mWindowInfo.mWidth, mWindowInfo.mHeight,
 									hWnd, 0, mINST, 0 );
 
 			if( !mHWND )
 				TRACE( "Error: CreateWindowEx = " << GetLastError() );
 			
-			Renderer::Inst()->Startup( mHWND );
+			Renderer::Inst()->Startup( mHWND, mWindowInfo.mFullscreen, mWindowInfo.mWidth, mWindowInfo.mHeight );
 
 			return HandleRef( this, IntPtr( mHWND ));
 		}

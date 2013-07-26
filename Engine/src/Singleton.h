@@ -181,7 +181,7 @@ namespace Sentinel
 
 	public:
 
-		static T* volatile Inst( T* obj )
+		static T* Inst( T* obj )
 		{
 			DWORD threadID = GetCurrentThreadId();
 
@@ -191,12 +191,12 @@ namespace Sentinel
 			return mObj[ threadID ];
 		}
 
-		static T* volatile Inst()
+		static T* Inst()
 		{
 			return mObj[ GetCurrentThreadId() ];
 		}
 
-		static void volatile Destroy()
+		static void Destroy()
 		{
 			DWORD threadID = GetCurrentThreadId();
 
@@ -209,4 +209,89 @@ namespace Sentinel
 	};
 
 	template< class T > std::unordered_map< DWORD, T* > SingletonAbstractThreaded< T >::mObj;
+
+	//////////////////////////////////////////////////////////////////////////
+
+	// Singleton for multiple windows.
+	//
+	template< class T >
+	class SingletonWindow
+	{
+	private:
+
+		static std::unordered_map< void*, volatile T* volatile > mObj;
+
+	protected:
+
+		SingletonWindow() {}
+		SingletonWindow( const SingletonWindow& ) {}
+		SingletonWindow& operator = ( const SingletonWindow& ) {}
+		~SingletonWindow() {}
+
+	public:
+
+		static T* volatile Inst( void* hWnd = NULL )
+		{
+			if( mObj.find( hWnd ) == mObj.end() )
+				mObj[ hWnd ] = new T();
+			
+			return (T*)mObj[ hWnd ];
+		}
+
+		static void volatile Destroy()
+		{
+			if( mObj.find( hWnd ) != mObj.end() )
+			{
+				delete mObj[ hWnd ];
+				mObj.erase( hWnd );
+			}
+		}
+	};
+
+	template< class T > std::unordered_map< void*, volatile T* volatile > SingletonWindow< T >::mObj;
+
+	//////////////////////////////////////////////////////////////////////////
+
+	// Singleton for multiple windows on an abstract class.
+	//
+	template< class T >
+	class SingletonAbstractWindow
+	{
+	private:
+
+		static std::unordered_map< void*, volatile T* > mObj;
+
+	protected:
+
+		SingletonAbstractWindow() {}
+		SingletonAbstractWindow( const SingletonAbstractWindow& ) {}
+		SingletonAbstractWindow& operator = ( const SingletonAbstractWindow& ) { return *this; }
+		~SingletonAbstractWindow() {}
+
+	public:
+
+		static T* volatile Inst( T* obj, void* hWnd = NULL )
+		{
+			if( mObj.find( hWnd ) == mObj.end() )
+				mObj[ hWnd ] = obj;
+			
+			return (T*)mObj[ hWnd ];
+		}
+
+		static T* volatile Inst( void* hWnd = NULL )
+		{
+			return (T*)mObj[ hWnd ];
+		}
+
+		static void volatile Destroy( void* hWnd = NULL )
+		{
+			if( mObj.find( hWnd ) != mObj.end() )
+			{
+				delete mObj[ hWnd ];
+				mObj.erase( hWnd );
+			}
+		}
+	};
+
+	template< class T > std::unordered_map< void*, volatile T* volatile > SingletonAbstractWindow< T >::mObj;
 }

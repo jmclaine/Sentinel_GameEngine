@@ -38,13 +38,14 @@ namespace Sentinel_Editor
 
         private void Window_Loaded(Object sender, RoutedEventArgs e)
         {
-            if (!WRenderer.Load("config.xml"))
+            mRenderer = new WRenderer();
+
+            if (!mRenderer.Load("config.xml"))
             {
                 MessageBox.Show("Failed to load config.xml", "Application Failure");
                 System.Environment.Exit(0);
             }
 
-            mRenderer = new WRenderer();
             RendererHWND.Child = mRenderer;
 
             DispatcherTimer timer = new DispatcherTimer();
