@@ -26,6 +26,8 @@ namespace Sentinel
 
 	class Mouse : public Singleton< Mouse >
 	{
+		friend class Singleton< Mouse >;
+
 	private:
 
 		int mButtonStates[ NUM_BUTTONS ];
@@ -35,22 +37,24 @@ namespace Sentinel
 
 		static HWND mHWND;
 
-		/////////////////////////////////
+	private:
 
 		Mouse();
 
-		void  SetPosition( const POINT& pos );
-		POINT GetPosition() const;
+	public:
 
-		bool IsDown( MouseButton button ) const;
+		void	SetPosition( const POINT& pos );
+		POINT	GetPosition() const;
 
-		bool DidGoUp( MouseButton button ) const;
-		bool DidGoDown( MouseButton button ) const;
-		bool DidDoubleClick( MouseButton button ) const;
+		bool	IsDown( MouseButton button ) const;
 
-		void Update();
+		bool	DidGoUp( MouseButton button ) const;
+		bool	DidGoDown( MouseButton button ) const;
+		bool	DidDoubleClick( MouseButton button ) const;
 
-		void ProcessMessages( UINT message );
+		void	Update();
+
+		void	ProcessMessages( UINT message );
 	};
 
 	///////////////////////////////////////////
@@ -63,6 +67,8 @@ namespace Sentinel
 
 	class Keyboard : public Singleton< Keyboard >
 	{
+		friend class Singleton< Keyboard >;
+
 	private:
 
 		static const UINT NUM_KEYS	= 256;
@@ -70,17 +76,19 @@ namespace Sentinel
 		int mKeyStates[ NUM_KEYS ];
 		int mLastKeyStates[ NUM_KEYS ];
 
-	public:
+		///////////////////////////////////
 
 		Keyboard();
-		
-		bool IsDown( UINT key );
 
-		bool DidGoUp( UINT key ) const;
-		bool DidGoDown( UINT key ) const;
+	public:
 
-		void Update();
+		bool	IsDown( UINT key );
 
-		void ProcessMessages();
+		bool	DidGoUp( UINT key ) const;
+		bool	DidGoDown( UINT key ) const;
+
+		void	Update();
+
+		void	ProcessMessages();
 	};
 }

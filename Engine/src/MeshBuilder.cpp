@@ -21,7 +21,7 @@ namespace Sentinel
 
 		for( UINT i = 0; i < NUM_TEXTURES; ++i )
 		{
-			mTexture[ i ] = Renderer::BASE_TEXTURE;
+			mTexture[ i ] = Renderer::Inst()->BASE_TEXTURE;
 		}
 
 		mVBO = NULL;

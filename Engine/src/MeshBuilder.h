@@ -1,5 +1,11 @@
 #pragma once
 
+/*
+Provides complete customization of objects programmatically.
+
+Always set mShader to a valid shader before calling BuildMesh();
+*/
+
 #include <memory>
 #include <vector>
 
@@ -40,9 +46,10 @@ namespace Sentinel
 			}
 
 			Vertex( const Vector3f& pos, const ColorRGBA& color = ColorRGBA( 1, 1, 1, 1 )) :
-				mPosition( pos ),
-				mColor( COLORtoUINT( color.R(), color.G(), color.B(), color.A() ))
+				mPosition( pos )
 			{
+				mColor = color.ToUINT();
+
 				mMatrixVertex.Identity();
 			}
 		};
@@ -59,7 +66,7 @@ namespace Sentinel
 
 		Material				mMaterial;
 
-		Texture*				mTexture[ NUM_TEXTURES ];
+		Texture*				mTexture[ NUM_TEXTURES ];	// uses TextureType
 		Vector4f				mTextureScale;
 
 		std::vector< Vertex >	mVertex;
@@ -74,6 +81,7 @@ namespace Sentinel
 		void	ClearGeometry();
 
 		// Returns UINT_MAX if not found.
+		// Helper function for M3D and OBJ model loaders.
 		//
 		UINT	FindVertex( const Vector3f& pos, const Vector2f& tex, const Vector3f& normal );
 
@@ -82,15 +90,17 @@ namespace Sentinel
 		void	AddIndex( UINT i0 );										// Point
 		void	AddIndex( UINT i0, UINT i1 );								// Line
 		void	AddIndex( UINT i0, UINT i1, UINT i2 );						// Triangle
-		void	AddIndex( UINT i0, UINT i1, UINT i2, UINT i3 );			// Quad
+		void	AddIndex( UINT i0, UINT i1, UINT i2, UINT i3 );				// Quad
 		void	AddIndex( UINT i0, UINT i1, UINT i2, UINT i3, UINT i4 );	// Polygon
 
 		// Tangents.
 		// Call this function only after all vertices have been added.
+		// Used for normal mapping.
 		//
 		void	CalculateTangents( bool doNormals = false );
 
 		// Create objects.
+		// Based on geometry.h provided with OpenGL.
 		//
 		void	CreateQuad( float size, const Vector3f& pos = Vector3f( 0, 0, 0 ), const Vector3f& normal = Vector3f( 0, 0, 1 ));
 		void	CreateCube( float size, const Vector3f& pos = Vector3f( 0, 0, 0 ));

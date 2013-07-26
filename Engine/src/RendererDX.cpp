@@ -101,7 +101,8 @@ namespace Sentinel
 		// Use the filename without the extension.
 		// DirectX uses .fx files.
 		//
-		UINT Startup( std::string filename, std::string attrib, std::string uniform, ID3D11Device*	device, ID3D11DeviceContext* context )
+		UINT Startup( std::string filename, const std::string& attrib, const std::string& uniform, 
+					  ID3D11Device* device, ID3D11DeviceContext* context )
 		{
 			mAttribute  = attrib;
 			mUniform	= uniform;
@@ -449,9 +450,9 @@ namespace Sentinel
 
 	private:
 
-		UINT Startup( void* hWnd, bool fullscreen, UINT width = 1920, UINT height = 1080 )
+		UINT Startup( void* hWnd )
 		{
-			Renderer::Startup( hWnd, fullscreen, width, height );
+			Renderer::Startup( hWnd );
 
 			D3D_FEATURE_LEVEL featurelevels[] = 
 			{
@@ -463,7 +464,7 @@ namespace Sentinel
 			DXGI_SWAP_CHAIN_DESC sd =
 			{
 				{
-					width, height,
+					WINDOW_WIDTH, WINDOW_HEIGHT,
 					{ 0, 0 },
 					DXGI_FORMAT_R8G8B8A8_UNORM,
 					DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED,
@@ -473,7 +474,7 @@ namespace Sentinel
 				DXGI_USAGE_RENDER_TARGET_OUTPUT,
 				1,
 				(HWND)hWnd,
-				!fullscreen,
+				!FULLSCREEN,
 				DXGI_SWAP_EFFECT_DISCARD,
 				DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH
 			};
@@ -490,9 +491,9 @@ namespace Sentinel
 											   featurelevels, sizeof(featurelevels)/sizeof(D3D_FEATURE_LEVEL),
 											   D3D11_SDK_VERSION, &sd, &mSwapChain, &mDevice, 0, &mContext ));
 
-			if( fullscreen )
+			if( FULLSCREEN )
 			{
-				HV( mSwapChain->ResizeBuffers( 1, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH ));
+				HV( mSwapChain->ResizeBuffers( 1, WINDOW_WIDTH, WINDOW_HEIGHT, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH ));
 				HV( mSwapChain->SetFullscreenState( TRUE, NULL ));
 			}
 
@@ -526,10 +527,10 @@ namespace Sentinel
 
 			delete newTex;
 
-			CreateDepthStencil( width, height );
+			CreateDepthStencil( WINDOW_WIDTH, WINDOW_HEIGHT );
 			SetDepthStencil( 0 );
 
-			CreateViewport( width, height );
+			CreateViewport( WINDOW_WIDTH, WINDOW_HEIGHT );
 			SetViewport( 0 );
 
 			ID3D11Texture2D *tex = NULL;
@@ -1075,6 +1076,8 @@ namespace Sentinel
 
 	Renderer* BuildRendererDX()
 	{
+		TRACE( "Creating DX11 Renderer..." );
+
 		return new RendererDX();
 	}
 }

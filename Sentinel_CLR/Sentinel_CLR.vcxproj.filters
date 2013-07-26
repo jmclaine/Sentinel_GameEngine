@@ -39,38 +39,38 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\Bufferw.h">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\Shaderw.h">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\Texturew.h">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\Matrix4fw.h">
-      <Filter>Sentinel_Engine\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\Quatfw.h">
-      <Filter>Sentinel_Engine\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\Vector2fw.h">
-      <Filter>Sentinel_Engine\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\Vector3fw.h">
-      <Filter>Sentinel_Engine\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\Vector4fw.h">
-      <Filter>Sentinel_Engine\Math</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\CLR\SString.h">
       <Filter>Sentinel_Engine\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\Rendererw.h">
-      <Filter>Sentinel_Engine\Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\Colorw.h">
+    <ClInclude Include="..\Engine\src\CLR\WBuffer.h">
       <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WColor.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WShader.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WTexture.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WMatrix4f.h">
+      <Filter>Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WQuatf.h">
+      <Filter>Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WVector2f.h">
+      <Filter>Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WVector3f.h">
+      <Filter>Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WVector4f.h">
+      <Filter>Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WRenderer.h">
+      <Filter>Sentinel_Engine\Systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -83,35 +83,35 @@
     <ClCompile Include="Stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\Bufferw.cpp">
+    <ClCompile Include="..\Engine\src\CLR\WBuffer.cpp">
       <Filter>Sentinel_Engine\Assets</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\Shaderw.cpp">
+    <ClCompile Include="..\Engine\src\CLR\WColor.cpp">
       <Filter>Sentinel_Engine\Assets</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\Texturew.cpp">
+    <ClCompile Include="..\Engine\src\CLR\WShader.cpp">
       <Filter>Sentinel_Engine\Assets</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\Matrix4fw.cpp">
+    <ClCompile Include="..\Engine\src\CLR\WTexture.cpp">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WMatrix4f.cpp">
       <Filter>Sentinel_Engine\Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\Quatfw.cpp">
+    <ClCompile Include="..\Engine\src\CLR\WQuatf.cpp">
       <Filter>Sentinel_Engine\Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\Vector2fw.cpp">
+    <ClCompile Include="..\Engine\src\CLR\WVector2f.cpp">
       <Filter>Sentinel_Engine\Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\Vector3fw.cpp">
+    <ClCompile Include="..\Engine\src\CLR\WVector3f.cpp">
       <Filter>Sentinel_Engine\Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\Vector4fw.cpp">
+    <ClCompile Include="..\Engine\src\CLR\WVector4f.cpp">
       <Filter>Sentinel_Engine\Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\Rendererw.cpp">
+    <ClCompile Include="..\Engine\src\CLR\WRenderer.cpp">
       <Filter>Sentinel_Engine\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\Colorw.cpp">
-      <Filter>Sentinel_Engine\Assets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

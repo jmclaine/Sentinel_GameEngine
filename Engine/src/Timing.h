@@ -12,12 +12,15 @@
 
 namespace Sentinel
 {
-	class Timing : public Singleton< Timing >
+	class Timing : public SingletonThreaded< Timing >
 	{
+		friend class SingletonThreaded< Timing >;
+
 	public:
 
 		static const double DESIRED_FRAME_RATE;
 		static const double INVERSE_FRAME_RATE;
+		static const double THRESHOLD_FRAME_RATE;
 
 	private:
 
@@ -29,13 +32,18 @@ namespace Sentinel
 
 		float			mDeltaTime;
 
-	public:
+		///////////////////////////////////
 
 		Timing();
+
+	public:
 		
-		double QueryCounter();
-		void   Update();
-		void   Limit( double frameRate = DESIRED_FRAME_RATE );
-		float  DeltaTime();
+		double	QueryCounter();
+
+		void	Update();
+
+		void	Limit( double frameRate = DESIRED_FRAME_RATE );
+
+		float	DeltaTime();
 	};
 }

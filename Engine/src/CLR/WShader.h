@@ -1,23 +1,23 @@
 #pragma once
 
 #include "Shader.h"
-#include "Texturew.h"
+#include "WTexture.h"
 
 namespace Sentinel { namespace Assets
 {
-	public ref class Shaderw
+	public ref class WShader
 	{
 	private:
 
 		Shader*				mRef;
 
-		Shaderw();
+		WShader();
 
 	public:
 
-		Shaderw( Shaderw^ shader );
-		Shaderw( Shader* shader );
-		~Shaderw();
+		WShader( WShader^ shader );
+		WShader( Shader* shader );
+		~WShader();
 
 		Shader*				GetRef();
 
@@ -36,6 +36,6 @@ namespace Sentinel { namespace Assets
 		void				SetFloat3( UINT uniform, float* data, UINT offset, UINT count );
 		void				SetFloat4( UINT uniform, float* data, UINT offset, UINT count );
 		void				SetMatrix( UINT uniform, float* matrix, UINT offset, UINT count );
-		void				SetTexture( UINT uniform, Texturew^ texture );
+		void				SetTexture( UINT uniform, WTexture^ texture );
 	};
 }}

@@ -596,12 +596,12 @@ namespace Sentinel
 			Shutdown();
 		}
 		
-		UINT Startup( void* hWnd, bool fullscreen, UINT width = 1920, UINT height = 1080 )
+		UINT Startup( void* hWnd )
 		{
 			mHWND = (HWND)hWnd;
 			mHDC  = GetDC( mHWND );
 
-			Renderer::Startup( hWnd, fullscreen, width, height );
+			Renderer::Startup( hWnd );
 
 			_ASSERT( mHDC );
 
@@ -621,14 +621,14 @@ namespace Sentinel
 			mRenderingContext = wglCreateContext( mHDC );
 			wglMakeCurrent( mHDC, mRenderingContext );
 
-			if( fullscreen )
+			if( FULLSCREEN )
 			{
 				DEVMODE dmScreenSettings;
 				memset( &dmScreenSettings, 0, sizeof( dmScreenSettings ));
 
 				dmScreenSettings.dmSize			= sizeof( dmScreenSettings );
-				dmScreenSettings.dmPelsWidth	= width;
-				dmScreenSettings.dmPelsHeight	= height;
+				dmScreenSettings.dmPelsWidth	= WINDOW_WIDTH;
+				dmScreenSettings.dmPelsHeight	= WINDOW_HEIGHT;
 				dmScreenSettings.dmBitsPerPel	= 32;
 				dmScreenSettings.dmFields		= DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
@@ -643,7 +643,7 @@ namespace Sentinel
 			glEnable( GL_CULL_FACE );
 			glFrontFace( GL_CCW );
 
-			CreateViewport( width, height );
+			CreateViewport( WINDOW_WIDTH, WINDOW_HEIGHT );
 
 			SetRenderTarget( 0 );
 			SetViewport( 0 );
@@ -955,6 +955,8 @@ namespace Sentinel
 
 	Renderer* BuildRendererGL()
 	{
+		TRACE( "Creating OpenGL 4.1 Renderer..." );
+
 		return new RendererGL();
 	}
 }

@@ -1,5 +1,10 @@
 #pragma once
 
+// Mesh is not modifiable, except the buffers
+// associated with the Mesh.
+//
+// Mesh is generated through MeshBuilder.h or Model.h
+//
 #include "Renderer.h"
 #include "Matrix4f.h"
 #include "Vector4f.h"

@@ -40,24 +40,13 @@ namespace Sentinel
 		}
 		verts += sizeof( Vector2f );
 
-		*(UINT*)verts = COLORtoUINT( mColor );
+		*(UINT*)verts = mColor.ToUINT();
 		verts += sizeof( UINT );
 
 		*(Matrix4f*)verts = mMatrixTranslation * mMatrixRotation * mMatrixScale;
 		verts += sizeof( Matrix4f );
 
-		if( mCamera )
-		{
-			CameraComponent* camera = GameWorld::Inst()->mCurrentCamera;
-
-			GameWorld::Inst()->mCurrentCamera = mCamera;
-
-			ParticleSystem::Inst()->End();
-
-			GameWorld::Inst()->mCurrentCamera = camera;
-		}
-		else
-			ParticleSystem::Inst()->End();
+		ParticleSystem::Inst()->End();
 	}
 
 	void SpriteComponent::Shutdown()

@@ -5,24 +5,18 @@
 
 namespace Sentinel
 {
-	float		Renderer::WINDOW_WIDTH_RATIO	= 1;
-	float		Renderer::WINDOW_HEIGHT_RATIO	= 1;
-
-	UINT		Renderer::DESKTOP_WIDTH			= 1920;
-	UINT		Renderer::DESKTOP_HEIGHT		= 1080;
-
-	UINT		Renderer::WINDOW_WIDTH			= 1920;
-	UINT		Renderer::WINDOW_HEIGHT			= 1080;
-	bool		Renderer::FULLSCREEN			= false;
-
-	Texture*	Renderer::NULL_TEXTURE			= NULL;
-	Texture*	Renderer::BASE_TEXTURE			= NULL;
+	Renderer::Renderer()
+	{
+		FULLSCREEN		= false;
+		WINDOW_WIDTH	= 1920;
+		WINDOW_HEIGHT	= 1080;
+	}
 
 	// This function should create and assign the resulting Renderer*
 	// to the SingletonAbstract instance; however, doing so results
 	// in the pointer being set back to NULL in the CLR wrapper.
 	//
-	const Renderer* Renderer::Load( const char* filename )
+	const void* Renderer::Load( const char* filename )
 	{
 		TiXmlDocument doc;
 		if( !doc.LoadFile( filename ))
@@ -33,29 +27,20 @@ namespace Sentinel
 		TiXmlElement* pElem = hDoc.FirstChild( "Renderer" ).Element();
 		const char*   pName = pElem->Attribute( "Type" );
 
-		if( !mSingle )
-			mSingle = (strcmp( "DIRECTX", pName ) == 0) ? BuildRendererDX() : BuildRendererGL();
+		if( !Renderer::Inst( (strcmp( "DIRECTX", pName ) == 0) ? BuildRendererDX() : BuildRendererGL() ))
+			return NULL;
 		
-		pElem->QueryBoolAttribute(		"Fullscreen",	&Renderer::FULLSCREEN );
-		pElem->QueryUnsignedAttribute(	"Width",		&Renderer::WINDOW_WIDTH );
-		pElem->QueryUnsignedAttribute(	"Height",		&Renderer::WINDOW_HEIGHT );
+		pElem->QueryBoolAttribute(		"Fullscreen",	&Renderer::Inst()->FULLSCREEN );
+		pElem->QueryUnsignedAttribute(	"Width",		&Renderer::Inst()->WINDOW_WIDTH );
+		pElem->QueryUnsignedAttribute(	"Height",		&Renderer::Inst()->WINDOW_HEIGHT );
 
-		return const_cast< Renderer* >(mSingle);
+		return (void*)Renderer::Inst();
 	}
 
-	UINT Renderer::Startup( void* hWnd, bool fullscreen, UINT width, UINT height )
+	UINT Renderer::Startup( void* hWnd )
 	{
-		WINDOW_WIDTH	= width;
-		WINDOW_HEIGHT	= height;
-		FULLSCREEN		= fullscreen;
-
 		WINDOW_WIDTH_RATIO  = (float)WINDOW_WIDTH  / (float)WINDOW_WIDTH_BASE;
 		WINDOW_HEIGHT_RATIO = (float)WINDOW_HEIGHT / (float)WINDOW_HEIGHT_BASE;
-
-		RECT screenRect;
-		GetWindowRect( GetDesktopWindow(), &screenRect );
-		DESKTOP_WIDTH  = screenRect.right;
-		DESKTOP_HEIGHT = screenRect.bottom;
 
 		return 1;
 	}

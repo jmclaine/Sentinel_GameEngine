@@ -24,6 +24,8 @@ namespace Sentinel
 		void	SetA( float alpha );
 
 		float*	Ptr();
+
+		UINT	ToUINT() const;
 	};
 	
 	class SENTINEL_DLL ColorRGB : public ColorRGBA
@@ -52,29 +54,4 @@ namespace Sentinel
 				  const ColorRGBA& specular = ColorRGBA( 0.2f, 0.2f, 0.2f, 1.0f ),
 				  float spec_comp = 32.0f );
 	};
-
-	////////////////////////////////////////////////////////////////////
-
-	inline UINT COLORtoUINT( float red, float green, float blue, float alpha = 1 )
-	{
-		return \
-			((UINT)(alpha * 255.0f) << 24) |
-			((UINT)(blue  * 255.0f) << 16) |
-			((UINT)(green * 255.0f) << 8)  |
-			((UINT)(red   * 255.0f));
-	}
-
-	inline UINT COLORtoUINT( const ColorRGBA& color )
-	{
-		return COLORtoUINT( color.R(), color.G(), color.B(), color.A() );
-	}
-
-	inline UINT UCHARtoUINT( UCHAR red, UCHAR green, UCHAR blue, UCHAR alpha = 1 )
-	{
-		return \
-			((UINT)(alpha)	<< 24) |
-			((UINT)(blue)	<< 16) |
-			((UINT)(green)	<< 8)  |
-			((UINT)(red));
-	}
 }

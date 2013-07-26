@@ -4,8 +4,9 @@
 
 namespace Sentinel
 {
-	const double Timing::INVERSE_FRAME_RATE = 60.0;
-	const double Timing::DESIRED_FRAME_RATE = 1.0 / 60.0;
+	const double Timing::INVERSE_FRAME_RATE		= 60.0;
+	const double Timing::DESIRED_FRAME_RATE		= 1.0 / 60.0;
+	const double Timing::THRESHOLD_FRAME_RATE	= DESIRED_FRAME_RATE * 4.0;
 
 	Timing::Timing()
 	{
@@ -51,8 +52,8 @@ namespace Sentinel
 		}
 
 		mDeltaTime = static_cast< float >(mTimeLater - mTimeNow);
-		if( mDeltaTime > (float)DESIRED_FRAME_RATE * 2.0f )
-			mDeltaTime = (float)DESIRED_FRAME_RATE * 2.0f;
+		if( mDeltaTime > (float)THRESHOLD_FRAME_RATE )
+			mDeltaTime = (float)THRESHOLD_FRAME_RATE;
 	}
 
 	float Timing::DeltaTime()

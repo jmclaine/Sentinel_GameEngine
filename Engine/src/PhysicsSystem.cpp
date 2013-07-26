@@ -1,3 +1,5 @@
+#include <process.h>
+
 #include "PhysicsSystem.h"
 #include "Renderer.h"
 #include "Timing.h"
@@ -32,7 +34,7 @@ namespace Sentinel
 
 		while( DT > 0 )
 		{
-			mWorld->stepSimulation( btScalar( DT ));
+			PhysicsSystem::Inst()->mWorld->stepSimulation( btScalar( DT ));
 
 			DT -= (float)Timing::DESIRED_FRAME_RATE;
 		}

@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Interop;
+using System.Windows.Threading;
 
 using System.Runtime.InteropServices;
 
@@ -27,20 +28,38 @@ namespace Sentinel_Editor
     /// </summary>
     public partial class MainWindow : Window
     {
+        private WRenderer           mRenderer;
+        private static WColorRGBA   mClearColor = new WColorRGBA(0.0f, 0.2f, 0.8f, 1.0f);
+
         public MainWindow()
         {
             InitializeComponent();
+        }
 
-            Sentinel.Math.Vector3fw mTestX = new Sentinel.Math.Vector3fw();
-
-            if (!Rendererw.Load("config.xml"))
+        private void Window_Loaded(Object sender, RoutedEventArgs e)
+        {
+            if (!WRenderer.Load("config.xml"))
             {
                 MessageBox.Show("Failed to load config.xml", "Application Failure");
-                System.Environment.Exit(0);   
+                System.Environment.Exit(0);
             }
 
-            Rendererw.SetCull(0);//Sentinel.Systems.CullType.CULL_CCW);
-            Rendererw.Destroy();
+            mRenderer = new WRenderer();
+            RendererHWND.Child = mRenderer;
+
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Tick += new EventHandler(UpdateRenderer);
+            timer.Interval = new TimeSpan(16);
+            timer.Start();
+        }
+
+        private void UpdateRenderer(Object sender, EventArgs e)
+        {
+            mRenderer.Clear(mClearColor);
+
+            // Draw stuff...
+
+            mRenderer.Present();
         }
 
         ///

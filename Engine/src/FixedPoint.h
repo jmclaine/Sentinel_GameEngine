@@ -1,5 +1,8 @@
 #pragma once
 
+// FixedPoint works the same as float.
+// sin and cos have lookup tables for speed.
+//
 #include <iostream>
 
 #include "MathCommon.h"

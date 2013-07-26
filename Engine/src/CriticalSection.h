@@ -10,6 +10,9 @@ namespace Sentinel
 
 		CRITICAL_SECTION	mCS;
 
+		CriticalSection( const CriticalSection& );
+		CriticalSection& operator = ( const CriticalSection& );
+
 	public:
 
 		CriticalSection()

@@ -118,4 +118,35 @@ namespace Sentinel
 				mGameObject.erase( it );
 			}
 	}
+
+	/////////////////////////////////
+
+	void GameWorld::SetCamera( UINT index )
+	{
+		_ASSERT( index < mCamera.size() );
+
+		mCurrentCamera = mCamera[ index ];
+	}
+
+	// -1 = mCurrentCamera
+	CameraComponent* GameWorld::GetCamera( int index )
+	{
+		_ASSERT( index < (int)mCamera.size() && index >= -1 );
+
+		return (index > -1) ? mCamera[ index ] : mCurrentCamera;
+	}
+
+	LightComponent* GameWorld::GetLight( UINT index )
+	{
+		_ASSERT( index < mLight.size() );
+
+		return mLight[ index ];
+	}
+
+	GameObject* GameWorld::GetGameObject( UINT index )
+	{
+		_ASSERT( index < mGameObject.size() );
+
+		return mGameObject[ index ];
+	}
 }

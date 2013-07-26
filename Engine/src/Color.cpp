@@ -62,6 +62,15 @@ namespace Sentinel
 	{
 		return Vector4f::Ptr();
 	}
+
+	UINT ColorRGBA::ToUINT() const
+	{
+		return \
+			((UINT)(A() * 255.0f) << 24) |
+			((UINT)(B() * 255.0f) << 16) |
+			((UINT)(G() * 255.0f) << 8)  |
+			((UINT)(R() * 255.0f));
+	}
 	
 	////////////////////////////////////////////////////////////////////
 

@@ -4,7 +4,7 @@
 
 namespace Sentinel { namespace Assets
 {
-	public ref class ColorRGBAw
+	public ref class WColorRGBA
 	{
 	private:
 
@@ -12,10 +12,11 @@ namespace Sentinel { namespace Assets
 
 	public:
 
-		ColorRGBAw();
-		ColorRGBAw( ColorRGBAw% color );
-		ColorRGBAw( ColorRGBA& color );
-		~ColorRGBAw();
+		WColorRGBA();
+		WColorRGBA( float red, float green, float blue, float alpha );
+		WColorRGBA( ColorRGBA& color );
+		WColorRGBA( WColorRGBA% color );
+		~WColorRGBA();
 
 		ColorRGBA*	GetRef();
 
@@ -30,5 +31,7 @@ namespace Sentinel { namespace Assets
 		void		SetA( float alpha );
 
 		float*		Ptr();
+
+		UINT		ToUINT();
 	};
 }}

@@ -12,6 +12,7 @@ namespace Sentinel
 
 	class ParticleSystem : public Singleton< ParticleSystem >
 	{
+		friend class Singleton< ParticleSystem >;
 		friend class SpriteComponent;
 
 	private:
@@ -23,11 +24,13 @@ namespace Sentinel
 		void*	mVertex;		// locked vertices within mMesh after Begin()
 		UINT	mCount;			// number of sprites to render
 
-		/////////////////////////////////
+	private:
 
 		ParticleSystem();
 		~ParticleSystem();
-		
+
+	public:
+
 		void Startup( Shader* shader, UINT maxSprites = 1000 );
 
 		void Shutdown();

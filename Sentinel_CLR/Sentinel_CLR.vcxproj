@@ -95,32 +95,32 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Engine\src\CLR\Bufferw.h" />
-    <ClInclude Include="..\Engine\src\CLR\Colorw.h" />
-    <ClInclude Include="..\Engine\src\CLR\Matrix4fw.h" />
-    <ClInclude Include="..\Engine\src\CLR\Quatfw.h" />
-    <ClInclude Include="..\Engine\src\CLR\Rendererw.h" />
-    <ClInclude Include="..\Engine\src\CLR\Shaderw.h" />
+    <ClInclude Include="..\Engine\src\CLR\WBuffer.h" />
+    <ClInclude Include="..\Engine\src\CLR\WColor.h" />
+    <ClInclude Include="..\Engine\src\CLR\WMatrix4f.h" />
+    <ClInclude Include="..\Engine\src\CLR\WQuatf.h" />
+    <ClInclude Include="..\Engine\src\CLR\WRenderer.h" />
+    <ClInclude Include="..\Engine\src\CLR\WShader.h" />
     <ClInclude Include="..\Engine\src\CLR\SString.h" />
-    <ClInclude Include="..\Engine\src\CLR\Texturew.h" />
-    <ClInclude Include="..\Engine\src\CLR\Vector2fw.h" />
-    <ClInclude Include="..\Engine\src\CLR\Vector3fw.h" />
-    <ClInclude Include="..\Engine\src\CLR\Vector4fw.h" />
+    <ClInclude Include="..\Engine\src\CLR\WTexture.h" />
+    <ClInclude Include="..\Engine\src\CLR\WVector2f.h" />
+    <ClInclude Include="..\Engine\src\CLR\WVector3f.h" />
+    <ClInclude Include="..\Engine\src\CLR\WVector4f.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Sentinel_CLR.h" />
     <ClInclude Include="Stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Engine\src\CLR\Bufferw.cpp" />
-    <ClCompile Include="..\Engine\src\CLR\Colorw.cpp" />
-    <ClCompile Include="..\Engine\src\CLR\Matrix4fw.cpp" />
-    <ClCompile Include="..\Engine\src\CLR\Quatfw.cpp" />
-    <ClCompile Include="..\Engine\src\CLR\Rendererw.cpp" />
-    <ClCompile Include="..\Engine\src\CLR\Shaderw.cpp" />
-    <ClCompile Include="..\Engine\src\CLR\Texturew.cpp" />
-    <ClCompile Include="..\Engine\src\CLR\Vector2fw.cpp" />
-    <ClCompile Include="..\Engine\src\CLR\Vector3fw.cpp" />
-    <ClCompile Include="..\Engine\src\CLR\Vector4fw.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WBuffer.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WColor.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WMatrix4f.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WQuatf.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WRenderer.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WShader.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WTexture.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WVector2f.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WVector3f.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WVector4f.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="Sentinel_CLR.cpp" />
     <ClCompile Include="Stdafx.cpp">

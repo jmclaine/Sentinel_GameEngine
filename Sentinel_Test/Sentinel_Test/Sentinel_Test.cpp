@@ -36,13 +36,13 @@ using namespace Sentinel;
 //
 #define MAX_LOADSTRING 100
 
-HINSTANCE	hInst;								// current instance
-TCHAR		szTitle[ MAX_LOADSTRING ];			// title bar text
-TCHAR		szWindowClass[ MAX_LOADSTRING ];	// main window class name
+HINSTANCE			hInst;								// current instance
+TCHAR				szTitle[ MAX_LOADSTRING ];			// title bar text
+TCHAR				szWindowClass[ MAX_LOADSTRING ];	// main window class name
 
-ATOM				MyRegisterClass(HINSTANCE hInstance);
-HWND				InitInstance(HINSTANCE, int);
-LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
+ATOM				MyRegisterClass( HINSTANCE hInstance );
+HWND				InitInstance( HINSTANCE, int );
+LRESULT CALLBACK	WndProc( HWND, UINT, WPARAM, LPARAM );
 
 
 // Main Application.
@@ -101,7 +101,7 @@ public:
 		{
 			REPORT_ERROR( "Failed to load 'config.xml'\nDefaulting to OpenGL", "Renderer Setup Failure" );
 
-			if( !Renderer::Inst( BuildRendererGL ))
+			if( !Renderer::Inst( BuildRendererGL() ))
 				throw AppException( "Failed to BuildRendererGL" );
 		}
 
@@ -120,7 +120,7 @@ public:
 		Mouse::Inst()->SetPosition( CenterHandle( Mouse::mHWND ));
 		ShowCursor( FALSE );
 
-		if( Renderer::Inst()->Startup( mHWND, Renderer::FULLSCREEN, Renderer::WINDOW_WIDTH, Renderer::WINDOW_HEIGHT ) != S_OK )
+		if( Renderer::Inst()->Startup( mHWND ) != S_OK )
 			throw AppException( "Failed Renderer::Startup()" );
 
 		PhysicsSystem::Inst()->Startup();
@@ -175,7 +175,7 @@ public:
 		GameWorld::Inst()->Update();
 
 		Renderer::Inst()->Present();
-
+		
 		Mouse::Inst()->Update();
 		Keyboard::Inst()->Update();
 
@@ -224,7 +224,7 @@ public:
 
 		// Create main perspective camera.
 		//
-		camera = new PerspectiveCameraComponent( (float)Renderer::WINDOW_WIDTH, (float)Renderer::WINDOW_HEIGHT );
+		camera = new PerspectiveCameraComponent( (float)Renderer::Inst()->WINDOW_WIDTH, (float)Renderer::Inst()->WINDOW_HEIGHT );
 		
 		transform = new TransformComponent();
 		transform->mPosition = Vector3f( 0, 10, 50 );
@@ -247,7 +247,7 @@ public:
 
 		// Create sprite orthographic camera.
 		//
-		camera = new OrthographicCameraComponent( (float)Renderer::WINDOW_WIDTH, (float)Renderer::WINDOW_HEIGHT );
+		camera = new OrthographicCameraComponent( (float)Renderer::Inst()->WINDOW_WIDTH, (float)Renderer::Inst()->WINDOW_HEIGHT );
 		
 		transform = new TransformComponent();
 		transform->mPosition = Vector3f( 0, 0, 0 );
@@ -545,8 +545,8 @@ HWND InitInstance( HINSTANCE hInstance, int nCmdShow )
 
    hInst = hInstance; // Store instance handle in our global variable
 
-   hWnd = CreateWindow( szWindowClass, "Sentinel", (!Renderer::FULLSCREEN) ? WS_OVERLAPPEDWINDOW : WS_POPUP,
-						0, 0, Renderer::WINDOW_WIDTH, Renderer::WINDOW_HEIGHT,
+   hWnd = CreateWindow( szWindowClass, "Sentinel", (!Renderer::Inst()->FULLSCREEN) ? WS_OVERLAPPEDWINDOW : WS_POPUP,
+						0, 0, Renderer::Inst()->WINDOW_WIDTH, Renderer::Inst()->WINDOW_HEIGHT,
 						NULL, NULL, hInstance, NULL );
 
    if( !hWnd )

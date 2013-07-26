@@ -9,8 +9,10 @@
 
 namespace Sentinel
 {
-	class PhysicsSystem : public Singleton< PhysicsSystem >
+	class PhysicsSystem : public SingletonThreaded< PhysicsSystem >
 	{
+		friend class SingletonThreaded< PhysicsSystem >;
+
 	private:
 
 		btDefaultCollisionConfiguration*					mConfig;
@@ -22,10 +24,12 @@ namespace Sentinel
 		btAlignedObjectArray< btCollisionShape* >			mShape;
 		btAlignedObjectArray< btTriangleIndexVertexArray* > mShapeData;
 
-	public:
+		//////////////////////////////////
 
 		PhysicsSystem();
 		~PhysicsSystem();
+
+	public:
 
 		void			Startup();
 

@@ -131,11 +131,13 @@ namespace Sentinel
 	//
 	class NetworkPacketSender : public NetworkPacket, public Singleton< NetworkPacketSender >
 	{
-	public:
+		friend class Singleton< NetworkPacketSender >;
+
+	private:
 
 		NetworkPacketSender();
-		
-		//////////////////////////////////
+
+	public:
 
 		void AddHeader( UCHAR header, float advTimer = 0.0f );
 
@@ -168,11 +170,13 @@ namespace Sentinel
 	//
 	class NetworkPacketReceiver : public NetworkPacket, public Singleton< NetworkPacketReceiver >
 	{
-	public:
+		friend class Singleton< NetworkPacketReceiver >;
+
+	private:
 
 		NetworkPacketReceiver();
-		
-		//////////////////////////////////
+
+	public:
 
 		const NetworkPacket::Header& GetHeader();
 

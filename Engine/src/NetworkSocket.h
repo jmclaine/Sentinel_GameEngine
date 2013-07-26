@@ -61,6 +61,8 @@ namespace Sentinel
 	
 	class NetworkSocket : public Singleton< NetworkSocket >
 	{
+		friend class Singleton< NetworkSocket >;
+
 	public:
 
 		struct Connection
@@ -106,10 +108,12 @@ namespace Sentinel
 
 		WORD					mFlags;			// NetworkType
 
-	public:
+		////////////////////////////////////
 
 		NetworkSocket();
 		~NetworkSocket();
+
+	public:
 
 		// Initialize by connection type flags.
 		// Must use NETWORK_UDP or NETWORK_TCP.

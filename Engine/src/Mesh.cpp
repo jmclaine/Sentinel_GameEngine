@@ -50,7 +50,7 @@ namespace Sentinel
 
 		for( UINT i = 0; i < NUM_TEXTURES; ++i )
 		{
-			mTexture[ i ] = Renderer::BASE_TEXTURE;
+			mTexture[ i ] = Renderer::Inst()->BASE_TEXTURE;
 		}
 
 		mVBO = NULL;
@@ -70,7 +70,7 @@ namespace Sentinel
 
 	void Mesh::Draw( UINT count )
 	{
-		_ASSERT( GameWorld::Inst()->mCurrentCamera != NULL );
+		_ASSERT( GameWorld::Inst()->GetCamera() != NULL );
 
 		if( count == 0 )
 			return;
@@ -97,7 +97,7 @@ namespace Sentinel
 					// Model-View-Projection Matrix.
 					//
 					case 'P':
-						mShader->SetMatrix( uniformIndex, (GameWorld::Inst()->mCurrentCamera->mMatrixFinal * mMatrixWorld).Ptr() );
+						mShader->SetMatrix( uniformIndex, (GameWorld::Inst()->GetCamera()->mMatrixFinal * mMatrixWorld).Ptr() );
 						break;
 
 					// World Matrix.
@@ -122,7 +122,7 @@ namespace Sentinel
 					// Camera Position.
 					//
 					case 'V':
-						pos = GameWorld::Inst()->mCurrentCamera->GetTransform()->mPosition;
+						pos = GameWorld::Inst()->GetCamera()->GetTransform()->mPosition;
 						
 						mShader->SetFloat3( uniformIndex, pos.Ptr() );
 						break;
@@ -130,15 +130,15 @@ namespace Sentinel
 					// Light Position.
 					//
 					case 'L':
-						pos = GameWorld::Inst()->mLight[ lightCount ]->GetTransform()->mPosition;
+						pos = GameWorld::Inst()->GetLight( lightCount )->GetTransform()->mPosition;
 						
 						mShader->SetFloat3( uniformIndex, pos.Ptr() );
 						++uniformIndex;
 
-						mShader->SetFloat3( uniformIndex, GameWorld::Inst()->mLight[ lightCount ]->mColor.Ptr() );
+						mShader->SetFloat3( uniformIndex, GameWorld::Inst()->GetLight( lightCount )->mColor.Ptr() );
 						++uniformIndex;
 
-						mShader->SetFloat4( uniformIndex, GameWorld::Inst()->mLight[ lightCount ]->mAttenuation.Ptr() );
+						mShader->SetFloat4( uniformIndex, GameWorld::Inst()->GetLight( lightCount )->mAttenuation.Ptr() );
 						++lightCount;
 
 						break;
@@ -183,12 +183,12 @@ namespace Sentinel
 					//
 					case 'A':
 						{
-						Vector2f pixelSize( 1.0f / Renderer::WINDOW_WIDTH, 1.0f / Renderer::WINDOW_HEIGHT );
+						Vector2f pixelSize( 1.0f / Renderer::Inst()->WINDOW_WIDTH, 1.0f / Renderer::Inst()->WINDOW_HEIGHT );
 
-						mShader->SetMatrix( uniformIndex, (GameWorld::Inst()->mCurrentCamera->mMatrixProjection.Inverse()).Ptr() );
+						mShader->SetMatrix( uniformIndex, (GameWorld::Inst()->GetCamera()->mMatrixProjection.Inverse()).Ptr() );
 						++uniformIndex;
 
-						mShader->SetMatrix( uniformIndex, GameWorld::Inst()->mCurrentCamera->mMatrixView.Ptr() );
+						mShader->SetMatrix( uniformIndex, GameWorld::Inst()->GetCamera()->mMatrixView.Ptr() );
 						++uniformIndex;
 
 						mShader->SetFloat2( uniformIndex, pixelSize.Ptr() );

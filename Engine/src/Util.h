@@ -246,12 +246,12 @@ namespace Sentinel
 	template< typename Real >
 	void NUMtoBYTES( UCHAR* data, Real value )
 	{
-		UINTVal = *(reinterpret_cast< unsigned* >( &value ));
+		unsigned result = *(reinterpret_cast< unsigned* >( &value ));
 
 		for( unsigned i = 0; i < 4; ++i )
 		{
-			data[ i ] = ( intVal & 0xFF );
-			intVal = intVal >> 8;
+			data[ i ] = (result & 0xFF);
+			result >>= 8;
 		}
 	}
 
@@ -262,8 +262,8 @@ namespace Sentinel
 
 		for( unsigned i = 0; i < 4; ++i )
 		{
-			result = ( result << 8 );
-			result = ( result | data[ 3 - i ] );
+			result = (result << 8);
+			result = (result | data[ 3 - i ]);
 		}
 
 		type = *(reinterpret_cast< Real* >( &result ));

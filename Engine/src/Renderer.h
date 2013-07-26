@@ -1,5 +1,75 @@
 #pragma once
 
+/*
+HOW TO USE:
+
+Create a file called 'config.xml' for easy setup.
+
+config.xml syntax:
+
+<?xml version="1.0" ?>
+<!--DIRECTX or OPENGL-->
+<Renderer Type="OPENGL" Fullscreen="false" Width="1920" Height="1080" />
+
+// This initializes the Renderer values within the XML file.
+Renderer::Load( "config.xml" );
+
+
+// Alternative to creating and loading the XML file.
+Renderer::Inst( BuildRendererGL() );
+* OR *
+Renderer::Inst( BuildRendererDX() );
+
+// The Renderer defaults to this if unassigned.
+Renderer::Inst()->FULLSCREEN    = false;
+Renderer::Inst()->WINDOW_WIDTH  = 1920;
+Renderer::Inst()->WINDOW_HEIGHT = 1080;
+
+
+// Initialize the Renderer.
+Renderer::Inst()->Startup( mHWND );		// use appropriate HWND for Windows apps
+
+
+// Now the Renderer can perform its normal functionality.
+// See functions for their applicability to desired use.
+
+// See MeshBuilder.h for ease of object creation.
+// See Mesh.h for ease of object rendering.
+
+// Although custom object creation and rendering is possible,
+// it is highly recommended to use both the MeshBuilder and Mesh
+// to render objects easily.
+//
+// If more complex objects are desired, then it is recommended
+// to create either OBJ or M3D (3ds Max plugin) models, and
+// import them. (see Model.h)
+
+
+EXAMPLE:
+
+Renderer::Inst()->Clear( ColorRGBA( 0.0f, 0.2f, 0.8f, 1.0f ).Ptr() );
+
+// Shaders are required.
+Renderer::Inst()->SetShader( shader );
+
+// VBOs and IBOs required.
+Renderer::Inst()->SetVBO( bufferVBO );
+Renderer::Inst()->SetIBO( bufferIBO );
+
+// Set shader variables here.
+
+// Draw stuff.
+Renderer::Inst()->SetRenderType( primitive );
+Renderer::Inst()->DrawIndexed( bufferIBO.mCount, 0, 0 );
+
+Renderer::Inst()->Present();
+
+
+// When finished with Renderer always call:
+Renderer::Destroy();
+
+*/
+
 #include "Singleton.h"
 #include "Util.h"
 #include "Shader.h"
@@ -56,6 +126,15 @@ namespace Sentinel
 		NUM_STENCIL_TYPES
 	};
 
+	// Renderer is a SingletonAbstract as creating multiple instances
+	// of this particular object would unnecessarily complicate the
+	// natural threading ability of the video card interface without
+	// any gains.  Due to this class being a Singleton, this also
+	// prevents a user from creating both OpenGL and DirectX at the
+	// same time.
+	//
+	// TODO: Create functions to allow draw calls on multiple windows.
+	//
 	class SENTINEL_DLL Renderer : public SingletonAbstract< Renderer >
 	{
 	protected:
@@ -70,26 +149,29 @@ namespace Sentinel
 		static const UINT	WINDOW_WIDTH_BASE  = 1920;
 		static const UINT	WINDOW_HEIGHT_BASE = 1080;
 
-		static float		WINDOW_WIDTH_RATIO;
-		static float		WINDOW_HEIGHT_RATIO;
+		float				WINDOW_WIDTH_RATIO;
+		float				WINDOW_HEIGHT_RATIO;
 
-		static UINT			DESKTOP_WIDTH;
-		static UINT			DESKTOP_HEIGHT;
+		UINT				WINDOW_WIDTH;
+		UINT				WINDOW_HEIGHT;
+		bool				FULLSCREEN;
 
-		static UINT			WINDOW_WIDTH;
-		static UINT			WINDOW_HEIGHT;
-		static bool			FULLSCREEN;
+		Texture*			NULL_TEXTURE;	// black default texture
+		Texture*			BASE_TEXTURE;	// white default texture
 
-		static Texture*		NULL_TEXTURE;	// black default texture
-		static Texture*		BASE_TEXTURE;	// white default texture
+	protected:
 
-		//////////////////////////////
+		Renderer();
+
+	public:
 
 		virtual ~Renderer() {};
 
-		static const Renderer*	Load( const char* filename );
+		/////////////////////////////////
 
-		virtual UINT		Startup( void* hWnd, bool fullscreen, UINT width = 1920, UINT height = 1080 );
+		static const void*	Load( const char* filename );
+
+		virtual UINT		Startup( void* hWnd );	// void* for multiplatform
 
 		virtual void		Shutdown() = 0;
 

@@ -20,14 +20,10 @@ namespace Sentinel
 
 		UINT					mNumFrames;
 
-	public:
-
-		CameraComponent*		mCamera;
-
 		ColorRGBA				mColor;
 		UINT					mFrame;
 
-		/////////////////////////////////
+	public:
 
 		SpriteComponent( Texture* texture, const POINT& spriteSize );
 
@@ -36,5 +32,10 @@ namespace Sentinel
 		void Update();
 
 		void Shutdown();
+
+		/////////////////////////////////
+
+		void SetColor( const ColorRGBA& color );
+		void SetFrame( UINT frame );
 	};
 }
