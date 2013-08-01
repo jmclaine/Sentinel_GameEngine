@@ -87,6 +87,12 @@
     <ClInclude Include="..\Engine\src\CriticalSection.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\src\Input.h">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\GameWindow.h">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\Shader.cpp">
@@ -145,6 +151,12 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\Color.cpp">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Input.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\GameWindow.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

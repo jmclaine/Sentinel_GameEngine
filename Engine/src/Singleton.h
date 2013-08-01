@@ -21,7 +21,7 @@ namespace Sentinel
 
 		Singleton() {}
 		Singleton( const Singleton& ) {}
-		Singleton& operator = ( const Singleton& ) {}
+		Singleton& operator = ( const Singleton& ) { return *this; }
 		~Singleton() {}
 
 	public:

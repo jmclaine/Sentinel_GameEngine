@@ -4,26 +4,17 @@
 
 namespace Sentinel { namespace Systems
 {
-	LRESULT WINAPI RendererMsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+	WRenderer::WRenderer()
 	{
-		switch( msg )
-		{
-			case WM_IME_SETCONTEXT:
-				if( LOWORD( wParam ) > 0 )
-					SetFocus( hWnd );
-
-				return 0;
-
-			default:
-				return DefWindowProc( hWnd, msg, wParam, lParam );
-		}
+		mTitle		 = new wchar_t[16];
+		mWindowClass = new wchar_t[24];
 	}
 
-	WRenderer::WRenderer()
-	{}
-
 	WRenderer::~WRenderer()
-	{}
+	{
+		delete mTitle;
+		delete mWindowClass;
+	}
 
 	bool WRenderer::Load( System::String^ filename )
 	{
@@ -32,28 +23,14 @@ namespace Sentinel { namespace Systems
 		// which is nullptr.
 		//
 		Renderer::WindowInfo info;
-		if( !Renderer::Inst( (Renderer*)(Renderer::Load( SString( filename ), info ))))
-			return false;
-		
-		mWindowInfo.mFullscreen = info.mFullscreen;
-		mWindowInfo.mWidth		= info.mWidth;
-		mWindowInfo.mHeight		= info.mHeight;
 
-		return true;
+		return (Renderer::Inst( (Renderer*)(Renderer::Load( SString( filename ), info ))) != NULL);
 	}
 
-	UINT WRenderer::Startup( IntPtr hWnd )
+	void WRenderer::Shutdown()
 	{
-		return Renderer::Inst()->Startup( hWnd.ToPointer(), mWindowInfo.mFullscreen, mWindowInfo.mWidth, mWindowInfo.mHeight );
-	}
-
-	void WRenderer::Update( Object^ sender, EventArgs^ e )
-	{
-		Renderer::Inst()->Clear( ColorRGBA( 0.0f, 0.2f, 0.8f, 1.0f ).Ptr() );
-
-		// Draw stuff.
-
-		Renderer::Inst()->Present();
+		SetActive();
+		Renderer::Inst()->Shutdown();
 	}
 
 	void WRenderer::Destroy()
@@ -63,9 +40,14 @@ namespace Sentinel { namespace Systems
 
 	// Windows.
 	//
-	WRenderer::WindowInfo^ WRenderer::GetWindowInfo()
+	void WRenderer::SetActive()
 	{
-		return %mWindowInfo;
+		Renderer::Inst()->SetWindow( mInfo );
+	}
+
+	bool WRenderer::ShareResources( WRenderer^ renderer )
+	{
+		return Renderer::Inst()->ShareResources( mInfo, renderer->mInfo );
 	}
 
 	// Buffers.
@@ -104,6 +86,11 @@ namespace Sentinel { namespace Systems
 	
 	// Special Rendering.
 	//
+	UINT WRenderer::CreateBackbuffer()
+	{
+		return Renderer::Inst()->CreateBackbuffer();
+	}
+
 	UINT WRenderer::CreateRenderTarget( WTexture^ texture )
 	{
 		return Renderer::Inst()->CreateRenderTarget( texture->GetRef() );
@@ -220,7 +207,8 @@ namespace Sentinel { namespace Systems
 
 	void WRenderer::DestroyWindowCore( HandleRef hwnd )
 	{
-		Renderer::Destroy();
+		SetActive();
+		Shutdown();
 
 		if( mHWND != NULL && mHWND == (HWND)hwnd.Handle.ToPointer())
 		{
@@ -229,6 +217,21 @@ namespace Sentinel { namespace Systems
 		}
 
 		UnregisterClass( (LPCSTR)mWindowClass, mINST );
+	}
+
+	LRESULT WINAPI RendererMsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+	{
+		switch( msg )
+		{
+			case WM_IME_SETCONTEXT:
+				if( LOWORD( wParam ) > 0 )
+					SetFocus( hWnd );
+
+				return 0;
+
+			default:
+				return DefWindowProc( hWnd, msg, wParam, lParam );
+		}
 	}
 
 	bool WRenderer::RegisterWindowClass()
@@ -260,27 +263,36 @@ namespace Sentinel { namespace Systems
 
 	HandleRef WRenderer::BuildWindowCore( HandleRef hwndParent )
 	{
-		mINST			= (HINSTANCE)GetModuleHandle( NULL );
-		mTitle			= L"Renderer";
-		mWindowClass	= L"RendererClass";
+		mINST = (HINSTANCE)GetModuleHandle( NULL );
 		
+		swprintf_s( mTitle, 16, L"Renderer%d", mClassIndex );
+		swprintf_s( mWindowClass, 24, L"RendererClass%d", mClassIndex );
+
 		if( RegisterWindowClass() )
 		{
+			++mClassIndex;
+
 			HWND hWnd = (HWND)hwndParent.Handle.ToPointer();
 			RECT screenRect;
 			GetWindowRect( hWnd, &screenRect );
 
-			mWindowInfo.mWidth  = screenRect.right  - screenRect.left;
-			mWindowInfo.mHeight = screenRect.bottom - screenRect.top;
+			mWindowInfo = gcnew WindowInfo();
+
+			mWindowInfo->mFullscreen	= false;
+			mWindowInfo->mWidth			= screenRect.right  - screenRect.left;
+			mWindowInfo->mHeight		= screenRect.bottom - screenRect.top;
 			
 			mHWND = CreateWindowEx( 0, (LPCSTR)mWindowClass, (LPCSTR)mTitle, WS_CHILD | WS_VISIBLE, 
-									0, 0, mWindowInfo.mWidth, mWindowInfo.mHeight,
+									0, 0, mWindowInfo->mWidth, mWindowInfo->mHeight,
 									hWnd, 0, mINST, 0 );
 
 			if( !mHWND )
 				TRACE( "Error: CreateWindowEx = " << GetLastError() );
 			
-			Renderer::Inst()->Startup( mHWND, mWindowInfo.mFullscreen, mWindowInfo.mWidth, mWindowInfo.mHeight );
+			mInfo = Renderer::Inst()->Startup( mHWND, mWindowInfo->mFullscreen, mWindowInfo->mWidth, mWindowInfo->mHeight );
+
+			mWindowInfo->mWidthRatio	= mInfo->mWidthRatio;
+			mWindowInfo->mHeightRatio	= mInfo->mHeightRatio;
 
 			return HandleRef( this, IntPtr( mHWND ));
 		}

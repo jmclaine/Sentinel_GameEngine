@@ -7,7 +7,7 @@ namespace Sentinel
 	POINT CenterHandle( HWND hWnd )
 	{
 		RECT screenRect;
-		GetWindowRect( hWnd, &screenRect );
+		GetWindowRect( (!hWnd) ? GetDesktopWindow() : hWnd, &screenRect );
 
 		POINT p;
 		p.x = screenRect.left + screenRect.right / 2;
@@ -18,8 +18,6 @@ namespace Sentinel
 
 	//////////////////////////////////////////////////////////////////////////
 
-	HWND Mouse::mHWND = NULL;
-
 	Mouse::Mouse()
 	{
 		for( UINT button = 0; button < NUM_BUTTONS; ++button )
@@ -27,6 +25,12 @@ namespace Sentinel
 			mButtonStates[ button ]		= BUTTON_UP;
 			mLastButtonStates[ button ] = BUTTON_UP;
 		}
+
+		RECT rc;
+		GetWindowRect( GetDesktopWindow(), &rc );
+
+		mDesktopWidth  = (float)(rc.left - rc.right);
+		mDesktopHeight = (float)(rc.top  - rc.bottom);
 	}
 
 	void Mouse::SetPosition( const POINT& pos )
@@ -34,20 +38,22 @@ namespace Sentinel
 		SetCursorPos( pos.x, pos.y );
 	}
 
-	POINT Mouse::GetPosition() const
+	POINT Mouse::GetPosition( HWND hWnd ) const
 	{
-		_ASSERT( mHWND );
-
 		POINT mousePos;
 		RECT rc;
 
-		GetClientRect( mHWND, &rc );
 		GetCursorPos( &mousePos );
-		ScreenToClient( mHWND, &mousePos );
 
-		mousePos.x = (LONG)((float)(mousePos.x)*1920.0f/(float)(rc.right));
-		mousePos.y = (LONG)((float)(mousePos.y)*1080.0f/(float)(rc.bottom));
+		if( hWnd )
+		{
+			GetClientRect( hWnd, &rc );
+			ScreenToClient( hWnd, &mousePos );
 
+			mousePos.x = (LONG)((float)(mousePos.x) * mDesktopWidth / (float)(rc.right));
+			mousePos.y = (LONG)((float)(mousePos.y) * mDesktopHeight / (float)(rc.bottom));
+		}
+		
 		return mousePos;
 	}
 

@@ -28,39 +28,95 @@ namespace Sentinel_Editor
     /// </summary>
     public partial class MainWindow : Window
     {
-        private WRenderer           mRenderer;
-        private static WColorRGBA   mClearColor = new WColorRGBA(0.0f, 0.2f, 0.8f, 1.0f);
+        private WRenderer           mRenderer0;
+        private static WColorRGBA   mClearColor0 = new WColorRGBA(0.0f, 0.2f, 0.8f, 1.0f);
+        private uint                mDepthStencil0;
+        private uint                mViewport0;
+        private uint                mRenderTarget0;
+
+        private WRenderer           mRenderer1;
+        private static WColorRGBA   mClearColor1 = new WColorRGBA(0.2f, 0.2f, 0.8f, 1.0f);
+        private uint                mDepthStencil1;
+        private uint                mViewport1;
+        private uint                mRenderTarget1;
 
         public MainWindow()
         {
             InitializeComponent();
         }
 
+        protected void OnClosed(RoutedEventArgs e)
+        {
+            WRenderer.Destroy();
+        }
+
         private void Window_Loaded(Object sender, RoutedEventArgs e)
         {
-            mRenderer = new WRenderer();
-
-            if (!mRenderer.Load("config.xml"))
+            mRenderer0 = new WRenderer();
+            
+            if (!mRenderer0.Load("config.xml"))
             {
                 MessageBox.Show("Failed to load config.xml", "Application Failure");
+
                 System.Environment.Exit(0);
             }
 
-            RendererHWND.Child = mRenderer;
+            RendererHWND0.Child = mRenderer0;
+
+            mRenderer0.SetActive();
+
+            mDepthStencil0  = mRenderer0.CreateDepthStencil(mRenderer0.mWindowInfo.mWidth, mRenderer0.mWindowInfo.mHeight);
+            mViewport0      = mRenderer0.CreateViewport(mRenderer0.mWindowInfo.mWidth, mRenderer0.mWindowInfo.mHeight);
+            mRenderTarget0  = mRenderer0.CreateBackbuffer();
+
+            ///////////////////////////////////////
+            
+            mRenderer1 = new WRenderer();
+            
+            RendererHWND1.Child = mRenderer1;
+
+            mRenderer1.SetActive();
+
+            mDepthStencil1  = mRenderer1.CreateDepthStencil(mRenderer1.mWindowInfo.mWidth, mRenderer1.mWindowInfo.mHeight);
+            mViewport1      = mRenderer1.CreateViewport(mRenderer1.mWindowInfo.mWidth, mRenderer1.mWindowInfo.mHeight);
+            mRenderTarget1  = mRenderer1.CreateBackbuffer();
+
+            mRenderer1.ShareResources(mRenderer0);
+            
+            ///////////////////////////////////////
 
             DispatcherTimer timer = new DispatcherTimer();
-            timer.Tick += new EventHandler(UpdateRenderer);
-            timer.Interval = new TimeSpan(16);
+            timer.Tick      += new EventHandler(Update);
+            timer.Interval   = new TimeSpan(16);
             timer.Start();
         }
 
-        private void UpdateRenderer(Object sender, EventArgs e)
+        private void Update(Object sender, EventArgs e)
         {
-            mRenderer.Clear(mClearColor);
+            mRenderer0.SetActive();
+
+            mRenderer0.SetDepthStencil(mDepthStencil0);
+            mRenderer0.SetViewport(mViewport0);
+            mRenderer0.SetRenderTarget(mRenderTarget0);
+            mRenderer0.Clear(mClearColor0);
 
             // Draw stuff...
 
-            mRenderer.Present();
+            mRenderer0.Present();
+
+            ///////////////////////////////////////
+            
+            mRenderer1.SetActive();
+
+            mRenderer1.SetDepthStencil(mDepthStencil1);
+            mRenderer1.SetViewport(mViewport1);
+            mRenderer1.SetRenderTarget(mRenderTarget1);
+            mRenderer1.Clear(mClearColor1);
+
+            // Draw stuff...
+
+            mRenderer1.Present();
+            //*/
         }
 
         ///

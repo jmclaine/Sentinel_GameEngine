@@ -63,7 +63,7 @@ namespace Sentinel
 		POINT  mousePos;
 
 		GetCursorPos( &mousePos );
-		POINT center = CenterHandle( Mouse::mHWND );
+		POINT center = CenterHandle();
 		Vector3f diff = Vector3f( (float)(center.x-mousePos.x), (float)(center.y-mousePos.y), 0 ) * mAngularSpeed;
 
 		if( keyboard->IsDown( VK_UP ))

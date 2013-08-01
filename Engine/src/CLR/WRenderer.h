@@ -15,6 +15,7 @@
 
 #include <Windows.h>
 
+#include "GameWindow.h"
 #include "WTexture.h"
 #include "WBuffer.h"
 #include "WShader.h"
@@ -84,10 +85,16 @@ namespace Sentinel { namespace Systems
 	{
 	private:
 
-		HWND				mHWND;
-		HINSTANCE			mINST;
-		wchar_t* 			mTitle;
-		wchar_t* 			mWindowClass;
+		HWND					mHWND;
+		HINSTANCE				mINST;
+
+		wchar_t* 				mTitle;
+		wchar_t* 				mWindowClass;
+		static UINT				mClassIndex		= 0;
+
+		Renderer::WindowInfo*	mInfo;
+
+		//GameWindow*			mWindow;
 
 	public:
 
@@ -104,7 +111,7 @@ namespace Sentinel { namespace Systems
 			float		mHeightRatio;
 		};
 
-		WindowInfo			mWindowInfo;
+		WindowInfo^			mWindowInfo;
 
 		WTexture^			NULL_TEXTURE;	// black default texture
 		WTexture^			BASE_TEXTURE;	// white default texture
@@ -115,13 +122,14 @@ namespace Sentinel { namespace Systems
 		~WRenderer();
 
 		bool				Load( String^ filename );
-		UINT				Startup( IntPtr hWnd );
-		void				Update( Object^ sender, EventArgs^ e );
-		void				Destroy();
+		void				Shutdown();
+
+		static void			Destroy();
 
 		// Windows.
 		//
-		WindowInfo^			GetWindowInfo();
+		void				SetActive();
+		bool				ShareResources( WRenderer^ renderer );
 
 		// Buffers.
 		//
@@ -138,6 +146,7 @@ namespace Sentinel { namespace Systems
 	
 		// Special Rendering.
 		//
+		UINT				CreateBackbuffer();
 		UINT				CreateRenderTarget( WTexture^ texture );
 		UINT				CreateDepthStencil( UINT width, UINT height );
 		UINT				CreateViewport( UINT width, UINT height );

@@ -411,7 +411,6 @@ namespace Sentinel
 			ID3D11RasterizerState*		mRasterizerState;
 		};
 
-		std::vector< WindowInfoDX >				mWindow;
 		WindowInfoDX*							mCurrWindow;
 
 		std::vector< ID3D11DepthStencilView* >	mDepthStencil;
@@ -452,7 +451,7 @@ namespace Sentinel
 
 	private:
 
-		UINT Startup( void* hWnd, bool fullscreen, UINT width, UINT height )
+		WindowInfo* Startup( void* hWnd, bool fullscreen, UINT width, UINT height )
 		{
 			D3D_FEATURE_LEVEL featurelevels[] = 
 			{
@@ -487,8 +486,7 @@ namespace Sentinel
 			//	createdeviceflags |= D3D11_CREATE_DEVICE_DEBUG;
 			//#endif
 	
-			mWindow.push_back( WindowInfoDX() );
-			mCurrWindow = &mWindow.back();
+			mCurrWindow = new WindowInfoDX();
 
 			mCurrWindow->mFullscreen	= fullscreen;
 			mCurrWindow->mWidth			= width;
@@ -496,19 +494,19 @@ namespace Sentinel
 			mCurrWindow->mWidthRatio	= (float)width  / (float)WINDOW_WIDTH_BASE;
 			mCurrWindow->mHeightRatio	= (float)height / (float)WINDOW_HEIGHT_BASE;
 
-			HV( D3D11CreateDeviceAndSwapChain( NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createdeviceflags, 
-											   featurelevels, sizeof(featurelevels)/sizeof(D3D_FEATURE_LEVEL),
-											   D3D11_SDK_VERSION, &sd, &mCurrWindow->mSwapChain, 
-											   &mCurrWindow->mDevice, 0, &mCurrWindow->mContext ));
+			HV_PTR( D3D11CreateDeviceAndSwapChain( NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createdeviceflags, 
+												   featurelevels, sizeof(featurelevels)/sizeof(D3D_FEATURE_LEVEL),
+												   D3D11_SDK_VERSION, &sd, &mCurrWindow->mSwapChain, 
+												   &mCurrWindow->mDevice, 0, &mCurrWindow->mContext ));
 
 			if( fullscreen )
 			{
-				HV( mCurrWindow->mSwapChain->ResizeBuffers( 1, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH ));
-				HV( mCurrWindow->mSwapChain->SetFullscreenState( TRUE, NULL ));
+				HV_PTR( mCurrWindow->mSwapChain->ResizeBuffers( 1, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH ));
+				HV_PTR( mCurrWindow->mSwapChain->SetFullscreenState( TRUE, NULL ));
 			}
 
 			D3D11_RASTERIZER_DESC rasterizerstate = { D3D11_FILL_SOLID, D3D11_CULL_BACK, true, 0, 0, 0, true, false, true, false };
-			HV( mCurrWindow->mDevice->CreateRasterizerState( &rasterizerstate, &mCurrWindow->mRasterizerState ));
+			HV_PTR( mCurrWindow->mDevice->CreateRasterizerState( &rasterizerstate, &mCurrWindow->mRasterizerState ));
 			mCurrWindow->mContext->RSSetState( mCurrWindow->mRasterizerState );
 
 			#ifndef NDEBUG
@@ -518,130 +516,128 @@ namespace Sentinel
 				SET_DEBUG_NAME( mCurrWindow->mRasterizerState );
 			#endif
 
-			UCHAR* newTex = new UCHAR[ 4 ];
-
 			// Create NULL_TEXTURE (Black).
 			//
 			if( !NULL_TEXTURE )
 			{
+				UCHAR* newTex = new UCHAR[ 4 ];
+
 				newTex[ 0 ] = 0;
 				newTex[ 1 ] = 0;
 				newTex[ 2 ] = 0;
 				newTex[ 3 ] = 255;
+
 				NULL_TEXTURE = CreateTextureFromMemory( newTex, 1, 1, IMAGE_FORMAT_RGBA );
+
+				delete newTex;
 			}
 
 			// Create BASE_TEXTURE (White).
 			//
 			if( !BASE_TEXTURE )
 			{
+				UCHAR* newTex = new UCHAR[ 4 ];
+
 				newTex[ 0 ] = 255;
 				newTex[ 1 ] = 255;
 				newTex[ 2 ] = 255;
+				newTex[ 3 ] = 255;
+
 				BASE_TEXTURE = CreateTextureFromMemory( newTex, 1, 1, IMAGE_FORMAT_RGBA );
+
+				delete newTex;
 			}
 
-			delete newTex;
-
-			CreateDepthStencil( width, height );
-			SetDepthStencil( 0 );
-
-			CreateViewport( width, height );
-			SetViewport( 0 );
-
-			ID3D11Texture2D *tex = NULL;
-			HV( mCurrWindow->mSwapChain->GetBuffer( 0, __uuidof(ID3D11Texture2D), (void **)&tex ));
-			CreateRenderTarget( tex );
-			SAFE_RELEASE_PTR( tex );
-			SetRenderTarget( 0 );
-
-			D3D11_BLEND_DESC blend_desc;
-			ZeroMemory( &blend_desc, sizeof( D3D11_BLEND_DESC ));
-
-			// Create BLEND_DEFAULT.
-			// No alpha.
-			//
-			for( UINT x = 0; x < 8; ++x )
+			if( mBlendState.empty() )
 			{
-				blend_desc.RenderTarget[ x ].BlendEnable			= FALSE;
-				blend_desc.RenderTarget[ x ].SrcBlend				= D3D11_BLEND_SRC_ALPHA;
-				blend_desc.RenderTarget[ x ].DestBlend				= D3D11_BLEND_INV_SRC_ALPHA;
-				blend_desc.RenderTarget[ x ].BlendOp				= D3D11_BLEND_OP_ADD;
-				blend_desc.RenderTarget[ x ].SrcBlendAlpha			= D3D11_BLEND_ONE;
-				blend_desc.RenderTarget[ x ].DestBlendAlpha			= D3D11_BLEND_ZERO;
-				blend_desc.RenderTarget[ x ].BlendOpAlpha			= D3D11_BLEND_OP_ADD;
-				blend_desc.RenderTarget[ x ].RenderTargetWriteMask	= 0x0F;
-			}
+				D3D11_BLEND_DESC blend_desc;
+				ZeroMemory( &blend_desc, sizeof( D3D11_BLEND_DESC ));
 
-			ID3D11BlendState* blend_state = NULL;
-			HV( mCurrWindow->mDevice->CreateBlendState( &blend_desc, &blend_state ));
-			mBlendState.push_back( blend_state );
+				// Create BLEND_DEFAULT.
+				// No alpha.
+				//
+				for( UINT x = 0; x < 8; ++x )
+				{
+					blend_desc.RenderTarget[ x ].BlendEnable			= FALSE;
+					blend_desc.RenderTarget[ x ].SrcBlend				= D3D11_BLEND_SRC_ALPHA;
+					blend_desc.RenderTarget[ x ].DestBlend				= D3D11_BLEND_INV_SRC_ALPHA;
+					blend_desc.RenderTarget[ x ].BlendOp				= D3D11_BLEND_OP_ADD;
+					blend_desc.RenderTarget[ x ].SrcBlendAlpha			= D3D11_BLEND_ONE;
+					blend_desc.RenderTarget[ x ].DestBlendAlpha			= D3D11_BLEND_ZERO;
+					blend_desc.RenderTarget[ x ].BlendOpAlpha			= D3D11_BLEND_OP_ADD;
+					blend_desc.RenderTarget[ x ].RenderTargetWriteMask	= 0x0F;
+				}
 
-			// Create BLEND_ALPHA.
-			//
-			for( UINT x = 0; x < 8; ++x )
-			{
-				blend_desc.RenderTarget[ x ].BlendEnable			= TRUE;
-			}
-			HV( mCurrWindow->mDevice->CreateBlendState( &blend_desc, &blend_state ));
-			mBlendState.push_back( blend_state );
+				ID3D11BlendState* blend_state = NULL;
+				HV_PTR( mCurrWindow->mDevice->CreateBlendState( &blend_desc, &blend_state ));
+				mBlendState.push_back( blend_state );
+
+				// Create BLEND_ALPHA.
+				//
+				for( UINT x = 0; x < 8; ++x )
+				{
+					blend_desc.RenderTarget[ x ].BlendEnable			= TRUE;
+				}
+				HV_PTR( mCurrWindow->mDevice->CreateBlendState( &blend_desc, &blend_state ));
+				mBlendState.push_back( blend_state );
 			
-			// Create BLEND_PARTICLE.
-			// Specially created to add transparency without regard to render order.
-			//
-			for( UINT x = 0; x < 8; ++x )
-			{
-				blend_desc.RenderTarget[ x ].SrcBlend				= D3D11_BLEND_SRC_ALPHA;
-				blend_desc.RenderTarget[ x ].DestBlend				= D3D11_BLEND_INV_SRC_ALPHA;
-				blend_desc.RenderTarget[ x ].SrcBlendAlpha			= D3D11_BLEND_SRC_ALPHA;
-				blend_desc.RenderTarget[ x ].DestBlendAlpha			= D3D11_BLEND_ZERO;
-				blend_desc.RenderTarget[ x ].BlendOpAlpha			= D3D11_BLEND_OP_ADD;
-				blend_desc.RenderTarget[ x ].RenderTargetWriteMask	= D3D11_COLOR_WRITE_ENABLE_ALL;
+				// Create BLEND_PARTICLE.
+				// Specially created to add transparency without regard to render order.
+				//
+				for( UINT x = 0; x < 8; ++x )
+				{
+					blend_desc.RenderTarget[ x ].SrcBlend				= D3D11_BLEND_SRC_ALPHA;
+					blend_desc.RenderTarget[ x ].DestBlend				= D3D11_BLEND_INV_SRC_ALPHA;
+					blend_desc.RenderTarget[ x ].SrcBlendAlpha			= D3D11_BLEND_SRC_ALPHA;
+					blend_desc.RenderTarget[ x ].DestBlendAlpha			= D3D11_BLEND_ZERO;
+					blend_desc.RenderTarget[ x ].BlendOpAlpha			= D3D11_BLEND_OP_ADD;
+					blend_desc.RenderTarget[ x ].RenderTargetWriteMask	= D3D11_COLOR_WRITE_ENABLE_ALL;
+				}
+				HV_PTR( mCurrWindow->mDevice->CreateBlendState( &blend_desc, &blend_state ));
+				mBlendState.push_back( blend_state );
 			}
-			HV( mCurrWindow->mDevice->CreateBlendState( &blend_desc, &blend_state ));
-			mBlendState.push_back( blend_state );
-
-			float blend_factor[ 4 ] = { 1, 1, 1, 1 };
-			mCurrWindow->mContext->OMSetBlendState( mBlendState[ 0 ], blend_factor, 0xFFFFFFFF );
 
 			SetBlend( BLEND_ALPHA );
 
 			// Create depth STENCIL_DEFAULT.
 			//
-			D3D11_DEPTH_STENCIL_DESC stencilDesc;
-			stencilDesc.DepthEnable						= TRUE;
-			stencilDesc.DepthWriteMask					= D3D11_DEPTH_WRITE_MASK_ALL;
-			stencilDesc.DepthFunc						= D3D11_COMPARISON_LESS;
+			if( mDepthStencilState.empty() )
+			{
+				D3D11_DEPTH_STENCIL_DESC stencilDesc;
+				stencilDesc.DepthEnable						= TRUE;
+				stencilDesc.DepthWriteMask					= D3D11_DEPTH_WRITE_MASK_ALL;
+				stencilDesc.DepthFunc						= D3D11_COMPARISON_LESS;
 
-			stencilDesc.StencilEnable					= FALSE;
-			stencilDesc.StencilReadMask					= 0xFF;
-			stencilDesc.StencilWriteMask				= 0xFF;
+				stencilDesc.StencilEnable					= FALSE;
+				stencilDesc.StencilReadMask					= 0xFF;
+				stencilDesc.StencilWriteMask				= 0xFF;
 
-			stencilDesc.FrontFace.StencilFailOp			= D3D11_STENCIL_OP_KEEP;
-			stencilDesc.FrontFace.StencilDepthFailOp	= D3D11_STENCIL_OP_INCR;
-			stencilDesc.FrontFace.StencilPassOp			= D3D11_STENCIL_OP_KEEP;
-			stencilDesc.FrontFace.StencilFunc			= D3D11_COMPARISON_ALWAYS;
+				stencilDesc.FrontFace.StencilFailOp			= D3D11_STENCIL_OP_KEEP;
+				stencilDesc.FrontFace.StencilDepthFailOp	= D3D11_STENCIL_OP_INCR;
+				stencilDesc.FrontFace.StencilPassOp			= D3D11_STENCIL_OP_KEEP;
+				stencilDesc.FrontFace.StencilFunc			= D3D11_COMPARISON_ALWAYS;
 
-			stencilDesc.BackFace.StencilFailOp			= D3D11_STENCIL_OP_KEEP;
-			stencilDesc.BackFace.StencilDepthFailOp		= D3D11_STENCIL_OP_DECR;
-			stencilDesc.BackFace.StencilPassOp			= D3D11_STENCIL_OP_KEEP;
-			stencilDesc.BackFace.StencilFunc			= D3D11_COMPARISON_ALWAYS;
+				stencilDesc.BackFace.StencilFailOp			= D3D11_STENCIL_OP_KEEP;
+				stencilDesc.BackFace.StencilDepthFailOp		= D3D11_STENCIL_OP_DECR;
+				stencilDesc.BackFace.StencilPassOp			= D3D11_STENCIL_OP_KEEP;
+				stencilDesc.BackFace.StencilFunc			= D3D11_COMPARISON_ALWAYS;
 
-			ID3D11DepthStencilState* stencilState = NULL;
-			HV( mCurrWindow->mDevice->CreateDepthStencilState( &stencilDesc, &stencilState ));
-			mDepthStencilState.push_back( stencilState );
+				ID3D11DepthStencilState* stencilState = NULL;
+				HV_PTR( mCurrWindow->mDevice->CreateDepthStencilState( &stencilDesc, &stencilState ));
+				mDepthStencilState.push_back( stencilState );
 
-			// Create depth STENCIL_PARTICLE.
-			//
-			stencilDesc.DepthEnable						= TRUE;
-			stencilDesc.DepthWriteMask					= D3D11_DEPTH_WRITE_MASK_ZERO;
-			stencilDesc.DepthFunc						= D3D11_COMPARISON_LESS;
-			HV( mCurrWindow->mDevice->CreateDepthStencilState( &stencilDesc, &stencilState ));
-			mDepthStencilState.push_back( stencilState );
+				// Create depth STENCIL_PARTICLE.
+				//
+				stencilDesc.DepthEnable						= TRUE;
+				stencilDesc.DepthWriteMask					= D3D11_DEPTH_WRITE_MASK_ZERO;
+				stencilDesc.DepthFunc						= D3D11_COMPARISON_LESS;
+				HV_PTR( mCurrWindow->mDevice->CreateDepthStencilState( &stencilDesc, &stencilState ));
+				mDepthStencilState.push_back( stencilState );
+			}
 
 			SetDepthStencilState( STENCIL_DEFAULT );
 
-			return S_OK;
+			return mCurrWindow;
 		}
 
 		void Shutdown()
@@ -665,21 +661,31 @@ namespace Sentinel
 				
 				SAFE_RELEASE_PTR( mCurrWindow->mContext );
 				SAFE_RELEASE_PTR( mCurrWindow->mDevice );
+
+				delete mCurrWindow;
+				mCurrWindow = NULL;
 			}
 		}
 
 		// Windows.
 		//
-		void SetWindow( UINT index )
+		void SetWindow( WindowInfo* info )
 		{
-			_ASSERT( index < mWindow.size() );
+			_ASSERT( info );
 
-			mCurrWindow = &mWindow[ index ];
+			mCurrWindow = (WindowInfoDX*)info;
 		}
 
-		const WindowInfo* GetWindowInfo() const
+		WindowInfo* GetWindow()
 		{
 			return mCurrWindow;
+		}
+
+		bool ShareResources( WindowInfo* info0, WindowInfo* info1 )
+		{
+			//((WindowInfoDX*)info0)->
+
+			return false;
 		}
 
 		// Buffers.
@@ -941,6 +947,15 @@ namespace Sentinel
 
 		// Special Rendering.
 		//
+		UINT CreateBackbuffer()
+		{
+			ID3D11Texture2D *tex = NULL;
+
+			HV_PTR( mCurrWindow->mSwapChain->GetBuffer( 0, __uuidof(ID3D11Texture2D), (void **)&tex ));
+
+			return CreateRenderTarget( tex );
+		}
+
 		UINT CreateRenderTarget( ID3D11Texture2D *backbuffer )
 		{
 			ID3D11RenderTargetView* rendertarget = NULL;

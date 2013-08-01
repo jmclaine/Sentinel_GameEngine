@@ -24,8 +24,11 @@
             </MenuItem>
         </Menu>
             
-        <Grid Canvas.Left="0" Canvas.Top="21" Height="452" Name="grid1" Width="490">
-            <Border Name="RendererHWND" Margin="0,0, -10,0" />
+        <Grid Canvas.Left="0" Canvas.Top="21" Height="452" Name="grid1" Width="245">
+            <Border Name="RendererHWND0" Margin="0,0, -10,0" />
+        </Grid>
+        <Grid Canvas.Left="255" Canvas.Top="21" Height="452" Name="grid2" Width="245">
+            <Border Name="RendererHWND1" Margin="0,0, -10,0" />
         </Grid>
     </Canvas>
 </Window>

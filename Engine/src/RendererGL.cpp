@@ -562,7 +562,6 @@ namespace Sentinel
 			GLenum		mRenderMode;
 		};
 
-		std::vector< WindowInfoGL >		mWindow;
 		WindowInfoGL*					mCurrWindow;
 
 		std::vector< RenderTarget >		mRenderTarget;
@@ -577,21 +576,20 @@ namespace Sentinel
 		
 		RendererGL()
 		{
-			PRIMITIVE[ POINT_LIST ]     = GL_POINTS;
-			PRIMITIVE[ LINE_LIST ]		= GL_LINES;
-			PRIMITIVE[ TRIANGLE_LIST ]	= GL_TRIANGLES;
+			PRIMITIVE[ POINT_LIST ]				= GL_POINTS;
+			PRIMITIVE[ LINE_LIST ]				= GL_LINES;
+			PRIMITIVE[ TRIANGLE_LIST ]			= GL_TRIANGLES;
 
-			CULL_TYPE[ CULL_NONE ]		= GL_NONE;
-			CULL_TYPE[ CULL_CCW  ]		= GL_CCW;
-			CULL_TYPE[ CULL_CW   ]		= GL_CW;
+			CULL_TYPE[ CULL_NONE ]				= GL_NONE;
+			CULL_TYPE[ CULL_CCW ]				= GL_CCW;
+			CULL_TYPE[ CULL_CW ]				= GL_CW;
 
-			IMAGE_FORMAT[ IMAGE_FORMAT_RGB ]  = GL_RGB;
-			IMAGE_FORMAT[ IMAGE_FORMAT_RGBA ] = GL_RGBA;
+			IMAGE_FORMAT[ IMAGE_FORMAT_RGB ]	= GL_RGB;
+			IMAGE_FORMAT[ IMAGE_FORMAT_RGBA ]	= GL_RGBA;
 
 			mTexture.push_back( new TextureGL( "", 0, 0, 0 ));
 			NULL_TEXTURE = mTexture.back();
 
-			mRenderTarget.push_back( RenderTarget( NULL_TEXTURE, 0 ));
 			mDepthStencil.push_back( 0 );
 
 			mCurrShader = NULL;
@@ -602,10 +600,9 @@ namespace Sentinel
 			Shutdown();
 		}
 		
-		UINT Startup( void* hWnd, bool fullscreen, UINT width, UINT height )
+		WindowInfo* Startup( void* hWnd, bool fullscreen, UINT width, UINT height )
 		{
-			mWindow.push_back( WindowInfoGL() );
-			mCurrWindow = &mWindow.back();
+			mCurrWindow = new WindowInfoGL();
 
 			mCurrWindow->mFullscreen	= fullscreen;
 			mCurrWindow->mWidth			= width;
@@ -616,19 +613,28 @@ namespace Sentinel
 			mCurrWindow->mHWND			= (HWND)hWnd;
 			mCurrWindow->mHDC			= GetDC( mCurrWindow->mHWND );
 
-			_ASSERT( mCurrWindow->mHDC );
+			if( !mCurrWindow->mHDC )
+			{
+				delete mCurrWindow;
+				return NULL;
+			}
 
 			PIXELFORMATDESCRIPTOR pixelFormatDescriptor = {0};
 			pixelFormatDescriptor.nSize			= sizeof( pixelFormatDescriptor );
 			pixelFormatDescriptor.nVersion		= 1;
-			pixelFormatDescriptor.dwFlags		= PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+			pixelFormatDescriptor.dwFlags		= PFD_DRAW_TO_BITMAP | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER | PFD_GENERIC_ACCELERATED;
 			pixelFormatDescriptor.dwLayerMask	= PFD_MAIN_PLANE;
 			pixelFormatDescriptor.iPixelType	= PFD_TYPE_RGBA;
 			pixelFormatDescriptor.cColorBits	= 32;
 			pixelFormatDescriptor.cDepthBits	= 16;
 			
 			int pixelFormat = ChoosePixelFormat( mCurrWindow->mHDC, &pixelFormatDescriptor );
-			_ASSERT( pixelFormat != 0 );
+			if( !pixelFormat )
+			{
+				delete mCurrWindow;
+				return NULL;
+			}
+
 			SetPixelFormat( mCurrWindow->mHDC, pixelFormat, &pixelFormatDescriptor );
 
 			mCurrWindow->mContext = wglCreateContext( mCurrWindow->mHDC );
@@ -646,7 +652,10 @@ namespace Sentinel
 				dmScreenSettings.dmFields		= DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
 				if( ChangeDisplaySettings( &dmScreenSettings, CDS_FULLSCREEN ) != DISP_CHANGE_SUCCESSFUL )
-					return 0;
+				{
+					delete mCurrWindow;
+					return NULL;
+				}
 			}
 
 			glewInit();
@@ -656,33 +665,23 @@ namespace Sentinel
 			glEnable( GL_CULL_FACE );
 			glFrontFace( GL_CCW );
 
-			CreateViewport( width, height );
-
-			SetRenderTarget( 0 );
-			SetViewport( 0 );
-			SetDepthStencil( 0 );
-
 			// Create initial white texture as BASE_TEXTURE.
 			//
 			if( !BASE_TEXTURE )
 			{
 				UCHAR* newTex = new UCHAR[ 4 ];
+
 				newTex[ 0 ] = 255;
 				newTex[ 1 ] = 255;
 				newTex[ 2 ] = 255;
 				newTex[ 3 ] = 255;
 
 				BASE_TEXTURE = CreateTextureFromMemory( newTex, 1, 1, IMAGE_FORMAT_RGBA, false );
+
 				delete newTex;
 			}
-			// Share resources with the initial context.
-			//
-			else
-			{
-				wglShareLists( mWindow[ 0 ].mContext, mCurrWindow->mContext );
-			}
 
-			return S_OK;
+			return mCurrWindow;
 		}
 
 		void Shutdown()
@@ -696,30 +695,47 @@ namespace Sentinel
 			}
 			mTexture.clear();
 
-			for( UINT i = 1; i < mRenderTarget.size(); ++i )
+			for( UINT i = 0; i < mRenderTarget.size(); ++i )
 			{
 				glDeleteFramebuffers( 1, &mRenderTarget[ i ].mID );
 			}
+			mRenderTarget.clear();
 
-			wglMakeCurrent( NULL, NULL );
-			wglDeleteContext( mCurrWindow->mContext );
-			mCurrWindow->mContext = 0;
+			if( mCurrWindow )
+			{
+				wglMakeCurrent( NULL, NULL );
+				wglDeleteContext( mCurrWindow->mContext );
+				mCurrWindow->mContext = 0;
 
-			ReleaseDC( mCurrWindow->mHWND, mCurrWindow->mHDC );
+				ReleaseDC( mCurrWindow->mHWND, mCurrWindow->mHDC );
+
+				delete mCurrWindow;
+				mCurrWindow = NULL;
+			}
 		}
 
 		// Windows.
 		//
-		void SetWindow( UINT index )
+		void SetWindow( WindowInfo* info )
 		{
-			_ASSERT( index < mWindow.size() );
+			_ASSERT( info );
 
-			mCurrWindow = &mWindow[ index ];
+			mCurrWindow = (WindowInfoGL*)info;
+
+			glFinish();
+			glFlush();
+
+			wglMakeCurrent( mCurrWindow->mHDC, mCurrWindow->mContext );
 		}
 
-		const WindowInfo* GetWindowInfo() const
+		WindowInfo* GetWindow()
 		{
 			return mCurrWindow;
+		}
+
+		bool ShareResources( WindowInfo* info0, WindowInfo* info1 )
+		{
+			return wglShareLists( ((WindowInfoGL*)info0)->mContext, ((WindowInfoGL*)info1)->mContext ) != 0;
 		}
 
 		// Buffers.
@@ -834,6 +850,12 @@ namespace Sentinel
 
 		// Special Rendering.
 		//
+		UINT CreateBackbuffer()
+		{
+			mRenderTarget.push_back( RenderTarget( NULL_TEXTURE, 0 ));
+			return mRenderTarget.size()-1;
+		}
+
 		UINT CreateRenderTarget( Texture* texture )
 		{
 			UINT renderID = mRenderTarget.size();

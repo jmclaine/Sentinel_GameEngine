@@ -128,7 +128,6 @@
     <ClInclude Include="..\..\Engine\src\GameComponent.h" />
     <ClInclude Include="..\..\Engine\src\GameObject.h" />
     <ClInclude Include="..\..\Engine\src\GameWorld.h" />
-    <ClInclude Include="..\..\Engine\src\Input.h" />
     <ClInclude Include="..\..\Engine\src\LightComponent.h" />
     <ClInclude Include="..\..\Engine\src\Mesh.h" />
     <ClInclude Include="..\..\Engine\src\MeshComponent.h" />
@@ -157,7 +156,6 @@
     <ClCompile Include="..\..\Engine\src\DrawableComponent.cpp" />
     <ClCompile Include="..\..\Engine\src\GameObject.cpp" />
     <ClCompile Include="..\..\Engine\src\GameWorld.cpp" />
-    <ClCompile Include="..\..\Engine\src\Input.cpp" />
     <ClCompile Include="..\..\Engine\src\LightComponent.cpp" />
     <ClCompile Include="..\..\Engine\src\Mesh.cpp" />
     <ClCompile Include="..\..\Engine\src\MeshComponent.cpp" />

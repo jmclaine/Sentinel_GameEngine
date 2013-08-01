@@ -183,7 +183,7 @@ namespace Sentinel
 					//
 					case 'A':
 						{
-						const Renderer::WindowInfo* info = Renderer::Inst()->GetWindowInfo();
+						const Renderer::WindowInfo* info = Renderer::Inst()->GetWindow();
 
 						Vector2f pixelSize( 1.0f / info->mWidth, 1.0f / info->mHeight );
 

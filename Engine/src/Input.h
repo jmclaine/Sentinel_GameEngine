@@ -2,11 +2,12 @@
 
 #include <windows.h>
 
+#include "Common.h"
 #include "Singleton.h"
 
 namespace Sentinel
 {
-	POINT CenterHandle( HWND hWnd = NULL );
+	SENTINEL_DLL POINT CenterHandle( HWND hWnd = NULL );
 
 	enum MouseButtonStatus
 	{
@@ -24,27 +25,26 @@ namespace Sentinel
 		NUM_BUTTONS
 	};
 
-	class Mouse : public Singleton< Mouse >
+	class SENTINEL_DLL Mouse : public Singleton< Mouse >
 	{
 		friend class Singleton< Mouse >;
 
 	private:
 
-		int mButtonStates[ NUM_BUTTONS ];
-		int mLastButtonStates[ NUM_BUTTONS ];
+		int		mButtonStates[ NUM_BUTTONS ];
+		int		mLastButtonStates[ NUM_BUTTONS ];
 
-	public:
+		float	mDesktopWidth;
+		float	mDesktopHeight;
 
-		static HWND mHWND;
-
-	private:
+		///////////////////////////////////
 
 		Mouse();
 
 	public:
 
 		void	SetPosition( const POINT& pos );
-		POINT	GetPosition() const;
+		POINT	GetPosition( HWND hWnd = NULL ) const;
 
 		bool	IsDown( MouseButton button ) const;
 
@@ -65,7 +65,7 @@ namespace Sentinel
 		KEY_DOWN,
 	};
 
-	class Keyboard : public Singleton< Keyboard >
+	class SENTINEL_DLL Keyboard : public Singleton< Keyboard >
 	{
 		friend class Singleton< Keyboard >;
 
@@ -73,8 +73,8 @@ namespace Sentinel
 
 		static const UINT NUM_KEYS	= 256;
 
-		int mKeyStates[ NUM_KEYS ];
-		int mLastKeyStates[ NUM_KEYS ];
+		int		mKeyStates[ NUM_KEYS ];
+		int		mLastKeyStates[ NUM_KEYS ];
 
 		///////////////////////////////////
 

@@ -8,7 +8,7 @@
 
 #include "Sentinel_Test.h"
 
-#include "Renderer.h"
+#include "GameWindow.h"
 #include "PhysicsSystem.h"
 #include "ParticleSystem.h"
 #include "NetworkSocket.h"
@@ -30,20 +30,6 @@
 #include "ModelComponent.h"
 
 using namespace Sentinel;
-
-
-// Visual Studio generated.
-//
-#define MAX_LOADSTRING 100
-
-HINSTANCE				hInst;								// current instance
-TCHAR					szTitle[ MAX_LOADSTRING ];			// title bar text
-TCHAR					szWindowClass[ MAX_LOADSTRING ];	// main window class name
-Renderer::WindowInfo	gWindowInfo;						// info about window
-
-ATOM				MyRegisterClass( HINSTANCE hInstance );
-HWND				InitInstance( HINSTANCE, int );
-LRESULT CALLBACK	WndProc( HWND, UINT, WPARAM, LPARAM );
 
 
 // Main Application.
@@ -75,30 +61,50 @@ enum ShapeTypes
 
 class MainApp
 {
-	HACCEL			mAccelTable;
-	HWND			mHWND;
+	HACCEL					mAccelTable;
+	
+	Shader*					mShader[ NUM_SHADERS ];
+	Texture*				mTexture;
 
-	Shader*			mShader[ NUM_SHADERS ];
-	Texture*		mTexture;
+	GameWindow*				mWindow0;
+	GameWindow*				mWindow1;
+
+	TCHAR					mTitle[ GameWindow::MAX_LOADSTRING ];
+	TCHAR					mWindowClass[ GameWindow::MAX_LOADSTRING ];
 
 public:
 
-	MainApp( HINSTANCE hInstance, int nCmdShow )
+	MainApp()
 	{
 		srand( (UINT)time( (time_t*)0 ));
 
 		for( UINT x = 0; x < NUM_SHADERS; ++x )
 			mShader[ x ] = NULL;
 
-		//////////////////////////////////////////
-		
-		LoadString( hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING );
-		LoadString( hInstance, IDC_SENTINEL_TEST, szWindowClass, MAX_LOADSTRING );
-		MyRegisterClass( hInstance );
+		mTexture = NULL;
 
+		mWindow0 = NULL;
+		mWindow1 = NULL;
+
+		memset( mTitle, 0, GameWindow::MAX_LOADSTRING );
+		memset( mWindowClass, 0, GameWindow::MAX_LOADSTRING );
+	}
+
+	~MainApp()
+	{}
+
+	int Run( HINSTANCE hInstance, int nCmdShow )
+	{
+		mWindow0 = new GameWindow( IDI_SENTINEL_TEST, IDI_SMALL, IDC_SENTINEL_TEST );
+		mWindow1 = new GameWindow( IDI_SENTINEL_TEST, IDI_SMALL, IDC_SENTINEL_TEST );
+
+		LoadString( hInstance, IDS_APP_TITLE, mTitle, GameWindow::MAX_LOADSTRING );
+		LoadString( hInstance, IDC_SENTINEL_TEST, mWindowClass, GameWindow::MAX_LOADSTRING );
+		
 		mAccelTable = LoadAccelerators( hInstance, MAKEINTRESOURCE( IDC_SENTINEL_TEST ));
 
-		if( !Renderer::Load( "config.xml", gWindowInfo ))
+		Renderer::WindowInfo info;
+		if( !Renderer::Load( "config.xml", info ))
 		{
 			REPORT_ERROR( "Failed to load 'config.xml'\nDefaulting to OpenGL", "Renderer Setup Failure" );
 
@@ -106,23 +112,18 @@ public:
 				throw AppException( "Failed to BuildRendererGL" );
 		}
 
-		mHWND = InitInstance( hInstance, nCmdShow );
-		TV( mHWND );
-	}
+		mWindow0->Startup( hInstance, nCmdShow, "Sentinel_Test", "SentinelClass0", info );
+		mWindow1->Startup( hInstance, nCmdShow, "Sentinel_Dup", "SentinelClass1", info );
 
-	~MainApp()
-	{}
+		SetFocus( mWindow0->GetHandle() );
 
-	int Run()
-	{
-		SetFocus( mHWND );
-
-		Mouse::mHWND = mHWND;
-		Mouse::Inst()->SetPosition( CenterHandle( Mouse::mHWND ));
+		Mouse::Inst()->SetPosition( CenterHandle( mWindow0->GetHandle() ));
 		ShowCursor( FALSE );
 
-		if( Renderer::Inst()->Startup( mHWND, gWindowInfo.mFullscreen, gWindowInfo.mWidth, gWindowInfo.mHeight ) != S_OK )
-			throw AppException( "Failed Renderer::Startup()" );
+		mWindow0->SetActive();
+		mWindow1->ShareResources( mWindow0 );
+		
+		////////////////////////////////////
 
 		PhysicsSystem::Inst()->Startup();
 
@@ -167,16 +168,20 @@ public:
 			PostQuitMessage( 0 );
 		}
 
-		static float color[] = {0.0f, 0.2f, 0.8f, 1.0f};
-		Renderer::Inst()->Clear( color );
-		Renderer::Inst()->SetRenderTarget( 0 );
-		Renderer::Inst()->SetDepthStencil( 0 );
-		Renderer::Inst()->SetViewport( 0 );
+		mWindow0->Update();
 
 		GameWorld::Inst()->Update();
 
 		Renderer::Inst()->Present();
+
+		/////////////////////////////////
+
+		mWindow1->Update();
+
+		Renderer::Inst()->Present();
 		
+		/////////////////////////////////
+
 		Mouse::Inst()->Update();
 		Keyboard::Inst()->Update();
 
@@ -214,6 +219,7 @@ public:
 	{
 		SetDirectory( "Objects" );
 		
+		Renderer::WindowInfo*	info;
 		TransformComponent*		transform;
 		ControllerComponent*	controller;
 		PhysicsComponent*		physics;
@@ -223,10 +229,9 @@ public:
 
 		//////////////////////////////
 
-		const Renderer::WindowInfo* info = Renderer::Inst()->GetWindowInfo();
-
 		// Create main perspective camera.
 		//
+		info = mWindow0->GetWindow();
 		camera = new PerspectiveCameraComponent( (float)info->mWidth, (float)info->mHeight );
 		
 		transform = new TransformComponent();
@@ -444,6 +449,13 @@ public:
 		PhysicsSystem::Destroy();
 		ParticleSystem::Destroy();
 		GameWorld::Destroy();
+
+		mWindow0->Shutdown();
+		delete mWindow0;
+		
+		mWindow1->Shutdown();
+		delete mWindow1;
+
 		Renderer::Destroy();
 	}
 };
@@ -451,27 +463,27 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-int APIENTRY _tWinMain(HINSTANCE hInstance,
-					   HINSTANCE hPrevInstance,
-					   LPTSTR    lpCmdLine,
-					   int       nCmdShow)
+int APIENTRY _tWinMain( HINSTANCE hInstance,
+					    HINSTANCE hPrevInstance,
+					    LPTSTR    lpCmdLine,
+					    int       nCmdShow )
 {
 	// Check for memory leaks.
 	//
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	_CrtSetReportMode( _CRT_ERROR, _CRTDBG_MODE_DEBUG );
-	//_CrtSetBreakAlloc( 209 );
+	//_CrtSetBreakAlloc( 239 );
 
-	UNREFERENCED_PARAMETER(hPrevInstance);
-	UNREFERENCED_PARAMETER(lpCmdLine);
+	UNREFERENCED_PARAMETER( hPrevInstance );
+	UNREFERENCED_PARAMETER( lpCmdLine );
 
 	int result = 0;
 	MainApp* mainApp = 0;
 
 	try
 	{
-		mainApp = new MainApp( hInstance, nCmdShow );
-		result  = mainApp->Run();
+		mainApp = new MainApp();
+		result  = mainApp->Run( hInstance, nCmdShow );
 	}
 	catch( AppException e )
 	{
@@ -490,108 +502,11 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		REPORT_ERROR( "Failed to initialize.", "Application Error" );
 	}
 
-	mainApp->Shutdown();
-	SAFE_DELETE( mainApp );
+	if( mainApp )
+	{
+		mainApp->Shutdown();
+		delete mainApp;
+	}
 	
 	return result;
-}
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-//
-//  FUNCTION: MyRegisterClass()
-//
-//  PURPOSE: Registers the window class.
-//
-//  COMMENTS:
-//
-//    This function and its usage are only necessary if you want this code
-//    to be compatible with Win32 systems prior to the 'RegisterClassEx'
-//    function that was added to Windows 95. It is important to call this function
-//    so that the application will get 'well formed' small icons associated
-//    with it.
-//
-ATOM MyRegisterClass(HINSTANCE hInstance)
-{
-	WNDCLASSEX wcex;
-
-	wcex.cbSize = sizeof(WNDCLASSEX);
-
-	wcex.style			= CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc	= WndProc;
-	wcex.cbClsExtra		= 0;
-	wcex.cbWndExtra		= 0;
-	wcex.hInstance		= hInstance;
-	wcex.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_SENTINEL_TEST));
-	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
-	wcex.lpszMenuName	= MAKEINTRESOURCE(IDC_SENTINEL_TEST);
-	wcex.lpszClassName	= szWindowClass;
-	wcex.hIconSm		= LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
-
-	return RegisterClassEx(&wcex);
-}
-
-//
-//   FUNCTION: InitInstance(HINSTANCE, int)
-//
-//   PURPOSE: Saves instance handle and creates main window
-//
-//   COMMENTS:
-//
-//        In this function, we save the instance handle in a global variable and
-//        create and display the main program window.
-//
-HWND InitInstance( HINSTANCE hInstance, int nCmdShow )
-{
-   HWND hWnd;
-
-   hInst = hInstance; // Store instance handle in our global variable
-
-   hWnd = CreateWindow( szWindowClass, "Sentinel", (!gWindowInfo.mFullscreen) ? WS_OVERLAPPEDWINDOW : WS_POPUP,
-						0, 0, gWindowInfo.mWidth, gWindowInfo.mHeight,
-						NULL, NULL, hInstance, NULL );
-
-   if( !hWnd )
-      return NULL;
-   
-   ShowWindow( hWnd, nCmdShow );
-   UpdateWindow( hWnd );
-
-   return hWnd;
-}
-
-//
-//  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  PURPOSE:  Processes messages for the main window.
-//
-//  WM_COMMAND	- process the application menu
-//  WM_PAINT	- Paint the main window
-//  WM_DESTROY	- post a quit message and return
-//
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	Mouse::Inst()->ProcessMessages( message );
-	Keyboard::Inst()->ProcessMessages();
-
-	switch( message )
-	{
-		case WM_COMMAND:
-			return DefWindowProc( hWnd, message, wParam, lParam );
-			
-		case WM_PAINT:
-			{
-			PAINTSTRUCT ps;
-			BeginPaint(hWnd, &ps);
-			EndPaint(hWnd, &ps);
-			}
-			break;
-
-		case WM_DESTROY:
-			PostQuitMessage( 0 );
-			break;
-	}
-
-	return DefWindowProc( hWnd, message, wParam, lParam );
 }

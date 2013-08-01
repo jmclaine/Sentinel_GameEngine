@@ -87,10 +87,12 @@
     <ClInclude Include="..\Engine\src\Color.h" />
     <ClInclude Include="..\Engine\src\Common.h" />
     <ClInclude Include="..\Engine\src\CriticalSection.h" />
+    <ClInclude Include="..\Engine\src\Input.h" />
     <ClInclude Include="..\Engine\src\MathCommon.h" />
     <ClInclude Include="..\Engine\src\Matrix4f.h" />
     <ClInclude Include="..\Engine\src\Quatf.h" />
     <ClInclude Include="..\Engine\src\Renderer.h" />
+    <ClInclude Include="..\Engine\src\GameWindow.h" />
     <ClInclude Include="..\Engine\src\Shader.h" />
     <ClInclude Include="..\Engine\src\Shape.h" />
     <ClInclude Include="..\Engine\src\Singleton.h" />
@@ -104,12 +106,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\Color.cpp" />
+    <ClCompile Include="..\Engine\src\Input.cpp" />
     <ClCompile Include="..\Engine\src\MathCommon.cpp" />
     <ClCompile Include="..\Engine\src\Matrix4f.cpp" />
     <ClCompile Include="..\Engine\src\Quatf.cpp" />
     <ClCompile Include="..\Engine\src\Renderer.cpp" />
     <ClCompile Include="..\Engine\src\RendererDX.cpp" />
     <ClCompile Include="..\Engine\src\RendererGL.cpp" />
+    <ClCompile Include="..\Engine\src\GameWindow.cpp" />
     <ClCompile Include="..\Engine\src\Shader.cpp" />
     <ClCompile Include="..\Engine\src\Shape.cpp" />
     <ClCompile Include="..\Engine\src\stb_image.c" />

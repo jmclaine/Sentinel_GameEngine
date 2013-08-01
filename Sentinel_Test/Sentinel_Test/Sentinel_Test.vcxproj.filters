@@ -153,9 +153,6 @@
     <ClInclude Include="..\..\Engine\src\TransformComponent.h">
       <Filter>Sentinel_Engine\Components\Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Engine\src\Input.h">
-      <Filter>Sentinel_Engine\Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Engine\src\MeshBuilder.h">
       <Filter>Sentinel_Engine\Assets</Filter>
     </ClInclude>
@@ -232,9 +229,6 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\src\TransformComponent.cpp">
       <Filter>Sentinel_Engine\Components\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\Input.cpp">
-      <Filter>Sentinel_Engine\Core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Engine\src\MeshBuilder.cpp">
       <Filter>Sentinel_Engine\Assets</Filter>

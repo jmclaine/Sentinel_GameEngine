@@ -12,7 +12,8 @@ config.xml syntax:
 <Renderer Type="OPENGL" Fullscreen="false" Width="1920" Height="1080" />
 
 // This initializes the Renderer values within the XML file.
-Renderer::Load( "config.xml" );
+WindowInfo info;
+Renderer::Load( "config.xml", info );
 
 
 // Alternative to creating and loading the XML file.
@@ -20,14 +21,10 @@ Renderer::Inst( BuildRendererGL() );
 * OR *
 Renderer::Inst( BuildRendererDX() );
 
-// The Renderer defaults to this if unassigned.
-Renderer::Inst()->FULLSCREEN    = false;
-Renderer::Inst()->WINDOW_WIDTH  = 1920;
-Renderer::Inst()->WINDOW_HEIGHT = 1080;
-
 
 // Initialize the Renderer.
-Renderer::Inst()->Startup( mHWND );		// use appropriate HWND for Windows apps
+// Use appropriate HWND for Windows applications.
+WindowInfo* windowInfo = Renderer::Inst()->Startup( mHWND, info.mFullscreen, info.mWidth, info.mHeight );
 
 
 // Now the Renderer can perform its normal functionality.
@@ -47,6 +44,10 @@ Renderer::Inst()->Startup( mHWND );		// use appropriate HWND for Windows apps
 
 EXAMPLE:
 
+// Only necessary when rendering to multiple windows.
+Renderer::Inst()->SetWindow( windowInfo );
+
+// Clear buffers.
 Renderer::Inst()->Clear( ColorRGBA( 0.0f, 0.2f, 0.8f, 1.0f ).Ptr() );
 
 // Shaders are required.
@@ -56,7 +57,7 @@ Renderer::Inst()->SetShader( shader );
 Renderer::Inst()->SetVBO( bufferVBO );
 Renderer::Inst()->SetIBO( bufferIBO );
 
-// Set shader variables here.
+// Set shader variables here (see Shader.h).
 
 // Draw stuff.
 Renderer::Inst()->SetRenderType( primitive );
@@ -68,8 +69,17 @@ Renderer::Inst()->Present();
 // When finished with Renderer always call:
 Renderer::Destroy();
 
+// If more than one window / handle was created:
+Renderer::Inst()->SetWindow( windowInfo0 );
+Renderer::Inst()->Shutdown();
+
+Renderer::Inst()->SetWindow( windowInfo1 );
+Renderer::Inst()->Shutdown();
+
+Renderer::Destroy();
 */
 
+#include "Common.h"
 #include "Singleton.h"
 #include "Util.h"
 #include "Shader.h"
@@ -133,8 +143,6 @@ namespace Sentinel
 	// prevents a user from creating both OpenGL and DirectX at the
 	// same time.
 	//
-	// TODO: Create functions to allow draw calls on multiple windows.
-	//
 	class SENTINEL_DLL Renderer : public SingletonAbstract< Renderer >
 	{
 	public:
@@ -175,16 +183,17 @@ namespace Sentinel
 
 		static const void*	Load( const char* filename, WindowInfo& info );
 
-		virtual UINT		Startup( void* hWnd, bool fullscreen, UINT width, UINT height ) = 0; // void* for multiplatform
+		virtual WindowInfo*	Startup( void* hWnd, bool fullscreen, UINT width, UINT height ) = 0;
 
 		virtual void		Shutdown() = 0;
 
 		// Windows.
 		//
-		virtual void		SetWindow( UINT index ) = 0;
+		virtual void		SetWindow( WindowInfo* info ) = 0;
+		virtual WindowInfo* GetWindow() = 0;
 
-		virtual const WindowInfo* GetWindowInfo() const = 0;
-		
+		virtual bool		ShareResources( WindowInfo* info0, WindowInfo* info1 ) = 0;
+
 		// Buffers.
 		//
 		virtual Buffer*		CreateBuffer( void* data, UINT size, UINT stride, BufferType type ) = 0;
@@ -201,6 +210,7 @@ namespace Sentinel
 	
 		// Special Rendering.
 		//
+		virtual UINT		CreateBackbuffer() = 0;
 		virtual UINT		CreateRenderTarget( Texture* texture ) = 0;
 		virtual UINT		CreateDepthStencil( UINT width, UINT height ) = 0;
 		virtual UINT		CreateViewport( UINT width, UINT height ) = 0;
