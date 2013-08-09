@@ -404,11 +404,10 @@ namespace Sentinel
 		{
 		public:
 
-			ID3D11Device*				mDevice;
-			ID3D11DeviceContext*		mContext;
-
-			IDXGISwapChain*				mSwapChain;
-			ID3D11RasterizerState*		mRasterizerState;
+			ID3D11Device*						mDevice;
+			ID3D11DeviceContext*				mContext;
+			IDXGISwapChain*						mSwapChain;
+			ID3D11RasterizerState*				mRasterizerState;
 		};
 
 		WindowInfoDX*							mCurrWindow;
@@ -445,9 +444,7 @@ namespace Sentinel
 		}
 
 		~RendererDX()
-		{
-			Shutdown();
-		}
+		{}
 
 	private:
 
@@ -655,13 +652,11 @@ namespace Sentinel
 				SAFE_RELEASE_PTR_LIST( mDepthStencilState );
 
 				for( UINT i = 0; i < (UINT)mTexture.size(); ++i )
-				{
 					SAFE_DELETE( mTexture[ i ] );
-				}
-				
-				SAFE_RELEASE_PTR( mCurrWindow->mContext );
-				SAFE_RELEASE_PTR( mCurrWindow->mDevice );
+				mTexture.clear();
 
+				SAFE_RELEASE_PTR( mCurrWindow->mContext );
+				
 				delete mCurrWindow;
 				mCurrWindow = NULL;
 			}
@@ -684,7 +679,13 @@ namespace Sentinel
 		bool ShareResources( WindowInfo* info0, WindowInfo* info1 )
 		{
 			//((WindowInfoDX*)info0)->
+			/*IDXGIResource* res = NULL;
 
+			if( ((WindowInfoDX*)info0)->mContext->QueryInterface( __uuidof(IDXGIResource), (void**)&res ) != S_OK )
+				return false;
+
+			HWND hWnd;
+			if( res->GetSharedHandle( &hWnd );*/
 			return false;
 		}
 
@@ -893,8 +894,8 @@ namespace Sentinel
 				newFormat,
 				D3D_SRV_DIMENSION_TEXTURE2D
 			};
-			rsv.Texture2D.MipLevels = 1;
-			rsv.Texture2D.MostDetailedMip = 0;
+			rsv.Texture2D.MipLevels			= 1;
+			rsv.Texture2D.MostDetailedMip	= 0;
 
 			// Create mipmaps.
 			//

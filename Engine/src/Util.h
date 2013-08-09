@@ -101,7 +101,8 @@ namespace Sentinel
 
 	#define SAFE_RELEASE_PTR_LIST( var )\
 		TRAVERSE_LIST( it, var )\
-			SAFE_RELEASE_PTR( (*it) );
+			SAFE_RELEASE_PTR( (*it) );\
+		var.clear();
 
 	#define SAFE_RELEASE_LIST( var )\
 		TRAVERSE_LIST( it, var )\

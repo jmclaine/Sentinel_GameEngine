@@ -205,20 +205,6 @@ namespace Sentinel { namespace Systems
 	void WRenderer::OnMouseDown( MouseButtonEventArgs^ e )
 	{}
 
-	void WRenderer::DestroyWindowCore( HandleRef hwnd )
-	{
-		SetActive();
-		Shutdown();
-
-		if( mHWND != NULL && mHWND == (HWND)hwnd.Handle.ToPointer())
-		{
-			::DestroyWindow( mHWND );
-			mHWND = NULL;
-		}
-
-		UnregisterClass( (LPCSTR)mWindowClass, mINST );
-	}
-
 	LRESULT WINAPI RendererMsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 	{
 		switch( msg )
@@ -298,5 +284,19 @@ namespace Sentinel { namespace Systems
 		}
 
 		return HandleRef( nullptr, IntPtr::Zero );
+	}
+
+	void WRenderer::DestroyWindowCore( HandleRef hwnd )
+	{
+		SetActive();
+		Shutdown();
+
+		if( mHWND != NULL && mHWND == (HWND)hwnd.Handle.ToPointer())
+		{
+			::DestroyWindow( mHWND );
+			mHWND = NULL;
+		}
+
+		UnregisterClass( (LPCSTR)mWindowClass, mINST );
 	}
 }}

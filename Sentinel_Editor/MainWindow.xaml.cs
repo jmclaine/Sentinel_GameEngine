@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Interop;
 using System.Windows.Threading;
+using System.ComponentModel;
 
 using System.Runtime.InteropServices;
 
@@ -28,61 +29,36 @@ namespace Sentinel_Editor
     /// </summary>
     public partial class MainWindow : Window
     {
-        private WRenderer           mRenderer0;
-        private static WColorRGBA   mClearColor0 = new WColorRGBA(0.0f, 0.2f, 0.8f, 1.0f);
-        private uint                mDepthStencil0;
-        private uint                mViewport0;
-        private uint                mRenderTarget0;
-
-        private WRenderer           mRenderer1;
-        private static WColorRGBA   mClearColor1 = new WColorRGBA(0.2f, 0.2f, 0.8f, 1.0f);
-        private uint                mDepthStencil1;
-        private uint                mViewport1;
-        private uint                mRenderTarget1;
+        private WRenderer           mRenderer;
+        private static WColorRGBA   mClearColor = new WColorRGBA(0.0f, 0.2f, 0.8f, 1.0f);
+        private uint                mDepthStencil;
+        private uint                mViewport;
+        private uint                mRenderTarget;
 
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        protected void OnClosed(RoutedEventArgs e)
-        {
-            WRenderer.Destroy();
-        }
-
         private void Window_Loaded(Object sender, RoutedEventArgs e)
         {
-            mRenderer0 = new WRenderer();
+            mRenderer = new WRenderer();
             
-            if (!mRenderer0.Load("config.xml"))
+            if (!mRenderer.Load("config.xml"))
             {
                 MessageBox.Show("Failed to load config.xml", "Application Failure");
 
                 System.Environment.Exit(0);
             }
 
-            RendererHWND0.Child = mRenderer0;
+            RendererHWND0.Child = mRenderer;
 
-            mRenderer0.SetActive();
+            mRenderer.SetActive();
 
-            mDepthStencil0  = mRenderer0.CreateDepthStencil(mRenderer0.mWindowInfo.mWidth, mRenderer0.mWindowInfo.mHeight);
-            mViewport0      = mRenderer0.CreateViewport(mRenderer0.mWindowInfo.mWidth, mRenderer0.mWindowInfo.mHeight);
-            mRenderTarget0  = mRenderer0.CreateBackbuffer();
+            mDepthStencil  = mRenderer.CreateDepthStencil(mRenderer.mWindowInfo.mWidth, mRenderer.mWindowInfo.mHeight);
+            mViewport      = mRenderer.CreateViewport(mRenderer.mWindowInfo.mWidth, mRenderer.mWindowInfo.mHeight);
+            mRenderTarget  = mRenderer.CreateBackbuffer();
 
-            ///////////////////////////////////////
-            
-            mRenderer1 = new WRenderer();
-            
-            RendererHWND1.Child = mRenderer1;
-
-            mRenderer1.SetActive();
-
-            mDepthStencil1  = mRenderer1.CreateDepthStencil(mRenderer1.mWindowInfo.mWidth, mRenderer1.mWindowInfo.mHeight);
-            mViewport1      = mRenderer1.CreateViewport(mRenderer1.mWindowInfo.mWidth, mRenderer1.mWindowInfo.mHeight);
-            mRenderTarget1  = mRenderer1.CreateBackbuffer();
-
-            mRenderer1.ShareResources(mRenderer0);
-            
             ///////////////////////////////////////
 
             DispatcherTimer timer = new DispatcherTimer();
@@ -91,60 +67,14 @@ namespace Sentinel_Editor
             timer.Start();
         }
 
-        private void Update(Object sender, EventArgs e)
-        {
-            mRenderer0.SetActive();
-
-            mRenderer0.SetDepthStencil(mDepthStencil0);
-            mRenderer0.SetViewport(mViewport0);
-            mRenderer0.SetRenderTarget(mRenderTarget0);
-            mRenderer0.Clear(mClearColor0);
-
-            // Draw stuff...
-
-            mRenderer0.Present();
-
-            ///////////////////////////////////////
-            
-            mRenderer1.SetActive();
-
-            mRenderer1.SetDepthStencil(mDepthStencil1);
-            mRenderer1.SetViewport(mViewport1);
-            mRenderer1.SetRenderTarget(mRenderTarget1);
-            mRenderer1.Clear(mClearColor1);
-
-            // Draw stuff...
-
-            mRenderer1.Present();
-            //*/
-        }
-
-        ///
-        /// File
-        ///
-        private void Click_Open(Object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("You clicked 'Open...'");
-        }
-
-        private void Click_Save(Object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("You clicked 'Save...'");
-        }
-
-        private void Click_SaveAs(Object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("You clicked 'Save As...'");
-        }
-
-        private void Click_Exit(Object sender, RoutedEventArgs e)
+        private void Window_Closing(Object sender, CancelEventArgs e)
         {
             MessageBoxResult result = MessageBox.Show("Save before Exiting?",
                                                       "Exit Application",
                                                       MessageBoxButton.YesNoCancel,
                                                       MessageBoxImage.Question);
 
-            switch(result)
+            switch (result)
             {
                 case MessageBoxResult.Yes:
                     MessageBox.Show("Saving...");
@@ -155,10 +85,46 @@ namespace Sentinel_Editor
                     break;
 
                 case MessageBoxResult.Cancel:
+                    e.Cancel = true;
                     return;
             }
+        }
 
-            System.Environment.Exit(0);
+        private void Update(Object sender, EventArgs e)
+        {
+            mRenderer.SetActive();
+
+            mRenderer.SetDepthStencil(mDepthStencil);
+            mRenderer.SetViewport(mViewport);
+            mRenderer.SetRenderTarget(mRenderTarget);
+            mRenderer.Clear(mClearColor);
+
+            // Draw stuff...
+
+            mRenderer.Present();
+        }
+
+        ///
+        /// File
+        ///
+        private void Open_Click(Object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("You clicked 'Open...'");
+        }
+
+        private void Save_Click(Object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("You clicked 'Save...'");
+        }
+
+        private void SaveAs_Click(Object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("You clicked 'Save As...'");
+        }
+
+        private void Exit_Click(Object sender, RoutedEventArgs e)
+        {
+            Close();
         }
 
         ///
@@ -168,9 +134,22 @@ namespace Sentinel_Editor
         ///
         /// Help
         ///
-        private void Click_About(Object sender, RoutedEventArgs e)
+        private void About_Click(Object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Sentinel Editor\nVersion 1.0.0.0\nCopyright © BEHOLDER Software 2013", "About...");
+        }
+
+        ///
+        /// ToolBar
+        ///
+        private void ToolBar_Open_Click(Object sender, RoutedEventArgs e)
+        {
+            Open_Click(sender, e);
+        }
+
+        private void ToolBar_Save_Click(Object sender, RoutedEventArgs e)
+        {
+            Save_Click(sender, e);
         }
     }
 }

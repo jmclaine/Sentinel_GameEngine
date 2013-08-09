@@ -113,7 +113,7 @@ public:
 		}
 
 		mWindow0->Startup( hInstance, nCmdShow, "Sentinel_Test", "SentinelClass0", info );
-		mWindow1->Startup( hInstance, nCmdShow, "Sentinel_Dup", "SentinelClass1", info );
+		mWindow1->Startup( hInstance, nCmdShow, "Sentinel_Dup",  "SentinelClass1", info );
 
 		SetFocus( mWindow0->GetHandle() );
 
@@ -121,7 +121,7 @@ public:
 		ShowCursor( FALSE );
 
 		mWindow0->SetActive();
-		mWindow1->ShareResources( mWindow0 );
+		mWindow0->ShareResources( mWindow1 );
 		
 		////////////////////////////////////
 

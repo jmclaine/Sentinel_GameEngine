@@ -678,6 +678,12 @@ namespace Sentinel
 
 				BASE_TEXTURE = CreateTextureFromMemory( newTex, 1, 1, IMAGE_FORMAT_RGBA, false );
 
+				if( !BASE_TEXTURE )
+				{
+					delete mCurrWindow;
+					return NULL;
+				}
+
 				delete newTex;
 			}
 
