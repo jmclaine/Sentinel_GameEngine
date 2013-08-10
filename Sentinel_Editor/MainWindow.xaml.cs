@@ -29,8 +29,9 @@ namespace Sentinel_Editor
     /// </summary>
     public partial class MainWindow : Window
     {
-        private WRenderer           mRendererWorld;
-        private static WColorRGBA   mClearColor = new WColorRGBA(0.0f, 0.2f, 0.8f, 1.0f);
+        private WGameWindow         mWindowWorld;
+        private static float        mBlue;
+        //private static WColorRGBA   mClearColor = new WColorRGBA(0.0f, 0.2f, 0.8f, 1.0f);
 
         public MainWindow()
         {
@@ -39,16 +40,18 @@ namespace Sentinel_Editor
 
         private void Window_Loaded(Object sender, RoutedEventArgs e)
         {
-            mRendererWorld = new WRenderer("World", "WorldClass");
-            
-            if (!mRendererWorld.Load("config.xml"))
+            WWindowInfo info = WRenderer.Load("config.xml");
+            if (info == null)
             {
                 MessageBox.Show("Failed to load config.xml", "Application Failure");
 
                 System.Environment.Exit(0);
             }
 
-            Renderer_World.Child = mRendererWorld;
+            mWindowWorld = new WGameWindow();
+            mWindowWorld.Startup("World", "WorldClass", info);
+
+            Window_World.Child = mWindowWorld;
 
             ///////////////////////////////////////
 
@@ -83,16 +86,22 @@ namespace Sentinel_Editor
 
         private void Update(Object sender, EventArgs e)
         {
-            mRendererWorld.SetActive();
+            mBlue += 0.001f;
+            if (mBlue >= 1.0f)
+                mBlue = 0.0f;
+            WColorRGBA mClearColor = new WColorRGBA(0.0f, 0.2f, mBlue, 1.0f);
 
-            mRendererWorld.SetDepthStencil(0);
-            mRendererWorld.SetViewport(0);
-            mRendererWorld.SetRenderTarget(0);
-            mRendererWorld.Clear(mClearColor);
+            mWindowWorld.SetActive();
+
+            WRenderer.SetDepthStencil(0);
+            WRenderer.SetViewport(0);
+            WRenderer.SetRenderTarget(0);
+
+            WRenderer.Clear(mClearColor);
 
             // Draw stuff...
 
-            mRendererWorld.Present();
+            WRenderer.Present();
         }
 
         ///

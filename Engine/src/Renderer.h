@@ -136,6 +136,19 @@ namespace Sentinel
 		NUM_STENCIL_TYPES
 	};
 
+	class WindowInfo
+	{
+	public:
+
+		bool		mFullscreen;
+
+		UINT		mWidth;
+		UINT		mHeight;
+
+		float		mWidthRatio;
+		float		mHeightRatio;
+	};
+
 	// Renderer is a SingletonAbstract as creating multiple instances
 	// of this particular object would unnecessarily complicate the
 	// shared context capability of the video card interface without
@@ -145,21 +158,6 @@ namespace Sentinel
 	//
 	class SENTINEL_DLL Renderer : public SingletonAbstract< Renderer >
 	{
-	public:
-
-		class WindowInfo
-		{
-		public:
-
-			bool		mFullscreen;
-
-			UINT		mWidth;
-			UINT		mHeight;
-
-			float		mWidthRatio;
-			float		mHeightRatio;
-		};
-
 	protected:
 
 		UINT				PRIMITIVE[ NUM_PRIMITIVES ];

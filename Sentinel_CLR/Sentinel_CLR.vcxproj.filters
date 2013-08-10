@@ -72,6 +72,9 @@
     <ClInclude Include="..\Engine\src\CLR\WRenderer.h">
       <Filter>Sentinel_Engine\Systems</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WGameWindow.h">
+      <Filter>Sentinel_Engine\Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sentinel_CLR.cpp">
@@ -111,6 +114,9 @@
       <Filter>Sentinel_Engine\Math</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\CLR\WRenderer.cpp">
+      <Filter>Sentinel_Engine\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WGameWindow.cpp">
       <Filter>Sentinel_Engine\Systems</Filter>
     </ClCompile>
   </ItemGroup>

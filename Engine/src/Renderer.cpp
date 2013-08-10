@@ -20,8 +20,9 @@ namespace Sentinel
 		TiXmlElement* pElem = hDoc.FirstChild( "Renderer" ).Element();
 		const char*   pName = pElem->Attribute( "Type" );
 
-		if( !Renderer::Inst( (strcmp( "DIRECTX", pName ) == 0) ? BuildRendererDX() : BuildRendererGL() ))
-			return NULL;
+		if( !Renderer::Inst() )
+			if( !Renderer::Inst( (strcmp( "DIRECTX", pName ) == 0) ? BuildRendererDX() : BuildRendererGL() ))
+				return NULL;
 		
 		pElem->QueryBoolAttribute(		"Fullscreen",	&info.mFullscreen );
 		pElem->QueryUnsignedAttribute(	"Width",		&info.mWidth );

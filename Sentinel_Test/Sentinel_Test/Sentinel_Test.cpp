@@ -69,9 +69,6 @@ class MainApp
 	GameWindow*				mWindow0;
 	GameWindow*				mWindow1;
 
-	TCHAR					mTitle[ GameWindow::MAX_LOADSTRING ];
-	TCHAR					mWindowClass[ GameWindow::MAX_LOADSTRING ];
-
 public:
 
 	MainApp()
@@ -85,9 +82,6 @@ public:
 
 		mWindow0 = NULL;
 		mWindow1 = NULL;
-
-		memset( mTitle, 0, GameWindow::MAX_LOADSTRING );
-		memset( mWindowClass, 0, GameWindow::MAX_LOADSTRING );
 	}
 
 	~MainApp()
@@ -98,12 +92,14 @@ public:
 		mWindow0 = new GameWindow( IDI_SENTINEL_TEST, IDI_SMALL, IDC_SENTINEL_TEST );
 		mWindow1 = new GameWindow( IDI_SENTINEL_TEST, IDI_SMALL, IDC_SENTINEL_TEST );
 
-		LoadString( hInstance, IDS_APP_TITLE, mTitle, GameWindow::MAX_LOADSTRING );
-		LoadString( hInstance, IDC_SENTINEL_TEST, mWindowClass, GameWindow::MAX_LOADSTRING );
+		//LoadString( hInstance, IDS_APP_TITLE, mTitle, GameWindow::MAX_LOADSTRING );
+		//LoadString( hInstance, IDC_SENTINEL_TEST, mWindowClass, GameWindow::MAX_LOADSTRING );
 		
 		mAccelTable = LoadAccelerators( hInstance, MAKEINTRESOURCE( IDC_SENTINEL_TEST ));
 
-		Renderer::WindowInfo info;
+		// Load config file to setup windows for the renderer.
+		//
+		WindowInfo info;
 		if( !Renderer::Load( "config.xml", info ))
 		{
 			REPORT_ERROR( "Failed to load 'config.xml'\nDefaulting to OpenGL", "Renderer Setup Failure" );
@@ -112,8 +108,23 @@ public:
 				throw AppException( "Failed to BuildRendererGL" );
 		}
 
+		// Prepare main window.
+		//
 		mWindow0->Startup( hInstance, nCmdShow, "Sentinel_Test", "SentinelClass0", info );
+
+		Renderer::Inst()->CreateDepthStencil( info.mWidth, info.mHeight );
+		Renderer::Inst()->CreateViewport( info.mWidth, info.mHeight );
+		Renderer::Inst()->CreateBackbuffer();
+
+		// Prepare second window for testing.
+		//
 		mWindow1->Startup( hInstance, nCmdShow, "Sentinel_Dup",  "SentinelClass1", info );
+
+		Renderer::Inst()->CreateDepthStencil( info.mWidth, info.mHeight );
+		Renderer::Inst()->CreateViewport( info.mWidth, info.mHeight );
+		Renderer::Inst()->CreateBackbuffer();
+
+		////////////////////////////////////
 
 		SetFocus( mWindow0->GetHandle() );
 
@@ -135,6 +146,8 @@ public:
 
 		GameWorld::Inst()->Startup( "NoMap.MAP" );
 
+		// Enter main game loop.
+		//
 		MSG msg;
 		for(;;)
 		{
@@ -168,7 +181,15 @@ public:
 			PostQuitMessage( 0 );
 		}
 
-		mWindow0->Update();
+		static float color[] = {0.0f, 0.2f, 0.8f, 1.0f};
+
+		mWindow0->SetActive();
+
+		Renderer::Inst()->SetDepthStencil( 0 );
+		Renderer::Inst()->SetViewport( 0 );
+		Renderer::Inst()->SetRenderTarget( 0 );
+
+		Renderer::Inst()->Clear( color );
 
 		GameWorld::Inst()->Update();
 
@@ -176,7 +197,13 @@ public:
 
 		/////////////////////////////////
 
-		mWindow1->Update();
+		mWindow1->SetActive();
+
+		Renderer::Inst()->SetDepthStencil( 1 );
+		Renderer::Inst()->SetViewport( 1 );
+		Renderer::Inst()->SetRenderTarget( 1 );
+
+		Renderer::Inst()->Clear( color );
 
 		Renderer::Inst()->Present();
 		
@@ -219,7 +246,7 @@ public:
 	{
 		SetDirectory( "Objects" );
 		
-		Renderer::WindowInfo*	info;
+		const WindowInfo*		info;
 		TransformComponent*		transform;
 		ControllerComponent*	controller;
 		PhysicsComponent*		physics;
@@ -231,7 +258,7 @@ public:
 
 		// Create main perspective camera.
 		//
-		info = mWindow0->GetWindow();
+		info = mWindow0->GetInfo();
 		camera = new PerspectiveCameraComponent( (float)info->mWidth, (float)info->mHeight );
 		
 		transform = new TransformComponent();

@@ -566,9 +566,9 @@ namespace Sentinel
 
 		std::vector< RenderTarget >		mRenderTarget;
 		std::vector< GLuint >			mDepthStencil;
+		std::vector< Viewport >			mViewport;
 		
 		std::vector< TextureGL* >		mTexture;
-		std::vector< Viewport >			mViewport;
 
 		UINT IMAGE_FORMAT[ NUM_IMAGE_FORMATS ];
 

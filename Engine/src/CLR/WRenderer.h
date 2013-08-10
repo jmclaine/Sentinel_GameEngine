@@ -1,12 +1,15 @@
 #pragma once
 
 // WRenderer works almost identically to the C++ version.
+// All functions are static.
 //
-// The biggest change is the removal of the Singleton.
-// The removal allows the Renderer to create its own
-// window / handle, and interface directly with the
-// WPF Window, which makes drawing to multiple windows
-// and controls easy and intuitive.
+// Removed Startup as it is only useful within WGameWindow
+// during the BuildWindowCore function.
+//
+// Adjusted Load to return WWindowInfo instead.
+//
+// Left functionality as open as possible for custom
+// creation of windows if required.
 //
 #using <System.dll>
 #using <WindowsBase.dll>
@@ -78,112 +81,93 @@ namespace Sentinel { namespace Systems
 		NUM_STENCIL_TYPES
 	};
 
-	#define MAX_TITLE_LENGTH	16
-	#define MAX_CLASS_LENGTH	24
-
 	LRESULT WINAPI RendererMsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
  
-	public ref class WRenderer : public HwndHost
+	public ref class WWindowInfo
 	{
 	private:
 
-		HWND					mHWND;
-		HINSTANCE				mINST;
-
-		wchar_t* 				mTitle;
-		wchar_t* 				mWindowClass;
-		
-		Renderer::WindowInfo*	mInfo;
+		WindowInfo*		mRef;
 
 	public:
 
-		ref class WindowInfo
-		{
-		public:
+		WWindowInfo();
+		WWindowInfo( const WindowInfo% info );
+		WWindowInfo( WindowInfo* info );
+		WWindowInfo( const WWindowInfo% info );
+		~WWindowInfo();
 
-			bool		mFullscreen;
+		WindowInfo*		GetRef();
 
-			UINT		mWidth;
-			UINT		mHeight;
+		bool			GetFullscreen();
 
-			float		mWidthRatio;
-			float		mHeightRatio;
-		};
+		int				GetWidth();
+		int				GetHeight();
 
-		WindowInfo^				mWindowInfo;
+		float			GetWidthRatio();
+		float			GetHeightRatio();
+	};
 
-		WTexture^				NULL_TEXTURE;	// black default texture
-		WTexture^				BASE_TEXTURE;	// white default texture
+	public ref class WRenderer
+	{
+	public:
+
+		static WTexture^	NULL_TEXTURE;	// black default texture
+		static WTexture^	BASE_TEXTURE;	// white default texture
 
 		//////////////////////////////
 
-		WRenderer( String^ title, String^ clazz );
-		~WRenderer();
+		static WWindowInfo^	Load( String^ filename );
 
-		bool				Load( String^ filename );
-		void				Shutdown();
+		static void			Shutdown();
 
 		static void			Destroy();
 
 		// Windows.
 		//
-		void				SetActive();
-		bool				ShareResources( WRenderer^ renderer );
+		static void			SetWindow( WWindowInfo^ info );
+		static WWindowInfo^ GetWindow();
+
+		static bool			ShareResources( WWindowInfo^ info0, WWindowInfo^ info1 );
 
 		// Buffers.
 		//
-		WBuffer^			CreateBuffer( IntPtr data, UINT size, UINT stride, BufferType type );
+		static WBuffer^		CreateBuffer( IntPtr data, UINT size, UINT stride, BufferType type );
 
-		void				SetVBO( WBuffer^ buffer );
-		void				SetIBO( WBuffer^ buffer );
+		static void			SetVBO( WBuffer^ buffer );
+		static void			SetIBO( WBuffer^ buffer );
 
 		// Textures.
 		//
-		WTexture^			CreateTexture( UINT width, UINT height, ImageFormatType format, bool createMips );
-		WTexture^			CreateTextureFromFile( String^ filename );
-		WTexture^			CreateTextureFromMemory( IntPtr data, UINT width, UINT height, ImageFormatType format, bool createMips );
+		static WTexture^	CreateTexture( UINT width, UINT height, ImageFormatType format, bool createMips );
+		static WTexture^	CreateTextureFromFile( String^ filename );
+		static WTexture^	CreateTextureFromMemory( IntPtr data, UINT width, UINT height, ImageFormatType format, bool createMips );
 	
 		// Special Rendering.
 		//
-		UINT				CreateBackbuffer();
-		UINT				CreateRenderTarget( WTexture^ texture );
-		UINT				CreateDepthStencil( UINT width, UINT height );
-		UINT				CreateViewport( UINT width, UINT height );
-		UINT				ResizeBuffers( UINT width, UINT height );
+		static UINT			CreateBackbuffer();
+		static UINT			CreateRenderTarget( WTexture^ texture );
+		static UINT			CreateDepthStencil( UINT width, UINT height );
+		static UINT			CreateViewport( UINT width, UINT height );
+		static UINT			ResizeBuffers( UINT width, UINT height );
 
-		void				SetRenderType( PrimitiveType type );
-		void				SetRenderTarget( UINT target );
-		void				SetDepthStencil( UINT stencil );
-		void				SetDepthStencilState( UINT state );
-		void				SetViewport( UINT viewport );
-		UINT				SetCull( CullType type );
-		void				SetBlend( BlendType type );
+		static void			SetRenderType( PrimitiveType type );
+		static void			SetRenderTarget( UINT target );
+		static void			SetDepthStencil( UINT stencil );
+		static void			SetDepthStencilState( UINT state );
+		static void			SetViewport( UINT viewport );
+		static UINT			SetCull( CullType type );
+		static void			SetBlend( BlendType type );
 
 		// Shaders.
 		//
-		WShader^			CreateShader( System::String^ filename, System::String^ attrib, System::String^ uniform );
-		void				SetShader( WShader^ shader );
+		static WShader^		CreateShader( System::String^ filename, System::String^ attrib, System::String^ uniform );
+		static void			SetShader( WShader^ shader );
 
 		// Rendering.
 		//
-		void				Clear( WColorRGBA^ color );
-		void				DrawIndexed( UINT count, UINT startIndex, UINT baseVertex );
-		void				Present();
-
-	protected:
-		
-		virtual IntPtr		WndProc( IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, bool% handled ) override;
-
-		virtual void		OnRenderSizeChanged( SizeChangedInfo^ sizeInfo ) override;
-
-		virtual void		OnRender( DrawingContext^ drawingContext ) override;
-
-		virtual void		OnMouseDown( MouseButtonEventArgs^ e ) override;
-
-		virtual void		DestroyWindowCore( HandleRef hwnd ) override;
-
-		bool				RegisterWindowClass();
-
-		virtual HandleRef	BuildWindowCore( HandleRef hwndParent ) override;
+		static void			Clear( WColorRGBA^ color );
+		static void			DrawIndexed( UINT count, UINT startIndex, UINT baseVertex );
+		static void			Present();
 	};
 }}

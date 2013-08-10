@@ -639,26 +639,29 @@ namespace Sentinel
 
 		void Shutdown()
 		{
-			if( mCurrWindow->mSwapChain != NULL )
+			if( mCurrWindow )
 			{
-				mCurrWindow->mSwapChain->SetFullscreenState( FALSE, NULL );
+				if( mCurrWindow->mSwapChain != NULL )
+				{
+					mCurrWindow->mSwapChain->SetFullscreenState( FALSE, NULL );
 
-				SAFE_RELEASE_PTR( mCurrWindow->mSwapChain );
-				SAFE_RELEASE_PTR( mCurrWindow->mRasterizerState );
+					SAFE_RELEASE_PTR( mCurrWindow->mSwapChain );
+					SAFE_RELEASE_PTR( mCurrWindow->mRasterizerState );
 
-				SAFE_RELEASE_PTR_LIST( mRenderTarget );
-				SAFE_RELEASE_PTR_LIST( mDepthStencil );
-				SAFE_RELEASE_PTR_LIST( mBlendState );
-				SAFE_RELEASE_PTR_LIST( mDepthStencilState );
+					SAFE_RELEASE_PTR_LIST( mRenderTarget );
+					SAFE_RELEASE_PTR_LIST( mDepthStencil );
+					SAFE_RELEASE_PTR_LIST( mBlendState );
+					SAFE_RELEASE_PTR_LIST( mDepthStencilState );
 
-				for( UINT i = 0; i < (UINT)mTexture.size(); ++i )
-					SAFE_DELETE( mTexture[ i ] );
-				mTexture.clear();
+					for( UINT i = 0; i < (UINT)mTexture.size(); ++i )
+						SAFE_DELETE( mTexture[ i ] );
+					mTexture.clear();
 
-				SAFE_RELEASE_PTR( mCurrWindow->mContext );
+					SAFE_RELEASE_PTR( mCurrWindow->mContext );
 				
-				delete mCurrWindow;
-				mCurrWindow = NULL;
+					delete mCurrWindow;
+					mCurrWindow = NULL;
+				}
 			}
 		}
 
@@ -693,6 +696,7 @@ namespace Sentinel
 		//
 		Buffer* CreateBuffer( void* data, UINT size, UINT stride, BufferType type )
 		{
+			_ASSERT( mCurrWindow );
 			_ASSERT( type == VERTEX_BUFFER || type == INDEX_BUFFER );
 
 			D3D11_BUFFER_DESC bufferDesc;
@@ -726,6 +730,8 @@ namespace Sentinel
 
 		void SetVBO( Buffer* buffer )
 		{
+			_ASSERT( mCurrWindow );
+
 			UINT offset = 0;
 
 			mCurrWindow->mContext->IASetVertexBuffers( 0, 1, &static_cast< BufferDX* >(buffer)->mBuffer, &static_cast< BufferDX* >(buffer)->mStride, &offset );
@@ -733,6 +739,8 @@ namespace Sentinel
 
 		void SetIBO( Buffer* buffer )
 		{
+			_ASSERT( mCurrWindow );
+
 			mCurrWindow->mContext->IASetIndexBuffer( static_cast< BufferDX* >(buffer)->mBuffer, DXGI_FORMAT_R32_UINT, 0 );
 		}
 
@@ -950,6 +958,8 @@ namespace Sentinel
 		//
 		UINT CreateBackbuffer()
 		{
+			_ASSERT( mCurrWindow );
+
 			ID3D11Texture2D *tex = NULL;
 
 			HV_PTR( mCurrWindow->mSwapChain->GetBuffer( 0, __uuidof(ID3D11Texture2D), (void **)&tex ));
@@ -959,6 +969,8 @@ namespace Sentinel
 
 		UINT CreateRenderTarget( ID3D11Texture2D *backbuffer )
 		{
+			_ASSERT( mCurrWindow );
+
 			ID3D11RenderTargetView* rendertarget = NULL;
 			
 			HV( mCurrWindow->mDevice->CreateRenderTargetView( backbuffer, NULL, &rendertarget ));
@@ -975,6 +987,8 @@ namespace Sentinel
 
 		UINT CreateDepthStencil( UINT width, UINT height )
 		{
+			_ASSERT( mCurrWindow );
+
 			D3D11_TEXTURE2D_DESC texDesc =
 			{
 				width, height,
@@ -1030,6 +1044,8 @@ namespace Sentinel
 
 		void SetRenderType( PrimitiveType type )
 		{
+			_ASSERT( type < NUM_PRIMITIVES );
+
 			mCurrShader->ApplyPass();
 			mCurrShader->ApplyLayout();
 			mCurrWindow->mContext->IASetPrimitiveTopology( static_cast< D3D11_PRIMITIVE_TOPOLOGY >( PRIMITIVE[ type ] ));
@@ -1037,6 +1053,10 @@ namespace Sentinel
 
 		void SetRenderTarget( UINT target )
 		{
+			_ASSERT( mCurrWindow );
+			_ASSERT( mCurrStencil );
+			_ASSERT( target < mRenderTarget.size() );
+
 			// Unbind render targets.
 			//
 			mCurrWindow->mContext->OMSetRenderTargets( 0, 0, 0 );
@@ -1050,21 +1070,32 @@ namespace Sentinel
 
 		void SetDepthStencil( UINT stencil )
 		{
+			_ASSERT( stencil < mDepthStencil.size() );
+
 			mCurrStencil = mDepthStencil[ stencil ];
 		}
 
 		void SetDepthStencilState( UINT state )
 		{
+			_ASSERT( mCurrWindow );
+			_ASSERT( state < mDepthStencilState.size() );
+
 			mCurrWindow->mContext->OMSetDepthStencilState( mDepthStencilState[ state ], 0 );
 		}
 
 		void SetViewport( UINT viewport )
 		{
+			_ASSERT( mCurrWindow );
+			_ASSERT( viewport < mViewport.size() );
+
 			mCurrWindow->mContext->RSSetViewports( 1, &mViewport[ viewport ] );
 		}
 
 		UINT SetCull( CullType type )
 		{
+			_ASSERT( mCurrWindow );
+			_ASSERT( type < NUM_CULL_TYPES );
+
 			SAFE_RELEASE_PTR( mCurrWindow->mRasterizerState );
 			D3D11_RASTERIZER_DESC rasterizerstate = { D3D11_FILL_SOLID, (D3D11_CULL_MODE)CULL_TYPE[ type ], true, 0, 0, 0, true, false, true, false };
 
@@ -1076,6 +1107,9 @@ namespace Sentinel
 
 		void SetBlend( BlendType type )
 		{
+			_ASSERT( mCurrWindow );
+			_ASSERT( type < NUM_BLEND_TYPES );
+
 			float blend_factor[ 4 ] = { 1, 1, 1, 1 };
 			mCurrWindow->mContext->OMSetBlendState( mBlendState[ type ], blend_factor, 0xFFFFFFFF );
 		}
@@ -1104,17 +1138,23 @@ namespace Sentinel
 		//
 		void Clear( float* color )
 		{
+			_ASSERT( mCurrWindow );
+
 			mCurrWindow->mContext->ClearRenderTargetView( mCurrTarget, color );
 			mCurrWindow->mContext->ClearDepthStencilView( mCurrStencil, D3D11_CLEAR_DEPTH, 1.0f, 0 );
 		}
 
 		void DrawIndexed( UINT count, UINT startIndex, UINT baseVertex )
 		{
+			_ASSERT( mCurrWindow );
+
 			mCurrWindow->mContext->DrawIndexed( count, startIndex, baseVertex );
 		}
 
 		void Present()
 		{
+			_ASSERT( mCurrWindow );
+
 			mCurrWindow->mSwapChain->Present( 0, 0 );
 			
 			// Unbind render targets.

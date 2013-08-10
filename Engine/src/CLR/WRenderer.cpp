@@ -4,52 +4,81 @@
 
 namespace Sentinel { namespace Systems
 {
-	WRenderer::WRenderer( String^ title, String^ clazz )
+	WWindowInfo::WWindowInfo()
 	{
-		_ASSERT( title->Length < MAX_TITLE_LENGTH && clazz->Length < MAX_CLASS_LENGTH );
-
-		mTitle		 = new wchar_t[ MAX_TITLE_LENGTH ];
-		mWindowClass = new wchar_t[ MAX_CLASS_LENGTH ];
-
-		memset( mTitle, 0, MAX_TITLE_LENGTH );
-		memset( mWindowClass, 0, MAX_CLASS_LENGTH );
-
-		for( int x = 0; x < title->Length; ++x )
-			mTitle[ x ] = title[ x ];
-
-		for( int x = 0; x < clazz->Length; ++x )
-			mWindowClass[ x ] = clazz[ x ];
+		mRef = new WindowInfo();
 	}
 
-	WRenderer::~WRenderer()
+	WWindowInfo::WWindowInfo( const WindowInfo% info )
 	{
-		delete mTitle;
-		delete mWindowClass;
+		mRef = new WindowInfo( info );
 	}
 
-	bool WRenderer::Load( String^ filename )
+	WWindowInfo::WWindowInfo( WindowInfo* info )
+	{
+		mRef = info;
+	}
+
+	WWindowInfo::WWindowInfo( const WWindowInfo% info )
+	{
+		mRef = new WindowInfo( *info.mRef );
+	}
+
+	WWindowInfo::~WWindowInfo()
+	{
+		delete mRef;
+	}
+
+	WindowInfo* WWindowInfo::GetRef()
+	{
+		return mRef;
+	}
+
+	bool WWindowInfo::GetFullscreen()
+	{
+		return mRef->mFullscreen;
+	}
+
+	int WWindowInfo::GetWidth()
+	{
+		return mRef->mWidth;
+	}
+
+	int WWindowInfo::GetHeight()
+	{
+		return mRef->mHeight;
+	}
+
+	float WWindowInfo::GetWidthRatio()
+	{
+		return mRef->mWidthRatio;
+	}
+
+	float WWindowInfo::GetHeightRatio()
+	{
+		return mRef->mHeightRatio;
+	}
+
+	/////////////////////////////////////////////////
+
+	WWindowInfo^ WRenderer::Load( String^ filename )
 	{
 		// Somehow the pointer created in the DLL SingletonAbstract
 		// is not the same as the SingletonAbstract located here,
 		// which is nullptr.
 		//
-		Renderer::WindowInfo info;
+		WindowInfo info;
 
 		bool result = (Renderer::Inst( (Renderer*)(Renderer::Load( SString( filename ), info ))) != NULL);
 
-		mWindowInfo = gcnew WindowInfo();
+		if( !result )
+			return nullptr;
 
-		mWindowInfo->mFullscreen	= info.mFullscreen;
-		mWindowInfo->mWidth			= info.mWidth;
-		mWindowInfo->mHeight		= info.mHeight;
-
-		return result;
+		return gcnew WWindowInfo( info );
 	}
 
 	void WRenderer::Shutdown()
 	{
-		SetActive();
-
 		Renderer::Inst()->Shutdown();
 	}
 
@@ -60,14 +89,19 @@ namespace Sentinel { namespace Systems
 
 	// Windows.
 	//
-	void WRenderer::SetActive()
+	void WRenderer::SetWindow( WWindowInfo^ info )
 	{
-		Renderer::Inst()->SetWindow( mInfo );
+		Renderer::Inst()->SetWindow( info->GetRef() );
 	}
 
-	bool WRenderer::ShareResources( WRenderer^ renderer )
+	WWindowInfo^ WRenderer::GetWindow()
 	{
-		return Renderer::Inst()->ShareResources( mInfo, renderer->mInfo );
+		return gcnew WWindowInfo( Renderer::Inst()->GetWindow() );
+	}
+
+	bool WRenderer::ShareResources( WWindowInfo^ info0, WWindowInfo^ info1 )
+	{
+		return Renderer::Inst()->ShareResources( info0->GetRef(), info1->GetRef() );
 	}
 
 	// Buffers.
@@ -193,121 +227,5 @@ namespace Sentinel { namespace Systems
 	void WRenderer::Present()
 	{
 		Renderer::Inst()->Present();
-	}
-
-	IntPtr WRenderer::WndProc( IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, bool% handled )
-	{
-		switch( msg )
-		{
-			case WM_IME_SETCONTEXT:
-				if( LOWORD( wParam.ToInt32() ) > 0)
-					SetFocus( mHWND );
-
-				handled = true;
-				return IntPtr::Zero;
-		}
-
-		handled = false;
-
-		return IntPtr::Zero;
-	}
-
-	void WRenderer::OnRenderSizeChanged( SizeChangedInfo^ sizeInfo )
-	{
-		Renderer::Inst()->ResizeBuffers( (UINT)sizeInfo->NewSize.Width, (UINT)sizeInfo->NewSize.Height );
-	}
-
-	void WRenderer::OnRender( DrawingContext^ drawingContext )
-	{
-		// Better to do nothing as the rendering should be taking place in app.
-	}
-
-	void WRenderer::OnMouseDown( MouseButtonEventArgs^ e )
-	{}
-
-	LRESULT WINAPI RendererMsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
-	{
-		switch( msg )
-		{
-			case WM_IME_SETCONTEXT:
-				if( LOWORD( wParam ) > 0 )
-					SetFocus( hWnd );
-
-				return 0;
-
-			default:
-				return DefWindowProc( hWnd, msg, wParam, lParam );
-		}
-	}
-
-	bool WRenderer::RegisterWindowClass()
-	{
-		WNDCLASS wndClass;
-
-		if( GetClassInfo( mINST, (LPCSTR)mWindowClass, &wndClass ))
-			return true;
-		
-		wndClass.style			= CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-		wndClass.lpfnWndProc	= (WNDPROC)RendererMsgProc;
-		wndClass.cbClsExtra		= 0;
-		wndClass.cbWndExtra		= 0;
-		wndClass.hInstance		= mINST;
-		wndClass.hIcon			= LoadIcon(NULL, IDI_WINLOGO);
-		wndClass.hCursor		= LoadCursor(0, IDC_ARROW);
-		wndClass.hbrBackground	= 0;
-		wndClass.lpszMenuName	= 0;
-		wndClass.lpszClassName	= (LPCSTR)mWindowClass;
-
-		if( !RegisterClass( &wndClass ))
-		{
-			TRACE( "Error: RegisterClass = " << GetLastError() );
-			return false;
-		}
-		
-		return true;
-	}
-
-	HandleRef WRenderer::BuildWindowCore( HandleRef hwndParent )
-	{
-		mINST = (HINSTANCE)GetModuleHandle( NULL );
-		
-		if( RegisterWindowClass() )
-		{
-			mHWND = CreateWindowEx( 0, (LPCSTR)mWindowClass, (LPCSTR)mTitle, WS_CHILD | WS_VISIBLE, 
-									0, 0, mWindowInfo->mWidth, mWindowInfo->mHeight,
-									(HWND)hwndParent.Handle.ToPointer(), 0, mINST, 0 );
-
-			if( !mHWND )
-				TRACE( "Error: CreateWindowEx = " << GetLastError() );
-			
-			mInfo = Renderer::Inst()->Startup( mHWND, mWindowInfo->mFullscreen, mWindowInfo->mWidth, mWindowInfo->mHeight );
-
-			mWindowInfo->mWidthRatio	= mInfo->mWidthRatio;
-			mWindowInfo->mHeightRatio	= mInfo->mHeightRatio;
-
-			// Create default (0) settings.
-			//
-			CreateDepthStencil( mWindowInfo->mWidth, mWindowInfo->mHeight );
-			CreateViewport( mWindowInfo->mWidth, mWindowInfo->mHeight );
-			CreateBackbuffer();
-			
-			return HandleRef( this, IntPtr( mHWND ));
-		}
-
-		return HandleRef( nullptr, IntPtr::Zero );
-	}
-
-	void WRenderer::DestroyWindowCore( HandleRef hwnd )
-	{
-		SetActive();
-		Shutdown();
-
-		if( mHWND != NULL && mHWND == (HWND)hwnd.Handle.ToPointer())
-		{
-			::DestroyWindow( mHWND );
-			mHWND = NULL;
-		}
-
-		UnregisterClass( (LPCSTR)mWindowClass, mINST );
 	}
 }}

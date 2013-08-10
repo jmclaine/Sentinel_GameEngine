@@ -6,12 +6,11 @@
 
 namespace Sentinel
 {
+	#define MAX_TITLE_LENGTH	16
+	#define MAX_CLASS_LENGTH	24
+
 	class SENTINEL_DLL GameWindow
 	{
-	public:
-
-		static const UINT		MAX_LOADSTRING = 32;
-
 	private:
 
 		HWND					mHWND;
@@ -22,23 +21,17 @@ namespace Sentinel
 		UINT					mMenu;
 		LPCSTR					mCursor;
 		
-		char					mTitle[ MAX_LOADSTRING ];
-		char					mWindowClass[ MAX_LOADSTRING ];
+		char					mTitle[ MAX_TITLE_LENGTH ];
+		char					mWindowClass[ MAX_CLASS_LENGTH ];
 
-		Renderer::WindowInfo*	mWindowInfo;
-
-		UINT					mRenderTarget;
-		UINT					mDepthStencil;
-		UINT					mViewport;
+		WindowInfo*				mWindowInfo;
 
 	public:
 
 		GameWindow( UINT icon, UINT iconSmall, UINT menu, LPCSTR cursor = IDC_ARROW );
 		~GameWindow();
 
-		void	Startup( HINSTANCE hInstance, int nCmdShow, char* title, char* windowClass, const Renderer::WindowInfo& info );
-
-		void	Update();
+		void	Startup( HINSTANCE hInstance, int nCmdShow, char* title, char* windowClass, const WindowInfo& info );
 
 		void	Shutdown();
 
@@ -50,7 +43,7 @@ namespace Sentinel
 
 		HWND	GetHandle();
 
-		Renderer::WindowInfo*	GetWindow();
+		const WindowInfo* GetInfo() const;
 
 	private:
 

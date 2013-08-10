@@ -16,7 +16,7 @@ namespace Sentinel
 	GameWindow::~GameWindow()
 	{}
 
-	void GameWindow::Startup( HINSTANCE hInstance, int nCmdShow, TCHAR* title, TCHAR* windowClass, const Renderer::WindowInfo& info )
+	void GameWindow::Startup( HINSTANCE hInstance, int nCmdShow, TCHAR* title, TCHAR* windowClass, const WindowInfo& info )
 	{
 		strcpy_s( mTitle, title );
 		strcpy_s( mWindowClass, windowClass );
@@ -40,23 +40,6 @@ namespace Sentinel
 
 		if( !mWindowInfo )
 			throw AppException( "Failed Renderer::Startup()" );
-
-		mDepthStencil	= Renderer::Inst()->CreateDepthStencil( mWindowInfo->mWidth, mWindowInfo->mHeight );
-		mViewport		= Renderer::Inst()->CreateViewport( mWindowInfo->mWidth, mWindowInfo->mHeight );
-		mRenderTarget	= Renderer::Inst()->CreateBackbuffer();
-	}
-
-	void GameWindow::Update()
-	{
-		static float color[] = {0.0f, 0.2f, 0.8f, 1.0f};
-
-		Renderer::Inst()->SetWindow( mWindowInfo );
-
-		Renderer::Inst()->SetDepthStencil( mDepthStencil );
-		Renderer::Inst()->SetViewport( mViewport );
-		Renderer::Inst()->SetRenderTarget( mRenderTarget );
-
-		Renderer::Inst()->Clear( color );
 	}
 
 	void GameWindow::Shutdown()
@@ -85,7 +68,7 @@ namespace Sentinel
 		return mHWND;
 	}
 
-	Renderer::WindowInfo* GameWindow::GetWindow()
+	const WindowInfo* GameWindow::GetInfo() const
 	{
 		return mWindowInfo;
 	}
