@@ -8,7 +8,7 @@
         Name="Window_Main">
     
         <Canvas Name="Canvas_Main">
-        <Grid Name="Grid_Main" Canvas.Left="0" Canvas.Top="0" Background="LightSlateGray" Width="{Binding ElementName=Canvas_Main,Path=ActualWidth}" Height="{Binding ElementName=Canvas_Main,Path=ActualHeight}">
+        <Grid Name="Grid_Main" Background="LightSlateGray" Width="{Binding ElementName=Canvas_Main,Path=ActualWidth}" Height="{Binding ElementName=Canvas_Main,Path=ActualHeight}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -36,7 +36,7 @@
                 </MenuItem>
             </Menu>
 
-            <ToolBarTray Grid.Row="1" Background="{x:Null}">
+            <ToolBarTray Grid.Row="1" Background="#222222">
                 <ToolBar Name="ToolBar_Common" HorizontalAlignment="Left" VerticalAlignment="Top" Background="LightGray" BorderBrush="Gray" BorderThickness="1">
                     <Button Name="Open_File" Width="22" Height="22" Click="ToolBar_Open_Click">
                         <Button.Content>
@@ -52,7 +52,48 @@
                 </ToolBar>
             </ToolBarTray>
 
-            <Border Grid.Row="2" Name="RendererHWND0" BorderThickness="5" BorderBrush="RoyalBlue" Margin="0,2,0,-2" />
+            <Grid Grid.Row="2" Name="Grid_Editor" Background="#222222">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="24" />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Name="Grid_Editor_Split" Background="#444444">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="8*" MinWidth="256" />
+                        <ColumnDefinition Width="2*" MinWidth="64" />
+                        <ColumnDefinition Width="3*" MinWidth="128" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Name="Renderer_World" BorderThickness="2" BorderBrush="#666666" Margin="0,0,8,0" />
+                    
+                    <GridSplitter Grid.Column="0" HorizontalAlignment="Right" Width="8" Background="#222222" />
+
+                    <Grid Grid.Column="1" Name="Grid_Assets" Background="#444444">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        
+                        <Rectangle Grid.Row="0" Fill="#444444" Margin="0,0,8,8" />
+                        <Border Grid.Row="0" BorderThickness="2" BorderBrush="#666666" Margin="0,0,8,8" />
+                        
+                        <Rectangle Grid.Row="1" Fill="#444444" Margin="0,0,8,0" />
+                        <Border Grid.Row="1" BorderThickness="2" BorderBrush="#666666" Margin="0,0,8,0" />
+                        
+                        <GridSplitter Grid.Row="0" VerticalAlignment="Bottom" Height="8" Background="#222222" HorizontalAlignment="Stretch" />
+                    </Grid>
+
+                    <GridSplitter Grid.Column="1" HorizontalAlignment="Right" Width="8" Background="#222222" />
+                    
+                    <Rectangle Grid.Row="0" Grid.Column="2" Margin="0,0,0,0" Fill="#444444" />
+                    <Border Grid.Row="0" Grid.Column="2" BorderThickness="2" BorderBrush="#666666" Margin="0,0,0,0" />
+                </Grid>
+                
+                <Label Grid.Row="1" Content="Ready" Foreground="White" IsEnabled="True">
+                    
+                </Label>
+            </Grid>
         </Grid>
     </Canvas>
 </Window>

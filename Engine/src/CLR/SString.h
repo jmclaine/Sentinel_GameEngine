@@ -14,6 +14,7 @@ namespace Sentinel
 
 			for( int x = 0; x < str->Length; ++x )
 				data[ x ] = static_cast< char >(str[ x ]);
+
 			data[ str->Length ] = 0;
 		}
 
@@ -25,6 +26,11 @@ namespace Sentinel
 		operator const char* ()
 		{
 			return data;
+		}
+
+		char operator [] ( int index )
+		{
+			return data[ index ];
 		}
 	};
 }

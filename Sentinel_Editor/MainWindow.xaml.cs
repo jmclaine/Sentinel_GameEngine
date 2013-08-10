@@ -29,11 +29,8 @@ namespace Sentinel_Editor
     /// </summary>
     public partial class MainWindow : Window
     {
-        private WRenderer           mRenderer;
+        private WRenderer           mRendererWorld;
         private static WColorRGBA   mClearColor = new WColorRGBA(0.0f, 0.2f, 0.8f, 1.0f);
-        private uint                mDepthStencil;
-        private uint                mViewport;
-        private uint                mRenderTarget;
 
         public MainWindow()
         {
@@ -42,22 +39,16 @@ namespace Sentinel_Editor
 
         private void Window_Loaded(Object sender, RoutedEventArgs e)
         {
-            mRenderer = new WRenderer();
+            mRendererWorld = new WRenderer("World", "WorldClass");
             
-            if (!mRenderer.Load("config.xml"))
+            if (!mRendererWorld.Load("config.xml"))
             {
                 MessageBox.Show("Failed to load config.xml", "Application Failure");
 
                 System.Environment.Exit(0);
             }
 
-            RendererHWND0.Child = mRenderer;
-
-            mRenderer.SetActive();
-
-            mDepthStencil  = mRenderer.CreateDepthStencil(mRenderer.mWindowInfo.mWidth, mRenderer.mWindowInfo.mHeight);
-            mViewport      = mRenderer.CreateViewport(mRenderer.mWindowInfo.mWidth, mRenderer.mWindowInfo.mHeight);
-            mRenderTarget  = mRenderer.CreateBackbuffer();
+            Renderer_World.Child = mRendererWorld;
 
             ///////////////////////////////////////
 
@@ -92,16 +83,16 @@ namespace Sentinel_Editor
 
         private void Update(Object sender, EventArgs e)
         {
-            mRenderer.SetActive();
+            mRendererWorld.SetActive();
 
-            mRenderer.SetDepthStencil(mDepthStencil);
-            mRenderer.SetViewport(mViewport);
-            mRenderer.SetRenderTarget(mRenderTarget);
-            mRenderer.Clear(mClearColor);
+            mRendererWorld.SetDepthStencil(0);
+            mRendererWorld.SetViewport(0);
+            mRendererWorld.SetRenderTarget(0);
+            mRendererWorld.Clear(mClearColor);
 
             // Draw stuff...
 
-            mRenderer.Present();
+            mRendererWorld.Present();
         }
 
         ///

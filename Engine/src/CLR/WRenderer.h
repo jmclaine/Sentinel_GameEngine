@@ -21,7 +21,6 @@
 #include "WShader.h"
 #include "WColor.h"
 
-using namespace Sentinel::Assets;
 using namespace System;
 using namespace System::Windows;
 using namespace System::Windows::Interop;
@@ -29,6 +28,8 @@ using namespace System::Windows::Input;
 using namespace System::Windows::Media;
 using namespace System::Windows::Threading;
 using namespace System::Runtime::InteropServices;
+
+using namespace Sentinel::Assets;
 
 namespace Sentinel { namespace Systems
 {
@@ -77,7 +78,8 @@ namespace Sentinel { namespace Systems
 		NUM_STENCIL_TYPES
 	};
 
-	#define MAX_LOADSTRING 100
+	#define MAX_TITLE_LENGTH	16
+	#define MAX_CLASS_LENGTH	24
 
 	LRESULT WINAPI RendererMsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
  
@@ -90,11 +92,8 @@ namespace Sentinel { namespace Systems
 
 		wchar_t* 				mTitle;
 		wchar_t* 				mWindowClass;
-		static UINT				mClassIndex		= 0;
-
+		
 		Renderer::WindowInfo*	mInfo;
-
-		//GameWindow*			mWindow;
 
 	public:
 
@@ -111,14 +110,14 @@ namespace Sentinel { namespace Systems
 			float		mHeightRatio;
 		};
 
-		WindowInfo^			mWindowInfo;
+		WindowInfo^				mWindowInfo;
 
-		WTexture^			NULL_TEXTURE;	// black default texture
-		WTexture^			BASE_TEXTURE;	// white default texture
+		WTexture^				NULL_TEXTURE;	// black default texture
+		WTexture^				BASE_TEXTURE;	// white default texture
 
 		//////////////////////////////
 
-		WRenderer();
+		WRenderer( String^ title, String^ clazz );
 		~WRenderer();
 
 		bool				Load( String^ filename );

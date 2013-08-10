@@ -4,10 +4,21 @@
 
 namespace Sentinel { namespace Systems
 {
-	WRenderer::WRenderer()
+	WRenderer::WRenderer( String^ title, String^ clazz )
 	{
-		mTitle		 = new wchar_t[16];
-		mWindowClass = new wchar_t[24];
+		_ASSERT( title->Length < MAX_TITLE_LENGTH && clazz->Length < MAX_CLASS_LENGTH );
+
+		mTitle		 = new wchar_t[ MAX_TITLE_LENGTH ];
+		mWindowClass = new wchar_t[ MAX_CLASS_LENGTH ];
+
+		memset( mTitle, 0, MAX_TITLE_LENGTH );
+		memset( mWindowClass, 0, MAX_CLASS_LENGTH );
+
+		for( int x = 0; x < title->Length; ++x )
+			mTitle[ x ] = title[ x ];
+
+		for( int x = 0; x < clazz->Length; ++x )
+			mWindowClass[ x ] = clazz[ x ];
 	}
 
 	WRenderer::~WRenderer()
@@ -16,7 +27,7 @@ namespace Sentinel { namespace Systems
 		delete mWindowClass;
 	}
 
-	bool WRenderer::Load( System::String^ filename )
+	bool WRenderer::Load( String^ filename )
 	{
 		// Somehow the pointer created in the DLL SingletonAbstract
 		// is not the same as the SingletonAbstract located here,
@@ -24,12 +35,21 @@ namespace Sentinel { namespace Systems
 		//
 		Renderer::WindowInfo info;
 
-		return (Renderer::Inst( (Renderer*)(Renderer::Load( SString( filename ), info ))) != NULL);
+		bool result = (Renderer::Inst( (Renderer*)(Renderer::Load( SString( filename ), info ))) != NULL);
+
+		mWindowInfo = gcnew WindowInfo();
+
+		mWindowInfo->mFullscreen	= info.mFullscreen;
+		mWindowInfo->mWidth			= info.mWidth;
+		mWindowInfo->mHeight		= info.mHeight;
+
+		return result;
 	}
 
 	void WRenderer::Shutdown()
 	{
 		SetActive();
+
 		Renderer::Inst()->Shutdown();
 	}
 
@@ -251,26 +271,11 @@ namespace Sentinel { namespace Systems
 	{
 		mINST = (HINSTANCE)GetModuleHandle( NULL );
 		
-		swprintf_s( mTitle, 16, L"Renderer%d", mClassIndex );
-		swprintf_s( mWindowClass, 24, L"RendererClass%d", mClassIndex );
-
 		if( RegisterWindowClass() )
 		{
-			++mClassIndex;
-
-			HWND hWnd = (HWND)hwndParent.Handle.ToPointer();
-			RECT screenRect;
-			GetWindowRect( hWnd, &screenRect );
-
-			mWindowInfo = gcnew WindowInfo();
-
-			mWindowInfo->mFullscreen	= false;
-			mWindowInfo->mWidth			= screenRect.right  - screenRect.left;
-			mWindowInfo->mHeight		= screenRect.bottom - screenRect.top;
-			
 			mHWND = CreateWindowEx( 0, (LPCSTR)mWindowClass, (LPCSTR)mTitle, WS_CHILD | WS_VISIBLE, 
 									0, 0, mWindowInfo->mWidth, mWindowInfo->mHeight,
-									hWnd, 0, mINST, 0 );
+									(HWND)hwndParent.Handle.ToPointer(), 0, mINST, 0 );
 
 			if( !mHWND )
 				TRACE( "Error: CreateWindowEx = " << GetLastError() );
@@ -280,6 +285,12 @@ namespace Sentinel { namespace Systems
 			mWindowInfo->mWidthRatio	= mInfo->mWidthRatio;
 			mWindowInfo->mHeightRatio	= mInfo->mHeightRatio;
 
+			// Create default (0) settings.
+			//
+			CreateDepthStencil( mWindowInfo->mWidth, mWindowInfo->mHeight );
+			CreateViewport( mWindowInfo->mWidth, mWindowInfo->mHeight );
+			CreateBackbuffer();
+			
 			return HandleRef( this, IntPtr( mHWND ));
 		}
 
