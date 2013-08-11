@@ -185,7 +185,7 @@ namespace Sentinel
 						{
 						const WindowInfo* info = Renderer::Inst()->GetWindow();
 
-						Vector2f pixelSize( 1.0f / info->mWidth, 1.0f / info->mHeight );
+						Vector2f pixelSize( 1.0f / info->GetWidth(), 1.0f / info->GetHeight() );
 
 						mShader->SetMatrix( uniformIndex, (GameWorld::Inst()->GetCamera()->mMatrixProjection.Inverse()).Ptr() );
 						++uniformIndex;

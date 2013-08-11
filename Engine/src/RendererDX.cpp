@@ -402,6 +402,8 @@ namespace Sentinel
 
 		class WindowInfoDX : public WindowInfo
 		{
+			friend class RendererDX;
+
 		public:
 
 			ID3D11Device*						mDevice;

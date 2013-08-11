@@ -151,6 +151,14 @@
   <ItemGroup>
     <Resource Include="Images\Save.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\New.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Rotate.png" />
+    <Resource Include="Images\Scale.png" />
+    <Resource Include="Images\Translate.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

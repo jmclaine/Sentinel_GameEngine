@@ -553,6 +553,8 @@ namespace Sentinel
 
 		class WindowInfoGL : public WindowInfo
 		{
+			friend class RendererGL;
+			
 		public:
 
 			HWND		mHWND;

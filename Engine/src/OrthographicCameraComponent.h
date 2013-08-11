@@ -1,10 +1,11 @@
 #pragma once
 
+#include "Common.h"
 #include "CameraComponent.h"
 
 namespace Sentinel
 {
-	class OrthographicCameraComponent : public CameraComponent
+	class SENTINEL_DLL OrthographicCameraComponent : public CameraComponent
 	{
 	public:
 

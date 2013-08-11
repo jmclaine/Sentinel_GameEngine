@@ -5,6 +5,7 @@
 //
 // Mesh is generated through MeshBuilder.h or Model.h
 //
+#include "Common.h"
 #include "Renderer.h"
 #include "Matrix4f.h"
 #include "Vector4f.h"
@@ -20,7 +21,7 @@ namespace Sentinel
 		NUM_TEXTURES,
 	};
 
-	class Mesh
+	class SENTINEL_DLL Mesh
 	{
 		friend class MeshBuilder;
 

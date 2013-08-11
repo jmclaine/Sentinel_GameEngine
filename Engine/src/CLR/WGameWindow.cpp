@@ -148,7 +148,7 @@ namespace Sentinel { namespace Systems
 			
 			mWindowInfo = gcnew WWindowInfo( Renderer::Inst()->Startup( mHWND, mWindowInfo->GetFullscreen(), mWindowInfo->GetWidth(), mWindowInfo->GetHeight() ));
 
-			// Create default (0) settings.
+			// Create default settings.
 			//
 			WRenderer::CreateDepthStencil( mWindowInfo->GetWidth(), mWindowInfo->GetHeight() );
 			WRenderer::CreateViewport( mWindowInfo->GetWidth(), mWindowInfo->GetHeight() );

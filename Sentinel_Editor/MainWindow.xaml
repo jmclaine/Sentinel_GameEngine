@@ -20,6 +20,7 @@
 
             <Menu Grid.Row="0" IsMainMenu="True" Background="LightGray" Width="{Binding ElementName=Window_Main,Path=ActualWidth}">
                 <MenuItem Header="_File">
+                    <MenuItem Header="_New" Click="New_Click" />
                     <MenuItem Header="_Open" Click="Open_Click" />
                     <Separator/>
                     <MenuItem Header="_Save" Click="Save_Click" />
@@ -37,18 +38,45 @@
             </Menu>
 
             <ToolBarTray Grid.Row="1" Background="#222222">
-                <ToolBar Name="ToolBar_Common" HorizontalAlignment="Left" VerticalAlignment="Top" Background="LightGray" BorderBrush="Gray" BorderThickness="1">
+                <ToolBar Name="ToolBar_Common" HorizontalAlignment="Left" VerticalAlignment="Top" Background="LightGray" BorderBrush="Gray" BorderThickness="1" DataContext="{Binding}">
+                    <Button Name="New_File" Width="22" Height="22" Click="ToolBar_New_Click">
+                        <Button.Content>
+                            <Image Source="/Sentinel_Editor;component/Images/New.png" Width="18" Height="18" Stretch="Fill" StretchDirection="Both" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="New" />
+                        </Button.Content>
+                    </Button>
+                    
                     <Button Name="Open_File" Width="22" Height="22" Click="ToolBar_Open_Click">
                         <Button.Content>
-                            <Image Source="/Sentinel_Editor;component/Images/Open.png" Width="16" Height="16" Stretch="Fill" StretchDirection="Both" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Image Source="/Sentinel_Editor;component/Images/Open.png" Width="18" Height="18" Stretch="Fill" StretchDirection="Both" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="Open" />
                         </Button.Content>
                     </Button>
 
                     <Button Name="Save_File" Width="22" Height="22" Click="ToolBar_Save_Click">
                         <Button.Content>
-                            <Image Source="/Sentinel_Editor;component/Images/Save.png" Width="16" Height="16" Stretch="Fill" StretchDirection="Both" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Image Source="/Sentinel_Editor;component/Images/Save.png" Width="18" Height="18" Stretch="Fill" StretchDirection="Both" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="Save" />
                         </Button.Content>
                     </Button>
+                    
+                    <Separator Padding="4" Margin="4" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FF666666"></Separator>
+
+                    <Button Name="Translate_Object" Width="22" Height="22" Click="ToolBar_Translate_Click">
+                        <Button.Content>
+                            <Image Source="/Sentinel_Editor;component/Images/Translate.png" Width="18" Height="18" Stretch="Fill" StretchDirection="Both" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="Translate" />
+                        </Button.Content>
+                    </Button>
+
+                    <Button Name="Rotate_Object" Width="22" Height="22" Click="ToolBar_Rotate_Click">
+                        <Button.Content>
+                            <Image Source="/Sentinel_Editor;component/Images/Rotate.png" Width="18" Height="18" Stretch="Fill" StretchDirection="Both" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="Rotate" />
+                        </Button.Content>
+                    </Button>
+
+                    <Button Name="Scale_Object" Width="22" Height="22" Click="ToolBar_Scale_Click">
+                        <Button.Content>
+                            <Image Source="/Sentinel_Editor;component/Images/Scale.png" Width="18" Height="18" Stretch="Fill" StretchDirection="Both" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="Scale" />
+                        </Button.Content>
+                    </Button>
+
                 </ToolBar>
             </ToolBarTray>
 
@@ -84,7 +112,7 @@
                         <GridSplitter Grid.Row="0" VerticalAlignment="Bottom" Height="8" Background="#222222" HorizontalAlignment="Stretch" />
                     </Grid>
 
-                    <GridSplitter Grid.Column="1" HorizontalAlignment="Right" Width="8" Background="#222222" />
+                    <GridSplitter Grid.Column="1" HorizontalAlignment="Right" Width="8" Background="#222222" ResizeDirection="Columns" ShowsPreview="False" />
                     
                     <Rectangle Grid.Row="0" Grid.Column="2" Margin="0,0,0,0" Fill="#444444" />
                     <Border Grid.Row="0" Grid.Column="2" Name="Inspector" BorderThickness="2" BorderBrush="#666666" Margin="0,0,0,0" />

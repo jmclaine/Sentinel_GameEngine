@@ -1,11 +1,12 @@
 #pragma once
 
+#include "Common.h"
 #include "Model.h"
 #include "DrawableComponent.h"
 
 namespace Sentinel
 {
-	class ModelComponent : public DrawableComponent
+	class SENTINEL_DLL ModelComponent : public DrawableComponent
 	{
 		std::shared_ptr< Model > mModel;
 		

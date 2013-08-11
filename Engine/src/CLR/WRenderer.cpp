@@ -36,27 +36,27 @@ namespace Sentinel { namespace Systems
 
 	bool WWindowInfo::GetFullscreen()
 	{
-		return mRef->mFullscreen;
+		return mRef->GetFullscreen();
 	}
 
 	int WWindowInfo::GetWidth()
 	{
-		return mRef->mWidth;
+		return mRef->GetWidth();
 	}
 
 	int WWindowInfo::GetHeight()
 	{
-		return mRef->mHeight;
+		return mRef->GetHeight();
 	}
 
 	float WWindowInfo::GetWidthRatio()
 	{
-		return mRef->mWidthRatio;
+		return mRef->GetWidthRatio();
 	}
 
 	float WWindowInfo::GetHeightRatio()
 	{
-		return mRef->mHeightRatio;
+		return mRef->GetHeightRatio();
 	}
 
 	/////////////////////////////////////////////////
@@ -80,11 +80,6 @@ namespace Sentinel { namespace Systems
 	void WRenderer::Shutdown()
 	{
 		Renderer::Inst()->Shutdown();
-	}
-
-	void WRenderer::Destroy()
-	{
-		Renderer::Destroy();
 	}
 
 	// Windows.

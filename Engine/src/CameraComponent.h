@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Common.h"
 #include "Matrix4f.h"
 #include "TransformComponent.h"
 
@@ -18,7 +19,7 @@
 
 namespace Sentinel
 {
-	class CameraComponent : public GameComponent
+	class SENTINEL_DLL CameraComponent : public GameComponent
 	{
 		TransformComponent* mTransform;
 

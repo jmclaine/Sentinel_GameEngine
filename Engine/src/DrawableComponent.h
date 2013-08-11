@@ -1,11 +1,12 @@
 #pragma once
 
+#include "Common.h"
 #include "TransformComponent.h"
 #include "Util.h"
 
 namespace Sentinel
 {
-	class DrawableComponent : public GameComponent
+	class SENTINEL_DLL DrawableComponent : public GameComponent
 	{
 	protected:
 

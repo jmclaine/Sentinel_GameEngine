@@ -132,7 +132,7 @@ namespace Sentinel
 
 		SingletonThreaded() {}
 		SingletonThreaded( const SingletonThreaded& ) {}
-		SingletonThreaded& operator = ( const SingletonThreaded& ) {}
+		SingletonThreaded& operator = ( const SingletonThreaded& ) { return *this; }
 		~SingletonThreaded() {}
 
 	public:

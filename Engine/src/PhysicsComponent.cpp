@@ -6,15 +6,10 @@ namespace Sentinel
 {
 	PhysicsComponent::PhysicsComponent( btRigidBody* body )
 	{
-		mComponentType = COMPONENT_PHYSICS;
+		mComponentType	= COMPONENT_PHYSICS;
 
-		mTransform = NULL;
-		mRigidBody = body;
-	}
-
-	btRigidBody* PhysicsComponent::GetRigidBody()
-	{
-		return mRigidBody;
+		mTransform		= NULL;
+		mRigidBody		= body;
 	}
 
 	void PhysicsComponent::Startup()
@@ -42,5 +37,12 @@ namespace Sentinel
 	void PhysicsComponent::Shutdown()
 	{
 		mTransform = NULL;
+	}
+
+	////////////////////////
+
+	btRigidBody* PhysicsComponent::GetRigidBody()
+	{
+		return mRigidBody;
 	}
 }

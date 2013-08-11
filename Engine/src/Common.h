@@ -14,3 +14,10 @@ template class __declspec(dllexport) std::basic_string< char, std::char_traits< 
 
 typedef unsigned int	UINT;
 typedef unsigned char	UCHAR;
+
+// These warnings can be disabled safely.
+// They only appear when using STL in a DLL.
+//
+#pragma warning (disable : 4251)
+#pragma warning (disable : 4835)
+#pragma warning (disable : 4275)

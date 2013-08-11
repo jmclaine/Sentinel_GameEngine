@@ -28,6 +28,7 @@ namespace Sentinel
 		}
 
 		builder.mPrimitive = POINT_LIST;
+
 		mMesh = builder.BuildMesh();
 	}
 

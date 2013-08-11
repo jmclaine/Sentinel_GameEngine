@@ -9,7 +9,7 @@
 
 namespace Sentinel
 {
-	class PhysicsSystem : public SingletonThreaded< PhysicsSystem >
+	class SENTINEL_DLL PhysicsSystem : public SingletonThreaded< PhysicsSystem >
 	{
 		friend class SingletonThreaded< PhysicsSystem >;
 

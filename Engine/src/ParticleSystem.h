@@ -4,13 +4,13 @@
 #pragma once
 
 #include "GameWorld.h"
-#include "OrthographicCameraComponent.h"
+#include "Mesh.h"
 
 namespace Sentinel
 {
 	class SpriteComponent;
 
-	class ParticleSystem : public Singleton< ParticleSystem >
+	class SENTINEL_DLL ParticleSystem : public Singleton< ParticleSystem >
 	{
 		friend class Singleton< ParticleSystem >;
 		friend class SpriteComponent;

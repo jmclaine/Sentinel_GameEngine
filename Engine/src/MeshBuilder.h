@@ -9,11 +9,12 @@ Always set mShader to a valid shader before calling BuildMesh();
 #include <memory>
 #include <vector>
 
+#include "Common.h"
 #include "Mesh.h"
 
 namespace Sentinel
 {
-	class MeshBuilder
+	class SENTINEL_DLL MeshBuilder
 	{
 	public:
 

@@ -13,30 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Sentinel_Engine">
-      <UniqueIdentifier>{2088f491-8c96-4bb7-86ff-eec36ec1e64d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sentinel_Engine\Components">
-      <UniqueIdentifier>{4f5f2d43-6730-466a-adb4-c193e21e3b2f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sentinel_Engine\Components\Physics">
-      <UniqueIdentifier>{8305e449-23ac-48eb-86ce-8bf110f7c927}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sentinel_Engine\Core">
-      <UniqueIdentifier>{f0f88ea3-0f4f-4fa2-b47c-3d23dfae2071}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sentinel_Engine\Components\Core">
-      <UniqueIdentifier>{6bc0074d-afbf-4968-952a-3d2b6fb17ffd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sentinel_Engine\Script">
-      <UniqueIdentifier>{39a78e71-ce97-4dfe-9521-64c312550278}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sentinel_Engine\Assets">
-      <UniqueIdentifier>{2ac9c3f8-832c-48b9-89ec-673e68f5fb4b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sentinel_Engine\Network">
-      <UniqueIdentifier>{3883dbb6-6910-47d4-9ebc-8c4381479b4e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Shaders">
       <UniqueIdentifier>{acf27911-70da-4480-92c8-0cd635de2b31}</UniqueIdentifier>
     </Filter>
@@ -46,21 +22,6 @@
     <Filter Include="Source Files\Shaders\OpenGL">
       <UniqueIdentifier>{e8e4f6c3-83ac-482d-851a-64ee11b820b6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Sentinel_Engine\Components\Controllers">
-      <UniqueIdentifier>{3ea1a447-3822-4b72-9b7d-523841cedc79}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sentinel_Engine\Utilities">
-      <UniqueIdentifier>{261e02ad-9b47-42aa-afc7-a2d226360bdb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sentinel_Engine\Components\Drawables">
-      <UniqueIdentifier>{349ae1d3-2f10-4067-bda7-a10b69be8396}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sentinel_Engine\Systems">
-      <UniqueIdentifier>{1f0d00a8-046c-41cb-976e-118efc911668}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sentinel_Engine\Math">
-      <UniqueIdentifier>{716cb6ac-7bd6-4800-a008-3adedc75b1e4}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="small.ico">
@@ -68,12 +29,6 @@
     </None>
     <None Include="Sentinel_Test.ico">
       <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\..\Engine\src\sin16.inl">
-      <Filter>Sentinel_Engine\Utilities</Filter>
-    </None>
-    <None Include="..\..\Engine\src\sin8.inl">
-      <Filter>Sentinel_Engine\Utilities</Filter>
     </None>
     <None Include="Shaders\colnorm.fx">
       <Filter>Source Files\Shaders\DirectX</Filter>
@@ -132,81 +87,6 @@
     <ClInclude Include="Sentinel_Test.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Engine\src\FixedPoint.h">
-      <Filter>Sentinel_Engine\Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\GameComponent.h">
-      <Filter>Sentinel_Engine\Components\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\GameObject.h">
-      <Filter>Sentinel_Engine\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\GameWorld.h">
-      <Filter>Sentinel_Engine\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\PhysicsComponent.h">
-      <Filter>Sentinel_Engine\Components\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\Timing.h">
-      <Filter>Sentinel_Engine\Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\TransformComponent.h">
-      <Filter>Sentinel_Engine\Components\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\MeshBuilder.h">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\CameraComponent.h">
-      <Filter>Sentinel_Engine\Components\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\ControllerComponent.h">
-      <Filter>Sentinel_Engine\Components\Controllers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\Mesh.h">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\Model.h">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\NetworkPacket.h">
-      <Filter>Sentinel_Engine\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\NetworkSocket.h">
-      <Filter>Sentinel_Engine\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\DrawableComponent.h">
-      <Filter>Sentinel_Engine\Components\Drawables</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\MeshComponent.h">
-      <Filter>Sentinel_Engine\Components\Drawables</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\ModelComponent.h">
-      <Filter>Sentinel_Engine\Components\Drawables</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\SpriteComponent.h">
-      <Filter>Sentinel_Engine\Components\Drawables</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\LightComponent.h">
-      <Filter>Sentinel_Engine\Components\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\OrthographicCameraComponent.h">
-      <Filter>Sentinel_Engine\Components\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\PerspectiveCameraComponent.h">
-      <Filter>Sentinel_Engine\Components\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\PlayerControllerComponent.h">
-      <Filter>Sentinel_Engine\Components\Controllers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\AIControllerComponent.h">
-      <Filter>Sentinel_Engine\Components\Controllers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\PhysicsSystem.h">
-      <Filter>Sentinel_Engine\Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\src\ParticleSystem.h">
-      <Filter>Sentinel_Engine\Systems</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -214,78 +94,6 @@
     </ClCompile>
     <ClCompile Include="Sentinel_Test.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\GameObject.cpp">
-      <Filter>Sentinel_Engine\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\GameWorld.cpp">
-      <Filter>Sentinel_Engine\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\PhysicsComponent.cpp">
-      <Filter>Sentinel_Engine\Components\Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\Timing.cpp">
-      <Filter>Sentinel_Engine\Utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\TransformComponent.cpp">
-      <Filter>Sentinel_Engine\Components\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\MeshBuilder.cpp">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\CameraComponent.cpp">
-      <Filter>Sentinel_Engine\Components\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\ControllerComponent.cpp">
-      <Filter>Sentinel_Engine\Components\Controllers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\Mesh.cpp">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\Model.cpp">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\ModelM3D.cpp">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\NetworkPacket.cpp">
-      <Filter>Sentinel_Engine\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\NetworkSocket.cpp">
-      <Filter>Sentinel_Engine\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\DrawableComponent.cpp">
-      <Filter>Sentinel_Engine\Components\Drawables</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\MeshComponent.cpp">
-      <Filter>Sentinel_Engine\Components\Drawables</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\ModelComponent.cpp">
-      <Filter>Sentinel_Engine\Components\Drawables</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\LightComponent.cpp">
-      <Filter>Sentinel_Engine\Components\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\OrthographicCameraComponent.cpp">
-      <Filter>Sentinel_Engine\Components\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\PerspectiveCameraComponent.cpp">
-      <Filter>Sentinel_Engine\Components\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\PlayerControllerComponent.cpp">
-      <Filter>Sentinel_Engine\Components\Controllers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\PhysicsSystem.cpp">
-      <Filter>Sentinel_Engine\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\SpriteComponent.cpp">
-      <Filter>Sentinel_Engine\Components\Drawables</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\ParticleSystem.cpp">
-      <Filter>Sentinel_Engine\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\src\stb_image.c">
-      <Filter>Sentinel_Engine\Utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

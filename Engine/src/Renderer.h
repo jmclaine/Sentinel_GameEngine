@@ -136,9 +136,11 @@ namespace Sentinel
 		NUM_STENCIL_TYPES
 	};
 
-	class WindowInfo
+	class SENTINEL_DLL WindowInfo
 	{
-	public:
+		friend class Renderer;
+
+	protected:
 
 		bool		mFullscreen;
 
@@ -147,6 +149,18 @@ namespace Sentinel
 
 		float		mWidthRatio;
 		float		mHeightRatio;
+
+	public:
+
+		WindowInfo();
+
+		bool	GetFullscreen() const;
+
+		UINT	GetWidth() const;
+		UINT	GetHeight() const;
+
+		float	GetWidthRatio() const;
+		float	GetHeightRatio() const;
 	};
 
 	// Renderer is a SingletonAbstract as creating multiple instances

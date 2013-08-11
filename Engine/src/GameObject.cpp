@@ -23,25 +23,25 @@ namespace Sentinel
 			case COMPONENT_TRANSFORM:
 				_ASSERT( !mTransform );
 
-				mTransform = (TransformComponent*)component;
+				mTransform = component;
 				return component;
 
 			case COMPONENT_CONTROLLER:
 				_ASSERT( !mController );
 
-				mController = (ControllerComponent*)component;
+				mController = component;
 				return component;
 
 			case COMPONENT_PHYSICS:
 				_ASSERT( !mPhysics );
 				
-				mPhysics = (PhysicsComponent*)component;
+				mPhysics = component;
 				return component;
 
 			case COMPONENT_DRAWABLE:
 				_ASSERT( !mDrawable );
 
-				mDrawable = (DrawableComponent*)component;
+				mDrawable = component;
 				return component;
 
 			default:
@@ -154,12 +154,6 @@ namespace Sentinel
 		}
 		mComponent.clear();
 	}
-
-	void GameObject::OnCollisionEnter( GameObject* obj )
-	{}
-
-	void GameObject::OnCollisionExit( GameObject* obj )
-	{}
 
 	GameComponent* GameObject::FindComponent( ComponentType type )
 	{

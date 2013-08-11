@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "Common.h"
 #include "Timing.h"
 #include "Renderer.h"
 #include "Mesh.h"
@@ -13,7 +14,7 @@ namespace Sentinel
 	extern Model* LoadModelOBJ( const char* filename );
 	extern Model* LoadModelM3D( const char* filename );
 
-	class Model
+	class SENTINEL_DLL Model
 	{
 	public:
 

@@ -24,6 +24,7 @@
 #include "GameObject.h"
 
 #include "PerspectiveCameraComponent.h"
+#include "OrthographicCameraComponent.h"
 #include "PlayerControllerComponent.h"
 #include "PhysicsComponent.h"
 #include "MeshComponent.h"
@@ -112,16 +113,16 @@ public:
 		//
 		mWindow0->Startup( hInstance, nCmdShow, "Sentinel_Test", "SentinelClass0", info );
 
-		Renderer::Inst()->CreateDepthStencil( info.mWidth, info.mHeight );
-		Renderer::Inst()->CreateViewport( info.mWidth, info.mHeight );
+		Renderer::Inst()->CreateDepthStencil( info.GetWidth(), info.GetHeight() );
+		Renderer::Inst()->CreateViewport( info.GetWidth(), info.GetHeight() );
 		Renderer::Inst()->CreateBackbuffer();
 
 		// Prepare second window for testing.
 		//
 		mWindow1->Startup( hInstance, nCmdShow, "Sentinel_Dup",  "SentinelClass1", info );
 
-		Renderer::Inst()->CreateDepthStencil( info.mWidth, info.mHeight );
-		Renderer::Inst()->CreateViewport( info.mWidth, info.mHeight );
+		Renderer::Inst()->CreateDepthStencil( info.GetWidth(), info.GetHeight() );
+		Renderer::Inst()->CreateViewport( info.GetWidth(), info.GetHeight() );
 		Renderer::Inst()->CreateBackbuffer();
 
 		////////////////////////////////////
@@ -259,7 +260,7 @@ public:
 		// Create main perspective camera.
 		//
 		info = mWindow0->GetInfo();
-		camera = new PerspectiveCameraComponent( (float)info->mWidth, (float)info->mHeight );
+		camera = new PerspectiveCameraComponent( (float)info->GetWidth(), (float)info->GetHeight() );
 		
 		transform = new TransformComponent();
 		transform->mPosition = Vector3f( 0, 10, 50 );
@@ -282,7 +283,7 @@ public:
 
 		// Create sprite orthographic camera.
 		//
-		camera = new OrthographicCameraComponent( (float)info->mWidth, (float)info->mHeight );
+		camera = new OrthographicCameraComponent( (float)info->GetWidth(), (float)info->GetHeight() );
 		
 		transform = new TransformComponent();
 		transform->mPosition = Vector3f( 0, 0, 0 );

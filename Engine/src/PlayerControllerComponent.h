@@ -1,10 +1,11 @@
 #pragma once
 
+#include "Common.h"
 #include "ControllerComponent.h"
 
 namespace Sentinel
 {
-	class PlayerControllerComponent : public ControllerComponent
+	class SENTINEL_DLL PlayerControllerComponent : public ControllerComponent
 	{
 	public:
 

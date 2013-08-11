@@ -5,6 +5,44 @@
 
 namespace Sentinel
 {
+	WindowInfo::WindowInfo()
+	{
+		mFullscreen		= false;
+
+		mWidth			= 1920;
+		mHeight			= 1080;
+
+		mWidthRatio		= 1.0f;
+		mHeightRatio	= 1.0f;
+	}
+
+	bool WindowInfo::GetFullscreen() const
+	{
+		return mFullscreen;
+	}
+
+	UINT WindowInfo::GetWidth() const
+	{
+		return mWidth;
+	}
+
+	UINT WindowInfo::GetHeight() const
+	{
+		return mHeight;
+	}
+
+	float WindowInfo::GetWidthRatio() const
+	{
+		return mWidthRatio;
+	}
+
+	float WindowInfo::GetHeightRatio() const
+	{
+		return mHeightRatio;
+	}
+
+	//////////////////////////////////////////
+
 	// This function should create and assign the resulting Renderer*
 	// to the SingletonAbstract instance; however, doing so results
 	// in the pointer being set back to NULL in the CLR wrapper.

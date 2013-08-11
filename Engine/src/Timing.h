@@ -8,11 +8,12 @@
 	#include <Windows.h>
 #endif
 
+#include "Common.h"
 #include "Singleton.h"
 
 namespace Sentinel
 {
-	class Timing : public SingletonThreaded< Timing >
+	class SENTINEL_DLL Timing : public SingletonThreaded< Timing >
 	{
 		friend class SingletonThreaded< Timing >;
 

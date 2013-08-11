@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Common.h"
 #include "NetworkSocket.h"
 #include "Timing.h"
 
@@ -25,7 +26,7 @@ namespace Sentinel
 	// Guaranteed messages are handled internally.
 	// This class is a basis for sending and receiving packets.
 	//
-	class NetworkPacket
+	class SENTINEL_DLL NetworkPacket
 	{
 	public:
 
@@ -55,7 +56,7 @@ namespace Sentinel
 				{}
 		};
 
-		struct GuaranteedMessage
+		struct SENTINEL_DLL GuaranteedMessage
 		{
 			UINT		mCounter;		// count of instances
 			UINT		mSize;			// size of data
@@ -65,7 +66,7 @@ namespace Sentinel
 			~GuaranteedMessage();
 		};
 
-		struct GuaranteedSender
+		struct SENTINEL_DLL GuaranteedSender
 		{
 			UINT		mACK;			// ACK number of message to send
 			float		mResendTimer;	// Timer to send message (based on mAverageRTT of connection)
@@ -129,7 +130,7 @@ namespace Sentinel
 	//
 	// NetworkPacketSender::Inst()->Send();
 	//
-	class NetworkPacketSender : public NetworkPacket, public Singleton< NetworkPacketSender >
+	class SENTINEL_DLL NetworkPacketSender : public NetworkPacket, public Singleton< NetworkPacketSender >
 	{
 		friend class Singleton< NetworkPacketSender >;
 
@@ -168,7 +169,7 @@ namespace Sentinel
 	//     BYTE value = NetworkPacketReceiver::Inst()->GetValue< BYTE >();
 	// }
 	//
-	class NetworkPacketReceiver : public NetworkPacket, public Singleton< NetworkPacketReceiver >
+	class SENTINEL_DLL NetworkPacketReceiver : public NetworkPacket, public Singleton< NetworkPacketReceiver >
 	{
 		friend class Singleton< NetworkPacketReceiver >;
 

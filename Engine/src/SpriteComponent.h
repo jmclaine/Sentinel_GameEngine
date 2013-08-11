@@ -1,12 +1,14 @@
 #pragma once
 
+#include "Common.h"
 #include "Texture.h"
 #include "Util.h"
 #include "ParticleSystem.h"
+#include "DrawableComponent.h"
 
 namespace Sentinel
 {
-	class SpriteComponent : public DrawableComponent
+	class SENTINEL_DLL SpriteComponent : public DrawableComponent
 	{
 		friend class ParticleSystem;
 

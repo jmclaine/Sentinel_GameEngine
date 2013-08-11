@@ -1,14 +1,13 @@
 #pragma once
 
+#include "Common.h"
 #include "GameComponent.h"
 #include "Vector3f.h"
 #include "Quatf.h"
 
 namespace Sentinel
 {
-	class GameComponent;
-
-	class TransformComponent : public GameComponent
+	class SENTINEL_DLL TransformComponent : public GameComponent
 	{
 	public:
 

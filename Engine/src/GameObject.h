@@ -2,23 +2,22 @@
 
 #include <set>
 #include <string>
+#include <vector>
 
+#include "Common.h"
 #include "Util.h"
-#include "TransformComponent.h"
-#include "ControllerComponent.h"
-#include "PhysicsComponent.h"
-#include "DrawableComponent.h"
+#include "GameComponent.h"
 
 namespace Sentinel
 {
-	class GameObject
+	class SENTINEL_DLL GameObject
 	{
 	protected:
 
-		TransformComponent*					mTransform;
-		ControllerComponent*				mController;
-		PhysicsComponent*					mPhysics;
-		DrawableComponent*					mDrawable;
+		GameComponent*						mTransform;
+		GameComponent*						mController;
+		GameComponent*						mPhysics;
+		GameComponent*						mDrawable;
 
 		std::vector< GameComponent* >		mComponent;
 
@@ -52,12 +51,6 @@ namespace Sentinel
 		virtual void UpdateComponents();
 
 		virtual void Shutdown();
-
-		//////////////////////////////
-
-		virtual void OnCollisionEnter( GameObject* obj = NULL );
-
-		virtual void OnCollisionExit( GameObject* obj = NULL );
 
 		//////////////////////////////
 

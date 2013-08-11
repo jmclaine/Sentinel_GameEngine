@@ -2,12 +2,13 @@
 
 #include <memory>
 
+#include "Common.h"
 #include "Mesh.h"
 #include "DrawableComponent.h"
 
 namespace Sentinel
 {
-	class MeshComponent : public DrawableComponent
+	class SENTINEL_DLL MeshComponent : public DrawableComponent
 	{
 	private:
 

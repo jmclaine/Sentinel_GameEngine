@@ -1,4 +1,5 @@
 #include "GameWorld.h"
+#include "PhysicsSystem.h"
 
 namespace Sentinel
 {

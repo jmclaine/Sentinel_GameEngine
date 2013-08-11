@@ -33,6 +33,7 @@
     #include <IPHlpApi.h>
 #endif
 
+#include "Common.h"
 #include "Singleton.h"
 #include "Util.h"
 
@@ -59,13 +60,13 @@ namespace Sentinel
 
 	////////////////////////////////////////////////
 	
-	class NetworkSocket : public Singleton< NetworkSocket >
+	class SENTINEL_DLL NetworkSocket : public Singleton< NetworkSocket >
 	{
 		friend class Singleton< NetworkSocket >;
 
 	public:
 
-		struct Connection
+		struct SENTINEL_DLL Connection
 		{
 			char		mUserName[ 32 ];
 			sockaddr_in mReceiver;

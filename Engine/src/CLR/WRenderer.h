@@ -121,8 +121,6 @@ namespace Sentinel { namespace Systems
 
 		static void			Shutdown();
 
-		static void			Destroy();
-
 		// Windows.
 		//
 		static void			SetWindow( WWindowInfo^ info );

@@ -89,9 +89,9 @@ namespace Sentinel_Editor
             mBlue += 0.001f;
             if (mBlue >= 1.0f)
                 mBlue = 0.0f;
-            WColorRGBA mClearColor = new WColorRGBA(0.0f, 0.2f, mBlue, 1.0f);
+            WColorRGBA mClearColor = new WColorRGBA(0.0f, 0.2f*mBlue, mBlue, 1.0f);
 
-            mWindowWorld.SetActive();
+            //mWindowWorld.SetActive();
 
             WRenderer.SetDepthStencil(0);
             WRenderer.SetViewport(0);
@@ -107,6 +107,11 @@ namespace Sentinel_Editor
         ///
         /// File
         ///
+        private void New_Click(Object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("You clicked 'New...'");
+        }
+
         private void Open_Click(Object sender, RoutedEventArgs e)
         {
             MessageBox.Show("You clicked 'Open...'");
@@ -142,6 +147,11 @@ namespace Sentinel_Editor
         ///
         /// ToolBar
         ///
+        private void ToolBar_New_Click(Object sender, RoutedEventArgs e)
+        {
+            New_Click(sender, e);
+        }
+
         private void ToolBar_Open_Click(Object sender, RoutedEventArgs e)
         {
             Open_Click(sender, e);
@@ -151,5 +161,14 @@ namespace Sentinel_Editor
         {
             Save_Click(sender, e);
         }
+
+        private void ToolBar_Translate_Click(Object sender, RoutedEventArgs e)
+        {}
+
+        private void ToolBar_Rotate_Click(Object sender, RoutedEventArgs e)
+        {}
+
+        private void ToolBar_Scale_Click(Object sender, RoutedEventArgs e)
+        {}
     }
 }

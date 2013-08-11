@@ -4,6 +4,8 @@
 #include <string>
 #include <sstream>
 
+#include "Common.h"
+
 namespace Sentinel
 {
 	class GameObject;
@@ -18,11 +20,12 @@ namespace Sentinel
 		COMPONENT_CAMERA,
 		COMPONENT_LIGHT,
 		COMPONENT_DRAWABLE,
+		COMPONENT_TRIGGER,
 
 		NUM_COMPONENTS
 	};
 
-	class GameComponent
+	class SENTINEL_DLL GameComponent
 	{
 	protected:
 
@@ -35,12 +38,9 @@ namespace Sentinel
 
 		////////////////////////////////
 
-		GameComponent()
-		{
-			mComponentType = COMPONENT_GAME;
-		}
+		GameComponent();
 
-		virtual ~GameComponent() {}
+		virtual ~GameComponent();
 
 		virtual void Startup() = 0;
 
@@ -48,14 +48,8 @@ namespace Sentinel
 
 		virtual void Shutdown() = 0;
 
-		void SetOwner( GameObject* owner )
-		{
-			mOwner = owner;
-		}
+		void SetOwner( GameObject* owner );
 
-		ComponentType Type()
-		{
-			return mComponentType;
-		}
+		ComponentType Type();
 	};
 }

@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 
+#include "Common.h"
 #include "Singleton.h"
 #include "CameraComponent.h"
 #include "LightComponent.h"
@@ -10,7 +11,7 @@
 
 namespace Sentinel
 {
-	class GameWorld : public SingletonThreaded< GameWorld >
+	class SENTINEL_DLL GameWorld : public SingletonThreaded< GameWorld >
 	{
 		friend class SingletonThreaded< GameWorld >;
 

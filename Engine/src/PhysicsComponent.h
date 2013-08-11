@@ -2,12 +2,13 @@
 
 #include <vector>
 
+#include "Common.h"
 #include "PhysicsSystem.h"
 #include "TransformComponent.h"
 
 namespace Sentinel
 {
-	class PhysicsComponent : public GameComponent
+	class SENTINEL_DLL PhysicsComponent : public GameComponent
 	{
 		TransformComponent*	mTransform;
 
@@ -17,12 +18,14 @@ namespace Sentinel
 
 		PhysicsComponent( btRigidBody* body );
 
-		btRigidBody* GetRigidBody();
-		
 		void Startup();
 
 		void Update();
 		
 		void Shutdown();
+
+		////////////////////////
+
+		btRigidBody* GetRigidBody();
 	};
 }
