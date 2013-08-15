@@ -21,8 +21,8 @@ namespace Sentinel
 		Matrix4f( float* arr );
 		Matrix4f( const Quatf& q );
 		
-		float		Get( int index ) const;
-		void		Set( int index, float value );
+		float		operator [] ( int i ) const;
+		float&		operator [] ( int i );
 
 		float*		Ptr();
 

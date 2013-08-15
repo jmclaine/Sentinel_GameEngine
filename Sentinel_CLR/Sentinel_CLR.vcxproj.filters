@@ -28,6 +28,12 @@
     <Filter Include="Sentinel_Engine\Utilities">
       <UniqueIdentifier>{167d1854-883e-42af-9713-194a9688aa6f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sentinel_Engine\Components">
+      <UniqueIdentifier>{ef2ab701-1f73-4792-b2e0-0fb45ca49e44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sentinel_Engine\Components\Core">
+      <UniqueIdentifier>{cf19ad5a-898a-48fd-b265-cbb17b613167}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sentinel_CLR.h">
@@ -38,9 +44,6 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\SString.h">
-      <Filter>Sentinel_Engine\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\CLR\WBuffer.h">
       <Filter>Sentinel_Engine\Assets</Filter>
@@ -74,6 +77,33 @@
     </ClInclude>
     <ClInclude Include="..\Engine\src\CLR\WGameWindow.h">
       <Filter>Sentinel_Engine\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WMesh.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WMaterial.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WFloat.h">
+      <Filter>Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WString.h">
+      <Filter>Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WTransformComponent.h">
+      <Filter>Sentinel_Engine\Components\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WGameComponent.h">
+      <Filter>Sentinel_Engine\Components\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WGameObject.h">
+      <Filter>Sentinel_Engine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WGameWorld.h">
+      <Filter>Sentinel_Engine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\m_shared_ptr.h">
+      <Filter>Sentinel_Engine\Utilities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -118,6 +148,30 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\CLR\WGameWindow.cpp">
       <Filter>Sentinel_Engine\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WMesh.cpp">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WMaterial.cpp">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WFloat.cpp">
+      <Filter>Sentinel_Engine\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WString.cpp">
+      <Filter>Sentinel_Engine\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WTransformComponent.cpp">
+      <Filter>Sentinel_Engine\Components\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WGameComponent.cpp">
+      <Filter>Sentinel_Engine\Components\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WGameObject.cpp">
+      <Filter>Sentinel_Engine\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WGameWorld.cpp">
+      <Filter>Sentinel_Engine\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

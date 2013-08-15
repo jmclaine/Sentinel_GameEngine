@@ -6,7 +6,7 @@ namespace Sentinel
 {
 	class SENTINEL_DLL Texture
 	{
-	public:
+	protected:
 
 		std::string		mFilename;
 		UINT			mWidth;
@@ -18,8 +18,15 @@ namespace Sentinel
 		Texture();
 		Texture( const std::string& filename, UINT width, UINT height, UINT id );
 
+	public:
+
 		virtual ~Texture();
 
-		virtual void Release();
+		virtual void		Release();
+
+		const std::string&	Filename();
+		UINT				Width();
+		UINT				Height();
+		UINT				ID();
 	};
 }

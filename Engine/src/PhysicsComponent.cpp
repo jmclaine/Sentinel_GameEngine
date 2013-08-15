@@ -28,10 +28,10 @@ namespace Sentinel
 		
 		btQuaternion q( mRigidBody->getOrientation() );
 
-		mTransform->mOrientation.SetX( q.x() );
-		mTransform->mOrientation.SetY( q.y() );
-		mTransform->mOrientation.SetZ( q.z() );
-		mTransform->mOrientation.SetW( q.w() );
+		mTransform->mOrientation.x = q.x();
+		mTransform->mOrientation.y = q.y();
+		mTransform->mOrientation.z = q.z();
+		mTransform->mOrientation.w = q.w();
 	}
 
 	void PhysicsComponent::Shutdown()

@@ -2,17 +2,14 @@
 
 namespace Sentinel { namespace Assets
 {
-	WShader::WShader()
-	{}
+	WShader::WShader( Shader* shader )
+	{
+		mRef = shader;
+	}
 
 	WShader::WShader( WShader^ shader )
 	{
 		mRef = shader->mRef;
-	}
-
-	WShader::WShader( Shader* shader )
-	{
-		mRef = shader;
 	}
 
 	WShader::~WShader()

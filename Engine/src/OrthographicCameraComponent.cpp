@@ -4,7 +4,7 @@ namespace Sentinel
 {
 	OrthographicCameraComponent::OrthographicCameraComponent( float windowWidth, float windowHeight )
 	{
-		mMatrixProjection.ProjectionOrthographic( windowWidth, windowHeight );
+		Set( windowWidth, windowHeight );
 	}
 
 	void OrthographicCameraComponent::Startup()
@@ -21,4 +21,11 @@ namespace Sentinel
 
 	void OrthographicCameraComponent::Shutdown()
 	{}
+
+	//////////////////////////////
+
+	void OrthographicCameraComponent::Set( float windowWidth, float windowHeight )
+	{
+		mMatrixProjection.ProjectionOrthographic( windowWidth, windowHeight );
+	}
 }

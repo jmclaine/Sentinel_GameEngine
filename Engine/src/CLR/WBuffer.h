@@ -1,5 +1,6 @@
 #pragma once
 
+#include "m_shared_ptr.h"
 #include "Buffer.h"
 
 namespace Sentinel { namespace Assets
@@ -16,15 +17,14 @@ namespace Sentinel { namespace Assets
 	{
 	private:
 
-		Buffer*	mRef;
+		Buffer*		mRef;
 
 	public:
 
-		WBuffer();
 		WBuffer( Buffer* buffer );
 		WBuffer( WBuffer^ buffer );
 		~WBuffer();
-
+		
 		Buffer*		GetRef();
 
 		UCHAR*		Lock();

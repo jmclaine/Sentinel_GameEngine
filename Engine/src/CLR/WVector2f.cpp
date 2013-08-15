@@ -32,29 +32,24 @@ namespace Sentinel { namespace Math
 		delete mRef;
 	}
 
-	const Vector2f* WVector2f::GetRef()
+	WVector2f::!WVector2f()
+	{
+		delete mRef;
+	}
+
+	Vector2f* WVector2f::GetRef()
 	{
 		return mRef;
 	}
 
-	float WVector2f::X()
+	WFloat^ WVector2f::X()
 	{
-		return mRef->X();
+		return gcnew WFloat( &mRef->x );
 	}
 
-	float WVector2f::Y()
+	WFloat^ WVector2f::Y()
 	{
-		return mRef->Y();
-	}
-
-	void WVector2f::SetX( float _x )
-	{
-		mRef->SetX( _x );
-	}
-
-	void WVector2f::SetY( float _y )
-	{
-		mRef->SetY( _y );
+		return gcnew WFloat( &mRef->y );
 	}
 
 	bool WVector2f::operator == ( const WVector2f^ v )

@@ -48,6 +48,8 @@ namespace Sentinel
 
 		virtual void Shutdown() = 0;
 
+		////////////////////////////////
+
 		void SetOwner( GameObject* owner );
 
 		ComponentType Type();

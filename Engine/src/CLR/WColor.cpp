@@ -12,17 +12,27 @@ namespace Sentinel { namespace Assets
 		mRef = new ColorRGBA( red, green, blue, alpha );
 	}
 
+	WColorRGBA::WColorRGBA( ColorRGBA* color )
+	{
+		mRef = color;
+	}
+
+	WColorRGBA::WColorRGBA( WColorRGBA^ color )
+	{
+		mRef = new ColorRGBA( *color->mRef );
+	}
+
 	WColorRGBA::WColorRGBA( WColorRGBA% color )
 	{
 		mRef = new ColorRGBA( *color.mRef );
 	}
 
-	WColorRGBA::WColorRGBA( ColorRGBA& color )
+	WColorRGBA::~WColorRGBA()
 	{
-		mRef = new ColorRGBA( color );
+		delete mRef;
 	}
 
-	WColorRGBA::~WColorRGBA()
+	WColorRGBA::!WColorRGBA()
 	{
 		delete mRef;
 	}
@@ -32,44 +42,24 @@ namespace Sentinel { namespace Assets
 		return mRef;
 	}
 
-	float WColorRGBA::R()
+	WFloat^ WColorRGBA::R()
 	{
-		return mRef->R();
+		return gcnew WFloat( &mRef->r );
 	}
 
-	float WColorRGBA::G()
+	WFloat^ WColorRGBA::G()
 	{
-		return mRef->G();
+		return gcnew WFloat( &mRef->g );
 	}
 
-	float WColorRGBA::B()
+	WFloat^ WColorRGBA::B()
 	{
-		return mRef->B();
+		return gcnew WFloat( &mRef->b );
 	}
 
-	float WColorRGBA::A()
+	WFloat^ WColorRGBA::A()
 	{
-		return mRef->A();
-	}
-
-	void WColorRGBA::SetR( float red )
-	{
-		return mRef->SetR( red );
-	}
-
-	void WColorRGBA::SetG( float green )
-	{
-		return mRef->SetG( green );
-	}
-
-	void WColorRGBA::SetB( float blue )
-	{
-		return mRef->SetB( blue );
-	}
-
-	void WColorRGBA::SetA( float alpha )
-	{
-		return mRef->SetA( alpha );
+		return gcnew WFloat( &mRef->a );
 	}
 
 	float* WColorRGBA::Ptr()

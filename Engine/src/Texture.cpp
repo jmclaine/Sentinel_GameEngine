@@ -19,4 +19,24 @@ namespace Sentinel
 
 	void Texture::Release()
 	{}
+
+	const std::string& Texture::Filename()
+	{
+		return mFilename;
+	}
+
+	UINT Texture::Width()
+	{
+		return mWidth;
+	}
+
+	UINT Texture::Height()
+	{
+		return mHeight;
+	}
+
+	UINT Texture::ID()
+	{
+		return mID;
+	}
 }

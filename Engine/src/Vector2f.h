@@ -6,11 +6,11 @@ namespace Sentinel
 {
 	class SENTINEL_DLL Vector2f
 	{
-	protected:
+	public:
 
 		float x, y;
 
-	public:
+		////////////////////////////////
 
 		Vector2f();
 		Vector2f( float _x, float _y );
@@ -19,12 +19,6 @@ namespace Sentinel
 		float		operator [] ( int i ) const;
 		float&		operator [] ( int i );
 
-		float		X() const;
-		float		Y() const;
-		
-		void		SetX( float _x );
-		void		SetY( float _y );
-		
 		float*		Ptr();
 
 		bool		operator == ( const Vector2f& v ) const;

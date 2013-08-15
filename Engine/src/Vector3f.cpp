@@ -36,36 +36,6 @@ namespace Sentinel
 		return (&x)[i];
 	}
 
-	float Vector3f::X() const
-	{
-		return x;
-	}
-
-	float Vector3f::Y() const
-	{
-		return y;
-	}
-
-	float Vector3f::Z() const
-	{
-		return z;
-	}
-
-	void Vector3f::SetX( float _x )
-	{
-		x = _x;
-	}
-
-	void Vector3f::SetY( float _y )
-	{
-		y = _y;
-	}
-
-	void Vector3f::SetZ( float _z )
-	{
-		z = _z;
-	}
-
 	float* Vector3f::Ptr()
 	{
 		return static_cast< float* >(&x);
@@ -181,7 +151,7 @@ namespace Sentinel
 
 	Vector3f Vector3f::Cross( const Vector3f& v ) const
 	{
-		return Vector3f( y*v.z-z*v.y, z*v.x-x*v.z, x*v.y-y*v.x );
+		return Vector3f( y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x );
 	}
 
 	float Vector3f::Angle( const Vector3f& v ) const
@@ -192,7 +162,7 @@ namespace Sentinel
 
 		if( len0 > 0 && len1 > 0 )
 		{
-			float d = this->Mul( 1.0f / sqrt( len0 )).Dot( v.Mul( 1.0f / sqrt( len1 )));
+			float d = Mul( 1.0f / sqrt( len0 )).Dot( v.Mul( 1.0f / sqrt( len1 )));
 
 			// Prevent floating point errors.
 			//

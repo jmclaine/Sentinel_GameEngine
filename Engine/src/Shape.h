@@ -10,21 +10,21 @@ namespace Sentinel
 	{
 	public:
 
-		Vector3f pos,
-				 normal;
+		Vector3f mPosition,
+				 mNormal;
 
-		Plane( const Vector3f& _pos = Vector3f( 0, 0, 0 ), const Vector3f& _normal = Vector3f( 0, 0, 0 ));
+		Plane( const Vector3f& pos = Vector3f( 0, 0, 0 ), const Vector3f& normal = Vector3f( 0, 0, 0 ));
 
-		float Distance( const Vector3f& _pos );
+		float Distance( const Vector3f& pos );
 	};
 
 	class SENTINEL_DLL Triangle
 	{
 	public:
 
-		Vector3f pos[ 3 ];
+		Vector3f mPosition[ 3 ];
 
-		Triangle( const Vector3f& _posA = Vector3f( 0, 0, 0 ), const Vector3f& _posB = Vector3f( 0, 0, 0 ), const Vector3f& _posC = Vector3f( 0, 0, 0 ));
+		Triangle( const Vector3f& posA = Vector3f( 0, 0, 0 ), const Vector3f& posB = Vector3f( 0, 0, 0 ), const Vector3f& posC = Vector3f( 0, 0, 0 ));
 
 		float Area();
 	};
@@ -33,16 +33,16 @@ namespace Sentinel
 	{
 	public:
 
-		Vector3f center;
-		float    radius;
+		Vector3f mCenter;
+		float    mRadius;
 
-		BoundingSphere( const Vector3f& _center = Vector3f( 0, 0, 0 ), float _radius = 0 );
+		BoundingSphere( const Vector3f& center = Vector3f( 0, 0, 0 ), float radius = 0 );
 		BoundingSphere( const Vector3f& v0, const Vector3f& v1 );
 		BoundingSphere( const Vector3f& v0, const Vector3f& v1, const Vector3f& v2 );
 		BoundingSphere( const Vector3f& v0, const Vector3f& v1, const Vector3f& v2, const Vector3f& v3 );
 	};
 
-	SENTINEL_DLL bool CheckPointInSphere( const Vector3f& v, const BoundingSphere& sphere );
+	SENTINEL_DLL bool CheckPointInSphere( const Vector3f& point, const BoundingSphere& sphere );
 
 	SENTINEL_DLL BoundingSphere FindSmallestSphere( Buffer*& vbo );
 }

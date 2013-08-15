@@ -1,5 +1,6 @@
 #pragma once
 
+#include "m_shared_ptr.h"
 #include "Shader.h"
 #include "WTexture.h"
 
@@ -11,14 +12,12 @@ namespace Sentinel { namespace Assets
 
 		Shader*				mRef;
 
-		WShader();
-
 	public:
 
-		WShader( WShader^ shader );
 		WShader( Shader* shader );
+		WShader( WShader^ shader );
 		~WShader();
-
+		
 		Shader*				GetRef();
 
 		System::String^		AttributeDecl();

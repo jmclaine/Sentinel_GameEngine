@@ -12,8 +12,8 @@ namespace Sentinel
 		mTexture		= texture;
 		mSpriteSize		= spriteSize;
 
-		mSpriteDimension.x = texture->mWidth  / mSpriteSize.x;
-		mSpriteDimension.y = texture->mHeight / mSpriteSize.y;
+		mSpriteDimension.x = texture->Width()  / mSpriteSize.x;
+		mSpriteDimension.y = texture->Height() / mSpriteSize.y;
 
 		mNumFrames = mSpriteDimension.x * mSpriteDimension.y;
 	}

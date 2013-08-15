@@ -22,46 +22,6 @@ namespace Sentinel
 		w = _w;
 	}
 
-	float Quatf::X() const
-	{
-		return x;
-	}
-
-	float Quatf::Y() const
-	{
-		return y;
-	}
-
-	float Quatf::Z() const
-	{
-		return z;
-	}
-
-	float Quatf::W() const
-	{
-		return w;
-	}
-
-	void Quatf::SetX( float _x )
-	{
-		x = _x;
-	}
-
-	void Quatf::SetY( float _y )
-	{
-		y = _y;
-	}
-
-	void Quatf::SetZ( float _z )
-	{
-		z = _z;
-	}
-
-	void Quatf::SetW( float _w )
-	{
-		w = _w;
-	}
-
 	float* Quatf::Ptr()
 	{
 		return static_cast< float* >(&x);

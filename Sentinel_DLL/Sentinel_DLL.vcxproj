@@ -103,6 +103,7 @@
     <ClInclude Include="..\Engine\src\GameWorld.h" />
     <ClInclude Include="..\Engine\src\Input.h" />
     <ClInclude Include="..\Engine\src\LightComponent.h" />
+    <ClInclude Include="..\Engine\src\Material.h" />
     <ClInclude Include="..\Engine\src\MathCommon.h" />
     <ClInclude Include="..\Engine\src\Matrix4f.h" />
     <ClInclude Include="..\Engine\src\Mesh.h" />
@@ -137,6 +138,7 @@
     <ClInclude Include="..\Sentinel_Test\Sentinel_Test\TriggerComponent.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Engine\src\Buffer.cpp" />
     <ClCompile Include="..\Engine\src\CameraComponent.cpp" />
     <ClCompile Include="..\Engine\src\Color.cpp" />
     <ClCompile Include="..\Engine\src\ControllerComponent.cpp" />
@@ -146,6 +148,7 @@
     <ClCompile Include="..\Engine\src\GameWorld.cpp" />
     <ClCompile Include="..\Engine\src\Input.cpp" />
     <ClCompile Include="..\Engine\src\LightComponent.cpp" />
+    <ClCompile Include="..\Engine\src\Material.cpp" />
     <ClCompile Include="..\Engine\src\MathCommon.cpp" />
     <ClCompile Include="..\Engine\src\Matrix4f.cpp" />
     <ClCompile Include="..\Engine\src\Mesh.cpp" />

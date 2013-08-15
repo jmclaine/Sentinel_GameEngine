@@ -5,7 +5,7 @@ namespace Sentinel
 	PerspectiveCameraComponent::PerspectiveCameraComponent( float windowWidth, float windowHeight, float nearZ, float farZ, float FOV ) :
 		mNearZ( nearZ ), mFarZ( farZ ), mFOV( FOV )
 	{
-		mMatrixProjection.ProjectionPerspective( windowWidth, windowHeight, nearZ, farZ, FOV );
+		Set( windowWidth, windowHeight, nearZ, farZ, FOV );
 	}
 	
 	void PerspectiveCameraComponent::Startup()
@@ -25,9 +25,16 @@ namespace Sentinel
 	void PerspectiveCameraComponent::Shutdown()
 	{}
 
+	//////////////////////////////
+
+	void PerspectiveCameraComponent::Set( float windowWidth, float windowHeight, float nearZ, float farZ, float FOV )
+	{
+		mMatrixProjection.ProjectionPerspective( windowWidth, windowHeight, nearZ, farZ, FOV );
+	}
+
 	// Create the frustum.
 	//
-	/*void CameraComponent::CreateFrustum()
+	/*void PerspectiveCameraComponent::CreateFrustum()
 	{
 		static Vector3f ftl, ftr, fbl, fbr,
 					 ntl, ntr, nbl, nbr;
@@ -95,7 +102,7 @@ namespace Sentinel
 
 	// Check for a sphere being within the frustum.
 	//
-	bool CameraComponent::checkFrustum( BoundingSphere& sphere )
+	bool PerspectiveCameraComponent::CheckFrustum( BoundingSphere& sphere )
 	{
 		float distance;
 
@@ -113,7 +120,7 @@ namespace Sentinel
 
 	// Check for a box being within the frustum.
 	//
-	bool CameraComponent::checkFrustum( FrustumBox& box )
+	bool PerspectiveCameraComponent::CheckFrustum( const FrustumBox& box )
 	{
 		float distance;
 		int   counter;

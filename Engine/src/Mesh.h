@@ -7,6 +7,7 @@
 //
 #include "Common.h"
 #include "Renderer.h"
+#include "Material.h"
 #include "Matrix4f.h"
 #include "Vector4f.h"
 
@@ -41,9 +42,12 @@ namespace Sentinel
 		Buffer*				mVBO;
 		Buffer*				mIBO;
 
-	public:
+		////////////////////////////
 
 		Mesh();
+
+	public:
+
 		~Mesh();
 
 		void		SetWorldTransform( const Matrix4f& world );

@@ -21,14 +21,14 @@ namespace Sentinel
 		Rotate( q );
 	}
 
-	float Matrix4f::Get( int index ) const
+	float Matrix4f::operator [] ( int i ) const
 	{
-		return m[ index ];
+		return m[ i ];
 	}
 
-	void Matrix4f::Set( int index, float value )
+	float& Matrix4f::operator [] ( int i )
 	{
-		m[ index ] = value;
+		return m[ i ];
 	}
 
 	float* Matrix4f::Ptr()

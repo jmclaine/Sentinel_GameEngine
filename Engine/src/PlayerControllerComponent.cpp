@@ -55,7 +55,7 @@ namespace Sentinel
 		// Move in direction.
 		//
 		if( impulse.LengthSquared() > 0 )
-			mPhysics->GetRigidBody()->applyCentralImpulse( btVector3( impulse.X(), impulse.Y(), impulse.Z() ).normalize() * mSpeed );
+			mPhysics->GetRigidBody()->applyCentralImpulse( btVector3( impulse.x, impulse.y, impulse.z ).normalize() * mSpeed );
 		
 		///////////////////////////////////
 
@@ -67,10 +67,10 @@ namespace Sentinel
 		Vector3f diff = Vector3f( (float)(center.x-mousePos.x), (float)(center.y-mousePos.y), 0 ) * mAngularSpeed;
 
 		if( keyboard->IsDown( VK_UP ))
-			diff.SetZ( diff.Z() + 1.0f );
+			diff.z += 1.0f;
 
 		if( keyboard->IsDown( VK_DOWN ))
-			diff.SetZ( diff.Z() - 1.0f );
+			diff.z -= 1.0f;
 
 		SetCursorPos( center.x, center.y );
 
@@ -85,7 +85,7 @@ namespace Sentinel
 			static Vector3f rot;
 			rot = rot + diff * (float)DEGREES_TO_RADIANS;
 	
-			qFinal = btQuaternion( rot.X(), rot.Y(), rot.Z() );
+			qFinal = btQuaternion( rot.x, rot.y, rot.z );
 		}
 
 		btQuaternion qResult = slerp( transform.getRotation(), qFinal, clamp( Timing::Inst()->DeltaTime()*10.0f, 0.0f, 1.0f ));

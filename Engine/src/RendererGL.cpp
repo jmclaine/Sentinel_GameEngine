@@ -30,11 +30,15 @@ inline void HANDLE_GL_ERRORS()
 
 namespace Sentinel
 {
+	class RendererGL;
+
 	class TextureGL : public Texture
 	{
+		friend class RendererGL;
+
 	public:
 
-		TextureGL( std::string filename, UINT width, UINT height, UINT id )
+		TextureGL( const std::string& filename, UINT width, UINT height, UINT id )
 		{
 			mFilename	= filename;
 			mWidth		= width;
@@ -455,7 +459,7 @@ namespace Sentinel
 			glEnable( GL_BLEND );
 			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-			glBindTexture( GL_TEXTURE_2D, texture->mID );
+			glBindTexture( GL_TEXTURE_2D, texture->ID() );
 
 			++mTextureLevel;
 		}
@@ -477,14 +481,20 @@ namespace Sentinel
 
 	class BufferGL : public Buffer
 	{
-	public:
+		friend class RendererGL;
+
+	private:
 
 		GLuint	mID;
+
+		////////////////////////
 
 		BufferGL()
 		{
 			mID = 0;
 		}
+
+	public:
 
 		void Startup( BufferType type )
 		{
@@ -521,6 +531,8 @@ namespace Sentinel
 	//
 	class RendererGL : public Renderer
 	{
+		friend class Texture;
+
 	private:
 
 		class RenderTarget
@@ -790,7 +802,7 @@ namespace Sentinel
 			//
 			for( UINT i = 0; i < mTexture.size(); ++i )
 			{
-				if( mTexture[ i ]->mFilename == filename )
+				if( mTexture[ i ]->Filename() == filename )
 				{
 					return mTexture[ i ];
 				}
@@ -812,7 +824,7 @@ namespace Sentinel
 
 			Texture* result = CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA );
 
-			result->mFilename = filename;
+			((TextureGL*)result)->mFilename = filename;
 
 			stbi_image_free( pixels );
 
@@ -872,7 +884,7 @@ namespace Sentinel
 			
 			glGenFramebuffers( 1, &mRenderTarget.back().mID );
 			glBindFramebuffer( GL_DRAW_FRAMEBUFFER, mRenderTarget.back().mID );
-			glFramebufferTexture( GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture->mID, 0 );
+			glFramebufferTexture( GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, static_cast< TextureGL* >(texture)->mID, 0 );
 			
 			if( glCheckFramebufferStatus( GL_FRAMEBUFFER ) != GL_FRAMEBUFFER_COMPLETE )
 				REPORT_ERROR( "Failed to create Render Target #" << renderID, "OpenGL Render Target" );
@@ -906,17 +918,24 @@ namespace Sentinel
 
 		void SetRenderType( PrimitiveType type )
 		{
+			_ASSERT( mCurrShader );
+			_ASSERT( mCurrWindow );
+
 			mCurrShader->ApplyLayout();
 			mCurrWindow->mRenderMode = type;
 		}
 
 		void SetRenderTarget( UINT target )
 		{
+			_ASSERT( target < mRenderTarget.size() );
+
 			glBindFramebuffer( GL_DRAW_FRAMEBUFFER, mRenderTarget[ target ].mID );
 		}
 
 		void SetDepthStencil( UINT stencil )
 		{
+			_ASSERT( stencil < mDepthStencil.size() );
+
 			glBindRenderbuffer( GL_RENDERBUFFER, mDepthStencil[ stencil ] );
 		}
 
@@ -983,7 +1002,7 @@ namespace Sentinel
 		{
 			glClearColor( color[ 0 ], color[ 1 ], color[ 2 ], color[ 3 ] );
 			glClearDepth( 1 );
-			glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+			glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 		}
 
 		void DrawIndexed( UINT count, UINT startIndex, UINT baseVertex )

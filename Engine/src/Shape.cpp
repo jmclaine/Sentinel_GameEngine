@@ -5,32 +5,32 @@
 
 namespace Sentinel
 {
-	Plane::Plane( const Vector3f& _pos, const Vector3f& _normal ) :
-		pos( _pos ),
-		normal( _normal )
+	Plane::Plane( const Vector3f& pos, const Vector3f& normal ) :
+		mPosition( pos ),
+		mNormal( normal )
 	{}
 
-	float Plane::Distance( const Vector3f& _pos )
+	float Plane::Distance( const Vector3f& pos )
 	{
-		return normal.Dot( _pos ) - pos.Dot( normal );
+		return mNormal.Dot( pos ) - mPosition.Dot( mNormal );
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
 
-	Triangle::Triangle( const Vector3f& _posA, const Vector3f& _posB, const Vector3f& _posC )
+	Triangle::Triangle( const Vector3f& posA, const Vector3f& posB, const Vector3f& posC )
 	{
-		pos[ 0 ] = _posA;
-		pos[ 1 ] = _posB;
-		pos[ 2 ] = _posC;
+		mPosition[ 0 ] = posA;
+		mPosition[ 1 ] = posB;
+		mPosition[ 2 ] = posC;
 	}
 
 	// Based on Heron's Formula @ www.mathopenref.com/heronsformula.html
 	//
 	float Triangle::Area()
 	{
-		float a = (pos[ 0 ] - pos[ 1 ]).Length();
-		float b = (pos[ 0 ] - pos[ 2 ]).Length();
-		float c = (pos[ 1 ] - pos[ 2 ]).Length();
+		float a = (mPosition[ 0 ] - mPosition[ 1 ]).Length();
+		float b = (mPosition[ 0 ] - mPosition[ 2 ]).Length();
+		float c = (mPosition[ 1 ] - mPosition[ 2 ]).Length();
 		float p = (a + b + c) / 2;
 
 		return sqrt( p * (p - a) * (p - b) * (p - c) );
@@ -38,9 +38,9 @@ namespace Sentinel
 
 	/////////////////////////////////////////////////////////////////////////////////////
 
-	BoundingSphere::BoundingSphere( const Vector3f& _center, float _radius ) :
-		center( _center ),
-		radius( _radius )
+	BoundingSphere::BoundingSphere( const Vector3f& center, float radius ) :
+		mCenter( center ),
+		mRadius( radius )
 	{}
 
 	// Create a sphere based on points contained within it.
@@ -52,8 +52,8 @@ namespace Sentinel
 		Vector3f u1 = v1 - v0;
 		Vector3f u0 = u1 * 0.5f;
 
-		radius = u0.Length() + (float)EPSILON;
-		center = v0 + u0;
+		mRadius = u0.Length() + (float)EPSILON;
+		mCenter = v0 + u0;
 	}
 
 	BoundingSphere::BoundingSphere( const Vector3f& v0, const Vector3f& v1,  const Vector3f& v2 )
@@ -68,6 +68,7 @@ namespace Sentinel
 		if( det == 0 )
 		{
 			BoundingSphere sphere;
+
 			float len01 = u1.LengthSquared();
 			float len02 = u2.LengthSquared();
 
@@ -80,16 +81,17 @@ namespace Sentinel
 				sphere = BoundingSphere( v0, v2 );
 			}
 
-			radius = sphere.radius;
-			center = sphere.center;
+			mRadius = sphere.mRadius;
+			mCenter = sphere.mCenter;
+
 			return;
 		}
 
 		Vector3f u0 = (u1.Cross( u2 ).Cross( u1 ) * u2.LengthSquared() + \
 					   u2.Cross( u1.Cross( u2 )) * u1.LengthSquared()) * (1.0f / det);
 
-		radius = u0.Length() + (float)EPSILON;
-		center = v0.Add( u0 );
+		mRadius = u0.Length() + (float)EPSILON;
+		mCenter = v0.Add( u0 );
 	}
 
 	BoundingSphere::BoundingSphere( const Vector3f& v0, const Vector3f& v1, const Vector3f& v2, const Vector3f& v3 )
@@ -99,9 +101,9 @@ namespace Sentinel
 		Vector3f u3 = v3 - v0;
 
 		float m[9];
-		m[0] = u1.X();	m[1] = u1.Y();	m[2] = u1.Z();
-		m[3] = u2.X();	m[4] = u2.Y();	m[5] = u2.Z();
-		m[6] = u3.X();	m[7] = u3.Y();	m[8] = u3.Z();
+		m[0] = u1.x;	m[1] = u1.y;	m[2] = u1.z;
+		m[3] = u2.x;	m[4] = u2.y;	m[5] = u2.z;
+		m[6] = u3.x;	m[7] = u3.y;	m[8] = u3.z;
 		float det = 2.0f * m[0]*(m[4]*m[8]-m[5]*m[7]) - m[1]*(m[3]*m[8]-m[5]*m[6]) + m[2]*(m[3]*m[7]-m[4]*m[6]);
 
 		// Guarantee a smallest sphere of three points.
@@ -127,8 +129,8 @@ namespace Sentinel
 				sphere = BoundingSphere( v0, v2, v3 );
 			}
 
-			radius = sphere.radius;
-			center = sphere.center;
+			mRadius = sphere.mRadius;
+			mCenter = sphere.mCenter;
 			return;
 		}
 
@@ -136,16 +138,16 @@ namespace Sentinel
 					   u3.Cross( u1 ) * u2.LengthSquared() + \
 					   u2.Cross( u3 ) * u1.LengthSquared()) * (1.0f / det);
 
-		radius = u0.Length() + (float)EPSILON;
-		center = v0 + u0;
+		mRadius = u0.Length() + (float)EPSILON;
+		mCenter = v0 + u0;
 	}
 
-	bool CheckPointInSphere( const Vector3f& position, const BoundingSphere& sphere )
+	bool CheckPointInSphere( const Vector3f& point, const BoundingSphere& sphere )
 	{
-		float d  = (position - sphere.center).LengthSquared();
-		float r2 = sphere.radius * sphere.radius;
+		float d  = (point - sphere.mCenter).LengthSquared();
+		float r2 = sphere.mRadius * sphere.mRadius;
 
-		return ( d < r2 ) ? true : false;
+		return (d < r2) ? true : false;
 	}
 
 	// Find the smallest sphere.
@@ -161,12 +163,12 @@ namespace Sentinel
 		BoundingSphere sphere( *(Vector3f*)verts );		// final bounding sphere
 		BoundingSphere newSphere[ 14 ];					// create possible spheres
 
-		points.push_back( sphere.center );
+		points.push_back( sphere.mCenter );
 
 		UINT currIndex = 0;
-		while( currIndex < vbo->mCount )
+		while( currIndex < vbo->Count() )
 		{
-			Vector3f pos = *(Vector3f*)(verts + currIndex * vbo->mStride);
+			Vector3f pos = *(Vector3f*)(verts + currIndex * vbo->Stride());
 			bool isContained = false;
 
 			for( UINT x = 0; x < points.size(); ++x )
@@ -196,14 +198,14 @@ namespace Sentinel
 
 							if( CheckPointInSphere( points[ 1 ], newSphere[ 0 ] ))
 							{
-								minRadius = newSphere[ 0 ].radius;
+								minRadius = newSphere[ 0 ].mRadius;
 								index = 0;
 							}
 							else
-							if( newSphere[ 1 ].radius < minRadius &&
+							if( newSphere[ 1 ].mRadius < minRadius &&
 								CheckPointInSphere( points[ 0 ], newSphere[ 1 ] ))
 							{
-								minRadius = newSphere[ 1 ].radius;
+								minRadius = newSphere[ 1 ].mRadius;
 								index = 1;
 							}
 
@@ -232,44 +234,44 @@ namespace Sentinel
 								CheckPointInSphere( points[ 2 ], newSphere[ 0 ] ))
 							{
 								index = 0;
-								minRadius = newSphere[ 0 ].radius;
+								minRadius = newSphere[ 0 ].mRadius;
 							}
 
-							if( newSphere[ 1 ].radius < minRadius &&
+							if( newSphere[ 1 ].mRadius < minRadius &&
 								CheckPointInSphere( points[ 0 ], newSphere[ 1 ] ) &&
 								CheckPointInSphere( points[ 2 ], newSphere[ 1 ] ))
 							{
 								index = 1;
-								minRadius = newSphere[ 1 ].radius;
+								minRadius = newSphere[ 1 ].mRadius;
 							}
 
-							if( newSphere[ 2 ].radius < minRadius &&
+							if( newSphere[ 2 ].mRadius < minRadius &&
 								CheckPointInSphere( points[ 0 ], newSphere[ 2 ] ) &&
 								CheckPointInSphere( points[ 1 ], newSphere[ 2 ] ))
 							{
 								index = 2;
-								minRadius = newSphere[ 2 ].radius;
+								minRadius = newSphere[ 2 ].mRadius;
 							}
 
-							if( newSphere[ 3 ].radius < minRadius &&
+							if( newSphere[ 3 ].mRadius < minRadius &&
 								CheckPointInSphere( points[ 2 ], newSphere[ 3 ] ))
 							{
 								index = 3;
-								minRadius = newSphere[ 3 ].radius;
+								minRadius = newSphere[ 3 ].mRadius;
 							}
 
-							if( newSphere[ 4 ].radius < minRadius &&
+							if( newSphere[ 4 ].mRadius < minRadius &&
 								CheckPointInSphere( points[ 1 ], newSphere[ 4 ] ))
 							{
 								index = 4;
-								minRadius = newSphere[ 4 ].radius;
+								minRadius = newSphere[ 4 ].mRadius;
 							}
 
-							if( newSphere[ 5 ].radius < minRadius &&
+							if( newSphere[ 5 ].mRadius < minRadius &&
 								CheckPointInSphere( points[ 0 ], newSphere[ 5 ] ))
 							{
 								index = 5;
-								minRadius = newSphere[ 5 ].radius;
+								minRadius = newSphere[ 5 ].mRadius;
 							}
 
 							if( index > -1 )
@@ -340,114 +342,114 @@ namespace Sentinel
 								CheckPointInSphere( points[ 3 ], newSphere[ 0 ] ))
 							{
 								index = 0;
-								minRadius = newSphere[ 0 ].radius;
+								minRadius = newSphere[ 0 ].mRadius;
 							}
 
-							if( newSphere[ 1 ].radius < minRadius &&
+							if( newSphere[ 1 ].mRadius < minRadius &&
 								CheckPointInSphere( points[ 0 ], newSphere[ 1 ] ) &&
 								CheckPointInSphere( points[ 2 ], newSphere[ 1 ] ) &&
 								CheckPointInSphere( points[ 3 ], newSphere[ 1 ] ))
 							{
 								index = 1;
-								minRadius = newSphere[ 1 ].radius;
+								minRadius = newSphere[ 1 ].mRadius;
 							}
 
-							if( newSphere[ 2 ].radius < minRadius &&
+							if( newSphere[ 2 ].mRadius < minRadius &&
 								CheckPointInSphere( points[ 0 ], newSphere[ 2 ] ) &&
 								CheckPointInSphere( points[ 1 ], newSphere[ 2 ] ) &&
 								CheckPointInSphere( points[ 3 ], newSphere[ 2 ] ))
 							{
 								index = 2;
-								minRadius = newSphere[ 2 ].radius;
+								minRadius = newSphere[ 2 ].mRadius;
 							}
 
-							if( newSphere[ 3 ].radius < minRadius &&
+							if( newSphere[ 3 ].mRadius < minRadius &&
 								CheckPointInSphere( points[ 0 ], newSphere[ 3 ] ) &&
 								CheckPointInSphere( points[ 1 ], newSphere[ 3 ] ) &&
 								CheckPointInSphere( points[ 2 ], newSphere[ 3 ] ))
 							{
 								index = 3;
-								minRadius = newSphere[ 3 ].radius;
+								minRadius = newSphere[ 3 ].mRadius;
 							}
 
 							// Check 3 point spheres.
 							//
-							if( newSphere[ 4 ].radius < minRadius &&
+							if( newSphere[ 4 ].mRadius < minRadius &&
 								CheckPointInSphere( points[ 2 ], newSphere[ 4 ] ) &&
 								CheckPointInSphere( points[ 3 ], newSphere[ 4 ] ))
 							{
 								index = 4;
-								minRadius = newSphere[ 4 ].radius;
+								minRadius = newSphere[ 4 ].mRadius;
 							}
 
-							if( newSphere[ 5 ].radius < minRadius &&
+							if( newSphere[ 5 ].mRadius < minRadius &&
 								CheckPointInSphere( points[ 1 ], newSphere[ 5 ] ) &&
 								CheckPointInSphere( points[ 3 ], newSphere[ 5 ] ))
 							{
 								index = 5;
-								minRadius = newSphere[ 5 ].radius;
+								minRadius = newSphere[ 5 ].mRadius;
 							}
 
-							if( newSphere[ 6 ].radius < minRadius &&
+							if( newSphere[ 6 ].mRadius < minRadius &&
 								CheckPointInSphere( points[ 1 ], newSphere[ 6 ] ) &&
 								CheckPointInSphere( points[ 2 ], newSphere[ 6 ] ))
 							{
 								index = 6;
-								minRadius = newSphere[ 6 ].radius;
+								minRadius = newSphere[ 6 ].mRadius;
 							}
 
-							if( newSphere[ 7 ].radius < minRadius &&
+							if( newSphere[ 7 ].mRadius < minRadius &&
 								CheckPointInSphere( points[ 0 ], newSphere[ 7 ] ) &&
 								CheckPointInSphere( points[ 3 ], newSphere[ 7 ] ))
 							{
 								index = 7;
-								minRadius = newSphere[ 7 ].radius;
+								minRadius = newSphere[ 7 ].mRadius;
 							}
 
-							if( newSphere[ 8 ].radius < minRadius &&
+							if( newSphere[ 8 ].mRadius < minRadius &&
 								CheckPointInSphere( points[ 0 ], newSphere[ 8 ] ) &&
 								CheckPointInSphere( points[ 2 ], newSphere[ 8 ] ))
 							{
 								index = 8;
-								minRadius = newSphere[ 8 ].radius;
+								minRadius = newSphere[ 8 ].mRadius;
 							}
 
-							if( newSphere[ 9 ].radius < minRadius &&
+							if( newSphere[ 9 ].mRadius < minRadius &&
 								CheckPointInSphere( points[ 0 ], newSphere[ 9 ] ) &&
 								CheckPointInSphere( points[ 1 ], newSphere[ 9 ] ))
 							{
 								index = 9;
-								minRadius = newSphere[ 9 ].radius;
+								minRadius = newSphere[ 9 ].mRadius;
 							}
 
 							// Check 4 point spheres.
 							//
-							if( newSphere[ 10 ].radius < minRadius &&
+							if( newSphere[ 10 ].mRadius < minRadius &&
 								CheckPointInSphere( points[ 3 ], newSphere[ 10 ] ))
 							{
 								index = 10;
-								minRadius = newSphere[ 10 ].radius;
+								minRadius = newSphere[ 10 ].mRadius;
 							}
 
-							if( newSphere[ 11 ].radius < minRadius &&
+							if( newSphere[ 11 ].mRadius < minRadius &&
 								CheckPointInSphere( points[ 2 ], newSphere[ 11 ] ))
 							{
 								index = 11;
-								minRadius = newSphere[ 11 ].radius;
+								minRadius = newSphere[ 11 ].mRadius;
 							}
 
-							if( newSphere[ 12 ].radius < minRadius &&
+							if( newSphere[ 12 ].mRadius < minRadius &&
 								CheckPointInSphere( points[ 0 ], newSphere[ 12 ] ))
 							{
 								index = 12;
-								minRadius = newSphere[ 12 ].radius;
+								minRadius = newSphere[ 12 ].mRadius;
 							}
 
-							if( newSphere[ 13 ].radius < minRadius &&
+							if( newSphere[ 13 ].mRadius < minRadius &&
 								CheckPointInSphere( points[ 1 ], newSphere[ 13 ] ))
 							{
 								index = 13;
-								minRadius = newSphere[ 13 ].radius;
+								minRadius = newSphere[ 13 ].mRadius;
 							}
 
 							minSphere = newSphere[ index ];
@@ -529,7 +531,7 @@ namespace Sentinel
 							break;
 					}
 
-					if( minSphere.radius > sphere.radius )
+					if( minSphere.mRadius > sphere.mRadius )
 					{
 						sphere = minSphere;
 						currIndex = 0;

@@ -21,14 +21,18 @@ namespace Sentinel
 
 		PerspectiveCameraComponent( float windowWidth, float windowHeight, float nearZ = 0.1f, float farZ = 10000.0f, float FOV = 45.0f );
 
-		void Startup();
+		void	Startup();
 
-		void Update();
+		void	Update();
 
-		void Shutdown();
+		void	Shutdown();
 
-		//void CreateFrustum();
-		//bool CheckFrustum( const Vector3f position, float radius );
-		//bool CheckFrustum( FrustumBox& box );
+		//////////////////////////////
+
+		void	Set( float windowWidth, float windowHeight, float nearZ = 0.1f, float farZ = 10000.0f, float FOV = 45.0f );
+
+		//void	CreateFrustum();
+		//bool	CheckFrustum( const BoundingSphere& sphere );
+		//bool	CheckFrustum( const FrustumBox& box );
 	};
 }

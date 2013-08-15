@@ -43,9 +43,6 @@
     <Filter Include="Source Files\Sentinel_Engine\Components\Drawables">
       <UniqueIdentifier>{6df0aaf8-b340-4c44-bb4a-da4ff26b58af}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Sentinel_Engine\Core">
-      <UniqueIdentifier>{5daa48a3-c659-400c-8436-9467dd3a88c3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Sentinel_Engine\Components\Physics">
       <UniqueIdentifier>{7d929b97-e255-4090-9633-1b1aac43e26f}</UniqueIdentifier>
     </Filter>
@@ -165,12 +162,6 @@
     <ClInclude Include="..\Engine\src\SpriteComponent.h">
       <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\GameObject.h">
-      <Filter>Source Files\Sentinel_Engine\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\GameWorld.h">
-      <Filter>Source Files\Sentinel_Engine\Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\PhysicsSystem.h">
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
     </ClInclude>
@@ -188,6 +179,15 @@
     </ClInclude>
     <ClInclude Include="..\Engine\src\ControllerComponent.h">
       <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Material.h">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\GameWorld.h">
+      <Filter>Source Files\Sentinel_Engine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\GameObject.h">
+      <Filter>Source Files\Sentinel_Engine\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -305,12 +305,6 @@
     <ClCompile Include="..\Engine\src\SpriteComponent.cpp">
       <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\GameObject.cpp">
-      <Filter>Source Files\Sentinel_Engine\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\GameWorld.cpp">
-      <Filter>Source Files\Sentinel_Engine\Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\PhysicsSystem.cpp">
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
     </ClCompile>
@@ -328,6 +322,18 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\GameComponent.cpp">
       <Filter>Source Files\Sentinel_Engine\Components\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Material.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\GameObject.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\GameWorld.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Buffer.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

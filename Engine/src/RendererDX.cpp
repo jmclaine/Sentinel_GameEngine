@@ -39,8 +39,12 @@ namespace Sentinel
 
 	////////////////////////////////////////////////////////////////////////////////////
 
+	class RendererDX;
+
 	class TextureDX : public Texture
 	{
+		friend class RendererDX;
+
 	public:
 
 		ID3D11ShaderResourceView*	mResource;
@@ -126,7 +130,7 @@ namespace Sentinel
 				}
 				else
 				{
-					TRACE( filename.c_str() << " loaded" );
+					TRACE( filename.c_str() << " failed to load." );
 				}
 
 				SAFE_RELEASE_PTR( errblob );
@@ -361,7 +365,9 @@ namespace Sentinel
 
 	class BufferDX : public Buffer
 	{
-	public:
+		friend class RendererDX;
+
+	private:
 
 		ID3D11DeviceContext*	mContext;
 		ID3D11Buffer*			mBuffer;
@@ -371,6 +377,8 @@ namespace Sentinel
 			mBuffer = NULL;
 			mStride = 0;
 		}
+
+	public:
 
 		void* Lock()
 		{
@@ -398,6 +406,8 @@ namespace Sentinel
 	//
 	class RendererDX : public Renderer
 	{
+		friend class Texture;
+
 	private:
 
 		class WindowInfoDX : public WindowInfo
@@ -760,7 +770,7 @@ namespace Sentinel
 			UINT index = 0;
 			for( UINT i = 0; i < mTexture.size(); ++i )
 			{
-				if( mTexture[ i ]->mFilename == filename )
+				if( mTexture[ i ]->Filename() == filename )
 				{
 					return mTexture[ i ];
 				}
@@ -814,7 +824,7 @@ namespace Sentinel
 
 			// Rename the texture because loading from memory sets a default.
 			//
-			result->mFilename = filename;
+			static_cast< TextureDX* >(result)->mFilename = filename;
 
 			stbi_image_free( pixels );
 

@@ -16,6 +16,8 @@ namespace Sentinel
 {
 	class SENTINEL_DLL MeshBuilder
 	{
+		friend class Mesh;
+
 	public:
 
 		struct Vertex

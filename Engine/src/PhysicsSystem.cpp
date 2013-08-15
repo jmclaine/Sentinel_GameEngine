@@ -75,8 +75,8 @@ namespace Sentinel
 
 #define CREATE_OBJECT()\
 	return CreateObject( shape, \
-						 btVector3( position.X(), position.Y(), position.Z() ), \
-						 btQuaternion( orientation.X(), orientation.Y(), orientation.Z(), orientation.W() ), \
+						 btVector3( position.x, position.y, position.z ), \
+						 btQuaternion( orientation.x, orientation.y, orientation.z, orientation.w ), \
 						 mass );
 
 	btRigidBody* PhysicsSystem::CreateSphere( const Vector3f& position, const Quatf& orientation, float radius, float mass )
@@ -88,7 +88,7 @@ namespace Sentinel
 
 	btRigidBody* PhysicsSystem::CreateBox( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, float mass )
 	{
-		btCollisionShape* shape = new btBoxShape( btVector3( scale.X(), scale.Y(), scale.Z() ));
+		btCollisionShape* shape = new btBoxShape( btVector3( scale.x, scale.y, scale.z ));
 
 		CREATE_OBJECT();
 	}
@@ -96,7 +96,7 @@ namespace Sentinel
 	btRigidBody* PhysicsSystem::CreateCylinder( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, float mass )
 	{
 		// scale.Z() is unused
-		btCollisionShape* shape = new btCylinderShape( btVector3( scale.X(), scale.Y()*0.5f, scale.X() ));
+		btCollisionShape* shape = new btCylinderShape( btVector3( scale.x, scale.y*0.5f, scale.x ));
 
 		CREATE_OBJECT();
 	}
@@ -108,7 +108,7 @@ namespace Sentinel
 		
 		// Store only the vertex positions.
 		//
-		UINT   count		= vbo->mCount;
+		UINT   count		= vbo->Count();
 		UCHAR* vboData		= (UCHAR*)vbo->Lock();
 		UCHAR* vboCopy		= new UCHAR[ count * sizeof(Vector3f) ];
 		UCHAR* vboCopyData	= vboCopy;
@@ -120,29 +120,29 @@ namespace Sentinel
 			*(Vector3f*)vboCopyData = *(Vector3f*)vboData * 0.935f;
 
 			vboCopyData += sizeof(Vector3f);
-			vboData += vbo->mStride;
+			vboData += vbo->Stride();
 		}
 		vbo->Unlock();
 
-		UCHAR* iboCopy = new UCHAR[ ibo->mSize ];
-		memcpy( iboCopy, (UCHAR*)ibo->Lock(), ibo->mSize );
+		UCHAR* iboCopy = new UCHAR[ ibo->Size() ];
+		memcpy( iboCopy, (UCHAR*)ibo->Lock(), ibo->Size() );
 		ibo->Unlock();
 
 		btIndexedMesh iMesh;
 		iMesh.m_vertexType			= PHY_FLOAT;
-		iMesh.m_numVertices			= vbo->mCount;
+		iMesh.m_numVertices			= vbo->Count();
 		iMesh.m_vertexBase			= vboCopy;
 		iMesh.m_vertexStride		= sizeof(Vector3f);
 
 		iMesh.m_indexType			= PHY_INTEGER;
-		iMesh.m_numTriangles		= ibo->mCount;
+		iMesh.m_numTriangles		= ibo->Count();
 		iMesh.m_triangleIndexBase	= iboCopy;
-		iMesh.m_triangleIndexStride = ibo->mStride;
+		iMesh.m_triangleIndexStride = ibo->Stride();
 
 		btTriangleIndexVertexArray* tiva = new btTriangleIndexVertexArray();
 
 		tiva->addIndexedMesh( iMesh, PHY_UCHAR );
-		tiva->setScaling( btVector3( scale.X(), scale.Y(), scale.Z() ));
+		tiva->setScaling( btVector3( scale.x, scale.y, scale.z ));
 
 		mShapeData.push_back( tiva );
 

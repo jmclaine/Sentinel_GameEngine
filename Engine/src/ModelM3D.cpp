@@ -77,10 +77,17 @@ namespace Sentinel
 		{
 			// Set the material.
 			//
-			ColorRGB ambient  = ReadPoint3( file );
-			ColorRGB diffuse  = ReadPoint3( file );
-			ColorRGB specular = ReadPoint3( file );
-			float spec_comp   = ReadFloat( file ) * 100.0f;
+			Vector3f color;
+			color = ReadPoint3( file );
+			ColorRGBA ambient( color.x, color.y, color.z );
+
+			color = ReadPoint3( file );
+			ColorRGBA diffuse( color.x, color.y, color.z );
+
+			color = ReadPoint3( file );
+			ColorRGBA specular( color.x, color.y, color.z );
+
+			float spec_comp = ReadFloat( file ) * 100.0f;
 
 			matTex.mMaterial = Material( ambient, diffuse, specular, spec_comp );
 
@@ -298,7 +305,7 @@ namespace Sentinel
 				for( int x = 0; x < numTexCoords; ++x )
 				{
 					texCoords[ x ] = ReadPoint2( file );
-					texCoords[ x ].SetY( 1.0f - texCoords[ x ].Y() );
+					texCoords[ x ].y = 1.0f - texCoords[ x ].y;
 				}
 
 				// Read fat indices.
@@ -337,7 +344,7 @@ namespace Sentinel
 							for( int w = 0; w < 4; ++w )
 							{
 								float f = ReadFloat( file );
-								currKey->mMatrix.Set( (z<<2)+w, f );
+								currKey->mMatrix[ (z<<2)+w ] = f;
 							}
 						}
 
@@ -449,7 +456,7 @@ namespace Sentinel
 							}
 
 							meshVertex.mNormal = normals[ normal ];
-							meshVertex.mTextureCoords[ 0 ] = Vector2f( texCoords[ texCoord ].X(), texCoords[ texCoord ].Y() );
+							meshVertex.mTextureCoords[ 0 ] = Vector2f( texCoords[ texCoord ].x, texCoords[ texCoord ].y );
 
 							builder.mVertex.push_back( meshVertex );
 

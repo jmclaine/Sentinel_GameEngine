@@ -38,28 +38,33 @@ namespace Sentinel
 
 	void GameWorld::Update()
 	{
-		// Update Controllers.
-		//
+		UpdateController();
+		UpdatePhysics();
+		UpdateComponents();
+		UpdateDrawable();
+	}
+
+	void GameWorld::UpdateController()
+	{
 		TRAVERSE_VECTOR( x, mGameObject )
 		{
 			mGameObject[ x ]->UpdateController();
 		}
+	}
 
-		// Update Physics.
-		//
+	void GameWorld::UpdatePhysics()
+	{
 		PhysicsSystem::Inst()->Update();
 
 		TRAVERSE_VECTOR( x, mGameObject )
 		{
 			mGameObject[ x ]->UpdatePhysics();
 		}
+	}
 
-		// Update other components.
-		//
-		TRAVERSE_VECTOR( x, mGameObject )
-		{
-			mGameObject[ x ]->UpdateComponents();
-		}
+	void GameWorld::UpdateDrawable()
+	{
+		_ASSERT( mCurrentCamera );
 
 		// Meshes may contain alpha values.
 		// Put them in order.
@@ -83,6 +88,14 @@ namespace Sentinel
 		TRAVERSE_LIST( it, mAlphaOrder )
 		{
 			(*it).second->UpdateDrawable();
+		}
+	}
+
+	void GameWorld::UpdateComponents()
+	{
+		TRAVERSE_VECTOR( x, mGameObject )
+		{
+			mGameObject[ x ]->UpdateComponents();
 		}
 	}
 

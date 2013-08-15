@@ -37,46 +37,6 @@ namespace Sentinel
 
 		return (&x)[i];
 	}
-
-	float Vector4f::X() const
-	{
-		return x;
-	}
-
-	float Vector4f::Y() const
-	{
-		return y;
-	}
-
-	float Vector4f::Z() const
-	{
-		return z;
-	}
-
-	float Vector4f::W() const
-	{
-		return w;
-	}
-
-	void Vector4f::SetX( float _x )
-	{
-		x = _x;
-	}
-
-	void Vector4f::SetY( float _y )
-	{
-		y = _y;
-	}
-
-	void Vector4f::SetZ( float _z )
-	{
-		z = _z;
-	}
-
-	void Vector4f::SetW( float _w )
-	{
-		w = _w;
-	}
 	
 	float* Vector4f::Ptr()
 	{
@@ -111,7 +71,7 @@ namespace Sentinel
 
 	Vector4f Vector4f::Add( const Vector4f& v ) const
 	{
-		return Vector4f( x + v.x, y + v.y, z + v.z, w + v.w );
+		return Vector4f( x+v.x, y+v.y, z+v.z, w+v.w );
 	}
 
 	Vector4f& Vector4f::operator -= ( const Vector4f& v )
@@ -127,7 +87,7 @@ namespace Sentinel
 
 	Vector4f Vector4f::Sub( const Vector4f& v ) const
 	{
-		return Vector4f( x - v.x, y - v.y, z - v.z, w - v.w );
+		return Vector4f( x-v.x, y-v.y, z-v.z, w-v.w );
 	}
 
 	Vector4f& Vector4f::operator *= ( float scalar )
@@ -143,7 +103,7 @@ namespace Sentinel
 
 	Vector4f Vector4f::Mul( const float scalar ) const
 	{
-		return Vector4f( x * scalar, y * scalar, z * scalar, w * scalar );
+		return Vector4f( x*scalar, y*scalar, z*scalar, w*scalar );
 	}
 
 	Vector4f& Vector4f::operator *= ( const Vector4f& v )
@@ -159,7 +119,7 @@ namespace Sentinel
 
 	Vector4f Vector4f::Mul( const Vector4f& v ) const
 	{
-		return Vector4f( x * v.x, y * v.y, z * v.z, w * v.w );
+		return Vector4f( x*v.x, y*v.y, z*v.z, w*v.w );
 	}
 
 	float Vector4f::Length() const
@@ -189,12 +149,12 @@ namespace Sentinel
 
 	float Vector4f::Dot( const Vector4f& v ) const
 	{
-		return x*v.x+y*v.y+z*v.z+w*v.w;
+		return x*v.x + y*v.y + z*v.z + w*v.w;
 	}
 
 	Vector4f Vector4f::Cross( const Vector4f& v ) const
 	{
-		return Vector4f( y*v.z-z*v.y, z*v.x-x*v.z, x*v.y-y*v.x, 0.0f );
+		return Vector4f( y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x, 0.0f );
 	}
 
 	float Vector4f::Angle( const Vector4f& v ) const
@@ -205,7 +165,7 @@ namespace Sentinel
 
 		if( len0 > 0 && len1 > 0 )
 		{
-			float d = this->Mul( 1.0f / sqrt( len0 )).Dot( v.Mul( 1.0f / sqrt( len1 )));
+			float d = Mul( 1.0f / sqrt( len0 )).Dot( v.Mul( 1.0f / sqrt( len1 )));
 
 			// Prevent floating point errors.
 			//

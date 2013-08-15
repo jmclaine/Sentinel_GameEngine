@@ -2,9 +2,6 @@
 
 namespace Sentinel { namespace Assets
 {
-	WBuffer::WBuffer()
-	{}
-
 	WBuffer::WBuffer( Buffer* buffer )
 	{
 		mRef = buffer;
@@ -16,9 +13,7 @@ namespace Sentinel { namespace Assets
 	}
 
 	WBuffer::~WBuffer()
-	{
-		Release();
-	}
+	{}
 
 	Buffer* WBuffer::GetRef()
 	{

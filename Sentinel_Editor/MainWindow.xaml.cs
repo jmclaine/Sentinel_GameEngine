@@ -21,154 +21,218 @@ using System.Runtime.InteropServices;
 using Sentinel.Systems;
 using Sentinel.Assets;
 using Sentinel.Math;
+using Sentinel.Utilities;
+using Sentinel.Components;
 
 namespace Sentinel_Editor
 {
-    /// <summary>
-    /// Editor Window
-    /// </summary>
-    public partial class MainWindow : Window
-    {
-        private WGameWindow         mWindowWorld;
-        private static float        mBlue;
-        //private static WColorRGBA   mClearColor = new WColorRGBA(0.0f, 0.2f, 0.8f, 1.0f);
+	/// <summary>
+	/// Editor Window
+	/// </summary>
+	public partial class MainWindow : Window
+	{
+		private enum ShaderTypes
+		{
+			SHADER_COLOR,
+			//SHADER_TEXTURE,
+			//SHADER_NORMAL_MAP,
+			//SHADER_SPRITE,
 
-        public MainWindow()
-        {
-            InitializeComponent();
-        }
+			NUM_SHADERS
+		};
 
-        private void Window_Loaded(Object sender, RoutedEventArgs e)
-        {
-            WWindowInfo info = WRenderer.Load("config.xml");
-            if (info == null)
-            {
-                MessageBox.Show("Failed to load config.xml", "Application Failure");
+		private enum ShapeTypes
+		{
+			SHAPE_CUBE,
+			SHAPE_CYLINDER,
+			SHAPE_OCTAHEDRON,
+			SHAPE_TETRAHEDRON,
+			SHAPE_DODECAHEDRON,
+			SHAPE_SPHERE,
+			SHAPE_WIRE_SPHERE,
 
-                System.Environment.Exit(0);
-            }
+			NUM_SHAPES
+		};
 
-            mWindowWorld = new WGameWindow();
-            mWindowWorld.Startup("World", "WorldClass", info);
+		private WGameWindow		mWindowWorld;
+		private static float	mBlue;
+		//private static WColorRGBA   mClearColor = new WColorRGBA(0.0f, 0.2f, 0.8f, 1.0f);
 
-            Window_World.Child = mWindowWorld;
+		private WShader[]		mShader;
+		private WMesh			mShape;
+		private WMaterial		mMaterial;
 
-            ///////////////////////////////////////
+		private bool			mDoUpdate;
 
-            DispatcherTimer timer = new DispatcherTimer();
-            timer.Tick      += new EventHandler(Update);
-            timer.Interval   = new TimeSpan(16);
-            timer.Start();
-        }
+		public MainWindow()
+		{
+			InitializeComponent();
+		}
 
-        private void Window_Closing(Object sender, CancelEventArgs e)
-        {
-            MessageBoxResult result = MessageBox.Show("Save before Exiting?",
-                                                      "Exit Application",
-                                                      MessageBoxButton.YesNoCancel,
-                                                      MessageBoxImage.Question);
+		private void Window_Loaded( Object sender, RoutedEventArgs e )
+		{
+			///////////////////////////////////////
+			// Initialize Renderer.
+			//
+			WWindowInfo info = WRenderer.Load( "config.xml" );
+			if( info == null )
+			{
+				MessageBox.Show( "Failed to load config.xml", "Application Failure" );
 
-            switch (result)
-            {
-                case MessageBoxResult.Yes:
-                    MessageBox.Show("Saving...");
-                    break;
+				System.Environment.Exit( 0 );
+			}
 
-                case MessageBoxResult.No:
-                    MessageBox.Show("Not Saving...");
-                    break;
+			mWindowWorld = new WGameWindow();
+			mWindowWorld.Startup( "World", "WorldClass", info );
 
-                case MessageBoxResult.Cancel:
-                    e.Cancel = true;
-                    return;
-            }
-        }
+			Window_World.Child = mWindowWorld;
 
-        private void Update(Object sender, EventArgs e)
-        {
-            mBlue += 0.001f;
-            if (mBlue >= 1.0f)
-                mBlue = 0.0f;
-            WColorRGBA mClearColor = new WColorRGBA(0.0f, 0.2f*mBlue, mBlue, 1.0f);
+			///////////////////////////////////////
+			// Prepare shaders.
+			//
+			mShader = new WShader[ (int)ShaderTypes.NUM_SHADERS ];
 
-            //mWindowWorld.SetActive();
+			mShader[ (int)ShaderTypes.SHADER_COLOR ] = WRenderer.CreateShader( "Shaders\\colnorm", "PN", "PpVML" );
+			if( mShader[ (int)ShaderTypes.SHADER_COLOR ] == null )
+				MessageBox.Show( "Failed to load shader: colnorm", "Shader Load Failure" );
 
-            WRenderer.SetDepthStencil(0);
-            WRenderer.SetViewport(0);
-            WRenderer.SetRenderTarget(0);
+			///////////////////////////////////////
+			// Prepare Game Objects.
+			//
+			WGameObject obj = WGameWorld.AddGameObject( new WGameObject(), "Test_Object" );
 
-            WRenderer.Clear(mClearColor);
+			WGameWorld.Startup( "NoMap.MAP" );
 
-            // Draw stuff...
+			///////////////////////////////////////
+			// Setup game loop.
+			//
+			mDoUpdate = true;
 
-            WRenderer.Present();
-        }
+			DispatcherTimer timer = new DispatcherTimer();
+			timer.Tick += new EventHandler( Update );
+			timer.Interval = new TimeSpan( 16 );
+			timer.Start();
+		}
 
-        ///
-        /// File
-        ///
-        private void New_Click(Object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("You clicked 'New...'");
-        }
+		private void Window_Closing( Object sender, CancelEventArgs e )
+		{
+			MessageBoxResult result = MessageBox.Show( "Save before Exiting?",
+													   "Exit Application",
+													   MessageBoxButton.YesNoCancel,
+													   MessageBoxImage.Question );
 
-        private void Open_Click(Object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("You clicked 'Open...'");
-        }
+			switch( result )
+			{
+				case MessageBoxResult.Yes:
+					MessageBox.Show( "Saving..." );
+					break;
 
-        private void Save_Click(Object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("You clicked 'Save...'");
-        }
+				case MessageBoxResult.No:
+					MessageBox.Show( "Not Saving..." );
+					break;
 
-        private void SaveAs_Click(Object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("You clicked 'Save As...'");
-        }
+				case MessageBoxResult.Cancel:
+					e.Cancel = true;
+					return;
+			}
+		}
 
-        private void Exit_Click(Object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
+		private void Window_Closed( Object sender, EventArgs e )
+		{
+			mDoUpdate = false;
 
-        ///
-        /// Edit
-        ///
+			//mWindowWorld.Shutdown();
+			//WGameWorld.Shutdown();
+		}
 
-        ///
-        /// Help
-        ///
-        private void About_Click(Object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Sentinel Editor\nVersion 1.0.0.0\nCopyright © BEHOLDER Software 2013", "About...");
-        }
+		private void Update( Object sender, EventArgs e )
+		{
+			if( mDoUpdate )
+			{
+				mBlue += 0.001f;
+				if( mBlue >= 1.0f )
+					mBlue = 0.0f;
+				WColorRGBA mClearColor = new WColorRGBA( 0.0f, 0.2f * mBlue, mBlue, 1.0f );
 
-        ///
-        /// ToolBar
-        ///
-        private void ToolBar_New_Click(Object sender, RoutedEventArgs e)
-        {
-            New_Click(sender, e);
-        }
+				//mWindowWorld.SetActive();
 
-        private void ToolBar_Open_Click(Object sender, RoutedEventArgs e)
-        {
-            Open_Click(sender, e);
-        }
+				WRenderer.SetDepthStencil( 0 );
+				WRenderer.SetViewport( 0 );
+				WRenderer.SetRenderTarget( 0 );
 
-        private void ToolBar_Save_Click(Object sender, RoutedEventArgs e)
-        {
-            Save_Click(sender, e);
-        }
+				WRenderer.Clear( mClearColor );
 
-        private void ToolBar_Translate_Click(Object sender, RoutedEventArgs e)
-        {}
+				//WGameWorld.UpdateDrawable();
 
-        private void ToolBar_Rotate_Click(Object sender, RoutedEventArgs e)
-        {}
+				WRenderer.Present();
+			}
+		}
 
-        private void ToolBar_Scale_Click(Object sender, RoutedEventArgs e)
-        {}
-    }
+		///
+		/// File
+		///
+		private void New_Click( Object sender, RoutedEventArgs e )
+		{
+			MessageBox.Show( "You clicked 'New...'" );
+		}
+
+		private void Open_Click( Object sender, RoutedEventArgs e )
+		{
+			MessageBox.Show( "You clicked 'Open...'" );
+		}
+
+		private void Save_Click( Object sender, RoutedEventArgs e )
+		{
+			MessageBox.Show( "You clicked 'Save...'" );
+		}
+
+		private void SaveAs_Click( Object sender, RoutedEventArgs e )
+		{
+			MessageBox.Show( "You clicked 'Save As...'" );
+		}
+
+		private void Exit_Click( Object sender, RoutedEventArgs e )
+		{
+			Close();
+		}
+
+		///
+		/// Edit
+		///
+
+		///
+		/// Help
+		///
+		private void About_Click( Object sender, RoutedEventArgs e )
+		{
+			MessageBox.Show( "Sentinel Editor\nVersion 1.0.0.0\nCopyright © BEHOLDER Software 2013", "About..." );
+		}
+
+		///
+		/// ToolBar
+		///
+		private void ToolBar_New_Click( Object sender, RoutedEventArgs e )
+		{
+			New_Click( sender, e );
+		}
+
+		private void ToolBar_Open_Click( Object sender, RoutedEventArgs e )
+		{
+			Open_Click( sender, e );
+		}
+
+		private void ToolBar_Save_Click( Object sender, RoutedEventArgs e )
+		{
+			Save_Click( sender, e );
+		}
+
+		private void ToolBar_Translate_Click( Object sender, RoutedEventArgs e )
+		{ }
+
+		private void ToolBar_Rotate_Click( Object sender, RoutedEventArgs e )
+		{ }
+
+		private void ToolBar_Scale_Click( Object sender, RoutedEventArgs e )
+		{ }
+	}
 }

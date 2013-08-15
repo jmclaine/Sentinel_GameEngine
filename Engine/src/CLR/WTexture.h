@@ -1,5 +1,6 @@
 #pragma once
 
+#include "m_shared_ptr.h"
 #include "Texture.h"
 
 namespace Sentinel { namespace Assets
@@ -8,17 +9,21 @@ namespace Sentinel { namespace Assets
 	{
 	private:
 
-		Texture*	mRef;
+		Texture*			mRef;
 
 	public:
 
-		WTexture();
 		WTexture( Texture* texture );
 		WTexture( WTexture^ texture );
 		~WTexture();
+		
+		Texture*			GetRef();
 
-		Texture* GetRef();
+		void				Release();
 
-		void Release();
+		System::String^		Filename();
+		UINT				Width();
+		UINT				Height();
+		UINT				ID();
 	};
 }}

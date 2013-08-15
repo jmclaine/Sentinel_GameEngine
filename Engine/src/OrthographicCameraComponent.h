@@ -16,5 +16,9 @@ namespace Sentinel
 		void Update();
 
 		void Shutdown();
+
+		//////////////////////////////
+
+		void Set( float windowWidth, float windowHeight );
 	};
 }

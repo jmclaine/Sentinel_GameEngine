@@ -8,11 +8,11 @@ namespace Sentinel
 	{
 		friend class Matrix4f;
 
-	protected:
+	public:
 		
 		float x, y, z;
 
-	public:
+		////////////////////////////////
 
 		Vector3f();
 		Vector3f( float _x, float _y, float _z );
@@ -20,14 +20,6 @@ namespace Sentinel
 
 		float		operator [] ( int i ) const;
 		float&		operator [] ( int i );
-
-		float		X() const;
-		float		Y() const;
-		float		Z() const;
-
-		void		SetX( float _x );
-		void		SetY( float _y );
-		void		SetZ( float _z );
 
 		float*		Ptr();
 		

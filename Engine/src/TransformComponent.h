@@ -15,14 +15,14 @@ namespace Sentinel
 		Quatf		mOrientation;
 		Vector3f	mScale;
 
-		//////////////////////////////
+		///////////////////////////////////
 
 		TransformComponent();
 
-		void Startup();
+		void		Startup();
 
-		void Update();
+		void		Update();
 
-		void Shutdown();
+		void		Shutdown();
 	};
 }

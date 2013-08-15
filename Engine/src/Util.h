@@ -195,17 +195,17 @@ namespace Sentinel
 
 	inline Vector3f RandomValue( const Vector3f& minValue, const Vector3f& maxValue )
 	{
-		return Vector3f( RandomValue( minValue.X(), maxValue.X() ), \
-						 RandomValue( minValue.Y(), maxValue.Y() ), \
-						 RandomValue( minValue.Z(), maxValue.Z() ));
+		return Vector3f( RandomValue( minValue.x, maxValue.x ), \
+						 RandomValue( minValue.y, maxValue.y ), \
+						 RandomValue( minValue.z, maxValue.z ));
 	}
 
 	inline ColorRGBA RandomValue( const ColorRGBA& minColor, const ColorRGBA& maxColor )
 	{
-		return ColorRGBA( RandomValue( minColor.R(), maxColor.R() ), \
-						  RandomValue( minColor.G(), maxColor.G() ), \
-						  RandomValue( minColor.B(), maxColor.B() ), \
-						  RandomValue( minColor.A(), maxColor.A() ));
+		return ColorRGBA( RandomValue( minColor.r, maxColor.r ), \
+						  RandomValue( minColor.g, maxColor.g ), \
+						  RandomValue( minColor.b, maxColor.b ), \
+						  RandomValue( minColor.a, maxColor.a ));
 	}
 
 	////////////////////////////////////////////////////////////////////

@@ -32,49 +32,34 @@ namespace Sentinel { namespace Math
 		delete mRef;
 	}
 
-	const Vector4f* WVector4f::GetRef()
+	WVector4f::!WVector4f()
+	{
+		delete mRef;
+	}
+
+	Vector4f* WVector4f::GetRef()
 	{
 		return mRef;
 	}
 
-	float WVector4f::X()
+	WFloat^ WVector4f::X()
 	{
-		return mRef->X();
+		return gcnew WFloat( &mRef->x );
 	}
 
-	float WVector4f::Y()
+	WFloat^ WVector4f::Y()
 	{
-		return mRef->Y();
+		return gcnew WFloat( &mRef->y );
 	}
 
-	float WVector4f::Z()
+	WFloat^ WVector4f::Z()
 	{
-		return mRef->Z();
+		return gcnew WFloat( &mRef->z );
 	}
 
-	float WVector4f::W()
+	WFloat^ WVector4f::W()
 	{
-		return mRef->W();
-	}
-
-	void WVector4f::SetX( float _x )
-	{
-		mRef->SetX( _x );
-	}
-
-	void WVector4f::SetY( float _y )
-	{
-		mRef->SetY( _y );
-	}
-
-	void WVector4f::SetZ( float _z )
-	{
-		mRef->SetZ( _z );
-	}
-
-	void WVector4f::SetW( float _w )
-	{
-		mRef->SetW( _w );
+		return gcnew WFloat( &mRef->w );
 	}
 
 	bool WVector4f::operator == ( const WVector4f^ v )

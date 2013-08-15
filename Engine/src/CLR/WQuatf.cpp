@@ -32,49 +32,34 @@ namespace Sentinel { namespace Math
 		delete mRef;
 	}
 
-	const Quatf* WQuatf::GetRef()
+	WQuatf::!WQuatf()
+	{
+		delete mRef;
+	}
+
+	Quatf* WQuatf::GetRef()
 	{
 		return mRef;
 	}
 
-	float WQuatf::X()
+	WFloat^ WQuatf::X()
 	{
-		return mRef->X();
+		return gcnew WFloat( &mRef->x );
 	}
 
-	float WQuatf::Y()
+	WFloat^ WQuatf::Y()
 	{
-		return mRef->Y();
+		return gcnew WFloat( &mRef->y );
 	}
 
-	float WQuatf::Z()
+	WFloat^ WQuatf::Z()
 	{
-		return mRef->Z();
+		return gcnew WFloat( &mRef->z );
 	}
 
-	float WQuatf::W()
+	WFloat^ WQuatf::W()
 	{
-		return mRef->W();
-	}
-
-	void WQuatf::SetX( float _x )
-	{
-		mRef->SetX( _x );
-	}
-
-	void WQuatf::SetY( float _y )
-	{
-		mRef->SetY( _y );
-	}
-
-	void WQuatf::SetZ( float _z )
-	{
-		mRef->SetZ( _z );
-	}
-
-	void WQuatf::SetW( float _w )
-	{
-		mRef->SetW( _w );
+		return gcnew WFloat( &mRef->w );
 	}
 
 	WQuatf^	WQuatf::operator * ( const WQuatf^ q )

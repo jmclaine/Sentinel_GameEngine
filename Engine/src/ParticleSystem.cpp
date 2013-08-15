@@ -54,8 +54,8 @@ namespace Sentinel
 
 		mMesh->SetTexture( sprite->mTexture );
 
-		mMesh->SetTextureScale( Vector4f( (float)sprite->mSpriteSize.x / (float)sprite->mTexture->mWidth,
-									      (float)sprite->mSpriteSize.y / (float)sprite->mTexture->mHeight, 0, 0 ));
+		mMesh->SetTextureScale( Vector4f( (float)sprite->mSpriteSize.x / (float)sprite->mTexture->Width(),
+									      (float)sprite->mSpriteSize.y / (float)sprite->mTexture->Height(), 0, 0 ));
 
 		mVertex = mMesh->GetVBO()->Lock();
 	}

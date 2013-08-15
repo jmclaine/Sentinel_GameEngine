@@ -32,39 +32,29 @@ namespace Sentinel { namespace Math
 		delete mRef;
 	}
 
-	const Vector3f* WVector3f::GetRef()
+	WVector3f::!WVector3f()
+	{
+		delete mRef;
+	}
+
+	Vector3f* WVector3f::GetRef()
 	{
 		return mRef;
 	}
 
-	float WVector3f::X()
+	WFloat^ WVector3f::X()
 	{
-		return mRef->X();
+		return gcnew WFloat( &mRef->x );
 	}
 
-	float WVector3f::Y()
+	WFloat^ WVector3f::Y()
 	{
-		return mRef->Y();
+		return gcnew WFloat( &mRef->y );
 	}
 
-	float WVector3f::Z()
+	WFloat^ WVector3f::Z()
 	{
-		return mRef->Z();
-	}
-
-	void WVector3f::SetX( float _x )
-	{
-		mRef->SetX( _x );
-	}
-
-	void WVector3f::SetY( float _y )
-	{
-		mRef->SetY( _y );
-	}
-
-	void WVector3f::SetZ( float _z )
-	{
-		mRef->SetZ( _z );
+		return gcnew WFloat( &mRef->z );
 	}
 
 	bool WVector3f::operator == ( const WVector3f^ v )

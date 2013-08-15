@@ -1,8 +1,10 @@
 #pragma once
 
 #include "Quatf.h"
+#include "WFloat.h"
 
 using namespace System;
+using namespace Sentinel::Utilities;
 
 namespace Sentinel { namespace Math
 {
@@ -20,18 +22,14 @@ namespace Sentinel { namespace Math
 		WQuatf( const Quatf% q );
 		WQuatf( const WQuatf% q );
 		~WQuatf();
+		!WQuatf();
 
-		const Quatf* GetRef();
+		Quatf*		GetRef();
 
-		float		X();
-		float		Y();
-		float		Z();
-		float		W();
-
-		void		SetX( float _x );
-		void		SetY( float _y );
-		void		SetZ( float _z );
-		void		SetW( float _w );
+		WFloat^		X();
+		WFloat^		Y();
+		WFloat^		Z();
+		WFloat^		W();
 
 		WQuatf^		operator * ( const WQuatf^ q );
 		WQuatf^		Mul( const WQuatf^ q );

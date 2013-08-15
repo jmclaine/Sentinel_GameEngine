@@ -34,26 +34,6 @@ namespace Sentinel
 		return (&x)[i];
 	}
 
-	float Vector2f::X() const
-	{
-		return x;
-	}
-
-	float Vector2f::Y() const
-	{
-		return y;
-	}
-
-	void Vector2f::SetX( float _x )
-	{
-		x = _x;
-	}
-
-	void Vector2f::SetY( float _y )
-	{
-		y = _y;
-	}
-
 	float* Vector2f::Ptr()
 	{
 		return static_cast< float* >(&x);

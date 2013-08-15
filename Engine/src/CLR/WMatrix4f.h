@@ -20,8 +20,9 @@ namespace Sentinel { namespace Math
 		WMatrix4f( const Matrix4f% mat );
 		WMatrix4f( const WMatrix4f% mat );
 		~WMatrix4f();
+		!WMatrix4f();
 
-		const Matrix4f* GetRef();
+		Matrix4f*	GetRef();
 		
 		float		Get( int index );
 		void		Set( int index, float value );

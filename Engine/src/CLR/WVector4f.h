@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Vector4f.h"
+#include "WFloat.h"
 
-using namespace System;
+using namespace Sentinel::Utilities;
 
 namespace Sentinel { namespace Math
 {
@@ -20,18 +21,14 @@ namespace Sentinel { namespace Math
 		WVector4f( const Vector4f% v );
 		WVector4f( const WVector4f% v );
 		~WVector4f();
+		!WVector4f();
 
-		const Vector4f*	GetRef();
+		Vector4f*	GetRef();
 
-		float		X();
-		float		Y();
-		float		Z();
-		float		W();
-
-		void		SetX( float _x );
-		void		SetY( float _y );
-		void		SetZ( float _z );
-		void		SetW( float _w );
+		WFloat^		X();
+		WFloat^		Y();
+		WFloat^		Z();
+		WFloat^		W();
 
 		bool		operator == ( const WVector4f^ v );
 		bool		operator != ( const WVector4f^ v );

@@ -403,8 +403,8 @@ public:
 			else
 			if( shape == SHAPE_CYLINDER )
 			{
-				transform->mScale.SetZ( transform->mScale.X() );
-				transform->mScale.SetY( transform->mScale.Y() * 5 );
+				transform->mScale.z = transform->mScale.x;
+				transform->mScale.y = transform->mScale.y * 5;
 				physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateCylinder( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mass ));
 			}
 			else
@@ -441,10 +441,8 @@ public:
 		//////////////////////////////
 
 		for( UINT x = 0; x < NUM_SHAPES; ++x )
-		{
 			mesh[ x ].reset();
-		}
-
+		
 		model.reset();
 
 		SetDirectory( ".." );

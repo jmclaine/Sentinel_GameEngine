@@ -120,21 +120,21 @@ namespace Sentinel
 
 			// Calculate the tangents.
 			//
-			float s1 = mVertex[ j[1] ].mTextureCoords[0].X() - mVertex[ j[0] ].mTextureCoords[0].X();
-			float t1 = mVertex[ j[1] ].mTextureCoords[0].Y() - mVertex[ j[0] ].mTextureCoords[0].Y();
+			float s1 = mVertex[ j[1] ].mTextureCoords[0].x - mVertex[ j[0] ].mTextureCoords[0].x;
+			float t1 = mVertex[ j[1] ].mTextureCoords[0].y - mVertex[ j[0] ].mTextureCoords[0].y;
 
-			float s2 = mVertex[ j[2] ].mTextureCoords[0].X() - mVertex[ j[0] ].mTextureCoords[0].X();
-			float t2 = mVertex[ j[2] ].mTextureCoords[0].Y() - mVertex[ j[0] ].mTextureCoords[0].Y();
+			float s2 = mVertex[ j[2] ].mTextureCoords[0].x - mVertex[ j[0] ].mTextureCoords[0].x;
+			float t2 = mVertex[ j[2] ].mTextureCoords[0].y - mVertex[ j[0] ].mTextureCoords[0].y;
 
 			float det = 1.0f / (s1*t2 - s2*t1);
 
-			Vector3f T = Vector3f( (Q1.X() * t2 + Q2.X() * -t1) * det, \
-							 (Q1.Y() * t2 + Q2.Y() * -t1) * det, \
-							 (Q1.Z() * t2 + Q2.Z() * -t1) * det ).Normalize();
+			Vector3f T = Vector3f( (Q1.x * t2 + Q2.x * -t1) * det, \
+								   (Q1.y * t2 + Q2.y * -t1) * det, \
+								   (Q1.z * t2 + Q2.z * -t1) * det ).Normalize();
 
-			Vector3f B = Vector3f( (Q1.X() * -s2 + Q2.X() * s1) * det, \
-							 (Q1.Y() * -s2 + Q2.Y() * s1) * det, \
-							 (Q1.Z() * -s2 + Q2.Z() * s1) * det ).Normalize();
+			Vector3f B = Vector3f( (Q1.x * -s2 + Q2.x * s1) * det, \
+								   (Q1.y * -s2 + Q2.y * s1) * det, \
+								   (Q1.z * -s2 + Q2.z * s1) * det ).Normalize();
 
 			// Sum the tangents up by their vertex for averaging.
 			//
@@ -165,7 +165,7 @@ namespace Sentinel
 
 			// Finalize the tangent as the average.
 			//
-			mVertex[ i ].mTangent = Vector4f( Tn.X(), Tn.Y(), Tn.Z(), sign );
+			mVertex[ i ].mTangent = Vector4f( Tn.x, Tn.y, Tn.z, sign );
 		}
 
 		delete[] tangent;
@@ -181,7 +181,7 @@ namespace Sentinel
 	{
 		UINT startVert = mVertex.size();
 
-		Vector3f up = Vector3f( normal.Y(), normal.Z(), normal.X() );
+		Vector3f up = Vector3f( normal.y, normal.z, normal.x );
 		Vector3f right = normal.Cross( up ).Normalize();
 
 		Vector3f cornerUR = right + up;
@@ -1450,6 +1450,7 @@ namespace Sentinel
 	//
 	void MeshBuilder::CreateBuffers()
 	{
+		_ASSERT( mShader );
 		_ASSERT( mVertex.size() > 0 );
 		_ASSERT( mIndex.size() > 0 );
 
@@ -1496,7 +1497,7 @@ namespace Sentinel
 				case 'x':
 					for( UINT k = 0; k < 16; ++k )
 					{
-						*((float*)base) = mVertex[ j ].mMatrixVertex.Get( k );
+						*((float*)base) = mVertex[ j ].mMatrixVertex[ k ];
 						base += sizeof(float);
 					}
 					break;

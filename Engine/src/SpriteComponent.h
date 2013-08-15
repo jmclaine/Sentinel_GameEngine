@@ -38,6 +38,7 @@ namespace Sentinel
 		/////////////////////////////////
 
 		void SetColor( const ColorRGBA& color );
+
 		void SetFrame( UINT frame );
 	};
 }

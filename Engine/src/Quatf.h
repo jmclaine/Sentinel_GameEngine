@@ -9,25 +9,15 @@ namespace Sentinel
 	{
 		friend class Matrix4f;
 
-	private:
+	public:
 
 		float x, y, z, w;
 
-	public:
+		////////////////////////////////
 
 		Quatf();
 		Quatf( float _pitch, float _yaw, float _roll );
 		Quatf( float _x, float _y, float _z, float _w );
-
-		float		X() const;
-		float		Y() const;
-		float		Z() const;
-		float		W() const;
-
-		void		SetX( float _x );
-		void		SetY( float _y );
-		void		SetZ( float _z );
-		void		SetW( float _w );
 
 		float*		Ptr();
 

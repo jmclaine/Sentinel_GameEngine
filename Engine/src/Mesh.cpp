@@ -4,6 +4,30 @@
 
 namespace Sentinel
 {
+	Mesh::Mesh()
+	{
+		mPrimitive = TRIANGLE_LIST;
+
+		for( UINT i = 0; i < NUM_TEXTURES; ++i )
+		{
+			mTexture[ i ] = Renderer::Inst()->BASE_TEXTURE;
+		}
+
+		mVBO = NULL;
+		mIBO = NULL;
+
+		mMatrixWorld.Identity();
+		mMatrixShadow.Identity();
+		
+		mTextureScale = Vector4f( 0, 0, 1, 1 );
+	}
+
+	Mesh::~Mesh()
+	{
+		SAFE_RELEASE_DELETE( mVBO );
+		SAFE_RELEASE_DELETE( mIBO );
+	}
+
 	void Mesh::SetWorldTransform( const Matrix4f& world )
 	{
 		mMatrixWorld = world;
@@ -42,30 +66,6 @@ namespace Sentinel
 	Buffer* Mesh::GetIBO()
 	{
 		return mIBO;
-	}
-
-	Mesh::Mesh()
-	{
-		mPrimitive = TRIANGLE_LIST;
-
-		for( UINT i = 0; i < NUM_TEXTURES; ++i )
-		{
-			mTexture[ i ] = Renderer::Inst()->BASE_TEXTURE;
-		}
-
-		mVBO = NULL;
-		mIBO = NULL;
-
-		mMatrixWorld.Identity();
-		mMatrixShadow.Identity();
-		
-		mTextureScale = Vector4f( 0, 0, 1, 1 );
-	}
-
-	Mesh::~Mesh()
-	{
-		SAFE_RELEASE_DELETE( mVBO );
-		SAFE_RELEASE_DELETE( mIBO );
 	}
 
 	void Mesh::Draw( UINT count )
@@ -207,7 +207,7 @@ namespace Sentinel
 			}
 
 			Renderer::Inst()->SetRenderType( mPrimitive );
-			Renderer::Inst()->DrawIndexed( (count == UINT_MAX) ? mIBO->mCount : count, 0, 0 );
+			Renderer::Inst()->DrawIndexed( (count == UINT_MAX) ? mIBO->Count() : count, 0, 0 );
 		}
 	}
 }

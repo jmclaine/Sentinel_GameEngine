@@ -1,6 +1,6 @@
 #include "WRenderer.h"
 #include "Renderer.h"
-#include "SString.h"
+#include "WString.h"
 
 namespace Sentinel { namespace Systems
 {
@@ -69,7 +69,7 @@ namespace Sentinel { namespace Systems
 		//
 		WindowInfo info;
 
-		bool result = (Renderer::Inst( (Renderer*)(Renderer::Load( SString( filename ), info ))) != NULL);
+		bool result = (Renderer::Inst( (Renderer*)(Renderer::Load( WString::ToString( filename ).c_str(), info ))) != NULL);
 
 		if( !result )
 			return nullptr;
@@ -125,7 +125,7 @@ namespace Sentinel { namespace Systems
 
 	WTexture^ WRenderer::CreateTextureFromFile( String^ filename )
 	{
-		return gcnew WTexture( Renderer::Inst()->CreateTextureFromFile( SString( filename )));
+		return gcnew WTexture( Renderer::Inst()->CreateTextureFromFile( WString::ToString( filename ).c_str() ));
 	}
 
 	WTexture^ WRenderer::CreateTextureFromMemory( IntPtr data, UINT width, UINT height, ImageFormatType format, bool createMips )
@@ -199,7 +199,7 @@ namespace Sentinel { namespace Systems
 	//
 	WShader^ WRenderer::CreateShader( System::String^ filename, System::String^ attrib, System::String^ uniform )
 	{
-		return gcnew WShader( Renderer::Inst()->CreateShader( SString( filename ), SString( attrib ), SString( uniform )));
+		return gcnew WShader( Renderer::Inst()->CreateShader( WString::ToString( filename ).c_str(), WString::ToString( attrib ).c_str(), WString::ToString( uniform ).c_str() ));
 	}
 
 	void WRenderer::SetShader( WShader^ shader )

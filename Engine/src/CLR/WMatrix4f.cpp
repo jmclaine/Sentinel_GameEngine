@@ -22,19 +22,24 @@ namespace Sentinel { namespace Math
 		delete mRef;
 	}
 
-	const Matrix4f* WMatrix4f::GetRef()
+	WMatrix4f::!WMatrix4f()
+	{
+		delete mRef;
+	}
+
+	Matrix4f* WMatrix4f::GetRef()
 	{
 		return mRef;
 	}
-		
+
 	float WMatrix4f::Get( int index )
 	{
-		return mRef->Get( index );
+		return (*mRef)[ index ];
 	}
 
 	void WMatrix4f::Set( int index, float value )
 	{
-		mRef->Set( index, value );
+		(*mRef)[ index ] = value;
 	}
 
 	WMatrix4f^ WMatrix4f::operator + ( WMatrix4f^ mat0, WMatrix4f^ mat1 )

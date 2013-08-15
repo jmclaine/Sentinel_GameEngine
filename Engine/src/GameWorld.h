@@ -36,6 +36,10 @@ namespace Sentinel
 		void				Startup( const std::string& mapName );
 
 		void				Update();
+		void				UpdateController();
+		void				UpdatePhysics();
+		void				UpdateDrawable();
+		void				UpdateComponents();
 
 		void				Shutdown();
 

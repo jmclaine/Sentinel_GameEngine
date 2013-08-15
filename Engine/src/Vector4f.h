@@ -6,11 +6,11 @@ namespace Sentinel
 {
 	class SENTINEL_DLL Vector4f
 	{
-	protected:
+	public:
 
 		float x, y, z, w;
 
-	public:
+		////////////////////////////////
 
 		Vector4f();
 		Vector4f( float _x, float _y, float _z, float _w );
@@ -18,16 +18,6 @@ namespace Sentinel
 
 		float		operator [] ( int i ) const;
 		float&		operator [] ( int i );
-
-		float		X() const;
-		float		Y() const;
-		float		Z() const;
-		float		W() const;
-
-		void		SetX( float _x );
-		void		SetY( float _y );
-		void		SetZ( float _z );
-		void		SetW( float _w );
 
 		float*		Ptr();
 

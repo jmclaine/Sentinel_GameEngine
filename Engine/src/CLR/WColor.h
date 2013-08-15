@@ -1,6 +1,9 @@
 #pragma once
 
 #include "Color.h"
+#include "WFloat.h"
+
+using namespace Sentinel::Utilities;
 
 namespace Sentinel { namespace Assets
 {
@@ -8,30 +11,27 @@ namespace Sentinel { namespace Assets
 	{
 	private:
 
-		ColorRGBA*	mRef;
+		ColorRGBA*		mRef;
 
 	public:
 
 		WColorRGBA();
 		WColorRGBA( float red, float green, float blue, float alpha );
-		WColorRGBA( ColorRGBA& color );
+		WColorRGBA( ColorRGBA* color );
+		WColorRGBA( WColorRGBA^ color );
 		WColorRGBA( WColorRGBA% color );
 		~WColorRGBA();
+		!WColorRGBA();
 
-		ColorRGBA*	GetRef();
+		ColorRGBA*		GetRef();
 
-		float		R();
-		float		G();
-		float		B();
-		float		A();
+		WFloat^			R();
+		WFloat^			G();
+		WFloat^			B();
+		WFloat^			A();
 
-		void		SetR( float red );
-		void		SetG( float green );
-		void		SetB( float blue );
-		void		SetA( float alpha );
+		float*			Ptr();
 
-		float*		Ptr();
-
-		UINT		ToUINT();
+		UINT			ToUINT();
 	};
 }}

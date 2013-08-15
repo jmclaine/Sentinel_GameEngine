@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Common.h"
-#include "TransformComponent.h"
 #include "Util.h"
+#include "Material.h"
+#include "TransformComponent.h"
 
 namespace Sentinel
 {
