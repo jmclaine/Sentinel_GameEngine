@@ -1,13 +1,23 @@
 #include "WGameWorld.h"
-#include "WString.h"
+#include "RString.h"
 
 using namespace Sentinel::Utilities;
 
 namespace Sentinel { namespace Components
 {
-	void WGameWorld::Startup( System::String^ mapName )
+	void WGameWorld::Load( System::String^ mapName )
 	{
-		GameWorld::Inst()->Startup( WString::ToString( mapName ));
+		GameWorld::Inst( GameWorld::Load( RString::ToString( mapName )));
+	}
+
+	void WGameWorld::Load( System::String^ mapName, IntPtr hWnd )
+	{
+		GameWorld::Inst( GameWorld::Load( RString::ToString( mapName ), hWnd.ToPointer() ));
+	}
+
+	void WGameWorld::Startup()
+	{
+		GameWorld::Inst()->Startup();
 	}
 
 	void WGameWorld::Update()
@@ -42,16 +52,15 @@ namespace Sentinel { namespace Components
 
 	//////////////////////////////
 
-	WGameObject^ WGameWorld::AddGameObject( WGameObject^ entity, System::String^ name )
+	RGameObject^ WGameWorld::AddGameObject( WGameObject^ entity, System::String^ name )
 	{
-		GameWorld::Inst()->AddGameObject( entity->GetRef(), WString::ToString( name ));
-
-		return entity;
+		return gcnew RGameObject( GameWorld::Inst()->AddGameObject( entity->GetRef(), RString::ToString( name )));
 	}
 
-	void WGameWorld::RemoveGameObject( WGameObject^ entity )
+	RGameObject^ WGameWorld::RemoveGameObject( RGameObject^ entity )
 	{
 		GameWorld::Inst()->RemoveGameObject( entity->GetRef() );
+		return entity;
 	}
 
 	//////////////////////////////
@@ -60,19 +69,19 @@ namespace Sentinel { namespace Components
 	{
 		GameWorld::Inst()->SetCamera( index );
 	}
-	/*
-	WCameraComponent^ WGameWorld::GetCamera( int index = -1 )
+
+	WCameraComponent^ WGameWorld::GetCamera( int index )
 	{
 		return gcnew WCameraComponent( GameWorld::Inst()->GetCamera( index ));
 	}
-
+	/*
 	WLightComponent^ WGameWorld::GetLight( UINT index )
 	{
 		return gcnew WLightComponent( GameWorld::Inst()->GetLight( index ));
 	}
 	*/
-	WGameObject^ WGameWorld::GetGameObject( UINT index )
+	RGameObject^ WGameWorld::GetGameObject( UINT index )
 	{
-		return gcnew WGameObject( GameWorld::Inst()->GetGameObject( index ));
+		return gcnew RGameObject( GameWorld::Inst()->GetGameObject( index ));
 	}
 }}

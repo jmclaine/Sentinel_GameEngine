@@ -140,18 +140,18 @@ namespace Sentinel { namespace Systems
 		if( RegisterWindowClass() )
 		{
 			mHWND = CreateWindowEx( 0, (LPCSTR)mWindowClass, (LPCSTR)mTitle, WS_CHILD | WS_VISIBLE, 
-									0, 0, mWindowInfo->GetWidth(), mWindowInfo->GetHeight(),
+									0, 0, mWindowInfo->Width(), mWindowInfo->Height(),
 									(HWND)hwndParent.Handle.ToPointer(), 0, mINST, 0 );
 
 			if( !mHWND )
 				TRACE( "Error: CreateWindowEx = " << GetLastError() );
 			
-			mWindowInfo = gcnew WWindowInfo( Renderer::Inst()->Startup( mHWND, mWindowInfo->GetFullscreen(), mWindowInfo->GetWidth(), mWindowInfo->GetHeight() ));
+			mWindowInfo = gcnew WWindowInfo( Renderer::Inst()->Startup( mHWND, mWindowInfo->Fullscreen(), mWindowInfo->Width(), mWindowInfo->Height() ));
 
 			// Create default settings.
 			//
-			WRenderer::CreateDepthStencil( mWindowInfo->GetWidth(), mWindowInfo->GetHeight() );
-			WRenderer::CreateViewport( mWindowInfo->GetWidth(), mWindowInfo->GetHeight() );
+			WRenderer::CreateDepthStencil( mWindowInfo->Width(), mWindowInfo->Height() );
+			WRenderer::CreateViewport( mWindowInfo->Width(), mWindowInfo->Height() );
 			WRenderer::CreateBackbuffer();
 			
 			return HandleRef( this, IntPtr( mHWND ));
@@ -162,9 +162,6 @@ namespace Sentinel { namespace Systems
 
 	void WGameWindow::DestroyWindowCore( HandleRef hwnd )
 	{
-		SetActive();
-		Shutdown();
-
 		if( mHWND != NULL && mHWND == (HWND)hwnd.Handle.ToPointer())
 		{
 			::DestroyWindow( mHWND );

@@ -8,23 +8,20 @@ namespace Sentinel { namespace Components
 		mRef = NULL;
 	}
 
-	WGameComponent::WGameComponent( GameComponent* obj )
-	{
-		mRef = obj;
-	}
-
-	WGameComponent::WGameComponent( WGameComponent% obj )
-	{
-		mRef = obj.mRef;
-	}
-
 	WGameComponent::~WGameComponent()
 	{}
+
+	void WGameComponent::Delete()
+	{
+		delete mRef;
+	}
 
 	GameComponent* WGameComponent::GetRef()
 	{
 		return mRef;
 	}
+
+	////////////////////////////////
 
 	void WGameComponent::Startup()
 	{
@@ -41,9 +38,9 @@ namespace Sentinel { namespace Components
 		mRef->Shutdown();
 	}
 
-	void WGameComponent::SetOwner( WGameObject% owner )
+	void WGameComponent::SetOwner( RGameObject^ owner )
 	{
-		mRef->SetOwner( owner.GetRef() );
+		mRef->SetOwner( owner->GetRef() );
 	}
 
 	ComponentType WGameComponent::Type()
@@ -51,8 +48,8 @@ namespace Sentinel { namespace Components
 		return (Sentinel::Components::ComponentType)mRef->Type();
 	}
 
-	WString^ WGameComponent::Name()
+	RString^ WGameComponent::Name()
 	{
-		return gcnew WString( mRef->mName );
+		return gcnew RString( mRef->mName );
 	}
 }}

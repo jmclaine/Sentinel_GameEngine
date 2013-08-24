@@ -1,26 +1,26 @@
-#include "WString.h"
+#include "RString.h"
 
 namespace Sentinel { namespace Utilities
 {
-	WString::WString( std::string& str )
+	RString::RString( std::string& str )
 	{
 		mRef = &str;
 	}
 
-	WString::~WString()
+	RString::~RString()
 	{}
 
-	char WString::operator [] ( int index )
+	char RString::operator [] ( int index )
 	{
 		return mRef->at( index );
 	}
 
-	void WString::Set( std::string& str )
+	void RString::Set( std::string& str )
 	{
 		mRef = &str;
 	}
 
-	void WString::Set( System::String^ str )
+	void RString::Set( System::String^ str )
 	{
 		mRef->clear();
 
@@ -30,17 +30,17 @@ namespace Sentinel { namespace Utilities
 		mRef->push_back( 0 );
 	}
 
-	WString::operator const char* ()
+	RString::operator const char* ()
 	{
 		return mRef->c_str();
 	}
 
-	WString::operator System::String^ ()
+	RString::operator System::String^ ()
 	{
 		return gcnew System::String( mRef->c_str() );
 	}
 
-	std::string WString::ToString( System::String^ str )
+	std::string RString::ToString( System::String^ str )
 	{
 		std::string temp;
 

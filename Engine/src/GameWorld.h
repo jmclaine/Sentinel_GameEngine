@@ -1,5 +1,7 @@
 #pragma once
-
+/*
+Attached GameObject(s) are automatically shutdown and removed during Shutdown()
+*/
 #include <vector>
 #include <map>
 
@@ -11,9 +13,9 @@
 
 namespace Sentinel
 {
-	class SENTINEL_DLL GameWorld : public SingletonThreaded< GameWorld >
+	class SENTINEL_DLL GameWorld : public SingletonWindow< GameWorld >
 	{
-		friend class SingletonThreaded< GameWorld >;
+		friend class SingletonWindow< GameWorld >;
 
 	private:
 
@@ -32,8 +34,10 @@ namespace Sentinel
 		~GameWorld();
 
 	public:
+
+		static GameWorld*	Load( const std::string& mapName, void* hWnd = NULL );
 		
-		void				Startup( const std::string& mapName );
+		void				Startup();
 
 		void				Update();
 		void				UpdateController();
@@ -45,9 +49,13 @@ namespace Sentinel
 
 		//////////////////////////////
 
+		// Returns entity.
+		//
 		GameObject*			AddGameObject( GameObject* entity, const std::string& name );
 
-		void				RemoveGameObject( GameObject* entity );
+		// Removes and returns entity.
+		//
+		GameObject*			RemoveGameObject( GameObject* entity );
 
 		//////////////////////////////
 

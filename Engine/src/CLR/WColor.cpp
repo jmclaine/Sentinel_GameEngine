@@ -12,9 +12,9 @@ namespace Sentinel { namespace Assets
 		mRef = new ColorRGBA( red, green, blue, alpha );
 	}
 
-	WColorRGBA::WColorRGBA( ColorRGBA* color )
+	WColorRGBA::WColorRGBA( ColorRGBA& color )
 	{
-		mRef = color;
+		mRef = new ColorRGBA( color );
 	}
 
 	WColorRGBA::WColorRGBA( WColorRGBA^ color )
@@ -29,10 +29,15 @@ namespace Sentinel { namespace Assets
 
 	WColorRGBA::~WColorRGBA()
 	{
-		delete mRef;
+		Delete();
 	}
 
 	WColorRGBA::!WColorRGBA()
+	{
+		Delete();
+	}
+
+	void WColorRGBA::Delete()
 	{
 		delete mRef;
 	}
@@ -42,24 +47,26 @@ namespace Sentinel { namespace Assets
 		return mRef;
 	}
 
-	WFloat^ WColorRGBA::R()
+	////////////////////////////////
+
+	RFloat^ WColorRGBA::R()
 	{
-		return gcnew WFloat( &mRef->r );
+		return gcnew RFloat( &mRef->r );
 	}
 
-	WFloat^ WColorRGBA::G()
+	RFloat^ WColorRGBA::G()
 	{
-		return gcnew WFloat( &mRef->g );
+		return gcnew RFloat( &mRef->g );
 	}
 
-	WFloat^ WColorRGBA::B()
+	RFloat^ WColorRGBA::B()
 	{
-		return gcnew WFloat( &mRef->b );
+		return gcnew RFloat( &mRef->b );
 	}
 
-	WFloat^ WColorRGBA::A()
+	RFloat^ WColorRGBA::A()
 	{
-		return gcnew WFloat( &mRef->a );
+		return gcnew RFloat( &mRef->a );
 	}
 
 	float* WColorRGBA::Ptr()
@@ -71,4 +78,29 @@ namespace Sentinel { namespace Assets
 	{
 		return mRef->ToUINT();
 	}
+
+	////////////////////////////////
+
+	RColorRGBA::RColorRGBA( ColorRGBA* color )
+	{
+		mRef = color;
+	}
+
+	RColorRGBA::RColorRGBA( WColorRGBA^ color )
+	{
+		mRef = color->GetRef();
+	}
+
+	void RColorRGBA::Set( const ColorRGBA& color )
+	{
+		*mRef = color;
+	}
+
+	void RColorRGBA::Set( WColorRGBA^ color )
+	{
+		*mRef = *color->GetRef();
+	}
+
+	void RColorRGBA::Delete()
+	{}
 }}

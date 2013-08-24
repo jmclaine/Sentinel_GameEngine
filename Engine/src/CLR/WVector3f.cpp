@@ -29,10 +29,15 @@ namespace Sentinel { namespace Math
 
 	WVector3f::~WVector3f()
 	{
-		delete mRef;
+		Delete();
 	}
 
 	WVector3f::!WVector3f()
+	{
+		Delete();
+	}
+
+	void WVector3f::Delete()
 	{
 		delete mRef;
 	}
@@ -42,20 +47,24 @@ namespace Sentinel { namespace Math
 		return mRef;
 	}
 
-	WFloat^ WVector3f::X()
+	////////////////////////////////
+
+	RFloat^ WVector3f::X()
 	{
-		return gcnew WFloat( &mRef->x );
+		return gcnew RFloat( &mRef->x );
 	}
 
-	WFloat^ WVector3f::Y()
+	RFloat^ WVector3f::Y()
 	{
-		return gcnew WFloat( &mRef->y );
+		return gcnew RFloat( &mRef->y );
 	}
 
-	WFloat^ WVector3f::Z()
+	RFloat^ WVector3f::Z()
 	{
-		return gcnew WFloat( &mRef->z );
+		return gcnew RFloat( &mRef->z );
 	}
+
+	////////////////////////////////
 
 	bool WVector3f::operator == ( const WVector3f^ v )
 	{
@@ -170,4 +179,29 @@ namespace Sentinel { namespace Math
 	{
 		return mRef->Angle( *v->mRef );
 	}
+
+	////////////////////////////////
+
+	RVector3f::RVector3f( Vector3f* v )
+	{
+		mRef = v;
+	}
+
+	RVector3f::RVector3f( WVector3f^ v )
+	{
+		mRef = v->GetRef();
+	}
+
+	void RVector3f::Set( const Vector3f& v )
+	{
+		*mRef = v;
+	}
+
+	void RVector3f::Set( WVector3f^ v )
+	{
+		*mRef = *v->GetRef();
+	}
+
+	void RVector3f::Delete()
+	{}
 }}

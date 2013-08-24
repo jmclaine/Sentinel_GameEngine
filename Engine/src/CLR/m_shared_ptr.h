@@ -2,6 +2,9 @@
 
 #include <memory>
 
+// Based on http://stackoverflow.com/questions/6172361/c-cli-wrapping-a-function-that-returns-a-stdshared-ptr
+// by Chillitom
+//
 template< class T >
 public ref class m_shared_ptr sealed
 {
@@ -37,7 +40,7 @@ public:
 
     !m_shared_ptr()
 	{
-        delete mPtr;
+        //delete mPtr;	// will gladly crash!
     }
 
     operator std::shared_ptr< T >()

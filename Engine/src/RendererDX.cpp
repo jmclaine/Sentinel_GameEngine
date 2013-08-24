@@ -380,6 +380,11 @@ namespace Sentinel
 
 	public:
 
+		~BufferDX()
+		{
+			Release();
+		}
+
 		void* Lock()
 		{
 			D3D11_MAPPED_SUBRESOURCE mapRes;
@@ -453,6 +458,13 @@ namespace Sentinel
 
 			mSampleDesc.Count   = 1;
 			mSampleDesc.Quality = 0;
+
+			NULL_TEXTURE = NULL;
+			BASE_TEXTURE = NULL;
+
+			mCurrWindow  = NULL;
+			mCurrStencil = NULL;
+			mCurrTarget  = NULL;
 		}
 
 		~RendererDX()

@@ -6,8 +6,9 @@ namespace Sentinel
 {
 	enum BufferType
 	{
-		VERTEX_BUFFER = 1,
-		INDEX_BUFFER  = 2,
+		NULL_BUFFER,
+		VERTEX_BUFFER,
+		INDEX_BUFFER,
 
 		NUM_BUFFER_TYPES
 	};
@@ -23,11 +24,11 @@ namespace Sentinel
 
 		//////////////////////////
 
-		Buffer() {}
+		Buffer();
 
 	public:
 
-		virtual ~Buffer() {}
+		virtual ~Buffer();
 
 		virtual void*	Lock() = 0;
 		virtual void	Unlock() = 0;

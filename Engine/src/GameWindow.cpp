@@ -25,8 +25,8 @@ namespace Sentinel
 
 		if( RegisterWindowClass() )
 		{
-			mHWND = CreateWindow( mWindowClass, mTitle, (!info.GetFullscreen()) ? WS_OVERLAPPEDWINDOW : WS_POPUP,
-								  0, 0, info.GetWidth(), info.GetHeight(),
+			mHWND = CreateWindow( mWindowClass, mTitle, (!info.Fullscreen()) ? WS_OVERLAPPEDWINDOW : WS_POPUP,
+								  0, 0, info.Width(), info.Height(),
 								  NULL, NULL, mINST, NULL );
 
 			if( !mHWND )
@@ -36,7 +36,7 @@ namespace Sentinel
 			UpdateWindow( mHWND );
 		}
 
-		mWindowInfo = Renderer::Inst()->Startup( mHWND, info.GetFullscreen(), info.GetWidth(), info.GetHeight() );
+		mWindowInfo = Renderer::Inst()->Startup( mHWND, info.Fullscreen(), info.Width(), info.Height() );
 
 		if( !mWindowInfo )
 			throw AppException( "Failed Renderer::Startup()" );

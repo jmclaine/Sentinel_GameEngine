@@ -29,10 +29,15 @@ namespace Sentinel { namespace Math
 
 	WVector4f::~WVector4f()
 	{
-		delete mRef;
+		Delete();
 	}
 
 	WVector4f::!WVector4f()
+	{
+		Delete();
+	}
+
+	void WVector4f::Delete()
 	{
 		delete mRef;
 	}
@@ -42,25 +47,29 @@ namespace Sentinel { namespace Math
 		return mRef;
 	}
 
-	WFloat^ WVector4f::X()
+	////////////////////////////////
+
+	RFloat^ WVector4f::X()
 	{
-		return gcnew WFloat( &mRef->x );
+		return gcnew RFloat( &mRef->x );
 	}
 
-	WFloat^ WVector4f::Y()
+	RFloat^ WVector4f::Y()
 	{
-		return gcnew WFloat( &mRef->y );
+		return gcnew RFloat( &mRef->y );
 	}
 
-	WFloat^ WVector4f::Z()
+	RFloat^ WVector4f::Z()
 	{
-		return gcnew WFloat( &mRef->z );
+		return gcnew RFloat( &mRef->z );
 	}
 
-	WFloat^ WVector4f::W()
+	RFloat^ WVector4f::W()
 	{
-		return gcnew WFloat( &mRef->w );
+		return gcnew RFloat( &mRef->w );
 	}
+
+	////////////////////////////////
 
 	bool WVector4f::operator == ( const WVector4f^ v )
 	{
@@ -175,4 +184,29 @@ namespace Sentinel { namespace Math
 	{
 		return mRef->Angle( *v->mRef );
 	}
+
+	////////////////////////////////
+
+	RVector4f::RVector4f( Vector4f* v )
+	{
+		mRef = v;
+	}
+
+	RVector4f::RVector4f( WVector4f^ v )
+	{
+		mRef = v->GetRef();
+	}
+
+	void RVector4f::Set( const Vector4f& v )
+	{
+		*mRef = v;
+	}
+
+	void RVector4f::Set( WVector4f^ v )
+	{
+		*mRef = *v->GetRef();
+	}
+
+	void RVector4f::Delete()
+	{}
 }}

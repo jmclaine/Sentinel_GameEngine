@@ -1,41 +1,48 @@
 #pragma once
-
+/*
+Creates a new GameObject.
+GameObject will not be freed unless it is attached to the GameWorld.
+Delete() should be called manually for a controlled free memory.
+*/
 #include "m_shared_ptr.h"
 #include "GameObject.h"
 #include "WGameComponent.h"
-#include "WString.h"
+#include "RString.h"
 
 using namespace Sentinel::Utilities;
 
 namespace Sentinel { namespace Components
 {
+	ref class RGameObject;
+
 	public ref class WGameObject
 	{
-	private:
+	protected:
 
 		GameObject*		mRef;
 
 	public:
 
 		WGameObject();
-		WGameObject( GameObject* obj );
-		WGameObject( WGameObject% obj );
 		~WGameObject();
-		!WGameObject();
+
+		void			Delete();
 		
 		GameObject*		GetRef();
 
-		WGameObject^	Parent();
+		////////////////////////////////
 
-		WString^		Name();
+		RGameObject^	Parent();
 
-		//////////////////////////////
+		RString^		Name();
+
+		////////////////////////////////
 
 		WGameComponent^ AttachComponent( WGameComponent^ component, System::String^ name );
 
-		void			DetachComponent( WGameComponent^ component );
+		WGameComponent^	DetachComponent( WGameComponent^ component );
 
-		//////////////////////////////
+		////////////////////////////////
 
 		virtual void	Startup();
 
@@ -48,5 +55,13 @@ namespace Sentinel { namespace Components
 		virtual void	UpdateComponents();
 
 		virtual void	Shutdown();
+	};
+
+	public ref class RGameObject sealed : public WGameObject
+	{
+	public:
+
+		RGameObject( GameObject* obj );
+		RGameObject( WGameObject^ obj );
 	};
 }}

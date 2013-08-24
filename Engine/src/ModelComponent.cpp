@@ -19,7 +19,7 @@ namespace Sentinel
 
 		mModel->SetMaterial( mMaterial );
 
-		mModel->SetWorldTransform( mMatrixTranslation * mMatrixScale * mMatrixRotation );
+		mModel->mMatrixWorld = mMatrixTranslation * mMatrixScale * mMatrixRotation;
 
 		mModel->Draw();
 	}

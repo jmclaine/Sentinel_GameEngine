@@ -34,6 +34,9 @@
     <Filter Include="Sentinel_Engine\Components\Core">
       <UniqueIdentifier>{cf19ad5a-898a-48fd-b265-cbb17b613167}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sentinel_Engine\Components\Drawables">
+      <UniqueIdentifier>{66a5cd8f-b13f-4714-ba83-828c6b14ab4e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sentinel_CLR.h">
@@ -45,16 +48,7 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\WBuffer.h">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\CLR\WColor.h">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\WShader.h">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\WTexture.h">
       <Filter>Sentinel_Engine\Assets</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\CLR\WMatrix4f.h">
@@ -78,22 +72,10 @@
     <ClInclude Include="..\Engine\src\CLR\WGameWindow.h">
       <Filter>Sentinel_Engine\Systems</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\WMesh.h">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\CLR\WMaterial.h">
       <Filter>Sentinel_Engine\Assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\WFloat.h">
-      <Filter>Sentinel_Engine\Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\WString.h">
-      <Filter>Sentinel_Engine\Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\CLR\WTransformComponent.h">
-      <Filter>Sentinel_Engine\Components\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\WGameComponent.h">
       <Filter>Sentinel_Engine\Components\Core</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\CLR\WGameObject.h">
@@ -104,6 +86,45 @@
     </ClInclude>
     <ClInclude Include="..\Engine\src\CLR\m_shared_ptr.h">
       <Filter>Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WCameraComponent.h">
+      <Filter>Sentinel_Engine\Components\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\RFloat.h">
+      <Filter>Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\RString.h">
+      <Filter>Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\RTexture.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\RBuffer.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\RMesh.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\RModel.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WGameComponent.h">
+      <Filter>Sentinel_Engine\Components\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WPerspectiveCameraComponent.h">
+      <Filter>Sentinel_Engine\Components\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WMeshBuilder.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WDrawableComponent.h">
+      <Filter>Sentinel_Engine\Components\Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WMeshComponent.h">
+      <Filter>Sentinel_Engine\Components\Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WShader.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -116,16 +137,7 @@
     <ClCompile Include="Stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\WBuffer.cpp">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\CLR\WColor.cpp">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\WShader.cpp">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\WTexture.cpp">
       <Filter>Sentinel_Engine\Assets</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\CLR\WMatrix4f.cpp">
@@ -149,22 +161,10 @@
     <ClCompile Include="..\Engine\src\CLR\WGameWindow.cpp">
       <Filter>Sentinel_Engine\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\WMesh.cpp">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\CLR\WMaterial.cpp">
       <Filter>Sentinel_Engine\Assets</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\WFloat.cpp">
-      <Filter>Sentinel_Engine\Utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\WString.cpp">
-      <Filter>Sentinel_Engine\Utilities</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\CLR\WTransformComponent.cpp">
-      <Filter>Sentinel_Engine\Components\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\WGameComponent.cpp">
       <Filter>Sentinel_Engine\Components\Core</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\CLR\WGameObject.cpp">
@@ -172,6 +172,42 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\CLR\WGameWorld.cpp">
       <Filter>Sentinel_Engine\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\RFloat.cpp">
+      <Filter>Sentinel_Engine\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\RString.cpp">
+      <Filter>Sentinel_Engine\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\RTexture.cpp">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\RBuffer.cpp">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\RMesh.cpp">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\RModel.cpp">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WGameComponent.cpp">
+      <Filter>Sentinel_Engine\Components\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WCameraComponent.cpp">
+      <Filter>Sentinel_Engine\Components\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WPerspectiveCameraComponent.cpp">
+      <Filter>Sentinel_Engine\Components\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WMeshBuilder.cpp">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WMeshComponent.cpp">
+      <Filter>Sentinel_Engine\Components\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WShader.cpp">
+      <Filter>Sentinel_Engine\Assets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

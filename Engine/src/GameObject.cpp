@@ -7,11 +7,14 @@
 namespace Sentinel
 {
 	GameObject::GameObject() :
-		mTransform( NULL ), mController( NULL ), mPhysics( NULL ), mDrawable( NULL )
+		mTransform( NULL ), mController( NULL ), mPhysics( NULL ), mDrawable( NULL ),
+		mParent( NULL )
 	{}
 
 	GameObject::~GameObject()
-	{}
+	{
+		Shutdown();
+	}
 
 	GameComponent* GameObject::AttachComponent( GameComponent* component, const std::string& name )
 	{
@@ -129,7 +132,9 @@ namespace Sentinel
 	void GameObject::UpdateComponents()
 	{
 		TRAVERSE_VECTOR( x, mComponent )
-			mComponent[ x ]->Update();
+			if( mComponent[ x ]->Type() != COMPONENT_CAMERA && 
+				mComponent[ x ]->Type() != COMPONENT_LIGHT )
+				mComponent[ x ]->Update();
 	}
 
 #define SHUTDOWN_COMPONENT( obj )\

@@ -113,16 +113,16 @@ public:
 		//
 		mWindow0->Startup( hInstance, nCmdShow, "Sentinel_Test", "SentinelClass0", info );
 
-		Renderer::Inst()->CreateDepthStencil( info.GetWidth(), info.GetHeight() );
-		Renderer::Inst()->CreateViewport( info.GetWidth(), info.GetHeight() );
+		Renderer::Inst()->CreateDepthStencil( info.Width(), info.Height() );
+		Renderer::Inst()->CreateViewport( info.Width(), info.Height() );
 		Renderer::Inst()->CreateBackbuffer();
 
 		// Prepare second window for testing.
 		//
 		mWindow1->Startup( hInstance, nCmdShow, "Sentinel_Dup",  "SentinelClass1", info );
 
-		Renderer::Inst()->CreateDepthStencil( info.GetWidth(), info.GetHeight() );
-		Renderer::Inst()->CreateViewport( info.GetWidth(), info.GetHeight() );
+		Renderer::Inst()->CreateDepthStencil( info.Width(), info.Height() );
+		Renderer::Inst()->CreateViewport( info.Width(), info.Height() );
 		Renderer::Inst()->CreateBackbuffer();
 
 		////////////////////////////////////
@@ -144,8 +144,6 @@ public:
 		PrepareFont();
 
 		ParticleSystem::Inst()->Startup( mShader[ SHADER_SPRITE ], 100 );
-
-		GameWorld::Inst()->Startup( "NoMap.MAP" );
 
 		// Enter main game loop.
 		//
@@ -257,10 +255,12 @@ public:
 
 		//////////////////////////////
 
+		GameWorld::Load( "NoMap.MAP" );
+		
 		// Create main perspective camera.
 		//
 		info = mWindow0->GetInfo();
-		camera = new PerspectiveCameraComponent( (float)info->GetWidth(), (float)info->GetHeight() );
+		camera = new PerspectiveCameraComponent( (float)info->Width(), (float)info->Height() );
 		
 		transform = new TransformComponent();
 		transform->mPosition = Vector3f( 0, 10, 50 );
@@ -283,7 +283,7 @@ public:
 
 		// Create sprite orthographic camera.
 		//
-		camera = new OrthographicCameraComponent( (float)info->GetWidth(), (float)info->GetHeight() );
+		camera = new OrthographicCameraComponent( (float)info->Width(), (float)info->Height() );
 		
 		transform = new TransformComponent();
 		transform->mPosition = Vector3f( 0, 0, 0 );
@@ -359,7 +359,7 @@ public:
 		transform->mOrientation = Quatf( 0, 0, 1, 15 ).AxisAngle();
 		transform->mScale		= Vector3f( 10, 1, 25 );
 		
-		physics   = new PhysicsComponent( PhysicsSystem::Inst()->CreateBox( transform->mPosition, transform->mOrientation, transform->mScale, 0 ));
+		physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateBox( transform->mPosition, transform->mOrientation, transform->mScale, 0 ));
 
 		obj = GameWorld::Inst()->AddGameObject( new GameObject(), "Origin" );
 		obj->AttachComponent( transform,	"Transform" );
@@ -373,7 +373,7 @@ public:
 		transform->mOrientation = Quatf( 0, 0, 1, -15 ).AxisAngle();
 		transform->mScale		= Vector3f( 10, 1, 25 );
 		
-		physics   = new PhysicsComponent( PhysicsSystem::Inst()->CreateBox( transform->mPosition, transform->mOrientation, transform->mScale, 0 ));
+		physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateBox( transform->mPosition, transform->mOrientation, transform->mScale, 0 ));
 
 		obj = GameWorld::Inst()->AddGameObject( new GameObject(), "Origin" );
 		obj->AttachComponent( transform,	"Transform" );
@@ -445,6 +445,8 @@ public:
 		
 		model.reset();
 
+		GameWorld::Inst()->Startup();
+
 		SetDirectory( ".." );
 	}
 
@@ -498,7 +500,7 @@ int APIENTRY _tWinMain( HINSTANCE hInstance,
 	//
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	_CrtSetReportMode( _CRT_ERROR, _CRTDBG_MODE_DEBUG );
-	//_CrtSetBreakAlloc( 239 );
+	//_CrtSetBreakAlloc( 597 );
 
 	UNREFERENCED_PARAMETER( hPrevInstance );
 	UNREFERENCED_PARAMETER( lpCmdLine );

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Quatf.h"
-#include "WFloat.h"
+#include "RFloat.h"
 
 using namespace System;
 using namespace Sentinel::Utilities;
@@ -10,7 +10,7 @@ namespace Sentinel { namespace Math
 {
 	public ref class WQuatf
 	{
-	private:
+	protected:
 
 		Quatf*		mRef;
 
@@ -24,12 +24,22 @@ namespace Sentinel { namespace Math
 		~WQuatf();
 		!WQuatf();
 
+	protected:
+
+		virtual void Delete();
+
+	public:
+
 		Quatf*		GetRef();
 
-		WFloat^		X();
-		WFloat^		Y();
-		WFloat^		Z();
-		WFloat^		W();
+		////////////////////////////////
+
+		RFloat^		X();
+		RFloat^		Y();
+		RFloat^		Z();
+		RFloat^		W();
+
+		////////////////////////////////
 
 		WQuatf^		operator * ( const WQuatf^ q );
 		WQuatf^		Mul( const WQuatf^ q );
@@ -46,5 +56,20 @@ namespace Sentinel { namespace Math
 
 		WQuatf^		Euler( float _pitch, float _yaw, float _roll );
 		WQuatf^		Euler();
+	};
+
+	public ref class RQuatf sealed : public WQuatf
+	{
+	public:
+
+		RQuatf( Quatf* q );
+		RQuatf( WQuatf^ q );
+
+		void		Set( const Quatf& q );
+		void		Set( WQuatf^ q );
+
+	protected:
+
+		virtual void Delete() override;
 	};
 }}

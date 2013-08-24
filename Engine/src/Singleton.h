@@ -213,24 +213,35 @@ namespace Sentinel
 	//////////////////////////////////////////////////////////////////////////
 
 	// Singleton for multiple windows.
+	// The Inst(void*) makes this class useful for other OSs if necessary,
+	// or for Singleton's based on any memory address rather than
+	// requiring window handles specifically.
 	//
 	template< class T >
 	class SingletonWindow
 	{
 	private:
 
-		static std::unordered_map< void*, volatile T* volatile > mObj;
+		static std::unordered_map< void*, T* > mObj;
 
 	protected:
 
 		SingletonWindow() {}
 		SingletonWindow( const SingletonWindow& ) {}
-		SingletonWindow& operator = ( const SingletonWindow& ) {}
+		SingletonWindow& operator = ( const SingletonWindow& ) { return *this; }
 		~SingletonWindow() {}
 
 	public:
 
-		static T* volatile Inst( void* hWnd = NULL )
+		static T* Inst( T* obj, void* hWnd = NULL )
+		{
+			if( mObj.find( hWnd ) == mObj.end() )
+				mObj[ hWnd ] = obj;
+			
+			return (T*)mObj[ hWnd ];
+		}
+
+		static T* Inst( void* hWnd = NULL )
 		{
 			if( mObj.find( hWnd ) == mObj.end() )
 				mObj[ hWnd ] = new T();
@@ -238,7 +249,7 @@ namespace Sentinel
 			return (T*)mObj[ hWnd ];
 		}
 
-		static void volatile Destroy()
+		static void Destroy( void* hWnd = NULL )
 		{
 			if( mObj.find( hWnd ) != mObj.end() )
 			{
@@ -248,7 +259,7 @@ namespace Sentinel
 		}
 	};
 
-	template< class T > std::unordered_map< void*, volatile T* volatile > SingletonWindow< T >::mObj;
+	template< class T > std::unordered_map< void*, T* > SingletonWindow< T >::mObj;
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -259,7 +270,7 @@ namespace Sentinel
 	{
 	private:
 
-		static std::unordered_map< void*, volatile T* > mObj;
+		static std::unordered_map< void*, T* > mObj;
 
 	protected:
 
@@ -270,7 +281,7 @@ namespace Sentinel
 
 	public:
 
-		static T* volatile Inst( T* obj, void* hWnd = NULL )
+		static T* Inst( T* obj, void* hWnd = NULL )
 		{
 			if( mObj.find( hWnd ) == mObj.end() )
 				mObj[ hWnd ] = obj;
@@ -278,12 +289,12 @@ namespace Sentinel
 			return (T*)mObj[ hWnd ];
 		}
 
-		static T* volatile Inst( void* hWnd = NULL )
+		static T* Inst( void* hWnd = NULL )
 		{
 			return (T*)mObj[ hWnd ];
 		}
 
-		static void volatile Destroy( void* hWnd = NULL )
+		static void Destroy( void* hWnd = NULL )
 		{
 			if( mObj.find( hWnd ) != mObj.end() )
 			{
@@ -293,5 +304,5 @@ namespace Sentinel
 		}
 	};
 
-	template< class T > std::unordered_map< void*, volatile T* volatile > SingletonAbstractWindow< T >::mObj;
+	template< class T > std::unordered_map< void*, T* > SingletonAbstractWindow< T >::mObj;
 }

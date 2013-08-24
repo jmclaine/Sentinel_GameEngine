@@ -6,6 +6,7 @@
 #include "Model.h"
 #include "Util.h"
 #include "MeshBuilder.h"
+#include "Timing.h"
 
 namespace Sentinel
 {
@@ -141,80 +142,6 @@ namespace Sentinel
 		~ModelM3D()
 		{
 			Release();
-		}
-
-		void SetMaterial( const Material& material )
-		{
-			for( UINT x = 0; x < mNumObjects; ++x )
-			{
-				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
-				{
-					mObject[ x ].mMesh[ y ]->SetMaterial( material );
-				}
-			}
-		}
-
-		void SetShader( Shader* shader )
-		{
-			for( UINT x = 0; x < mNumObjects; ++x )
-			{
-				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
-				{
-					mObject[ x ].mMesh[ y ]->SetShader( shader );
-				}
-			}
-		}
-
-		// Set a keyframe, and append it if the index is -1.
-		//
-		void SetKeyFrame( const KeyFrame& key, int keyIndex = -1, int objIndex = 0 )
-		{
-			_ASSERT( objIndex >= 0 && (UINT)objIndex < mNumObjects && keyIndex > -1 && keyIndex < (int)mObject[ objIndex ].mNumKeyFrames );
-
-			mObject[ objIndex ].mKeyFrame[ keyIndex ] = key;
-		}
-
-		void SetTime( float _time, UINT objIndex = 0 )
-		{
-			_ASSERT( objIndex < mNumObjects );
-
-			if( (UINT)_time < mObject[ objIndex ].mNumKeyFrames )
-			{
-				mObject[ objIndex ].mCurrTime = _time;
-				mObject[ objIndex ].mCurrKey  = (int)_time;
-			}
-			else
-			{
-				mObject[ objIndex ].mCurrTime = 0;
-				mObject[ objIndex ].mCurrKey  = 0;
-			}
-		}
-
-		float GetTime( UINT objIndex = 0 )
-		{
-			_ASSERT( objIndex < mNumObjects );
-
-			return mObject[ objIndex ].mCurrTime;
-		}
-
-		void Release()
-		{
-			for( UINT x = 0; x < mNumObjects; ++x )
-			{
-				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
-				{
-					SAFE_DELETE( mObject[ x ].mMesh[ y ] );
-				}
-
-				SAFE_DELETE_ARRAY( mObject[ x ].mMesh );
-				SAFE_DELETE_ARRAY( mObject[ x ].mKeyFrame );
-			}
-
-			SAFE_DELETE_ARRAY( mMaterials );
-			SAFE_DELETE_ARRAY( mObject );
-
-			mNumObjects   = 0;
-			mNumMaterials = 0;
 		}
 
 		bool Create( const char* filename )
@@ -501,6 +428,80 @@ namespace Sentinel
 			return true;
 		}
 
+		void Release()
+		{
+			for( UINT x = 0; x < mNumObjects; ++x )
+			{
+				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
+					SAFE_DELETE( mObject[ x ].mMesh[ y ] );
+				
+				SAFE_DELETE_ARRAY( mObject[ x ].mMesh );
+				SAFE_DELETE_ARRAY( mObject[ x ].mKeyFrame );
+			}
+
+			SAFE_DELETE_ARRAY( mMaterials );
+			SAFE_DELETE_ARRAY( mObject );
+
+			mNumObjects   = 0;
+			mNumMaterials = 0;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+
+		void SetMaterial( const Material& material )
+		{
+			for( UINT x = 0; x < mNumObjects; ++x )
+			{
+				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
+				{
+					mObject[ x ].mMesh[ y ]->SetMaterial( material );
+				}
+			}
+		}
+
+		void SetShader( Shader* shader )
+		{
+			for( UINT x = 0; x < mNumObjects; ++x )
+			{
+				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
+				{
+					mObject[ x ].mMesh[ y ]->SetShader( shader );
+				}
+			}
+		}
+
+		// Set a keyframe, and append it if the index is -1.
+		//
+		void SetKeyFrame( const KeyFrame& key, int keyIndex = -1, int objIndex = 0 )
+		{
+			_ASSERT( objIndex >= 0 && (UINT)objIndex < mNumObjects && keyIndex > -1 && keyIndex < (int)mObject[ objIndex ].mNumKeyFrames );
+
+			mObject[ objIndex ].mKeyFrame[ keyIndex ] = key;
+		}
+
+		void SetTime( float _time, UINT objIndex = 0 )
+		{
+			_ASSERT( objIndex < mNumObjects );
+
+			if( (UINT)_time < mObject[ objIndex ].mNumKeyFrames )
+			{
+				mObject[ objIndex ].mCurrTime = _time;
+				mObject[ objIndex ].mCurrKey  = (int)_time;
+			}
+			else
+			{
+				mObject[ objIndex ].mCurrTime = 0;
+				mObject[ objIndex ].mCurrKey  = 0;
+			}
+		}
+
+		float GetTime( UINT objIndex = 0 )
+		{
+			_ASSERT( objIndex < mNumObjects );
+
+			return mObject[ objIndex ].mCurrTime;
+		}
+		
 		void Update()
 		{
 			// Setup Bone Matrix.

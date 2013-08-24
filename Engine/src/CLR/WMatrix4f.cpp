@@ -19,10 +19,15 @@ namespace Sentinel { namespace Math
 
 	WMatrix4f::~WMatrix4f()
 	{
-		delete mRef;
+		Delete();
 	}
 
 	WMatrix4f::!WMatrix4f()
+	{
+		Delete();
+	}
+
+	void WMatrix4f::Delete()
 	{
 		delete mRef;
 	}
@@ -32,9 +37,11 @@ namespace Sentinel { namespace Math
 		return mRef;
 	}
 
-	float WMatrix4f::Get( int index )
+	////////////////////////////////
+
+	RFloat^ WMatrix4f::Get( int index )
 	{
-		return (*mRef)[ index ];
+		return gcnew RFloat( &(*mRef)[ index ] );
 	}
 
 	void WMatrix4f::Set( int index, float value )
@@ -181,4 +188,29 @@ namespace Sentinel { namespace Math
 	{
 		return gcnew WVector3f( mRef->Right() );
 	}
+
+	////////////////////////////////
+
+	RMatrix4f::RMatrix4f( Matrix4f* mat )
+	{
+		mRef = mat;
+	}
+
+	RMatrix4f::RMatrix4f( WMatrix4f^ mat )
+	{
+		mRef = mat->GetRef();
+	}
+
+	void RMatrix4f::Set( const Matrix4f& mat )
+	{
+		*mRef = mat;
+	}
+
+	void RMatrix4f::Set( WMatrix4f^ mat )
+	{
+		*mRef = *mat->GetRef();
+	}
+
+	void RMatrix4f::Delete()
+	{}
 }}

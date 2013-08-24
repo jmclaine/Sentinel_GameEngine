@@ -1,5 +1,7 @@
 #pragma once
-
+/*
+All attached GameComponent(s) are freed on Shutdown()
+*/
 #include <set>
 #include <string>
 #include <vector>

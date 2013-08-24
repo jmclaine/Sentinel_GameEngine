@@ -5,8 +5,6 @@ HOW TO USE:
 
 Create a file called 'config.xml' for easy setup.
 
-config.xml syntax:
-
 <?xml version="1.0" ?>
 <!--DIRECTX or OPENGL-->
 <Renderer Type="OPENGL" Fullscreen="false" Width="1920" Height="1080" />
@@ -154,13 +152,13 @@ namespace Sentinel
 
 		WindowInfo();
 
-		bool	GetFullscreen() const;
+		bool	Fullscreen() const;
 
-		UINT	GetWidth() const;
-		UINT	GetHeight() const;
+		UINT	Width() const;
+		UINT	Height() const;
 
-		float	GetWidthRatio() const;
-		float	GetHeightRatio() const;
+		float	WidthRatio() const;
+		float	HeightRatio() const;
 	};
 
 	// Renderer is a SingletonAbstract as creating multiple instances
@@ -193,7 +191,7 @@ namespace Sentinel
 
 		/////////////////////////////////
 
-		static const void*	Load( const char* filename, WindowInfo& info );
+		static Renderer*	Load( const char* filename, WindowInfo& info );
 
 		virtual WindowInfo*	Startup( void* hWnd, bool fullscreen, UINT width, UINT height ) = 0;
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Vector3f.h"
-#include "WFloat.h"
+#include "RFloat.h"
 
 using namespace Sentinel::Utilities;
 
@@ -9,7 +9,7 @@ namespace Sentinel { namespace Math
 {
 	public ref class WVector3f
 	{
-	private:
+	protected:
 
 		Vector3f*	mRef;
 
@@ -23,11 +23,19 @@ namespace Sentinel { namespace Math
 		~WVector3f();
 		!WVector3f();
 
+	protected:
+
+		virtual void Delete();
+
+	public:
+
 		Vector3f*	GetRef();
 
-		WFloat^		X();
-		WFloat^		Y();
-		WFloat^		Z();
+		RFloat^		X();
+		RFloat^		Y();
+		RFloat^		Z();
+
+		////////////////////////////////
 
 		bool		operator == ( const WVector3f^ v );
 		bool		operator != ( const WVector3f^ v );
@@ -59,5 +67,20 @@ namespace Sentinel { namespace Math
 		WVector3f^	Cross( const WVector3f^ v );
 
 		float		Angle( const WVector3f^ v );
+	};
+
+	public ref class RVector3f sealed : public WVector3f
+	{
+	public:
+
+		RVector3f( Vector3f* v );
+		RVector3f( WVector3f^ v );
+
+		void		Set( const Vector3f& v );
+		void		Set( WVector3f^ v );
+		
+	protected:
+
+		virtual void Delete() override;
 	};
 }}

@@ -1,14 +1,17 @@
 #pragma once
-
+/*
+All GameComponent(s) are freed when their associated GameObject is Shutdown()
+Delete() should be called manually for a controlled free memory.
+*/
 #include "m_shared_ptr.h"
 #include "GameComponent.h"
-#include "WString.h"
+#include "RString.h"
 
 using namespace Sentinel::Utilities;
 
 namespace Sentinel { namespace Components
 {
-	ref class WGameObject;
+	ref class RGameObject;
 
 	public enum ComponentType
 	{
@@ -37,11 +40,13 @@ namespace Sentinel { namespace Components
 
 	public:
 
-		WGameComponent( GameComponent* obj );
-		WGameComponent( WGameComponent% obj );
 		virtual ~WGameComponent();
 
+		void			Delete();
+
 		GameComponent*	GetRef();
+
+		////////////////////////////////
 
 		void			Startup();
 
@@ -51,9 +56,9 @@ namespace Sentinel { namespace Components
 
 		////////////////////////////////
 
-		void			SetOwner( WGameObject% owner );
+		void			SetOwner( RGameObject^ owner );
 
 		ComponentType	Type();
-		WString^		Name();
+		RString^		Name();
 	};
 }}

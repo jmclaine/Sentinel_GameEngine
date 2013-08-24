@@ -1,11 +1,13 @@
 #pragma once
-
 /*
-Provides complete customization of objects programmatically.
+Provides complete customization of objects.
 
-Always set mShader to a valid shader before calling BuildMesh();
+Always set mShader to a valid shader before calling BuildMesh()
+
+Each Vertex contains all the possible variations of vertices
+for ease of creation.  These vertices are then copied over
+into another buffer of the shader specifications.
 */
-
 #include <memory>
 #include <vector>
 
@@ -84,7 +86,7 @@ namespace Sentinel
 		void	ClearGeometry();
 
 		// Returns UINT_MAX if not found.
-		// Helper function for M3D and OBJ model loaders.
+		// Helper function for model loaders.
 		//
 		UINT	FindVertex( const Vector3f& pos, const Vector2f& tex, const Vector3f& normal );
 
@@ -96,7 +98,6 @@ namespace Sentinel
 		void	AddIndex( UINT i0, UINT i1, UINT i2, UINT i3 );				// Quad
 		void	AddIndex( UINT i0, UINT i1, UINT i2, UINT i3, UINT i4 );	// Polygon
 
-		// Tangents.
 		// Call this function only after all vertices have been added.
 		// Used for normal mapping.
 		//
@@ -105,8 +106,8 @@ namespace Sentinel
 		// Create objects.
 		// Based on geometry.h provided with OpenGL.
 		//
-		void	CreateQuad( float size, const Vector3f& pos = Vector3f( 0, 0, 0 ), const Vector3f& normal = Vector3f( 0, 0, 1 ));
-		void	CreateCube( float size, const Vector3f& pos = Vector3f( 0, 0, 0 ));
+		void	CreateQuad( float size, const Vector3f& normal = Vector3f( 0, 0, 1 ));
+		void	CreateCube( float size );
 		void	CreateCylinder( float radius, float height, int slices, int stacks = 1 );
 		void	CreateTetrahedron( float scale );
 		void	CreateOctahedron( float radius );

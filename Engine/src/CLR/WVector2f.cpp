@@ -29,10 +29,15 @@ namespace Sentinel { namespace Math
 
 	WVector2f::~WVector2f()
 	{
-		delete mRef;
+		Delete();
 	}
 
 	WVector2f::!WVector2f()
+	{
+		Delete();
+	}
+
+	void WVector2f::Delete()
 	{
 		delete mRef;
 	}
@@ -42,15 +47,19 @@ namespace Sentinel { namespace Math
 		return mRef;
 	}
 
-	WFloat^ WVector2f::X()
+	////////////////////////////////
+
+	RFloat^ WVector2f::X()
 	{
-		return gcnew WFloat( &mRef->x );
+		return gcnew RFloat( &mRef->x );
 	}
 
-	WFloat^ WVector2f::Y()
+	RFloat^ WVector2f::Y()
 	{
-		return gcnew WFloat( &mRef->y );
+		return gcnew RFloat( &mRef->y );
 	}
+
+	////////////////////////////////
 
 	bool WVector2f::operator == ( const WVector2f^ v )
 	{
@@ -165,4 +174,29 @@ namespace Sentinel { namespace Math
 	{
 		return mRef->Angle( *v->mRef );
 	}
+
+	////////////////////////////////
+
+	RVector2f::RVector2f( Vector2f* v )
+	{
+		mRef = v;
+	}
+
+	RVector2f::RVector2f( WVector2f^ v )
+	{
+		mRef = v->GetRef();
+	}
+
+	void RVector2f::Set( const Vector2f& v )
+	{
+		*mRef = v;
+	}
+
+	void RVector2f::Set( WVector2f^ v )
+	{
+		*mRef = *v->GetRef();
+	}
+
+	void RVector2f::Delete()
+	{}
 }}

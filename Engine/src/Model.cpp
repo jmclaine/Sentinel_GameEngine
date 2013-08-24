@@ -8,6 +8,9 @@ namespace Sentinel
 	Shader*	Model::SHADER_PARALLAX		= NULL;
 	Shader*	Model::SHADER_SKINNING		= NULL;
 
+	Model::~Model()
+	{}
+
 	Model* Model::Load( const char* filename )
 	{
 		// Determine the extension of the object,
@@ -16,7 +19,7 @@ namespace Sentinel
 		int len = strlen( filename ) - 1;
 		if( toupper(filename[ len - 2 ]) == 'O' && toupper(filename[ len - 1 ]) == 'B' && toupper(filename[ len ]) == 'J' )
 		{
-			//return LoadModelOBJ( filename );
+			return LoadModelOBJ( filename );
 		}
 		else
 		if( toupper(filename[ len - 2 ]) == 'M' && toupper(filename[ len - 1 ]) == '3' && toupper(filename[ len ]) == 'D' )
@@ -25,15 +28,5 @@ namespace Sentinel
 		}
 
 		return NULL;
-	}
-
-	void Model::SetWorldTransform( const Matrix4f& world )
-	{
-		mMatrixWorld = world;
-	}
-
-	const Matrix4f& Model::GetWorldTransform() const
-	{
-		return mMatrixWorld;
 	}
 }

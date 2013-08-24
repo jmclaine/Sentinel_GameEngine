@@ -1,16 +1,16 @@
 #pragma once
+/*
+WRenderer works almost identically to the C++ version.
+All functions are static.
 
-// WRenderer works almost identically to the C++ version.
-// All functions are static.
-//
-// Removed Startup as it is only useful within WGameWindow
-// during the BuildWindowCore function.
-//
-// Adjusted Load to return WWindowInfo instead.
-//
-// Left functionality as open as possible for custom
-// creation of windows if required.
-//
+Removed Startup as it is only useful within WGameWindow
+during the BuildWindowCore function.
+
+Adjusted Load to return WWindowInfo instead.
+
+Left functionality as open as possible for custom
+creation of windows if required.
+*/
 #using <System.dll>
 #using <WindowsBase.dll>
 #using <PresentationCore.dll>
@@ -19,8 +19,8 @@
 #include <Windows.h>
 
 #include "GameWindow.h"
-#include "WTexture.h"
-#include "WBuffer.h"
+#include "RTexture.h"
+#include "RBuffer.h"
 #include "WShader.h"
 #include "WColor.h"
 
@@ -99,21 +99,21 @@ namespace Sentinel { namespace Systems
 
 		WindowInfo*		GetRef();
 
-		bool			GetFullscreen();
+		bool			Fullscreen();
 
-		int				GetWidth();
-		int				GetHeight();
+		int				Width();
+		int				Height();
 
-		float			GetWidthRatio();
-		float			GetHeightRatio();
+		float			WidthRatio();
+		float			HeightRatio();
 	};
 
 	public ref class WRenderer
 	{
 	public:
 
-		static WTexture^	NULL_TEXTURE;	// black default texture
-		static WTexture^	BASE_TEXTURE;	// white default texture
+		static RTexture^	NULL_TEXTURE;	// black default texture
+		static RTexture^	BASE_TEXTURE;	// white default texture
 
 		//////////////////////////////
 
@@ -130,21 +130,21 @@ namespace Sentinel { namespace Systems
 
 		// Buffers.
 		//
-		static WBuffer^		CreateBuffer( IntPtr data, UINT size, UINT stride, BufferType type );
+		static RBuffer^		CreateBuffer( IntPtr data, UINT size, UINT stride, BufferType type );
 
-		static void			SetVBO( WBuffer^ buffer );
-		static void			SetIBO( WBuffer^ buffer );
+		static void			SetVBO( RBuffer^ buffer );
+		static void			SetIBO( RBuffer^ buffer );
 
 		// Textures.
 		//
-		static WTexture^	CreateTexture( UINT width, UINT height, ImageFormatType format, bool createMips );
-		static WTexture^	CreateTextureFromFile( String^ filename );
-		static WTexture^	CreateTextureFromMemory( IntPtr data, UINT width, UINT height, ImageFormatType format, bool createMips );
+		static RTexture^	CreateTexture( UINT width, UINT height, ImageFormatType format, bool createMips );
+		static RTexture^	CreateTextureFromFile( String^ filename );
+		static RTexture^	CreateTextureFromMemory( IntPtr data, UINT width, UINT height, ImageFormatType format, bool createMips );
 	
 		// Special Rendering.
 		//
 		static UINT			CreateBackbuffer();
-		static UINT			CreateRenderTarget( WTexture^ texture );
+		static UINT			CreateRenderTarget( RTexture^ texture );
 		static UINT			CreateDepthStencil( UINT width, UINT height );
 		static UINT			CreateViewport( UINT width, UINT height );
 		static UINT			ResizeBuffers( UINT width, UINT height );

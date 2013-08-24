@@ -1,5 +1,4 @@
 #include "WTransformComponent.h"
-#include "TransformComponent.h"
 
 namespace Sentinel { namespace Components
 {
@@ -8,9 +7,9 @@ namespace Sentinel { namespace Components
 		mRef = new TransformComponent();
 	}
 
-	WTransformComponent::WTransformComponent( WTransformComponent% obj )
+	WTransformComponent::WTransformComponent( const TransformComponent* component )
 	{
-		mRef = obj.mRef;
+		mRef = const_cast< TransformComponent* >(component);
 	}
 
 	WTransformComponent::~WTransformComponent()
@@ -18,18 +17,18 @@ namespace Sentinel { namespace Components
 
 	/////////////////////////////////
 
-	WVector3f^ WTransformComponent::Position()
+	RVector3f^ WTransformComponent::Position()
 	{
-		return gcnew WVector3f( static_cast< TransformComponent* >(mRef)->mPosition );
+		return gcnew RVector3f( &static_cast< TransformComponent* >(mRef)->mPosition );
 	}
 
-	WQuatf^ WTransformComponent::Orientation()
+	RQuatf^ WTransformComponent::Orientation()
 	{
-		return gcnew WQuatf( static_cast< TransformComponent* >(mRef)->mOrientation );
+		return gcnew RQuatf( &static_cast< TransformComponent* >(mRef)->mOrientation );
 	}
 
-	WVector3f^ WTransformComponent::Scale()
+	RVector3f^ WTransformComponent::Scale()
 	{
-		return gcnew WVector3f( static_cast< TransformComponent* >(mRef)->mScale );
+		return gcnew RVector3f( &static_cast< TransformComponent* >(mRef)->mScale );
 	}
 }}

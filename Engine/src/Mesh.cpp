@@ -9,10 +9,8 @@ namespace Sentinel
 		mPrimitive = TRIANGLE_LIST;
 
 		for( UINT i = 0; i < NUM_TEXTURES; ++i )
-		{
 			mTexture[ i ] = Renderer::Inst()->BASE_TEXTURE;
-		}
-
+		
 		mVBO = NULL;
 		mIBO = NULL;
 
@@ -24,8 +22,8 @@ namespace Sentinel
 
 	Mesh::~Mesh()
 	{
-		SAFE_RELEASE_DELETE( mVBO );
-		SAFE_RELEASE_DELETE( mIBO );
+		SAFE_DELETE( mVBO );
+		SAFE_DELETE( mIBO );
 	}
 
 	void Mesh::SetWorldTransform( const Matrix4f& world )
@@ -71,7 +69,7 @@ namespace Sentinel
 	void Mesh::Draw( UINT count )
 	{
 		_ASSERT( GameWorld::Inst()->GetCamera() != NULL );
-
+		
 		if( count == 0 )
 			return;
 
@@ -185,7 +183,7 @@ namespace Sentinel
 						{
 						const WindowInfo* info = Renderer::Inst()->GetWindow();
 
-						Vector2f pixelSize( 1.0f / info->GetWidth(), 1.0f / info->GetHeight() );
+						Vector2f pixelSize( 1.0f / info->Width(), 1.0f / info->Height() );
 
 						mShader->SetMatrix( uniformIndex, (GameWorld::Inst()->GetCamera()->mMatrixProjection.Inverse()).Ptr() );
 						++uniformIndex;

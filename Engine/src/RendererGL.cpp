@@ -92,8 +92,6 @@ namespace Sentinel
 
 		~ShaderGL()
 		{
-			delete[] mAttributeGL;
-
 			Release();
 		}
 
@@ -137,19 +135,15 @@ namespace Sentinel
 			mProgramID = glCreateProgram();
 
 			if( mProgramID < 0 )
-			{
 				REPORT_ERROR( "Could not create shader program.", "Shader Loader Error" );
-			}
-
+			
 			// Create the shaders.
 			//
 			std::string filenameVS = filename;
 			filenameVS.append( ".vsh" );
 			if( CreateFromFile( filenameVS.c_str(), mVertexShader, GL_VERTEX_SHADER ) != 1 )
-			{
 				return S_FALSE;
-			}
-
+			
 			// Allow no geometry shader.
 			//
 			bool useGS = false;
@@ -174,9 +168,7 @@ namespace Sentinel
 			std::string filenamePS = filename;
 			filenamePS.append( ".psh" );
 			if( CreateFromFile( filenamePS.c_str(), mFragmentShader, GL_FRAGMENT_SHADER ) != 1 )
-			{
 				return S_FALSE;
-			}
 
 			// Create the attributes.
 			//
@@ -193,7 +185,6 @@ namespace Sentinel
 			{
 				if( attrib[ i ] == 'B' )
 				{
-
 					mAttributeSize += 2;
 					break;
 				}
@@ -248,9 +239,8 @@ namespace Sentinel
 					glBindAttribLocation( mProgramID, attribIndex, name );
 
 					for( UINT x = 0; x < 4; ++x )
-					{
 						SetOffset( attribIndex++, mVertexSize, 16, GL_FLOAT );
-					}
+					
 					continue;
 
 				// Tangent Vector with sign.
@@ -398,6 +388,8 @@ namespace Sentinel
 
 		void Release()
 		{
+			SAFE_DELETE_ARRAY( mAttributeGL );
+			
 			if( mProgramID != 0 )
 			{
 				glDeleteProgram( mProgramID );
@@ -415,11 +407,9 @@ namespace Sentinel
 		void ApplyLayout()
 		{
 			for( UINT i = 0; i < mAttributeSize; ++i )
-			{
 				glVertexAttribPointer( i, mAttributeGL[ i ].mOffsetSize, mAttributeGL[ i ].mType, mAttributeGL[ i ].mNormalize, mVertexSize, \
 									   reinterpret_cast< const GLvoid* >( mAttributeGL[ i ].mOffset ));
-			}
-
+			
 			mTextureLevel = 0;
 		}
 
@@ -469,10 +459,8 @@ namespace Sentinel
 			GLuint id = glGetUniformLocation( mProgramID, name );
 
 			if( id == -1 )
-			{
 				TRACE( "Shader Warning: Uniform '" << name << "' does not match within file." );
-			}
-
+			
 			mUniformGL.push_back( id );
 		}
 	};
@@ -495,6 +483,11 @@ namespace Sentinel
 		}
 
 	public:
+
+		~BufferGL()
+		{
+			Release();
+		}
 
 		void Startup( BufferType type )
 		{
@@ -603,16 +596,17 @@ namespace Sentinel
 
 			mTexture.push_back( new TextureGL( "", 0, 0, 0 ));
 			NULL_TEXTURE = mTexture.back();
+			BASE_TEXTURE = NULL;
 
 			mDepthStencil.push_back( 0 );
 
 			mCurrShader = NULL;
+
+			mCurrWindow = NULL;
 		}
 
 		RendererGL::~RendererGL()
-		{
-			Shutdown();
-		}
+		{}
 		
 		WindowInfo* Startup( void* hWnd, bool fullscreen, UINT width, UINT height )
 		{
@@ -623,7 +617,6 @@ namespace Sentinel
 			mCurrWindow->mHeight		= height;
 			mCurrWindow->mWidthRatio	= (float)width  / (float)WINDOW_WIDTH_BASE;
 			mCurrWindow->mHeightRatio	= (float)height / (float)WINDOW_HEIGHT_BASE;
-
 			mCurrWindow->mHWND			= (HWND)hWnd;
 			mCurrWindow->mHDC			= GetDC( mCurrWindow->mHWND );
 
@@ -716,9 +709,7 @@ namespace Sentinel
 			mTexture.clear();
 
 			for( UINT i = 0; i < mRenderTarget.size(); ++i )
-			{
 				glDeleteFramebuffers( 1, &mRenderTarget[ i ].mID );
-			}
 			mRenderTarget.clear();
 
 			if( mCurrWindow )
@@ -801,13 +792,9 @@ namespace Sentinel
 			// Determine if the same file is being loaded, and if so, only return it's index.
 			//
 			for( UINT i = 0; i < mTexture.size(); ++i )
-			{
 				if( mTexture[ i ]->Filename() == filename )
-				{
 					return mTexture[ i ];
-				}
-			}
-
+			
 			// Load texture for 32-bits.
 			//
 			int width, height;
@@ -857,10 +844,8 @@ namespace Sentinel
 			glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, IMAGE_FORMAT[ format ], GL_UNSIGNED_BYTE, data );
 
 			if( createMips )
-			{
 				glGenerateMipmap( GL_TEXTURE_2D );
-			}
-
+			
 			char filename[ 256 ];
 			sprintf_s( filename, "~Memory%d", mTexture.size() );
 			mTexture.push_back( new TextureGL( filename, width, height, texID ));
@@ -987,9 +972,7 @@ namespace Sentinel
 			if( mCurrShader != NULL )
 			{
 				for( UINT i = 0; i < static_cast< ShaderGL* >(mCurrShader)->AttributeSize(); ++i )
-				{
 					glDisableVertexAttribArray( i );
-				}
 			}
 
 			mCurrShader = shader;
@@ -1002,7 +985,7 @@ namespace Sentinel
 		{
 			glClearColor( color[ 0 ], color[ 1 ], color[ 2 ], color[ 3 ] );
 			glClearDepth( 1 );
-			glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
+			glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		}
 
 		void DrawIndexed( UINT count, UINT startIndex, UINT baseVertex )
@@ -1010,17 +993,15 @@ namespace Sentinel
 			_ASSERT( mCurrShader != NULL );
 
 			for( UINT i = 0; i < static_cast< ShaderGL* >(mCurrShader)->AttributeSize(); ++i )
-			{
 				glEnableVertexAttribArray( i );
-			}
-
+			
 			glDrawRangeElementsBaseVertex( PRIMITIVE[ mCurrWindow->mRenderMode ], startIndex, startIndex + count, count, GL_UNSIGNED_INT, \
-										   reinterpret_cast< void* >( startIndex * sizeof( UINT ) ), baseVertex );
+										   reinterpret_cast< void* >( startIndex * sizeof( UINT )), baseVertex );
 			
 			for( UINT i = 0; i < static_cast< ShaderGL* >(mCurrShader)->AttributeSize(); ++i )
-			{
 				glDisableVertexAttribArray( i );
-			}
+				
+			glFlush();
 		}
 
 		void Present()

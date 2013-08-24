@@ -29,10 +29,15 @@ namespace Sentinel { namespace Math
 
 	WQuatf::~WQuatf()
 	{
-		delete mRef;
+		Delete();
 	}
 
 	WQuatf::!WQuatf()
+	{
+		Delete();
+	}
+
+	void WQuatf::Delete()
 	{
 		delete mRef;
 	}
@@ -42,25 +47,29 @@ namespace Sentinel { namespace Math
 		return mRef;
 	}
 
-	WFloat^ WQuatf::X()
+	////////////////////////////////
+
+	RFloat^ WQuatf::X()
 	{
-		return gcnew WFloat( &mRef->x );
+		return gcnew RFloat( &mRef->x );
 	}
 
-	WFloat^ WQuatf::Y()
+	RFloat^ WQuatf::Y()
 	{
-		return gcnew WFloat( &mRef->y );
+		return gcnew RFloat( &mRef->y );
 	}
 
-	WFloat^ WQuatf::Z()
+	RFloat^ WQuatf::Z()
 	{
-		return gcnew WFloat( &mRef->z );
+		return gcnew RFloat( &mRef->z );
 	}
 
-	WFloat^ WQuatf::W()
+	RFloat^ WQuatf::W()
 	{
-		return gcnew WFloat( &mRef->w );
+		return gcnew RFloat( &mRef->w );
 	}
+
+	////////////////////////////////
 
 	WQuatf^	WQuatf::operator * ( const WQuatf^ q )
 	{
@@ -120,4 +129,29 @@ namespace Sentinel { namespace Math
 		mRef->Euler();
 		return this;
 	}
+
+	////////////////////////////////
+
+	RQuatf::RQuatf( Quatf* q )
+	{
+		mRef = q;
+	}
+	
+	RQuatf::RQuatf( WQuatf^ q )
+	{
+		mRef = q->GetRef();
+	}
+
+	void RQuatf::Set( const Quatf& q )
+	{
+		*mRef = q;
+	}
+
+	void RQuatf::Set( WQuatf^ q )
+	{
+		*mRef = *q->GetRef();
+	}
+
+	void RQuatf::Delete()
+	{}
 }}

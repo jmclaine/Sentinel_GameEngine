@@ -7,7 +7,7 @@ namespace Sentinel
 {
 	class SENTINEL_DLL PerspectiveCameraComponent : public CameraComponent
 	{
-	public:
+	private:
 
 		float		mNearZ;
 		float		mFarZ;
@@ -18,6 +18,10 @@ namespace Sentinel
 		//Plane mPlane[ 6 ];	// view frustum planes
 
 		//////////////////////////////
+
+		PerspectiveCameraComponent();
+
+	public:
 
 		PerspectiveCameraComponent( float windowWidth, float windowHeight, float nearZ = 0.1f, float farZ = 10000.0f, float FOV = 45.0f );
 

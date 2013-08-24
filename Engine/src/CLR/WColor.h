@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Color.h"
-#include "WFloat.h"
+#include "RFloat.h"
 
 using namespace Sentinel::Utilities;
 
@@ -9,7 +9,7 @@ namespace Sentinel { namespace Assets
 {
 	public ref class WColorRGBA
 	{
-	private:
+	protected:
 
 		ColorRGBA*		mRef;
 
@@ -17,21 +17,44 @@ namespace Sentinel { namespace Assets
 
 		WColorRGBA();
 		WColorRGBA( float red, float green, float blue, float alpha );
-		WColorRGBA( ColorRGBA* color );
+		WColorRGBA( ColorRGBA& color );
 		WColorRGBA( WColorRGBA^ color );
 		WColorRGBA( WColorRGBA% color );
 		~WColorRGBA();
 		!WColorRGBA();
 
-		ColorRGBA*		GetRef();
+	protected:
 
-		WFloat^			R();
-		WFloat^			G();
-		WFloat^			B();
-		WFloat^			A();
+		virtual void Delete();
 
-		float*			Ptr();
+	public:
 
-		UINT			ToUINT();
+		ColorRGBA*	GetRef();
+
+		////////////////////////////////
+
+		RFloat^		R();
+		RFloat^		G();
+		RFloat^		B();
+		RFloat^		A();
+
+		float*		Ptr();
+
+		UINT		ToUINT();
+	};
+
+	public ref class RColorRGBA sealed : public WColorRGBA
+	{
+	public:
+
+		RColorRGBA( ColorRGBA* color );
+		RColorRGBA( WColorRGBA^ color );
+
+		void		Set( const ColorRGBA& color );
+		void		Set( WColorRGBA^ color );
+
+	protected:
+
+		virtual void Delete() override;
 	};
 }}

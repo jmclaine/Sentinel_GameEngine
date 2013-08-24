@@ -1,9 +1,9 @@
 #pragma once
-
-// Created a new GameWindow specific for the CLR
-// due to the major differences in instantiation
-// of the windows between C# / WPF and C++
-//
+/*
+Created a new GameWindow specific for the CLR
+due to the major differences in instantiation
+of the windows between C# / WPF and C++
+*/
 #include "WRenderer.h"
 #include "GameWindow.h"
 

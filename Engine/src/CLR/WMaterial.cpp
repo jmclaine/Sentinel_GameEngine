@@ -40,10 +40,15 @@ namespace Sentinel { namespace Assets
 
 	WMaterial::~WMaterial()
 	{
-		delete mRef;
+		Delete();
 	}
 
 	WMaterial::!WMaterial()
+	{
+		Delete();
+	}
+
+	void WMaterial::Delete()
 	{
 		delete mRef;
 	}
@@ -53,23 +58,50 @@ namespace Sentinel { namespace Assets
 		return mRef;
 	}
 
-	WColorRGBA^ WMaterial::Ambient()
+	////////////////////////////////
+
+	RColorRGBA^ WMaterial::Ambient()
 	{
-		return gcnew WColorRGBA( &mRef->mAmbient );
+		return gcnew RColorRGBA( &mRef->mAmbient );
 	}
 
-	WColorRGBA^ WMaterial::Diffuse()
+	RColorRGBA^ WMaterial::Diffuse()
 	{
-		return gcnew WColorRGBA( &mRef->mDiffuse );
+		return gcnew RColorRGBA( &mRef->mDiffuse );
 	}
 
-	WColorRGBA^ WMaterial::Specular()
+	RColorRGBA^ WMaterial::Specular()
 	{
-		return gcnew WColorRGBA( &mRef->mSpecular );
+		return gcnew RColorRGBA( &mRef->mSpecular );
 	}
 
-	WFloat^ WMaterial::SpecularComponent()
+	RFloat^ WMaterial::SpecularComponent()
 	{
-		return gcnew WFloat( &mRef->mSpecularComponent );
+		return gcnew RFloat( &mRef->mSpecularComponent );
 	}
+
+	////////////////////////////////
+
+	RMaterial::RMaterial( Material* material )
+	{
+		mRef = material;
+	}
+
+	RMaterial::RMaterial( WMaterial^ material )
+	{
+		mRef = material->GetRef();
+	}
+
+	void RMaterial::Set( const Material& material )
+	{
+		*mRef = material;
+	}
+
+	void RMaterial::Set( WMaterial^ material )
+	{
+		*mRef = *material->GetRef();
+	}
+
+	void RMaterial::Delete()
+	{}
 }}

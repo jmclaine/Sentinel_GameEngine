@@ -1,10 +1,10 @@
 #pragma once
+/*
+Mesh is not modifiable, except the buffers
+associated with the Mesh.
 
-// Mesh is not modifiable, except the buffers
-// associated with the Mesh.
-//
-// Mesh is generated through MeshBuilder.h or Model.h
-//
+Mesh is generated through MeshBuilder.h or Model.h
+*/
 #include "Common.h"
 #include "Renderer.h"
 #include "Material.h"

@@ -3,15 +3,13 @@
 #include <fstream>
 #include <sstream>
 
-#include "Actor.h"
-#include "Collision.h"
-#include "MeshBuilder.h"
 #include "Model.h"
+#include "MeshBuilder.h"
 #include "Util.h"
 #include "Renderer.h"
 
 
-namespace Engine
+namespace Sentinel
 {
 	class ModelOBJ : public Model
 	{
@@ -22,85 +20,34 @@ namespace Engine
 		typedef std::map< std::string, MeshBuilder* >  MeshBuilderMap;
 		typedef std::pair< std::string, MeshBuilder* > MeshBuilderPair;
 
-		Mesh** m_mesh;
-		UINT   m_numMeshes;
+		Mesh**		mMesh;
+		UINT		mNumMeshes;
 
 	public:
 
 		ModelOBJ( const char* filename )
 		{
-			load( filename );
+			Create( filename );
 		}
 
-		//////////////////////////////////////////////////////////////////////////
-
-		void setMaterial( const Material& material )
-		{
-			for( UINT x = 0; x < m_numMeshes; ++x )
-			{
-				m_mesh[ x ]->setMaterial( material );
-			}
-		}
-
-		void setShader( Shader* shader )
-		{
-			for( UINT x = 0; x < m_numMeshes; ++x )
-			{
-				m_mesh[ x ]->setShader( shader );
-			}
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-
-		// TODO:
-		// Support animation for OBJ files.
-		//
-		// Set a keyframe, and append it if the index is -1.
-		//
-		void setKeyFrame( const KeyFrame& key, int keyIndex = -1, int objIndex = 0 )
-		{}
-
-		void setTime( float _time, UINT objIndex = 0 )
-		{}
-
-		float getTime( UINT objIndex = 0 )
-		{
-			return 0;
-		}
-
-		// Clear the geometry and materials.
-		//
-		void release()
-		{
-			for( UINT x = 0; x < m_numMeshes; ++x )
-			{
-				m_mesh[ x ]->release();
-				delete m_mesh[ x ];
-			}
-
-			delete[] m_mesh;
-		}
-
-		// Load the model.
-		//
-		void load( const char* filename )
+		bool Create( const char* filename )
 		{
 			// Clear out any model that may have existed previously.
 			//
-			release();
+			Release();
 
 			// Model data.
 			// OBJ files start with the first index as 1,
 			// so push a dummy into the vectors to align.
 			//
-			std::vector< vec3f > positions(1);
-			std::vector< vec2f > texCoords(1);
-			std::vector< vec3f > normals(1);
+			std::vector< Vector3f > positions(1);
+			std::vector< Vector2f > texCoords(1);
+			std::vector< Vector3f > normals(1);
 
 			// Initialize the minimum and maximum vertex positions for the bounding sphere.
 			//
-			vec3f minPosition( FLT_MAX, FLT_MAX, FLT_MAX ),
-				  maxPosition( FLT_MIN, FLT_MIN, FLT_MIN );
+			Vector3f minPosition( FLT_MAX, FLT_MAX, FLT_MAX ),
+					 maxPosition( FLT_MIN, FLT_MIN, FLT_MIN );
 
 			// Create a default material.
 			//
@@ -108,8 +55,8 @@ namespace Engine
 			const std::string defaultMaterial = "~*Default*~";
 			builder.insert( MeshBuilderPair( defaultMaterial, new MeshBuilder() ));
 
-			MeshBuilder* mesh = builder.begin()->second;
-			mesh->setShader( m_shaderColor );
+			MeshBuilder* meshBuilder = builder.begin()->second;
+			meshBuilder->mShader = SHADER_COLOR;
 
 			// Read the file.
 			//
@@ -138,7 +85,7 @@ namespace Engine
 					else
 					if( token == "v" )
 					{
-						vec3f p;
+						Vector3f p;
 						parsehelper >> p.x >> p.y >> p.z;
 						positions.push_back( p );
 
@@ -153,7 +100,7 @@ namespace Engine
 					else
 					if( token == "vt" )
 					{
-						vec2f p;
+						Vector2f p;
 						parsehelper >> p.x >> p.y;
 						p.y = 1 - p.y;				// Texture is reverse y-axis.
 						texCoords.push_back( p );
@@ -163,7 +110,7 @@ namespace Engine
 					else
 					if( token == "vn" )
 					{
-						vec3f p;
+						Vector3f p;
 						parsehelper >> p.x >> p.y >> p.z;
 						normals.push_back( p );
 					}
@@ -202,8 +149,8 @@ namespace Engine
 									mtlParsehelper >> mtlName;
 									builder.insert( MeshBuilderPair( mtlName, new MeshBuilder() ));
 
-									MeshBuilder* mesh = builder.find( mtlName )->second;
-									mesh->setShader( m_shaderColor );
+									MeshBuilder* meshBuilder = builder.find( mtlName )->second;
+									meshBuilder->mShader = SHADER_COLOR;
 								}
 								// Load a texture.
 								//
@@ -215,9 +162,9 @@ namespace Engine
 									if( mtl_iter != builder.end() )
 									{
 										mtlParsehelper >> mtlToken;
-										MeshBuilder* mesh = mtl_iter->second;
-										mesh->loadTexture( mtlToken.c_str() );
-										mesh->setShader( m_shaderTexture );
+										MeshBuilder* meshBuilder = mtl_iter->second;
+										meshBuilder->mShader = SHADER_TEXTURE;
+										meshBuilder->mTexture[ TEXTURE_DIFFUSE ] = Renderer::Inst()->CreateTextureFromFile( mtlToken.c_str() );
 									}
 								}
 							}
@@ -239,11 +186,11 @@ namespace Engine
 						//
 						if( mtl_iter == builder.end() )
 						{
-							mesh = builder.find( defaultMaterial )->second;
+							meshBuilder = builder.find( defaultMaterial )->second;
 						}
                         else
                         {
-                            mesh = mtl_iter->second;
+                            meshBuilder = mtl_iter->second;
                         }
 					}
 					// Fat indices.
@@ -251,13 +198,15 @@ namespace Engine
 					else
 					if( token == "f" )
 					{
-						if( mesh == NULL )
+						if( meshBuilder == NULL )
 						{
 							REPORT_ERROR( "Invalid syntax for OBJ file.", "OBJ Load Error" );
-							return;
+							return false;
 						}
 
+						MeshBuilder::Vertex meshVertex;
 						UINT i = 0;
+
 						for(;;)
 						{
 							// Convert this token into an index.
@@ -275,7 +224,7 @@ namespace Engine
 							// Texture coord.
 							// Normal.
 							//
-							vec3i vIndex;
+							int vIndex[3];
 							int currType = 0;
 							std::string fatIndex;
 
@@ -298,30 +247,31 @@ namespace Engine
 
 							// Search for a duplicate vertex, and reference its index instead.
 							//
-							UINT currVertex = mesh->findVertex( positions[ vIndex[ 0 ]], texCoords[ vIndex[ 1 ]], normals[ vIndex[ 2 ]] );
+							UINT currVertex = meshBuilder->FindVertex( positions[ vIndex[ 0 ]], texCoords[ vIndex[ 1 ]], normals[ vIndex[ 2 ]] );
 							if( currVertex == UINT_MAX )
 							{
 								// Create this vertex.
 								//
-								currVertex = mesh->numVertices();
+								currVertex = meshBuilder->mVertex.size();
 
-								mesh->addVertex( positions[ vIndex[ 0 ]] );
-								mesh->setTexCoord0( texCoords[ vIndex[ 1 ]].x, texCoords[ vIndex[ 1 ]].y );
-								mesh->setNormal( normals[ vIndex[ 2 ]] );
+								meshVertex.mPosition			= positions[ vIndex[ 0 ]];
+								meshVertex.mTextureCoords[ 0 ]	= texCoords[ vIndex[ 1 ]];
+								meshVertex.mNormal				= normals[ vIndex[ 2 ]];
+								meshBuilder->mVertex.push_back( meshVertex );
 							}
 
 							// Add the index.
 							//
-							mesh->addIndex( currVertex );
+							meshBuilder->mIndex.push_back( currVertex );
 							++i;
 
 							if( i > 3 )
 							{
 								// This is part of a triangle list, so add a couple more indices to complete the triangle.
 								//
-								UINT index = mesh->numIndices();
-								mesh->addIndex( mesh->getIndex( index - 4 ));
-								mesh->addIndex( mesh->getIndex( index - 2 ));
+								UINT index = meshBuilder->mIndex.size();
+								meshBuilder->mIndex.push_back( meshBuilder->mIndex[ index - 4 ] );
+								meshBuilder->mIndex.push_back( meshBuilder->mIndex[ index - 2 ] );
 							}
 						}
 					}
@@ -333,13 +283,13 @@ namespace Engine
 				// Now make the VBOs and IBOs for each material.
 				//
 				UINT i = 0;
-				m_mesh = new Mesh*[ builder.size() ];
+				mMesh = new Mesh*[ builder.size() ];
 
 				TRAVERSE_LIST( it, builder )
 				{
-					if( it->second->numVertices() > 0 )
+					if( it->second->mVertex.size() > 0 )
 					{
-						m_mesh[ i ] = it->second->buildMesh();
+						mMesh[ i ] = it->second->BuildMesh();
 						++i;
 					}
 
@@ -351,22 +301,71 @@ namespace Engine
 			else
 			{
 				REPORT_ERROR( "Failed to load " << filename, "OBJ Model Load Failure" );
+				return false;
 			}
+
+			return true;
+		}
+
+		void Release()
+		{
+			for( UINT x = 0; x < mNumMeshes; ++x )
+				delete mMesh[ x ];
+			
+			delete[] mMesh;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+
+		void SetMaterial( const Material& material )
+		{
+			for( UINT x = 0; x < mNumMeshes; ++x )
+			{
+				mMesh[ x ]->SetMaterial( material );
+			}
+		}
+
+		void SetShader( Shader* shader )
+		{
+			for( UINT x = 0; x < mNumMeshes; ++x )
+			{
+				mMesh[ x ]->SetShader( shader );
+			}
+		}
+
+		// OBJ files do not support animation.
+		//
+		void SetKeyFrame( const KeyFrame& key, int keyIndex = -1, int objIndex = 0 )
+		{
+			_ASSERT(0);	// unsupported
+		}
+
+		void SetTime( float _time, UINT objIndex = 0 )
+		{
+			_ASSERT(0);	// unsupported
+		}
+
+		float GetTime( UINT objIndex = 0 )
+		{
+			_ASSERT(0);	// unsupported
+			return 0;
 		}
 
 		// Update the model by keyframe.
 		//
-		void update( float deltaTime )
-		{}
+		void Update()
+		{
+			_ASSERT(0);	// unsupported
+		}
 
 		// Render the model.
 		//
-		void draw()
+		void Draw()
 		{
-			for( UINT x = 0; x < m_numMeshes; ++x )
+			for( UINT x = 0; x < mNumMeshes; ++x )
 			{
-				m_mesh[ x ]->setWorldMatrix( m_matWorld );
-				m_mesh[ x ]->draw();
+				mMesh[ x ]->SetWorldTransform( mMatrixWorld );
+				mMesh[ x ]->Draw();
 			}
 		}
 	};

@@ -20,9 +20,9 @@ namespace Sentinel
 		mPrimitive = TRIANGLE_LIST;
 
 		for( UINT i = 0; i < NUM_TEXTURES; ++i )
-		{
 			mTexture[ i ] = Renderer::Inst()->BASE_TEXTURE;
-		}
+		
+		mShader = NULL;
 
 		mVBO = NULL;
 		mIBO = NULL;
@@ -177,7 +177,7 @@ namespace Sentinel
 	
 	// Create a quad based on a normal and size.
 	//
-	void MeshBuilder::CreateQuad( float size, const Vector3f& pos, const Vector3f& normal )
+	void MeshBuilder::CreateQuad( float size, const Vector3f& normal )
 	{
 		UINT startVert = mVertex.size();
 
@@ -188,28 +188,28 @@ namespace Sentinel
 		Vector3f cornerUL = up - right;
 
 		Vertex vertex;
-		vertex.mPosition			= cornerUL * -size + pos;
+		vertex.mPosition			= cornerUL * -size;
 		vertex.mTextureCoords[ 0 ]	= Vector2f( 0, 1 );
 		vertex.mTextureCoords[ 1 ]	= Vector2f( 0, 1 );
 		vertex.mNormal				= normal;
 
 		mVertex.push_back( vertex );
 		
-		vertex.mPosition			= cornerUR * -size + pos;
+		vertex.mPosition			= cornerUR * -size;
 		vertex.mTextureCoords[ 0 ]	= Vector2f( 1, 1 );
 		vertex.mTextureCoords[ 1 ]	= Vector2f( 1, 1 );
 		vertex.mNormal				= normal;
 
 		mVertex.push_back( vertex );
 
-		vertex.mPosition			= cornerUL * size + pos;
+		vertex.mPosition			= cornerUL * size;
 		vertex.mTextureCoords[ 0 ]	= Vector2f( 1, 0 );
 		vertex.mTextureCoords[ 1 ]	= Vector2f( 1, 0 );
 		vertex.mNormal				= normal;
 
 		mVertex.push_back( vertex );
 
-		vertex.mPosition			= cornerUR * size + pos;
+		vertex.mPosition			= cornerUR * size;
 		vertex.mTextureCoords[ 0 ]	= Vector2f( 0, 0 );
 		vertex.mTextureCoords[ 1 ]	= Vector2f( 0, 0 );
 		vertex.mNormal				= normal;
@@ -223,15 +223,17 @@ namespace Sentinel
 
 #define CUBE_SIDE( n )\
 	normal = n;\
-	newPos = pos + normal * extSize;\
-	CreateQuad( size, newPos, normal );
+	startVert = mVertex.size();\
+	matTrans.Translate( normal * size );\
+	CreateQuad( size, normal );\
+	ApplyMatrix( matTrans, startVert );
 
-	void MeshBuilder::CreateCube( float size, const Vector3f& pos )
+	void MeshBuilder::CreateCube( float size )
 	{
-		Vector3f newPos;
+		Matrix4f matTrans;
 		Vector3f normal;
-		float extSize = size;
-
+		UINT	 startVert;
+		
 		// Front
 		CUBE_SIDE( Vector3f( 0, 0, -1 ));
 

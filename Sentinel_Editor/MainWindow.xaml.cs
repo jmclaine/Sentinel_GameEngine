@@ -54,16 +54,16 @@ namespace Sentinel_Editor
 			NUM_SHAPES
 		};
 
-		private WGameWindow		mWindowWorld;
-		private static float	mBlue;
-		//private static WColorRGBA   mClearColor = new WColorRGBA(0.0f, 0.2f, 0.8f, 1.0f);
+		private WGameWindow			mWindowWorld;
+		private static WColorRGBA   mClearColor = new WColorRGBA( 0.0f, 0.2f, 0.8f, 1.0f );
 
-		private WShader[]		mShader;
-		private WMesh			mShape;
-		private WMaterial		mMaterial;
+		private WShader[]			mShader;
+		
+		private bool				mDoUpdate;
 
-		private bool			mDoUpdate;
-
+		///
+		/// Starting Point of Application.
+		///
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -87,21 +87,8 @@ namespace Sentinel_Editor
 
 			Window_World.Child = mWindowWorld;
 
-			///////////////////////////////////////
-			// Prepare shaders.
-			//
-			mShader = new WShader[ (int)ShaderTypes.NUM_SHADERS ];
-
-			mShader[ (int)ShaderTypes.SHADER_COLOR ] = WRenderer.CreateShader( "Shaders\\colnorm", "PN", "PpVML" );
-			if( mShader[ (int)ShaderTypes.SHADER_COLOR ] == null )
-				MessageBox.Show( "Failed to load shader: colnorm", "Shader Load Failure" );
-
-			///////////////////////////////////////
-			// Prepare Game Objects.
-			//
-			WGameObject obj = WGameWorld.AddGameObject( new WGameObject(), "Test_Object" );
-
-			WGameWorld.Startup( "NoMap.MAP" );
+			PrepareShaders();
+			PrepareObjects();
 
 			///////////////////////////////////////
 			// Setup game loop.
@@ -112,6 +99,25 @@ namespace Sentinel_Editor
 			timer.Tick += new EventHandler( Update );
 			timer.Interval = new TimeSpan( 16 );
 			timer.Start();
+		}
+
+		private void Update( Object sender, EventArgs e )
+		{
+			if( mDoUpdate )
+			{
+				WRenderer.SetDepthStencil( 0 );
+				WRenderer.SetViewport( 0 );
+				WRenderer.SetRenderTarget( 0 );
+
+				WRenderer.Clear( mClearColor );
+
+				//WPerspectiveCameraComponent camera = new WPerspectiveCameraComponent( WGameWorld.GetCamera( 0 ));
+				//camera.Set( (float)mWindowWorld.GetInfo().Width(), (float)mWindowWorld.GetInfo().Height(), 0.1f, 10000.0f, 45.0f * (float)mWindowWorld.GetInfo().Width() / (float)mWindowWorld.GetInfo().Height() );
+
+				WGameWorld.UpdateDrawable();
+
+				WRenderer.Present();
+			}
 		}
 
 		private void Window_Closing( Object sender, CancelEventArgs e )
@@ -141,31 +147,66 @@ namespace Sentinel_Editor
 		{
 			mDoUpdate = false;
 
-			//mWindowWorld.Shutdown();
-			//WGameWorld.Shutdown();
+			for( int x = 0; x < mShader.Length; ++x )
+				mShader[ x ].Dispose();
+
+			mWindowWorld.Shutdown();
+			WGameWorld.Shutdown();
 		}
 
-		private void Update( Object sender, EventArgs e )
+		///
+		/// Prepare Shaders.
+		///
+		private void PrepareShaders()
 		{
-			if( mDoUpdate )
-			{
-				mBlue += 0.001f;
-				if( mBlue >= 1.0f )
-					mBlue = 0.0f;
-				WColorRGBA mClearColor = new WColorRGBA( 0.0f, 0.2f * mBlue, mBlue, 1.0f );
+			mShader = new WShader[ (int)ShaderTypes.NUM_SHADERS ];
 
-				//mWindowWorld.SetActive();
+			mShader[ (int)ShaderTypes.SHADER_COLOR ] = WRenderer.CreateShader( "Shaders\\colnorm", "PN", "PpVML" );
+			if( mShader[ (int)ShaderTypes.SHADER_COLOR ] == null )
+				MessageBox.Show( "Failed to load shader: colnorm", "Shader Load Failure" );
+		}
 
-				WRenderer.SetDepthStencil( 0 );
-				WRenderer.SetViewport( 0 );
-				WRenderer.SetRenderTarget( 0 );
+		///
+		/// Prepare Game Objects.
+		///
+		private void PrepareObjects()
+		{
+			WMeshBuilder					meshBuilder = new WMeshBuilder();
+			WMaterial						material    = new WMaterial();
+			WGameObject						obj;
+			WPerspectiveCameraComponent		camera;
+			WTransformComponent				transform;
+			
+			////////////////////////////////////
 
-				WRenderer.Clear( mClearColor );
+			WGameWorld.Load( "NoMap.MAP" );
 
-				//WGameWorld.UpdateDrawable();
+			// Camera.
+			//
+			obj = WGameWorld.AddGameObject( new WGameObject(), "Main_Camera" );
+			
+			transform = new WTransformComponent();
+			//transform.Position().Set( new WVector3f( 0, 10, -100 ));
+			obj.AttachComponent( transform, "Transform" );
 
-				WRenderer.Present();
-			}
+			camera = new WPerspectiveCameraComponent( (float)mWindowWorld.GetInfo().Width(), (float)mWindowWorld.GetInfo().Height() );
+			obj.AttachComponent( camera, "Camera" );
+
+			// Test object.
+			//
+			meshBuilder.CreateCube( 1.0f );
+			meshBuilder.Shader().Set( mShader[ (int)ShaderTypes.SHADER_COLOR ] );
+
+			obj = WGameWorld.AddGameObject( new WGameObject(), "Test_Object" );
+
+			transform = new WTransformComponent();
+			transform.Position().Set( new WVector3f( 0, 0, -10 ));
+			//transform.Scale().Set( new WVector3f( 100, 1, 100 ));
+			obj.AttachComponent( transform, "Transform" );
+
+			obj.AttachComponent( new WMeshComponent( meshBuilder.BuildMesh(), material ), "Mesh" );
+			
+			WGameWorld.Startup();
 		}
 
 		///

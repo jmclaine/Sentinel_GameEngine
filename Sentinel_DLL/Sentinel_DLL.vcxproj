@@ -157,6 +157,7 @@
     <ClCompile Include="..\Engine\src\Model.cpp" />
     <ClCompile Include="..\Engine\src\ModelComponent.cpp" />
     <ClCompile Include="..\Engine\src\ModelM3D.cpp" />
+    <ClCompile Include="..\Engine\src\ModelOBJ.cpp" />
     <ClCompile Include="..\Engine\src\NetworkPacket.cpp" />
     <ClCompile Include="..\Engine\src\NetworkSocket.cpp" />
     <ClCompile Include="..\Engine\src\OrthographicCameraComponent.cpp" />

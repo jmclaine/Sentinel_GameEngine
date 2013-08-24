@@ -4,22 +4,29 @@
 namespace Sentinel
 {
 	GameWorld::GameWorld()
-	{}
+	{
+		mCurrentCamera = NULL;
+	}
 
 	GameWorld::~GameWorld()
 	{
 		Shutdown();
 	}
 
-	void GameWorld::Startup( const std::string& mapName )
+	GameWorld* GameWorld::Load( const std::string& mapName, void* hWnd )
 	{
+		GameWorld* world = GameWorld::Inst( hWnd );
+
 		// No map file format to load...yet.
 
+		return world;
+	}
+
+	void GameWorld::Startup()
+	{
 		TRAVERSE_VECTOR( x, mGameObject )
 		{
 			GameObject* obj = mGameObject[ x ];
-
-			obj->Startup();
 
 			CameraComponent* camera = (CameraComponent*)obj->FindComponent( COMPONENT_CAMERA );
 		
@@ -32,8 +39,28 @@ namespace Sentinel
 				mLight.push_back( light );
 		}
 
-		if( !mCamera.empty() )
-			mCurrentCamera = mCamera[ 0 ];	// assume first camera created is Main Camera
+		mCurrentCamera = (!mCamera.empty()) ? mCamera[ 0 ] : NULL;
+
+		// Create a default light if none exist.
+		//
+		if( mLight.empty() )
+		{
+			LightComponent* light = new LightComponent();
+			light->mAttenuation = Vector4f( 1, 1, 1, 2000 );
+			light->mColor		= ColorRGBA( 1, 1, 1, 1 );
+
+			TransformComponent* transform = new TransformComponent();
+			transform->mPosition = Vector3f( 0, 250, 0 );
+
+			GameObject* obj = AddGameObject( new GameObject(), "Default_Light" );
+			obj->AttachComponent( transform, "Transform" );
+			obj->AttachComponent( light, "Light" );
+
+			mLight.push_back( light );
+		}
+
+		TRAVERSE_VECTOR( x, mGameObject )
+			mGameObject[ x ]->Startup();
 	}
 
 	void GameWorld::Update()
@@ -47,9 +74,7 @@ namespace Sentinel
 	void GameWorld::UpdateController()
 	{
 		TRAVERSE_VECTOR( x, mGameObject )
-		{
 			mGameObject[ x ]->UpdateController();
-		}
 	}
 
 	void GameWorld::UpdatePhysics()
@@ -57,14 +82,18 @@ namespace Sentinel
 		PhysicsSystem::Inst()->Update();
 
 		TRAVERSE_VECTOR( x, mGameObject )
-		{
 			mGameObject[ x ]->UpdatePhysics();
-		}
 	}
 
 	void GameWorld::UpdateDrawable()
 	{
 		_ASSERT( mCurrentCamera );
+
+		TRAVERSE_VECTOR( x, mCamera )
+			mCamera[ x ]->Update();
+
+		TRAVERSE_VECTOR( x, mLight )
+			mLight[ x ]->Update();
 
 		// Meshes may contain alpha values.
 		// Put them in order.
@@ -86,17 +115,13 @@ namespace Sentinel
 		// Update and Render Meshes.
 		//
 		TRAVERSE_LIST( it, mAlphaOrder )
-		{
 			(*it).second->UpdateDrawable();
-		}
 	}
 
 	void GameWorld::UpdateComponents()
 	{
 		TRAVERSE_VECTOR( x, mGameObject )
-		{
 			mGameObject[ x ]->UpdateComponents();
-		}
 	}
 
 	void GameWorld::Shutdown()
@@ -122,15 +147,13 @@ namespace Sentinel
 		return entity;
 	}
 
-	void GameWorld::RemoveGameObject( GameObject* entity )
+	GameObject* GameWorld::RemoveGameObject( GameObject* entity )
 	{
 		TRAVERSE_LIST( it, mGameObject )
 			if( (*it) == entity )
-			{
-				entity->Shutdown();
-				delete entity;
 				mGameObject.erase( it );
-			}
+		
+		return entity;
 	}
 
 	/////////////////////////////////

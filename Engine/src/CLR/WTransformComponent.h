@@ -1,5 +1,6 @@
 #pragma once
 
+#include "TransformComponent.h"
 #include "WGameComponent.h"
 #include "WVector3f.h"
 #include "WQuatf.h"
@@ -13,13 +14,13 @@ namespace Sentinel { namespace Components
 	public:
 
 		WTransformComponent();
-		WTransformComponent( WTransformComponent% v );
+		WTransformComponent( const TransformComponent* component );
 		~WTransformComponent();
 
 		/////////////////////////////////
 
-		WVector3f^		Position();
-		WQuatf^			Orientation();
-		WVector3f^		Scale();
+		RVector3f^		Position();
+		RQuatf^			Orientation();
+		RVector3f^		Scale();
 	};
 }}

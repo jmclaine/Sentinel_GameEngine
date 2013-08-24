@@ -21,6 +21,8 @@ namespace Sentinel
 {
 	class SENTINEL_DLL CameraComponent : public GameComponent
 	{
+	protected:
+
 		TransformComponent* mTransform;
 
 	public:

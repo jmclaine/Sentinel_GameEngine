@@ -2,23 +2,37 @@
 
 namespace Sentinel { namespace Assets
 {
+	WShader::WShader()
+	{
+		mRef = NULL;
+	}
+
 	WShader::WShader( Shader* shader )
 	{
 		mRef = shader;
 	}
 
-	WShader::WShader( WShader^ shader )
+	WShader::~WShader()
 	{
-		mRef = shader->mRef;
+		Delete();
 	}
 
-	WShader::~WShader()
-	{}
+	WShader::!WShader()
+	{
+		Delete();
+	}
+
+	void WShader::Delete()
+	{
+		delete mRef;
+	}
 
 	Shader* WShader::GetRef()
 	{
 		return mRef;
 	}
+
+	////////////////////////////////
 
 	System::String^	WShader::AttributeDecl()
 	{
@@ -75,8 +89,31 @@ namespace Sentinel { namespace Assets
 		mRef->SetMatrix( uniform, matrix, offset, count );
 	}
 
-	void WShader::SetTexture( UINT uniform, WTexture^ texture )
+	void WShader::SetTexture( UINT uniform, RTexture^ texture )
 	{
 		mRef->SetTexture( uniform, texture->GetRef() );
 	}
+
+	////////////////////////////////
+
+	RShader::RShader( Shader*& shader ) :
+		mRefPtr( shader )
+	{
+		Set( shader );
+	}
+
+	void RShader::Set( Shader*& shader )
+	{
+		mRefPtr = shader;
+		mRef = mRefPtr;
+	}
+
+	void RShader::Set( WShader^ shader )
+	{
+		mRefPtr = shader->GetRef();
+		mRef = mRefPtr;
+	}
+
+	void RShader::Delete()
+	{}
 }}

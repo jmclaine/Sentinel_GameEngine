@@ -5,8 +5,8 @@
 #include "WColor.h"
 #include "WMaterial.h"
 #include "WShader.h"
-#include "WTexture.h"
-#include "WBuffer.h"
+#include "RTexture.h"
+#include "RBuffer.h"
 #include "WMatrix4f.h"
 #include "WVector4f.h"
 
@@ -23,7 +23,7 @@ namespace Sentinel { namespace Assets
 		NUM_TEXTURES,
 	};
 
-	public ref class WMesh
+	public ref class RMesh
 	{
 	private:
 
@@ -31,11 +31,13 @@ namespace Sentinel { namespace Assets
 
 	public:
 
-		WMesh( std::shared_ptr< Mesh > mesh );
-		WMesh( WMesh^ mesh );
-		~WMesh();
+		RMesh( Mesh* mesh );
+		RMesh( std::shared_ptr< Mesh > mesh );
+		~RMesh();
 
 		std::shared_ptr< Mesh >	GetRef();
+
+		////////////////////////////////
 
 		void		SetWorldTransform( WMatrix4f^ world );
 		void		SetShadowTransform( WMatrix4f^ shadow );
@@ -43,10 +45,10 @@ namespace Sentinel { namespace Assets
 
 		void		SetShader( WShader^ shader );
 		void		SetMaterial( WMaterial^ material );
-		void		SetTexture( WTexture^ texture, TextureType type );
+		void		SetTexture( RTexture^ texture, TextureType type );
 
-		WBuffer^	GetVBO();
-		WBuffer^	GetIBO();
+		RBuffer^	GetVBO();
+		RBuffer^	GetIBO();
 
 		void		Draw();
 		void		Draw( UINT count );

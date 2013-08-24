@@ -335,6 +335,9 @@
     <ClCompile Include="..\Engine\src\Buffer.cpp">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClCompile>
+    <ClCompile Include="..\Engine\src\ModelOBJ.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Engine\src\sin16.inl">

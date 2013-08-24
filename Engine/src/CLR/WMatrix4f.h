@@ -10,7 +10,7 @@ namespace Sentinel { namespace Math
 {
 	public ref class WMatrix4f
 	{
-	private:
+	protected:
 		
 		Matrix4f*	mRef;
 
@@ -22,9 +22,17 @@ namespace Sentinel { namespace Math
 		~WMatrix4f();
 		!WMatrix4f();
 
+	protected:
+
+		virtual void Delete();
+
+	public:
+
 		Matrix4f*	GetRef();
+
+		////////////////////////////////
 		
-		float		Get( int index );
+		RFloat^		Get( int index );
 		void		Set( int index, float value );
 
 		static WMatrix4f^ WMatrix4f::operator + ( WMatrix4f^ mat0, WMatrix4f^ mat1 );
@@ -65,5 +73,20 @@ namespace Sentinel { namespace Math
 		WVector3f^	Forward();
 		WVector3f^	Up();
 		WVector3f^	Right();
+	};
+
+	public ref class RMatrix4f sealed : public WMatrix4f
+	{
+	public:
+
+		RMatrix4f( Matrix4f* mat );
+		RMatrix4f( WMatrix4f^ mat );
+
+		void		Set( const Matrix4f& mat );
+		void		Set( WMatrix4f^ mat );
+
+	protected:
+
+		virtual void Delete() override;
 	};
 }}

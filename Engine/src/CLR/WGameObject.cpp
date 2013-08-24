@@ -1,5 +1,5 @@
 #include "WGameObject.h"
-#include "WString.h"
+#include "RString.h"
 
 using namespace Sentinel::Utilities;
 
@@ -10,22 +10,12 @@ namespace Sentinel { namespace Components
 		mRef = new GameObject();
 	}
 
-	WGameObject::WGameObject( GameObject* obj )
-	{
-		mRef = obj;
-	}
-
-	WGameObject::WGameObject( WGameObject% obj )
-	{
-		mRef = obj.mRef;
-	}
-
 	WGameObject::~WGameObject()
 	{
-		delete mRef;
+		Delete();
 	}
 
-	WGameObject::!WGameObject()
+	void WGameObject::Delete()
 	{
 		delete mRef;
 	}
@@ -35,29 +25,33 @@ namespace Sentinel { namespace Components
 		return mRef;
 	}
 
-	WGameObject^ WGameObject::Parent()
+	////////////////////////////////
+
+	RGameObject^ WGameObject::Parent()
 	{
-		return gcnew WGameObject( mRef->mParent );
+		return gcnew RGameObject( mRef->mParent );
 	}
 
-	WString^ WGameObject::Name()
+	RString^ WGameObject::Name()
 	{
-		return gcnew WString( mRef->mName );
+		return gcnew RString( mRef->mName );
 	}
 
-	//////////////////////////////
+	////////////////////////////////
 
 	WGameComponent^ WGameObject::AttachComponent( WGameComponent^ component, System::String^ name )
 	{
-		return gcnew WGameComponent( mRef->AttachComponent( component->GetRef(), WString::ToString( name )));
+		mRef->AttachComponent( component->GetRef(), RString::ToString( name ));
+		return component;
 	}
 
-	void WGameObject::DetachComponent( WGameComponent^ component )
+	WGameComponent^ WGameObject::DetachComponent( WGameComponent^ component )
 	{
 		mRef->DetachComponent( component->GetRef() );
+		return component;
 	}
 
-	//////////////////////////////
+	////////////////////////////////
 
 	void WGameObject::Startup()
 	{
@@ -87,5 +81,17 @@ namespace Sentinel { namespace Components
 	void WGameObject::Shutdown()
 	{
 		mRef->Shutdown();
+	}
+
+	////////////////////////////////
+
+	RGameObject::RGameObject( GameObject* obj )
+	{
+		mRef = obj;
+	}
+
+	RGameObject::RGameObject( WGameObject^ obj )
+	{
+		mRef = obj->GetRef();
 	}
 }}

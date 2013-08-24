@@ -5,7 +5,7 @@
 
 namespace Sentinel { namespace Assets
 {
-	public ref class WTexture
+	public ref class RTexture
 	{
 	private:
 
@@ -13,11 +13,12 @@ namespace Sentinel { namespace Assets
 
 	public:
 
-		WTexture( Texture* texture );
-		WTexture( WTexture^ texture );
-		~WTexture();
+		RTexture( Texture* texture );
+		~RTexture();
 		
 		Texture*			GetRef();
+
+		////////////////////////////////
 
 		void				Release();
 

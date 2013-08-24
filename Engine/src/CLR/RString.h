@@ -1,10 +1,14 @@
 #pragma once
-
+/*
+A referenced string.
+Used for public member variables of classes.
+Allows setting as if variable were public.
+*/
 #include <string>
 
 namespace Sentinel { namespace Utilities
 {
-	public ref class WString
+	public ref class RString
 	{
 	private:
 
@@ -12,8 +16,8 @@ namespace Sentinel { namespace Utilities
 		
 	public:
 
-		WString( std::string& str );
-		~WString();
+		RString( std::string& str );
+		~RString();
 		
 		char operator [] ( int index );
 

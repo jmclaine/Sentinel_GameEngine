@@ -3,8 +3,7 @@
 #include <vector>
 
 #include "Common.h"
-#include "Timing.h"
-#include "Renderer.h"
+#include "Shader.h"
 #include "Mesh.h"
 
 namespace Sentinel
@@ -26,9 +25,7 @@ namespace Sentinel
 
 	protected:
 
-		Matrix4f		mMatrixWorld;
-
-		//BoundingSphere	m_sphere;
+		//BoundingSphere	mSphere;
 
 		struct KeyFrame
 		{
@@ -78,12 +75,16 @@ namespace Sentinel
 
 	public:
 
-		virtual ~Model() {}
+		Matrix4f		mMatrixWorld;
+
+		/////////////////////////////////////
+
+		virtual ~Model();
 		
 		static Model*	Load( const char* filename );
 
-		void			SetWorldTransform( const Matrix4f& world );
-		const Matrix4f& GetWorldTransform() const;
+		virtual bool	Create( const char* filename ) = 0;
+		virtual void	Release() = 0;
 
 		virtual void	SetMaterial( const Material& material ) = 0;
 		virtual void	SetShader( Shader* shader ) = 0;
@@ -91,9 +92,6 @@ namespace Sentinel
 		virtual void	SetKeyFrame( const KeyFrame& key, int keyIndex = -1, int objIndex = 0 ) = 0;
 		virtual void	SetTime( float _time, UINT objIndex = 0 ) = 0;
 		virtual float	GetTime( UINT objIndex = 0 ) = 0;
-
-		virtual void	Release() = 0;
-		virtual bool	Create( const char* filename ) = 0;
 
 		virtual void	Update() = 0;
 		virtual void	Draw() = 0;

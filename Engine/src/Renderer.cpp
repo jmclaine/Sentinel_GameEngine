@@ -16,27 +16,27 @@ namespace Sentinel
 		mHeightRatio	= 1.0f;
 	}
 
-	bool WindowInfo::GetFullscreen() const
+	bool WindowInfo::Fullscreen() const
 	{
 		return mFullscreen;
 	}
 
-	UINT WindowInfo::GetWidth() const
+	UINT WindowInfo::Width() const
 	{
 		return mWidth;
 	}
 
-	UINT WindowInfo::GetHeight() const
+	UINT WindowInfo::Height() const
 	{
 		return mHeight;
 	}
 
-	float WindowInfo::GetWidthRatio() const
+	float WindowInfo::WidthRatio() const
 	{
 		return mWidthRatio;
 	}
 
-	float WindowInfo::GetHeightRatio() const
+	float WindowInfo::HeightRatio() const
 	{
 		return mHeightRatio;
 	}
@@ -47,7 +47,7 @@ namespace Sentinel
 	// to the SingletonAbstract instance; however, doing so results
 	// in the pointer being set back to NULL in the CLR wrapper.
 	//
-	const void* Renderer::Load( const char* filename, WindowInfo& info )
+	Renderer* Renderer::Load( const char* filename, WindowInfo& info )
 	{
 		TiXmlDocument doc;
 		if( !doc.LoadFile( filename ))
@@ -66,7 +66,7 @@ namespace Sentinel
 		pElem->QueryUnsignedAttribute(	"Width",		&info.mWidth );
 		pElem->QueryUnsignedAttribute(	"Height",		&info.mHeight );
 
-		return (void*)Renderer::Inst();
+		return Renderer::Inst();
 	}
 
 	Texture* Renderer::CreateTexture( UINT width, UINT height, ImageFormatType format, bool createMips )

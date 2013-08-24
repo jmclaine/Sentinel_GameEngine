@@ -1,6 +1,6 @@
 #include "WRenderer.h"
 #include "Renderer.h"
-#include "WString.h"
+#include "RString.h"
 
 namespace Sentinel { namespace Systems
 {
@@ -34,29 +34,29 @@ namespace Sentinel { namespace Systems
 		return mRef;
 	}
 
-	bool WWindowInfo::GetFullscreen()
+	bool WWindowInfo::Fullscreen()
 	{
-		return mRef->GetFullscreen();
+		return mRef->Fullscreen();
 	}
 
-	int WWindowInfo::GetWidth()
+	int WWindowInfo::Width()
 	{
-		return mRef->GetWidth();
+		return mRef->Width();
 	}
 
-	int WWindowInfo::GetHeight()
+	int WWindowInfo::Height()
 	{
-		return mRef->GetHeight();
+		return mRef->Height();
 	}
 
-	float WWindowInfo::GetWidthRatio()
+	float WWindowInfo::WidthRatio()
 	{
-		return mRef->GetWidthRatio();
+		return mRef->WidthRatio();
 	}
 
-	float WWindowInfo::GetHeightRatio()
+	float WWindowInfo::HeightRatio()
 	{
-		return mRef->GetHeightRatio();
+		return mRef->HeightRatio();
 	}
 
 	/////////////////////////////////////////////////
@@ -69,7 +69,7 @@ namespace Sentinel { namespace Systems
 		//
 		WindowInfo info;
 
-		bool result = (Renderer::Inst( (Renderer*)(Renderer::Load( WString::ToString( filename ).c_str(), info ))) != NULL);
+		bool result = (Renderer::Inst( (Renderer*)(Renderer::Load( RString::ToString( filename ).c_str(), info ))) != NULL);
 
 		if( !result )
 			return nullptr;
@@ -101,36 +101,36 @@ namespace Sentinel { namespace Systems
 
 	// Buffers.
 	//
-	WBuffer^ WRenderer::CreateBuffer( IntPtr data, UINT size, UINT stride, BufferType type )
+	RBuffer^ WRenderer::CreateBuffer( IntPtr data, UINT size, UINT stride, BufferType type )
 	{
-		return gcnew WBuffer( Renderer::Inst()->CreateBuffer( data.ToPointer(), size, stride, type ));
+		return gcnew RBuffer( Renderer::Inst()->CreateBuffer( data.ToPointer(), size, stride, type ));
 	}
 
-	void WRenderer::SetVBO( WBuffer^ buffer )
+	void WRenderer::SetVBO( RBuffer^ buffer )
 	{
 		Renderer::Inst()->SetVBO( buffer->GetRef() );
 	}
 
-	void WRenderer::SetIBO( WBuffer^ buffer )
+	void WRenderer::SetIBO( RBuffer^ buffer )
 	{
 		Renderer::Inst()->SetIBO( buffer->GetRef() );
 	}
 
 	// Textures.
 	//
-	WTexture^ WRenderer::CreateTexture( UINT width, UINT height, ImageFormatType format, bool createMips )
+	RTexture^ WRenderer::CreateTexture( UINT width, UINT height, ImageFormatType format, bool createMips )
 	{
-		return gcnew WTexture( Renderer::Inst()->CreateTexture( width, height, (Sentinel::ImageFormatType)format, createMips ));
+		return gcnew RTexture( Renderer::Inst()->CreateTexture( width, height, (Sentinel::ImageFormatType)format, createMips ));
 	}
 
-	WTexture^ WRenderer::CreateTextureFromFile( String^ filename )
+	RTexture^ WRenderer::CreateTextureFromFile( String^ filename )
 	{
-		return gcnew WTexture( Renderer::Inst()->CreateTextureFromFile( WString::ToString( filename ).c_str() ));
+		return gcnew RTexture( Renderer::Inst()->CreateTextureFromFile( RString::ToString( filename ).c_str() ));
 	}
 
-	WTexture^ WRenderer::CreateTextureFromMemory( IntPtr data, UINT width, UINT height, ImageFormatType format, bool createMips )
+	RTexture^ WRenderer::CreateTextureFromMemory( IntPtr data, UINT width, UINT height, ImageFormatType format, bool createMips )
 	{
-		return gcnew WTexture( Renderer::Inst()->CreateTextureFromMemory( data.ToPointer(), width, height, (Sentinel::ImageFormatType)format, createMips ));
+		return gcnew RTexture( Renderer::Inst()->CreateTextureFromMemory( data.ToPointer(), width, height, (Sentinel::ImageFormatType)format, createMips ));
 	}
 	
 	// Special Rendering.
@@ -140,7 +140,7 @@ namespace Sentinel { namespace Systems
 		return Renderer::Inst()->CreateBackbuffer();
 	}
 
-	UINT WRenderer::CreateRenderTarget( WTexture^ texture )
+	UINT WRenderer::CreateRenderTarget( RTexture^ texture )
 	{
 		return Renderer::Inst()->CreateRenderTarget( texture->GetRef() );
 	}
@@ -199,7 +199,7 @@ namespace Sentinel { namespace Systems
 	//
 	WShader^ WRenderer::CreateShader( System::String^ filename, System::String^ attrib, System::String^ uniform )
 	{
-		return gcnew WShader( Renderer::Inst()->CreateShader( WString::ToString( filename ).c_str(), WString::ToString( attrib ).c_str(), WString::ToString( uniform ).c_str() ));
+		return gcnew WShader( Renderer::Inst()->CreateShader( RString::ToString( filename ).c_str(), RString::ToString( attrib ).c_str(), RString::ToString( uniform ).c_str() ));
 	}
 
 	void WRenderer::SetShader( WShader^ shader )
