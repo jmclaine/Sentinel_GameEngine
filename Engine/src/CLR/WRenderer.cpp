@@ -197,7 +197,7 @@ namespace Sentinel { namespace Systems
 
 	// Shaders.
 	//
-	WShader^ WRenderer::CreateShader( System::String^ filename, System::String^ attrib, System::String^ uniform )
+	WShader^ WRenderer::CreateShader( String^ filename, String^ attrib, String^ uniform )
 	{
 		return gcnew WShader( Renderer::Inst()->CreateShader( RString::ToString( filename ).c_str(), RString::ToString( attrib ).c_str(), RString::ToString( uniform ).c_str() ));
 	}

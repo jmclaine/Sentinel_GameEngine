@@ -2,6 +2,7 @@
 
 #include "Quatf.h"
 #include "RFloat.h"
+#include "WVector3f.h"
 
 using namespace System;
 using namespace Sentinel::Utilities;
@@ -41,7 +42,7 @@ namespace Sentinel { namespace Math
 
 		////////////////////////////////
 
-		WQuatf^		operator * ( const WQuatf^ q );
+		static WQuatf^ operator * ( WQuatf^ q0, WQuatf^ q1 );
 		WQuatf^		Mul( const WQuatf^ q );
 		WQuatf^		Mul( float scalar );
 
@@ -56,6 +57,7 @@ namespace Sentinel { namespace Math
 
 		WQuatf^		Euler( float _pitch, float _yaw, float _roll );
 		WQuatf^		Euler();
+		WVector3f^	ToEuler();
 	};
 
 	public ref class RQuatf sealed : public WQuatf

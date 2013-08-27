@@ -1,4 +1,5 @@
 #include "WGameWindow.h"
+#include "WInput.h"
 
 namespace Sentinel { namespace Systems
 {
@@ -33,12 +34,60 @@ namespace Sentinel { namespace Systems
 		mWindowInfo = info;
 	}
 
+	void WGameWindow::Update()
+	{}
+
 	void WGameWindow::Shutdown()
 	{
 		SetActive();
 
 		Renderer::Inst()->Shutdown();
 	}
+
+	///////////////////////////
+
+	// Mouse Down.
+	//
+	void WGameWindow::OnLeftMouseDown()
+	{}
+
+	void WGameWindow::OnRightMouseDown()
+	{}
+
+	void WGameWindow::OnMiddleMouseDown()
+	{}
+
+	// Mouse Up.
+	//
+	void WGameWindow::OnLeftMouseUp()
+	{}
+
+	void WGameWindow::OnRightMouseUp()
+	{}
+
+	void WGameWindow::OnMiddleMouseUp()
+	{}
+
+	// Mouse Double Click.
+	//
+	void WGameWindow::OnLeftMouseDoubleClick()
+	{}
+
+	void WGameWindow::OnRightMouseDoubleClick()
+	{}
+
+	void WGameWindow::OnMiddleMouseDoubleClick()
+	{}
+
+	// Scrolling.
+	//
+	void WGameWindow::OnMouseScroll()
+	{}
+
+	// Mouse Move.
+	//
+	void WGameWindow::OnMouseMove()
+	{}
 
 	///////////////////////////
 
@@ -59,21 +108,86 @@ namespace Sentinel { namespace Systems
 
 	///////////////////////////
 
-	IntPtr WGameWindow::WndProc( IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, bool% handled )
+#define RETURN_HANDLE( isHandled )\
+	handled = isHandled;\
+	return IntPtr::Zero;
+
+	IntPtr WGameWindow::WndProc( IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, bool% handled )
 	{
+		handled = WMouse::ProcessMessages( hWnd, msg, wParam, lParam );
+
 		switch( msg )
 		{
 			case WM_IME_SETCONTEXT:
 				if( LOWORD( wParam.ToInt32() ) > 0)
-					SetFocus( mHWND );
+					SetFocus( (HWND)hWnd.ToPointer() );
+				RETURN_HANDLE( true );
 
-				handled = true;
-				return IntPtr::Zero;
+			// Moving.
+			//
+			case WM_MOUSEMOVE:
+				SetFocus( (HWND)hWnd.ToPointer() );
+				OnMouseMove();
+				RETURN_HANDLE( true );
+
+			// Scrolling.
+			//
+			case WM_MOUSEWHEEL:
+				OnMouseScroll();
+				RETURN_HANDLE( true );
 		}
 
-		handled = false;
+		// Button Down.
+		//
+		if( WMouse::DidGoDown( BUTTON_LEFT ))
+			OnLeftMouseDown();
 
-		return IntPtr::Zero;
+		if( WMouse::DidGoDown( BUTTON_RIGHT ))
+			OnRightMouseDown();
+
+		if( WMouse::DidGoDown( BUTTON_MIDDLE ))
+			OnMiddleMouseDown();
+
+		// Button Up.
+		//
+		if( WMouse::DidGoUp( BUTTON_LEFT ))
+			OnLeftMouseUp();
+
+		if( WMouse::DidGoUp( BUTTON_RIGHT ))
+			OnRightMouseUp();
+
+		if( WMouse::DidGoUp( BUTTON_MIDDLE ))
+			OnMiddleMouseUp();
+
+		// Button Double Click.
+		//
+		if( WMouse::DidDoubleClick( BUTTON_LEFT ))
+			OnLeftMouseDoubleClick();
+
+		if( WMouse::DidDoubleClick( BUTTON_RIGHT ))
+			OnRightMouseDoubleClick();
+
+		if( WMouse::DidDoubleClick( BUTTON_MIDDLE ))
+			OnMiddleMouseDoubleClick();
+
+		if( handled )
+			return IntPtr::Zero;
+
+		RETURN_HANDLE( false );
+	}
+
+	LRESULT WINAPI GameWindowMsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+	{
+		switch( msg )
+		{
+			case WM_IME_SETCONTEXT:
+				if( LOWORD( wParam ) > 0 )
+					SetFocus( hWnd );
+				return 0;
+
+			default:
+				return DefWindowProc( hWnd, msg, wParam, lParam );
+		}
 	}
 
 	void WGameWindow::OnRenderSizeChanged( SizeChangedInfo^ sizeInfo )
@@ -88,22 +202,7 @@ namespace Sentinel { namespace Systems
 
 	void WGameWindow::OnMouseDown( MouseButtonEventArgs^ e )
 	{
-		// Handled within app.
-	}
-
-	LRESULT WINAPI RendererMsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
-	{
-		switch( msg )
-		{
-			case WM_IME_SETCONTEXT:
-				if( LOWORD( wParam ) > 0 )
-					SetFocus( hWnd );
-
-				return 0;
-
-			default:
-				return DefWindowProc( hWnd, msg, wParam, lParam );
-		}
+		HwndHost::OnMouseDown( e );
 	}
 
 	bool WGameWindow::RegisterWindowClass()
@@ -114,7 +213,7 @@ namespace Sentinel { namespace Systems
 			return true;
 		
 		wndClass.style			= CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-		wndClass.lpfnWndProc	= (WNDPROC)RendererMsgProc;
+		wndClass.lpfnWndProc	= (WNDPROC)GameWindowMsgProc;
 		wndClass.cbClsExtra		= 0;
 		wndClass.cbWndExtra		= 0;
 		wndClass.hInstance		= mINST;
@@ -139,7 +238,7 @@ namespace Sentinel { namespace Systems
 		
 		if( RegisterWindowClass() )
 		{
-			mHWND = CreateWindowEx( 0, (LPCSTR)mWindowClass, (LPCSTR)mTitle, WS_CHILD | WS_VISIBLE, 
+			mHWND = CreateWindowEx( 0, (LPCSTR)mWindowClass, (LPCSTR)mTitle, WS_CHILD | WS_VISIBLE | DS_CONTROL, 
 									0, 0, mWindowInfo->Width(), mWindowInfo->Height(),
 									(HWND)hwndParent.Handle.ToPointer(), 0, mINST, 0 );
 

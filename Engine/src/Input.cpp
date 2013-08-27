@@ -26,11 +26,18 @@ namespace Sentinel
 			mLastButtonStates[ button ] = BUTTON_UP;
 		}
 
+		mScrollDistance = 0;
+
 		RECT rc;
 		GetWindowRect( GetDesktopWindow(), &rc );
 
 		mDesktopWidth  = (float)(rc.left - rc.right);
 		mDesktopHeight = (float)(rc.top  - rc.bottom);
+	}
+
+	int Mouse::Show( bool visiblity )
+	{
+		return ShowCursor( visiblity );
 	}
 
 	void Mouse::SetPosition( const POINT& pos )
@@ -85,60 +92,71 @@ namespace Sentinel
 		return (mButtonStates[ button ] == BUTTON_DBLCLK);
 	}
 
+	int Mouse::ScrollDistance() const
+	{
+		return mScrollDistance;
+	}
+
 	void Mouse::Update()
 	{
 		for( UINT button = 0; button < NUM_BUTTONS; ++button )
-		{
 			mLastButtonStates[ button ] = mButtonStates[ button ];
-		}
+	
+		mScrollDistance = 0;
 	}
 
-	void Mouse::ProcessMessages( UINT message )
+	bool Mouse::ProcessMessages( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 	{
-		switch( message )
+		switch( msg )
 		{
 			// Left Mouse Button.
 			//
 			case WM_LBUTTONDBLCLK:
 				mButtonStates[ BUTTON_LEFT ]	= BUTTON_DBLCLK;
-				break;
+				return true;
 
 			case WM_LBUTTONDOWN:
 				mButtonStates[ BUTTON_LEFT ]	= BUTTON_DOWN;
-				break;
+				return true;
 
 			case WM_LBUTTONUP:
 				mButtonStates[ BUTTON_LEFT ]	= BUTTON_UP;
-				break;
+				return true;
 
 			// Right Mouse Button.
 			//
 			case WM_RBUTTONDBLCLK:
 				mButtonStates[ BUTTON_RIGHT ]	= BUTTON_DBLCLK;
-				break;
+				return true;
 
 			case WM_RBUTTONDOWN:
 				mButtonStates[ BUTTON_RIGHT ]	= BUTTON_DOWN;
-				break;
+				return true;
 
 			case WM_RBUTTONUP:
 				mButtonStates[ BUTTON_RIGHT ]	= BUTTON_UP;
-				break;
+				return true;
 
 			// Middle Mouse Button.
 			//
 			case WM_MBUTTONDBLCLK:
-				mButtonStates[ BUTTON_MIDDLE ] = BUTTON_DBLCLK;
-				break;
+				mButtonStates[ BUTTON_MIDDLE ]	= BUTTON_DBLCLK;
+				return true;
 
 			case WM_MBUTTONDOWN:
-				mButtonStates[ BUTTON_MIDDLE ] = BUTTON_DOWN;
-				break;
+				mButtonStates[ BUTTON_MIDDLE ]	= BUTTON_DOWN;
+				return true;
 
 			case WM_MBUTTONUP:
-				mButtonStates[ BUTTON_MIDDLE ] = BUTTON_UP;
-				break;
+				mButtonStates[ BUTTON_MIDDLE ]	= BUTTON_UP;
+				return true;
+
+			case WM_MOUSEWHEEL:
+				mScrollDistance = (int)GET_WHEEL_DELTA_WPARAM( wParam );
+				return true;
 		}
+
+		return false;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -172,16 +190,12 @@ namespace Sentinel
 	void Keyboard::Update()
 	{
 		for( UINT key = 0; key < NUM_KEYS; ++key )
-		{
 			mLastKeyStates[ key ] = mKeyStates[ key ];
-		}
 	}
 
 	void Keyboard::ProcessMessages()
 	{
 		for( UINT key = 0; key < NUM_KEYS; ++key )
-		{
 			mKeyStates[ key ] = (GetAsyncKeyState( key ) & 0x8000) == 0x8000;
-		}
 	}
 }

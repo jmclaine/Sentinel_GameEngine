@@ -19,6 +19,7 @@ namespace Sentinel { namespace Math
 		WMatrix4f();
 		WMatrix4f( const Matrix4f% mat );
 		WMatrix4f( const WMatrix4f% mat );
+		WMatrix4f( WQuatf^ q );
 		~WMatrix4f();
 		!WMatrix4f();
 

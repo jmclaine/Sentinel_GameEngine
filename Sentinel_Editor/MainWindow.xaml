@@ -96,7 +96,7 @@
                     </Grid.ColumnDefinitions>
 
                     <Border Grid.Column="0" Name="Window_World" BorderThickness="2" BorderBrush="#666666" Margin="0,0,8,0" />
-                    
+
                     <GridSplitter Grid.Column="0" HorizontalAlignment="Right" Width="8" Background="#222222" />
 
                     <Grid Grid.Column="1" Name="Grid_Editor_Info_Split" Background="#444444">
@@ -126,10 +126,9 @@
                         <Border Grid.Column="1" Name="Inspector" BorderThickness="2" BorderBrush="#666666" Margin="0,0,0,0" />
                     </Grid>
                 </Grid>
-                
-                <Label Grid.Row="1" Content="Ready" Foreground="White" IsEnabled="True">
-                    
-                </Label>
+
+                <Label Grid.Row="1" Content="Ready" Foreground="White" IsEnabled="True" Margin="18,0,6,0" />
+                <Image Grid.Row="1" Width="16" Height="16" Name="Status_Image" Source="/Sentinel_Editor;component/Images/Good.png" HorizontalAlignment="Left" Margin="4,5,0,3" />
             </Grid>
         </Grid>
     </Canvas>

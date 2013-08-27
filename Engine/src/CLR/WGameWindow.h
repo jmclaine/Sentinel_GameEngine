@@ -3,6 +3,12 @@
 Created a new GameWindow specific for the CLR
 due to the major differences in instantiation
 of the windows between C# / WPF and C++
+
+WGameWindow should be inherited to use input.
+
+public class GameWindow : WGameWindow
+{}
+
 */
 #include "WRenderer.h"
 #include "GameWindow.h"
@@ -28,9 +34,28 @@ namespace Sentinel { namespace Systems
 
 		void				Startup( String^ title, String^ windowClass, WWindowInfo^ info );
 		
+		virtual void		Update();
+
 		void				Shutdown();
 
-		///////////////////////////
+	protected:
+
+		virtual void		OnLeftMouseDown();
+		virtual void		OnRightMouseDown();
+		virtual void		OnMiddleMouseDown();
+
+		virtual void		OnLeftMouseUp();
+		virtual void		OnRightMouseUp();
+		virtual void		OnMiddleMouseUp();
+
+		virtual void		OnLeftMouseDoubleClick();
+		virtual void		OnRightMouseDoubleClick();
+		virtual void		OnMiddleMouseDoubleClick();
+
+		virtual void		OnMouseScroll();
+		virtual void		OnMouseMove();
+
+	public:
 
 		void				SetActive();
 

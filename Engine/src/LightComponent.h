@@ -21,10 +21,10 @@ namespace Sentinel
 
 		const TransformComponent* GetTransform();
 
-		void Startup();
+		void		Startup();
 
-		void Update();
+		void		Update();
 
-		void Shutdown();
+		void		Shutdown();
 	};
 }

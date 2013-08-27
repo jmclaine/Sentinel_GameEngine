@@ -61,7 +61,7 @@ namespace Sentinel
 
 	Quatf Quatf::Mul( const float scalar ) const
 	{
-		return Quatf( x / scalar, y / scalar, z / scalar, w / scalar );
+		return Quatf( x*scalar, y*scalar, z*scalar, w*scalar );
 	}
 
 	float Quatf::Length() const
@@ -139,5 +139,12 @@ namespace Sentinel
 	Quatf& Quatf::Euler()
 	{
 		return Euler( x, y, z );
+	}
+
+	Vector3f Quatf::ToEuler()
+	{
+		return Vector3f( atan2( 2.0f*((w * x) + (y * z)), 1.0f - (2.0f * ((x* x) + (y * y)))),
+						 asin( 2.0f * ((w * y) - (z * x))),
+						 atan2( 2.0f * ((w * z) + (x * y)), 1.0f - (2.0f * ((y * y) + (z * z)))));
 	}
 }

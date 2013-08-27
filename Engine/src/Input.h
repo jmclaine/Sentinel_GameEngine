@@ -34,6 +34,8 @@ namespace Sentinel
 		int		mButtonStates[ NUM_BUTTONS ];
 		int		mLastButtonStates[ NUM_BUTTONS ];
 
+		int		mScrollDistance;
+
 		float	mDesktopWidth;
 		float	mDesktopHeight;
 
@@ -42,6 +44,8 @@ namespace Sentinel
 		Mouse();
 
 	public:
+
+		int		Show( bool visiblity );
 
 		void	SetPosition( const POINT& pos );
 		POINT	GetPosition( HWND hWnd = NULL ) const;
@@ -52,9 +56,11 @@ namespace Sentinel
 		bool	DidGoDown( MouseButton button ) const;
 		bool	DidDoubleClick( MouseButton button ) const;
 
+		int		ScrollDistance() const;
+
 		void	Update();
 
-		void	ProcessMessages( UINT message );
+		bool	ProcessMessages( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 	};
 
 	///////////////////////////////////////////

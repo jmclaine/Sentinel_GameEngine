@@ -8,6 +8,8 @@ namespace Sentinel
 		mComponentType = COMPONENT_LIGHT;
 
 		mTransform = NULL;
+
+		mAttenuation = Vector4f( 1, 1, 1, 10000 );
 	}
 
 	const TransformComponent* LightComponent::GetTransform()

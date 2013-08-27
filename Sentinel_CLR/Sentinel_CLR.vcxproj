@@ -105,6 +105,8 @@
     <ClInclude Include="..\Engine\src\CLR\WGameObject.h" />
     <ClInclude Include="..\Engine\src\CLR\WGameWindow.h" />
     <ClInclude Include="..\Engine\src\CLR\WGameWorld.h" />
+    <ClInclude Include="..\Engine\src\CLR\WInput.h" />
+    <ClInclude Include="..\Engine\src\CLR\WLightComponent.h" />
     <ClInclude Include="..\Engine\src\CLR\WMaterial.h" />
     <ClInclude Include="..\Engine\src\CLR\WMatrix4f.h" />
     <ClInclude Include="..\Engine\src\CLR\RMesh.h" />
@@ -134,6 +136,8 @@
     <ClCompile Include="..\Engine\src\CLR\WGameObject.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WGameWindow.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WGameWorld.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WInput.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WLightComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WMaterial.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WMatrix4f.cpp" />
     <ClCompile Include="..\Engine\src\CLR\RMesh.cpp" />

@@ -2,6 +2,7 @@
 
 #include "Common.h"
 #include "Matrix4f.h"
+#include "Vector3f.h"
 
 namespace Sentinel
 {
@@ -40,5 +41,6 @@ namespace Sentinel
 
 		Quatf&		Euler( float _pitch, float _yaw, float _roll );
 		Quatf&		Euler();
+		Vector3f	ToEuler();
 	};
 }

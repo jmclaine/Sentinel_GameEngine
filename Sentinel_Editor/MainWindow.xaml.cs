@@ -26,9 +26,9 @@ using Sentinel.Components;
 
 namespace Sentinel_Editor
 {
-	/// <summary>
+	///
 	/// Editor Window
-	/// </summary>
+	///
 	public partial class MainWindow : Window
 	{
 		private enum ShaderTypes
@@ -54,11 +54,10 @@ namespace Sentinel_Editor
 			NUM_SHAPES
 		};
 
-		private WGameWindow			mWindowWorld;
 		private static WColorRGBA   mClearColor = new WColorRGBA( 0.0f, 0.2f, 0.8f, 1.0f );
 
+		private GameWindow			mWindowWorld;
 		private WShader[]			mShader;
-		
 		private bool				mDoUpdate;
 
 		///
@@ -82,13 +81,15 @@ namespace Sentinel_Editor
 				System.Environment.Exit( 0 );
 			}
 
-			mWindowWorld = new WGameWindow();
+			mWindowWorld = new GameWindow();
 			mWindowWorld.Startup( "World", "WorldClass", info );
-
+			
 			Window_World.Child = mWindowWorld;
-
+			
 			PrepareShaders();
 			PrepareObjects();
+
+			//Status_Image.Source = new BitmapImage( new Uri( "pack://application:,,,/Images/Warning.png" ));
 
 			///////////////////////////////////////
 			// Setup game loop.
@@ -105,16 +106,15 @@ namespace Sentinel_Editor
 		{
 			if( mDoUpdate )
 			{
+				WMouse.Update();
+
 				WRenderer.SetDepthStencil( 0 );
 				WRenderer.SetViewport( 0 );
 				WRenderer.SetRenderTarget( 0 );
 
 				WRenderer.Clear( mClearColor );
 
-				//WPerspectiveCameraComponent camera = new WPerspectiveCameraComponent( WGameWorld.GetCamera( 0 ));
-				//camera.Set( (float)mWindowWorld.GetInfo().Width(), (float)mWindowWorld.GetInfo().Height(), 0.1f, 10000.0f, 45.0f * (float)mWindowWorld.GetInfo().Width() / (float)mWindowWorld.GetInfo().Height() );
-
-				WGameWorld.UpdateDrawable();
+				mWindowWorld.Update();
 
 				WRenderer.Present();
 			}
@@ -174,7 +174,6 @@ namespace Sentinel_Editor
 			WMeshBuilder					meshBuilder = new WMeshBuilder();
 			WMaterial						material    = new WMaterial();
 			WGameObject						obj;
-			WPerspectiveCameraComponent		camera;
 			WTransformComponent				transform;
 			
 			////////////////////////////////////
@@ -186,11 +185,26 @@ namespace Sentinel_Editor
 			obj = WGameWorld.AddGameObject( new WGameObject(), "Main_Camera" );
 			
 			transform = new WTransformComponent();
-			//transform.Position().Set( new WVector3f( 0, 10, -100 ));
+			transform.Position().Set( new WVector3f( 0, 25, 25 ));
+			transform.Orientation().Set( new WQuatf( -45, 0, 0 )); 
 			obj.AttachComponent( transform, "Transform" );
 
-			camera = new WPerspectiveCameraComponent( (float)mWindowWorld.GetInfo().Width(), (float)mWindowWorld.GetInfo().Height() );
+			WPerspectiveCameraComponent camera = new WPerspectiveCameraComponent( (float)mWindowWorld.GetInfo().Width(), (float)mWindowWorld.GetInfo().Height() );
 			obj.AttachComponent( camera, "Camera" );
+
+			mWindowWorld.SetRotation( new WVector3f( -45, 0, 0 ));
+
+			// Point Light.
+			//
+			obj = WGameWorld.AddGameObject( new WGameObject(), "Point_Light" );
+
+			transform = new WTransformComponent();
+			transform.Position().Set( new WVector3f( 0, 10, 0 ));
+			obj.AttachComponent( transform, "Transform" );
+
+			WLightComponent light = new WLightComponent();
+			light.Attenuation().Set( new WVector4f( 1, 1, 1, 25 ));
+			obj.AttachComponent( light, "Light" );
 
 			// Test object.
 			//
@@ -200,7 +214,21 @@ namespace Sentinel_Editor
 			obj = WGameWorld.AddGameObject( new WGameObject(), "Test_Object" );
 
 			transform = new WTransformComponent();
-			transform.Position().Set( new WVector3f( 0, 0, -10 ));
+			transform.Position().Set( new WVector3f( 0, 0, 0 ));
+			transform.Scale().Set( new WVector3f( 100, 1, 100 ));
+			obj.AttachComponent( transform, "Transform" );
+
+			obj.AttachComponent( new WMeshComponent( meshBuilder.BuildMesh(), material ), "Mesh" );
+
+			// Test object.
+			//
+			meshBuilder.CreateCube( 1.0f );
+			meshBuilder.Shader().Set( mShader[ (int)ShaderTypes.SHADER_COLOR ] );
+
+			obj = WGameWorld.AddGameObject( new WGameObject(), "Test_Object" );
+
+			transform = new WTransformComponent();
+			transform.Position().Set( new WVector3f( 0, 2, 0 ));
 			//transform.Scale().Set( new WVector3f( 100, 1, 100 ));
 			obj.AttachComponent( transform, "Transform" );
 

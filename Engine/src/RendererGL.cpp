@@ -898,6 +898,12 @@ namespace Sentinel
 
 		UINT ResizeBuffers( UINT width, UINT height )
 		{
+			mCurrWindow->mWidth			= width;
+			mCurrWindow->mHeight		= height;
+
+			mCurrWindow->mWidthRatio	= (float)width  / (float)WINDOW_WIDTH_BASE;
+			mCurrWindow->mHeightRatio	= (float)height / (float)WINDOW_HEIGHT_BASE;
+
 			return 1;
 		}
 

@@ -75,21 +75,21 @@ namespace Sentinel
 
 	///////////////////////////
 
-	LRESULT CALLBACK GameWindow::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
+	LRESULT CALLBACK GameWindow::WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 	{
-		Mouse::Inst()->ProcessMessages( message );
+		Mouse::Inst()->ProcessMessages( hWnd, msg, wParam, lParam );
 		Keyboard::Inst()->ProcessMessages();
 
-		switch( message )
+		switch( msg )
 		{
 			case WM_COMMAND:
-				return DefWindowProc( hWnd, message, wParam, lParam );
+				return DefWindowProc( hWnd, msg, wParam, lParam );
 			
 			case WM_PAINT:
 				{
 				PAINTSTRUCT ps;
-				BeginPaint(hWnd, &ps);
-				EndPaint(hWnd, &ps);
+				BeginPaint( hWnd, &ps );
+				EndPaint( hWnd, &ps );
 				}
 				break;
 
@@ -98,7 +98,7 @@ namespace Sentinel
 				break;
 		}
 
-		return DefWindowProc( hWnd, message, wParam, lParam );
+		return DefWindowProc( hWnd, msg, wParam, lParam );
 	}
 
 	bool GameWindow::RegisterWindowClass()

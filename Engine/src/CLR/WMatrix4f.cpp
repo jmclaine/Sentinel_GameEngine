@@ -17,6 +17,11 @@ namespace Sentinel { namespace Math
 		mRef = new Matrix4f( *mat.mRef );
 	}
 
+	WMatrix4f::WMatrix4f( WQuatf^ q )
+	{
+		mRef = new Matrix4f( *q->GetRef() );
+	}
+
 	WMatrix4f::~WMatrix4f()
 	{
 		Delete();

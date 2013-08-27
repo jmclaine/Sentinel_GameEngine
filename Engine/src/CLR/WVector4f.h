@@ -45,19 +45,20 @@ namespace Sentinel { namespace Math
 		bool		Equals( const WVector4f^ v );
 		
 		WVector4f^	operator += ( const WVector4f^ v );
-		WVector4f^	operator +  ( const WVector4f^ v );
+		static WVector4f^ operator + ( WVector4f^ v0, WVector4f^ v1 );
 		WVector4f^	Add( const WVector4f^ v );
 
 		WVector4f^	operator -= ( const WVector4f^ v );
-		WVector4f^	operator -  ( const WVector4f^ v );
+		static WVector4f^ operator - ( WVector4f^ v0, WVector4f^ v1 );
 		WVector4f^	Sub( const WVector4f^ v );
 
 		WVector4f^	operator *= ( float scalar );
-		WVector4f^	operator *  ( float scalar );
+		static WVector4f^ operator * ( WVector4f^ v, float scalar );
+		static WVector4f^ operator * ( float scalar, WVector4f^ v );
 		WVector4f^	Mul( float scalar );
 
 		WVector4f^	operator *= ( const WVector4f^ v );
-		WVector4f^	operator *  ( const WVector4f^ v );
+		static WVector4f^ operator * ( WVector4f^ v0, WVector4f^ v1 );
 		WVector4f^	Mul( const WVector4f^ v );
 
 		float		Length();

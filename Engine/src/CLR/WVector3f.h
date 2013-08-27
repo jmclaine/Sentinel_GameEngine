@@ -42,19 +42,20 @@ namespace Sentinel { namespace Math
 		bool		Equals( const WVector3f^ v );
 		
 		WVector3f^	operator += ( const WVector3f^ v );
-		WVector3f^	operator +  ( const WVector3f^ v );
+		static WVector3f^ operator + ( WVector3f^ v0, WVector3f^ v1 );
 		WVector3f^	Add( const WVector3f^ v );
 
 		WVector3f^	operator -= ( const WVector3f^ v );
-		WVector3f^	operator -  ( const WVector3f^ v );
+		static WVector3f^ operator - ( WVector3f^ v0, WVector3f^ v1 );
 		WVector3f^	Sub( const WVector3f^ v );
 
 		WVector3f^	operator *= ( float scalar );
-		WVector3f^	operator *  ( float scalar );
+		static WVector3f^ operator * ( WVector3f^ v, float scalar );
+		static WVector3f^ operator * ( float scalar, WVector3f^ v );
 		WVector3f^	Mul( float scalar );
 
 		WVector3f^	operator *= ( const WVector3f^ v );
-		WVector3f^	operator *  ( const WVector3f^ v );
+		static WVector3f^ operator * ( WVector3f^ v0, WVector3f^ v1 );
 		WVector3f^	Mul( const WVector3f^ v );
 
 		float		Length();

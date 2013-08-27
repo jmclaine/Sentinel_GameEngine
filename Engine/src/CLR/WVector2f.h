@@ -43,19 +43,20 @@ namespace Sentinel { namespace Math
 		bool		Equals( const WVector2f^ v );
 		
 		WVector2f^	operator += ( const WVector2f^ v );
-		WVector2f^	operator +  ( const WVector2f^ v );
+		static WVector2f^ operator + ( WVector2f^ v0, WVector2f^ v1 );
 		WVector2f^	Add( const WVector2f^ v );
 
 		WVector2f^	operator -= ( const WVector2f^ v );
-		WVector2f^	operator -  ( const WVector2f^ v );
+		static WVector2f^ operator - ( WVector2f^ v0, WVector2f^ v1 );
 		WVector2f^	Sub( const WVector2f^ v );
 
 		WVector2f^	operator *= ( float scalar );
-		WVector2f^	operator *  ( float scalar );
+		static WVector2f^ operator * ( WVector2f^ v, float scalar );
+		static WVector2f^ operator * ( float scalar, WVector2f^ v );
 		WVector2f^	Mul( float scalar );
 
 		WVector2f^	operator *= ( const WVector2f^ v );
-		WVector2f^	operator *  ( const WVector2f^ v );
+		static WVector2f^ operator * ( WVector2f^ v0, WVector2f^ v1 );
 		WVector2f^	Mul( const WVector2f^ v );
 
 		float		Length();

@@ -82,9 +82,9 @@ namespace Sentinel { namespace Math
 		return this;
 	}
 
-	WVector2f^ WVector2f::operator + ( const WVector2f^ v )
+	WVector2f^ WVector2f::operator + ( WVector2f^ v0, WVector2f^ v1 )
 	{
-		return Add( v );
+		return v0->Add( v1 );
 	}
 
 	WVector2f^ WVector2f::Add( const WVector2f^ v )
@@ -98,9 +98,9 @@ namespace Sentinel { namespace Math
 		return this;
 	}
 
-	WVector2f^ WVector2f::operator - ( const WVector2f^ v )
+	WVector2f^ WVector2f::operator - ( WVector2f^ v0, WVector2f^ v1 )
 	{
-		return Sub( v );
+		return v0->Sub( v1 );
 	}
 
 	WVector2f^ WVector2f::Sub( const WVector2f^ v )
@@ -114,9 +114,14 @@ namespace Sentinel { namespace Math
 		return this;
 	}
 
-	WVector2f^ WVector2f::operator * ( float scalar )
+	WVector2f^ WVector2f::operator * ( WVector2f^ v, float scalar )
 	{
-		return Mul( scalar );
+		return v->Mul( scalar );
+	}
+
+	WVector2f^ WVector2f::operator * ( float scalar, WVector2f^ v )
+	{
+		return v->Mul( scalar );
 	}
 
 	WVector2f^ WVector2f::Mul( float scalar )
@@ -130,9 +135,9 @@ namespace Sentinel { namespace Math
 		return this;
 	}
 
-	WVector2f^ WVector2f::operator * ( const WVector2f^ v )
+	WVector2f^ WVector2f::operator * ( WVector2f^ v0, WVector2f^ v1 )
 	{
-		return Mul( v );
+		return v0->Mul( v1 );
 	}
 
 	WVector2f^ WVector2f::Mul( const WVector2f^ v )

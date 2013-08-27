@@ -71,9 +71,9 @@ namespace Sentinel { namespace Math
 
 	////////////////////////////////
 
-	WQuatf^	WQuatf::operator * ( const WQuatf^ q )
+	WQuatf^ WQuatf::operator * ( WQuatf^ q0, WQuatf^ q1 )
 	{
-		return Mul( q );
+		return q0->Mul( q1 );
 	}
 
 	WQuatf^	WQuatf::Mul( const WQuatf^ q )
@@ -128,6 +128,11 @@ namespace Sentinel { namespace Math
 	{
 		mRef->Euler();
 		return this;
+	}
+
+	WVector3f^ WQuatf::ToEuler()
+	{
+		return gcnew WVector3f( mRef->ToEuler() );
 	}
 
 	////////////////////////////////

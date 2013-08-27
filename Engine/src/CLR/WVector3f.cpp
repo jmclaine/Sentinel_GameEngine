@@ -87,9 +87,9 @@ namespace Sentinel { namespace Math
 		return this;
 	}
 
-	WVector3f^ WVector3f::operator + ( const WVector3f^ v )
+	WVector3f^ WVector3f::operator + ( WVector3f^ v0, WVector3f^ v1 )
 	{
-		return Add( v );
+		return v0->Add( v1 );
 	}
 
 	WVector3f^ WVector3f::Add( const WVector3f^ v )
@@ -103,9 +103,9 @@ namespace Sentinel { namespace Math
 		return this;
 	}
 
-	WVector3f^ WVector3f::operator - ( const WVector3f^ v )
+	WVector3f^ WVector3f::operator - ( WVector3f^ v0, WVector3f^ v1 )
 	{
-		return Sub( v );
+		return v0->Sub( v1 );
 	}
 
 	WVector3f^ WVector3f::Sub( const WVector3f^ v )
@@ -119,9 +119,14 @@ namespace Sentinel { namespace Math
 		return this;
 	}
 
-	WVector3f^ WVector3f::operator * ( float scalar )
+	WVector3f^ WVector3f::operator * ( WVector3f^ v, float scalar )
 	{
-		return Mul( scalar );
+		return v->Mul( scalar );
+	}
+
+	WVector3f^ WVector3f::operator * ( float scalar, WVector3f^ v )
+	{
+		return v->Mul( scalar );
 	}
 
 	WVector3f^ WVector3f::Mul( float scalar )
@@ -135,9 +140,9 @@ namespace Sentinel { namespace Math
 		return this;
 	}
 
-	WVector3f^ WVector3f::operator * ( const WVector3f^ v )
+	WVector3f^ WVector3f::operator * ( WVector3f^ v0, WVector3f^ v1 )
 	{
-		return Mul( v );
+		return v0->Mul( v1 );
 	}
 
 	WVector3f^ WVector3f::Mul( const WVector3f^ v )

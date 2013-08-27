@@ -195,7 +195,7 @@ public:
 		Renderer::Inst()->Present();
 
 		/////////////////////////////////
-
+		/*
 		mWindow1->SetActive();
 
 		Renderer::Inst()->SetDepthStencil( 1 );
@@ -205,7 +205,7 @@ public:
 		Renderer::Inst()->Clear( color );
 
 		Renderer::Inst()->Present();
-		
+		*/
 		/////////////////////////////////
 
 		Mouse::Inst()->Update();
