@@ -65,21 +65,21 @@ namespace Sentinel { namespace Components
 
 	//////////////////////////////
 
-	void WGameWorld::SetCamera( UINT index )
+	void WGameWorld::SetCamera( WCameraComponent^ camera )
 	{
-		GameWorld::Inst()->SetCamera( index );
+		GameWorld::Inst()->SetCamera( (CameraComponent*)camera->GetRef() );
 	}
 
 	WCameraComponent^ WGameWorld::GetCamera( int index )
 	{
 		return gcnew WCameraComponent( GameWorld::Inst()->GetCamera( index ));
 	}
-	/*
+
 	WLightComponent^ WGameWorld::GetLight( UINT index )
 	{
 		return gcnew WLightComponent( GameWorld::Inst()->GetLight( index ));
 	}
-	*/
+
 	RGameObject^ WGameWorld::GetGameObject( UINT index )
 	{
 		return gcnew RGameObject( GameWorld::Inst()->GetGameObject( index ));

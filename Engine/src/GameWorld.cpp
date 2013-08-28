@@ -39,7 +39,8 @@ namespace Sentinel
 				mLight.push_back( light );
 		}
 
-		mCurrentCamera = (!mCamera.empty()) ? mCamera[ 0 ] : NULL;
+		if( !mCurrentCamera )
+			mCurrentCamera = (!mCamera.empty()) ? mCamera[ 0 ] : NULL;
 
 		// Create a default light if none exist.
 		//
@@ -158,11 +159,11 @@ namespace Sentinel
 
 	/////////////////////////////////
 
-	void GameWorld::SetCamera( UINT index )
+	void GameWorld::SetCamera( CameraComponent* camera )
 	{
-		_ASSERT( index < mCamera.size() );
+		_ASSERT( camera );
 
-		mCurrentCamera = mCamera[ index ];
+		mCurrentCamera = camera;
 	}
 
 	// -1 = mCurrentCamera

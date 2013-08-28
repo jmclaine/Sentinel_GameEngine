@@ -32,11 +32,11 @@ namespace Sentinel { namespace Systems
 		WGameWindow();
 		~WGameWindow();
 
-		void				Startup( String^ title, String^ windowClass, WWindowInfo^ info );
+		virtual void		Startup( String^ title, String^ windowClass, WWindowInfo^ info );
 		
 		virtual void		Update();
 
-		void				Shutdown();
+		virtual void		Shutdown();
 
 	protected:
 

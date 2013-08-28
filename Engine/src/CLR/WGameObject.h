@@ -9,6 +9,7 @@ Delete() should be called manually for a controlled free memory.
 #include "WGameComponent.h"
 #include "RString.h"
 
+using namespace System;
 using namespace Sentinel::Utilities;
 
 namespace Sentinel { namespace Components
@@ -38,7 +39,7 @@ namespace Sentinel { namespace Components
 
 		////////////////////////////////
 
-		WGameComponent^ AttachComponent( WGameComponent^ component, System::String^ name );
+		WGameComponent^ AttachComponent( WGameComponent^ component, String^ name );
 
 		WGameComponent^	DetachComponent( WGameComponent^ component );
 

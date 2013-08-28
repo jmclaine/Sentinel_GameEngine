@@ -17,30 +17,49 @@ namespace Sentinel_Editor
 		Point		mLastMousePos;
 
 		bool		mIsMoving;
-		float		mForwardMovement;
-		float		mAngularSpeed;
+
+		float		mMovementDirection;
+		float		mMovementSpeed;
+
 		WVector3f	mRotation;
+		float		mAngularSpeed;
+
+		WGameObject					mObject;
+		WPerspectiveCameraComponent mCamera;
+		WTransformComponent			mTransform;
 		
 		///////////////////////////////
 
 		public GameWindow()
 		{
 			mIsMoving			= false;
-			mForwardMovement	= 0.0f;
+			mMovementDirection	= 0.0f;
+			mMovementSpeed		= 0.1f;
 			mAngularSpeed		= 1.0f;
 		}
 
-		public void SetRotation( WVector3f rot )
+		public override void Startup( String title, String windowClass, WWindowInfo info )
 		{
-			mRotation = rot;
+			base.Startup( title, windowClass, info );
+
+			// Create default viewing camera.
+			//
+			mObject = new WGameObject();
+			mObject.Name().Set( "~Camera~" );
+
+			mTransform	= (WTransformComponent)mObject.AttachComponent( new WTransformComponent(), "Transform" );
+			mCamera		= (WPerspectiveCameraComponent)mObject.AttachComponent( new WPerspectiveCameraComponent( (float)GetInfo().Width(), (float)GetInfo().Height() ), "Camera" );
+			
+			mObject.Startup();
+
+			WGameWorld.SetCamera( mCamera );
 		}
-		
+
 		public override void Update()
 		{
-			WPerspectiveCameraComponent camera = new WPerspectiveCameraComponent( WGameWorld.GetCamera( 0 ));
-			camera.Set( (float)GetInfo().Width(), (float)GetInfo().Height() );
+			base.Update();
 
-			WTransformComponent transform = camera.GetTransform();
+			mCamera.Set( (float)GetInfo().Width(), (float)GetInfo().Height() );
 
 			if( mIsMoving )
 			{
@@ -52,7 +71,7 @@ namespace Sentinel_Editor
 				{
 					mRotation += diff * mAngularSpeed;
 	
-					transform.Orientation().Set( new WQuatf( mRotation.X(), mRotation.Y(), 0 ));
+					mTransform.Orientation().Set( new WQuatf( mRotation.X(), mRotation.Y(), 0 ));
 				}
 
 				WMouse.SetPosition( mLastMousePos );
@@ -60,15 +79,35 @@ namespace Sentinel_Editor
 
 			// Move.
 			//
-			if( mForwardMovement != 0 )
+			if( mMovementDirection != 0 )
 			{
-				WMatrix4f rot = new WMatrix4f( transform.Orientation() );
-				transform.Position().Set( transform.Position() + mForwardMovement * rot.Forward() );
+				mTransform.Position().Set( mTransform.Position() + mMovementDirection * new WMatrix4f( mTransform.Orientation() ).Forward() );
 
-				mForwardMovement = 0;
+				mMovementDirection = 0;
 			}
 
+			mCamera.Update();
+
 			WGameWorld.UpdateDrawable();
+		}
+
+		public override void Shutdown()
+		{
+			base.Shutdown();
+
+			mObject.Shutdown();
+			mObject.Dispose();
+		}
+
+		public void SetCameraPosition( WVector3f pos )
+		{
+			mTransform.Position().Set( pos );
+		}
+
+		public void SetCameraRotation( WVector3f rot )
+		{
+			mRotation = rot;
+			mTransform.Orientation().Set( new WQuatf( mRotation.X(), mRotation.Y(), 0 ));
 		}
 
 		///
@@ -112,7 +151,7 @@ namespace Sentinel_Editor
 
 		protected override void OnMouseScroll()
 		{
-			mForwardMovement = (float)WMouse.ScrollDistance() * 0.1f;
+			mMovementDirection = (float)WMouse.ScrollDistance() * mMovementSpeed;
 		}
 
 		protected override void OnMouseMove()

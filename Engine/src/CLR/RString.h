@@ -28,5 +28,7 @@ namespace Sentinel { namespace Utilities
 		operator System::String^ ();
 
 		static std::string ToString( System::String^ str );
+
+		virtual System::String^ ToString() override;
 	};
 }}

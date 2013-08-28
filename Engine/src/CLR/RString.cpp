@@ -51,4 +51,9 @@ namespace Sentinel { namespace Utilities
 
 		return temp;
 	}
+
+	System::String^ RString::ToString()
+	{
+		return gcnew System::String( mRef->c_str() );
+	}
 }}

@@ -59,7 +59,7 @@ namespace Sentinel
 
 		//////////////////////////////
 
-		void				SetCamera( UINT index );
+		void				SetCamera( CameraComponent* camera );
 
 		CameraComponent*	GetCamera( int index = -1 );	// -1 = mCurrentCamera
 		LightComponent*		GetLight( UINT index );

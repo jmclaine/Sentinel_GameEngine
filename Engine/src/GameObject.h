@@ -38,7 +38,7 @@ namespace Sentinel
 
 		GameComponent* AttachComponent( GameComponent* component, const std::string& name );
 
-		void DetachComponent( GameComponent* component );
+		GameComponent* DetachComponent( GameComponent* component );
 
 		//////////////////////////////
 

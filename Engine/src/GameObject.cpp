@@ -20,7 +20,7 @@ namespace Sentinel
 	{
 		component->SetOwner( this );
 		component->mName = name;
-
+		
 		switch( component->Type() )
 		{
 			case COMPONENT_TRANSFORM:
@@ -60,11 +60,12 @@ namespace Sentinel
 		delete obj;\
 		obj = NULL;\
 	}\
-	return;
+	return component;
 
-	void GameObject::DetachComponent( GameComponent* component )
+	GameComponent* GameObject::DetachComponent( GameComponent* component )
 	{
 		_ASSERT( component );
+
 		switch( component->Type() )
 		{
 			case COMPONENT_TRANSFORM:
@@ -87,10 +88,12 @@ namespace Sentinel
 						mComponent[ x ]->Shutdown();
 						delete mComponent[ x ];
 						mComponent.erase( mComponent.begin() + x );
-						return;
+						return component;
 					}
 				}
 		}
+
+		return component;
 	}
 
 	void GameObject::Startup()

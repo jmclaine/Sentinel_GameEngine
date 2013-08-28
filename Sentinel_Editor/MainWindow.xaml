@@ -23,7 +23,13 @@
 
             <Menu Grid.Row="0" IsMainMenu="True" Background="LightGray" Width="{Binding ElementName=Window_Main,Path=ActualWidth}">
                 <MenuItem Header="_File">
-                    <MenuItem Header="_New" Click="New_Click" />
+                    <MenuItem Header="New" Click="New_Click">
+                        <MenuItem.Icon>
+                            <StackPanel>
+                                <Image Width="18" Height="18" Source="/Sentinel_Editor;component/Images/New.png" />
+                            </StackPanel>
+                        </MenuItem.Icon>
+                    </MenuItem>
                     <MenuItem Header="_Open" Click="Open_Click" />
                     <Separator/>
                     <MenuItem Header="_Save" Click="Save_Click" />
@@ -107,23 +113,35 @@
 
                         <Grid Grid.Column="0" Name="Grid_Assets" Background="#444444">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" MinHeight="34"/>
+                                <RowDefinition Height="*" MinHeight="28"/>
                             </Grid.RowDefinitions>
 
-                            <Rectangle Grid.Row="0" Fill="#444444" Margin="0,0,8,8" />
-                            <Border Grid.Row="0" Name="Asset_Handler" BorderThickness="2" BorderBrush="#666666" Margin="0,0,8,8" />
+                            <Border Grid.Row="0" Name="Asset_Handler" BorderThickness="2" BorderBrush="#666666" Margin="0,0,8,8" Panel.ZIndex="1">
+                                <TextBlock Height="24" Text="Objects" Foreground="White" FontWeight="Bold" Padding="4" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="#FF666666" TextAlignment="Center" FontSize="12" />
+                            </Border>
 
-                            <Rectangle Grid.Row="1" Fill="#444444" Margin="0,0,8,0" />
-                            <Border Grid.Row="1" Name="Asset_Manager" BorderThickness="2" BorderBrush="#666666" Margin="0,0,8,0" />
+                            <Grid Grid.Row="0">
+                                <TreeView Name="Objects_TreeView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2,26,10,10" VerticalContentAlignment="Top" Background="#FF444444" Foreground="White" BorderThickness="0" MinWidth="10" MinHeight="10" OverridesDefaultStyle="False" Padding="0" Panel.ZIndex="-1" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                            </Grid>
 
-                            <GridSplitter Grid.Row="0" VerticalAlignment="Bottom" Height="8" Background="#222222" HorizontalAlignment="Stretch" />
+                            <GridSplitter Grid.Row="0" VerticalAlignment="Bottom" Height="8" Background="#222222" HorizontalAlignment="Stretch" Panel.ZIndex="1" />
+
+                            <Border Grid.Row="1" Name="Asset_Manager" BorderThickness="2" BorderBrush="#666666" Margin="0,0,8,0">
+                                <TextBlock Background="#FF666666" FontWeight="Bold" Foreground="White" Height="24" Padding="4" Text="Assets" TextAlignment="Center" VerticalAlignment="Top" />
+                            </Border>
+
+                            <Grid Grid.Row="1">
+                                <TreeView Name="Assets_TreeView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2,26,10,2" VerticalContentAlignment="Top" Background="#FF444444" Foreground="White" BorderThickness="0" MinWidth="10" MinHeight="10" OverridesDefaultStyle="False" Padding="0" Panel.ZIndex="-1" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                            </Grid>
                         </Grid>
 
                         <GridSplitter Grid.Column="0" HorizontalAlignment="Right" Width="8" Background="#222222" ResizeDirection="Columns" ShowsPreview="False" />
 
                         <Rectangle Grid.Column="1" Margin="0,0,0,0" Fill="#444444" />
-                        <Border Grid.Column="1" Name="Inspector" BorderThickness="2" BorderBrush="#666666" Margin="0,0,0,0" />
+                        <Border Grid.Column="1" Name="Inspector" BorderThickness="2" BorderBrush="#666666" Margin="0,0,0,0">
+                            <TextBlock Background="#FF666666" FontWeight="Bold" Foreground="White" Height="24" Padding="4" Text="Inspector" TextAlignment="Center" VerticalAlignment="Top" />
+                        </Border>
                     </Grid>
                 </Grid>
 

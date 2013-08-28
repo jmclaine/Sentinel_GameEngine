@@ -3,7 +3,7 @@
 #include "GameWorld.h"
 #include "WGameObject.h"
 #include "WCameraComponent.h"
-//#include "WLightComponent.h"
+#include "WLightComponent.h"
 
 namespace Sentinel { namespace Components
 {
@@ -32,10 +32,10 @@ namespace Sentinel { namespace Components
 
 		//////////////////////////////
 
-		static void					SetCamera( UINT index );
+		static void					SetCamera( WCameraComponent^ camera );
 
 		static WCameraComponent^	GetCamera( int index );	// -1 = mCurrentCamera
-		//static WLightComponent^		GetLight( UINT index );
+		static WLightComponent^		GetLight( UINT index );
 		static RGameObject^			GetGameObject( UINT index );
 	};
 }}

@@ -39,7 +39,7 @@ namespace Sentinel { namespace Components
 
 	////////////////////////////////
 
-	WGameComponent^ WGameObject::AttachComponent( WGameComponent^ component, System::String^ name )
+	WGameComponent^ WGameObject::AttachComponent( WGameComponent^ component, String^ name )
 	{
 		mRef->AttachComponent( component->GetRef(), RString::ToString( name ));
 		return component;

@@ -81,8 +81,12 @@ namespace Sentinel_Editor
 				System.Environment.Exit( 0 );
 			}
 
+			WGameWorld.Load( "Default.MAP" );
+
 			mWindowWorld = new GameWindow();
 			mWindowWorld.Startup( "World", "WorldClass", info );
+			mWindowWorld.SetCameraPosition( new WVector3f( 0, 25, 25 ));
+			mWindowWorld.SetCameraRotation( new WVector3f( -45, 0, 0 ));
 			
 			Window_World.Child = mWindowWorld;
 			
@@ -155,6 +159,19 @@ namespace Sentinel_Editor
 		}
 
 		///
+		/// Game Objects Tree.
+		/// 
+		private void AddObjectToTree( WGameObject obj )
+		{
+			TreeViewItem item = new TreeViewItem();
+			item.Foreground = Brushes.LightGray;
+			item.Header = obj.Name().ToString();
+			
+			//item.Items.Add( new TreeViewItem() { Header = "Dummy" } );
+			Objects_TreeView.Items.Add( item );
+		}
+
+		///
 		/// Prepare Shaders.
 		///
 		private void PrepareShaders()
@@ -178,61 +195,59 @@ namespace Sentinel_Editor
 			
 			////////////////////////////////////
 
-			WGameWorld.Load( "NoMap.MAP" );
-
 			// Camera.
 			//
 			obj = WGameWorld.AddGameObject( new WGameObject(), "Main_Camera" );
-			
-			transform = new WTransformComponent();
+
+			transform = (WTransformComponent)obj.AttachComponent( new WTransformComponent(), "Transform" );
 			transform.Position().Set( new WVector3f( 0, 25, 25 ));
-			transform.Orientation().Set( new WQuatf( -45, 0, 0 )); 
-			obj.AttachComponent( transform, "Transform" );
+			transform.Orientation().Set( new WQuatf( -45, 0, 0 ));
 
-			WPerspectiveCameraComponent camera = new WPerspectiveCameraComponent( (float)mWindowWorld.GetInfo().Width(), (float)mWindowWorld.GetInfo().Height() );
-			obj.AttachComponent( camera, "Camera" );
+			obj.AttachComponent( new WPerspectiveCameraComponent( mWindowWorld.GetInfo().Width(), mWindowWorld.GetInfo().Height() ), "Camera" );
 
-			mWindowWorld.SetRotation( new WVector3f( -45, 0, 0 ));
-
+			AddObjectToTree( obj );
+			
 			// Point Light.
 			//
 			obj = WGameWorld.AddGameObject( new WGameObject(), "Point_Light" );
 
-			transform = new WTransformComponent();
+			transform = (WTransformComponent)obj.AttachComponent( new WTransformComponent(), "Transform" );
 			transform.Position().Set( new WVector3f( 0, 10, 0 ));
-			obj.AttachComponent( transform, "Transform" );
 
-			WLightComponent light = new WLightComponent();
+			WLightComponent light = (WLightComponent)obj.AttachComponent( new WLightComponent(), "Light" );
 			light.Attenuation().Set( new WVector4f( 1, 1, 1, 25 ));
-			obj.AttachComponent( light, "Light" );
+
+			AddObjectToTree( obj );
 
 			// Test object.
 			//
 			meshBuilder.CreateCube( 1.0f );
 			meshBuilder.Shader().Set( mShader[ (int)ShaderTypes.SHADER_COLOR ] );
 
-			obj = WGameWorld.AddGameObject( new WGameObject(), "Test_Object" );
+			obj = WGameWorld.AddGameObject( new WGameObject(), "Ground" );
 
-			transform = new WTransformComponent();
+			transform = (WTransformComponent)obj.AttachComponent( new WTransformComponent(), "Transform" );
 			transform.Position().Set( new WVector3f( 0, 0, 0 ));
 			transform.Scale().Set( new WVector3f( 100, 1, 100 ));
-			obj.AttachComponent( transform, "Transform" );
 
 			obj.AttachComponent( new WMeshComponent( meshBuilder.BuildMesh(), material ), "Mesh" );
+
+			AddObjectToTree( obj );
 
 			// Test object.
 			//
 			meshBuilder.CreateCube( 1.0f );
 			meshBuilder.Shader().Set( mShader[ (int)ShaderTypes.SHADER_COLOR ] );
 
-			obj = WGameWorld.AddGameObject( new WGameObject(), "Test_Object" );
+			obj = WGameWorld.AddGameObject( new WGameObject(), "Cube" );
 
-			transform = new WTransformComponent();
+			transform = (WTransformComponent)obj.AttachComponent( new WTransformComponent(), "Transform" );
 			transform.Position().Set( new WVector3f( 0, 2, 0 ));
 			//transform.Scale().Set( new WVector3f( 100, 1, 100 ));
-			obj.AttachComponent( transform, "Transform" );
 
 			obj.AttachComponent( new WMeshComponent( meshBuilder.BuildMesh(), material ), "Mesh" );
+
+			AddObjectToTree( obj );
 			
 			WGameWorld.Startup();
 		}
