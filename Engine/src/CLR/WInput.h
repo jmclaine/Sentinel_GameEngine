@@ -13,7 +13,7 @@ using namespace System::Windows::Interop;
 
 namespace Sentinel { namespace Systems
 {
-	public enum MouseButton
+	public enum class MouseButton
 	{
 		BUTTON_LEFT,
 		BUTTON_RIGHT,

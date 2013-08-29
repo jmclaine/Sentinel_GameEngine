@@ -90,9 +90,6 @@
     <ClInclude Include="..\Engine\src\CLR\WCameraComponent.h">
       <Filter>Sentinel_Engine\Components\Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\RFloat.h">
-      <Filter>Sentinel_Engine\Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\CLR\RString.h">
       <Filter>Sentinel_Engine\Utilities</Filter>
     </ClInclude>
@@ -131,6 +128,9 @@
     </ClInclude>
     <ClInclude Include="..\Engine\src\CLR\WInput.h">
       <Filter>Sentinel_Engine\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\Property.h">
+      <Filter>Sentinel_Engine\Utilities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -178,9 +178,6 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\CLR\WGameWorld.cpp">
       <Filter>Sentinel_Engine\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\RFloat.cpp">
-      <Filter>Sentinel_Engine\Utilities</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\CLR\RString.cpp">
       <Filter>Sentinel_Engine\Utilities</Filter>

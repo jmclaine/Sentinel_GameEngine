@@ -5,6 +5,7 @@ consumption of multiple copies of the Vertex
 and Index buffers.
 */
 #include "MeshBuilder.h"
+#include "Property.h"
 #include "WRenderer.h"
 #include "RMesh.h"
 #include "WMaterial.h"
@@ -32,14 +33,12 @@ namespace Sentinel { namespace Assets
 
 		//////////////////////////////////
 
-		RShader^		Shader();
-
-		PrimitiveType%	Primitive();
-		
-		RMaterial^		Material();
+		DECLARE_PROPERTY( WShader^,		Shader );
+		DECLARE_PROPERTY( Sentinel::Systems::PrimitiveType, Primitive );
+		DECLARE_PROPERTY( WMaterial^,	Material );
 
 		RTexture^		Texture( TextureType type );
-		RVector4f^		TextureScale();
+		DECLARE_PROPERTY( WVector4f^,	TextureScale );
 
 		//////////////////////////////////
 

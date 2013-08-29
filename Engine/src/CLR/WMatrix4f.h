@@ -33,8 +33,13 @@ namespace Sentinel { namespace Math
 
 		////////////////////////////////
 		
-		RFloat^		Get( int index );
-		void		Set( int index, float value );
+		property float default[ int ]
+		{
+			float get( int index );
+			void  set( int index, float value );
+		}
+
+		////////////////////////////////
 
 		static WMatrix4f^ WMatrix4f::operator + ( WMatrix4f^ mat0, WMatrix4f^ mat1 );
 		WMatrix4f^	Add( const WMatrix4f^ mat );

@@ -44,15 +44,17 @@ namespace Sentinel { namespace Math
 
 	////////////////////////////////
 
-	RFloat^ WMatrix4f::Get( int index )
+	float WMatrix4f::default::get( int index )
 	{
-		return gcnew RFloat( &(*mRef)[ index ] );
+		return (*mRef)[ index ];
 	}
 
-	void WMatrix4f::Set( int index, float value )
+	void WMatrix4f::default::set( int index, float value )
 	{
 		(*mRef)[ index ] = value;
 	}
+
+	////////////////////////////////
 
 	WMatrix4f^ WMatrix4f::operator + ( WMatrix4f^ mat0, WMatrix4f^ mat1 )
 	{

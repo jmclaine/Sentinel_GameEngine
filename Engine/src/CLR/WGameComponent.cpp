@@ -1,5 +1,8 @@
 #include "WGameComponent.h"
 #include "WGameObject.h"
+#include "RString.h"
+
+using namespace Sentinel::Utilities;
 
 namespace Sentinel { namespace Components
 {
@@ -48,8 +51,5 @@ namespace Sentinel { namespace Components
 		return (Sentinel::Components::ComponentType)mRef->Type();
 	}
 
-	RString^ WGameComponent::Name()
-	{
-		return gcnew RString( mRef->mName );
-	}
+	DEFINE_PROPERTY_S( GameComponent, Name );
 }}

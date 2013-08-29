@@ -49,25 +49,12 @@ namespace Sentinel { namespace Assets
 
 	////////////////////////////////
 
-	RFloat^ WColorRGBA::R()
-	{
-		return gcnew RFloat( &mRef->r );
-	}
+	DEFINE_PROPERTY( ColorRGBA, float, r );
+	DEFINE_PROPERTY( ColorRGBA, float, g );
+	DEFINE_PROPERTY( ColorRGBA, float, b );
+	DEFINE_PROPERTY( ColorRGBA, float, a );
 
-	RFloat^ WColorRGBA::G()
-	{
-		return gcnew RFloat( &mRef->g );
-	}
-
-	RFloat^ WColorRGBA::B()
-	{
-		return gcnew RFloat( &mRef->b );
-	}
-
-	RFloat^ WColorRGBA::A()
-	{
-		return gcnew RFloat( &mRef->a );
-	}
+	////////////////////////////////
 
 	float* WColorRGBA::Ptr()
 	{

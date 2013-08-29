@@ -5,7 +5,7 @@
 
 namespace Sentinel { namespace Assets
 {
-	public enum BufferType
+	public enum class BufferType
 	{
 		VERTEX_BUFFER = 1,
 		INDEX_BUFFER  = 2,

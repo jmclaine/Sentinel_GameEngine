@@ -25,17 +25,15 @@ namespace Sentinel { namespace Components
 		return mRef;
 	}
 
+	System::String^ WGameObject::ToString()
+	{
+		return gcnew System::String( mRef->mName.c_str() );
+	}
+
 	////////////////////////////////
 
-	RGameObject^ WGameObject::Parent()
-	{
-		return gcnew RGameObject( mRef->mParent );
-	}
-
-	RString^ WGameObject::Name()
-	{
-		return gcnew RString( mRef->mName );
-	}
+	DEFINE_PROPERTY_P( GameObject, GameObject, Parent );
+	DEFINE_PROPERTY_S( GameObject, Name );
 
 	////////////////////////////////
 

@@ -5,12 +5,11 @@ GameObject will not be freed unless it is attached to the GameWorld.
 Delete() should be called manually for a controlled free memory.
 */
 #include "m_shared_ptr.h"
+#include "Property.h"
 #include "GameObject.h"
 #include "WGameComponent.h"
-#include "RString.h"
 
 using namespace System;
-using namespace Sentinel::Utilities;
 
 namespace Sentinel { namespace Components
 {
@@ -31,11 +30,12 @@ namespace Sentinel { namespace Components
 		
 		GameObject*		GetRef();
 
+		virtual String^	ToString() override;
+
 		////////////////////////////////
 
-		RGameObject^	Parent();
-
-		RString^		Name();
+		DECLARE_PROPERTY( WGameObject^, Parent );
+		DECLARE_PROPERTY( String^,		Name )
 
 		////////////////////////////////
 

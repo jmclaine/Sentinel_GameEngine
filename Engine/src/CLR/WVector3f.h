@@ -1,9 +1,7 @@
 #pragma once
 
 #include "Vector3f.h"
-#include "RFloat.h"
-
-using namespace Sentinel::Utilities;
+#include "Property.h"
 
 namespace Sentinel { namespace Math
 {
@@ -31,9 +29,9 @@ namespace Sentinel { namespace Math
 
 		Vector3f*	GetRef();
 
-		RFloat^		X();
-		RFloat^		Y();
-		RFloat^		Z();
+		DECLARE_PROPERTY( float, x );
+		DECLARE_PROPERTY( float, y );
+		DECLARE_PROPERTY( float, z );
 
 		////////////////////////////////
 

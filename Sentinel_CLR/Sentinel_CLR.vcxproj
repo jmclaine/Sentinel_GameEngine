@@ -95,9 +95,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Engine\src\CLR\Property.h" />
     <ClInclude Include="..\Engine\src\CLR\m_shared_ptr.h" />
     <ClInclude Include="..\Engine\src\CLR\WCameraComponent.h" />
-    <ClInclude Include="..\Engine\src\CLR\RFloat.h" />
     <ClInclude Include="..\Engine\src\CLR\RBuffer.h" />
     <ClInclude Include="..\Engine\src\CLR\WColor.h" />
     <ClInclude Include="..\Engine\src\CLR\WDrawableComponent.h" />
@@ -131,7 +131,6 @@
     <ClCompile Include="..\Engine\src\CLR\RBuffer.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WCameraComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WColor.cpp" />
-    <ClCompile Include="..\Engine\src\CLR\RFloat.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WGameComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WGameObject.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WGameWindow.cpp" />

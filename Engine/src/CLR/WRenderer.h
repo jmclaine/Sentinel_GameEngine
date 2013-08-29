@@ -36,7 +36,7 @@ using namespace Sentinel::Assets;
 
 namespace Sentinel { namespace Systems
 {
-	public enum PrimitiveType
+	public enum class PrimitiveType
 	{
 		POINT_LIST,
 		LINE_LIST,
@@ -45,7 +45,7 @@ namespace Sentinel { namespace Systems
 		NUM_PRIMITIVES
 	};
 
-	public enum ImageFormatType
+	public enum class ImageFormatType
 	{
 		IMAGE_FORMAT_R,
 		IMAGE_FORMAT_RGB,
@@ -55,7 +55,7 @@ namespace Sentinel { namespace Systems
 		NUM_IMAGE_FORMATS
 	};
 
-	public enum CullType
+	public enum class CullType
 	{
 		CULL_NONE,
 		CULL_CCW,
@@ -64,7 +64,7 @@ namespace Sentinel { namespace Systems
 		NUM_CULL_TYPES
 	};
 
-	public enum BlendType
+	public enum class BlendType
 	{
 		BLEND_DEFAULT,
 		BLEND_ALPHA,
@@ -73,7 +73,7 @@ namespace Sentinel { namespace Systems
 		NUM_BLEND_TYPES
 	};
 
-	public enum StencilType
+	public enum class StencilType
 	{
 		STENCIL_DEFAULT,
 		STENCIL_PARTICLE,

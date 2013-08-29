@@ -32,13 +32,8 @@ namespace Sentinel { namespace Components
 		static_cast< LightComponent* >(mRef)->Shutdown();
 	}
 
-	RColorRGBA^ WLightComponent::Color()
-	{
-		return gcnew RColorRGBA( &static_cast< LightComponent* >(mRef)->mColor );
-	}
+	//////////////////////////////
 
-	RVector4f^ WLightComponent::Attenuation()
-	{
-		return gcnew RVector4f( &static_cast< LightComponent* >(mRef)->mAttenuation );
-	}
+	DEFINE_PROPERTY_R( LightComponent, ColorRGBA, Color );
+	DEFINE_PROPERTY_R( LightComponent, Vector4f,  Attenuation );
 }}

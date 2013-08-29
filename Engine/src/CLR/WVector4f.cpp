@@ -49,25 +49,10 @@ namespace Sentinel { namespace Math
 
 	////////////////////////////////
 
-	RFloat^ WVector4f::X()
-	{
-		return gcnew RFloat( &mRef->x );
-	}
-
-	RFloat^ WVector4f::Y()
-	{
-		return gcnew RFloat( &mRef->y );
-	}
-
-	RFloat^ WVector4f::Z()
-	{
-		return gcnew RFloat( &mRef->z );
-	}
-
-	RFloat^ WVector4f::W()
-	{
-		return gcnew RFloat( &mRef->w );
-	}
+	DEFINE_PROPERTY( Vector4f, float, x );
+	DEFINE_PROPERTY( Vector4f, float, y );
+	DEFINE_PROPERTY( Vector4f, float, z );
+	DEFINE_PROPERTY( Vector4f, float, w );
 
 	////////////////////////////////
 

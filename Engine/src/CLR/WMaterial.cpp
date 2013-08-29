@@ -60,26 +60,11 @@ namespace Sentinel { namespace Assets
 
 	////////////////////////////////
 
-	RColorRGBA^ WMaterial::Ambient()
-	{
-		return gcnew RColorRGBA( &mRef->mAmbient );
-	}
-
-	RColorRGBA^ WMaterial::Diffuse()
-	{
-		return gcnew RColorRGBA( &mRef->mDiffuse );
-	}
-
-	RColorRGBA^ WMaterial::Specular()
-	{
-		return gcnew RColorRGBA( &mRef->mSpecular );
-	}
-
-	RFloat^ WMaterial::SpecularComponent()
-	{
-		return gcnew RFloat( &mRef->mSpecularComponent );
-	}
-
+	DEFINE_PROPERTY_R( Material, ColorRGBA, Ambient );
+	DEFINE_PROPERTY_R( Material, ColorRGBA, Diffuse );
+	DEFINE_PROPERTY_R( Material, ColorRGBA, Specular );
+	DEFINE_PROPERTY_M( Material, float,		SpecularComponent );
+	
 	////////////////////////////////
 
 	RMaterial::RMaterial( Material* material )

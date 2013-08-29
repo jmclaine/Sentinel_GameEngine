@@ -14,7 +14,7 @@ using namespace Sentinel::Math;
 
 namespace Sentinel { namespace Assets
 {
-	public enum TextureType
+	public enum class TextureType
 	{
 		TEXTURE_DIFFUSE,
 		TEXTURE_NORMAL,

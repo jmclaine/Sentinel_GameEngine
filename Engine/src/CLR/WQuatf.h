@@ -1,11 +1,10 @@
 #pragma once
 
 #include "Quatf.h"
-#include "RFloat.h"
+#include "Property.h"
 #include "WVector3f.h"
 
 using namespace System;
-using namespace Sentinel::Utilities;
 
 namespace Sentinel { namespace Math
 {
@@ -35,10 +34,10 @@ namespace Sentinel { namespace Math
 
 		////////////////////////////////
 
-		RFloat^		X();
-		RFloat^		Y();
-		RFloat^		Z();
-		RFloat^		W();
+		DECLARE_PROPERTY( float, x );
+		DECLARE_PROPERTY( float, y );
+		DECLARE_PROPERTY( float, z );
+		DECLARE_PROPERTY( float, w );
 
 		////////////////////////////////
 

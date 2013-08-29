@@ -139,35 +139,35 @@ namespace Sentinel { namespace Systems
 
 		// Button Down.
 		//
-		if( WMouse::DidGoDown( BUTTON_LEFT ))
+		if( WMouse::DidGoDown( static_cast< Sentinel::Systems::MouseButton >(BUTTON_LEFT) ))
 			OnLeftMouseDown();
 
-		if( WMouse::DidGoDown( BUTTON_RIGHT ))
+		if( WMouse::DidGoDown( static_cast< Sentinel::Systems::MouseButton >(BUTTON_RIGHT) ))
 			OnRightMouseDown();
 
-		if( WMouse::DidGoDown( BUTTON_MIDDLE ))
+		if( WMouse::DidGoDown( static_cast< Sentinel::Systems::MouseButton >(BUTTON_MIDDLE) ))
 			OnMiddleMouseDown();
 
 		// Button Up.
 		//
-		if( WMouse::DidGoUp( BUTTON_LEFT ))
+		if( WMouse::DidGoUp( static_cast< Sentinel::Systems::MouseButton >(BUTTON_LEFT) ))
 			OnLeftMouseUp();
 
-		if( WMouse::DidGoUp( BUTTON_RIGHT ))
+		if( WMouse::DidGoUp( static_cast< Sentinel::Systems::MouseButton >(BUTTON_RIGHT) ))
 			OnRightMouseUp();
 
-		if( WMouse::DidGoUp( BUTTON_MIDDLE ))
+		if( WMouse::DidGoUp( static_cast< Sentinel::Systems::MouseButton >(BUTTON_MIDDLE) ))
 			OnMiddleMouseUp();
 
 		// Button Double Click.
 		//
-		if( WMouse::DidDoubleClick( BUTTON_LEFT ))
+		if( WMouse::DidDoubleClick( static_cast< Sentinel::Systems::MouseButton >(BUTTON_LEFT) ))
 			OnLeftMouseDoubleClick();
 
-		if( WMouse::DidDoubleClick( BUTTON_RIGHT ))
+		if( WMouse::DidDoubleClick( static_cast< Sentinel::Systems::MouseButton >(BUTTON_RIGHT) ))
 			OnRightMouseDoubleClick();
 
-		if( WMouse::DidDoubleClick( BUTTON_MIDDLE ))
+		if( WMouse::DidDoubleClick( static_cast< Sentinel::Systems::MouseButton >(BUTTON_MIDDLE) ))
 			OnMiddleMouseDoubleClick();
 
 		if( handled )

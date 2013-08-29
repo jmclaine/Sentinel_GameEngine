@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.Windows.Interop;
 using System.Windows.Threading;
 using System.ComponentModel;
+using System.Collections.ObjectModel;
 
 using System.Runtime.InteropServices;
 
@@ -89,6 +90,8 @@ namespace Sentinel_Editor
 			mWindowWorld.SetCameraRotation( new WVector3f( -45, 0, 0 ));
 			
 			Window_World.Child = mWindowWorld;
+
+			//Objects_TreeView.Items.Add( new ObservableCollection< GameObject_TreeViewItem >() );
 			
 			PrepareShaders();
 			PrepareObjects();
@@ -163,12 +166,33 @@ namespace Sentinel_Editor
 		/// 
 		private void AddObjectToTree( WGameObject obj )
 		{
+			GameObject_TreeViewItem item = new GameObject_TreeViewItem( obj );
+			
+			
+			
+			Objects_TreeView.Items.Add( item );
+		}
+
+		private void Objects_TreeView_Selected( Object sender, RoutedEventArgs e )
+		{
+			GameObject_TreeViewItem item = (GameObject_TreeViewItem)Objects_TreeView.SelectedItem;
+			
+			//Objects_TreeView.Items.Refresh();
+			//Objects_TreeView.UpdateLayout();
+		}
+
+		///
+		/// Assets Tree.
+		/// 
+		private void AddAssetToTree( String name )
+		{
 			TreeViewItem item = new TreeViewItem();
-			item.Foreground = Brushes.LightGray;
-			item.Header = obj.Name().ToString();
+			item.Foreground = Brushes.White;
+			item.Header = name;
 			
 			//item.Items.Add( new TreeViewItem() { Header = "Dummy" } );
-			Objects_TreeView.Items.Add( item );
+
+			Assets_TreeView.Items.Add( item );
 		}
 
 		///
@@ -200,8 +224,8 @@ namespace Sentinel_Editor
 			obj = WGameWorld.AddGameObject( new WGameObject(), "Main_Camera" );
 
 			transform = (WTransformComponent)obj.AttachComponent( new WTransformComponent(), "Transform" );
-			transform.Position().Set( new WVector3f( 0, 25, 25 ));
-			transform.Orientation().Set( new WQuatf( -45, 0, 0 ));
+			transform.Position = new WVector3f( 0, 25, 25 );
+			transform.Orientation = new WQuatf( -45, 0, 0 );
 
 			obj.AttachComponent( new WPerspectiveCameraComponent( mWindowWorld.GetInfo().Width(), mWindowWorld.GetInfo().Height() ), "Camera" );
 
@@ -212,23 +236,24 @@ namespace Sentinel_Editor
 			obj = WGameWorld.AddGameObject( new WGameObject(), "Point_Light" );
 
 			transform = (WTransformComponent)obj.AttachComponent( new WTransformComponent(), "Transform" );
-			transform.Position().Set( new WVector3f( 0, 10, 0 ));
+			transform.Position = new WVector3f( 0, 10, 0 );
 
 			WLightComponent light = (WLightComponent)obj.AttachComponent( new WLightComponent(), "Light" );
-			light.Attenuation().Set( new WVector4f( 1, 1, 1, 25 ));
+			light.Attenuation  = new WVector4f( 1, 1, 1, 25 );
 
 			AddObjectToTree( obj );
 
 			// Test object.
 			//
 			meshBuilder.CreateCube( 1.0f );
-			meshBuilder.Shader().Set( mShader[ (int)ShaderTypes.SHADER_COLOR ] );
+			meshBuilder.Shader = mShader[ (int)ShaderTypes.SHADER_COLOR ];
+			meshBuilder.Primitive = PrimitiveType.TRIANGLE_LIST;
 
 			obj = WGameWorld.AddGameObject( new WGameObject(), "Ground" );
 
 			transform = (WTransformComponent)obj.AttachComponent( new WTransformComponent(), "Transform" );
-			transform.Position().Set( new WVector3f( 0, 0, 0 ));
-			transform.Scale().Set( new WVector3f( 100, 1, 100 ));
+			transform.Position	= new WVector3f( 0, 0, 0 );
+			transform.Scale		= new WVector3f( 100, 1, 100 );
 
 			obj.AttachComponent( new WMeshComponent( meshBuilder.BuildMesh(), material ), "Mesh" );
 
@@ -237,13 +262,13 @@ namespace Sentinel_Editor
 			// Test object.
 			//
 			meshBuilder.CreateCube( 1.0f );
-			meshBuilder.Shader().Set( mShader[ (int)ShaderTypes.SHADER_COLOR ] );
+			meshBuilder.Shader = mShader[ (int)ShaderTypes.SHADER_COLOR ];
 
 			obj = WGameWorld.AddGameObject( new WGameObject(), "Cube" );
 
 			transform = (WTransformComponent)obj.AttachComponent( new WTransformComponent(), "Transform" );
-			transform.Position().Set( new WVector3f( 0, 2, 0 ));
-			//transform.Scale().Set( new WVector3f( 100, 1, 100 ));
+			transform.Position	= new WVector3f( 0, 2, 0 );
+			//transform.Scale	= new WVector3f( 1, 1, 1 );
 
 			obj.AttachComponent( new WMeshComponent( meshBuilder.BuildMesh(), material ), "Mesh" );
 

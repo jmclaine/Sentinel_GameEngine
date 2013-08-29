@@ -4,16 +4,14 @@ All GameComponent(s) are freed when their associated GameObject is Shutdown()
 Delete() should be called manually for a controlled free memory.
 */
 #include "m_shared_ptr.h"
+#include "Property.h"
 #include "GameComponent.h"
-#include "RString.h"
-
-using namespace Sentinel::Utilities;
 
 namespace Sentinel { namespace Components
 {
 	ref class RGameObject;
 
-	public enum ComponentType
+	public enum class ComponentType
 	{
 		COMPONENT_GAME,
 		COMPONENT_CONTROLLER,
@@ -59,6 +57,7 @@ namespace Sentinel { namespace Components
 		void			SetOwner( RGameObject^ owner );
 
 		ComponentType	Type();
-		RString^		Name();
+
+		DECLARE_PROPERTY( System::String^, Name );
 	};
 }}

@@ -49,25 +49,10 @@ namespace Sentinel { namespace Math
 
 	////////////////////////////////
 
-	RFloat^ WQuatf::X()
-	{
-		return gcnew RFloat( &mRef->x );
-	}
-
-	RFloat^ WQuatf::Y()
-	{
-		return gcnew RFloat( &mRef->y );
-	}
-
-	RFloat^ WQuatf::Z()
-	{
-		return gcnew RFloat( &mRef->z );
-	}
-
-	RFloat^ WQuatf::W()
-	{
-		return gcnew RFloat( &mRef->w );
-	}
+	DEFINE_PROPERTY( Quatf, float, x );
+	DEFINE_PROPERTY( Quatf, float, y );
+	DEFINE_PROPERTY( Quatf, float, z );
+	DEFINE_PROPERTY( Quatf, float, w );
 
 	////////////////////////////////
 

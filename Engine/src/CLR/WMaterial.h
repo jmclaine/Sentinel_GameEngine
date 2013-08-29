@@ -2,7 +2,6 @@
 
 #include "Material.h"
 #include "WColor.h"
-#include "RFloat.h"
 
 namespace Sentinel { namespace Assets
 {
@@ -35,10 +34,10 @@ namespace Sentinel { namespace Assets
 
 		////////////////////////////////
 
-		RColorRGBA^	Ambient();
-		RColorRGBA^	Diffuse();
-		RColorRGBA^	Specular();
-		RFloat^		SpecularComponent();
+		DECLARE_PROPERTY( WColorRGBA^,	Ambient );
+		DECLARE_PROPERTY( WColorRGBA^,	Diffuse );
+		DECLARE_PROPERTY( WColorRGBA^,	Specular );
+		DECLARE_PROPERTY( float,		SpecularComponent );
 	};
 
 	public ref class RMaterial sealed : public WMaterial

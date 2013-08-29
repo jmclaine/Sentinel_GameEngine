@@ -24,31 +24,17 @@ namespace Sentinel { namespace Assets
 
 	//////////////////////////////////
 
-	RShader^ WMeshBuilder::Shader()
-	{
-		return gcnew RShader( mRef->mShader );
-	}
-
-	PrimitiveType% WMeshBuilder::Primitive()
-	{
-		return static_cast< PrimitiveType >(mRef->mPrimitive);
-	}
-
-	RMaterial^ WMeshBuilder::Material()
-	{
-		return gcnew RMaterial( &mRef->mMaterial );
-	}
-
+	DEFINE_PROPERTY_P( MeshBuilder, Shader,		Shader );
+	DEFINE_PROPERTY_E( MeshBuilder, Systems,	PrimitiveType, Primitive );
+	DEFINE_PROPERTY_R( MeshBuilder, Material,	Material );
+	
 	RTexture^ WMeshBuilder::Texture( TextureType type )
 	{
 		return gcnew RTexture( mRef->mTexture[ (int)type ] );
 	}
 
-	RVector4f^ WMeshBuilder::TextureScale()
-	{
-		return gcnew RVector4f( &mRef->mTextureScale );
-	}
-
+	DEFINE_PROPERTY_R( MeshBuilder, Vector4f, TextureScale );
+	
 	//////////////////////////////////
 
 	void WMeshBuilder::ClearAll()

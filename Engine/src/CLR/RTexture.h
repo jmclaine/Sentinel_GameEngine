@@ -3,28 +3,30 @@
 #include "m_shared_ptr.h"
 #include "Texture.h"
 
+using namespace System;
+
 namespace Sentinel { namespace Assets
 {
 	public ref class RTexture
 	{
 	private:
 
-		Texture*			mRef;
+		Texture*	mRef;
 
 	public:
 
 		RTexture( Texture* texture );
 		~RTexture();
 		
-		Texture*			GetRef();
+		Texture*	GetRef();
 
 		////////////////////////////////
 
-		void				Release();
+		void		Release();
 
-		System::String^		Filename();
-		UINT				Width();
-		UINT				Height();
-		UINT				ID();
+		String^		Filename();
+		UINT		Width();
+		UINT		Height();
+		UINT		ID();
 	};
 }}

@@ -1,9 +1,7 @@
 #pragma once
 
 #include "Color.h"
-#include "RFloat.h"
-
-using namespace Sentinel::Utilities;
+#include "Property.h"
 
 namespace Sentinel { namespace Assets
 {
@@ -33,10 +31,12 @@ namespace Sentinel { namespace Assets
 
 		////////////////////////////////
 
-		RFloat^		R();
-		RFloat^		G();
-		RFloat^		B();
-		RFloat^		A();
+		DECLARE_PROPERTY( float, r );
+		DECLARE_PROPERTY( float, g );
+		DECLARE_PROPERTY( float, b );
+		DECLARE_PROPERTY( float, a );
+
+		////////////////////////////////
 
 		float*		Ptr();
 

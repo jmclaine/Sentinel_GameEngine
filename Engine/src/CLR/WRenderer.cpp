@@ -2,6 +2,8 @@
 #include "Renderer.h"
 #include "RString.h"
 
+using namespace Sentinel::Utilities;
+
 namespace Sentinel { namespace Systems
 {
 	WWindowInfo::WWindowInfo()

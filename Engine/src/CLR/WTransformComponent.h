@@ -19,8 +19,8 @@ namespace Sentinel { namespace Components
 
 		/////////////////////////////////
 
-		RVector3f^		Position();
-		RQuatf^			Orientation();
-		RVector3f^		Scale();
+		DECLARE_PROPERTY( WVector3f^,	Position );
+		DECLARE_PROPERTY( WQuatf^,		Orientation );
+		DECLARE_PROPERTY( WVector3f^,	Scale );
 	};
 }}

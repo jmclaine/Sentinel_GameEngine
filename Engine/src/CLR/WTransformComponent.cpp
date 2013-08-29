@@ -17,18 +17,7 @@ namespace Sentinel { namespace Components
 
 	/////////////////////////////////
 
-	RVector3f^ WTransformComponent::Position()
-	{
-		return gcnew RVector3f( &static_cast< TransformComponent* >(mRef)->mPosition );
-	}
-
-	RQuatf^ WTransformComponent::Orientation()
-	{
-		return gcnew RQuatf( &static_cast< TransformComponent* >(mRef)->mOrientation );
-	}
-
-	RVector3f^ WTransformComponent::Scale()
-	{
-		return gcnew RVector3f( &static_cast< TransformComponent* >(mRef)->mScale );
-	}
+	DEFINE_PROPERTY_R( TransformComponent, Vector3f, Position );
+	DEFINE_PROPERTY_R( TransformComponent, Quatf,	 Orientation );
+	DEFINE_PROPERTY_R( TransformComponent, Vector3f, Scale );
 }}

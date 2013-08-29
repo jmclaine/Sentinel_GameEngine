@@ -1,7 +1,11 @@
 #pragma once
 
 #include "CameraComponent.h"
+#include "Property.h"
 #include "WTransformComponent.h"
+#include "WMatrix4f.h"
+
+using namespace Sentinel::Math;
 
 namespace Sentinel { namespace Components
 {
@@ -16,5 +20,9 @@ namespace Sentinel { namespace Components
 		WCameraComponent( CameraComponent* camera );
 
 		const WTransformComponent^	GetTransform();
+
+		DECLARE_PROPERTY( WMatrix4f^, MatrixView );
+		DECLARE_PROPERTY( WMatrix4f^, MatrixProjection );
+		DECLARE_PROPERTY( WMatrix4f^, MatrixFinal );
 	};
 }}

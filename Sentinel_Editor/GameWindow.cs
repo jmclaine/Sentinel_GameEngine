@@ -13,20 +13,20 @@ namespace Sentinel_Editor
 {
 	public class GameWindow : WGameWindow
 	{
-		Point		mCurrentMousePos;
-		Point		mLastMousePos;
+		WGameObject						mObject;
+		WPerspectiveCameraComponent		mCamera;
+		WTransformComponent				mTransform;
 
-		bool		mIsMoving;
+		Point							mCurrentMousePos;
+		Point							mLastMousePos;
 
-		float		mMovementDirection;
-		float		mMovementSpeed;
+		bool							mIsMoving;
 
-		WVector3f	mRotation;
-		float		mAngularSpeed;
+		float							mMovementDirection;
+		float							mMovementSpeed;
 
-		WGameObject					mObject;
-		WPerspectiveCameraComponent mCamera;
-		WTransformComponent			mTransform;
+		WVector3f						mRotation;
+		float							mAngularSpeed;
 		
 		///////////////////////////////
 
@@ -45,7 +45,7 @@ namespace Sentinel_Editor
 			// Create default viewing camera.
 			//
 			mObject = new WGameObject();
-			mObject.Name().Set( "~Camera~" );
+			mObject.Name = "~Camera~";
 
 			mTransform	= (WTransformComponent)mObject.AttachComponent( new WTransformComponent(), "Transform" );
 			mCamera		= (WPerspectiveCameraComponent)mObject.AttachComponent( new WPerspectiveCameraComponent( (float)GetInfo().Width(), (float)GetInfo().Height() ), "Camera" );
@@ -71,7 +71,7 @@ namespace Sentinel_Editor
 				{
 					mRotation += diff * mAngularSpeed;
 	
-					mTransform.Orientation().Set( new WQuatf( mRotation.X(), mRotation.Y(), 0 ));
+					mTransform.Orientation = new WQuatf( mRotation.x, mRotation.y, 0 );
 				}
 
 				WMouse.SetPosition( mLastMousePos );
@@ -81,7 +81,7 @@ namespace Sentinel_Editor
 			//
 			if( mMovementDirection != 0 )
 			{
-				mTransform.Position().Set( mTransform.Position() + mMovementDirection * new WMatrix4f( mTransform.Orientation() ).Forward() );
+				mTransform.Position = mTransform.Position + mMovementDirection * new WMatrix4f( mTransform.Orientation ).Forward();
 
 				mMovementDirection = 0;
 			}
@@ -101,13 +101,13 @@ namespace Sentinel_Editor
 
 		public void SetCameraPosition( WVector3f pos )
 		{
-			mTransform.Position().Set( pos );
+			mTransform.Position = pos;
 		}
 
 		public void SetCameraRotation( WVector3f rot )
 		{
 			mRotation = rot;
-			mTransform.Orientation().Set( new WQuatf( mRotation.X(), mRotation.Y(), 0 ));
+			mTransform.Orientation = new WQuatf( mRotation.x, mRotation.y, 0 );
 		}
 
 		///

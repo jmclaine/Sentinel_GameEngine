@@ -28,7 +28,7 @@ namespace Sentinel { namespace Components
 
 		//////////////////////////////
 
-		RColorRGBA^		Color();
-		RVector4f^		Attenuation();
+		DECLARE_PROPERTY( WColorRGBA^,	Color );
+		DECLARE_PROPERTY( WVector4f^,	Attenuation );
 	};
 }}
