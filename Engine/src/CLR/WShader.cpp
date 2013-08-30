@@ -89,7 +89,7 @@ namespace Sentinel { namespace Assets
 		mRef->SetMatrix( uniform, matrix, offset, count );
 	}
 
-	void WShader::SetTexture( UINT uniform, RTexture^ texture )
+	void WShader::SetTexture( UINT uniform, WTexture^ texture )
 	{
 		mRef->SetTexture( uniform, texture->GetRef() );
 	}

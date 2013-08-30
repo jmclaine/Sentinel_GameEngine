@@ -5,7 +5,7 @@
 #include "WColor.h"
 #include "WMaterial.h"
 #include "WShader.h"
-#include "RTexture.h"
+#include "WTexture.h"
 #include "RBuffer.h"
 #include "WMatrix4f.h"
 #include "WVector4f.h"
@@ -45,7 +45,7 @@ namespace Sentinel { namespace Assets
 
 		void		SetShader( WShader^ shader );
 		void		SetMaterial( WMaterial^ material );
-		void		SetTexture( RTexture^ texture, TextureType type );
+		void		SetTexture( WTexture^ texture, TextureType type );
 
 		RBuffer^	GetVBO();
 		RBuffer^	GetIBO();

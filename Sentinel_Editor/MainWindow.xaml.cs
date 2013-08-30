@@ -35,7 +35,7 @@ namespace Sentinel_Editor
 		private enum ShaderTypes
 		{
 			SHADER_COLOR,
-			//SHADER_TEXTURE,
+			SHADER_TEXTURE,
 			//SHADER_NORMAL_MAP,
 			//SHADER_SPRITE,
 
@@ -59,6 +59,7 @@ namespace Sentinel_Editor
 
 		private GameWindow			mWindowWorld;
 		private WShader[]			mShader;
+		private WTexture			mTexture;
 		private bool				mDoUpdate;
 
 		///
@@ -205,6 +206,10 @@ namespace Sentinel_Editor
 			mShader[ (int)ShaderTypes.SHADER_COLOR ] = WRenderer.CreateShader( "Shaders\\colnorm", "PN", "PpVML" );
 			if( mShader[ (int)ShaderTypes.SHADER_COLOR ] == null )
 				MessageBox.Show( "Failed to load shader: colnorm", "Shader Load Failure" );
+
+			mShader[ (int)ShaderTypes.SHADER_TEXTURE ] = WRenderer.CreateShader( "Shaders\\texture", "PXN", "PpXVML" );
+			if( mShader[ (int)ShaderTypes.SHADER_TEXTURE ] == null )
+				MessageBox.Show( "Failed to load 'texture' shader.", "Shader Load Failure" );
 		}
 
 		///
@@ -218,6 +223,8 @@ namespace Sentinel_Editor
 			WTransformComponent				transform;
 			
 			////////////////////////////////////
+
+			mTexture = WRenderer.CreateTextureFromFile( "Assets\\Images\\default-alpha.png" );
 
 			// Camera.
 			//
@@ -246,7 +253,7 @@ namespace Sentinel_Editor
 			// Test object.
 			//
 			meshBuilder.CreateCube( 1.0f );
-			meshBuilder.Shader = mShader[ (int)ShaderTypes.SHADER_COLOR ];
+			meshBuilder.Shader    = mShader[ (int)ShaderTypes.SHADER_COLOR ];
 			meshBuilder.Primitive = PrimitiveType.TRIANGLE_LIST;
 
 			obj = WGameWorld.AddGameObject( new WGameObject(), "Ground" );
@@ -262,7 +269,8 @@ namespace Sentinel_Editor
 			// Test object.
 			//
 			meshBuilder.CreateCube( 1.0f );
-			meshBuilder.Shader = mShader[ (int)ShaderTypes.SHADER_COLOR ];
+			meshBuilder.Shader = mShader[ (int)ShaderTypes.SHADER_TEXTURE ];
+			meshBuilder.Texture( TextureType.TEXTURE_DIFFUSE ).Set( mTexture );
 
 			obj = WGameWorld.AddGameObject( new WGameObject(), "Cube" );
 

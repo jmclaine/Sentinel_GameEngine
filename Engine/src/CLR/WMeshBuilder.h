@@ -36,9 +36,9 @@ namespace Sentinel { namespace Assets
 		DECLARE_PROPERTY( WShader^,		Shader );
 		DECLARE_PROPERTY( Sentinel::Systems::PrimitiveType, Primitive );
 		DECLARE_PROPERTY( WMaterial^,	Material );
+		DECLARE_PROPERTY( WVector4f^,	TextureScale );
 
 		RTexture^		Texture( TextureType type );
-		DECLARE_PROPERTY( WVector4f^,	TextureScale );
 
 		//////////////////////////////////
 

@@ -461,6 +461,8 @@ public:
 
 	void Shutdown()
 	{
+		SAFE_DELETE( mTexture );
+
 		for( UINT x = 0; x < NUM_SHADERS; ++x )
 		{
 			if( mShader[ x ] )
@@ -500,7 +502,7 @@ int APIENTRY _tWinMain( HINSTANCE hInstance,
 	//
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	_CrtSetReportMode( _CRT_ERROR, _CRTDBG_MODE_DEBUG );
-	//_CrtSetBreakAlloc( 597 );
+	//_CrtSetBreakAlloc( 246 );
 
 	UNREFERENCED_PARAMETER( hPrevInstance );
 	UNREFERENCED_PARAMETER( lpCmdLine );

@@ -68,6 +68,12 @@ namespace Sentinel
 				for( UINT x = 0; x < NUM_AUTODESK_TYPES; ++x )
 					mTexture[ x ] = NULL;
 			}
+
+			~MaterialTexture()
+			{
+				for( UINT x = 0; x < NUM_AUTODESK_TYPES; ++x )
+					SAFE_DELETE( mTexture[ x ] );
+			}
 		};
 		MaterialTexture*	mMaterials;
 		UINT				mNumMaterials;

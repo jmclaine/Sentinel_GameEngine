@@ -19,7 +19,7 @@ creation of windows if required.
 #include <Windows.h>
 
 #include "GameWindow.h"
-#include "RTexture.h"
+#include "WTexture.h"
 #include "RBuffer.h"
 #include "WShader.h"
 #include "WColor.h"
@@ -137,14 +137,14 @@ namespace Sentinel { namespace Systems
 
 		// Textures.
 		//
-		static RTexture^	CreateTexture( UINT width, UINT height, ImageFormatType format, bool createMips );
-		static RTexture^	CreateTextureFromFile( String^ filename );
-		static RTexture^	CreateTextureFromMemory( IntPtr data, UINT width, UINT height, ImageFormatType format, bool createMips );
+		static WTexture^	CreateTexture( UINT width, UINT height, ImageFormatType format, bool createMips );
+		static WTexture^	CreateTextureFromFile( String^ filename );
+		static WTexture^	CreateTextureFromMemory( IntPtr data, UINT width, UINT height, ImageFormatType format, bool createMips );
 	
 		// Special Rendering.
 		//
 		static UINT			CreateBackbuffer();
-		static UINT			CreateRenderTarget( RTexture^ texture );
+		static UINT			CreateRenderTarget( WTexture^ texture );
 		static UINT			CreateDepthStencil( UINT width, UINT height );
 		static UINT			CreateViewport( UINT width, UINT height );
 		static UINT			ResizeBuffers( UINT width, UINT height );

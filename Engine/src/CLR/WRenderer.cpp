@@ -120,19 +120,19 @@ namespace Sentinel { namespace Systems
 
 	// Textures.
 	//
-	RTexture^ WRenderer::CreateTexture( UINT width, UINT height, ImageFormatType format, bool createMips )
+	WTexture^ WRenderer::CreateTexture( UINT width, UINT height, ImageFormatType format, bool createMips )
 	{
-		return gcnew RTexture( Renderer::Inst()->CreateTexture( width, height, (Sentinel::ImageFormatType)format, createMips ));
+		return gcnew WTexture( Renderer::Inst()->CreateTexture( width, height, (Sentinel::ImageFormatType)format, createMips ));
 	}
 
-	RTexture^ WRenderer::CreateTextureFromFile( String^ filename )
+	WTexture^ WRenderer::CreateTextureFromFile( String^ filename )
 	{
-		return gcnew RTexture( Renderer::Inst()->CreateTextureFromFile( RString::ToString( filename ).c_str() ));
+		return gcnew WTexture( Renderer::Inst()->CreateTextureFromFile( RString::ToString( filename ).c_str() ));
 	}
 
-	RTexture^ WRenderer::CreateTextureFromMemory( IntPtr data, UINT width, UINT height, ImageFormatType format, bool createMips )
+	WTexture^ WRenderer::CreateTextureFromMemory( IntPtr data, UINT width, UINT height, ImageFormatType format, bool createMips )
 	{
-		return gcnew RTexture( Renderer::Inst()->CreateTextureFromMemory( data.ToPointer(), width, height, (Sentinel::ImageFormatType)format, createMips ));
+		return gcnew WTexture( Renderer::Inst()->CreateTextureFromMemory( data.ToPointer(), width, height, (Sentinel::ImageFormatType)format, createMips ));
 	}
 	
 	// Special Rendering.
@@ -142,7 +142,7 @@ namespace Sentinel { namespace Systems
 		return Renderer::Inst()->CreateBackbuffer();
 	}
 
-	UINT WRenderer::CreateRenderTarget( RTexture^ texture )
+	UINT WRenderer::CreateRenderTarget( WTexture^ texture )
 	{
 		return Renderer::Inst()->CreateRenderTarget( texture->GetRef() );
 	}

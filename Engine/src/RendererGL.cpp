@@ -36,14 +36,23 @@ namespace Sentinel
 	{
 		friend class RendererGL;
 
+	private:
+
+		GLuint	mID;
+
 	public:
 
-		TextureGL( const std::string& filename, UINT width, UINT height, UINT id )
+		TextureGL( const char* filename, UINT width, UINT height )
 		{
 			mFilename	= filename;
 			mWidth		= width;
 			mHeight		= height;
-			mID			= id;
+			mID			= 0;
+		}
+
+		GLuint ID()
+		{
+			return mID;
 		}
 
 		void Release()
@@ -449,7 +458,7 @@ namespace Sentinel
 			glEnable( GL_BLEND );
 			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-			glBindTexture( GL_TEXTURE_2D, texture->ID() );
+			glBindTexture( GL_TEXTURE_2D, static_cast< TextureGL* >(texture)->ID() );
 
 			++mTextureLevel;
 		}
@@ -524,8 +533,6 @@ namespace Sentinel
 	//
 	class RendererGL : public Renderer
 	{
-		friend class Texture;
-
 	private:
 
 		class RenderTarget
@@ -575,8 +582,6 @@ namespace Sentinel
 		std::vector< GLuint >			mDepthStencil;
 		std::vector< Viewport >			mViewport;
 		
-		std::vector< TextureGL* >		mTexture;
-
 		UINT IMAGE_FORMAT[ NUM_IMAGE_FORMATS ];
 
 	public:
@@ -594,19 +599,20 @@ namespace Sentinel
 			IMAGE_FORMAT[ IMAGE_FORMAT_RGB ]	= GL_RGB;
 			IMAGE_FORMAT[ IMAGE_FORMAT_RGBA ]	= GL_RGBA;
 
-			mTexture.push_back( new TextureGL( "", 0, 0, 0 ));
-			NULL_TEXTURE = mTexture.back();
+			NULL_TEXTURE = NULL;
 			BASE_TEXTURE = NULL;
 
 			mDepthStencil.push_back( 0 );
 
 			mCurrShader = NULL;
-
 			mCurrWindow = NULL;
 		}
 
 		RendererGL::~RendererGL()
-		{}
+		{
+			SAFE_DELETE( NULL_TEXTURE );
+			SAFE_DELETE( BASE_TEXTURE );
+		}
 		
 		WindowInfo* Startup( void* hWnd, bool fullscreen, UINT width, UINT height )
 		{
@@ -672,6 +678,13 @@ namespace Sentinel
 			glEnable( GL_CULL_FACE );
 			glFrontFace( GL_CCW );
 
+			// Create NULL_TEXTURE.
+			//
+			if( !NULL_TEXTURE )
+			{
+				NULL_TEXTURE = new TextureGL( "", 0, 0 );
+			}
+
 			// Create initial white texture as BASE_TEXTURE.
 			//
 			if( !BASE_TEXTURE )
@@ -700,13 +713,6 @@ namespace Sentinel
 		void Shutdown()
 		{
 			mCurrShader = NULL;
-
-			for( UINT i = 0; i < mTexture.size(); ++i )
-			{
-				glDeleteTextures( 1, &mTexture[ i ]->mID );
-				SAFE_DELETE( mTexture[ i ] );
-			}
-			mTexture.clear();
 
 			for( UINT i = 0; i < mRenderTarget.size(); ++i )
 				glDeleteFramebuffers( 1, &mRenderTarget[ i ].mID );
@@ -787,14 +793,10 @@ namespace Sentinel
 		//
 		Texture* CreateTextureFromFile( const char* filename )
 		{
+			// TODO: Check for compatible texture size.
+
 			_ASSERT( strlen( filename ) > 0 );
 
-			// Determine if the same file is being loaded, and if so, only return it's index.
-			//
-			for( UINT i = 0; i < mTexture.size(); ++i )
-				if( mTexture[ i ]->Filename() == filename )
-					return mTexture[ i ];
-			
 			// Load texture for 32-bits.
 			//
 			int width, height;
@@ -809,13 +811,13 @@ namespace Sentinel
 				return NULL;
 			}
 
-			Texture* result = CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA );
+			TextureGL* texture = static_cast< TextureGL* >(CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA ));
 
-			((TextureGL*)result)->mFilename = filename;
+			texture->mFilename = filename;
 
 			stbi_image_free( pixels );
 
-			return result;
+			return texture;
 		}
 
 		Texture* CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormatType format, bool createMips = true )
@@ -846,11 +848,10 @@ namespace Sentinel
 			if( createMips )
 				glGenerateMipmap( GL_TEXTURE_2D );
 			
-			char filename[ 256 ];
-			sprintf_s( filename, "~Memory%d", mTexture.size() );
-			mTexture.push_back( new TextureGL( filename, width, height, texID ));
+			TextureGL* texture = new TextureGL( "~Memory~", width, height );
+			texture->mID = texID;
 
-			return mTexture.back();
+			return texture;
 		}
 
 		// Special Rendering.

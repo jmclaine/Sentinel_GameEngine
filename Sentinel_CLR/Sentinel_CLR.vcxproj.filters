@@ -93,9 +93,6 @@
     <ClInclude Include="..\Engine\src\CLR\RString.h">
       <Filter>Sentinel_Engine\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\RTexture.h">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\CLR\RBuffer.h">
       <Filter>Sentinel_Engine\Assets</Filter>
     </ClInclude>
@@ -131,6 +128,9 @@
     </ClInclude>
     <ClInclude Include="..\Engine\src\CLR\Property.h">
       <Filter>Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WTexture.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -182,9 +182,6 @@
     <ClCompile Include="..\Engine\src\CLR\RString.cpp">
       <Filter>Sentinel_Engine\Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\RTexture.cpp">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\CLR\RBuffer.cpp">
       <Filter>Sentinel_Engine\Assets</Filter>
     </ClCompile>
@@ -217,6 +214,9 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\CLR\WInput.cpp">
       <Filter>Sentinel_Engine\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WTexture.cpp">
+      <Filter>Sentinel_Engine\Assets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

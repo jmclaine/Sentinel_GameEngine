@@ -7,6 +7,13 @@
 		void set( type v );\
 	}
 
+#define DECLARE_PROPERTY_ARRAY( type, value, indexType )\
+	property type value[ indexType ]\
+	{\
+		type get( indexType i );\
+		void set( indexType i, type v );\
+	}
+
 // Native types, e.g. int, float, double
 //
 #define DEFINE_PROPERTY( clazz, type, value )\

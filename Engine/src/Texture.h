@@ -11,12 +11,11 @@ namespace Sentinel
 		std::string		mFilename;
 		UINT			mWidth;
 		UINT			mHeight;
-		UINT			mID;
-
+		
 		//////////////////////////////
 
 		Texture();
-		Texture( const std::string& filename, UINT width, UINT height, UINT id );
+		Texture( const char* filename, UINT width, UINT height );
 
 	public:
 
@@ -27,6 +26,5 @@ namespace Sentinel
 		const std::string&	Filename();
 		UINT				Width();
 		UINT				Height();
-		UINT				ID();
 	};
 }

@@ -40,17 +40,21 @@ namespace Sentinel
 	////////////////////////////////////////////////////////////////////////////////////
 
 	class RendererDX;
+	class ShaderDX;
 
 	class TextureDX : public Texture
 	{
 		friend class RendererDX;
+		friend class ShaderDX;
 
-	public:
+	private:
 
 		ID3D11ShaderResourceView*	mResource;
 		ID3D11Texture2D*			mTexture;
 
-		TextureDX( std::string filename, UINT width, UINT height, UINT id )
+	public:
+
+		TextureDX( const char* filename, UINT width, UINT height )
 		{
 			mResource	= NULL;
 			mTexture	= NULL;
@@ -58,7 +62,6 @@ namespace Sentinel
 			mFilename	= filename;
 			mWidth		= width;
 			mHeight		= height;
-			mID			= id;
 		}
 
 		void Release()
@@ -411,8 +414,6 @@ namespace Sentinel
 	//
 	class RendererDX : public Renderer
 	{
-		friend class Texture;
-
 	private:
 
 		class WindowInfoDX : public WindowInfo
@@ -442,8 +443,6 @@ namespace Sentinel
 
 		DXGI_SAMPLE_DESC						mSampleDesc;
 
-		std::vector< TextureDX* >				mTexture;
-		
 	public:
 		
 		RendererDX()
@@ -468,7 +467,15 @@ namespace Sentinel
 		}
 
 		~RendererDX()
-		{}
+		{
+			SAFE_RELEASE_PTR_LIST( mRenderTarget );
+			SAFE_RELEASE_PTR_LIST( mDepthStencil );
+			SAFE_RELEASE_PTR_LIST( mBlendState );
+			SAFE_RELEASE_PTR_LIST( mDepthStencilState );
+
+			SAFE_DELETE( NULL_TEXTURE );
+			SAFE_DELETE( BASE_TEXTURE );
+		}
 
 	private:
 
@@ -671,16 +678,6 @@ namespace Sentinel
 
 					SAFE_RELEASE_PTR( mCurrWindow->mSwapChain );
 					SAFE_RELEASE_PTR( mCurrWindow->mRasterizerState );
-
-					SAFE_RELEASE_PTR_LIST( mRenderTarget );
-					SAFE_RELEASE_PTR_LIST( mDepthStencil );
-					SAFE_RELEASE_PTR_LIST( mBlendState );
-					SAFE_RELEASE_PTR_LIST( mDepthStencilState );
-
-					for( UINT i = 0; i < (UINT)mTexture.size(); ++i )
-						SAFE_DELETE( mTexture[ i ] );
-					mTexture.clear();
-
 					SAFE_RELEASE_PTR( mCurrWindow->mContext );
 				
 					delete mCurrWindow;
@@ -772,23 +769,10 @@ namespace Sentinel
 		//
 		Texture* CreateTextureFromFile( const char* filename )
 		{
-			if( strlen( filename ) == 0 )
-			{
-				return NULL;
-			}
+			// TODO: Check for compatible texture size.
 
-			// Determine if the same file is being loaded, and if so, only return it's index.
-			//
-			UINT index = 0;
-			for( UINT i = 0; i < mTexture.size(); ++i )
-			{
-				if( mTexture[ i ]->Filename() == filename )
-				{
-					return mTexture[ i ];
-				}
-				++index;
-			}
-
+			_ASSERT( strlen( filename ) > 0 );
+				
 			// DDS files are loaded from DirectX.
 			// stbi does not support them.
 			//
@@ -800,9 +784,9 @@ namespace Sentinel
 
 				if( D3DX11CreateShaderResourceViewFromFileA( mCurrWindow->mDevice, filename, &info, NULL, &image, NULL ) == S_OK )
 				{
-					mTexture.push_back( new TextureDX( filename, info.Width, info.Height, mTexture.size() ));
-					mTexture.back()->mResource = image;
-					return mTexture.back();
+					TextureDX* texture = new TextureDX( filename, info.Width, info.Height );
+					texture->mResource = image;
+					return texture;
 				}
 				else
 				{
@@ -825,38 +809,21 @@ namespace Sentinel
 				return NULL;
 			}
 
-			if( width > 4096 || height > 4096 )
-			{
-				REPORT_ERROR( filename << " is bigger than 4096x4096.", "Texture load failure." );
-				return NULL;
-			}
-
-			Texture* result = CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA );
-			SAFE_RELEASE_PTR( ((TextureDX*)result)->mTexture );
+			TextureDX* texture = static_cast< TextureDX* >(CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA ));
+			SAFE_RELEASE_PTR( texture->mTexture );
 
 			// Rename the texture because loading from memory sets a default.
 			//
-			static_cast< TextureDX* >(result)->mFilename = filename;
+			texture->mFilename = filename;
 
 			stbi_image_free( pixels );
 
-			return result;
+			return texture;
 		}
 
 		Texture* CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormatType format, bool createMips = true )
 		{
-			char filename[ 256 ];
-			sprintf_s( filename, "~Memory%d~", mTexture.size());
-
-			// Anything larger could cause compatibility issues.
-			//
-			if( width > 4096 || height > 4096 )
-			{
-				REPORT_ERROR( filename << " is bigger than 4096x4096.", "Texture load failure." );
-				return 0;
-			}
-			
-			mTexture.push_back( new TextureDX( filename, width, height, mTexture.size() ));
+			TextureDX* texture = new TextureDX( "~Memory~", width, height );
 
 			UCHAR* newData = NULL;
 			
@@ -960,22 +927,20 @@ namespace Sentinel
 				SAFE_RELEASE_PTR( tex1 );
 			}
 
-			HV_PTR( mCurrWindow->mDevice->CreateShaderResourceView( tex0, &rsv, &(mTexture.back())->mResource ));
-			mCurrWindow->mContext->GenerateMips( (mTexture.back())->mResource );
+			HV_PTR( mCurrWindow->mDevice->CreateShaderResourceView( tex0, &rsv, &texture->mResource ));
+			mCurrWindow->mContext->GenerateMips( texture->mResource );
 			
-			mTexture.back()->mTexture = tex0;
+			texture->mTexture = tex0;
 
 			if( format == IMAGE_FORMAT_RGB )
-			{
 				free( newData );
-			}
 
 			#ifndef NDEBUG
-				SET_DEBUG_NAME( (mTexture.back())->mResource );
-				SET_DEBUG_NAME( (mTexture.back())->mTexture );
+				SET_DEBUG_NAME( texture->mResource );
+				SET_DEBUG_NAME( texture->mTexture );
 			#endif
 
-			return mTexture.back();
+			return texture;
 		}
 
 		// Special Rendering.

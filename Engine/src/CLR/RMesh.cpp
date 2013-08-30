@@ -47,7 +47,7 @@ namespace Sentinel { namespace Assets
 		mRef->SetMaterial( *material->GetRef() );
 	}
 
-	void RMesh::SetTexture( RTexture^ texture, TextureType type )
+	void RMesh::SetTexture( WTexture^ texture, TextureType type )
 	{
 		mRef->SetTexture( texture->GetRef(), (Sentinel::TextureType)type );
 	}

@@ -1,4 +1,5 @@
 #include "WMeshBuilder.h"
+#include "Texture.h"
 
 namespace Sentinel { namespace Assets
 {
@@ -27,13 +28,13 @@ namespace Sentinel { namespace Assets
 	DEFINE_PROPERTY_P( MeshBuilder, Shader,		Shader );
 	DEFINE_PROPERTY_E( MeshBuilder, Systems,	PrimitiveType, Primitive );
 	DEFINE_PROPERTY_R( MeshBuilder, Material,	Material );
-	
+	DEFINE_PROPERTY_R( MeshBuilder, Vector4f, TextureScale );
+
 	RTexture^ WMeshBuilder::Texture( TextureType type )
 	{
-		return gcnew RTexture( mRef->mTexture[ (int)type ] );
+		Sentinel::Texture*& tex = mRef->mTexture[ (int)type ];
+		return (tex != NULL) ? gcnew RTexture( tex ) : nullptr;
 	}
-
-	DEFINE_PROPERTY_R( MeshBuilder, Vector4f, TextureScale );
 	
 	//////////////////////////////////
 

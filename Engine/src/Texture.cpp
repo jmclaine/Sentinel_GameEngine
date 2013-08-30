@@ -5,11 +5,10 @@ namespace Sentinel
 	Texture::Texture()
 	{}
 
-	Texture::Texture( const std::string& filename, UINT width, UINT height, UINT id ) :
+	Texture::Texture( const char* filename, UINT width, UINT height ) :
 		mFilename( filename ),
 		mWidth( width ),
-		mHeight( height ),
-		mID( id )
+		mHeight( height )
 	{}
 
 	Texture::~Texture()
@@ -33,10 +32,5 @@ namespace Sentinel
 	UINT Texture::Height()
 	{
 		return mHeight;
-	}
-
-	UINT Texture::ID()
-	{
-		return mID;
 	}
 }

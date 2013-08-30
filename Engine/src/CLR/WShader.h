@@ -6,7 +6,7 @@ Delete() does nothing in RShader.
 */
 #include "m_shared_ptr.h"
 #include "Shader.h"
-#include "RTexture.h"
+#include "WTexture.h"
 
 using namespace System;
 
@@ -53,7 +53,7 @@ namespace Sentinel { namespace Assets
 		void			SetFloat3( UINT uniform, float* data, UINT offset, UINT count );
 		void			SetFloat4( UINT uniform, float* data, UINT offset, UINT count );
 		void			SetMatrix( UINT uniform, float* matrix, UINT offset, UINT count );
-		void			SetTexture( UINT uniform, RTexture^ texture );
+		void			SetTexture( UINT uniform, WTexture^ texture );
 	};
 
 	public ref class RShader : public WShader
