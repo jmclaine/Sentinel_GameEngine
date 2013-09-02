@@ -3,10 +3,6 @@
 
 namespace Sentinel
 {
-	Matrix4f DrawableComponent::mMatrixTranslation;
-	Matrix4f DrawableComponent::mMatrixScale;
-	Matrix4f DrawableComponent::mMatrixRotation;
-
 	DrawableComponent::DrawableComponent()
 	{
 		mComponentType = COMPONENT_DRAWABLE;
@@ -23,13 +19,7 @@ namespace Sentinel
 	}
 
 	void DrawableComponent::Update()
-	{
-		mMatrixTranslation.Translate( mTransform->mPosition );
-
-		mMatrixRotation.Rotate( mTransform->mOrientation );
-
-		mMatrixScale.Scale( mTransform->mScale );
-	}
+	{}
 
 	void DrawableComponent::Shutdown()
 	{}

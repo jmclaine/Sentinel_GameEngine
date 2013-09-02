@@ -1,87 +1,97 @@
 #pragma once
 
-#define DECLARE_PROPERTY( type, value )\
-	property type value\
+#define DECLARE_PROPERTY( varType, varName )\
+	property varType varName\
 	{\
-		type get();\
-		void set( type v );\
+		varType get();\
+		void set( varType v );\
 	}
 
-#define DECLARE_PROPERTY_ARRAY( type, value, indexType )\
-	property type value[ indexType ]\
+#define DECLARE_PROPERTY_ARRAY( varType, varName, indexType )\
+	property varType varName[ indexType ]\
 	{\
-		type get( indexType i );\
-		void set( indexType i, type v );\
+		varType get( indexType i );\
+		void set( indexType i, varType v );\
 	}
 
-// Native types, e.g. int, float, double
+// Native varTypes, e.g. int, float, double
 //
-#define DEFINE_PROPERTY( clazz, type, value )\
-	void W##clazz::value::set( type v )\
+#define DEFINE_PROPERTY( clazz, varType, varName )\
+	void W##clazz::varName::set( varType v )\
 	{\
-		mRef->value = v;\
+		mRef->varName = v;\
 	}\
-	type W##clazz::value::get()\
+	varType W##clazz::varName::get()\
 	{\
-		return mRef->value;\
+		return mRef->varName;\
 	}
 
-// Member variables with native types.
+// Member variables with native varTypes.
 //
-#define DEFINE_PROPERTY_M( clazz, type, value )\
-	void W##clazz::value::set( type v )\
+#define DEFINE_PROPERTY_M( clazz, varType, varName )\
+	void W##clazz::varName::set( varType v )\
 	{\
-		mRef->m##value = v;\
+		mRef->m##varName = v;\
 	}\
-	type W##clazz::value::get()\
+	varType W##clazz::varName::get()\
 	{\
-		return mRef->m##value;\
+		return mRef->m##varName;\
 	}
 
-// Member variables with enum types.
+// Member variables with enum varTypes.
 //
-#define DEFINE_PROPERTY_E( clazz, _namespace, type, value )\
-	void W##clazz::value::set( Sentinel::_namespace::type v )\
+#define DEFINE_PROPERTY_E( clazz, _namespace, varType, varName )\
+	void W##clazz::varName::set( Sentinel::_namespace::varType v )\
 	{\
-		mRef->m##value = (Sentinel::type)v;\
+		mRef->m##varName = (Sentinel::varType)v;\
 	}\
-	Sentinel::_namespace::type W##clazz::value::get()\
+	Sentinel::_namespace::varType W##clazz::varName::get()\
 	{\
-		return (Sentinel::_namespace::type)mRef->m##value;\
+		return (Sentinel::_namespace::varType)mRef->m##varName;\
 	}
 
 // Strings.
 //
-#define DEFINE_PROPERTY_S( clazz, value )\
-	String^ W##clazz::value::get()\
+#define DEFINE_PROPERTY_S( clazz, varName )\
+	String^ W##clazz::varName::get()\
 	{\
-		return gcnew String( mRef->m##value.c_str() );\
+		return gcnew String( mRef->m##varName.c_str() );\
 	}\
-	void W##clazz::value::set( String^ str )\
+	void W##clazz::varName::set( String^ str )\
 	{\
-		mRef->m##value = RString::ToString( str );\
+		mRef->m##varName = RString::ToString( str );\
 	}
 
 // Referenced variables.
 //
-#define DEFINE_PROPERTY_R( clazz, type, value )\
-	W##type^ W##clazz::value::get()\
+#define DEFINE_PROPERTY_R( clazz, varType, varName )\
+	W##varType^ W##clazz::varName::get()\
 	{\
-		return gcnew R##type( &static_cast< clazz* >(mRef)->m##value );\
+		return gcnew R##varType( &static_cast< clazz* >(mRef)->m##varName );\
 	}\
-	void W##clazz::value::set( W##type^ v )\
+	void W##clazz::varName::set( W##varType^ v )\
 	{\
-		static_cast< clazz* >(mRef)->m##value = *v->GetRef();\
+		static_cast< clazz* >(mRef)->m##varName = *v->GetRef();\
+	}
+
+#define DEFINE_PROPERTY_RS( clazz, varType, varName )\
+	W##varType^ W##clazz::varName::get()\
+	{\
+		return gcnew R##varType( &mRef->m##varName );\
+	}\
+	void W##clazz::varName::set( W##varType^ v )\
+	{\
+		mRef->m##varName = *v->GetRef();\
 	}
 
 // Pointer variables.
 //
-#define DEFINE_PROPERTY_P( clazz, type, value )\
-	W##type^ W##clazz::value::get()\
+#define DEFINE_PROPERTY_P( clazz, varType, varName )\
+	W##varType^ W##clazz::varName::get()\
 	{\
-		return (mRef->m##value) ? gcnew R##type( mRef->m##value ) : nullptr;\
+		return (mRef->m##varName) ? gcnew R##varType( mRef->m##varName ) : nullptr;\
 	}\
-	void W##clazz::value::set( W##type^ v )\
+	void W##clazz::varName::set( W##varType^ v )\
 	{\
-		mRef->m##value = v->GetRef();\
+		mRef->m##varName = v->GetRef();\
 	}

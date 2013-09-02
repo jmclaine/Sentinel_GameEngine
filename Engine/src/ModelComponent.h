@@ -12,7 +12,7 @@ namespace Sentinel
 		
 	public:
 
-		ModelComponent( std::shared_ptr< Model > model, const Material& material = Material() );
+		ModelComponent( std::shared_ptr< Model > model );
 
 		void Startup();
 

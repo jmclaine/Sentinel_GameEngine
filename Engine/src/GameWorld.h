@@ -42,8 +42,9 @@ namespace Sentinel
 		void				Update();
 		void				UpdateController();
 		void				UpdatePhysics();
-		void				UpdateDrawable();
+		void				UpdateTransform();
 		void				UpdateComponents();
+		void				UpdateDrawable();
 
 		void				Shutdown();
 

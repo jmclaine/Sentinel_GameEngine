@@ -96,6 +96,32 @@ namespace Sentinel
 		return component;
 	}
 
+	//////////////////////////////
+
+	GameObject* GameObject::GetParent()
+	{
+		return mParent;
+	}
+
+	void GameObject::AddChild( GameObject* obj )
+	{
+		mChild.push_back( obj );
+		obj->mParent = this;
+	}
+
+	void GameObject::RemoveChild( int index )
+	{
+		mChild[ index ]->mParent = NULL;
+		mChild.erase( mChild.begin() + index );
+	}
+
+	GameObject* GameObject::GetChild( int index )
+	{
+		return mChild[ index ];
+	}
+
+	//////////////////////////////
+
 	void GameObject::Startup()
 	{
 		if( mTransform )
@@ -112,24 +138,36 @@ namespace Sentinel
 		
 		TRAVERSE_VECTOR( x, mComponent )
 			mComponent[ x ]->Startup();
+
+		TRAVERSE_VECTOR( x, mChild )
+			mChild[ x ]->Startup();
 	}
 
 	void GameObject::UpdateController()
 	{
 		if( mController )
 			mController->Update();
+
+		TRAVERSE_VECTOR( x, mChild )
+			mChild[ x ]->UpdateController();
 	}
 
 	void GameObject::UpdatePhysics()
 	{
 		if( mPhysics )
 			mPhysics->Update();
+
+		TRAVERSE_VECTOR( x, mChild )
+			mChild[ x ]->UpdatePhysics();
 	}
 
-	void GameObject::UpdateDrawable()
+	void GameObject::UpdateTransform()
 	{
-		if( mDrawable )
-			mDrawable->Update();
+		if( mTransform )
+			mTransform->Update();
+
+		TRAVERSE_VECTOR( x, mChild )
+			mChild[ x ]->UpdateTransform();
 	}
 
 	void GameObject::UpdateComponents()
@@ -138,6 +176,15 @@ namespace Sentinel
 			if( mComponent[ x ]->Type() != COMPONENT_CAMERA && 
 				mComponent[ x ]->Type() != COMPONENT_LIGHT )
 				mComponent[ x ]->Update();
+	}
+
+	void GameObject::UpdateDrawable()
+	{
+		if( mDrawable )
+			mDrawable->Update();
+
+		TRAVERSE_VECTOR( x, mChild )
+			mChild[ x ]->UpdateDrawable();
 	}
 
 #define SHUTDOWN_COMPONENT( obj )\
@@ -161,6 +208,9 @@ namespace Sentinel
 			delete mComponent[ x ];
 		}
 		mComponent.clear();
+
+		TRAVERSE_VECTOR( x, mChild )
+			mChild[ x ]->Shutdown();
 	}
 
 	GameComponent* GameObject::FindComponent( ComponentType type )

@@ -3,8 +3,13 @@
 
 namespace Sentinel { namespace Components
 {
-	WMeshComponent::WMeshComponent( RMesh^ mesh, WMaterial^ material )
+	WMeshComponent::WMeshComponent( WMesh^ mesh )
 	{
-		mRef = new MeshComponent( mesh->GetRef(), *material->GetRef() );
+		mRef = new MeshComponent( mesh->GetRef() );
+	}
+
+	WMeshComponent::WMeshComponent( WGameComponent^ component )
+	{
+		mRef = component->GetRef();
 	}
 }}

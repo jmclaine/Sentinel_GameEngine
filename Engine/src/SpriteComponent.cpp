@@ -43,7 +43,7 @@ namespace Sentinel
 		*(UINT*)verts = mColor.ToUINT();
 		verts += sizeof( UINT );
 
-		*(Matrix4f*)verts = mMatrixTranslation * mMatrixRotation * mMatrixScale;
+		*(Matrix4f*)verts = mTransform->GetMatrixWorld();
 		verts += sizeof( Matrix4f );
 
 		ParticleSystem::Inst()->End();

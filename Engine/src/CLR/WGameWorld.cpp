@@ -35,14 +35,19 @@ namespace Sentinel { namespace Components
 		GameWorld::Inst()->UpdatePhysics();
 	}
 
-	void WGameWorld::UpdateDrawable()
+	void WGameWorld::UpdateTransform()
 	{
-		GameWorld::Inst()->UpdateDrawable();
+		GameWorld::Inst()->UpdateTransform();
 	}
 
 	void WGameWorld::UpdateComponents()
 	{
 		GameWorld::Inst()->UpdateComponents();
+	}
+
+	void WGameWorld::UpdateDrawable()
+	{
+		GameWorld::Inst()->UpdateDrawable();
 	}
 
 	void WGameWorld::Shutdown()

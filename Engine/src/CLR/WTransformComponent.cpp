@@ -12,6 +12,11 @@ namespace Sentinel { namespace Components
 		mRef = const_cast< TransformComponent* >(component);
 	}
 
+	WTransformComponent::WTransformComponent( WGameComponent^ component )
+	{
+		mRef = component->GetRef();
+	}
+
 	WTransformComponent::~WTransformComponent()
 	{}
 
@@ -20,4 +25,11 @@ namespace Sentinel { namespace Components
 	DEFINE_PROPERTY_R( TransformComponent, Vector3f, Position );
 	DEFINE_PROPERTY_R( TransformComponent, Quatf,	 Orientation );
 	DEFINE_PROPERTY_R( TransformComponent, Vector3f, Scale );
+
+	/////////////////////////////////
+
+	WMatrix4f^ WTransformComponent::GetMatrixWorld()
+	{
+		return gcnew WMatrix4f( static_cast< TransformComponent* >(mRef)->GetMatrixWorld() );
+	}
 }}

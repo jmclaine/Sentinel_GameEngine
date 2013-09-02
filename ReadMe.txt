@@ -31,16 +31,12 @@ http://www.microsoft.com/en-us/download/details.aspx?id=6812
 Install to the default directory.
 
 
+To compile the custom model exporter, the source requires the 3ds Max 2012 SDK.
+
+
 
 //////////////////////////
-// CONTROLS
+// HOW TO USE
 //
 
-Move with WASD
-
-Up / Down <=> Space / C
-
-ESC <=> Exit
-
-
-Mouse <=> Rotate
+Please read 'Sentinel_Manual.docx' for instructions.

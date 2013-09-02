@@ -2,6 +2,7 @@
 
 #include "TransformComponent.h"
 #include "WGameComponent.h"
+#include "WMatrix4f.h"
 #include "WVector3f.h"
 #include "WQuatf.h"
 
@@ -15,6 +16,7 @@ namespace Sentinel { namespace Components
 
 		WTransformComponent();
 		WTransformComponent( const TransformComponent* component );
+		WTransformComponent( WGameComponent^ component );
 		~WTransformComponent();
 
 		/////////////////////////////////
@@ -22,5 +24,9 @@ namespace Sentinel { namespace Components
 		DECLARE_PROPERTY( WVector3f^,	Position );
 		DECLARE_PROPERTY( WQuatf^,		Orientation );
 		DECLARE_PROPERTY( WVector3f^,	Scale );
+
+		/////////////////////////////////
+
+		WMatrix4f^	GetMatrixWorld();
 	};
 }}

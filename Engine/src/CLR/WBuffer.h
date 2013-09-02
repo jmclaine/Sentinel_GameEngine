@@ -13,7 +13,7 @@ namespace Sentinel { namespace Assets
 		NUM_BUFFER_TYPES
 	};
 
-	public ref class RBuffer
+	public ref class WBuffer
 	{
 	private:
 
@@ -21,8 +21,8 @@ namespace Sentinel { namespace Assets
 
 	public:
 
-		RBuffer( Buffer* buffer );
-		~RBuffer();
+		WBuffer( Buffer* buffer );
+		~WBuffer();
 		
 		Buffer*		GetRef();
 

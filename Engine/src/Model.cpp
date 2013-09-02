@@ -29,4 +29,14 @@ namespace Sentinel
 
 		return NULL;
 	}
+
+	void Model::SetShaderColor( Shader* shader )
+	{
+		SHADER_COLOR = shader;
+	}
+
+	Shader* Model::GetShaderColor()
+	{
+		return SHADER_COLOR;
+	}
 }

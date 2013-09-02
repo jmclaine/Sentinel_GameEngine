@@ -83,6 +83,9 @@ namespace Sentinel
 		
 		static Model*	Load( const char* filename );
 
+		static void		SetShaderColor( Shader* shader );
+		static Shader*	GetShaderColor();
+
 		virtual bool	Create( const char* filename ) = 0;
 		virtual void	Release() = 0;
 

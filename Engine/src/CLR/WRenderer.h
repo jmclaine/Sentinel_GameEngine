@@ -20,7 +20,7 @@ creation of windows if required.
 
 #include "GameWindow.h"
 #include "WTexture.h"
-#include "RBuffer.h"
+#include "WBuffer.h"
 #include "WShader.h"
 #include "WColor.h"
 
@@ -47,36 +47,37 @@ namespace Sentinel { namespace Systems
 
 	public enum class ImageFormatType
 	{
-		IMAGE_FORMAT_R,
-		IMAGE_FORMAT_RGB,
-		IMAGE_FORMAT_RGBA,
-		IMAGE_FORMAT_HDR,	// R32G32B32F
+		R,
+		RGB,
+		RGBA,
+		HDR,	// R32G32B32F
 
 		NUM_IMAGE_FORMATS
 	};
 
 	public enum class CullType
 	{
-		CULL_NONE,
-		CULL_CCW,
-		CULL_CW,
+		NONE,
+		CCW,
+		CW,
 
 		NUM_CULL_TYPES
 	};
 
 	public enum class BlendType
 	{
-		BLEND_DEFAULT,
-		BLEND_ALPHA,
-		BLEND_PARTICLE,
+		DEFAULT,
+		ALPHA,
+		PARTICLE,
 
 		NUM_BLEND_TYPES
 	};
 
 	public enum class StencilType
 	{
-		STENCIL_DEFAULT,
-		STENCIL_PARTICLE,
+		DEFAULT,
+		NO_ZBUFFER,
+		PARTICLE,
 
 		NUM_STENCIL_TYPES
 	};
@@ -130,10 +131,10 @@ namespace Sentinel { namespace Systems
 
 		// Buffers.
 		//
-		static RBuffer^		CreateBuffer( IntPtr data, UINT size, UINT stride, BufferType type );
+		static WBuffer^		CreateBuffer( IntPtr data, UINT size, UINT stride, BufferType type );
 
-		static void			SetVBO( RBuffer^ buffer );
-		static void			SetIBO( RBuffer^ buffer );
+		static void			SetVBO( WBuffer^ buffer );
+		static void			SetIBO( WBuffer^ buffer );
 
 		// Textures.
 		//
@@ -152,7 +153,7 @@ namespace Sentinel { namespace Systems
 		static void			SetRenderType( PrimitiveType type );
 		static void			SetRenderTarget( UINT target );
 		static void			SetDepthStencil( UINT stencil );
-		static void			SetDepthStencilState( UINT state );
+		static void			SetDepthStencilState( StencilType state );
 		static void			SetViewport( UINT viewport );
 		static UINT			SetCull( CullType type );
 		static void			SetBlend( BlendType type );

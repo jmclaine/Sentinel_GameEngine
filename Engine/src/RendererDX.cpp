@@ -658,6 +658,14 @@ namespace Sentinel
 				//
 				stencilDesc.DepthEnable						= TRUE;
 				stencilDesc.DepthWriteMask					= D3D11_DEPTH_WRITE_MASK_ZERO;
+				stencilDesc.DepthFunc						= D3D11_COMPARISON_ALWAYS;
+				HV_PTR( mCurrWindow->mDevice->CreateDepthStencilState( &stencilDesc, &stencilState ));
+				mDepthStencilState.push_back( stencilState );
+
+				// Create depth STENCIL_NO_ZBUFFER.
+				//
+				stencilDesc.DepthEnable						= TRUE;
+				stencilDesc.DepthWriteMask					= D3D11_DEPTH_WRITE_MASK_ZERO;
 				stencilDesc.DepthFunc						= D3D11_COMPARISON_LESS;
 				HV_PTR( mCurrWindow->mDevice->CreateDepthStencilState( &stencilDesc, &stencilState ));
 				mDepthStencilState.push_back( stencilState );

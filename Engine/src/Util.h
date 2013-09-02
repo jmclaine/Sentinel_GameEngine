@@ -131,18 +131,18 @@ namespace Sentinel
 
 	class AppException : public std::exception
 	{
-		const char* mMessage;
+		std::string mMessage;
 
 	public:
 
 		AppException( const std::string& msg )
 		{
-			mMessage = msg.c_str();
+			mMessage = msg;
 		}
 
 		const char* what() const throw()
 		{
-			return mMessage;
+			return mMessage.c_str();
 		}
 	};
 

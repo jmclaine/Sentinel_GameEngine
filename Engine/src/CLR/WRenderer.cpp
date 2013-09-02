@@ -103,17 +103,17 @@ namespace Sentinel { namespace Systems
 
 	// Buffers.
 	//
-	RBuffer^ WRenderer::CreateBuffer( IntPtr data, UINT size, UINT stride, BufferType type )
+	WBuffer^ WRenderer::CreateBuffer( IntPtr data, UINT size, UINT stride, BufferType type )
 	{
-		return gcnew RBuffer( Renderer::Inst()->CreateBuffer( data.ToPointer(), size, stride, type ));
+		return gcnew WBuffer( Renderer::Inst()->CreateBuffer( data.ToPointer(), size, stride, type ));
 	}
 
-	void WRenderer::SetVBO( RBuffer^ buffer )
+	void WRenderer::SetVBO( WBuffer^ buffer )
 	{
 		Renderer::Inst()->SetVBO( buffer->GetRef() );
 	}
 
-	void WRenderer::SetIBO( RBuffer^ buffer )
+	void WRenderer::SetIBO( WBuffer^ buffer )
 	{
 		Renderer::Inst()->SetIBO( buffer->GetRef() );
 	}
@@ -177,9 +177,9 @@ namespace Sentinel { namespace Systems
 		Renderer::Inst()->SetDepthStencil( stencil );
 	}
 
-	void WRenderer::SetDepthStencilState( UINT state )
+	void WRenderer::SetDepthStencilState( StencilType state )
 	{
-		Renderer::Inst()->SetDepthStencilState( state );
+		Renderer::Inst()->SetDepthStencilState( (Sentinel::StencilType)state );
 	}
 
 	void WRenderer::SetViewport( UINT viewport )

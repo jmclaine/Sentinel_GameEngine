@@ -19,8 +19,9 @@ namespace Sentinel { namespace Components
 		static void					Update();
 		static void					UpdateController();
 		static void					UpdatePhysics();
-		static void					UpdateDrawable();
+		static void					UpdateTransform();
 		static void					UpdateComponents();
+		static void					UpdateDrawable();
 
 		static void					Shutdown();
 

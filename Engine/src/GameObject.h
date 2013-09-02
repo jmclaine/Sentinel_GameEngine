@@ -23,9 +23,11 @@ namespace Sentinel
 
 		std::vector< GameComponent* >		mComponent;
 
+		GameObject*							mParent;
+		std::vector< GameObject* >			mChild;
+
 	public:
 
-		GameObject*							mParent;
 		std::string							mName;
 
 		//////////////////////////////
@@ -36,31 +38,41 @@ namespace Sentinel
 
 		//////////////////////////////
 
-		GameComponent* AttachComponent( GameComponent* component, const std::string& name );
+		GameComponent*	AttachComponent( GameComponent* component, const std::string& name );
 
-		GameComponent* DetachComponent( GameComponent* component );
-
-		//////////////////////////////
-
-		virtual void Startup();
-
-		virtual void UpdateController();
-
-		virtual void UpdatePhysics();
-
-		virtual void UpdateDrawable();
-
-		virtual void UpdateComponents();
-
-		virtual void Shutdown();
+		GameComponent*	DetachComponent( GameComponent* component );
 
 		//////////////////////////////
 
-		// Store the first occurrence of a component by type.
+		GameObject*		GetParent();
+
+		void			AddChild( GameObject* obj );
+		void			RemoveChild( int index );
+		GameObject*		GetChild( int index );
+
+		//////////////////////////////
+
+		virtual void	Startup();
+
+		virtual void	UpdateController();
+
+		virtual void	UpdatePhysics();
+
+		virtual void	UpdateTransform();
+
+		virtual void	UpdateComponents();
+
+		virtual void	UpdateDrawable();
+
+		virtual void	Shutdown();
+
+		//////////////////////////////
+
+		// Find the first occurrence of a component by type.
 		//
-		GameComponent* FindComponent( ComponentType type );
+		GameComponent*	FindComponent( ComponentType type );
 
-		// Store all components of a type to the componentList.
+		// Find all components of a type to the componentList.
 		//
 		template< class COMPONENT >
 		void FindComponent( ComponentType type, std::vector< COMPONENT* >& componentList )

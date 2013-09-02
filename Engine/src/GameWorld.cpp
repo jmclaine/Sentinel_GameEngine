@@ -68,6 +68,7 @@ namespace Sentinel
 	{
 		UpdateController();
 		UpdatePhysics();
+		UpdateTransform();
 		UpdateComponents();
 		UpdateDrawable();
 	}
@@ -84,6 +85,18 @@ namespace Sentinel
 
 		TRAVERSE_VECTOR( x, mGameObject )
 			mGameObject[ x ]->UpdatePhysics();
+	}
+
+	void GameWorld::UpdateTransform()
+	{
+		TRAVERSE_VECTOR( x, mGameObject )
+			mGameObject[ x ]->UpdateTransform();
+	}
+
+	void GameWorld::UpdateComponents()
+	{
+		TRAVERSE_VECTOR( x, mGameObject )
+			mGameObject[ x ]->UpdateComponents();
 	}
 
 	void GameWorld::UpdateDrawable()
@@ -117,12 +130,6 @@ namespace Sentinel
 		//
 		TRAVERSE_LIST( it, mAlphaOrder )
 			(*it).second->UpdateDrawable();
-	}
-
-	void GameWorld::UpdateComponents()
-	{
-		TRAVERSE_VECTOR( x, mGameObject )
-			mGameObject[ x ]->UpdateComponents();
 	}
 
 	void GameWorld::Shutdown()

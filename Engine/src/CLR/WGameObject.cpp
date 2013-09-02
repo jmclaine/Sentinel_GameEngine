@@ -7,7 +7,7 @@ namespace Sentinel { namespace Components
 {
 	WGameObject::WGameObject()
 	{
-		mRef = new GameObject();
+		mRef  = new GameObject();
 	}
 
 	WGameObject::~WGameObject()
@@ -32,7 +32,6 @@ namespace Sentinel { namespace Components
 
 	////////////////////////////////
 
-	DEFINE_PROPERTY_P( GameObject, GameObject, Parent );
 	DEFINE_PROPERTY_S( GameObject, Name );
 
 	////////////////////////////////
@@ -51,6 +50,28 @@ namespace Sentinel { namespace Components
 
 	////////////////////////////////
 
+	WGameObject^ WGameObject::GetParent()
+	{
+		return gcnew RGameObject( mRef->GetParent() );
+	}
+
+	void WGameObject::AddChild( WGameObject^ obj )
+	{
+		mRef->AddChild( obj->GetRef() );
+	}
+
+	void WGameObject::RemoveChild( int index )
+	{
+		mRef->RemoveChild( index );
+	}
+
+	WGameObject^ WGameObject::GetChild( int index )
+	{
+		return gcnew RGameObject( mRef->GetChild( index ));
+	}
+
+	////////////////////////////////
+
 	void WGameObject::Startup()
 	{
 		mRef->Startup();
@@ -65,20 +86,34 @@ namespace Sentinel { namespace Components
 	{
 		mRef->UpdatePhysics();
 	}
-		 
+	
+	void WGameObject::UpdateTransform()
+	{
+		mRef->UpdateTransform();
+	}
+
+	void WGameObject::UpdateComponents()
+	{
+		mRef->UpdateComponents();
+	}
+
 	void WGameObject::UpdateDrawable()
 	{
 		mRef->UpdateDrawable();
 	}
 		 
-	void WGameObject::UpdateComponents()
-	{
-		mRef->UpdateComponents();
-	}
-		 
 	void WGameObject::Shutdown()
 	{
 		mRef->Shutdown();
+	}
+
+	//////////////////////////////
+
+	// Find the first occurrence of a component by type.
+	//
+	WGameComponent^ WGameObject::FindComponent( Sentinel::Components::ComponentType type )
+	{
+		return gcnew WGameComponent( mRef->FindComponent( (Sentinel::ComponentType)type ));
 	}
 
 	////////////////////////////////

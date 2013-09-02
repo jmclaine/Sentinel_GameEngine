@@ -15,6 +15,8 @@ namespace Sentinel
 	private:
 
 		TransformComponent*		mTransform;
+
+		/////////////////////////////////
 		
 		Texture*				mTexture;
 		POINT					mSpriteSize;

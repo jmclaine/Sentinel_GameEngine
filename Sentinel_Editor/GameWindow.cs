@@ -13,20 +13,20 @@ namespace Sentinel_Editor
 {
 	public class GameWindow : WGameWindow
 	{
-		WGameObject						mObject;
-		WPerspectiveCameraComponent		mCamera;
-		WTransformComponent				mTransform;
+		private WGameObject						mObject;
+		private WPerspectiveCameraComponent		mCamera;
+		private WTransformComponent				mTransform;
 
-		Point							mCurrentMousePos;
-		Point							mLastMousePos;
+		private Point							mCurrentMousePos;
+		private Point							mLastMousePos;
 
-		bool							mIsMoving;
+		private bool							mIsMoving;
 
-		float							mMovementDirection;
-		float							mMovementSpeed;
+		private float							mMovementDirection;
+		private float							mMovementSpeed;
 
-		WVector3f						mRotation;
-		float							mAngularSpeed;
+		private WVector3f						mRotation;
+		private float							mAngularSpeed;
 		
 		///////////////////////////////
 
@@ -88,6 +88,7 @@ namespace Sentinel_Editor
 
 			mCamera.Update();
 
+			WGameWorld.UpdateTransform();
 			WGameWorld.UpdateDrawable();
 		}
 
@@ -97,6 +98,11 @@ namespace Sentinel_Editor
 
 			mObject.Shutdown();
 			mObject.Dispose();
+		}
+
+		public WCameraComponent GetCamera()
+		{
+			return mCamera;
 		}
 
 		public void SetCameraPosition( WVector3f pos )

@@ -95,10 +95,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Engine\src\CLR\RStdVector.h" />
     <ClInclude Include="..\Engine\src\CLR\Property.h" />
     <ClInclude Include="..\Engine\src\CLR\m_shared_ptr.h" />
     <ClInclude Include="..\Engine\src\CLR\WCameraComponent.h" />
-    <ClInclude Include="..\Engine\src\CLR\RBuffer.h" />
+    <ClInclude Include="..\Engine\src\CLR\WBuffer.h" />
     <ClInclude Include="..\Engine\src\CLR\WColor.h" />
     <ClInclude Include="..\Engine\src\CLR\WDrawableComponent.h" />
     <ClInclude Include="..\Engine\src\CLR\WGameComponent.h" />
@@ -109,10 +110,11 @@
     <ClInclude Include="..\Engine\src\CLR\WLightComponent.h" />
     <ClInclude Include="..\Engine\src\CLR\WMaterial.h" />
     <ClInclude Include="..\Engine\src\CLR\WMatrix4f.h" />
-    <ClInclude Include="..\Engine\src\CLR\RMesh.h" />
-    <ClInclude Include="..\Engine\src\CLR\RModel.h" />
+    <ClInclude Include="..\Engine\src\CLR\WMesh.h" />
+    <ClInclude Include="..\Engine\src\CLR\WModel.h" />
     <ClInclude Include="..\Engine\src\CLR\WMeshBuilder.h" />
     <ClInclude Include="..\Engine\src\CLR\WMeshComponent.h" />
+    <ClInclude Include="..\Engine\src\CLR\WModelComponent.h" />
     <ClInclude Include="..\Engine\src\CLR\WPerspectiveCameraComponent.h" />
     <ClInclude Include="..\Engine\src\CLR\WQuatf.h" />
     <ClInclude Include="..\Engine\src\CLR\WRenderer.h" />
@@ -128,9 +130,10 @@
     <ClInclude Include="Stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Engine\src\CLR\RBuffer.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WBuffer.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WCameraComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WColor.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WDrawableComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WGameComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WGameObject.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WGameWindow.cpp" />
@@ -139,10 +142,11 @@
     <ClCompile Include="..\Engine\src\CLR\WLightComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WMaterial.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WMatrix4f.cpp" />
-    <ClCompile Include="..\Engine\src\CLR\RMesh.cpp" />
-    <ClCompile Include="..\Engine\src\CLR\RModel.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WMesh.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WModel.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WMeshBuilder.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WMeshComponent.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WModelComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WPerspectiveCameraComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WQuatf.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WRenderer.cpp" />

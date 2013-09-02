@@ -13,15 +13,15 @@ namespace Sentinel { namespace Components
 
 	public enum class ComponentType
 	{
-		COMPONENT_GAME,
-		COMPONENT_CONTROLLER,
-		COMPONENT_COLLISION,
-		COMPONENT_PHYSICS,
-		COMPONENT_TRANSFORM,
-		COMPONENT_CAMERA,
-		COMPONENT_LIGHT,
-		COMPONENT_DRAWABLE,
-		COMPONENT_TRIGGER,
+		GAME,
+		CONTROLLER,
+		COLLISION,
+		PHYSICS,
+		TRANSFORM,
+		CAMERA,
+		LIGHT,
+		DRAWABLE,
+		TRIGGER,
 
 		NUM_COMPONENTS
 	};
@@ -38,6 +38,8 @@ namespace Sentinel { namespace Components
 
 	public:
 
+		WGameComponent( GameComponent* component );
+		WGameComponent( WGameComponent^ component );
 		virtual ~WGameComponent();
 
 		void			Delete();

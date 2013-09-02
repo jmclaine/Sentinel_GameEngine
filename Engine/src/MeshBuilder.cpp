@@ -24,17 +24,16 @@ namespace Sentinel
 		
 		mShader = NULL;
 
-		mVBO = NULL;
-		mIBO = NULL;
-
-		mVertex.clear();
-		mIndex.clear();
+		ClearGeometry();
 
 		mTextureScale = Vector4f( 0, 0, 1, 1 );
 	}
 
 	void MeshBuilder::ClearGeometry()
 	{
+		mVBO = NULL;
+		mIBO = NULL;
+
 		mVertex.clear();
 		mIndex.clear();
 	}

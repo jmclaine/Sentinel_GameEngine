@@ -300,6 +300,7 @@ namespace Sentinel
 						mObject[ x ].mMesh[ y ] = NULL;
 
 					MeshBuilder builder;
+					Material	material;
 
 					for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
 					{
@@ -315,7 +316,7 @@ namespace Sentinel
 						if( matID != 65535 )
 						{
 							MaterialTexture& mtex = mMaterials[ matID ];
-							builder.mMaterial = mtex.mMaterial;
+							material = mtex.mMaterial;
 
 							for( UINT z = 0; z < NUM_AUTODESK_TYPES; ++z )
 							{
@@ -327,6 +328,10 @@ namespace Sentinel
 									}
 								}
 							}
+						}
+						else
+						{
+							material = Material();
 						}
 
 						if( numTextures == 0 )
@@ -399,6 +404,7 @@ namespace Sentinel
 						builder.CalculateTangents( false );
 						
 						mObject[ x ].mMesh[ y ] = builder.BuildMesh();
+						mObject[ x ].mMesh[ y ]->SetMaterial( material );
 
 						builder.ApplyMatrix( mObject[ x ].mKeyFrame[ 0 ].mMatrix );
 

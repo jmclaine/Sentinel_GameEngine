@@ -69,8 +69,6 @@ namespace Sentinel
 		Shader*					mShader;
 		PrimitiveType			mPrimitive;
 
-		Material				mMaterial;
-
 		Texture*				mTexture[ NUM_TEXTURES ];	// uses TextureType
 		Vector4f				mTextureScale;
 

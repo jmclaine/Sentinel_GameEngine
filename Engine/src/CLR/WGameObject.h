@@ -4,7 +4,7 @@ Creates a new GameObject.
 GameObject will not be freed unless it is attached to the GameWorld.
 Delete() should be called manually for a controlled free memory.
 */
-#include "m_shared_ptr.h"
+#include "RStdVector.h"
 #include "Property.h"
 #include "GameObject.h"
 #include "WGameComponent.h"
@@ -34,7 +34,6 @@ namespace Sentinel { namespace Components
 
 		////////////////////////////////
 
-		DECLARE_PROPERTY( WGameObject^, Parent );
 		DECLARE_PROPERTY( String^,		Name )
 
 		////////////////////////////////
@@ -45,17 +44,33 @@ namespace Sentinel { namespace Components
 
 		////////////////////////////////
 
+		WGameObject^	GetParent();
+
+		void			AddChild( WGameObject^ obj );
+		void			RemoveChild( int index );
+		WGameObject^	GetChild( int index );
+
+		////////////////////////////////
+
 		virtual void	Startup();
 
 		virtual void	UpdateController();
 
 		virtual void	UpdatePhysics();
 
-		virtual void	UpdateDrawable();
+		virtual void	UpdateTransform();
 
 		virtual void	UpdateComponents();
 
+		virtual void	UpdateDrawable();
+
 		virtual void	Shutdown();
+
+		//////////////////////////////
+
+		// Find the first occurrence of a component by type.
+		//
+		WGameComponent^ FindComponent( Sentinel::Components::ComponentType type );
 	};
 
 	public ref class RGameObject sealed : public WGameObject

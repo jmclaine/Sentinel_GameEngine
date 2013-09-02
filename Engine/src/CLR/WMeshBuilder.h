@@ -7,7 +7,7 @@ and Index buffers.
 #include "MeshBuilder.h"
 #include "Property.h"
 #include "WRenderer.h"
-#include "RMesh.h"
+#include "WMesh.h"
 #include "WMaterial.h"
 #include "WMatrix4f.h"
 #include "WVector3f.h"
@@ -35,7 +35,6 @@ namespace Sentinel { namespace Assets
 
 		DECLARE_PROPERTY( WShader^,		Shader );
 		DECLARE_PROPERTY( Sentinel::Systems::PrimitiveType, Primitive );
-		DECLARE_PROPERTY( WMaterial^,	Material );
 		DECLARE_PROPERTY( WVector4f^,	TextureScale );
 
 		RTexture^		Texture( TextureType type );
@@ -70,6 +69,6 @@ namespace Sentinel { namespace Assets
 		// Returns the mesh created from the buffers.
 		// Ensure mShader is set before calling this.
 		//
-		RMesh^			BuildMesh();
+		WMesh^			BuildMesh();
 	};
 }}

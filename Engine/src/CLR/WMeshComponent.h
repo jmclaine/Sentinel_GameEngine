@@ -1,8 +1,7 @@
 #pragma once
 
 #include "WDrawableComponent.h"
-#include "RMesh.h"
-#include "WMaterial.h"
+#include "WMesh.h"
 
 using namespace Sentinel::Assets;
 
@@ -12,6 +11,7 @@ namespace Sentinel { namespace Components
 	{
 	public:
 
-		WMeshComponent( RMesh^ mesh, WMaterial^ material );
+		WMeshComponent( WMesh^ mesh );
+		WMeshComponent( WGameComponent^ component );
 	};
 }}

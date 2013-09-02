@@ -84,23 +84,11 @@
     <ClInclude Include="..\Engine\src\CLR\WGameWorld.h">
       <Filter>Sentinel_Engine\Components</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\m_shared_ptr.h">
-      <Filter>Sentinel_Engine\Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\CLR\WCameraComponent.h">
       <Filter>Sentinel_Engine\Components\Core</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\CLR\RString.h">
       <Filter>Sentinel_Engine\Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\RBuffer.h">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\RMesh.h">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\RModel.h">
-      <Filter>Sentinel_Engine\Assets</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\CLR\WGameComponent.h">
       <Filter>Sentinel_Engine\Components\Core</Filter>
@@ -131,6 +119,24 @@
     </ClInclude>
     <ClInclude Include="..\Engine\src\CLR\WTexture.h">
       <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WModel.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WMesh.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WBuffer.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\m_shared_ptr.h">
+      <Filter>Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\RStdVector.h">
+      <Filter>Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WModelComponent.h">
+      <Filter>Sentinel_Engine\Components\Drawables</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -182,15 +188,6 @@
     <ClCompile Include="..\Engine\src\CLR\RString.cpp">
       <Filter>Sentinel_Engine\Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\RBuffer.cpp">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\RMesh.cpp">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\RModel.cpp">
-      <Filter>Sentinel_Engine\Assets</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\CLR\WGameComponent.cpp">
       <Filter>Sentinel_Engine\Components\Core</Filter>
     </ClCompile>
@@ -217,6 +214,21 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\CLR\WTexture.cpp">
       <Filter>Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WModel.cpp">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WMesh.cpp">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WBuffer.cpp">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WDrawableComponent.cpp">
+      <Filter>Sentinel_Engine\Components\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WModelComponent.cpp">
+      <Filter>Sentinel_Engine\Components\Drawables</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

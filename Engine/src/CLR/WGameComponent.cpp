@@ -11,6 +11,16 @@ namespace Sentinel { namespace Components
 		mRef = NULL;
 	}
 
+	WGameComponent::WGameComponent( GameComponent* component )
+	{
+		mRef = component;
+	}
+
+	WGameComponent::WGameComponent( WGameComponent^ component )
+	{
+		mRef = component->mRef;
+	}
+
 	WGameComponent::~WGameComponent()
 	{}
 

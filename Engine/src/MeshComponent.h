@@ -16,7 +16,7 @@ namespace Sentinel
 
 	public:
 
-		MeshComponent( std::shared_ptr< Mesh > mesh, const Material& material = Material() );
+		MeshComponent( std::shared_ptr< Mesh > mesh );
 
 		void Startup();
 

@@ -129,6 +129,7 @@ namespace Sentinel
 	enum StencilType
 	{
 		STENCIL_DEFAULT,
+		STENCIL_NO_ZBUFFER,
 		STENCIL_PARTICLE,
 
 		NUM_STENCIL_TYPES

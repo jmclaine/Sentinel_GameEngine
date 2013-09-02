@@ -27,13 +27,11 @@ namespace Sentinel { namespace Assets
 
 	DEFINE_PROPERTY_P( MeshBuilder, Shader,		Shader );
 	DEFINE_PROPERTY_E( MeshBuilder, Systems,	PrimitiveType, Primitive );
-	DEFINE_PROPERTY_R( MeshBuilder, Material,	Material );
-	DEFINE_PROPERTY_R( MeshBuilder, Vector4f, TextureScale );
+	DEFINE_PROPERTY_R( MeshBuilder, Vector4f,	TextureScale );
 
 	RTexture^ WMeshBuilder::Texture( TextureType type )
 	{
-		Sentinel::Texture*& tex = mRef->mTexture[ (int)type ];
-		return (tex != NULL) ? gcnew RTexture( tex ) : nullptr;
+		return gcnew RTexture( mRef->mTexture[ (int)type ] );
 	}
 	
 	//////////////////////////////////
@@ -114,8 +112,8 @@ namespace Sentinel { namespace Assets
 	// Returns the mesh created from the buffers.
 	// Ensure mShader is set before calling this.
 	//
-	RMesh^ WMeshBuilder::BuildMesh()
+	WMesh^ WMeshBuilder::BuildMesh()
 	{
-		return gcnew RMesh( mRef->BuildMesh() );
+		return gcnew WMesh( mRef->BuildMesh() );
 	}
 }}

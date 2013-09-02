@@ -14,8 +14,8 @@ private:
 
 public:
 
-    m_shared_ptr() 
-        : mPtr( new std::shared_ptr< T >() ) 
+	m_shared_ptr() :
+		mPtr( new std::shared_ptr< T >() ) 
     {}
 
     m_shared_ptr( T* t )
@@ -40,7 +40,7 @@ public:
 
     !m_shared_ptr()
 	{
-        //delete mPtr;	// will gladly crash!
+        delete mPtr;
     }
 
     operator std::shared_ptr< T >()

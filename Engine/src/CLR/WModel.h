@@ -1,6 +1,7 @@
 #pragma once
 
 #include "m_shared_ptr.h"
+#include "Property.h"
 #include "Model.h"
 #include "WShader.h"
 #include "WMatrix4f.h"
@@ -10,7 +11,7 @@ using namespace Sentinel::Math;
 
 namespace Sentinel { namespace Assets
 {
-	public ref class RModel
+	public ref class WModel
 	{
 	private:
 
@@ -18,25 +19,23 @@ namespace Sentinel { namespace Assets
 
 	public:
 
-		static WShader^		SHADER_COLOR;
-		static WShader^		SHADER_TEXTURE;
-		static WShader^		SHADER_NORMAL_MAP;
-		static WShader^		SHADER_PARALLAX;
-		static WShader^		SHADER_SKINNING;
-
-		RModel( Model* model );
-		RModel( std::shared_ptr< Model > model );
-		~RModel();
+		WModel( Model* model );
+		WModel( std::shared_ptr< Model > model );
+		~WModel();
+		!WModel();
 
 		m_shared_ptr< Model > GetRef();
 
 		////////////////////////////////
 
-		RMatrix4f^			MatrixWorld();
+		DECLARE_PROPERTY( WMatrix4f^, MatrixWorld );
 
 		////////////////////////////////
 
-		static RModel^		Load( System::String^ filename );
+		static WModel^		Load( System::String^ filename );
+
+		static void			SetShaderColor( WShader^ shader );
+		static WShader^		GetShaderColor();
 
 		bool				Create( System::String^ filename );
 		void				Release();

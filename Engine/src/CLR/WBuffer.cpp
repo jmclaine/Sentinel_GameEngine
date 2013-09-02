@@ -1,33 +1,33 @@
-#include "RBuffer.h"
+#include "WBuffer.h"
 
 namespace Sentinel { namespace Assets
 {
-	RBuffer::RBuffer( Buffer* buffer )
+	WBuffer::WBuffer( Buffer* buffer )
 	{
 		mRef = buffer;
 	}
 
-	RBuffer::~RBuffer()
+	WBuffer::~WBuffer()
 	{}
 
-	Buffer* RBuffer::GetRef()
+	Buffer* WBuffer::GetRef()
 	{
 		return mRef;
 	}
 
 	////////////////////////////////
 
-	unsigned char* RBuffer::Lock()
+	unsigned char* WBuffer::Lock()
 	{
 		return (unsigned char*)mRef->Lock();
 	}
 
-	void RBuffer::Unlock()
+	void WBuffer::Unlock()
 	{
 		mRef->Unlock();
 	}
 
-	void RBuffer::Release()
+	void WBuffer::Release()
 	{
 		mRef->Release();
 	}

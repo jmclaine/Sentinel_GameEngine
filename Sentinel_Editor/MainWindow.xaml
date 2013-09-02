@@ -69,23 +69,23 @@
                     
                     <Separator Padding="4" Margin="4" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FF666666"></Separator>
 
-                    <Button Name="Translate_Object" Width="22" Height="22" Click="ToolBar_Translate_Click">
-                        <Button.Content>
+                    <ToggleButton Name="Translate_Object" Width="22" Height="22" Click="ToolBar_Translate_Click">
+                        <ToggleButton.Content>
                             <Image Source="/Sentinel_Editor;component/Images/Translate.png" Width="18" Height="18" Stretch="Fill" StretchDirection="Both" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="Translate" />
-                        </Button.Content>
-                    </Button>
+                        </ToggleButton.Content>
+                    </ToggleButton>
 
-                    <Button Name="Rotate_Object" Width="22" Height="22" Click="ToolBar_Rotate_Click">
-                        <Button.Content>
+                    <ToggleButton Name="Rotate_Object" Width="22" Height="22" Click="ToolBar_Rotate_Click">
+                        <ToggleButton.Content>
                             <Image Source="/Sentinel_Editor;component/Images/Rotate.png" Width="18" Height="18" Stretch="Fill" StretchDirection="Both" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="Rotate" />
-                        </Button.Content>
-                    </Button>
+                        </ToggleButton.Content>
+                    </ToggleButton>
 
-                    <Button Name="Scale_Object" Width="22" Height="22" Click="ToolBar_Scale_Click">
-                        <Button.Content>
+                    <ToggleButton Name="Scale_Object" Width="22" Height="22" Click="ToolBar_Scale_Click">
+                        <ToggleButton.Content>
                             <Image Source="/Sentinel_Editor;component/Images/Scale.png" Width="18" Height="18" Stretch="Fill" StretchDirection="Both" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="Scale" />
-                        </Button.Content>
-                    </Button>
+                        </ToggleButton.Content>
+                    </ToggleButton>
 
                 </ToolBar>
             </ToolBarTray>
