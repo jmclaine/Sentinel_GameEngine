@@ -4,6 +4,8 @@
 
 namespace Sentinel { namespace Assets
 {
+	DEFINE_REF( Material );
+
 	WMaterial::WMaterial()
 	{
 		mRef = new Material( ColorRGBA( 0.2f, 0.2f, 0.2f, 1.0f ),
@@ -38,55 +40,14 @@ namespace Sentinel { namespace Assets
 		mRef = new Material( *material.mRef );
 	}
 
-	WMaterial::~WMaterial()
-	{
-		Delete();
-	}
-
-	WMaterial::!WMaterial()
-	{
-		Delete();
-	}
-
-	void WMaterial::Delete()
-	{
-		delete mRef;
-	}
-
-	Material* WMaterial::GetRef()
-	{
-		return mRef;
-	}
-
-	////////////////////////////////
-
 	DEFINE_PROPERTY_R( Material, ColorRGBA, Ambient );
 	DEFINE_PROPERTY_R( Material, ColorRGBA, Diffuse );
 	DEFINE_PROPERTY_R( Material, ColorRGBA, Specular );
 	DEFINE_PROPERTY_M( Material, float,		SpecularComponent );
 	
+	DEFINE_OP_DEREF( Material );
+
 	////////////////////////////////
 
-	RMaterial::RMaterial( Material* material )
-	{
-		mRef = material;
-	}
-
-	RMaterial::RMaterial( WMaterial^ material )
-	{
-		mRef = material->GetRef();
-	}
-
-	void RMaterial::Set( const Material& material )
-	{
-		*mRef = material;
-	}
-
-	void RMaterial::Set( WMaterial^ material )
-	{
-		*mRef = *material->GetRef();
-	}
-
-	void RMaterial::Delete()
-	{}
+	DEFINE_CLASS_REF( Material );
 }}

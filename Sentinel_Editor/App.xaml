@@ -121,12 +121,12 @@
                                 <ContentPresenter x:Name="PART_Header"
                                           ContentSource="Header"
                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                             </Border>
                             <ItemsPresenter x:Name="ItemsHost"
                                     Grid.Row="1"
                                     Grid.Column="1"
-                                    Grid.ColumnSpan="2"/>
+                                    Grid.ColumnSpan="2" />
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsExpanded"

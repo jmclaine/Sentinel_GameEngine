@@ -10,9 +10,7 @@ namespace Sentinel { namespace Math
 {
 	public ref class WMatrix4f
 	{
-	protected:
-		
-		Matrix4f*	mRef;
+		DECLARE_REF( Matrix4f );
 
 	public:
 
@@ -20,16 +18,6 @@ namespace Sentinel { namespace Math
 		WMatrix4f( const Matrix4f% mat );
 		WMatrix4f( const WMatrix4f% mat );
 		WMatrix4f( WQuatf^ q );
-		~WMatrix4f();
-		!WMatrix4f();
-
-	protected:
-
-		virtual void Delete();
-
-	public:
-
-		Matrix4f*	GetRef();
 
 		////////////////////////////////
 		
@@ -41,11 +29,13 @@ namespace Sentinel { namespace Math
 
 		////////////////////////////////
 
+		DECLARE_OP_DEREF( Matrix4f );
+
 		static WMatrix4f^ WMatrix4f::operator + ( WMatrix4f^ mat0, WMatrix4f^ mat1 );
-		WMatrix4f^	Add( const WMatrix4f^ mat );
+		WMatrix4f^	Add( WMatrix4f^ mat );
 
 		static WMatrix4f^ WMatrix4f::operator * ( WMatrix4f^ mat0, WMatrix4f^ mat1 );
-		WMatrix4f^	Mul( const WMatrix4f^ mat );
+		WMatrix4f^	Mul( WMatrix4f^ mat );
 		
 		void		Zero();
 		void		Identity();
@@ -81,18 +71,5 @@ namespace Sentinel { namespace Math
 		WVector3f^	Right();
 	};
 
-	public ref class RMatrix4f sealed : public WMatrix4f
-	{
-	public:
-
-		RMatrix4f( Matrix4f* mat );
-		RMatrix4f( WMatrix4f^ mat );
-
-		void		Set( const Matrix4f& mat );
-		void		Set( WMatrix4f^ mat );
-
-	protected:
-
-		virtual void Delete() override;
-	};
+	DECLARE_CLASS_REF( Matrix4f );
 }}

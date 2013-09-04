@@ -25,20 +25,9 @@ namespace Sentinel { namespace Assets
 
 	public ref class WMesh
 	{
-	private:
-
-		m_shared_ptr< Mesh >	mRef;
+		DECLARE_REF_SHARED( Mesh );
 
 	public:
-
-		WMesh( Mesh* mesh );
-		WMesh( std::shared_ptr< Mesh > mesh );
-		~WMesh();
-		!WMesh();
-
-		std::shared_ptr< Mesh >	GetRef();
-
-		////////////////////////////////
 
 		void		SetWorldTransform( WMatrix4f^ world );
 		void		SetShadowTransform( WMatrix4f^ shadow );

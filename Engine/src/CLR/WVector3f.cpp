@@ -2,6 +2,8 @@
 
 namespace Sentinel { namespace Math
 {
+	DEFINE_REF( Vector3f );
+
 	WVector3f::WVector3f()
 	{
 		mRef = new Vector3f();
@@ -27,26 +29,6 @@ namespace Sentinel { namespace Math
 		mRef = new Vector3f( *v.mRef );
 	}
 
-	WVector3f::~WVector3f()
-	{
-		Delete();
-	}
-
-	WVector3f::!WVector3f()
-	{
-		Delete();
-	}
-
-	void WVector3f::Delete()
-	{
-		delete mRef;
-	}
-
-	Vector3f* WVector3f::GetRef()
-	{
-		return mRef;
-	}
-
 	////////////////////////////////
 
 	DEFINE_PROPERTY( Vector3f, float, x );
@@ -55,22 +37,24 @@ namespace Sentinel { namespace Math
 
 	////////////////////////////////
 
-	bool WVector3f::operator == ( const WVector3f^ v )
+	DEFINE_OP_DEREF( Vector3f );
+
+	bool WVector3f::operator == ( WVector3f^ v )
 	{
-		return mRef->Equals( *v->mRef );
+		return mRef->Equals( v );
 	}
 
-	bool WVector3f::operator != ( const WVector3f^ v )
+	bool WVector3f::operator != ( WVector3f^ v )
 	{
-		return !mRef->Equals( *v->mRef );
+		return !mRef->Equals( v );
 	}
 
-	bool WVector3f::Equals( const WVector3f^ v )
+	bool WVector3f::Equals( WVector3f^ v )
 	{
-		return mRef->Equals( *v->mRef );
+		return mRef->Equals( v );
 	}
 
-	WVector3f^ WVector3f::operator += ( const WVector3f^ v )
+	WVector3f^ WVector3f::operator += ( WVector3f^ v )
 	{
 		*mRef += *v->mRef;
 		return this;
@@ -81,12 +65,12 @@ namespace Sentinel { namespace Math
 		return v0->Add( v1 );
 	}
 
-	WVector3f^ WVector3f::Add( const WVector3f^ v )
+	WVector3f^ WVector3f::Add( WVector3f^ v )
 	{
-		return gcnew WVector3f( mRef->Add( *v->mRef ));
+		return gcnew WVector3f( mRef->Add( v ));
 	}
 
-	WVector3f^ WVector3f::operator -= ( const WVector3f^ v )
+	WVector3f^ WVector3f::operator -= ( WVector3f^ v )
 	{
 		*mRef -= *v->mRef;
 		return this;
@@ -97,9 +81,9 @@ namespace Sentinel { namespace Math
 		return v0->Sub( v1 );
 	}
 
-	WVector3f^ WVector3f::Sub( const WVector3f^ v )
+	WVector3f^ WVector3f::Sub( WVector3f^ v )
 	{
-		return gcnew WVector3f( mRef->Sub( *v->mRef ));
+		return gcnew WVector3f( mRef->Sub( v ));
 	}
 
 	WVector3f^ WVector3f::operator *= ( float scalar )
@@ -123,7 +107,7 @@ namespace Sentinel { namespace Math
 		return gcnew WVector3f( mRef->Mul( scalar ));
 	}
 
-	WVector3f^ WVector3f::operator *= ( const WVector3f^ v )
+	WVector3f^ WVector3f::operator *= ( WVector3f^ v )
 	{
 		*mRef *= *v->mRef;
 		return this;
@@ -134,9 +118,9 @@ namespace Sentinel { namespace Math
 		return v0->Mul( v1 );
 	}
 
-	WVector3f^ WVector3f::Mul( const WVector3f^ v )
+	WVector3f^ WVector3f::Mul( WVector3f^ v )
 	{
-		return gcnew WVector3f( mRef->Mul( *v->mRef ));
+		return gcnew WVector3f( mRef->Mul( v ));
 	}
 
 	float WVector3f::Length()
@@ -159,43 +143,22 @@ namespace Sentinel { namespace Math
 		return gcnew WVector3f( mRef->Normalize() );
 	}
 
-	float WVector3f::Dot( const WVector3f^ v )
+	float WVector3f::Dot( WVector3f^ v )
 	{
-		return mRef->Dot( *v->mRef );
+		return mRef->Dot( v );
 	}
 
-	WVector3f^ WVector3f::Cross( const WVector3f^ v )
+	WVector3f^ WVector3f::Cross( WVector3f^ v )
 	{
-		return gcnew WVector3f( mRef->Cross( *v->mRef ));
+		return gcnew WVector3f( mRef->Cross( v ));
 	}
 
-	float WVector3f::Angle( const WVector3f^ v )
+	float WVector3f::Angle( WVector3f^ v )
 	{
-		return mRef->Angle( *v->mRef );
+		return mRef->Angle( v );
 	}
 
 	////////////////////////////////
 
-	RVector3f::RVector3f( Vector3f* v )
-	{
-		mRef = v;
-	}
-
-	RVector3f::RVector3f( WVector3f^ v )
-	{
-		mRef = v->GetRef();
-	}
-
-	void RVector3f::Set( const Vector3f& v )
-	{
-		*mRef = v;
-	}
-
-	void RVector3f::Set( WVector3f^ v )
-	{
-		*mRef = *v->GetRef();
-	}
-
-	void RVector3f::Delete()
-	{}
+	DEFINE_CLASS_REF( Vector3f );
 }}

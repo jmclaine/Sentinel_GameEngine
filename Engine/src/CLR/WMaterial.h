@@ -7,9 +7,7 @@ namespace Sentinel { namespace Assets
 {
 	public ref class WMaterial
 	{
-	protected:
-
-		Material*		mRef;
+		DECLARE_REF( Material );
 
 	public:
 
@@ -21,16 +19,6 @@ namespace Sentinel { namespace Assets
 		WMaterial( Material& material );
 		WMaterial( WMaterial^ material );
 		WMaterial( WMaterial% material );
-		~WMaterial();
-		!WMaterial();
-
-	protected:
-
-		virtual void Delete();
-
-	public:
-
-		Material*	GetRef();
 
 		////////////////////////////////
 
@@ -38,20 +26,11 @@ namespace Sentinel { namespace Assets
 		DECLARE_PROPERTY( WColorRGBA^,	Diffuse );
 		DECLARE_PROPERTY( WColorRGBA^,	Specular );
 		DECLARE_PROPERTY( float,		SpecularComponent );
+
+		////////////////////////////////
+
+		DECLARE_OP_DEREF( Material );
 	};
 
-	public ref class RMaterial sealed : public WMaterial
-	{
-	public:
-
-		RMaterial( Material* material );
-		RMaterial( WMaterial^ material );
-
-		void		Set( const Material& material );
-		void		Set( WMaterial^ material );
-
-	protected:
-
-		virtual void Delete() override;
-	};
+	DECLARE_CLASS_REF( Material );
 }}

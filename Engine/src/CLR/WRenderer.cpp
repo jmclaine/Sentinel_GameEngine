@@ -6,6 +6,8 @@ using namespace Sentinel::Utilities;
 
 namespace Sentinel { namespace Systems
 {
+	DEFINE_REF( WindowInfo );
+
 	WWindowInfo::WWindowInfo()
 	{
 		mRef = new WindowInfo();
@@ -24,16 +26,6 @@ namespace Sentinel { namespace Systems
 	WWindowInfo::WWindowInfo( const WWindowInfo% info )
 	{
 		mRef = new WindowInfo( *info.mRef );
-	}
-
-	WWindowInfo::~WWindowInfo()
-	{
-		delete mRef;
-	}
-
-	WindowInfo* WWindowInfo::GetRef()
-	{
-		return mRef;
 	}
 
 	bool WWindowInfo::Fullscreen()
@@ -60,6 +52,8 @@ namespace Sentinel { namespace Systems
 	{
 		return mRef->HeightRatio();
 	}
+
+	DEFINE_CLASS_REF( WindowInfo );
 
 	/////////////////////////////////////////////////
 
@@ -93,7 +87,7 @@ namespace Sentinel { namespace Systems
 
 	WWindowInfo^ WRenderer::GetWindow()
 	{
-		return gcnew WWindowInfo( Renderer::Inst()->GetWindow() );
+		return gcnew RWindowInfo( Renderer::Inst()->GetWindow() );
 	}
 
 	bool WRenderer::ShareResources( WWindowInfo^ info0, WWindowInfo^ info1 )
@@ -110,12 +104,12 @@ namespace Sentinel { namespace Systems
 
 	void WRenderer::SetVBO( WBuffer^ buffer )
 	{
-		Renderer::Inst()->SetVBO( buffer->GetRef() );
+		Renderer::Inst()->SetVBO( buffer );
 	}
 
 	void WRenderer::SetIBO( WBuffer^ buffer )
 	{
-		Renderer::Inst()->SetIBO( buffer->GetRef() );
+		Renderer::Inst()->SetIBO( buffer );
 	}
 
 	// Textures.
@@ -201,7 +195,9 @@ namespace Sentinel { namespace Systems
 	//
 	WShader^ WRenderer::CreateShader( String^ filename, String^ attrib, String^ uniform )
 	{
-		return gcnew WShader( Renderer::Inst()->CreateShader( RString::ToString( filename ).c_str(), RString::ToString( attrib ).c_str(), RString::ToString( uniform ).c_str() ));
+		Shader* shader = Renderer::Inst()->CreateShader( RString::ToString( filename ).c_str(), RString::ToString( attrib ).c_str(), RString::ToString( uniform ).c_str() );
+
+		return (shader) ? gcnew WShader( shader ) : nullptr;
 	}
 
 	void WRenderer::SetShader( WShader^ shader )

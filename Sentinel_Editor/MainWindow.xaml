@@ -11,7 +11,11 @@
         Closed="Window_Closed"
         Name="Window_Main">
     
-        <Canvas Name="Canvas_Main">
+    <Window.Resources>
+        <Style TargetType="{x:Type local:GameObject_TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}" />
+    </Window.Resources>
+    
+    <Canvas Name="Canvas_Main">
         <Grid Name="Grid_Main" Background="LightSlateGray" Width="{Binding ElementName=Canvas_Main,Path=ActualWidth}" Height="{Binding ElementName=Canvas_Main,Path=ActualHeight}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -123,11 +127,7 @@
                             </Border>
 
                             <Grid Grid.Row="0">
-                                <TreeView Name="Objects_TreeView" TreeViewItem.Selected="Objects_TreeView_Selected" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2,26,10,10" VerticalContentAlignment="Top" Background="#FF444444" Foreground="White" BorderThickness="0" MinWidth="10" MinHeight="10" OverridesDefaultStyle="False" Padding="0" Panel.ZIndex="-1" ScrollViewer.VerticalScrollBarVisibility="Auto" >
-                                    <TreeView.ItemContainerStyle>
-                                        <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}" />
-                                    </TreeView.ItemContainerStyle>
-                                </TreeView>
+                                <TreeView Name="Objects_TreeView" TreeViewItem.Selected="Objects_TreeView_Selected" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2,26,10,10" VerticalContentAlignment="Top" Background="#FF444444" Foreground="White" BorderThickness="0" MinWidth="10" MinHeight="10" OverridesDefaultStyle="False" Padding="0" Panel.ZIndex="-1" ScrollViewer.VerticalScrollBarVisibility="Auto" />
                             </Grid>
 
                             <GridSplitter VerticalAlignment="Bottom" Height="8" Background="#222222" HorizontalAlignment="Stretch" Panel.ZIndex="1" Margin="-2,0,2,0" />

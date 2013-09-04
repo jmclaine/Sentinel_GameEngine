@@ -687,9 +687,6 @@ namespace Sentinel
 					SAFE_RELEASE_PTR( mCurrWindow->mSwapChain );
 					SAFE_RELEASE_PTR( mCurrWindow->mRasterizerState );
 					SAFE_RELEASE_PTR( mCurrWindow->mContext );
-				
-					delete mCurrWindow;
-					mCurrWindow = NULL;
 				}
 			}
 		}

@@ -58,8 +58,8 @@ namespace Sentinel
 		void		SetMaterial( const Material& material );
 		void		SetTexture( Texture* texture, TextureType type = TEXTURE_DIFFUSE );
 
-		Buffer*		GetVBO();
-		Buffer*		GetIBO();
+		Buffer*&	GetVBO();
+		Buffer*&	GetIBO();
 
 		void		Draw( UINT count = UINT_MAX );
 	};

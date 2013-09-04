@@ -7,9 +7,7 @@ namespace Sentinel { namespace Math
 {
 	public ref class WVector4f
 	{
-	protected:
-
-		Vector4f*	mRef;
+		DECLARE_REF( Vector4f );
 
 	public:
 
@@ -18,16 +16,6 @@ namespace Sentinel { namespace Math
 		WVector4f( const float* v );
 		WVector4f( const Vector4f% v );
 		WVector4f( const WVector4f% v );
-		~WVector4f();
-		!WVector4f();
-
-	protected:
-
-		virtual void Delete();
-
-	public:
-
-		Vector4f*	GetRef();
 
 		////////////////////////////////
 
@@ -38,26 +26,28 @@ namespace Sentinel { namespace Math
 
 		////////////////////////////////
 
-		bool		operator == ( const WVector4f^ v );
-		bool		operator != ( const WVector4f^ v );
-		bool		Equals( const WVector4f^ v );
-		
-		WVector4f^	operator += ( const WVector4f^ v );
-		static WVector4f^ operator + ( WVector4f^ v0, WVector4f^ v1 );
-		WVector4f^	Add( const WVector4f^ v );
+		DECLARE_OP_DEREF( Vector4f );
 
-		WVector4f^	operator -= ( const WVector4f^ v );
+		bool		operator == ( WVector4f^ v );
+		bool		operator != ( WVector4f^ v );
+		bool		Equals( WVector4f^ v );
+		
+		WVector4f^	operator += ( WVector4f^ v );
+		static WVector4f^ operator + ( WVector4f^ v0, WVector4f^ v1 );
+		WVector4f^	Add( WVector4f^ v );
+
+		WVector4f^	operator -= ( WVector4f^ v );
 		static WVector4f^ operator - ( WVector4f^ v0, WVector4f^ v1 );
-		WVector4f^	Sub( const WVector4f^ v );
+		WVector4f^	Sub( WVector4f^ v );
 
 		WVector4f^	operator *= ( float scalar );
 		static WVector4f^ operator * ( WVector4f^ v, float scalar );
 		static WVector4f^ operator * ( float scalar, WVector4f^ v );
 		WVector4f^	Mul( float scalar );
 
-		WVector4f^	operator *= ( const WVector4f^ v );
+		WVector4f^	operator *= ( WVector4f^ v );
 		static WVector4f^ operator * ( WVector4f^ v0, WVector4f^ v1 );
-		WVector4f^	Mul( const WVector4f^ v );
+		WVector4f^	Mul( WVector4f^ v );
 
 		float		Length();
 		float		LengthSquared();
@@ -65,24 +55,11 @@ namespace Sentinel { namespace Math
 
 		WVector4f^	Normalize();
 
-		float		Dot( const WVector4f^ v );
-		WVector4f^	Cross( const WVector4f^ v );
+		float		Dot( WVector4f^ v );
+		WVector4f^	Cross( WVector4f^ v );
 
-		float		Angle( const WVector4f^ v );
+		float		Angle( WVector4f^ v );
 	};
 
-	public ref class RVector4f sealed : public WVector4f
-	{
-	public:
-
-		RVector4f( Vector4f* v );
-		RVector4f( WVector4f^ v );
-
-		void		Set( const Vector4f& v );
-		void		Set( WVector4f^ v );
-
-	protected:
-
-		virtual void Delete() override;
-	};
+	DECLARE_CLASS_REF( Vector4f );
 }}

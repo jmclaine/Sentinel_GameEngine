@@ -3,36 +3,9 @@
 
 using namespace Sentinel::Utilities;
 
-namespace Sentinel { 
-
-	Shader*  Model::SHADER_COLOR = NULL;
-
-namespace Assets
+namespace Sentinel { namespace Assets
 {
-	WModel::WModel( Model* model )
-	{
-		mRef = model;
-	}
-
-	WModel::WModel( std::shared_ptr< Model > model )
-	{
-		mRef = model.get();
-	}
-
-	WModel::~WModel()
-	{
-		//mRef.reset();
-	}
-
-	WModel::!WModel()
-	{
-		//mRef.reset();
-	}
-
-	m_shared_ptr< Model > WModel::GetRef()
-	{
-		return mRef;
-	}
+	DEFINE_REF_SHARED( Model );
 
 	////////////////////////////////
 
@@ -52,7 +25,7 @@ namespace Assets
 
 	WShader^ WModel::GetShaderColor()
 	{
-		return gcnew RShader( Model::SHADER_COLOR );
+		return gcnew RShader( Model::GetShaderColor() );
 	}
 
 	bool WModel::Create( System::String^ filename )

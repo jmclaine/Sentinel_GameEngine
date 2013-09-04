@@ -2,26 +2,7 @@
 
 namespace Sentinel { namespace Assets
 {
-	WMesh::WMesh( Mesh* mesh )
-	{
-		mRef = mesh;
-	}
-
-	WMesh::WMesh( std::shared_ptr< Mesh > mesh )
-	{
-		mRef = mesh.get();
-	}
-
-	WMesh::~WMesh()
-	{}
-
-	WMesh::!WMesh()
-	{}
-
-	std::shared_ptr< Mesh > WMesh::GetRef()
-	{
-		return mRef.get();
-	}
+	DEFINE_REF_SHARED( Mesh );
 
 	////////////////////////////////
 
@@ -57,12 +38,12 @@ namespace Sentinel { namespace Assets
 
 	WBuffer^ WMesh::GetVBO()
 	{
-		return gcnew WBuffer( mRef->GetVBO() );
+		return gcnew RBuffer( mRef->GetVBO() );
 	}
 
 	WBuffer^ WMesh::GetIBO()
 	{
-		return gcnew WBuffer( mRef->GetIBO() );
+		return gcnew RBuffer( mRef->GetIBO() );
 	}
 
 	void WMesh::Draw()

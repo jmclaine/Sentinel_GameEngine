@@ -2,6 +2,8 @@
 
 namespace Sentinel { namespace Assets
 {
+	DEFINE_REF( ColorRGBA );
+
 	WColorRGBA::WColorRGBA()
 	{
 		mRef = new ColorRGBA();
@@ -27,26 +29,6 @@ namespace Sentinel { namespace Assets
 		mRef = new ColorRGBA( *color.mRef );
 	}
 
-	WColorRGBA::~WColorRGBA()
-	{
-		Delete();
-	}
-
-	WColorRGBA::!WColorRGBA()
-	{
-		Delete();
-	}
-
-	void WColorRGBA::Delete()
-	{
-		delete mRef;
-	}
-
-	ColorRGBA* WColorRGBA::GetRef()
-	{
-		return mRef;
-	}
-
 	////////////////////////////////
 
 	DEFINE_PROPERTY( ColorRGBA, float, r );
@@ -55,6 +37,8 @@ namespace Sentinel { namespace Assets
 	DEFINE_PROPERTY( ColorRGBA, float, a );
 
 	////////////////////////////////
+
+	DEFINE_OP_DEREF( ColorRGBA );
 
 	float* WColorRGBA::Ptr()
 	{
@@ -68,26 +52,5 @@ namespace Sentinel { namespace Assets
 
 	////////////////////////////////
 
-	RColorRGBA::RColorRGBA( ColorRGBA* color )
-	{
-		mRef = color;
-	}
-
-	RColorRGBA::RColorRGBA( WColorRGBA^ color )
-	{
-		mRef = color->GetRef();
-	}
-
-	void RColorRGBA::Set( const ColorRGBA& color )
-	{
-		*mRef = color;
-	}
-
-	void RColorRGBA::Set( WColorRGBA^ color )
-	{
-		*mRef = *color->GetRef();
-	}
-
-	void RColorRGBA::Delete()
-	{}
+	DEFINE_CLASS_REF( ColorRGBA );
 }}

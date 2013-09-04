@@ -725,9 +725,6 @@ namespace Sentinel
 				mCurrWindow->mContext = 0;
 
 				ReleaseDC( mCurrWindow->mHWND, mCurrWindow->mHDC );
-
-				delete mCurrWindow;
-				mCurrWindow = NULL;
 			}
 		}
 

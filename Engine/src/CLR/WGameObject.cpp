@@ -62,12 +62,21 @@ namespace Sentinel { namespace Components
 
 	void WGameObject::RemoveChild( int index )
 	{
-		mRef->RemoveChild( index );
+		_ASSERT( index >= 0 );
+
+		mRef->RemoveChild( (UINT)index );
 	}
 
 	WGameObject^ WGameObject::GetChild( int index )
 	{
-		return gcnew RGameObject( mRef->GetChild( index ));
+		_ASSERT( index >= 0 );
+
+		return gcnew RGameObject( mRef->GetChild( (UINT)index ));
+	}
+
+	int WGameObject::NumChildren()
+	{
+		return (int)mRef->NumChildren();
 	}
 
 	////////////////////////////////

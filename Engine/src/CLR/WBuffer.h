@@ -1,35 +1,38 @@
 #pragma once
 
-#include "m_shared_ptr.h"
+#include "Property.h"
 #include "Buffer.h"
 
 namespace Sentinel { namespace Assets
 {
 	public enum class BufferType
 	{
-		VERTEX_BUFFER = 1,
-		INDEX_BUFFER  = 2,
+		VERTEX = 1,
+		INDEX  = 2,
 
 		NUM_BUFFER_TYPES
 	};
 
 	public ref class WBuffer
 	{
-	private:
+		DECLARE_REF( Buffer );
 
-		Buffer*		mRef;
+	protected:
+
+		WBuffer();
 
 	public:
 
 		WBuffer( Buffer* buffer );
-		~WBuffer();
-		
-		Buffer*		GetRef();
 
+		DECLARE_OP_PTR( Buffer );
+		
 		////////////////////////////////
 
 		UCHAR*		Lock();
 		void		Unlock();
 		void		Release();
 	};
+
+	DECLARE_CLASS_REF_PTR( Buffer );
 }}

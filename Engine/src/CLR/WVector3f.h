@@ -7,9 +7,7 @@ namespace Sentinel { namespace Math
 {
 	public ref class WVector3f
 	{
-	protected:
-
-		Vector3f*	mRef;
+		DECLARE_REF( Vector3f );
 
 	public:
 
@@ -18,16 +16,8 @@ namespace Sentinel { namespace Math
 		WVector3f( const float* v );
 		WVector3f( const Vector3f% v );
 		WVector3f( const WVector3f% v );
-		~WVector3f();
-		!WVector3f();
-
-	protected:
-
-		virtual void Delete();
-
-	public:
-
-		Vector3f*	GetRef();
+		
+		////////////////////////////////
 
 		DECLARE_PROPERTY( float, x );
 		DECLARE_PROPERTY( float, y );
@@ -35,26 +25,28 @@ namespace Sentinel { namespace Math
 
 		////////////////////////////////
 
-		bool		operator == ( const WVector3f^ v );
-		bool		operator != ( const WVector3f^ v );
-		bool		Equals( const WVector3f^ v );
-		
-		WVector3f^	operator += ( const WVector3f^ v );
-		static WVector3f^ operator + ( WVector3f^ v0, WVector3f^ v1 );
-		WVector3f^	Add( const WVector3f^ v );
+		DECLARE_OP_DEREF( Vector3f );
 
-		WVector3f^	operator -= ( const WVector3f^ v );
+		bool		operator == ( WVector3f^ v );
+		bool		operator != ( WVector3f^ v );
+		bool		Equals( WVector3f^ v );
+		
+		WVector3f^	operator += ( WVector3f^ v );
+		static WVector3f^ operator + ( WVector3f^ v0, WVector3f^ v1 );
+		WVector3f^	Add( WVector3f^ v );
+
+		WVector3f^	operator -= ( WVector3f^ v );
 		static WVector3f^ operator - ( WVector3f^ v0, WVector3f^ v1 );
-		WVector3f^	Sub( const WVector3f^ v );
+		WVector3f^	Sub( WVector3f^ v );
 
 		WVector3f^	operator *= ( float scalar );
 		static WVector3f^ operator * ( WVector3f^ v, float scalar );
 		static WVector3f^ operator * ( float scalar, WVector3f^ v );
 		WVector3f^	Mul( float scalar );
 
-		WVector3f^	operator *= ( const WVector3f^ v );
+		WVector3f^	operator *= ( WVector3f^ v );
 		static WVector3f^ operator * ( WVector3f^ v0, WVector3f^ v1 );
-		WVector3f^	Mul( const WVector3f^ v );
+		WVector3f^	Mul( WVector3f^ v );
 
 		float		Length();
 		float		LengthSquared();
@@ -62,24 +54,11 @@ namespace Sentinel { namespace Math
 
 		WVector3f^	Normalize();
 
-		float		Dot( const WVector3f^ v );
-		WVector3f^	Cross( const WVector3f^ v );
+		float		Dot( WVector3f^ v );
+		WVector3f^	Cross( WVector3f^ v );
 
-		float		Angle( const WVector3f^ v );
+		float		Angle( WVector3f^ v );
 	};
 
-	public ref class RVector3f sealed : public WVector3f
-	{
-	public:
-
-		RVector3f( Vector3f* v );
-		RVector3f( WVector3f^ v );
-
-		void		Set( const Vector3f& v );
-		void		Set( WVector3f^ v );
-		
-	protected:
-
-		virtual void Delete() override;
-	};
+	DECLARE_CLASS_REF( Vector3f );
 }}

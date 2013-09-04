@@ -5,6 +5,13 @@
 
 namespace Sentinel
 {
+	Ray::Ray( const Vector3f& pos, const Vector3f& dir ) :
+		mPosition( pos ),
+		mDirection( dir )
+	{}
+
+	/////////////////////////////////////////////////////////////////////////////////////
+
 	Plane::Plane( const Vector3f& pos, const Vector3f& normal ) :
 		mPosition( pos ),
 		mNormal( normal )
@@ -37,7 +44,7 @@ namespace Sentinel
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
-
+	
 	BoundingSphere::BoundingSphere( const Vector3f& center, float radius ) :
 		mCenter( center ),
 		mRadius( radius )
@@ -142,12 +149,17 @@ namespace Sentinel
 		mCenter = v0 + u0;
 	}
 
-	bool CheckPointInSphere( const Vector3f& point, const BoundingSphere& sphere )
+	bool BoundingSphere::Intersects( const Vector3f& point )
 	{
-		float d  = (point - sphere.mCenter).LengthSquared();
-		float r2 = sphere.mRadius * sphere.mRadius;
+		return (point - mCenter).LengthSquared() < (mRadius * mRadius);
+	}
 
-		return (d < r2) ? true : false;
+	bool BoundingSphere::Intersects( const BoundingSphere& sphere )
+	{
+		float d = (mCenter - sphere.mCenter).LengthSquared();
+		float r = (mRadius + sphere.mRadius);
+
+		return (d < r*r);
 	}
 
 	// Find the smallest sphere.
@@ -155,7 +167,7 @@ namespace Sentinel
 	// Nicolas Capens @ www.flipcode.com/archives/Smallest_Enclosing_Spheres.html
 	// Guest @ pastebin.com/04b1GBA2
 	//
-	BoundingSphere FindSmallestSphere( Buffer*& vbo )
+	BoundingSphere FindSmallestSphere( Buffer* vbo )
 	{
 		unsigned char* verts = (unsigned char*)vbo->Lock();
 
@@ -179,7 +191,7 @@ namespace Sentinel
 
 			if( !isContained )
 			{
-				if( !CheckPointInSphere( pos, sphere ))
+				if( !sphere.Intersects( pos ))
 				{
 					BoundingSphere minSphere;
 					float minRadius = FLT_MAX;
@@ -196,14 +208,14 @@ namespace Sentinel
 							newSphere[ 0 ] = BoundingSphere( pos, points[ 0 ] );
 							newSphere[ 1 ] = BoundingSphere( pos, points[ 1 ] );
 
-							if( CheckPointInSphere( points[ 1 ], newSphere[ 0 ] ))
+							if( newSphere[ 0 ].Intersects( points[ 1 ] ))
 							{
 								minRadius = newSphere[ 0 ].mRadius;
 								index = 0;
 							}
 							else
 							if( newSphere[ 1 ].mRadius < minRadius &&
-								CheckPointInSphere( points[ 0 ], newSphere[ 1 ] ))
+								newSphere[ 1 ].Intersects( points[ 0 ] ))
 							{
 								minRadius = newSphere[ 1 ].mRadius;
 								index = 1;
@@ -230,45 +242,45 @@ namespace Sentinel
 							newSphere[ 4 ] = BoundingSphere( pos, points[ 0 ], points[ 2 ] );
 							newSphere[ 5 ] = BoundingSphere( pos, points[ 1 ], points[ 2 ] );
 
-							if( CheckPointInSphere( points[ 1 ], newSphere[ 0 ] ) &&
-								CheckPointInSphere( points[ 2 ], newSphere[ 0 ] ))
+							if( newSphere[ 0 ].Intersects( points[ 1 ] ) &&
+								newSphere[ 0 ].Intersects( points[ 2 ] ))
 							{
 								index = 0;
 								minRadius = newSphere[ 0 ].mRadius;
 							}
 
 							if( newSphere[ 1 ].mRadius < minRadius &&
-								CheckPointInSphere( points[ 0 ], newSphere[ 1 ] ) &&
-								CheckPointInSphere( points[ 2 ], newSphere[ 1 ] ))
+								newSphere[ 1 ].Intersects( points[ 0 ] ) &&
+								newSphere[ 1 ].Intersects( points[ 2 ] ))
 							{
 								index = 1;
 								minRadius = newSphere[ 1 ].mRadius;
 							}
 
 							if( newSphere[ 2 ].mRadius < minRadius &&
-								CheckPointInSphere( points[ 0 ], newSphere[ 2 ] ) &&
-								CheckPointInSphere( points[ 1 ], newSphere[ 2 ] ))
+								newSphere[ 2 ].Intersects( points[ 0 ] ) &&
+								newSphere[ 2 ].Intersects( points[ 1 ] ))
 							{
 								index = 2;
 								minRadius = newSphere[ 2 ].mRadius;
 							}
 
 							if( newSphere[ 3 ].mRadius < minRadius &&
-								CheckPointInSphere( points[ 2 ], newSphere[ 3 ] ))
+								newSphere[ 3 ].Intersects( points[ 2 ] ))
 							{
 								index = 3;
 								minRadius = newSphere[ 3 ].mRadius;
 							}
 
 							if( newSphere[ 4 ].mRadius < minRadius &&
-								CheckPointInSphere( points[ 1 ], newSphere[ 4 ] ))
+								newSphere[ 4 ].Intersects( points[ 1 ] ))
 							{
 								index = 4;
 								minRadius = newSphere[ 4 ].mRadius;
 							}
 
 							if( newSphere[ 5 ].mRadius < minRadius &&
-								CheckPointInSphere( points[ 0 ], newSphere[ 5 ] ))
+								newSphere[ 5 ].Intersects( points[ 0 ] ))
 							{
 								index = 5;
 								minRadius = newSphere[ 5 ].mRadius;
@@ -337,36 +349,36 @@ namespace Sentinel
 
 							// Check 2 point spheres.
 							//
-							if( CheckPointInSphere( points[ 1 ], newSphere[ 0 ] ) &&
-								CheckPointInSphere( points[ 2 ], newSphere[ 0 ] ) &&
-								CheckPointInSphere( points[ 3 ], newSphere[ 0 ] ))
+							if( newSphere[ 0 ].Intersects( points[ 1 ] ) &&
+								newSphere[ 0 ].Intersects( points[ 2 ] ) &&
+								newSphere[ 0 ].Intersects( points[ 3 ] ))
 							{
 								index = 0;
 								minRadius = newSphere[ 0 ].mRadius;
 							}
 
 							if( newSphere[ 1 ].mRadius < minRadius &&
-								CheckPointInSphere( points[ 0 ], newSphere[ 1 ] ) &&
-								CheckPointInSphere( points[ 2 ], newSphere[ 1 ] ) &&
-								CheckPointInSphere( points[ 3 ], newSphere[ 1 ] ))
+								newSphere[ 1 ].Intersects( points[ 0 ] ) &&
+								newSphere[ 1 ].Intersects( points[ 2 ] ) &&
+								newSphere[ 1 ].Intersects( points[ 3 ] ))
 							{
 								index = 1;
 								minRadius = newSphere[ 1 ].mRadius;
 							}
 
 							if( newSphere[ 2 ].mRadius < minRadius &&
-								CheckPointInSphere( points[ 0 ], newSphere[ 2 ] ) &&
-								CheckPointInSphere( points[ 1 ], newSphere[ 2 ] ) &&
-								CheckPointInSphere( points[ 3 ], newSphere[ 2 ] ))
+								newSphere[ 2 ].Intersects( points[ 0 ] ) &&
+								newSphere[ 2 ].Intersects( points[ 1 ] ) &&
+								newSphere[ 2 ].Intersects( points[ 3 ] ))
 							{
 								index = 2;
 								minRadius = newSphere[ 2 ].mRadius;
 							}
 
 							if( newSphere[ 3 ].mRadius < minRadius &&
-								CheckPointInSphere( points[ 0 ], newSphere[ 3 ] ) &&
-								CheckPointInSphere( points[ 1 ], newSphere[ 3 ] ) &&
-								CheckPointInSphere( points[ 2 ], newSphere[ 3 ] ))
+								newSphere[ 3 ].Intersects( points[ 0 ] ) &&
+								newSphere[ 3 ].Intersects( points[ 1 ] ) &&
+								newSphere[ 3 ].Intersects( points[ 2 ] ))
 							{
 								index = 3;
 								minRadius = newSphere[ 3 ].mRadius;
@@ -375,48 +387,48 @@ namespace Sentinel
 							// Check 3 point spheres.
 							//
 							if( newSphere[ 4 ].mRadius < minRadius &&
-								CheckPointInSphere( points[ 2 ], newSphere[ 4 ] ) &&
-								CheckPointInSphere( points[ 3 ], newSphere[ 4 ] ))
+								newSphere[ 4 ].Intersects( points[ 2 ] ) &&
+								newSphere[ 4 ].Intersects( points[ 3 ] ))
 							{
 								index = 4;
 								minRadius = newSphere[ 4 ].mRadius;
 							}
 
 							if( newSphere[ 5 ].mRadius < minRadius &&
-								CheckPointInSphere( points[ 1 ], newSphere[ 5 ] ) &&
-								CheckPointInSphere( points[ 3 ], newSphere[ 5 ] ))
+								newSphere[ 5 ].Intersects( points[ 1 ] ) &&
+								newSphere[ 5 ].Intersects( points[ 3 ] ))
 							{
 								index = 5;
 								minRadius = newSphere[ 5 ].mRadius;
 							}
 
 							if( newSphere[ 6 ].mRadius < minRadius &&
-								CheckPointInSphere( points[ 1 ], newSphere[ 6 ] ) &&
-								CheckPointInSphere( points[ 2 ], newSphere[ 6 ] ))
+								newSphere[ 6 ].Intersects( points[ 1 ] ) &&
+								newSphere[ 6 ].Intersects( points[ 2 ] ))
 							{
 								index = 6;
 								minRadius = newSphere[ 6 ].mRadius;
 							}
 
 							if( newSphere[ 7 ].mRadius < minRadius &&
-								CheckPointInSphere( points[ 0 ], newSphere[ 7 ] ) &&
-								CheckPointInSphere( points[ 3 ], newSphere[ 7 ] ))
+								newSphere[ 7 ].Intersects( points[ 0 ] ) &&
+								newSphere[ 7 ].Intersects( points[ 3 ] ))
 							{
 								index = 7;
 								minRadius = newSphere[ 7 ].mRadius;
 							}
 
 							if( newSphere[ 8 ].mRadius < minRadius &&
-								CheckPointInSphere( points[ 0 ], newSphere[ 8 ] ) &&
-								CheckPointInSphere( points[ 2 ], newSphere[ 8 ] ))
+								newSphere[ 8 ].Intersects( points[ 0 ] ) &&
+								newSphere[ 8 ].Intersects( points[ 2 ] ))
 							{
 								index = 8;
 								minRadius = newSphere[ 8 ].mRadius;
 							}
 
 							if( newSphere[ 9 ].mRadius < minRadius &&
-								CheckPointInSphere( points[ 0 ], newSphere[ 9 ] ) &&
-								CheckPointInSphere( points[ 1 ], newSphere[ 9 ] ))
+								newSphere[ 9 ].Intersects( points[ 0 ] ) &&
+								newSphere[ 9 ].Intersects( points[ 1 ] ))
 							{
 								index = 9;
 								minRadius = newSphere[ 9 ].mRadius;
@@ -425,28 +437,28 @@ namespace Sentinel
 							// Check 4 point spheres.
 							//
 							if( newSphere[ 10 ].mRadius < minRadius &&
-								CheckPointInSphere( points[ 3 ], newSphere[ 10 ] ))
+								newSphere[ 10 ].Intersects( points[ 3 ] ))
 							{
 								index = 10;
 								minRadius = newSphere[ 10 ].mRadius;
 							}
 
 							if( newSphere[ 11 ].mRadius < minRadius &&
-								CheckPointInSphere( points[ 2 ], newSphere[ 11 ] ))
+								newSphere[ 11 ].Intersects( points[ 2 ] ))
 							{
 								index = 11;
 								minRadius = newSphere[ 11 ].mRadius;
 							}
 
 							if( newSphere[ 12 ].mRadius < minRadius &&
-								CheckPointInSphere( points[ 0 ], newSphere[ 12 ] ))
+								newSphere[ 12 ].Intersects( points[ 0 ] ))
 							{
 								index = 12;
 								minRadius = newSphere[ 12 ].mRadius;
 							}
 
 							if( newSphere[ 13 ].mRadius < minRadius &&
-								CheckPointInSphere( points[ 1 ], newSphere[ 13 ] ))
+								newSphere[ 13 ].Intersects( points[ 1 ] ))
 							{
 								index = 13;
 								minRadius = newSphere[ 13 ].mRadius;
@@ -546,5 +558,84 @@ namespace Sentinel
 		vbo->Unlock();
 
 		return sphere;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	BoundingBox::BoundingBox( const Vector3f& minBounds, const Vector3f& maxBounds )
+	{
+		Set( minBounds, maxBounds );
+	}
+
+	void BoundingBox::Set( const Vector3f& minBounds, const Vector3f& maxBounds )
+	{
+		// min
+		mPlane[ 0 ].mPosition = minBounds;
+		mPlane[ 0 ].mNormal   = Vector3f( 1, 0, 0 );
+
+		mPlane[ 1 ].mPosition = minBounds;
+		mPlane[ 1 ].mNormal   = Vector3f( 0, 1, 0 );
+
+		mPlane[ 2 ].mPosition = minBounds;
+		mPlane[ 2 ].mNormal   = Vector3f( 0, 0, 1 );
+
+		// max
+		mPlane[ 3 ].mPosition = maxBounds;
+		mPlane[ 3 ].mNormal   = Vector3f( -1, 0, 0 );
+
+		mPlane[ 4 ].mPosition = maxBounds;
+		mPlane[ 4 ].mNormal   = Vector3f( 0, -1, 0 );
+
+		mPlane[ 5 ].mPosition = maxBounds;
+		mPlane[ 5 ].mNormal   = Vector3f( 0, 0, -1 );
+	}
+
+	const Vector3f& BoundingBox::GetMinBounds()
+	{
+		return mPlane[ 0 ].mPosition;
+	}
+
+	const Vector3f& BoundingBox::GetMaxBounds()
+	{
+		return mPlane[ 3 ].mPosition;
+	}
+
+	bool BoundingBox::Intersects( const Vector3f& point )
+	{
+		for( UINT x = 0; x < 3; ++x )
+			if( point[ x ] < GetMinBounds()[ x ] || point[ x ] > GetMaxBounds()[ x ] )
+				return false;
+
+		return true;
+	}
+
+	// Check for a Ray being within a Box.
+	//
+	// Based on Dan Sunday's algorithm.
+	// softsurfer.com/Archive/algorithm_0105/algorithm_0105.htm
+	//
+	bool BoundingBox::Intersects( const Ray& ray )
+	{
+		for( int axis = 0; axis < 6; ++axis )
+		{
+			Vector3f w0 = ray.mPosition - mPlane[ axis ].mPosition;
+			float a = -mPlane[ axis ].mNormal.Dot( w0 );
+			float b = mPlane[ axis ].mNormal.Dot( ray.mDirection );
+
+			//if (fabs(b) < 0.001f)	// ray is parallel to the plane
+			//	return false;
+
+			float r = a / b;
+			//if (r < 0.0f)			// ray goes away from plane
+			//	return false;
+
+			// add a little to ensure the point has a chance to be within the box
+			Vector3f point = ray.mPosition + ray.mDirection * r + mPlane[ axis ].mNormal * 0.001f;
+
+			if( Intersects( point ))
+				return true;
+		}
+
+		return false;
 	}
 }

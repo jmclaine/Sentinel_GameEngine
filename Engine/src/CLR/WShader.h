@@ -4,6 +4,7 @@ Shaders are created from WRenderer.CreateShader()
 
 Delete() does nothing in RShader.
 */
+#include "Property.h"
 #include "m_shared_ptr.h"
 #include "Shader.h"
 #include "WTexture.h"
@@ -14,29 +15,19 @@ namespace Sentinel { namespace Assets
 {
 	public ref class WShader
 	{
+		DECLARE_REF( Shader );
+
 	protected:
-
-		Shader*			mRef;
-
-		////////////////////////////////
 
 		WShader();
 
 	public:
 
 		WShader( Shader* shader );
-		~WShader();
-		!WShader();
-
-	protected:
-
-		virtual void	Delete();
-
-	public:
-
-		Shader*			GetRef();
 
 		////////////////////////////////
+
+		DECLARE_OP_PTR( Shader );
 
 		String^			AttributeDecl();
 		String^			UniformDecl();
@@ -56,21 +47,5 @@ namespace Sentinel { namespace Assets
 		void			SetTexture( UINT uniform, WTexture^ texture );
 	};
 
-	public ref class RShader : public WShader
-	{
-	private:
-
-		Shader*&		mRefPtr;
-
-	public:
-
-		RShader( Shader*& shader );
-		
-		void			Set( Shader*& shader );
-		void			Set( WShader^ shader );
-
-	protected:
-
-		virtual void	Delete() override;
-	};
+	DECLARE_CLASS_REF_PTR( Shader );
 }}

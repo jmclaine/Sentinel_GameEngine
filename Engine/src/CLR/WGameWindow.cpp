@@ -268,5 +268,7 @@ namespace Sentinel { namespace Systems
 		}
 
 		UnregisterClass( (LPCSTR)mWindowClass, mINST );
+
+		delete mWindowInfo;
 	}
 }}

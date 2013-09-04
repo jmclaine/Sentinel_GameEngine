@@ -3,6 +3,7 @@
 #include "Util.h"
 #include "Timing.h"
 #include "GameObject.h"
+#include "GameWorld.h"
 
 namespace Sentinel
 {
@@ -56,8 +57,6 @@ namespace Sentinel
 #define DETACH_COMPONENT( obj )\
 	if( component == obj )\
 	{\
-		obj->Shutdown();\
-		delete obj;\
 		obj = NULL;\
 	}\
 	return component;
@@ -85,8 +84,6 @@ namespace Sentinel
 				{
 					if( component == mComponent[ x ] )
 					{
-						mComponent[ x ]->Shutdown();
-						delete mComponent[ x ];
 						mComponent.erase( mComponent.begin() + x );
 						return component;
 					}
@@ -107,17 +104,28 @@ namespace Sentinel
 	{
 		mChild.push_back( obj );
 		obj->mParent = this;
+
+		GameWorld::Inst()->RemoveGameObject( obj );
 	}
 
-	void GameObject::RemoveChild( int index )
+	void GameObject::RemoveChild( UINT index )
 	{
+		_ASSERT( index < NumChildren() );
+
 		mChild[ index ]->mParent = NULL;
 		mChild.erase( mChild.begin() + index );
 	}
 
-	GameObject* GameObject::GetChild( int index )
+	GameObject* GameObject::GetChild( UINT index )
 	{
+		_ASSERT( index < NumChildren() );
+
 		return mChild[ index ];
+	}
+
+	UINT GameObject::NumChildren()
+	{
+		return mChild.size();
 	}
 
 	//////////////////////////////

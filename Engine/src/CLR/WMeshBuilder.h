@@ -19,18 +19,12 @@ namespace Sentinel { namespace Assets
 {
 	public ref class WMeshBuilder
 	{
-	private:
-
-		MeshBuilder*	mRef;
-
+		DECLARE_REF( MeshBuilder );
+	
 	public:
 
 		WMeshBuilder();
-		~WMeshBuilder();
-		!WMeshBuilder();
-
-		MeshBuilder*	GetRef();
-
+		
 		//////////////////////////////////
 
 		DECLARE_PROPERTY( WShader^,		Shader );
@@ -40,6 +34,8 @@ namespace Sentinel { namespace Assets
 		RTexture^		Texture( TextureType type );
 
 		//////////////////////////////////
+
+		DECLARE_OP_DEREF( MeshBuilder );
 
 		void			ClearAll();
 		void			ClearGeometry();
@@ -71,4 +67,6 @@ namespace Sentinel { namespace Assets
 		//
 		WMesh^			BuildMesh();
 	};
+
+	DECLARE_CLASS_REF( MeshBuilder );
 }}

@@ -159,7 +159,10 @@ namespace Sentinel
 	{
 		TRAVERSE_LIST( it, mGameObject )
 			if( (*it) == entity )
+			{
 				mGameObject.erase( it );
+				return entity;
+			}
 		
 		return entity;
 	}

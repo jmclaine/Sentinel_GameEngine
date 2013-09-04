@@ -8,10 +8,8 @@ WGameWindow should be inherited to use input.
 
 public class GameWindow : WGameWindow
 {}
-
 */
 #include "WRenderer.h"
-#include "GameWindow.h"
 
 namespace Sentinel { namespace Systems
 {

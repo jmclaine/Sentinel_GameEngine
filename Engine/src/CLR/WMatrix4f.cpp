@@ -2,6 +2,8 @@
 
 namespace Sentinel { namespace Math
 {
+	DEFINE_REF( Matrix4f );
+
 	WMatrix4f::WMatrix4f()
 	{
 		mRef = new Matrix4f();
@@ -19,27 +21,7 @@ namespace Sentinel { namespace Math
 
 	WMatrix4f::WMatrix4f( WQuatf^ q )
 	{
-		mRef = new Matrix4f( *q->GetRef() );
-	}
-
-	WMatrix4f::~WMatrix4f()
-	{
-		Delete();
-	}
-
-	WMatrix4f::!WMatrix4f()
-	{
-		Delete();
-	}
-
-	void WMatrix4f::Delete()
-	{
-		delete mRef;
-	}
-
-	Matrix4f* WMatrix4f::GetRef()
-	{
-		return mRef;
+		mRef = new Matrix4f( q );
 	}
 
 	////////////////////////////////
@@ -56,14 +38,16 @@ namespace Sentinel { namespace Math
 
 	////////////////////////////////
 
+	DEFINE_OP_DEREF( Matrix4f );
+
 	WMatrix4f^ WMatrix4f::operator + ( WMatrix4f^ mat0, WMatrix4f^ mat1 )
 	{
 		return mat0->Add( mat1 );
 	}
 
-	WMatrix4f^ WMatrix4f::Add( const WMatrix4f^ mat )
+	WMatrix4f^ WMatrix4f::Add( WMatrix4f^ mat )
 	{
-		return gcnew WMatrix4f( mRef->Add( *mat->mRef ));
+		return gcnew WMatrix4f( mRef->Add( mat ));
 	}
 
 	WMatrix4f^ WMatrix4f::operator * ( WMatrix4f^ mat0, WMatrix4f^ mat1 )
@@ -71,9 +55,9 @@ namespace Sentinel { namespace Math
 		return mat0->Mul( mat1 );
 	}
 
-	WMatrix4f^ WMatrix4f::Mul( const WMatrix4f^ mat )
+	WMatrix4f^ WMatrix4f::Mul( WMatrix4f^ mat )
 	{
-		return gcnew WMatrix4f( mRef->Mul( *mat->mRef ));
+		return gcnew WMatrix4f( mRef->Mul( mat ));
 	}
 
 	void WMatrix4f::Zero()
@@ -88,17 +72,17 @@ namespace Sentinel { namespace Math
 
 	void WMatrix4f::Translate( WVector3f^ v )
 	{
-		mRef->Translate( *v->GetRef() );
+		mRef->Translate( v );
 	}
 
 	void WMatrix4f::Rotate( WQuatf^ q )
 	{
-		mRef->Rotate( *q->GetRef() );
+		mRef->Rotate( q );
 	}
 
 	void WMatrix4f::Rotate( WVector3f^ v )
 	{
-		mRef->Rotate( *v->GetRef() );
+		mRef->Rotate( v );
 	}
 
 	void WMatrix4f::RotateX( float degrees )
@@ -123,22 +107,22 @@ namespace Sentinel { namespace Math
 
 	void WMatrix4f::Scale( WVector3f^ _scale )
 	{
-		mRef->Scale( *_scale->GetRef() );
+		mRef->Scale( _scale );
 	}
 		
 	void WMatrix4f::LookAtView( WVector3f^ pos, WVector3f^ lookAt, WVector3f^ up )
 	{
-		mRef->LookAtView( *pos->GetRef(), *lookAt->GetRef(), *up->GetRef() );
+		mRef->LookAtView( pos, lookAt, up );
 	}
 
 	void WMatrix4f::BillboardAxis( WVector3f^ posBB, WVector3f^ posCamera, WVector3f^ up )
 	{
-		mRef->BillboardAxis( *posBB->GetRef(), *posCamera->GetRef(), *up->GetRef() );
+		mRef->BillboardAxis( posBB, posCamera, up );
 	}
 
 	void WMatrix4f::BillboardWorld( WVector3f^ posBB, WVector3f^ posCamera, WVector3f^ up )
 	{
-		mRef->BillboardWorld( *posBB->GetRef(), *posCamera->GetRef(), *up->GetRef() );
+		mRef->BillboardWorld( posBB, posCamera, up );
 	}
 		
 	float WMatrix4f::Det()
@@ -178,7 +162,7 @@ namespace Sentinel { namespace Math
 
 	WVector3f^ WMatrix4f::Transform( WVector3f^ v )
 	{
-		return gcnew WVector3f( mRef->Transform( *v->GetRef() ));
+		return gcnew WVector3f( mRef->Transform( v ));
 	}
 
 	WVector3f^ WMatrix4f::Forward()
@@ -198,26 +182,5 @@ namespace Sentinel { namespace Math
 
 	////////////////////////////////
 
-	RMatrix4f::RMatrix4f( Matrix4f* mat )
-	{
-		mRef = mat;
-	}
-
-	RMatrix4f::RMatrix4f( WMatrix4f^ mat )
-	{
-		mRef = mat->GetRef();
-	}
-
-	void RMatrix4f::Set( const Matrix4f& mat )
-	{
-		*mRef = mat;
-	}
-
-	void RMatrix4f::Set( WMatrix4f^ mat )
-	{
-		*mRef = *mat->GetRef();
-	}
-
-	void RMatrix4f::Delete()
-	{}
+	DEFINE_CLASS_REF( Matrix4f );
 }}

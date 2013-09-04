@@ -22,7 +22,7 @@ namespace Sentinel_Editor
 
 		private bool							mIsMoving;
 
-		private float							mMovementDirection;
+		private float							mMovementDirection;	// forward (+) or backward (-)
 		private float							mMovementSpeed;
 
 		private WVector3f						mRotation;

@@ -56,12 +56,12 @@ namespace Sentinel
 		mTexture[ type ] = texture;
 	}
 
-	Buffer*	Mesh::GetVBO()
+	Buffer*& Mesh::GetVBO()
 	{
 		return mVBO;
 	}
 
-	Buffer* Mesh::GetIBO()
+	Buffer*& Mesh::GetIBO()
 	{
 		return mIBO;
 	}

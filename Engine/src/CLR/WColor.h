@@ -7,10 +7,8 @@ namespace Sentinel { namespace Assets
 {
 	public ref class WColorRGBA
 	{
-	protected:
-
-		ColorRGBA*		mRef;
-
+		DECLARE_REF( ColorRGBA );
+	
 	public:
 
 		WColorRGBA();
@@ -18,16 +16,6 @@ namespace Sentinel { namespace Assets
 		WColorRGBA( ColorRGBA& color );
 		WColorRGBA( WColorRGBA^ color );
 		WColorRGBA( WColorRGBA% color );
-		~WColorRGBA();
-		!WColorRGBA();
-
-	protected:
-
-		virtual void Delete();
-
-	public:
-
-		ColorRGBA*	GetRef();
 
 		////////////////////////////////
 
@@ -38,23 +26,12 @@ namespace Sentinel { namespace Assets
 
 		////////////////////////////////
 
+		DECLARE_OP_DEREF( ColorRGBA );
+
 		float*		Ptr();
 
 		UINT		ToUINT();
 	};
 
-	public ref class RColorRGBA sealed : public WColorRGBA
-	{
-	public:
-
-		RColorRGBA( ColorRGBA* color );
-		RColorRGBA( WColorRGBA^ color );
-
-		void		Set( const ColorRGBA& color );
-		void		Set( WColorRGBA^ color );
-
-	protected:
-
-		virtual void Delete() override;
-	};
+	DECLARE_CLASS_REF( ColorRGBA );
 }}

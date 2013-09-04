@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Controls;
 using System.Windows;
+using System.Windows.Media;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 
@@ -17,8 +18,8 @@ namespace Sentinel_Editor
 		
 		public GameObject_TreeViewItem( WGameObject obj )
 		{
-			Header  = obj.Name;
-			mObject = obj;
+			Header		= obj.Name;
+			mObject		= obj;
 		}
 	}
 }

@@ -3,24 +3,11 @@
 
 namespace Sentinel { namespace Assets
 {
+	DEFINE_REF( MeshBuilder );
+
 	WMeshBuilder::WMeshBuilder()
 	{
 		mRef = new MeshBuilder();
-	}
-
-	WMeshBuilder::~WMeshBuilder()
-	{
-		delete mRef;
-	}
-
-	WMeshBuilder::!WMeshBuilder()
-	{
-		delete mRef;
-	}
-
-	MeshBuilder* WMeshBuilder::GetRef()
-	{
-		return mRef;
 	}
 
 	//////////////////////////////////
@@ -35,6 +22,8 @@ namespace Sentinel { namespace Assets
 	}
 	
 	//////////////////////////////////
+
+	DEFINE_OP_DEREF( MeshBuilder );
 
 	void WMeshBuilder::ClearAll()
 	{
@@ -116,4 +105,8 @@ namespace Sentinel { namespace Assets
 	{
 		return gcnew WMesh( mRef->BuildMesh() );
 	}
+
+	//////////////////////////////////
+
+	DEFINE_CLASS_REF( MeshBuilder );
 }}

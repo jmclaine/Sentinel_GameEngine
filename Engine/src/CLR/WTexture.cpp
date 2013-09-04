@@ -2,6 +2,8 @@
 
 namespace Sentinel { namespace Assets
 {
+	DEFINE_REF( Texture );
+
 	WTexture::WTexture()
 	{
 		mRef = NULL;
@@ -12,27 +14,9 @@ namespace Sentinel { namespace Assets
 		mRef = texture;
 	}
 
-	WTexture::~WTexture()
-	{
-		Delete();
-	}
-
-	WTexture::!WTexture()
-	{
-		Delete();
-	}
-
-	void WTexture::Delete()
-	{
-		delete mRef;
-	}
-
-	Texture* WTexture::GetRef()
-	{
-		return mRef;
-	}
-
 	////////////////////////////////
+
+	DEFINE_OP_PTR( Texture );
 
 	void WTexture::Release()
 	{
@@ -56,24 +40,5 @@ namespace Sentinel { namespace Assets
 
 	////////////////////////////////
 
-	RTexture::RTexture( Texture*& texture ) :
-		mRefPtr( texture )
-	{
-		Set( texture );
-	}
-
-	void RTexture::Set( Texture*& texture )
-	{
-		mRefPtr = texture;
-		mRef = mRefPtr;
-	}
-
-	void RTexture::Set( WTexture^ texture )
-	{
-		mRefPtr = texture->GetRef();
-		mRef = mRefPtr;
-	}
-
-	void RTexture::Delete()
-	{}
+	DEFINE_CLASS_REF_PTR( Texture );
 }}

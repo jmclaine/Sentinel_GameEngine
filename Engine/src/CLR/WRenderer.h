@@ -7,9 +7,6 @@ Removed Startup as it is only useful within WGameWindow
 during the BuildWindowCore function.
 
 Adjusted Load to return WWindowInfo instead.
-
-Left functionality as open as possible for custom
-creation of windows if required.
 */
 #using <System.dll>
 #using <WindowsBase.dll>
@@ -18,6 +15,7 @@ creation of windows if required.
 
 #include <Windows.h>
 
+#include "Property.h"
 #include "GameWindow.h"
 #include "WTexture.h"
 #include "WBuffer.h"
@@ -82,13 +80,11 @@ namespace Sentinel { namespace Systems
 		NUM_STENCIL_TYPES
 	};
 
-	LRESULT WINAPI RendererMsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
- 
+	////////////////////////////////////////////////////////////
+
 	public ref class WWindowInfo
 	{
-	private:
-
-		WindowInfo*		mRef;
+		DECLARE_REF( WindowInfo );
 
 	public:
 
@@ -96,9 +92,8 @@ namespace Sentinel { namespace Systems
 		WWindowInfo( const WindowInfo% info );
 		WWindowInfo( WindowInfo* info );
 		WWindowInfo( const WWindowInfo% info );
-		~WWindowInfo();
-
-		WindowInfo*		GetRef();
+		
+		//////////////////////////////
 
 		bool			Fullscreen();
 
@@ -108,6 +103,10 @@ namespace Sentinel { namespace Systems
 		float			WidthRatio();
 		float			HeightRatio();
 	};
+
+	DECLARE_CLASS_REF( WindowInfo );
+
+	////////////////////////////////////////////////////////////
 
 	public ref class WRenderer
 	{

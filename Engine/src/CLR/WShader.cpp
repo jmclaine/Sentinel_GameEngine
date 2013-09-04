@@ -2,6 +2,8 @@
 
 namespace Sentinel { namespace Assets
 {
+	DEFINE_REF( Shader );
+
 	WShader::WShader()
 	{
 		mRef = NULL;
@@ -12,27 +14,9 @@ namespace Sentinel { namespace Assets
 		mRef = shader;
 	}
 
-	WShader::~WShader()
-	{
-		Delete();
-	}
-
-	WShader::!WShader()
-	{
-		Delete();
-	}
-
-	void WShader::Delete()
-	{
-		delete mRef;
-	}
-
-	Shader* WShader::GetRef()
-	{
-		return mRef;
-	}
-
 	////////////////////////////////
+
+	DEFINE_OP_PTR( Shader );
 
 	System::String^	WShader::AttributeDecl()
 	{
@@ -96,24 +80,5 @@ namespace Sentinel { namespace Assets
 
 	////////////////////////////////
 
-	RShader::RShader( Shader*& shader ) :
-		mRefPtr( shader )
-	{
-		Set( shader );
-	}
-
-	void RShader::Set( Shader*& shader )
-	{
-		mRefPtr = shader;
-		mRef = mRefPtr;
-	}
-
-	void RShader::Set( WShader^ shader )
-	{
-		mRefPtr = shader->GetRef();
-		mRef = mRefPtr;
-	}
-
-	void RShader::Delete()
-	{}
+	DEFINE_CLASS_REF_PTR( Shader );
 }}

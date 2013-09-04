@@ -11,6 +11,11 @@ namespace Sentinel
 		mIconSmall	= iconSmall;
 		mMenu		= menu;
 		mCursor		= cursor;
+
+		memset( mTitle, 0, MAX_TITLE_LENGTH );
+		memset( mWindowClass, 0, MAX_CLASS_LENGTH );
+
+		mWindowInfo = NULL;
 	}
 
 	GameWindow::~GameWindow()
@@ -49,6 +54,9 @@ namespace Sentinel
 		Renderer::Inst()->Shutdown();
 
 		UnregisterClass( mWindowClass, mINST );
+
+		delete mWindowInfo;
+		mWindowInfo = NULL;
 	}
 
 	///////////////////////////

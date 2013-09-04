@@ -35,8 +35,48 @@ namespace Sentinel
 		SHADER_COLOR = shader;
 	}
 
-	Shader* Model::GetShaderColor()
+	Shader*& Model::GetShaderColor()
 	{
 		return SHADER_COLOR;
+	}
+
+	void Model::SetShaderTexture( Shader* shader )
+	{
+		SHADER_TEXTURE = shader;
+	}
+
+	Shader*& Model::GetShaderTexture()
+	{
+		return SHADER_TEXTURE;
+	}
+	
+	void Model::SetShaderNormalMap( Shader* shader )
+	{
+		SHADER_NORMAL_MAP = shader;
+	}
+
+	Shader*& Model::GetShaderNormalMap()
+	{
+		return SHADER_NORMAL_MAP;
+	}
+	
+	void Model::SetShaderParallax( Shader* shader )
+	{
+		SHADER_PARALLAX = shader;
+	}
+
+	Shader*& Model::GetShaderParallax()
+	{
+		return SHADER_PARALLAX;
+	}
+	
+	void Model::SetShaderSkinning( Shader* shader )
+	{
+		SHADER_SKINNING = shader;
+	}
+
+	Shader*& Model::GetShaderSkinning()
+	{
+		return SHADER_SKINNING;
 	}
 }

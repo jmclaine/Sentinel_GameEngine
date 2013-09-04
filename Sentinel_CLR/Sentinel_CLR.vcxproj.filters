@@ -138,6 +138,9 @@
     <ClInclude Include="..\Engine\src\CLR\WModelComponent.h">
       <Filter>Sentinel_Engine\Components\Drawables</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WShape.h">
+      <Filter>Sentinel_Engine\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sentinel_CLR.cpp">
@@ -229,6 +232,9 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\CLR\WModelComponent.cpp">
       <Filter>Sentinel_Engine\Components\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WShape.cpp">
+      <Filter>Sentinel_Engine\Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

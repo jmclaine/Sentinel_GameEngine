@@ -2,6 +2,8 @@
 
 namespace Sentinel { namespace Math
 {
+	DEFINE_REF( Quatf );
+
 	WQuatf::WQuatf()
 	{
 		mRef = new Quatf();
@@ -27,26 +29,6 @@ namespace Sentinel { namespace Math
 		mRef = new Quatf( *q.mRef );
 	}
 
-	WQuatf::~WQuatf()
-	{
-		Delete();
-	}
-
-	WQuatf::!WQuatf()
-	{
-		Delete();
-	}
-
-	void WQuatf::Delete()
-	{
-		delete mRef;
-	}
-
-	Quatf* WQuatf::GetRef()
-	{
-		return mRef;
-	}
-
 	////////////////////////////////
 
 	DEFINE_PROPERTY( Quatf, float, x );
@@ -56,14 +38,16 @@ namespace Sentinel { namespace Math
 
 	////////////////////////////////
 
+	DEFINE_OP_DEREF( Quatf );
+
 	WQuatf^ WQuatf::operator * ( WQuatf^ q0, WQuatf^ q1 )
 	{
 		return q0->Mul( q1 );
 	}
 
-	WQuatf^	WQuatf::Mul( const WQuatf^ q )
+	WQuatf^	WQuatf::Mul( WQuatf^ q )
 	{
-		return gcnew WQuatf( mRef->Mul( *q->mRef ));
+		return gcnew WQuatf( mRef->Mul( q ));
 	}
 
 	WQuatf^ WQuatf::Mul( float scalar )
@@ -122,26 +106,5 @@ namespace Sentinel { namespace Math
 
 	////////////////////////////////
 
-	RQuatf::RQuatf( Quatf* q )
-	{
-		mRef = q;
-	}
-	
-	RQuatf::RQuatf( WQuatf^ q )
-	{
-		mRef = q->GetRef();
-	}
-
-	void RQuatf::Set( const Quatf& q )
-	{
-		*mRef = q;
-	}
-
-	void RQuatf::Set( WQuatf^ q )
-	{
-		*mRef = *q->GetRef();
-	}
-
-	void RQuatf::Delete()
-	{}
+	DEFINE_CLASS_REF( Quatf );
 }}

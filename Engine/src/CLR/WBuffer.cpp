@@ -2,18 +2,19 @@
 
 namespace Sentinel { namespace Assets
 {
+	DEFINE_REF( Buffer );
+
+	WBuffer::WBuffer()
+	{
+		mRef = NULL;
+	}
+
 	WBuffer::WBuffer( Buffer* buffer )
 	{
 		mRef = buffer;
 	}
 
-	WBuffer::~WBuffer()
-	{}
-
-	Buffer* WBuffer::GetRef()
-	{
-		return mRef;
-	}
+	DEFINE_OP_PTR( Buffer );
 
 	////////////////////////////////
 
@@ -31,4 +32,8 @@ namespace Sentinel { namespace Assets
 	{
 		mRef->Release();
 	}
+
+	////////////////////////////////
+
+	DEFINE_CLASS_REF_PTR( Buffer );
 }}

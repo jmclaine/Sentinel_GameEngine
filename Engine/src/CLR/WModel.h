@@ -13,20 +13,9 @@ namespace Sentinel { namespace Assets
 {
 	public ref class WModel
 	{
-	private:
-
-		m_shared_ptr< Model > mRef;
+		DECLARE_REF_SHARED( Model );
 
 	public:
-
-		WModel( Model* model );
-		WModel( std::shared_ptr< Model > model );
-		~WModel();
-		!WModel();
-
-		m_shared_ptr< Model > GetRef();
-
-		////////////////////////////////
 
 		DECLARE_PROPERTY( WMatrix4f^, MatrixWorld );
 

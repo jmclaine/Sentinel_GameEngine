@@ -83,8 +83,27 @@ namespace Sentinel
 		
 		static Model*	Load( const char* filename );
 
+		/////////////////////////////////////
+
+		// The public static variables do not get set
+		// correctly in the CLR without these functions:
+		//
 		static void		SetShaderColor( Shader* shader );
-		static Shader*	GetShaderColor();
+		static Shader*&	GetShaderColor();
+
+		static void		SetShaderTexture( Shader* shader );
+		static Shader*&	GetShaderTexture();
+
+		static void		SetShaderNormalMap( Shader* shader );
+		static Shader*&	GetShaderNormalMap();
+
+		static void		SetShaderParallax( Shader* shader );
+		static Shader*&	GetShaderParallax();
+
+		static void		SetShaderSkinning( Shader* shader );
+		static Shader*&	GetShaderSkinning();
+
+		/////////////////////////////////////
 
 		virtual bool	Create( const char* filename ) = 0;
 		virtual void	Release() = 0;
