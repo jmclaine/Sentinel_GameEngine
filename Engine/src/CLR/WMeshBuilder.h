@@ -1,8 +1,6 @@
 #pragma once
 /*
-Removed creation of custom objects due to memory
-consumption of multiple copies of the Vertex
-and Index buffers.
+Contains all the functionality of the C++ version.
 */
 #include "MeshBuilder.h"
 #include "Property.h"
@@ -10,22 +8,59 @@ and Index buffers.
 #include "WMesh.h"
 #include "WMaterial.h"
 #include "WMatrix4f.h"
-#include "WVector3f.h"
 #include "WVector4f.h"
+#include "WVector3f.h"
+#include "WVector2f.h"
+#include "RStdVector.h"
 
 using namespace Sentinel::Math;
+using namespace Sentinel::Utilities;
 
 namespace Sentinel { namespace Assets
 {
+	ref class RStdVector_Vertex;
+	ref class RStdVector_Index;
+
 	public ref class WMeshBuilder
 	{
 		DECLARE_REF( MeshBuilder );
 	
 	public:
 
+		ref class WVertex
+		{
+			DECLARE_REF_EX( WVertex, MeshBuilder::Vertex );
+
+		public:
+
+			WVertex();
+			WVertex( WVector3f^ pos );
+			WVertex( WVector3f^ pos, WColorRGBA^ color );
+
+			DECLARE_OP_DEREF( MeshBuilder::Vertex );
+
+			DECLARE_PROPERTY( WVector3f^,	Position );
+
+			WVector2f^		TextureCoords( TextureType type );
+
+			DECLARE_PROPERTY( WVector3f^,	Normal );
+			DECLARE_PROPERTY( int,			Color );
+			DECLARE_PROPERTY( WVector4f^,	Tangent );
+
+			float%			Weight( int index );
+			int%			MatrixIndex( int index );
+
+			DECLARE_PROPERTY( WMatrix4f^,	MatrixVertex );
+		};
+
+		DECLARE_CLASS_REF_BASE( MeshBuilder, Vertex );
+
 		WMeshBuilder();
 		
 		//////////////////////////////////
+
+		RStdVector_Vertex^		Vertex;
+		RStdVector_Index^		Index;
 
 		DECLARE_PROPERTY( WShader^,		Shader );
 		DECLARE_PROPERTY( Sentinel::Systems::PrimitiveType, Primitive );
@@ -39,6 +74,14 @@ namespace Sentinel { namespace Assets
 
 		void			ClearAll();
 		void			ClearGeometry();
+
+		// Index helper functions.
+		//
+		void			AddIndex( int i0 );										// Point
+		void			AddIndex( int i0, int i1 );								// Line
+		void			AddIndex( int i0, int i1, int i2 );						// Triangle
+		void			AddIndex( int i0, int i1, int i2, int i3 );				// Quad
+		void			AddIndex( int i0, int i1, int i2, int i3, int i4 );		// Polygon
 
 		// Call this function only after all vertices have been added.
 		// Used for normal mapping.
@@ -69,4 +112,7 @@ namespace Sentinel { namespace Assets
 	};
 
 	DECLARE_CLASS_REF( MeshBuilder );
+
+	RStdVector_Class( Vertex, MeshBuilder::Vertex, WMeshBuilder::WVertex, WMeshBuilder::RVertex );
+	RStdVector_Native( Index, UINT, int );
 }}

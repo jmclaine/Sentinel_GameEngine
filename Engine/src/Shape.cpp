@@ -590,12 +590,12 @@ namespace Sentinel
 		mPlane[ 5 ].mNormal   = Vector3f( 0, 0, -1 );
 	}
 
-	const Vector3f& BoundingBox::GetMinBounds()
+	const Vector3f& BoundingBox::GetMinBounds() const
 	{
 		return mPlane[ 0 ].mPosition;
 	}
 
-	const Vector3f& BoundingBox::GetMaxBounds()
+	const Vector3f& BoundingBox::GetMaxBounds() const
 	{
 		return mPlane[ 3 ].mPosition;
 	}
@@ -637,5 +637,33 @@ namespace Sentinel
 		}
 
 		return false;
+	}
+
+	BoundingBox FindSmallestBox( Buffer* vbo )
+	{
+		unsigned char* verts = (unsigned char*)vbo->Lock();
+
+		Vector3f minBounds( FLT_MAX, FLT_MAX, FLT_MAX );
+		Vector3f maxBounds( FLT_MIN, FLT_MIN, FLT_MIN );
+		
+		for( UINT x = 0; x < vbo->Count(); ++x )
+		{
+			Vector3f pos = *(Vector3f*)(verts);
+
+			for( int y = 0; y < 3; ++y )
+			{
+				if( pos[ y ] < minBounds[ y ] )
+					minBounds[ y ] = pos[ y ];
+
+				if( pos[ y ] > maxBounds[ y ] )
+					maxBounds[ y ] = pos[ y ];
+			}
+
+			verts += vbo->Stride();
+		}
+
+		vbo->Unlock();
+
+		return BoundingBox( minBounds, maxBounds );
 	}
 }

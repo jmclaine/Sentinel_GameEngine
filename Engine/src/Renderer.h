@@ -1,5 +1,4 @@
 #pragma once
-
 /*
 HOW TO USE:
 

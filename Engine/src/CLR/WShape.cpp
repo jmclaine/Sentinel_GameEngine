@@ -145,6 +145,11 @@ namespace Sentinel { namespace Math
 		mRef = new BoundingBox( minBounds, maxBounds );
 	}
 
+	WBoundingBox::WBoundingBox( const BoundingBox& box )
+	{
+		mRef = new BoundingBox( box.GetMinBounds(), box.GetMaxBounds() );
+	}
+
 	DEFINE_OP_DEREF( BoundingBox );
 
 	void WBoundingBox::Set( WVector3f^ minBounds, WVector3f^ maxBounds )
@@ -173,4 +178,9 @@ namespace Sentinel { namespace Math
 	}
 
 	DEFINE_CLASS_REF( BoundingBox );
+
+	WBoundingBox^ FindSmallestBox( WBuffer^ vbo )
+	{
+		return gcnew WBoundingBox( Sentinel::FindSmallestBox( vbo ));
+	}
 }}

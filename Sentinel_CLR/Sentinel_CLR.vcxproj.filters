@@ -132,14 +132,14 @@
     <ClInclude Include="..\Engine\src\CLR\m_shared_ptr.h">
       <Filter>Sentinel_Engine\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\RStdVector.h">
-      <Filter>Sentinel_Engine\Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\CLR\WModelComponent.h">
       <Filter>Sentinel_Engine\Components\Drawables</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\CLR\WShape.h">
       <Filter>Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\RStdVector.h">
+      <Filter>Sentinel_Engine\Utilities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

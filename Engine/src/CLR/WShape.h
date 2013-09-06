@@ -103,7 +103,7 @@ namespace Sentinel { namespace Math
 		/////////////////////////////////
 
 		DECLARE_PROPERTY( WVector3f^, Center );
-		DECLARE_PROPERTY( float, Radius );
+		DECLARE_PROPERTY( float,	  Radius );
 
 		/////////////////////////////////
 
@@ -130,6 +130,7 @@ namespace Sentinel { namespace Math
 	public:
 
 		WBoundingBox( WVector3f^ minBounds, WVector3f^ maxBounds );
+		WBoundingBox( const BoundingBox& box );
 
 		/////////////////////////////////
 
@@ -147,4 +148,6 @@ namespace Sentinel { namespace Math
 	};
 
 	DECLARE_CLASS_REF( BoundingBox );
+
+	WBoundingBox^		FindSmallestBox( WBuffer^ vbo );
 }}

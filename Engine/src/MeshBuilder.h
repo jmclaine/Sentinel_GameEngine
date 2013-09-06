@@ -25,7 +25,7 @@ namespace Sentinel
 		struct Vertex
 		{
 			Vector3f	mPosition;
-			Vector2f	mTextureCoords[ 2 ];
+			Vector2f	mTextureCoords[ NUM_TEXTURES ];
 			Vector3f	mNormal;
 			UINT		mColor;
 
@@ -95,7 +95,7 @@ namespace Sentinel
 		void	AddIndex( UINT i0, UINT i1, UINT i2 );						// Triangle
 		void	AddIndex( UINT i0, UINT i1, UINT i2, UINT i3 );				// Quad
 		void	AddIndex( UINT i0, UINT i1, UINT i2, UINT i3, UINT i4 );	// Polygon
-
+		
 		// Call this function only after all vertices have been added.
 		// Used for normal mapping.
 		//

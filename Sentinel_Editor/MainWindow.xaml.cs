@@ -64,9 +64,11 @@ namespace Sentinel_Editor
 		private bool				mDoUpdate;
 
 		private WGameObject			mSelectedObject;
+
 		private WGameObject			mTranslateObject;
 		private WGameObject			mRotateObject;
 		private WGameObject			mScaleObject;
+		private WGameObject			mEditorSelectedObject;
 
 		private WMaterial			mX_Axis;
 		private WMaterial			mY_Axis;
@@ -147,16 +149,27 @@ namespace Sentinel_Editor
 
 				// Draw Object Transform Tool.
 				//
-				WRenderer.SetCull( CullType.NONE );
-				WRenderer.SetBlend( BlendType.PARTICLE );
-				WRenderer.SetDepthStencilState( StencilType.NO_ZBUFFER );
-
 				if( mSelectedObject != null )
 				{
+					WRenderer.SetCull( CullType.NONE );
+					WRenderer.SetBlend( BlendType.PARTICLE );
+
+					mEditorSelectedObject.UpdateTransform();
+					mEditorSelectedObject.UpdateDrawable();
+
+					WRenderer.SetDepthStencilState( StencilType.NO_ZBUFFER );
+
+					WTransformComponent selectedObjectTransform = new WTransformComponent( mSelectedObject.FindComponent( ComponentType.TRANSFORM ));
+					WVector3f selectedObjectPosition = selectedObjectTransform.GetMatrixWorld().Transform( new WVector3f( 0, 0, 0 ));
+
+					WTransformComponent editorSelectedObjectTransform = new WTransformComponent( mEditorSelectedObject.FindComponent( ComponentType.TRANSFORM ));
+					editorSelectedObjectTransform.Position = selectedObjectPosition;
+					editorSelectedObjectTransform.Scale    = selectedObjectTransform.Scale + new WVector3f( 0.01f, 0.01f, 0.01f );
+
 					if( Translate_Object.IsChecked == true )
 					{
 						WTransformComponent transform = new WTransformComponent( mTranslateObject.FindComponent( ComponentType.TRANSFORM ));
-						transform.Position = new WTransformComponent( mSelectedObject.FindComponent( ComponentType.TRANSFORM )).GetMatrixWorld().Transform( new WVector3f( 0, 0, 0 ));
+						transform.Position = selectedObjectPosition;
 
 						WVector3f distance = mGameWindow.GetCamera().GetTransform().Position - transform.Position;
 						distance.x = Math.Abs( distance.x );
@@ -214,6 +227,9 @@ namespace Sentinel_Editor
 			mScaleObject.Shutdown();
 			mScaleObject.Delete();
 
+			mEditorSelectedObject.Shutdown();
+			mEditorSelectedObject.Delete();
+
 			mGameWindow.Shutdown();
 			WGameWorld.Shutdown();
 		}
@@ -255,12 +271,12 @@ namespace Sentinel_Editor
 		/// 
 		private void AddAssetToTree( String name )
 		{
+			// TODO: Create new TreeViewItem(s) to support various assets.
+
 			TreeViewItem item = new TreeViewItem();
 			item.Foreground = Brushes.White;
 			item.Header     = name;
 			
-			//item.Items.Add( new TreeViewItem() { Header = "Dummy" } );
-
 			Assets_TreeView.Items.Add( item );
 		}
 
@@ -303,6 +319,7 @@ namespace Sentinel_Editor
 			WTransformComponent		transform;
 			WMesh					mesh;
 			WModelComponent			modelComp;
+			WMeshComponent			meshComp;
 			
 			////////////////////////////////////
 
@@ -328,7 +345,7 @@ namespace Sentinel_Editor
 			transform.Position = new WVector3f( 0, 10, 0 );
 
 			WLightComponent light = (WLightComponent)obj.AttachComponent( new WLightComponent(), "Light" );
-			light.Attenuation  = new WVector4f( 1, 1, 1, 25 );
+			light.Attenuation = new WVector4f( 1, 1, 1, 25 );
 
 			AddObjectToTree( obj );
 
@@ -401,6 +418,7 @@ namespace Sentinel_Editor
 			///////////////////////////////
 
 			obj = new WGameObject();
+
 			transform = new WTransformComponent();
 			transform.Position    = new WVector3f( tileSize, 0, 0 );
 			transform.Orientation = new WQuatf( 0, 0, -90 );
@@ -415,6 +433,7 @@ namespace Sentinel_Editor
 			///////////////////////////////
 			
 			obj = new WGameObject();
+
 			transform = new WTransformComponent();
 			transform.Position    = new WVector3f( 0, tileSize, 0 );
 			transform.Orientation = new WQuatf( 0, 0, 0 );
@@ -429,6 +448,7 @@ namespace Sentinel_Editor
 			///////////////////////////////
 
 			obj = new WGameObject();
+
 			transform = new WTransformComponent();
 			transform.Position    = new WVector3f( 0, 0, tileSize );
 			transform.Orientation = new WQuatf( 90, 0, 0 );
@@ -446,6 +466,48 @@ namespace Sentinel_Editor
 
 			mRotateObject = new WGameObject();
 			mScaleObject  = new WGameObject();
+
+			///////////////////////////////
+
+			// Create box selection.
+			//
+			mEditorSelectedObject = new WGameObject();
+
+			transform = new WTransformComponent();
+			mEditorSelectedObject.AttachComponent( transform, "Transform" );
+			
+			meshBuilder.ClearAll();
+			meshBuilder.Shader = mShader[ (int)ShaderTypes.COLOR_ONLY ];
+
+			CreateCubeCorner( meshBuilder, new WVector3f( -1.0f, 1.0f, 1.0f ), new WVector3f( 0.2f, -0.2f, -0.2f ));
+			CreateCubeCorner( meshBuilder, new WVector3f( 1.0f, 1.0f, 1.0f ), new WVector3f( -0.2f, -0.2f, -0.2f ));
+			CreateCubeCorner( meshBuilder, new WVector3f( -1.0f, -1.0f, 1.0f ), new WVector3f( 0.2f, 0.2f, -0.2f ));
+			CreateCubeCorner( meshBuilder, new WVector3f( 1.0f, -1.0f, 1.0f ), new WVector3f( -0.2f, 0.2f, -0.2f ));
+
+			CreateCubeCorner( meshBuilder, new WVector3f( -1.0f, 1.0f, -1.0f ), new WVector3f( 0.2f, -0.2f, 0.2f ));
+			CreateCubeCorner( meshBuilder, new WVector3f( 1.0f, 1.0f, -1.0f ), new WVector3f( -0.2f, -0.2f, 0.2f ));
+			CreateCubeCorner( meshBuilder, new WVector3f( -1.0f, -1.0f, -1.0f ), new WVector3f( 0.2f, 0.2f, 0.2f ));
+			CreateCubeCorner( meshBuilder, new WVector3f( 1.0f, -1.0f, -1.0f ), new WVector3f( -0.2f, 0.2f, 0.2f ));
+
+			meshComp = new WMeshComponent( meshBuilder.BuildMesh() );
+			meshComp.Material = mSelected_Axis;
+			mEditorSelectedObject.AttachComponent( meshComp, "Mesh" );
+
+			mEditorSelectedObject.Startup();
+		}
+
+		private void CreateCubeCorner( WMeshBuilder meshBuilder, WVector3f center, WVector3f distance )
+		{
+			int startIndex = meshBuilder.Vertex.Count();
+
+			meshBuilder.Vertex.Add( new WMeshBuilder.WVertex( center ));
+			meshBuilder.Vertex.Add( new WMeshBuilder.WVertex( center + new WVector3f( distance.x, 0, 0 )));
+			meshBuilder.Vertex.Add( new WMeshBuilder.WVertex( center + new WVector3f( 0, distance.y, 0 )));
+			meshBuilder.Vertex.Add( new WMeshBuilder.WVertex( center + new WVector3f( 0, 0, distance.z )));
+
+			meshBuilder.AddIndex( startIndex, startIndex+1, startIndex+2 );
+			meshBuilder.AddIndex( startIndex, startIndex+2, startIndex+3 );
+			meshBuilder.AddIndex( startIndex, startIndex+3, startIndex+1 );
 		}
 
 		///

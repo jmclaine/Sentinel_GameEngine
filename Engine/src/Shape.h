@@ -77,10 +77,12 @@ namespace Sentinel
 
 		void		Set( const Vector3f& minBounds, const Vector3f& maxBounds );
 
-		const Vector3f& GetMinBounds();
-		const Vector3f& GetMaxBounds();
+		const Vector3f& GetMinBounds() const;
+		const Vector3f& GetMaxBounds() const;
 
 		bool		Intersects( const Vector3f& point );
 		bool		Intersects( const Ray& ray );
 	};
+
+	SENTINEL_DLL BoundingBox FindSmallestBox( Buffer* vbo );
 }

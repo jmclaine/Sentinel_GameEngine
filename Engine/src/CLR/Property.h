@@ -18,82 +18,102 @@
 
 // Native varTypes, e.g. int, float, double
 //
-#define DEFINE_PROPERTY( clazz, varType, varName )\
-	void W##clazz::varName::set( varType v )\
+#define DEFINE_PROPERTY( refClass, varType, varName )\
+	void W##refClass::varName::set( varType v )\
 	{\
 		mRef->varName = v;\
 	}\
-	varType W##clazz::varName::get()\
+	varType W##refClass::varName::get()\
 	{\
 		return mRef->varName;\
 	}
 
 // Member variables with native varTypes.
 //
-#define DEFINE_PROPERTY_M( clazz, varType, varName )\
-	void W##clazz::varName::set( varType v )\
-	{\
-		mRef->m##varName = v;\
-	}\
-	varType W##clazz::varName::get()\
+#define DEFINE_PROPERTY_M( refClass, varType, varName )\
+	varType W##refClass::varName::get()\
 	{\
 		return mRef->m##varName;\
+	}\
+	void W##refClass::varName::set( varType v )\
+	{\
+		mRef->m##varName = v;\
+	}
+
+#define DEFINE_PROPERTY_M_BASE( baseClass, refClass, varType, varName )\
+	varType W##baseClass::W##refClass::varName::get()\
+	{\
+		return mRef->m##varName;\
+	}\
+	void W##baseClass::W##refClass::varName::set( varType v )\
+	{\
+		mRef->m##varName = v;\
 	}
 
 // Member variables with enum varTypes.
 //
-#define DEFINE_PROPERTY_E( clazz, _namespace, varType, varName )\
-	void W##clazz::varName::set( Sentinel::_namespace::varType v )\
-	{\
-		mRef->m##varName = (Sentinel::varType)v;\
-	}\
-	Sentinel::_namespace::varType W##clazz::varName::get()\
+#define DEFINE_PROPERTY_E( refClass, _namespace, varType, varName )\
+	Sentinel::_namespace::varType W##refClass::varName::get()\
 	{\
 		return (Sentinel::_namespace::varType)mRef->m##varName;\
+	}\
+	void W##refClass::varName::set( Sentinel::_namespace::varType v )\
+	{\
+		mRef->m##varName = (Sentinel::varType)v;\
 	}
 
 // Strings.
 //
-#define DEFINE_PROPERTY_S( clazz, varName )\
-	String^ W##clazz::varName::get()\
+#define DEFINE_PROPERTY_S( refClass, varName )\
+	String^ W##refClass::varName::get()\
 	{\
 		return gcnew String( mRef->m##varName.c_str() );\
 	}\
-	void W##clazz::varName::set( String^ str )\
+	void W##refClass::varName::set( String^ str )\
 	{\
 		mRef->m##varName = RString::ToString( str );\
 	}
 
 // Referenced variables.
 //
-#define DEFINE_PROPERTY_R( clazz, varType, varName )\
-	W##varType^ W##clazz::varName::get()\
+#define DEFINE_PROPERTY_R( refClass, varType, varName )\
+	W##varType^ W##refClass::varName::get()\
 	{\
-		return gcnew R##varType( &static_cast< clazz* >(mRef)->m##varName );\
+		return gcnew R##varType( &static_cast< refClass* >(mRef)->m##varName );\
 	}\
-	void W##clazz::varName::set( W##varType^ v )\
+	void W##refClass::varName::set( W##varType^ v )\
 	{\
-		static_cast< clazz* >(mRef)->m##varName = *v->GetRef();\
+		static_cast< refClass* >(mRef)->m##varName = *v->GetRef();\
 	}
 
-#define DEFINE_PROPERTY_RS( clazz, varType, varName )\
-	W##varType^ W##clazz::varName::get()\
+#define DEFINE_PROPERTY_R_BASE( baseClass, refClass, varType, varName )\
+	W##varType^ W##baseClass::W##refClass::varName::get()\
+	{\
+		return gcnew R##varType( &static_cast< baseClass::refClass* >(mRef)->m##varName );\
+	}\
+	void W##baseClass::W##refClass::varName::set( W##varType^ v )\
+	{\
+		static_cast< baseClass::refClass* >(mRef)->m##varName = *v->GetRef();\
+	}
+
+#define DEFINE_PROPERTY_RS( refClass, varType, varName )\
+	W##varType^ W##refClass::varName::get()\
 	{\
 		return gcnew R##varType( &mRef->m##varName );\
 	}\
-	void W##clazz::varName::set( W##varType^ v )\
+	void W##refClass::varName::set( W##varType^ v )\
 	{\
 		mRef->m##varName = *v->GetRef();\
 	}
 
 // Pointer variables.
 //
-#define DEFINE_PROPERTY_P( clazz, varType, varName )\
-	W##varType^ W##clazz::varName::get()\
+#define DEFINE_PROPERTY_P( refClass, varType, varName )\
+	W##varType^ W##refClass::varName::get()\
 	{\
 		return (mRef->m##varName) ? gcnew R##varType( mRef->m##varName ) : nullptr;\
 	}\
-	void W##clazz::varName::set( W##varType^ v )\
+	void W##refClass::varName::set( W##varType^ v )\
 	{\
 		mRef->m##varName = v->GetRef();\
 	}
@@ -102,85 +122,123 @@
 
 // Create standard wrapper reference for a class.
 //
-#define DECLARE_REF( clazz )\
+#define DECLARE_REF_EX( wrapClass, refClass )\
 	protected:\
-		clazz* mRef;\
+		refClass* mRef;\
 		virtual void Delete();\
 	public:\
-		clazz* GetRef();\
-		~W##clazz();\
-		!W##clazz();
+		refClass* GetRef();\
+		~wrapClass();\
+		!wrapClass();
 
-#define DEFINE_REF( clazz )\
-	W##clazz::~W##clazz()		{ Delete(); }\
-	W##clazz::!W##clazz()		{ Delete(); }\
-	void W##clazz::Delete()		{ delete mRef; }\
-	clazz* W##clazz::GetRef()	{ return mRef; }
+#define DEFINE_REF_EX( wrapClass, refClass )\
+	wrapClass::~wrapClass()			{ Delete(); }\
+	wrapClass::!wrapClass()			{ Delete(); }\
+	void wrapClass::Delete()		{ delete mRef; }\
+	refClass* wrapClass::GetRef()	{ return mRef; }
 
-#define DECLARE_REF_SHARED( clazz )\
+#define DEFINE_REF_EX_BASE( baseClass, wrapClass, refClass )\
+	baseClass::wrapClass::~wrapClass()			{ Delete(); }\
+	baseClass::wrapClass::!wrapClass()			{ Delete(); }\
+	void baseClass::wrapClass::Delete()			{ delete mRef; }\
+	refClass* baseClass::wrapClass::GetRef()	{ return mRef; }
+
+#define DECLARE_REF( refClass )\
+	DECLARE_REF_EX( W##refClass, refClass );
+
+#define DEFINE_REF( refClass )\
+	DEFINE_REF_EX( W##refClass, refClass );
+
+#define DECLARE_REF_SHARED( refClass )\
 	protected:\
-		m_shared_ptr< clazz > mRef;\
+		m_shared_ptr< refClass > mRef;\
 	public:\
-		W##clazz( clazz* obj );\
-		W##clazz( std::shared_ptr< clazz > obj );\
-		std::shared_ptr< clazz > GetRef();
+		W##refClass( refClass* obj );\
+		W##refClass( std::shared_ptr< refClass > obj );\
+		std::shared_ptr< refClass > GetRef();
 
-#define DEFINE_REF_SHARED( clazz )\
-	W##clazz::W##clazz( clazz* obj )					{ mRef = obj; }\
-	W##clazz::W##clazz( std::shared_ptr< clazz > obj )	{ mRef = obj.get(); }\
-	std::shared_ptr< clazz > W##clazz::GetRef()			{ return mRef.get(); }
+#define DEFINE_REF_SHARED( refClass )\
+	W##refClass::W##refClass( refClass* obj )					{ mRef = obj; }\
+	W##refClass::W##refClass( std::shared_ptr< refClass > obj )	{ mRef = obj.get(); }\
+	std::shared_ptr< refClass > W##refClass::GetRef()			{ return mRef.get(); }
+
 
 // Create conversion operator for ease of use.
 //
-#define DECLARE_OP_DEREF( clazz )\
-	operator const clazz& ();
+#define DECLARE_OP_DEREF( refClass )\
+	operator const refClass& ();
 
-#define DEFINE_OP_DEREF( clazz )\
-	W##clazz::operator const clazz& () { return *mRef; }
+#define DEFINE_OP_DEREF_EX( wrapClass, refClass )\
+	wrapClass::operator const refClass& () { return *mRef; }
 
-#define DECLARE_OP_PTR( clazz )\
-	operator clazz* ();
+#define DEFINE_OP_DEREF( refClass )\
+	DEFINE_OP_DEREF_EX( W##refClass, refClass );
+	
+#define DECLARE_OP_PTR( refClass )\
+	operator refClass* ();
 
-#define DEFINE_OP_PTR( clazz )\
-	W##clazz::operator clazz* () { return mRef; }
+#define DEFINE_OP_PTR_EX( wrapClass, refClass )\
+	wrapClass::operator refClass* () { return mRef; }
 
+#define DEFINE_OP_PTR( refClass )\
+	DEFINE_OP_PTR_EX( W##refClass, refClass );
+	
 
 // Create Reference class.
 //
-#define DECLARE_CLASS_REF( clazz )\
-	public ref class R##clazz sealed : public W##clazz\
+#define DECLARE_CLASS_REF( refClass )\
+	public ref class R##refClass sealed : public W##refClass\
 	{\
 	public:\
-		R##clazz( clazz* obj );\
-		R##clazz( W##clazz^ obj );\
-		void Set( const clazz& obj );\
-		void Set( W##clazz^ obj );\
+		R##refClass( refClass* obj );\
+		R##refClass( W##refClass^ obj );\
+		void Set( const refClass& obj );\
+		void Set( W##refClass^ obj );\
 	protected:\
 		virtual void Delete() override;\
 	};
 
-#define DEFINE_CLASS_REF( clazz )\
-	R##clazz::R##clazz( clazz* obj )		{ mRef = obj; }\
-	R##clazz::R##clazz( W##clazz^ obj )		{ mRef = obj->GetRef(); }\
-	void R##clazz::Set( const clazz& obj )	{ *mRef = obj; }\
-	void R##clazz::Set( W##clazz^ obj )		{ *mRef = *obj->GetRef(); }\
-	void R##clazz::Delete() {}
+#define DEFINE_CLASS_REF( refClass )\
+	R##refClass::R##refClass( refClass* obj )		{ mRef = obj; }\
+	R##refClass::R##refClass( W##refClass^ obj )	{ mRef = obj->GetRef(); }\
+	void R##refClass::Set( const refClass& obj )	{ *mRef = obj; }\
+	void R##refClass::Set( W##refClass^ obj )		{ *mRef = *obj->GetRef(); }\
+	void R##refClass::Delete() {}
 
-#define DECLARE_CLASS_REF_PTR( clazz )\
-	public ref class R##clazz sealed : public W##clazz\
+#define DECLARE_CLASS_REF_PTR( refClass )\
+	public ref class R##refClass sealed : public W##refClass\
 	{\
 	private:\
-		clazz*&		mRefPtr;\
+		refClass*& mRefPtr;\
 	public:\
-		R##clazz( clazz*& obj );\
-		void Set( clazz*& obj );\
-		void Set( W##clazz^ obj );\
+		R##refClass( refClass*& obj );\
+		void Set( refClass*& obj );\
+		void Set( W##refClass^ obj );\
 	protected:\
 		virtual void Delete() override;\
 	};
 
-#define DEFINE_CLASS_REF_PTR( clazz )\
-	R##clazz::R##clazz( clazz*& obj ) : mRefPtr( obj ) { Set( obj ); }\
-	void R##clazz::Set( clazz*& obj )	{ mRefPtr = obj; mRef = mRefPtr; }\
-	void R##clazz::Set( W##clazz^ obj )	{ mRefPtr = obj->GetRef(); mRef = mRefPtr; }\
-	void R##clazz::Delete() {}
+#define DEFINE_CLASS_REF_PTR( refClass )\
+	R##refClass::R##refClass( refClass*& obj ) : mRefPtr( obj ) { Set( obj ); }\
+	void R##refClass::Set( refClass*& obj )		{ mRefPtr = obj; mRef = mRefPtr; }\
+	void R##refClass::Set( W##refClass^ obj )	{ mRefPtr = obj->GetRef(); mRef = mRefPtr; }\
+	void R##refClass::Delete() {}
+
+#define DECLARE_CLASS_REF_BASE( baseClass, refClass )\
+	ref class R##refClass sealed : public W##refClass\
+	{\
+	public:\
+		R##refClass( baseClass::refClass* obj );\
+		R##refClass( W##refClass^ obj );\
+		void Set( const baseClass::refClass& obj );\
+		void Set( W##refClass^ obj );\
+	protected:\
+		virtual void Delete() override;\
+	};
+
+#define DEFINE_CLASS_REF_BASE( baseClass, refClass )\
+	W##baseClass::R##refClass::R##refClass( baseClass::refClass* obj )		{ mRef = obj; }\
+	W##baseClass::R##refClass::R##refClass( W##refClass^ obj )				{ mRef = obj->GetRef(); }\
+	void W##baseClass::R##refClass::Set( const baseClass::refClass& obj )	{ *mRef = obj; }\
+	void W##baseClass::R##refClass::Set( W##baseClass::W##refClass^ obj )	{ *mRef = *obj->GetRef(); }\
+	void W##baseClass::R##refClass::Delete() {}
