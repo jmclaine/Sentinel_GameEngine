@@ -116,6 +116,14 @@ namespace Sentinel
 		NUM_CULL_TYPES
 	};
 
+	enum FillType
+	{
+		FILL_SOLID,
+		FILL_WIREFRAME,
+
+		NUM_FILL_TYPES
+	};
+
 	enum BlendType
 	{
 		BLEND_DEFAULT,
@@ -174,6 +182,7 @@ namespace Sentinel
 
 		UINT				PRIMITIVE[ NUM_PRIMITIVES ];
 		UINT				CULL_TYPE[ NUM_CULL_TYPES ];
+		UINT				FILL_TYPE[ NUM_FILL_TYPES ];
 
 		Shader*				mCurrShader;
 
@@ -232,6 +241,7 @@ namespace Sentinel
 		virtual void		SetDepthStencilState( UINT state ) = 0;
 		virtual void		SetViewport( UINT viewport ) = 0;
 		virtual UINT		SetCull( CullType type ) = 0;
+		virtual UINT		SetFill( FillType type ) = 0;
 		virtual void		SetBlend( BlendType type ) = 0;
 
 		// Shaders.

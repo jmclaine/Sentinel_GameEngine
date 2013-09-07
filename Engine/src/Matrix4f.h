@@ -10,6 +10,7 @@ namespace Sentinel
 	{
 		friend class Quatf;
 		friend class Vector3f;
+		friend class Vector4f;
 
 	private:
 
@@ -66,6 +67,7 @@ namespace Sentinel
 		void		ProjectionPerspective( float windowWidth, float windowHeight, float nearZ = 0.1f, float farZ = 10000.0f, float FOV = 45.0f );
 
 		Vector3f	Transform( const Vector3f& v ) const;
+		Vector3f	Transform( const Vector4f& v ) const;
 
 		Vector3f	Forward();
 		Vector3f	Up();

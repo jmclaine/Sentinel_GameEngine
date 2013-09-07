@@ -596,6 +596,9 @@ namespace Sentinel
 			CULL_TYPE[ CULL_CCW ]				= GL_CCW;
 			CULL_TYPE[ CULL_CW ]				= GL_CW;
 
+			FILL_TYPE[ FILL_SOLID ]				= GL_FILL;
+			FILL_TYPE[ FILL_WIREFRAME ]			= GL_LINE;
+
 			IMAGE_FORMAT[ IMAGE_FORMAT_RGB ]	= GL_RGB;
 			IMAGE_FORMAT[ IMAGE_FORMAT_RGBA ]	= GL_RGBA;
 
@@ -939,6 +942,13 @@ namespace Sentinel
 		UINT SetCull( CullType type )
 		{
 			glFrontFace( CULL_TYPE[ type ] );
+
+			return S_OK;
+		}
+
+		UINT SetFill( FillType type )
+		{
+			glPolygonMode( GL_FRONT_AND_BACK, FILL_TYPE[ type ] );
 
 			return S_OK;
 		}

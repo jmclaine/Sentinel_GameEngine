@@ -186,6 +186,11 @@ namespace Sentinel { namespace Systems
 		return Renderer::Inst()->SetCull( (Sentinel::CullType)type );
 	}
 
+	UINT WRenderer::SetFill( FillType type )
+	{
+		return Renderer::Inst()->SetFill( (Sentinel::FillType)type );
+	}
+
 	void WRenderer::SetBlend( BlendType type )
 	{
 		Renderer::Inst()->SetBlend( (Sentinel::BlendType)type );

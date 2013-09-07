@@ -12,8 +12,9 @@ namespace Sentinel { namespace Components
 
 	public:
 
-		WPerspectiveCameraComponent( WCameraComponent^ camera );
 		WPerspectiveCameraComponent( float windowWidth, float windowHeight );
+
+		DECLARE_CAST_COMPONENT( WPerspectiveCameraComponent );
 
 		void	Startup();
 

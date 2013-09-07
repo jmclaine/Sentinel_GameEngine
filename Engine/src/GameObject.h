@@ -23,12 +23,12 @@ namespace Sentinel
 
 		std::vector< GameComponent* >		mComponent;
 
-		GameObject*							mParent;
 		std::vector< GameObject* >			mChild;
 
 	public:
 
 		std::string							mName;
+		GameObject*							mParent;
 
 		//////////////////////////////
 
@@ -43,8 +43,6 @@ namespace Sentinel
 		GameComponent*	DetachComponent( GameComponent* component );
 
 		//////////////////////////////
-
-		GameObject*		GetParent();
 
 		void			AddChild( GameObject* obj );
 		void			RemoveChild( UINT index );

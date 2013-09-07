@@ -142,6 +142,8 @@ namespace Sentinel
 
 		const char* what() const throw()
 		{
+			TRACE( mMessage );
+			
 			return mMessage.c_str();
 		}
 	};

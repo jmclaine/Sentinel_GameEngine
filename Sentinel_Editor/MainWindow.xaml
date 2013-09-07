@@ -73,6 +73,12 @@
                     
                     <Separator Padding="4" Margin="4" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FF666666"></Separator>
 
+                    <ToggleButton Name="Select_Object" Width="22" Height="22" Click="ToolBar_Select_Click" IsChecked="True">
+                        <ToggleButton.Content>
+                            <Image Source="/Sentinel_Editor;component/Images/Select.png" Width="18" Height="18" Stretch="Fill" StretchDirection="Both" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="Select Object" />
+                        </ToggleButton.Content>
+                    </ToggleButton>
+                    
                     <ToggleButton Name="Translate_Object" Width="22" Height="22" Click="ToolBar_Translate_Click">
                         <ToggleButton.Content>
                             <Image Source="/Sentinel_Editor;component/Images/Translate.png" Width="18" Height="18" Stretch="Fill" StretchDirection="Both" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="Translate" />

@@ -6,6 +6,8 @@ using namespace Sentinel::Utilities;
 
 namespace Sentinel { namespace Components
 {
+	DEFINE_REF_PTR( GameComponent );
+
 	WGameComponent::WGameComponent()
 	{
 		mRef = NULL;
@@ -16,11 +18,6 @@ namespace Sentinel { namespace Components
 		mRef = component;
 	}
 
-	WGameComponent::WGameComponent( WGameComponent^ component )
-	{
-		mRef = component->mRef;
-	}
-
 	WGameComponent::~WGameComponent()
 	{}
 
@@ -29,10 +26,12 @@ namespace Sentinel { namespace Components
 		delete mRef;
 	}
 
-	GameComponent* WGameComponent::GetRef()
+	System::String^ WGameComponent::ToString()
 	{
-		return mRef;
+		return gcnew System::String( mRef->mName.c_str() );
 	}
+
+	DEFINE_OP_PTR( GameComponent );
 
 	////////////////////////////////
 
@@ -51,7 +50,7 @@ namespace Sentinel { namespace Components
 		mRef->Shutdown();
 	}
 
-	void WGameComponent::SetOwner( RGameObject^ owner )
+	void WGameComponent::SetOwner( WGameObject^ owner )
 	{
 		mRef->SetOwner( owner->GetRef() );
 	}

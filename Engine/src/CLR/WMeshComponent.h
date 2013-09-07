@@ -12,6 +12,7 @@ namespace Sentinel { namespace Components
 	public:
 
 		WMeshComponent( WMesh^ mesh );
-		WMeshComponent( WGameComponent^ component );
+
+		DECLARE_CAST_COMPONENT( WMeshComponent );
 	};
 }}

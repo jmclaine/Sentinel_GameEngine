@@ -62,6 +62,14 @@ namespace Sentinel { namespace Systems
 		NUM_CULL_TYPES
 	};
 
+	public enum class FillType
+	{
+		SOLID,
+		WIREFRAME,
+
+		NUM_FILL_TYPES
+	};
+
 	public enum class BlendType
 	{
 		DEFAULT,
@@ -155,6 +163,7 @@ namespace Sentinel { namespace Systems
 		static void			SetDepthStencilState( StencilType state );
 		static void			SetViewport( UINT viewport );
 		static UINT			SetCull( CullType type );
+		static UINT			SetFill( FillType type );
 		static void			SetBlend( BlendType type );
 
 		// Shaders.

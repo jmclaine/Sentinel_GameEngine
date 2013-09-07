@@ -165,6 +165,11 @@ namespace Sentinel { namespace Math
 		return gcnew WVector3f( mRef->Transform( v ));
 	}
 
+	WVector3f^ WMatrix4f::Transform( WVector4f^ v )
+	{
+		return gcnew WVector3f( mRef->Transform( v ));
+	}
+
 	WVector3f^ WMatrix4f::Forward()
 	{
 		return gcnew WVector3f( mRef->Forward() );

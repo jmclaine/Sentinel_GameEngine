@@ -95,11 +95,6 @@ namespace Sentinel
 
 	//////////////////////////////
 
-	GameObject* GameObject::GetParent()
-	{
-		return mParent;
-	}
-
 	void GameObject::AddChild( GameObject* obj )
 	{
 		mChild.push_back( obj );

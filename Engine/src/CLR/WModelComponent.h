@@ -12,6 +12,7 @@ namespace Sentinel { namespace Components
 	public:
 
 		WModelComponent( WModel^ model );
-		WModelComponent( WGameComponent^ component );
+
+		DECLARE_CAST_COMPONENT( WModelComponent );
 	};
 }}

@@ -5,14 +5,16 @@ using namespace Sentinel::Utilities;
 
 namespace Sentinel { namespace Components
 {
+	DEFINE_REF_PTR( GameObject );
+
 	WGameObject::WGameObject()
 	{
-		mRef  = new GameObject();
+		mRef = new GameObject();
 	}
 
-	WGameObject::~WGameObject()
+	WGameObject::WGameObject( GameObject* obj )
 	{
-		Delete();
+		mRef = obj;
 	}
 
 	void WGameObject::Delete()
@@ -20,19 +22,17 @@ namespace Sentinel { namespace Components
 		delete mRef;
 	}
 
-	GameObject* WGameObject::GetRef()
+	String^ WGameObject::ToString()
 	{
-		return mRef;
+		return gcnew String( mRef->mName.c_str() );
 	}
 
-	System::String^ WGameObject::ToString()
-	{
-		return gcnew System::String( mRef->mName.c_str() );
-	}
+	DEFINE_OP_PTR( GameObject );
 
 	////////////////////////////////
 
-	DEFINE_PROPERTY_S( GameObject, Name );
+	DEFINE_PROPERTY_S(  GameObject, Name );
+	DEFINE_PROPERTY_PS( GameObject, GameObject, Parent );
 
 	////////////////////////////////
 
@@ -50,11 +50,6 @@ namespace Sentinel { namespace Components
 
 	////////////////////////////////
 
-	WGameObject^ WGameObject::GetParent()
-	{
-		return gcnew RGameObject( mRef->GetParent() );
-	}
-
 	void WGameObject::AddChild( WGameObject^ obj )
 	{
 		mRef->AddChild( obj->GetRef() );
@@ -71,7 +66,8 @@ namespace Sentinel { namespace Components
 	{
 		_ASSERT( index >= 0 );
 
-		return gcnew RGameObject( mRef->GetChild( (UINT)index ));
+		GameObject* obj = mRef->GetChild( (UINT)index );
+		return gcnew WGameObject( obj );
 	}
 
 	int WGameObject::NumChildren()
@@ -122,18 +118,8 @@ namespace Sentinel { namespace Components
 	//
 	WGameComponent^ WGameObject::FindComponent( Sentinel::Components::ComponentType type )
 	{
-		return gcnew WGameComponent( mRef->FindComponent( (Sentinel::ComponentType)type ));
-	}
+		GameComponent* component = mRef->FindComponent( (Sentinel::ComponentType)type );
 
-	////////////////////////////////
-
-	RGameObject::RGameObject( GameObject* obj )
-	{
-		mRef = obj;
-	}
-
-	RGameObject::RGameObject( WGameObject^ obj )
-	{
-		mRef = obj->GetRef();
+		return (component) ? gcnew WGameComponent( component ) : nullptr;
 	}
 }}

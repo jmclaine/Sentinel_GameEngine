@@ -12,13 +12,7 @@ namespace Sentinel { namespace Components
 		mRef = const_cast< TransformComponent* >(component);
 	}
 
-	WTransformComponent::WTransformComponent( WGameComponent^ component )
-	{
-		mRef = component->GetRef();
-	}
-
-	WTransformComponent::~WTransformComponent()
-	{}
+	DEFINE_CAST_COMPONENT( TransformComponent );
 
 	/////////////////////////////////
 

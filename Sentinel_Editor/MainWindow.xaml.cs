@@ -68,14 +68,13 @@ namespace Sentinel_Editor
 		private WGameObject			mTranslateObject;
 		private WGameObject			mRotateObject;
 		private WGameObject			mScaleObject;
-		private WGameObject			mEditorSelectedObject;
+		
+		private WMaterial			mMaterial_X_Axis;
+		private WMaterial			mMaterial_Y_Axis;
+		private WMaterial			mMaterial_Z_Axis;
+		private WMaterial			mMaterial_Selected;
 
-		private WMaterial			mX_Axis;
-		private WMaterial			mY_Axis;
-		private WMaterial			mZ_Axis;
-		private WMaterial			mSelected_Axis;
-
-		private const float			TRANSFORM_OBJECT_ALPHA = 0.25f;
+		private const float			TRANSFORM_OBJECT_ALPHA = 0.75f;
 		private const float			TRANSFORM_OBJECT_SCALE = 0.0025f;
 
 		///
@@ -108,11 +107,13 @@ namespace Sentinel_Editor
 			
 			Window_World.Child = mGameWindow;
 
-			mX_Axis = new WMaterial( new WColorRGBA( 1, 0, 0, TRANSFORM_OBJECT_ALPHA ), new WColorRGBA( 1, 0, 0, TRANSFORM_OBJECT_ALPHA ), new WColorRGBA( 1, 0, 0, TRANSFORM_OBJECT_ALPHA ), 0 );
-			mY_Axis = new WMaterial( new WColorRGBA( 0, 1, 0, TRANSFORM_OBJECT_ALPHA ), new WColorRGBA( 0, 1, 0, TRANSFORM_OBJECT_ALPHA ), new WColorRGBA( 0, 1, 0, TRANSFORM_OBJECT_ALPHA ), 0 );
-			mZ_Axis = new WMaterial( new WColorRGBA( 0, 0, 1, TRANSFORM_OBJECT_ALPHA ), new WColorRGBA( 0, 0, 1, TRANSFORM_OBJECT_ALPHA ), new WColorRGBA( 0, 0, 1, TRANSFORM_OBJECT_ALPHA ), 0 );
+			// Create editor materials.
+			//
+			mMaterial_X_Axis = new WMaterial( new WColorRGBA( 1, 0, 0, TRANSFORM_OBJECT_ALPHA ), new WColorRGBA( 0, 0, 0, 0 ), new WColorRGBA( 0, 0, 0, 0 ), 0 );
+			mMaterial_Y_Axis = new WMaterial( new WColorRGBA( 0, 1, 0, TRANSFORM_OBJECT_ALPHA ), new WColorRGBA( 0, 0, 0, 0 ), new WColorRGBA( 0, 0, 0, 0 ), 0 );
+			mMaterial_Z_Axis = new WMaterial( new WColorRGBA( 0, 0, 1, TRANSFORM_OBJECT_ALPHA ), new WColorRGBA( 0, 0, 0, 0 ), new WColorRGBA( 0, 0, 0, 0 ), 0 );
 
-			mSelected_Axis = new WMaterial( new WColorRGBA( 1, 1, 0, TRANSFORM_OBJECT_ALPHA ), new WColorRGBA( 1, 1, 0, TRANSFORM_OBJECT_ALPHA ), new WColorRGBA( 1, 1, 0, TRANSFORM_OBJECT_ALPHA ), 0 );
+			mMaterial_Selected = new WMaterial( new WColorRGBA( 1, 0.5f, 1, 1 ), new WColorRGBA( 0, 0, 0, 0 ), new WColorRGBA( 0, 0, 0, 0 ), 0 );
 
 			PrepareShaders();
 			PrepareObjects();
@@ -154,20 +155,37 @@ namespace Sentinel_Editor
 					WRenderer.SetCull( CullType.NONE );
 					WRenderer.SetBlend( BlendType.PARTICLE );
 
-					mEditorSelectedObject.UpdateTransform();
-					mEditorSelectedObject.UpdateDrawable();
-
-					WRenderer.SetDepthStencilState( StencilType.NO_ZBUFFER );
-
 					WTransformComponent selectedObjectTransform = new WTransformComponent( mSelectedObject.FindComponent( ComponentType.TRANSFORM ));
 					WVector3f selectedObjectPosition = selectedObjectTransform.GetMatrixWorld().Transform( new WVector3f( 0, 0, 0 ));
 
-					WTransformComponent editorSelectedObjectTransform = new WTransformComponent( mEditorSelectedObject.FindComponent( ComponentType.TRANSFORM ));
-					editorSelectedObjectTransform.Position = selectedObjectPosition;
-					editorSelectedObjectTransform.Scale    = selectedObjectTransform.Scale + new WVector3f( 0.01f, 0.01f, 0.01f );
+					if( Select_Object.IsChecked == true )
+					{
+						// Draw yellow wireframe around the selected object.
+						//
+						WGameComponent component = mSelectedObject.FindComponent( ComponentType.DRAWABLE );
+						
+						if( component != null )
+						{
+							WDrawableComponent mesh = new WDrawableComponent( component );
+							WMaterial material = new WMaterial( mesh.Material );
+							
+							mesh.Material = mMaterial_Selected;
 
+							WRenderer.SetFill( FillType.WIREFRAME );
+
+							mSelectedObject.UpdateTransform();
+							mSelectedObject.UpdateDrawable();
+
+							WRenderer.SetFill( FillType.SOLID );
+
+							mesh.Material = material;
+						}
+					}
+					else
 					if( Translate_Object.IsChecked == true )
 					{
+						// Draw the translate object.
+						//
 						WTransformComponent transform = new WTransformComponent( mTranslateObject.FindComponent( ComponentType.TRANSFORM ));
 						transform.Position = selectedObjectPosition;
 
@@ -178,7 +196,9 @@ namespace Sentinel_Editor
 						float d = distance.Length() * TRANSFORM_OBJECT_SCALE;
 						transform.Scale = new WVector3f( d, d, d );
 
-						//(new WMeshComponent( mTranslateObject.GetChild( 0 ).FindComponent( ComponentType.DRAWABLE ))).Material = mSelected_Axis;
+						WRenderer.SetDepthStencilState( StencilType.NO_ZBUFFER );
+
+						//(new WMeshComponent( mTranslateObject.GetChild( 0 ).FindComponent( ComponentType.DRAWABLE ))).Material = mMaterial_Selected;
 						mTranslateObject.UpdateTransform();
 						mTranslateObject.UpdateDrawable();
 					}
@@ -226,9 +246,6 @@ namespace Sentinel_Editor
 
 			mScaleObject.Shutdown();
 			mScaleObject.Delete();
-
-			mEditorSelectedObject.Shutdown();
-			mEditorSelectedObject.Delete();
 
 			mGameWindow.Shutdown();
 			WGameWorld.Shutdown();
@@ -319,7 +336,6 @@ namespace Sentinel_Editor
 			WTransformComponent		transform;
 			WMesh					mesh;
 			WModelComponent			modelComp;
-			WMeshComponent			meshComp;
 			
 			////////////////////////////////////
 
@@ -349,7 +365,7 @@ namespace Sentinel_Editor
 
 			AddObjectToTree( obj );
 
-			// Test object.
+			// Ground object.
 			//
 			meshBuilder.CreateCube( 1.0f );
 			meshBuilder.Shader    = mShader[ (int)ShaderTypes.COLOR ];
@@ -358,8 +374,8 @@ namespace Sentinel_Editor
 			obj = WGameWorld.AddGameObject( new WGameObject(), "Ground" );
 
 			transform = (WTransformComponent)obj.AttachComponent( new WTransformComponent(), "Transform" );
-			transform.Position	= new WVector3f( 0, 0, 0 );
-			transform.Scale		= new WVector3f( 100, 1, 100 );
+			transform.Position	 = new WVector3f( 0, 0, 0 );
+			transform.Scale		 = new WVector3f( 100, 1, 100 );
 
 			mesh = meshBuilder.BuildMesh();
 			obj.AttachComponent( new WMeshComponent( mesh ), "Mesh" );
@@ -374,8 +390,9 @@ namespace Sentinel_Editor
 			WGameObject obj2 = WGameWorld.AddGameObject( new WGameObject(), "Cube" );
 
 			transform = (WTransformComponent)obj2.AttachComponent( new WTransformComponent(), "Transform" );
-			transform.Position	= new WVector3f( 0, 2, 0 );
-			//transform.Scale	= new WVector3f( 1, 1, 1 );
+			transform.Position	  = new WVector3f( 0, 4, 0 );
+			transform.Scale		  = new WVector3f( 0.5f, 0.5f, 0.5f );
+			transform.Orientation = new WQuatf( 45, 45, 45 );
 
 			mesh = meshBuilder.BuildMesh();
 			obj2.AttachComponent( new WMeshComponent( mesh ), "Mesh" );
@@ -385,12 +402,12 @@ namespace Sentinel_Editor
 			obj = WGameWorld.AddGameObject( new WGameObject(), "Cube2" );
 
 			transform = (WTransformComponent)obj.AttachComponent( new WTransformComponent(), "Transform" );
-			transform.Position	= new WVector3f( -10, 2, 0 );
-			//transform.Scale	= new WVector3f( 1, 1, 1 );
+			transform.Position	  = new WVector3f( -10, 4, 0 );
+			transform.Scale		  = new WVector3f( 2, 2, 2 );
 
 			obj.AttachComponent( new WMeshComponent( mesh ), "Mesh" );
 
-			obj.AddChild( WGameWorld.GetGameObject( 3 ));
+			obj.AddChild( obj2 );
 
 			AddObjectToTree( obj );
 
@@ -425,7 +442,7 @@ namespace Sentinel_Editor
 			obj.AttachComponent( transform, "Tile_X" );
 
 			modelComp = new WModelComponent( model );
-			modelComp.Material = mX_Axis;
+			modelComp.Material = mMaterial_X_Axis;
 			obj.AttachComponent( modelComp, "Model_X" );
 
 			mTranslateObject.AddChild( obj );
@@ -440,7 +457,7 @@ namespace Sentinel_Editor
 			obj.AttachComponent( transform, "Tile_Y" );
 
 			modelComp = new WModelComponent( model );
-			modelComp.Material = mY_Axis;
+			modelComp.Material = mMaterial_Y_Axis;
 			obj.AttachComponent( modelComp, "Model_Y" );
 
 			mTranslateObject.AddChild( obj );
@@ -455,7 +472,7 @@ namespace Sentinel_Editor
 			obj.AttachComponent( transform, "Tile_Z" );
 
 			modelComp = new WModelComponent( model );
-			modelComp.Material = mZ_Axis;
+			modelComp.Material = mMaterial_Z_Axis;
 			obj.AttachComponent( modelComp, "Model_Z" );
 
 			mTranslateObject.AddChild( obj );
@@ -466,48 +483,6 @@ namespace Sentinel_Editor
 
 			mRotateObject = new WGameObject();
 			mScaleObject  = new WGameObject();
-
-			///////////////////////////////
-
-			// Create box selection.
-			//
-			mEditorSelectedObject = new WGameObject();
-
-			transform = new WTransformComponent();
-			mEditorSelectedObject.AttachComponent( transform, "Transform" );
-			
-			meshBuilder.ClearAll();
-			meshBuilder.Shader = mShader[ (int)ShaderTypes.COLOR_ONLY ];
-
-			CreateCubeCorner( meshBuilder, new WVector3f( -1.0f, 1.0f, 1.0f ), new WVector3f( 0.2f, -0.2f, -0.2f ));
-			CreateCubeCorner( meshBuilder, new WVector3f( 1.0f, 1.0f, 1.0f ), new WVector3f( -0.2f, -0.2f, -0.2f ));
-			CreateCubeCorner( meshBuilder, new WVector3f( -1.0f, -1.0f, 1.0f ), new WVector3f( 0.2f, 0.2f, -0.2f ));
-			CreateCubeCorner( meshBuilder, new WVector3f( 1.0f, -1.0f, 1.0f ), new WVector3f( -0.2f, 0.2f, -0.2f ));
-
-			CreateCubeCorner( meshBuilder, new WVector3f( -1.0f, 1.0f, -1.0f ), new WVector3f( 0.2f, -0.2f, 0.2f ));
-			CreateCubeCorner( meshBuilder, new WVector3f( 1.0f, 1.0f, -1.0f ), new WVector3f( -0.2f, -0.2f, 0.2f ));
-			CreateCubeCorner( meshBuilder, new WVector3f( -1.0f, -1.0f, -1.0f ), new WVector3f( 0.2f, 0.2f, 0.2f ));
-			CreateCubeCorner( meshBuilder, new WVector3f( 1.0f, -1.0f, -1.0f ), new WVector3f( -0.2f, 0.2f, 0.2f ));
-
-			meshComp = new WMeshComponent( meshBuilder.BuildMesh() );
-			meshComp.Material = mSelected_Axis;
-			mEditorSelectedObject.AttachComponent( meshComp, "Mesh" );
-
-			mEditorSelectedObject.Startup();
-		}
-
-		private void CreateCubeCorner( WMeshBuilder meshBuilder, WVector3f center, WVector3f distance )
-		{
-			int startIndex = meshBuilder.Vertex.Count();
-
-			meshBuilder.Vertex.Add( new WMeshBuilder.WVertex( center ));
-			meshBuilder.Vertex.Add( new WMeshBuilder.WVertex( center + new WVector3f( distance.x, 0, 0 )));
-			meshBuilder.Vertex.Add( new WMeshBuilder.WVertex( center + new WVector3f( 0, distance.y, 0 )));
-			meshBuilder.Vertex.Add( new WMeshBuilder.WVertex( center + new WVector3f( 0, 0, distance.z )));
-
-			meshBuilder.AddIndex( startIndex, startIndex+1, startIndex+2 );
-			meshBuilder.AddIndex( startIndex, startIndex+2, startIndex+3 );
-			meshBuilder.AddIndex( startIndex, startIndex+3, startIndex+1 );
 		}
 
 		///
@@ -568,8 +543,17 @@ namespace Sentinel_Editor
 			Save_Click( sender, e );
 		}
 
+		private void ToolBar_Select_Click( Object sender, RoutedEventArgs e )
+		{
+			Select_Object.IsChecked		= true;
+			Translate_Object.IsChecked	= false;
+			Rotate_Object.IsChecked		= false;
+			Scale_Object.IsChecked		= false;
+		}
+
 		private void ToolBar_Translate_Click( Object sender, RoutedEventArgs e )
 		{
+			Select_Object.IsChecked		= false;
 			Translate_Object.IsChecked	= true;
 			Rotate_Object.IsChecked		= false;
 			Scale_Object.IsChecked		= false;
@@ -577,6 +561,7 @@ namespace Sentinel_Editor
 
 		private void ToolBar_Rotate_Click( Object sender, RoutedEventArgs e )
 		{
+			Select_Object.IsChecked		= false;
 			Translate_Object.IsChecked	= false;
 			Rotate_Object.IsChecked		= true;
 			Scale_Object.IsChecked		= false;
@@ -584,6 +569,7 @@ namespace Sentinel_Editor
 
 		private void ToolBar_Scale_Click( Object sender, RoutedEventArgs e )
 		{
+			Select_Object.IsChecked		= false;
 			Translate_Object.IsChecked	= false;
 			Rotate_Object.IsChecked		= false;
 			Scale_Object.IsChecked		= true;

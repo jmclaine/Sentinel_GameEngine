@@ -16,8 +16,8 @@ namespace Sentinel { namespace Components
 
 		WTransformComponent();
 		WTransformComponent( const TransformComponent* component );
-		WTransformComponent( WGameComponent^ component );
-		~WTransformComponent();
+		
+		DECLARE_CAST_COMPONENT( WTransformComponent );
 
 		/////////////////////////////////
 

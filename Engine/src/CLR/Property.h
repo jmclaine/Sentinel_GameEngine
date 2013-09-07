@@ -118,16 +118,37 @@
 		mRef->m##varName = v->GetRef();\
 	}
 
+#define DEFINE_PROPERTY_PS( refClass, varType, varName )\
+	W##varType^ W##refClass::varName::get()\
+	{\
+		return (mRef->m##varName) ? gcnew W##varType( mRef->m##varName ) : nullptr;\
+	}\
+	void W##refClass::varName::set( W##varType^ v )\
+	{\
+		mRef->m##varName = v->GetRef();\
+	}
+
 ///////////////////////////////////////////////////
 
 // Create standard wrapper reference for a class.
 //
-#define DECLARE_REF_EX( wrapClass, refClass )\
+#define DECLARE_REF_PTR( refClass )\
 	protected:\
 		refClass* mRef;\
+	public:\
+		refClass* GetRef();
+
+#define DEFINE_REF_PTR_EX( wrapClass, refClass )\
+	refClass* wrapClass::GetRef() { return mRef; }
+
+#define DEFINE_REF_PTR( refClass )\
+	DEFINE_REF_PTR_EX( W##refClass, refClass );
+
+#define DECLARE_REF_EX( wrapClass, refClass )\
+	DECLARE_REF_PTR( refClass );\
+	protected:\
 		virtual void Delete();\
 	public:\
-		refClass* GetRef();\
 		~wrapClass();\
 		!wrapClass();
 
@@ -135,13 +156,13 @@
 	wrapClass::~wrapClass()			{ Delete(); }\
 	wrapClass::!wrapClass()			{ Delete(); }\
 	void wrapClass::Delete()		{ delete mRef; }\
-	refClass* wrapClass::GetRef()	{ return mRef; }
+	DEFINE_REF_PTR_EX( wrapClass, refClass );
 
 #define DEFINE_REF_EX_BASE( baseClass, wrapClass, refClass )\
 	baseClass::wrapClass::~wrapClass()			{ Delete(); }\
 	baseClass::wrapClass::!wrapClass()			{ Delete(); }\
 	void baseClass::wrapClass::Delete()			{ delete mRef; }\
-	refClass* baseClass::wrapClass::GetRef()	{ return mRef; }
+	DEFINE_REF_PTR_EX( baseClass::wrapClass, refClass );
 
 #define DECLARE_REF( refClass )\
 	DECLARE_REF_EX( W##refClass, refClass );

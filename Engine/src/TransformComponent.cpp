@@ -18,8 +18,8 @@ namespace Sentinel
 
 	void TransformComponent::Startup()
 	{
-		if( mOwner->GetParent() )
-			mParentTransform = static_cast< TransformComponent* >(mOwner->GetParent()->FindComponent( COMPONENT_TRANSFORM ));
+		if( mOwner->mParent )
+			mParentTransform = static_cast< TransformComponent* >(mOwner->mParent->FindComponent( COMPONENT_TRANSFORM ));
 		else
 			mParentTransform = NULL;
 	}

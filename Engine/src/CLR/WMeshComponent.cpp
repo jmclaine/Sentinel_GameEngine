@@ -8,8 +8,5 @@ namespace Sentinel { namespace Components
 		mRef = new MeshComponent( mesh->GetRef() );
 	}
 
-	WMeshComponent::WMeshComponent( WGameComponent^ component )
-	{
-		mRef = component->GetRef();
-	}
+	DEFINE_CAST_COMPONENT( MeshComponent );
 }}

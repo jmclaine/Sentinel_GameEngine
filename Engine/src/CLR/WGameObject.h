@@ -1,7 +1,7 @@
 #pragma once
 /*
 Creates a new GameObject.
-GameObject will not be freed unless it is attached to the GameWorld.
+WGameObject frees automatically when attached to WGameWorld.
 Delete() should be called manually for a controlled free memory.
 */
 #include "RStdVector.h"
@@ -13,28 +13,25 @@ using namespace System;
 
 namespace Sentinel { namespace Components
 {
-	ref class RGameObject;
-
 	public ref class WGameObject
 	{
-	protected:
-
-		GameObject*		mRef;
-
+		DECLARE_REF_PTR( GameObject );
+	
 	public:
 
 		WGameObject();
-		~WGameObject();
+		WGameObject( GameObject* obj );
 
-		void			Delete();
-		
-		GameObject*		GetRef();
+		void Delete();
 
 		virtual String^	ToString() override;
 
+		DECLARE_OP_PTR( GameObject );
+
 		////////////////////////////////
 
-		DECLARE_PROPERTY( String^,		Name )
+		DECLARE_PROPERTY( String^,		Name );
+		DECLARE_PROPERTY( WGameObject^, Parent );
 
 		////////////////////////////////
 
@@ -43,8 +40,6 @@ namespace Sentinel { namespace Components
 		WGameComponent^	DetachComponent( WGameComponent^ component );
 
 		////////////////////////////////
-
-		WGameObject^	GetParent();
 
 		void			AddChild( WGameObject^ obj );
 		void			RemoveChild( int index );
@@ -72,13 +67,5 @@ namespace Sentinel { namespace Components
 		// Find the first occurrence of a component by type.
 		//
 		WGameComponent^ FindComponent( Sentinel::Components::ComponentType type );
-	};
-
-	public ref class RGameObject sealed : public WGameObject
-	{
-	public:
-
-		RGameObject( GameObject* obj );
-		RGameObject( WGameObject^ obj );
 	};
 }}

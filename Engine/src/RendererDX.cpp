@@ -455,6 +455,9 @@ namespace Sentinel
 			CULL_TYPE[ CULL_CCW  ]		= D3D11_CULL_BACK;
 			CULL_TYPE[ CULL_CW   ]		= D3D11_CULL_FRONT;
 
+			FILL_TYPE[ FILL_SOLID ]		= D3D11_FILL_SOLID;
+			FILL_TYPE[ FILL_WIREFRAME ] = D3D11_FILL_WIREFRAME;
+
 			mSampleDesc.Count   = 1;
 			mSampleDesc.Quality = 0;
 
@@ -1093,9 +1096,29 @@ namespace Sentinel
 			_ASSERT( mCurrWindow );
 			_ASSERT( type < NUM_CULL_TYPES );
 
-			SAFE_RELEASE_PTR( mCurrWindow->mRasterizerState );
-			D3D11_RASTERIZER_DESC rasterizerstate = { D3D11_FILL_SOLID, (D3D11_CULL_MODE)CULL_TYPE[ type ], true, 0, 0, 0, true, false, true, false };
+			D3D11_RASTERIZER_DESC rasterizerstate;
+			mCurrWindow->mRasterizerState->GetDesc( &rasterizerstate );
 
+			SAFE_RELEASE_PTR( mCurrWindow->mRasterizerState );
+			rasterizerstate.CullMode = (D3D11_CULL_MODE)CULL_TYPE[ type ];
+			
+			HV( mCurrWindow->mDevice->CreateRasterizerState( &rasterizerstate, &mCurrWindow->mRasterizerState ));
+			mCurrWindow->mContext->RSSetState( mCurrWindow->mRasterizerState );
+
+			return S_OK;
+		}
+
+		UINT SetFill( FillType type )
+		{
+			_ASSERT( mCurrWindow );
+			_ASSERT( type < NUM_FILL_TYPES );
+
+			D3D11_RASTERIZER_DESC rasterizerstate;
+			mCurrWindow->mRasterizerState->GetDesc( &rasterizerstate );
+
+			SAFE_RELEASE_PTR( mCurrWindow->mRasterizerState );
+			rasterizerstate.FillMode = (D3D11_FILL_MODE)FILL_TYPE[ type ];
+			
 			HV( mCurrWindow->mDevice->CreateRasterizerState( &rasterizerstate, &mCurrWindow->mRasterizerState ));
 			mCurrWindow->mContext->RSSetState( mCurrWindow->mRasterizerState );
 

@@ -19,6 +19,8 @@ namespace Sentinel { namespace Components
 
 		WCameraComponent( CameraComponent* camera );
 
+		DECLARE_CAST_COMPONENT( WCameraComponent );
+
 		const WTransformComponent^	GetTransform();
 
 		DECLARE_PROPERTY( WMatrix4f^, MatrixView );

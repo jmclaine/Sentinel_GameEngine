@@ -12,6 +12,8 @@ namespace Sentinel { namespace Components
 		mRef = light;
 	}
 
+	DEFINE_CAST_COMPONENT( LightComponent );
+
 	const WTransformComponent^ WLightComponent::GetTransform()
 	{
 		return gcnew WTransformComponent( static_cast< LightComponent* >(mRef)->GetTransform() );

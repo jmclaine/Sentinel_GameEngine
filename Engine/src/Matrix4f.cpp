@@ -1,6 +1,7 @@
 #include "MathCommon.h"
 #include "Matrix4f.h"
 #include "Vector3f.h"
+#include "Vector4f.h"
 #include "Quatf.h"
 
 namespace Sentinel
@@ -441,9 +442,17 @@ namespace Sentinel
 
 	Vector3f Matrix4f::Transform( const Vector3f& v ) const
 	{
+		// assume v.w = 1
 		return Vector3f( v.x*m[0]+v.y*m[4]+v.z*m[8]+m[12], 
 						 v.x*m[1]+v.y*m[5]+v.z*m[9]+m[13], 
 						 v.x*m[2]+v.y*m[6]+v.z*m[10]+m[14] );
+	}
+
+	Vector3f Matrix4f::Transform( const Vector4f& v ) const
+	{
+		return Vector3f( v.x*m[0]+v.y*m[4]+v.z*m[8]+v.w*m[12], 
+						 v.x*m[1]+v.y*m[5]+v.z*m[9]+v.w*m[13], 
+						 v.x*m[2]+v.y*m[6]+v.z*m[10]+v.w*m[14] );
 	}
 
 	Vector3f Matrix4f::Right()

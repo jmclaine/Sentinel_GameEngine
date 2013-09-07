@@ -2,6 +2,7 @@
 
 #include "Matrix4f.h"
 #include "WVector3f.h"
+#include "WVector4f.h"
 #include "WQuatf.h"
 
 using namespace System;
@@ -65,6 +66,7 @@ namespace Sentinel { namespace Math
 		void		ProjectionPerspective( float windowWidth, float windowHeight, float nearZ, float farZ, float FOV );
 
 		WVector3f^	Transform( WVector3f^ v );
+		WVector3f^	Transform( WVector4f^ v );
 
 		WVector3f^	Forward();
 		WVector3f^	Up();

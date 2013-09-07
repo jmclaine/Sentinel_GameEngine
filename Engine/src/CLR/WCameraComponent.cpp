@@ -10,6 +10,8 @@ namespace Sentinel { namespace Components
 		mRef = camera;
 	}
 
+	DEFINE_CAST_COMPONENT( CameraComponent );
+
 	const WTransformComponent^ WCameraComponent::GetTransform()
 	{
 		return gcnew WTransformComponent( static_cast< CameraComponent* >(mRef)->GetTransform() );

@@ -8,15 +8,12 @@ namespace Sentinel { namespace Components
 		mRef = NULL;
 	}
 
-	WPerspectiveCameraComponent::WPerspectiveCameraComponent( WCameraComponent^ camera )
-	{
-		mRef = camera->GetRef();
-	}
-
 	WPerspectiveCameraComponent::WPerspectiveCameraComponent( float windowWidth, float windowHeight )
 	{
 		mRef = new PerspectiveCameraComponent( windowWidth, windowHeight );
 	}
+
+	DEFINE_CAST_COMPONENT( PerspectiveCameraComponent );
 
 	void WPerspectiveCameraComponent::Startup()
 	{
