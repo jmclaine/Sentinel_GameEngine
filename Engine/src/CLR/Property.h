@@ -16,6 +16,19 @@
 		void set( indexType i, varType v );\
 	}
 
+// DEFINE PROPERTIES
+// 
+// Definitions:
+//
+// M = member (appends m to variable name)
+// E = enum conversion
+// B = base class exists (i.e., nested class)
+// R = reference variables (i.e., converts to R class)
+// S = static_cast required
+// P = pointer based
+// T = shared_ptr
+//
+
 // Native varTypes, e.g. int, float, double
 //
 #define DEFINE_PROPERTY( refClass, varType, varName )\
@@ -40,7 +53,7 @@
 		mRef->m##varName = v;\
 	}
 
-#define DEFINE_PROPERTY_M_BASE( baseClass, refClass, varType, varName )\
+#define DEFINE_PROPERTY_MB( baseClass, refClass, varType, varName )\
 	varType W##baseClass::W##refClass::varName::get()\
 	{\
 		return mRef->m##varName;\
@@ -64,7 +77,7 @@
 
 // Strings.
 //
-#define DEFINE_PROPERTY_S( refClass, varName )\
+#define DEFINE_PROPERTY_STR( refClass, varName )\
 	String^ W##refClass::varName::get()\
 	{\
 		return gcnew String( mRef->m##varName.c_str() );\
@@ -79,6 +92,16 @@
 #define DEFINE_PROPERTY_R( refClass, varType, varName )\
 	W##varType^ W##refClass::varName::get()\
 	{\
+		return gcnew R##varType( &mRef->m##varName );\
+	}\
+	void W##refClass::varName::set( W##varType^ v )\
+	{\
+		mRef->m##varName = *v->GetRef();\
+	}
+
+#define DEFINE_PROPERTY_RS( refClass, varType, varName )\
+	W##varType^ W##refClass::varName::get()\
+	{\
 		return gcnew R##varType( &static_cast< refClass* >(mRef)->m##varName );\
 	}\
 	void W##refClass::varName::set( W##varType^ v )\
@@ -86,7 +109,7 @@
 		static_cast< refClass* >(mRef)->m##varName = *v->GetRef();\
 	}
 
-#define DEFINE_PROPERTY_R_BASE( baseClass, refClass, varType, varName )\
+#define DEFINE_PROPERTY_RSB( baseClass, refClass, varType, varName )\
 	W##varType^ W##baseClass::W##refClass::varName::get()\
 	{\
 		return gcnew R##varType( &static_cast< baseClass::refClass* >(mRef)->m##varName );\
@@ -96,19 +119,9 @@
 		static_cast< baseClass::refClass* >(mRef)->m##varName = *v->GetRef();\
 	}
 
-#define DEFINE_PROPERTY_RS( refClass, varType, varName )\
-	W##varType^ W##refClass::varName::get()\
-	{\
-		return gcnew R##varType( &mRef->m##varName );\
-	}\
-	void W##refClass::varName::set( W##varType^ v )\
-	{\
-		mRef->m##varName = *v->GetRef();\
-	}
-
 // Pointer variables.
 //
-#define DEFINE_PROPERTY_P( refClass, varType, varName )\
+#define DEFINE_PROPERTY_PR( refClass, varType, varName )\
 	W##varType^ W##refClass::varName::get()\
 	{\
 		return (mRef->m##varName) ? gcnew R##varType( mRef->m##varName ) : nullptr;\
@@ -121,11 +134,21 @@
 #define DEFINE_PROPERTY_PS( refClass, varType, varName )\
 	W##varType^ W##refClass::varName::get()\
 	{\
-		return (mRef->m##varName) ? gcnew W##varType( mRef->m##varName ) : nullptr;\
+		return (static_cast< refClass* >(mRef)->m##varName) ? gcnew W##varType( static_cast< refClass* >(mRef)->m##varName ) : nullptr;\
 	}\
 	void W##refClass::varName::set( W##varType^ v )\
 	{\
-		mRef->m##varName = v->GetRef();\
+		static_cast< refClass* >(mRef)->m##varName = v->GetRef();\
+	}
+
+#define DEFINE_PROPERTY_PRS( refClass, varType, varName )\
+	W##varType^ W##refClass::varName::get()\
+	{\
+		return (static_cast< refClass* >(mRef)->m##varName) ? gcnew R##varType( static_cast< refClass* >(mRef)->m##varName ) : nullptr;\
+	}\
+	void W##refClass::varName::set( W##varType^ v )\
+	{\
+		static_cast< refClass* >(mRef)->m##varName = v->GetRef();\
 	}
 
 ///////////////////////////////////////////////////
@@ -172,16 +195,22 @@
 
 #define DECLARE_REF_SHARED( refClass )\
 	protected:\
-		m_shared_ptr< refClass > mRef;\
+		m_shared_ptr< refClass >^ mRef;\
 	public:\
 		W##refClass( refClass* obj );\
 		W##refClass( std::shared_ptr< refClass > obj );\
+		~W##refClass();\
+		!W##refClass();\
+		virtual void Delete();\
 		std::shared_ptr< refClass > GetRef();
 
 #define DEFINE_REF_SHARED( refClass )\
-	W##refClass::W##refClass( refClass* obj )					{ mRef = obj; }\
-	W##refClass::W##refClass( std::shared_ptr< refClass > obj )	{ mRef = obj.get(); }\
-	std::shared_ptr< refClass > W##refClass::GetRef()			{ return mRef.get(); }
+	W##refClass::W##refClass( refClass* obj )					{ mRef = gcnew m_shared_ptr< refClass >( obj ); }\
+	W##refClass::W##refClass( std::shared_ptr< refClass > obj )	{ mRef = gcnew m_shared_ptr< refClass >( obj ); }\
+	W##refClass::~W##refClass()									{ Delete(); }\
+	W##refClass::!W##refClass()									{ Delete(); }\
+	void W##refClass::Delete()									{ delete mRef; }\
+	std::shared_ptr< refClass > W##refClass::GetRef()			{ return mRef; }
 
 
 // Create conversion operator for ease of use.

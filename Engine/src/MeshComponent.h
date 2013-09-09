@@ -10,18 +10,20 @@ namespace Sentinel
 {
 	class SENTINEL_DLL MeshComponent : public DrawableComponent
 	{
-	private:
+	public:
 
 		std::shared_ptr< Mesh > mMesh;
 
-	public:
+		Material				mMaterial;	// sets in update
+
+		/////////////////////////////
 
 		MeshComponent( std::shared_ptr< Mesh > mesh );
 
-		void Startup();
+		void	Startup();
 
-		void Update();
+		void	Update();
 
-		void Shutdown();
+		void	Shutdown();
 	};
 }

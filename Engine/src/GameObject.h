@@ -61,7 +61,7 @@ namespace Sentinel
 
 		virtual void	UpdateComponents();
 
-		virtual void	UpdateDrawable();
+		virtual void	UpdateDrawable( bool drawChildren = true );
 
 		virtual void	Shutdown();
 

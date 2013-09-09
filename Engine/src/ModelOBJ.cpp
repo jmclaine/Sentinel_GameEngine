@@ -317,22 +317,33 @@ namespace Sentinel
 
 		//////////////////////////////////////////////////////////////////////////
 
-		void SetMaterial( const Material& material )
+		void SetMaterials( const std::vector< Material >& material )
 		{
+			auto it = material.begin();
+
 			for( UINT x = 0; x < mNumMeshes; ++x )
 			{
-				mMesh[ x ]->SetMaterial( material );
+				mMesh[ x ]->mMaterial = *it;
+				++it;
 			}
 		}
 
+		void GetMaterials( std::vector< Material >* material )
+		{
+			for( UINT x = 0; x < mNumMeshes; ++x )
+			{
+				material->push_back( mMesh[ x ]->mMaterial );
+			}
+		}
+		/*
 		void SetShader( Shader* shader )
 		{
 			for( UINT x = 0; x < mNumMeshes; ++x )
 			{
-				mMesh[ x ]->SetShader( shader );
+				mMesh[ x ]->mShader = shader;
 			}
 		}
-
+		*/
 		// OBJ files do not support animation.
 		//
 		void SetKeyFrame( const KeyFrame& key, int keyIndex = -1, int objIndex = 0 )
@@ -364,7 +375,7 @@ namespace Sentinel
 		{
 			for( UINT x = 0; x < mNumMeshes; ++x )
 			{
-				mMesh[ x ]->SetWorldTransform( mMatrixWorld );
+				mMesh[ x ]->mMatrixWorld = mMatrixWorld;
 				mMesh[ x ]->Draw();
 			}
 		}

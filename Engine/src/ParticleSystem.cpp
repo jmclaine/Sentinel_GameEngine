@@ -50,21 +50,19 @@ namespace Sentinel
 
 		mCount = 0;
 
-		mMesh->SetMaterial( sprite->mMaterial );
+		mMesh->mTexture[ TEXTURE_DIFFUSE ] = sprite->mTexture;
 
-		mMesh->SetTexture( sprite->mTexture );
+		mMesh->mTextureScale = Vector4f( (float)sprite->mSpriteSize.x / (float)sprite->mTexture->Width(),
+									     (float)sprite->mSpriteSize.y / (float)sprite->mTexture->Height(), 0, 0 );
 
-		mMesh->SetTextureScale( Vector4f( (float)sprite->mSpriteSize.x / (float)sprite->mTexture->Width(),
-									      (float)sprite->mSpriteSize.y / (float)sprite->mTexture->Height(), 0, 0 ));
-
-		mVertex = mMesh->GetVBO()->Lock();
+		mVertex = mMesh->mVBO->Lock();
 	}
 
 	// Render Sprites within the batch.
 	//
 	void ParticleSystem::End()
 	{
-		mMesh->GetVBO()->Unlock();
+		mMesh->mVBO->Unlock();
 
 		mMesh->Draw( mCount );
 	}

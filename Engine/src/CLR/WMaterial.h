@@ -2,6 +2,7 @@
 
 #include "Material.h"
 #include "WColor.h"
+#include "WStdVector.h"
 
 namespace Sentinel { namespace Assets
 {
@@ -18,8 +19,7 @@ namespace Sentinel { namespace Assets
 				   float spec_comp );
 		WMaterial( Material& material );
 		WMaterial( WMaterial^ material );
-		WMaterial( WMaterial% material );
-
+		
 		////////////////////////////////
 
 		DECLARE_PROPERTY( WColorRGBA^,	Ambient );
@@ -33,4 +33,7 @@ namespace Sentinel { namespace Assets
 	};
 
 	DECLARE_CLASS_REF( Material );
+
+	WStdVector_Class( Material, Material, WMaterial, RMaterial );
+	RStdVector_Class( Material, Material, WMaterial, RMaterial );
 }}

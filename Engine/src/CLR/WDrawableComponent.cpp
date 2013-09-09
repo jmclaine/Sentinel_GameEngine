@@ -8,7 +8,10 @@ namespace Sentinel { namespace Components
 		mRef = NULL;
 	}
 
-	DEFINE_CAST_COMPONENT( DrawableComponent );
+	WDrawableComponent::WDrawableComponent( DrawableComponent* component )
+	{
+		mRef = component;
+	}
 
-	DEFINE_PROPERTY_R( DrawableComponent, Material, Material );
+	DEFINE_CAST_COMPONENT( DrawableComponent );
 }}

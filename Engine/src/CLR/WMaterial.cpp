@@ -35,11 +35,6 @@ namespace Sentinel { namespace Assets
 		mRef = new Material( *material->mRef );
 	}
 
-	WMaterial::WMaterial( WMaterial% material )
-	{
-		mRef = new Material( *material.mRef );
-	}
-
 	DEFINE_PROPERTY_R( Material, ColorRGBA, Ambient );
 	DEFINE_PROPERTY_R( Material, ColorRGBA, Diffuse );
 	DEFINE_PROPERTY_R( Material, ColorRGBA, Specular );

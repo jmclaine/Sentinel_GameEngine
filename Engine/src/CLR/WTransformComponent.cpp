@@ -16,9 +16,9 @@ namespace Sentinel { namespace Components
 
 	/////////////////////////////////
 
-	DEFINE_PROPERTY_R( TransformComponent, Vector3f, Position );
-	DEFINE_PROPERTY_R( TransformComponent, Quatf,	 Orientation );
-	DEFINE_PROPERTY_R( TransformComponent, Vector3f, Scale );
+	DEFINE_PROPERTY_RS( TransformComponent, Vector3f, Position );
+	DEFINE_PROPERTY_RS( TransformComponent, Quatf,	 Orientation );
+	DEFINE_PROPERTY_RS( TransformComponent, Vector3f, Scale );
 
 	/////////////////////////////////
 

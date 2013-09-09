@@ -57,6 +57,16 @@ namespace Sentinel { namespace Systems
 
 	/////////////////////////////////////////////////
 
+	WTexture^ WRenderer::NullTexture()
+	{
+		return gcnew RTexture( Renderer::Inst()->NULL_TEXTURE );
+	}
+
+	WTexture^ WRenderer::BaseTexture()
+	{
+		return gcnew RTexture( Renderer::Inst()->BASE_TEXTURE );
+	}
+
 	WWindowInfo^ WRenderer::Load( String^ filename )
 	{
 		// Somehow the pointer created in the DLL SingletonAbstract

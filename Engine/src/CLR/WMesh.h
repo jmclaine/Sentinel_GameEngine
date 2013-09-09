@@ -1,8 +1,9 @@
 #pragma once
 
 #include "m_shared_ptr.h"
+#include "Property.h"
 #include "Mesh.h"
-#include "WColor.h"
+#include "WRenderer.h"
 #include "WMaterial.h"
 #include "WShader.h"
 #include "WTexture.h"
@@ -29,16 +30,19 @@ namespace Sentinel { namespace Assets
 
 	public:
 
-		void		SetWorldTransform( WMatrix4f^ world );
-		void		SetShadowTransform( WMatrix4f^ shadow );
-		void		SetTextureScale( WVector4f^ scale );
+		DECLARE_PROPERTY( Sentinel::Systems::PrimitiveType,	Primitive );
+		
+		DECLARE_PROPERTY( WBuffer^,			VBO );
+		DECLARE_PROPERTY( WBuffer^,			IBO );
 
-		void		SetShader( WShader^ shader );
-		void		SetMaterial( WMaterial^ material );
-		void		SetTexture( WTexture^ texture, TextureType type );
+		DECLARE_PROPERTY( WMatrix4f^,		MatrixWorld );
+		DECLARE_PROPERTY( WMatrix4f^,		MatrixShadow );
+		DECLARE_PROPERTY( WVector4f^,		TextureScale );
+		
+		DECLARE_PROPERTY( WShader^,			Shader );
+		DECLARE_PROPERTY( WMaterial^,		Material );
 
-		WBuffer^	GetVBO();
-		WBuffer^	GetIBO();
+		RTexture^	Texture( TextureType type );
 
 		void		Draw();
 		void		Draw( UINT count );

@@ -404,7 +404,7 @@ namespace Sentinel
 						builder.CalculateTangents( false );
 						
 						mObject[ x ].mMesh[ y ] = builder.BuildMesh();
-						mObject[ x ].mMesh[ y ]->SetMaterial( material );
+						mObject[ x ].mMesh[ y ]->mMaterial = material;
 
 						builder.ApplyMatrix( mObject[ x ].mKeyFrame[ 0 ].mMatrix );
 
@@ -460,28 +460,44 @@ namespace Sentinel
 
 		//////////////////////////////////////////////////////////////////////////
 
-		void SetMaterial( const Material& material )
+		void SetMaterials( const std::vector< Material >& material )
 		{
+			auto it = material.begin();
+
 			for( UINT x = 0; x < mNumObjects; ++x )
 			{
 				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
 				{
-					mObject[ x ].mMesh[ y ]->SetMaterial( material );
+					mObject[ x ].mMesh[ y ]->mMaterial = *it;
+					++it;
 				}
 			}
 		}
 
+		void GetMaterials( std::vector< Material >* material )
+		{
+			material->clear();
+
+			for( UINT x = 0; x < mNumObjects; ++x )
+			{
+				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
+				{
+					material->push_back( mObject[ x ].mMesh[ y ]->mMaterial );
+				}
+			}
+		}
+		/*
 		void SetShader( Shader* shader )
 		{
 			for( UINT x = 0; x < mNumObjects; ++x )
 			{
 				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
 				{
-					mObject[ x ].mMesh[ y ]->SetShader( shader );
+					mObject[ x ].mMesh[ y ]->mShader = shader;
 				}
 			}
 		}
-
+		*/
 		// Set a keyframe, and append it if the index is -1.
 		//
 		void SetKeyFrame( const KeyFrame& key, int keyIndex = -1, int objIndex = 0 )
@@ -577,7 +593,7 @@ namespace Sentinel
 				//
 				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
 				{
-					mObject[ x ].mMesh[ y ]->SetWorldTransform( matWorldObject );
+					mObject[ x ].mMesh[ y ]->mMatrixWorld = matWorldObject;
 					mObject[ x ].mMesh[ y ]->Draw();
 				}
 			}

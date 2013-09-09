@@ -31,16 +31,20 @@ namespace Sentinel
 
 		SpriteComponent( Texture* texture, const POINT& spriteSize );
 
-		void Startup();
+		void	Startup();
 
-		void Update();
+		void	Update();
 
-		void Shutdown();
+		void	Shutdown();
 
 		/////////////////////////////////
 
-		void SetColor( const ColorRGBA& color );
+		void	SetMaterial( const Material& material );
 
-		void SetFrame( UINT frame );
+		const Material& GetMaterial();
+
+		void	SetColor( const ColorRGBA& color );
+
+		void	SetFrame( UINT frame );
 	};
 }

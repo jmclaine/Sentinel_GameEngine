@@ -9,7 +9,7 @@ namespace Sentinel { namespace Assets
 
 	////////////////////////////////
 
-	DEFINE_PROPERTY_RS( Model, Matrix4f, MatrixWorld );
+	DEFINE_PROPERTY_R( Model, Matrix4f, MatrixWorld );
 
 	////////////////////////////////
 
@@ -28,6 +28,46 @@ namespace Sentinel { namespace Assets
 		return gcnew RShader( Model::GetShaderColor() );
 	}
 
+	void WModel::SetShaderTexture( WShader^ shader )
+	{
+		Model::SetShaderTexture( shader->GetRef() );
+	}
+
+	WShader^ WModel::GetShaderTexture()
+	{
+		return gcnew RShader( Model::GetShaderTexture() );
+	}
+	
+	void WModel::SetShaderNormalMap( WShader^ shader )
+	{
+		Model::SetShaderNormalMap( shader->GetRef() );
+	}
+
+	WShader^ WModel::GetShaderNormalMap()
+	{
+		return gcnew RShader( Model::GetShaderNormalMap() );
+	}
+	
+	void WModel::SetShaderParallax( WShader^ shader )
+	{
+		Model::SetShaderParallax( shader->GetRef() );
+	}
+
+	WShader^ WModel::GetShaderParallax()
+	{
+		return gcnew RShader( Model::GetShaderParallax() );
+	}
+	
+	void WModel::SetShaderSkinning( WShader^ shader )
+	{
+		Model::SetShaderSkinning( shader->GetRef() );
+	}
+
+	WShader^ WModel::GetShaderSkinning()
+	{
+		return gcnew RShader( Model::GetShaderSkinning() );
+	}
+
 	bool WModel::Create( System::String^ filename )
 	{
 		return mRef->Create( RString::ToString( filename ).c_str() );
@@ -38,14 +78,14 @@ namespace Sentinel { namespace Assets
 		mRef->Release();
 	}
 
-	void WModel::SetMaterial( WMaterial^ material )
+	void WModel::SetMaterials( WStdVector_Material^ material )
 	{
-		mRef->SetMaterial( *material->GetRef() );
+		mRef->SetMaterials( material );
 	}
 
-	void WModel::SetShader( WShader^ shader )
+	void WModel::GetMaterials( WStdVector_Material^ material )
 	{
-		mRef->SetShader( shader->GetRef() );
+		mRef->GetMaterials( material->GetRef() );
 	}
 
 	//void WModel::SetKeyFrame( const KeyFrame& key, int keyIndex = -1, int objIndex = 0 )

@@ -6,44 +6,21 @@ namespace Sentinel { namespace Assets
 
 	////////////////////////////////
 
-	void WMesh::SetWorldTransform( WMatrix4f^ world )
-	{
-		mRef->SetWorldTransform( *world->GetRef() );
-	}
+	DEFINE_PROPERTY_E( Mesh, Systems, PrimitiveType, Primitive );
+	
+	DEFINE_PROPERTY_PR( Mesh, Buffer,		VBO );
+	DEFINE_PROPERTY_PR( Mesh, Buffer,		IBO );
 
-	void WMesh::SetShadowTransform( WMatrix4f^ shadow )
-	{
-		mRef->SetShadowTransform( *shadow->GetRef() );
-	}
+	DEFINE_PROPERTY_R(  Mesh, Matrix4f,		MatrixWorld );
+	DEFINE_PROPERTY_R(  Mesh, Matrix4f,		MatrixShadow );
+	DEFINE_PROPERTY_R(  Mesh, Vector4f,		TextureScale );
+		
+	DEFINE_PROPERTY_PR( Mesh, Shader,		Shader );
+	DEFINE_PROPERTY_R(  Mesh, Material,		Material );
 
-	void WMesh::SetTextureScale( WVector4f^ scale )
+	RTexture^ WMesh::Texture( TextureType type )
 	{
-		mRef->SetTextureScale( *scale->GetRef() );
-	}
-
-	void WMesh::SetShader( WShader^ shader )
-	{
-		mRef->SetShader( shader->GetRef() );
-	}
-
-	void WMesh::SetMaterial( WMaterial^ material )
-	{
-		mRef->SetMaterial( *material->GetRef() );
-	}
-
-	void WMesh::SetTexture( WTexture^ texture, TextureType type )
-	{
-		mRef->SetTexture( texture->GetRef(), (Sentinel::TextureType)type );
-	}
-
-	WBuffer^ WMesh::GetVBO()
-	{
-		return gcnew RBuffer( mRef->GetVBO() );
-	}
-
-	WBuffer^ WMesh::GetIBO()
-	{
-		return gcnew RBuffer( mRef->GetIBO() );
+		return gcnew RTexture( mRef->mTexture[ (int)type ] );
 	}
 
 	void WMesh::Draw()

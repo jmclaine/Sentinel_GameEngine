@@ -108,8 +108,11 @@ namespace Sentinel
 		virtual bool	Create( const char* filename ) = 0;
 		virtual void	Release() = 0;
 
-		virtual void	SetMaterial( const Material& material ) = 0;
-		virtual void	SetShader( Shader* shader ) = 0;
+		// There is no way to tell which materials pertain to what portion of the model.
+		// A name label for each material in conjuction with a std::map would solve this problem.
+		//
+		virtual void	SetMaterials( const std::vector< Material >& material ) = 0;
+		virtual void	GetMaterials( std::vector< Material >* material ) = 0;
 
 		virtual void	SetKeyFrame( const KeyFrame& key, int keyIndex = -1, int objIndex = 0 ) = 0;
 		virtual void	SetTime( float _time, UINT objIndex = 0 ) = 0;

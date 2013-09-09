@@ -36,6 +36,6 @@ namespace Sentinel { namespace Components
 
 	//////////////////////////////
 
-	DEFINE_PROPERTY_R( LightComponent, ColorRGBA, Color );
-	DEFINE_PROPERTY_R( LightComponent, Vector4f,  Attenuation );
+	DEFINE_PROPERTY_RS( LightComponent, ColorRGBA, Color );
+	DEFINE_PROPERTY_RS( LightComponent, Vector4f,  Attenuation );
 }}

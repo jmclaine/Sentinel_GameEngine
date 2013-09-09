@@ -33,7 +33,7 @@ namespace Sentinel
 
 		if( mTexture )
 		{
-			ParticleSystem::Inst()->mMesh->SetTexture( mTexture );
+			ParticleSystem::Inst()->mMesh->mTexture[ TEXTURE_DIFFUSE ] = mTexture;
 
 			*(Vector2f*)verts = Vector2f( (float)(mFrame % mSpriteDimension.x), \
 										  (float)(mFrame / mSpriteDimension.x) );
@@ -51,4 +51,26 @@ namespace Sentinel
 
 	void SpriteComponent::Shutdown()
 	{}
+
+	/////////////////////////////////
+
+	void SpriteComponent::SetMaterial( const Material& material )
+	{
+		ParticleSystem::Inst()->mMesh->mMaterial = material;
+	}
+
+	const Material& SpriteComponent::GetMaterial()
+	{
+		return ParticleSystem::Inst()->mMesh->mMaterial;
+	}
+
+	void SpriteComponent::SetColor( const ColorRGBA& color )
+	{
+		mColor = color;
+	}
+
+	void SpriteComponent::SetFrame( UINT frame )
+	{
+		mFrame = frame;
+	}
 }

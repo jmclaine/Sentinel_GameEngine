@@ -120,8 +120,8 @@ namespace Sentinel { namespace Systems
 	{
 	public:
 
-		static RTexture^	NULL_TEXTURE;	// black default texture
-		static RTexture^	BASE_TEXTURE;	// white default texture
+		static WTexture^	NullTexture();
+		static WTexture^	BaseTexture();
 
 		//////////////////////////////
 

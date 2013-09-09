@@ -31,7 +31,7 @@ namespace Sentinel { namespace Components
 
 	////////////////////////////////
 
-	DEFINE_PROPERTY_S(  GameObject, Name );
+	DEFINE_PROPERTY_STR( GameObject, Name );
 	DEFINE_PROPERTY_PS( GameObject, GameObject, Parent );
 
 	////////////////////////////////
@@ -105,6 +105,11 @@ namespace Sentinel { namespace Components
 	void WGameObject::UpdateDrawable()
 	{
 		mRef->UpdateDrawable();
+	}
+
+	void WGameObject::UpdateDrawable( bool drawChildren )
+	{
+		mRef->UpdateDrawable( drawChildren );
 	}
 		 
 	void WGameObject::Shutdown()

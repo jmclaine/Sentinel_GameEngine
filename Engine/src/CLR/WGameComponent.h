@@ -10,20 +10,16 @@ Delete() should be called manually for a controlled free memory.
 // Create macro to cast the GameComponent to another type.
 // Upcasting a WGameComponent to a derived version does
 // not work directly, therefore, it is necessary to create
-// a new derived version with the constructor and the
-// WGameComponent. The definition of the component cast
-// ensures that the component is indeed of the intended
-// type or it will throw an exception to denote failure.
+// a new derived version.
 //
-#define DECLARE_CAST_COMPONENT( wrapClass )\
-	wrapClass( WGameComponent^ component );
+#define DECLARE_CAST_COMPONENT( refClass )\
+	static W##refClass^ Cast( WGameComponent^ component );
 
 #define DEFINE_CAST_COMPONENT( refClass )\
-	W##refClass::W##refClass( WGameComponent^ component ) \
+	W##refClass^ W##refClass::Cast( WGameComponent^ component ) \
 	{\
-		mRef = dynamic_cast< refClass* >( component->GetRef() );\
-		if( mRef == NULL )\
-			throw gcnew InvalidCastException( "WGameComponent != W" + #refClass );\
+		refClass* obj = dynamic_cast< refClass* >( component->GetRef() );\
+		return (obj) ? gcnew W##refClass( obj ) : nullptr;\
 	}
 
 namespace Sentinel { namespace Components

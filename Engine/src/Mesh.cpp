@@ -26,46 +26,6 @@ namespace Sentinel
 		SAFE_DELETE( mIBO );
 	}
 
-	void Mesh::SetWorldTransform( const Matrix4f& world )
-	{
-		mMatrixWorld = world;
-	}
-
-	void Mesh::SetShadowTransform( const Matrix4f& shadow )
-	{
-		mMatrixShadow = shadow;
-	}
-
-	void Mesh::SetTextureScale( const Vector4f& scale )
-	{
-		mTextureScale = scale;
-	}
-
-	void Mesh::SetShader( Shader* shader )
-	{
-		mShader = shader;
-	}
-
-	void Mesh::SetMaterial( const Material& material )
-	{
-		mMaterial = material;
-	}
-
-	void Mesh::SetTexture( Texture* texture, TextureType type )
-	{
-		mTexture[ type ] = texture;
-	}
-
-	Buffer*& Mesh::GetVBO()
-	{
-		return mVBO;
-	}
-
-	Buffer*& Mesh::GetIBO()
-	{
-		return mIBO;
-	}
-
 	void Mesh::Draw( UINT count )
 	{
 		_ASSERT( GameWorld::Inst()->GetCamera() != NULL );

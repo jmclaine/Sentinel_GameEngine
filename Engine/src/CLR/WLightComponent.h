@@ -18,7 +18,7 @@ namespace Sentinel { namespace Components
 		WLightComponent();
 		WLightComponent( LightComponent* light );
 
-		DECLARE_CAST_COMPONENT( WLightComponent );
+		DECLARE_CAST_COMPONENT( LightComponent );
 
 		const WTransformComponent^	GetTransform();
 

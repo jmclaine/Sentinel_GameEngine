@@ -7,6 +7,8 @@ namespace Sentinel
 	MeshComponent::MeshComponent( std::shared_ptr< Mesh > mesh )
 	{
 		mMesh = mesh;
+
+		mMaterial = mMesh->mMaterial;
 	}
 
 	void MeshComponent::Startup()
@@ -18,9 +20,9 @@ namespace Sentinel
 	{
 		DrawableComponent::Update();
 
-		mMesh->SetMaterial( mMaterial );
+		mMesh->mMaterial = mMaterial;
 
-		mMesh->SetWorldTransform( mTransform->GetMatrixWorld() );
+		mMesh->mMatrixWorld = mTransform->GetMatrixWorld();
 
 		mMesh->Draw();
 	}

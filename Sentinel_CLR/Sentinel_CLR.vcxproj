@@ -95,7 +95,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Engine\src\CLR\RStdVector.h" />
+    <ClInclude Include="..\Engine\src\CLR\WStdVector.h" />
     <ClInclude Include="..\Engine\src\CLR\Property.h" />
     <ClInclude Include="..\Engine\src\CLR\m_shared_ptr.h" />
     <ClInclude Include="..\Engine\src\CLR\WCameraComponent.h" />

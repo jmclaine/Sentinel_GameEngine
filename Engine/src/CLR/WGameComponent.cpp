@@ -60,5 +60,5 @@ namespace Sentinel { namespace Components
 		return (Sentinel::Components::ComponentType)mRef->Type();
 	}
 
-	DEFINE_PROPERTY_S( GameComponent, Name );
+	DEFINE_PROPERTY_STR( GameComponent, Name );
 }}

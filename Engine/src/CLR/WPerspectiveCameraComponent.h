@@ -1,5 +1,6 @@
 #pragma once
 
+#include "PerspectiveCameraComponent.h"
 #include "WCameraComponent.h"
 
 namespace Sentinel { namespace Components
@@ -13,8 +14,9 @@ namespace Sentinel { namespace Components
 	public:
 
 		WPerspectiveCameraComponent( float windowWidth, float windowHeight );
+		WPerspectiveCameraComponent( PerspectiveCameraComponent* component );
 
-		DECLARE_CAST_COMPONENT( WPerspectiveCameraComponent );
+		DECLARE_CAST_COMPONENT( PerspectiveCameraComponent );
 
 		void	Startup();
 

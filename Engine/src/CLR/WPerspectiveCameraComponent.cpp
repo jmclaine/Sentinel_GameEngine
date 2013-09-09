@@ -13,6 +13,11 @@ namespace Sentinel { namespace Components
 		mRef = new PerspectiveCameraComponent( windowWidth, windowHeight );
 	}
 
+	WPerspectiveCameraComponent::WPerspectiveCameraComponent( PerspectiveCameraComponent* component )
+	{
+		mRef = component;
+	}
+
 	DEFINE_CAST_COMPONENT( PerspectiveCameraComponent );
 
 	void WPerspectiveCameraComponent::Startup()

@@ -31,18 +31,18 @@ namespace Sentinel
 
 	public:
 
-		void Startup( Shader* shader, UINT maxSprites = 1000 );
+		void	Startup( Shader* shader, UINT maxSprites = 1000 );
 
-		void Shutdown();
+		void	Shutdown();
 
 		/////////////////////////////////
 
 		// Prepare for batched Sprite rendering.
 		//
-		void Begin( SpriteComponent* sprite );
+		void	Begin( SpriteComponent* sprite );
 
 		// Render Sprites within the batch.
 		//
-		void End();
+		void	End();
 	};
 };

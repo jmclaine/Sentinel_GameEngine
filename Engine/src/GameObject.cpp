@@ -181,13 +181,14 @@ namespace Sentinel
 				mComponent[ x ]->Update();
 	}
 
-	void GameObject::UpdateDrawable()
+	void GameObject::UpdateDrawable( bool drawChildren )
 	{
 		if( mDrawable )
 			mDrawable->Update();
-
-		TRAVERSE_VECTOR( x, mChild )
-			mChild[ x ]->UpdateDrawable();
+		
+		if( drawChildren )
+			TRAVERSE_VECTOR( x, mChild )
+				mChild[ x ]->UpdateDrawable();
 	}
 
 #define SHUTDOWN_COMPONENT( obj )\

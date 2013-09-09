@@ -1,5 +1,6 @@
 #pragma once
 
+#include "MeshComponent.h"
 #include "WDrawableComponent.h"
 #include "WMesh.h"
 
@@ -12,7 +13,11 @@ namespace Sentinel { namespace Components
 	public:
 
 		WMeshComponent( WMesh^ mesh );
+		WMeshComponent( MeshComponent* component );
 
-		DECLARE_CAST_COMPONENT( WMeshComponent );
+		DECLARE_CAST_COMPONENT( MeshComponent );
+
+		DECLARE_PROPERTY( WMesh^,		Mesh );
+		DECLARE_PROPERTY( WMaterial^,	Material );
 	};
 }}

@@ -22,16 +22,16 @@ namespace Sentinel { namespace Assets
 
 	DEFINE_OP_DEREF_EX( WMeshBuilder::WVertex, MeshBuilder::Vertex );
 
-	DEFINE_PROPERTY_R_BASE( MeshBuilder, Vertex, Vector3f, Position );
+	DEFINE_PROPERTY_RSB( MeshBuilder, Vertex, Vector3f, Position );
 
 	WVector2f^ WMeshBuilder::WVertex::TextureCoords( TextureType type )
 	{
 		return gcnew RVector2f( &mRef->mTextureCoords[ (int)type ] );
 	}
 
-	DEFINE_PROPERTY_R_BASE( MeshBuilder, Vertex, Vector3f, Normal );
-	DEFINE_PROPERTY_M_BASE( MeshBuilder, Vertex, int,	   Color );
-	DEFINE_PROPERTY_R_BASE( MeshBuilder, Vertex, Vector4f, Tangent );
+	DEFINE_PROPERTY_RSB( MeshBuilder, Vertex, Vector3f, Normal );
+	DEFINE_PROPERTY_MB(  MeshBuilder, Vertex, int,	    Color );
+	DEFINE_PROPERTY_RSB( MeshBuilder, Vertex, Vector4f, Tangent );
 
 	float% WMeshBuilder::WVertex::Weight( int index )
 	{
@@ -43,7 +43,7 @@ namespace Sentinel { namespace Assets
 		return mRef->mMatrixIndex[ index ];
 	}
 
-	DEFINE_PROPERTY_R_BASE( MeshBuilder, Vertex, Matrix4f, MatrixVertex );
+	DEFINE_PROPERTY_RSB( MeshBuilder, Vertex, Matrix4f, MatrixVertex );
 
 	//////////////////////////////////
 
@@ -63,9 +63,9 @@ namespace Sentinel { namespace Assets
 
 	//////////////////////////////////
 
-	DEFINE_PROPERTY_P( MeshBuilder, Shader,		Shader );
-	DEFINE_PROPERTY_E( MeshBuilder, Systems,	PrimitiveType, Primitive );
-	DEFINE_PROPERTY_R( MeshBuilder, Vector4f,	TextureScale );
+	DEFINE_PROPERTY_PR( MeshBuilder, Shader,	Shader );
+	DEFINE_PROPERTY_E(  MeshBuilder, Systems,	PrimitiveType, Primitive );
+	DEFINE_PROPERTY_R(  MeshBuilder, Vector4f,	TextureScale );
 
 	RTexture^ WMeshBuilder::Texture( TextureType type )
 	{

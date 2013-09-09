@@ -8,16 +8,30 @@ namespace Sentinel
 {
 	class SENTINEL_DLL ModelComponent : public DrawableComponent
 	{
-		std::shared_ptr< Model > mModel;
-		
+	protected:
+
+		std::vector< Material >		mMaterial;
+
 	public:
+
+		std::shared_ptr< Model >	mModel;
+
+		/////////////////////////////
 
 		ModelComponent( std::shared_ptr< Model > model );
 
-		void Startup();
+		void	Startup();
 
-		void Update();
+		void	Update();
 
-		void Shutdown();
+		void	Shutdown();
+
+		/////////////////////////////
+
+		void	SetMaterial( const Material& material );
+		void	SetMaterial( UINT index, const Material& material );
+		void	SetMaterial( const std::vector< Material >& material );
+		const std::vector< Material >& GetMaterial();
+		UINT	GetMaterialSize();
 	};
 }

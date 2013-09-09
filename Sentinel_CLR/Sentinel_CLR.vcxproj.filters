@@ -138,7 +138,7 @@
     <ClInclude Include="..\Engine\src\CLR\WShape.h">
       <Filter>Sentinel_Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\RStdVector.h">
+    <ClInclude Include="..\Engine\src\CLR\WStdVector.h">
       <Filter>Sentinel_Engine\Utilities</Filter>
     </ClInclude>
   </ItemGroup>

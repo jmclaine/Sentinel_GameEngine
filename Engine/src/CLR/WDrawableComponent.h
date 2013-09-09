@@ -1,5 +1,6 @@
 #pragma once
 
+#include "DrawableComponent.h"
 #include "WGameObject.h"
 #include "WMaterial.h"
 
@@ -15,8 +16,8 @@ namespace Sentinel { namespace Components
 
 	public:
 
-		DECLARE_CAST_COMPONENT( WDrawableComponent );
+		WDrawableComponent( DrawableComponent* component );
 
-		DECLARE_PROPERTY( WMaterial^, Material );
+		DECLARE_CAST_COMPONENT( DrawableComponent );
 	};
 }}

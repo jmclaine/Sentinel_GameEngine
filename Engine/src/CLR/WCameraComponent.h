@@ -19,7 +19,7 @@ namespace Sentinel { namespace Components
 
 		WCameraComponent( CameraComponent* camera );
 
-		DECLARE_CAST_COMPONENT( WCameraComponent );
+		DECLARE_CAST_COMPONENT( CameraComponent );
 
 		const WTransformComponent^	GetTransform();
 

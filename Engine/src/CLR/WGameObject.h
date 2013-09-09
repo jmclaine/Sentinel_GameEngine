@@ -4,7 +4,6 @@ Creates a new GameObject.
 WGameObject frees automatically when attached to WGameWorld.
 Delete() should be called manually for a controlled free memory.
 */
-#include "RStdVector.h"
 #include "Property.h"
 #include "GameObject.h"
 #include "WGameComponent.h"
@@ -59,6 +58,7 @@ namespace Sentinel { namespace Components
 		virtual void	UpdateComponents();
 
 		virtual void	UpdateDrawable();
+		virtual void	UpdateDrawable( bool drawChildren );
 
 		virtual void	Shutdown();
 

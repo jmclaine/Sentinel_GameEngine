@@ -1,9 +1,8 @@
 #pragma once
 /*
-Mesh is not modifiable, except the buffers
-associated with the Mesh.
+Mesh is fully customizable.
 
-Mesh is generated through MeshBuilder.h or Model.h
+Mesh creation helpers are in MeshBuilder.h or Model.h
 */
 #include "Common.h"
 #include "Renderer.h"
@@ -26,10 +25,13 @@ namespace Sentinel
 	{
 		friend class MeshBuilder;
 
-	private:
+	public:
 
 		PrimitiveType		mPrimitive;
 		
+		Buffer*				mVBO;
+		Buffer*				mIBO;
+
 		Matrix4f			mMatrixWorld;
 		Matrix4f			mMatrixShadow;		// camera matrix
 		Vector4f			mTextureScale;
@@ -39,28 +41,11 @@ namespace Sentinel
 		Material			mMaterial;
 		Texture*			mTexture[ NUM_TEXTURES ];
 
-		Buffer*				mVBO;
-		Buffer*				mIBO;
-
-		////////////////////////////
+		//////////////////////////////
 
 		Mesh();
-
-	public:
-
 		~Mesh();
 
-		void		SetWorldTransform( const Matrix4f& world );
-		void		SetShadowTransform( const Matrix4f& shadow );
-		void		SetTextureScale( const Vector4f& scale );
-
-		void		SetShader( Shader* shader );
-		void		SetMaterial( const Material& material );
-		void		SetTexture( Texture* texture, TextureType type = TEXTURE_DIFFUSE );
-
-		Buffer*&	GetVBO();
-		Buffer*&	GetIBO();
-
-		void		Draw( UINT count = UINT_MAX );
+		void Draw( UINT count = UINT_MAX );
 	};
 }

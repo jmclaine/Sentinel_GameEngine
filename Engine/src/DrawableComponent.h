@@ -13,11 +13,7 @@ namespace Sentinel
 
 		TransformComponent*		mTransform;
 
-	public:
-
-		Material				mMaterial;
-
-	protected:
+		/////////////////////////////
 
 		DrawableComponent();
 

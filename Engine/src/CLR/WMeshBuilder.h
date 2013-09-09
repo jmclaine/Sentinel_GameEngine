@@ -11,7 +11,7 @@ Contains all the functionality of the C++ version.
 #include "WVector4f.h"
 #include "WVector3f.h"
 #include "WVector2f.h"
-#include "RStdVector.h"
+#include "WStdVector.h"
 
 using namespace Sentinel::Math;
 using namespace Sentinel::Utilities;
@@ -113,6 +113,9 @@ namespace Sentinel { namespace Assets
 
 	DECLARE_CLASS_REF( MeshBuilder );
 
+	WStdVector_Class( Vertex, MeshBuilder::Vertex, WMeshBuilder::WVertex, WMeshBuilder::RVertex );
 	RStdVector_Class( Vertex, MeshBuilder::Vertex, WMeshBuilder::WVertex, WMeshBuilder::RVertex );
+
+	WStdVector_Native( Index, UINT, int );
 	RStdVector_Native( Index, UINT, int );
 }}

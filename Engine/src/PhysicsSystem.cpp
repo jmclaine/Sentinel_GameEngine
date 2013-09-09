@@ -103,8 +103,8 @@ namespace Sentinel
 
 	btRigidBody* PhysicsSystem::CreateMesh( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, Mesh* mesh, float mass )
 	{
-		Buffer* vbo = mesh->GetVBO();
-		Buffer* ibo = mesh->GetIBO();
+		Buffer* vbo = mesh->mVBO;
+		Buffer* ibo = mesh->mIBO;
 		
 		// Store only the vertex positions.
 		//

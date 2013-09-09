@@ -277,7 +277,7 @@ namespace Sentinel
 				++attribIndex;
 			}
 
-			HRESULT hr = ( mDevice->CreateInputLayout( decl, len, desc.pIAInputSignature, desc.IAInputSignatureSize, &mLayout ));
+			HRESULT hr = mDevice->CreateInputLayout( decl, len, desc.pIAInputSignature, desc.IAInputSignatureSize, &mLayout );
 
 			delete[] decl;
 
@@ -355,7 +355,10 @@ namespace Sentinel
 
 		void SetTexture( UINT uniform, Texture* texture )
 		{
-			mUniformDX[ uniform ]->AsShaderResource()->SetResource( static_cast< TextureDX* >(texture)->mResource );
+			if( texture )
+				mUniformDX[ uniform ]->AsShaderResource()->SetResource( static_cast< TextureDX* >(texture)->mResource );
+			else
+				mUniformDX[ uniform ]->AsShaderResource()->SetResource( NULL );
 		}
 
 		void CreateUniform( const char* name )
