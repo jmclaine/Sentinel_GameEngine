@@ -77,6 +77,7 @@ namespace Sentinel_Editor
 		private const float			TRANSFORM_OBJECT_ALPHA = 0.75f;
 		private const float			TRANSFORM_OBJECT_SCALE = 0.0025f;
 
+		
 		///
 		/// Starting Point of Application.
 		///
@@ -87,6 +88,9 @@ namespace Sentinel_Editor
 
 		private void Window_Loaded( Object sender, RoutedEventArgs e )
 		{
+			Inspector_TreeViewItem.mTextStyle = (Style)FindResource( "Inspector_TextStyle" );
+			Inspector_TreeViewItem.mTreeStyle = (Style)FindResource( "Inspector_TreeStyle" );
+
 			///////////////////////////////////////
 			// Initialize Renderer.
 			//
@@ -156,89 +160,91 @@ namespace Sentinel_Editor
 					WRenderer.SetDepthStencilState( StencilType.NO_ZBUFFER );
 
 					WTransformComponent selectedObjectTransform = WTransformComponent.Cast( mSelectedObject.FindComponent( ComponentType.TRANSFORM ));
-					WVector3f selectedObjectPosition = selectedObjectTransform.GetMatrixWorld().Transform( new WVector3f( 0, 0, 0 ));
 
-					if( Select_Object.IsChecked == true )
+					if( selectedObjectTransform != null )
 					{
-						// Draw yellow wireframe around the selected object.
-						//
-						WGameComponent component = mSelectedObject.FindComponent( ComponentType.DRAWABLE );
-						
-						if( component != null )
+						WVector3f selectedObjectPosition = selectedObjectTransform.GetMatrixWorld().Transform( new WVector3f( 0, 0, 0 ));
+
+						if( Select_Object.IsChecked == true )
 						{
-							WRenderer.SetFill( FillType.WIREFRAME );
+							// Draw yellow wireframe around the selected object.
+							//
+							WGameComponent component = mSelectedObject.FindComponent( ComponentType.DRAWABLE );
+						
+							if( component != null )
+							{
+								WRenderer.SetFill( FillType.WIREFRAME );
 
-							WMeshComponent meshComp = WMeshComponent.Cast( component );
+								WMeshComponent meshComp = WMeshComponent.Cast( component );
 							
-							if( meshComp != null )
-							{
-								WMaterial material = new WMaterial( meshComp.Material );
-								meshComp.Material  = mMaterial_Selected;
-
-								WMesh mesh = meshComp.Mesh;
-								WShader shader = mesh.Shader;
-
-								mesh.Shader = mShader[ (int)ShaderTypes.COLOR_ONLY ];
-
-								mSelectedObject.UpdateTransform();
-								mSelectedObject.UpdateDrawable( false );
-
-								meshComp.Material = material;
-								mesh.Shader = shader;
-
-								// Not calling this here causes the garbage collector
-								// to accumulate shared_ptr counters.
-								//
-								mesh.Dispose();
-							}
-							else
-							{
-								WModelComponent modelComp = WModelComponent.Cast( component );
-
-								if( modelComp != null )
+								if( meshComp != null )
 								{
-									WStdVector_Material material = modelComp.GetMaterial();
-									modelComp.SetMaterial( mMaterial_Selected );
-									
-									WModel model = modelComp.Model;
-									//WShader shader = model.Shader;
-									
-									mSelectedObject.UpdateTransform();
+									WMaterial material = new WMaterial( meshComp.Material );
+									meshComp.Material  = mMaterial_Selected;
+
+									WMesh mesh = meshComp.Mesh;
+									WShader shader = mesh.Shader;
+
+									mesh.Shader = mShader[ (int)ShaderTypes.COLOR_ONLY ];
+
 									mSelectedObject.UpdateDrawable( false );
 
-									modelComp.SetMaterial( material );
+									meshComp.Material = material;
+									mesh.Shader = shader;
 
 									// Not calling this here causes the garbage collector
 									// to accumulate shared_ptr counters.
 									//
-									model.Dispose();
+									mesh.Dispose();
 								}
+								else
+								{
+									WModelComponent modelComp = WModelComponent.Cast( component );
+
+									if( modelComp != null )
+									{
+										WStdVector_Material material = modelComp.GetMaterial();
+										modelComp.SetMaterial( mMaterial_Selected );
+									
+										WModel model = modelComp.Model;
+										//WShader shader = model.Shader;
+									
+										mSelectedObject.UpdateDrawable( false );
+
+										modelComp.SetMaterial( material );
+
+										// Not calling this here causes the garbage collector
+										// to accumulate shared_ptr counters.
+										//
+										model.Dispose();
+									}
+								}
+
+								WRenderer.SetFill( FillType.SOLID );
 							}
-
-							WRenderer.SetFill( FillType.SOLID );
 						}
-					}
-					else
-					if( Translate_Object.IsChecked == true )
-					{
-						// Draw the translate object.
-						//
-						WTransformComponent transform = WTransformComponent.Cast( mTranslateObject.FindComponent( ComponentType.TRANSFORM ));
-						transform.Position = selectedObjectPosition;
+						else
+						if( Translate_Object.IsChecked == true )
+						{
+							// Draw the translate object.
+							//
+							WTransformComponent transform = WTransformComponent.Cast( mTranslateObject.FindComponent( ComponentType.TRANSFORM ));
+							transform.Position = selectedObjectPosition;
 
-						WVector3f distance = mGameWindow.GetCamera().GetTransform().Position - transform.Position;
-						distance.x = Math.Abs( distance.x );
-						distance.y = Math.Abs( distance.y );
-						distance.z = Math.Abs( distance.z );
-						float d = distance.Length() * TRANSFORM_OBJECT_SCALE;
-						transform.Scale = new WVector3f( d, d, d );
+							WVector3f distance = mGameWindow.GetCamera().GetTransform().Position - transform.Position;
+							distance.x = Math.Abs( distance.x );
+							distance.y = Math.Abs( distance.y );
+							distance.z = Math.Abs( distance.z );
+							float d = distance.Length() * TRANSFORM_OBJECT_SCALE;
+							transform.Scale = new WVector3f( d, d, d );
 
-						WRenderer.SetCull( CullType.NONE );
-						WRenderer.SetDepthStencilState( StencilType.NO_ZBUFFER );
+							WRenderer.SetCull( CullType.NONE );
+							WRenderer.SetDepthStencilState( StencilType.NO_ZBUFFER );
 
-						//(new WMeshComponent( mTranslateObject.GetChild( 0 ).FindComponent( ComponentType.DRAWABLE ))).Material = mMaterial_Selected;
-						mTranslateObject.UpdateTransform();
-						mTranslateObject.UpdateDrawable();
+							//(new WMeshComponent( mTranslateObject.GetChild( 0 ).FindComponent( ComponentType.DRAWABLE ))).Material = mMaterial_Selected;
+							mTranslateObject.UpdateTransform();
+							mTranslateObject.UpdateDrawable();
+						}
 					}
 				}
 
@@ -315,11 +321,17 @@ namespace Sentinel_Editor
 		{
 			GameObject_TreeViewItem item = (GameObject_TreeViewItem)Objects_TreeView.SelectedItem;
 			
-			mSelectedObject = item.mObject;
+			mSelectedObject = item.mData;
 
 			//Objects_TreeView.Items.Refresh();
 			//Objects_TreeView.UpdateLayout();
+
+			Inspector_TreeView.Items.Clear();
+			Inspector_TreeView.Items.Add( new GameObject_Inspector( mSelectedObject ));
 		}
+
+		private void Inspector_TreeView_Selected( Object sender, RoutedEventArgs e )
+		{}
 
 		///
 		/// Assets Tree.
@@ -384,7 +396,7 @@ namespace Sentinel_Editor
 
 			transform = (WTransformComponent)obj.AttachComponent( new WTransformComponent(), "Transform" );
 			transform.Position = new WVector3f( 0, 25, 25 );
-			transform.Orientation = new WQuatf( -45, 0, 0 );
+			transform.Rotation = new WVector3f( -45, 0, 0 );
 
 			obj.AttachComponent( new WPerspectiveCameraComponent( mGameWindow.GetInfo().Width(), mGameWindow.GetInfo().Height() ), "Camera" );
 
@@ -427,9 +439,9 @@ namespace Sentinel_Editor
 			WGameObject obj2 = WGameWorld.AddGameObject( new WGameObject(), "Cube" );
 
 			transform = (WTransformComponent)obj2.AttachComponent( new WTransformComponent(), "Transform" );
-			transform.Position	  = new WVector3f( 0, 4, 0 );
-			transform.Scale		  = new WVector3f( 0.5f, 0.5f, 0.5f );
-			transform.Orientation = new WQuatf( 45, 45, 45 );
+			transform.Position	= new WVector3f( 0, 4, 0 );
+			transform.Scale		= new WVector3f( 0.5f, 0.5f, 0.5f );
+			transform.Rotation	= new WVector3f( 90, 180, 270 );
 
 			mesh = meshBuilder.BuildMesh();
 			obj2.AttachComponent( new WMeshComponent( mesh ), "Mesh" );
@@ -439,8 +451,9 @@ namespace Sentinel_Editor
 			obj = WGameWorld.AddGameObject( new WGameObject(), "Cube2" );
 
 			transform = (WTransformComponent)obj.AttachComponent( new WTransformComponent(), "Transform" );
-			transform.Position	  = new WVector3f( -10, 4, 0 );
-			transform.Scale		  = new WVector3f( 2, 2, 2 );
+			transform.Position	= new WVector3f( -10, 4, 0 );
+			transform.Scale		= new WVector3f( 2, 2, 2 );
+			transform.Rotation	= new WVector3f( 45, 45, 45 );
 
 			obj.AttachComponent( new WMeshComponent( mesh ), "Mesh" );
 
@@ -479,8 +492,8 @@ namespace Sentinel_Editor
 			WGameObject obj = new WGameObject();
 
 			WTransformComponent transform = new WTransformComponent();
-			transform.Position    = new WVector3f( tileSize, 0, 0 );
-			transform.Orientation = new WQuatf( 0, 0, -90 );
+			transform.Position = new WVector3f( tileSize, 0, 0 );
+			transform.Rotation = new WVector3f( 0, 0, -90 );
 			obj.AttachComponent( transform, "Tile_X" );
 
 			WModelComponent modelComp = new WModelComponent( model );
@@ -494,8 +507,8 @@ namespace Sentinel_Editor
 			obj = new WGameObject();
 
 			transform = new WTransformComponent();
-			transform.Position    = new WVector3f( 0, tileSize, 0 );
-			transform.Orientation = new WQuatf( 0, 0, 0 );
+			transform.Position = new WVector3f( 0, tileSize, 0 );
+			transform.Rotation = new WVector3f( 0, 0, 0 );
 			obj.AttachComponent( transform, "Tile_Y" );
 
 			modelComp = new WModelComponent( model );
@@ -509,8 +522,8 @@ namespace Sentinel_Editor
 			obj = new WGameObject();
 
 			transform = new WTransformComponent();
-			transform.Position    = new WVector3f( 0, 0, tileSize );
-			transform.Orientation = new WQuatf( 90, 0, 0 );
+			transform.Position = new WVector3f( 0, 0, tileSize );
+			transform.Rotation = new WVector3f( 90, 0, 0 );
 			obj.AttachComponent( transform, "Tile_Z" );
 
 			modelComp = new WModelComponent( model );

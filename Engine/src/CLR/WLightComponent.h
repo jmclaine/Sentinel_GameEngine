@@ -22,12 +22,6 @@ namespace Sentinel { namespace Components
 
 		const WTransformComponent^	GetTransform();
 
-		void			Startup();
-
-		void			Update();
-
-		void			Shutdown();
-
 		//////////////////////////////
 
 		DECLARE_PROPERTY( WColorRGBA^,	Color );

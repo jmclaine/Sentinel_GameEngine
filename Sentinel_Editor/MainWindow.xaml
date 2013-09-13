@@ -13,6 +13,10 @@
     
     <Window.Resources>
         <Style TargetType="{x:Type local:GameObject_TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}" />
+        <Style x:Key="Inspector_TreeStyle" TargetType="{x:Type local:Inspector_TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}" />
+        <Style x:Key="Inspector_TextStyle" TargetType="Label">
+            <Setter Property="Foreground" Value="#FFFFFFFF" />
+        </Style>
     </Window.Resources>
     
     <Canvas Name="Canvas_Main">
@@ -150,9 +154,13 @@
                         <GridSplitter HorizontalAlignment="Right" Width="8" Background="#222222" ResizeDirection="Columns" ShowsPreview="False" Margin="0,-2,0,0" />
 
                         <Rectangle Grid.Column="1" Margin="0,0,0,0" Fill="#444444" />
-                        <Border Grid.Column="1" Name="Inspector" BorderThickness="2" BorderBrush="#666666" Margin="0,0,0,0">
+                        <Border Grid.Column="1" Name="Component_Inspector" BorderThickness="2" BorderBrush="#666666" Margin="0,0,0,0">
                             <TextBlock Background="#FF666666" FontWeight="Bold" Foreground="White" Height="24" Padding="4" Text="Inspector" TextAlignment="Center" VerticalAlignment="Top" />
                         </Border>
+
+                        <Grid Grid.Column="1">
+                            <TreeView Name="Inspector_TreeView" TreeViewItem.Selected="Inspector_TreeView_Selected" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2,26,2,2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Top" Background="#FF444444" Foreground="White" BorderThickness="0" MinWidth="10" MinHeight="10" OverridesDefaultStyle="False" Padding="0" Panel.ZIndex="-1" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                        </Grid>
                     </Grid>
                 </Grid>
 

@@ -18,6 +18,7 @@ namespace Sentinel
 
 		Quatf();
 		Quatf( float _pitch, float _yaw, float _roll );
+		Quatf( const Vector3f& rotation );
 		Quatf( float _x, float _y, float _z, float _w );
 
 		float*		Ptr();

@@ -15,10 +15,10 @@ namespace Sentinel
 
 	void PerspectiveCameraComponent::Update()
 	{
-		mMatrixView.Rotate( GetTransform()->mOrientation );
-		mLookAt = GetTransform()->mPosition + mMatrixView.Forward();
+		mMatrixView.Rotate( mTransform->mOrientation );
+		mLookAt = mTransform->mPosition + mMatrixView.Forward();
 
-		mMatrixView.LookAtView( GetTransform()->mPosition, mLookAt, mMatrixView.Up() );
+		mMatrixView.LookAtView( mTransform->mPosition, mLookAt, mMatrixView.Up() );
 		mMatrixFinal = mMatrixProjection * mMatrixView;
 	}
 

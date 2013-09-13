@@ -18,12 +18,6 @@ namespace Sentinel { namespace Components
 
 		DECLARE_CAST_COMPONENT( PerspectiveCameraComponent );
 
-		void	Startup();
-
-		void	Update();
-
-		void	Shutdown();
-
 		//////////////////////////////
 
 		void	Set( float windowWidth, float windowHeight );

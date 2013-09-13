@@ -14,6 +14,11 @@ namespace Sentinel { namespace Math
 		mRef = new Quatf( _pitch, _yaw, _roll );
 	}
 
+	WQuatf::WQuatf( WVector3f^ rotation )
+	{
+		mRef = new Quatf( rotation );
+	}
+
 	WQuatf::WQuatf( float _x, float _y, float _z, float _w )
 	{
 		mRef = new Quatf( _x, _y, _z, _w );

@@ -25,7 +25,6 @@ namespace Sentinel_Editor
 		private float							mMovementDirection;	// forward (+) or backward (-)
 		private float							mMovementSpeed;
 
-		private WVector3f						mRotation;
 		private float							mAngularSpeed;
 		
 		///////////////////////////////
@@ -69,9 +68,7 @@ namespace Sentinel_Editor
 				
 				if( diff.LengthSquared() > 0 )
 				{
-					mRotation += diff * mAngularSpeed;
-	
-					mTransform.Orientation = new WQuatf( mRotation.x, mRotation.y, 0 );
+					mTransform.Rotation += diff * mAngularSpeed;
 				}
 
 				WMouse.SetPosition( mLastMousePos );
@@ -81,7 +78,7 @@ namespace Sentinel_Editor
 			//
 			if( mMovementDirection != 0 )
 			{
-				mTransform.Position = mTransform.Position + mMovementDirection * new WMatrix4f( mTransform.Orientation ).Forward();
+				mTransform.Position = mTransform.Position + mMovementDirection * new WMatrix4f( new WQuatf( mTransform.Rotation )).Forward();
 
 				mMovementDirection = 0;
 			}
@@ -112,8 +109,7 @@ namespace Sentinel_Editor
 
 		public void SetCameraRotation( WVector3f rot )
 		{
-			mRotation = rot;
-			mTransform.Orientation = new WQuatf( mRotation.x, mRotation.y, 0 );
+			mTransform.Rotation = rot;
 		}
 
 		///

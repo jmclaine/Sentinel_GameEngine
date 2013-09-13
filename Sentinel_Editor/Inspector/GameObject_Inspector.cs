@@ -12,14 +12,21 @@ using Sentinel.Components;
 
 namespace Sentinel_Editor
 {
-	class GameObject_TreeViewItem : TreeViewItem
+	class GameObject_Inspector : Inspector_TreeViewItem
 	{
 		public WGameObject mData;
 		
-		public GameObject_TreeViewItem( WGameObject obj )
+		public GameObject_Inspector( WGameObject obj )
 		{
 			Header	= obj.Name;
 			mData	= obj;
+
+			WTransformComponent transform = WTransformComponent.Cast( obj.FindComponent( ComponentType.TRANSFORM ));
+
+			if( transform != null )
+				Items.Add( new TransformComponent_Inspector( transform ));
+
+			ExpandSubtree();
 		}
 	}
 }

@@ -16,6 +16,7 @@ namespace Sentinel { namespace Math
 
 		WQuatf();
 		WQuatf( float _pitch, float _yaw, float _roll );
+		WQuatf( WVector3f^ rotation );
 		WQuatf( float _x, float _y, float _z, float _w );
 		WQuatf( const Quatf% q );
 		WQuatf( const WQuatf% q );

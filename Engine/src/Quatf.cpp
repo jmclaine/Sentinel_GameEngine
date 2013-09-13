@@ -14,6 +14,11 @@ namespace Sentinel
 		Euler( _pitch, _yaw, _roll );
 	}
 
+	Quatf::Quatf( const Vector3f& rotation )
+	{
+		Euler( rotation.x, rotation.y, rotation.z );
+	}
+
 	Quatf::Quatf( float _x, float _y, float _z, float _w )
 	{
 		x = _x;
@@ -143,8 +148,30 @@ namespace Sentinel
 
 	Vector3f Quatf::ToEuler()
 	{
-		return Vector3f( atan2( 2.0f*((w * x) + (y * z)), 1.0f - (2.0f * ((x* x) + (y * y)))),
-						 asin( 2.0f * ((w * y) - (z * x))),
-						 atan2( 2.0f * ((w * z) + (x * y)), 1.0f - (2.0f * ((y * y) + (z * z)))));
+		float pitch, yaw, roll;
+		
+		pitch = atan2( 2.0f*((w * x) + (y * z)), 1.0f - (2.0f * ((x* x) + (z * z))));
+		
+		float check = x*y + z*w;
+		if( check > 0.499f )
+		{
+			pitch = -pitch;
+			roll = (float)PI;
+			yaw  = 2.0f * atan2( x, w );
+		}
+		else
+		if( check < -0.499f )
+		{
+			pitch = -pitch;
+			roll = (float)PI;
+			yaw  = -2 * atan2( x, w );
+		}
+		else
+		{
+			roll = asin( 2.0f * ((w * z) - (y * x)));
+			yaw  = atan2( 2.0f * ((w * y) + (x * z)), 1.0f - (2.0f * ((y * y) + (z * z))));
+		}
+
+		return Vector3f( pitch, yaw, roll );
 	}
 }

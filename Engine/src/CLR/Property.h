@@ -288,7 +288,7 @@
 
 #define DEFINE_CLASS_REF_BASE( baseClass, refClass )\
 	W##baseClass::R##refClass::R##refClass( baseClass::refClass* obj )		{ mRef = obj; }\
-	W##baseClass::R##refClass::R##refClass( W##refClass^ obj )				{ mRef = obj->GetRef(); }\
+	W##baseClass::R##refClass::R##refClass( W##refClass^ obj )				{ mRef = &*obj->GetRef(); }\
 	void W##baseClass::R##refClass::Set( const baseClass::refClass& obj )	{ *mRef = obj; }\
 	void W##baseClass::R##refClass::Set( W##baseClass::W##refClass^ obj )	{ *mRef = *obj->GetRef(); }\
 	void W##baseClass::R##refClass::Delete() {}

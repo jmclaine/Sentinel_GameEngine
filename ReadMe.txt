@@ -39,4 +39,4 @@ To compile the custom model exporter, the source requires the 3ds Max 2012 SDK.
 // HOW TO USE
 //
 
-Please read 'Sentinel_Manual.docx' located in the 'Engine' folder for instructions.
+Please read 'Sentinel_Manual.docx' for instructions.

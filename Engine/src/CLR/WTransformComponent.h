@@ -1,5 +1,8 @@
 #pragma once
-
+/*
+Direct access to orientation quaternion removed for ease of editor use.
+Added Rotation vector for clarity.
+*/
 #include "TransformComponent.h"
 #include "WGameComponent.h"
 #include "WMatrix4f.h"
@@ -12,6 +15,10 @@ namespace Sentinel { namespace Components
 {
 	public ref class WTransformComponent : public WGameComponent
 	{
+	private:
+
+		WVector3f^	mRotation;
+
 	public:
 
 		WTransformComponent();
@@ -21,8 +28,12 @@ namespace Sentinel { namespace Components
 
 		/////////////////////////////////
 
+		virtual void Update() override;
+
+		/////////////////////////////////
+
 		DECLARE_PROPERTY( WVector3f^,	Position );
-		DECLARE_PROPERTY( WQuatf^,		Orientation );
+		DECLARE_PROPERTY( WVector3f^,	Rotation );
 		DECLARE_PROPERTY( WVector3f^,	Scale );
 
 		/////////////////////////////////

@@ -20,21 +20,6 @@ namespace Sentinel { namespace Components
 
 	DEFINE_CAST_COMPONENT( PerspectiveCameraComponent );
 
-	void WPerspectiveCameraComponent::Startup()
-	{
-		mRef->Startup();
-	}
-
-	void WPerspectiveCameraComponent::Update()
-	{
-		mRef->Update();
-	}
-
-	void WPerspectiveCameraComponent::Shutdown()
-	{
-		mRef->Shutdown();
-	}
-
 	//////////////////////////////
 
 	void WPerspectiveCameraComponent::Set( float windowWidth, float windowHeight )

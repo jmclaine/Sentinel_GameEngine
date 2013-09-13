@@ -99,6 +99,10 @@
     </Compile>
     <Compile Include="GameObject_TreeViewItem.cs" />
     <Compile Include="GameWindow.cs" />
+    <Compile Include="Inspector\GameObject_Inspector.cs" />
+    <Compile Include="Inspector\Inspector_TreeViewItem.cs" />
+    <Compile Include="Inspector\TransformComponent_Inspector.cs" />
+    <Compile Include="Inspector\Vector3f_Inspector.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -177,6 +181,7 @@
   <ItemGroup>
     <Resource Include="Images\Select.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

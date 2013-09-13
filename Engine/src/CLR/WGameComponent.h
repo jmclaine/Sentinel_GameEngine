@@ -62,11 +62,11 @@ namespace Sentinel { namespace Components
 
 		////////////////////////////////
 
-		void			Startup();
+		virtual void	Startup();
 
-		void			Update();
+		virtual void	Update();
 
-		void			Shutdown();
+		virtual void	Shutdown();
 
 		////////////////////////////////
 

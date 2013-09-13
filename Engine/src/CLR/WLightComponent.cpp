@@ -19,21 +19,6 @@ namespace Sentinel { namespace Components
 		return gcnew WTransformComponent( static_cast< LightComponent* >(mRef)->GetTransform() );
 	}
 
-	void WLightComponent::Startup()
-	{
-		static_cast< LightComponent* >(mRef)->Startup();
-	}
-
-	void WLightComponent::Update()
-	{
-		static_cast< LightComponent* >(mRef)->Update();
-	}
-
-	void WLightComponent::Shutdown()
-	{
-		static_cast< LightComponent* >(mRef)->Shutdown();
-	}
-
 	//////////////////////////////
 
 	DEFINE_PROPERTY_RS( LightComponent, ColorRGBA, Color );
