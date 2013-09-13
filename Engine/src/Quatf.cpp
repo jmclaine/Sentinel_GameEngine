@@ -137,7 +137,7 @@ namespace Sentinel
 		y = cx * sycz + sx * cysz;
 		z = cx * cysz - sx * sycz;
 		w = cx * cycz + sx * sysz;
-
+		
 		return *this;
 	}
 
@@ -148,30 +148,31 @@ namespace Sentinel
 
 	Vector3f Quatf::ToEuler()
 	{
-		float pitch, yaw, roll;
-		
-		pitch = atan2( 2.0f*((w * x) + (y * z)), 1.0f - (2.0f * ((x* x) + (z * z))));
-		
-		float check = x*y + z*w;
-		if( check > 0.499f )
-		{
-			pitch = -pitch;
-			roll = (float)PI;
-			yaw  = 2.0f * atan2( x, w );
-		}
-		else
-		if( check < -0.499f )
-		{
-			pitch = -pitch;
-			roll = (float)PI;
-			yaw  = -2 * atan2( x, w );
-		}
-		else
-		{
-			roll = asin( 2.0f * ((w * z) - (y * x)));
-			yaw  = atan2( 2.0f * ((w * y) + (x * z)), 1.0f - (2.0f * ((y * y) + (z * z))));
-		}
+		Vector3f v;
 
-		return Vector3f( pitch, yaw, roll );
+		float y_y = y*y;
+		float py  = w*y - z*x;
+		
+		v.x = (float)atan2( 2*(x*w + y*z), 
+							1 - 2*(x*x + y_y) );
+
+		v.y = (float)asin( 2*py );
+
+		v.z = (float)atan2( 2*(z*w + y*x),
+							1 - 2*(y_y + z*z) );
+		
+		if( py >= 0.499f ) 
+		{
+		    v.x = (float)(-2 * atan2(x, w)); 
+		    v.z = 0;
+		}
+		else
+		if( py <= -0.499f ) 
+		{
+		    v.x = (float)(2 * atan2(x, w)); 
+		    v.z = 0;
+		}
+		
+		return v; 
 	}
 }

@@ -118,27 +118,27 @@ namespace Sentinel
 		float y_y = q.y * q.y;
 		float z_z = q.z * q.z;
 		float w_w = q.w * q.w;
-
-		float inv = 1.0f / (x_x + y_y + z_z + w_w);
+		
+		//float inv = 1.0f / (x_x + y_y + z_z + w_w);
  
-		m[0]  = ( x_x - y_y - z_z + w_w) * inv;
-		m[5]  = (-x_x + y_y - z_z + w_w) * inv;
-		m[10] = (-x_x - y_y + z_z + w_w) * inv;
+		m[0]  = ( x_x - y_y - z_z + w_w);
+		m[5]  = (-x_x + y_y - z_z + w_w);
+		m[10] = (-x_x - y_y + z_z + w_w);
  
 		float tmp1 = q.x * q.y;
 		float tmp2 = q.z * q.w;
-		m[1] = 2.0f * (tmp1 + tmp2) * inv;
-		m[4] = 2.0f * (tmp1 - tmp2) * inv;
+		m[1] = 2.0f * (tmp1 + tmp2);
+		m[4] = 2.0f * (tmp1 - tmp2);
  
 		tmp1 = q.x * q.z;
 		tmp2 = q.y * q.w;
-		m[2] = 2.0f * (tmp1 - tmp2) * inv;
-		m[8] = 2.0f * (tmp1 + tmp2) * inv;
+		m[2] = 2.0f * (tmp1 - tmp2);
+		m[8] = 2.0f * (tmp1 + tmp2);
 
 		tmp1 = q.y * q.z;
 		tmp2 = q.x * q.w;
-		m[6] = 2.0f * (tmp1 + tmp2) * inv;
-		m[9] = 2.0f * (tmp1 - tmp2) * inv;
+		m[6] = 2.0f * (tmp1 + tmp2);
+		m[9] = 2.0f * (tmp1 - tmp2);
 
 		m[15] = 1.0f;
 	}
