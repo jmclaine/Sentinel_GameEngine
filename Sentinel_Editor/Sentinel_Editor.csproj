@@ -97,18 +97,24 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="GameObject_TreeViewItem.cs" />
+    <Compile Include="Assets\AMesh.cs" />
+    <Compile Include="Assets\AShader.cs" />
+    <Compile Include="Assets\EditorAsset.cs" />
+    <Compile Include="Objects\OGameObject.cs" />
     <Compile Include="GameWindow.cs" />
-    <Compile Include="Inspector\GameObject_Inspector.cs" />
-    <Compile Include="Inspector\Inspector_TreeViewItem.cs" />
-    <Compile Include="Inspector\TransformComponent_Inspector.cs" />
-    <Compile Include="Inspector\Vector3f_Inspector.cs" />
+    <Compile Include="Inspector\IGameObject.cs" />
+    <Compile Include="Inspector\Inspector.cs" />
+    <Compile Include="Inspector\IMeshComponent.cs" />
+    <Compile Include="Inspector\IModelComponent.cs" />
+    <Compile Include="Inspector\ITransformComponent.cs" />
+    <Compile Include="Inspector\IVector3f.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\ATexture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -181,7 +187,9 @@
   <ItemGroup>
     <Resource Include="Images\Select.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Images\Asset_Image.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

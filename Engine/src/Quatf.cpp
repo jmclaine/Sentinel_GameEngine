@@ -153,7 +153,7 @@ namespace Sentinel
 		float y_y = y*y;
 		float py  = w*y - z*x;
 		
-		v.x = (float)atan2( 2*(x*w + y*z), 
+		v.x = (float)atan2( 2*(x*w + y*z),
 							1 - 2*(x*x + y_y) );
 
 		v.y = (float)asin( 2*py );
@@ -161,18 +161,22 @@ namespace Sentinel
 		v.z = (float)atan2( 2*(z*w + y*x),
 							1 - 2*(y_y + z*z) );
 		
-		if( py >= 0.499f ) 
+		if( py >= 0.499f )
 		{
-		    v.x = (float)(-2 * atan2(x, w)); 
+		    v.x = (float)(-2 * atan2(x, w));
 		    v.z = 0;
 		}
 		else
-		if( py <= -0.499f ) 
+		if( py <= -0.499f )
 		{
-		    v.x = (float)(2 * atan2(x, w)); 
+		    v.x = (float)(2 * atan2(x, w));
 		    v.z = 0;
 		}
+
+		for( int i = 0; i < 3; ++i )
+			if( v[ i ] > -EPSILON && v[ i ] < EPSILON )
+				v[ i ] = 0;
 		
-		return v; 
+		return v;
 	}
 }

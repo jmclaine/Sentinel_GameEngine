@@ -18,8 +18,11 @@ Delete() should be called manually for a controlled free memory.
 #define DEFINE_CAST_COMPONENT( refClass )\
 	W##refClass^ W##refClass::Cast( WGameComponent^ component ) \
 	{\
-		refClass* obj = dynamic_cast< refClass* >( component->GetRef() );\
-		return (obj) ? gcnew W##refClass( obj ) : nullptr;\
+		try {\
+			refClass* obj = dynamic_cast< refClass* >( component->GetRef() );\
+			return (obj) ? gcnew W##refClass( obj ) : nullptr;\
+		} catch( System::Exception^ ) {}\
+		return nullptr;\
 	}
 
 namespace Sentinel { namespace Components

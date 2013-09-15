@@ -63,6 +63,13 @@ namespace Sentinel_Editor
 		private WTexture			mTexture;
 		private bool				mDoUpdate;
 
+		private static TreeViewItem	mAsset_Texture;
+		private static TreeViewItem	mAsset_Shader;
+		private static TreeViewItem	mAsset_Mesh;
+		private static TreeViewItem	mAsset_Model;
+
+		private EditorAsset			mSelectedAsset;
+
 		private WGameObject			mSelectedObject;
 
 		private WGameObject			mTranslateObject;
@@ -88,8 +95,10 @@ namespace Sentinel_Editor
 
 		private void Window_Loaded( Object sender, RoutedEventArgs e )
 		{
-			Inspector_TreeViewItem.mTextStyle = (Style)FindResource( "Inspector_TextStyle" );
-			Inspector_TreeViewItem.mTreeStyle = (Style)FindResource( "Inspector_TreeStyle" );
+			Inspector.mTreeStyle = (Style)FindResource( "Inspector_TreeStyle" );
+			Inspector.mTextStyle = (Style)FindResource( "Inspector_TextStyle" );
+
+			EditorAsset.TreeStyle = (Style)FindResource( "Assets_TreeStyle" );
 
 			///////////////////////////////////////
 			// Initialize Renderer.
@@ -119,6 +128,15 @@ namespace Sentinel_Editor
 
 			mMaterial_Selected = new WMaterial( new WColorRGBA( 1, 0.5f, 1, 1 ), new WColorRGBA( 0, 0, 0, 0 ), new WColorRGBA( 0, 0, 0, 0 ), 0 );
 
+			// Create asset folders.
+			//
+			CreateAssetFolder( ref mAsset_Texture,	"Texture" );
+			CreateAssetFolder( ref mAsset_Shader,	"Shader" );
+			CreateAssetFolder( ref mAsset_Mesh,		"Mesh" );
+			CreateAssetFolder( ref mAsset_Model,	"Model" );
+
+			// Prepare Game World.
+			//
 			PrepareShaders();
 			PrepareObjects();
 
@@ -152,103 +170,108 @@ namespace Sentinel_Editor
 
 				mGameWindow.Update();
 
-				// Draw Object Transform Tool.
-				//
-				if( mSelectedObject != null )
+				DrawSelection();
+
+				WRenderer.Present();
+			}
+		}
+
+		private void DrawSelection()
+		{
+			// Draw Object Transform Tool.
+			//
+			if( mSelectedObject != null )
+			{
+				WRenderer.SetBlend( BlendType.PARTICLE );
+				WRenderer.SetDepthStencilState( StencilType.NO_ZBUFFER );
+
+				WTransformComponent selectedObjectTransform = WTransformComponent.Cast( mSelectedObject.FindComponent( ComponentType.TRANSFORM ));
+
+				if( selectedObjectTransform != null )
 				{
-					WRenderer.SetBlend( BlendType.PARTICLE );
-					WRenderer.SetDepthStencilState( StencilType.NO_ZBUFFER );
+					WVector3f selectedObjectPosition = selectedObjectTransform.GetMatrixWorld().Transform( new WVector3f( 0, 0, 0 ));
 
-					WTransformComponent selectedObjectTransform = WTransformComponent.Cast( mSelectedObject.FindComponent( ComponentType.TRANSFORM ));
-
-					if( selectedObjectTransform != null )
+					if( Select_Object.IsChecked == true )
 					{
-						WVector3f selectedObjectPosition = selectedObjectTransform.GetMatrixWorld().Transform( new WVector3f( 0, 0, 0 ));
-
-						if( Select_Object.IsChecked == true )
-						{
-							// Draw yellow wireframe around the selected object.
-							//
-							WGameComponent component = mSelectedObject.FindComponent( ComponentType.DRAWABLE );
+						// Draw wireframe around the selected object.
+						//
+						WGameComponent component = mSelectedObject.FindComponent( ComponentType.DRAWABLE );
 						
-							if( component != null )
-							{
-								WRenderer.SetFill( FillType.WIREFRAME );
+						if( component != null )
+						{
+							WRenderer.SetFill( FillType.WIREFRAME );
 
-								WMeshComponent meshComp = WMeshComponent.Cast( component );
+							WMeshComponent meshComp = WMeshComponent.Cast( component );
 							
-								if( meshComp != null )
+							if( meshComp != null )
+							{
+								WMaterial material = new WMaterial( meshComp.Material );
+								meshComp.Material  = mMaterial_Selected;
+
+								WMesh mesh = meshComp.Mesh;
+								WShader shader = mesh.Shader;
+
+								mesh.Shader = mShader[ (int)ShaderTypes.COLOR_ONLY ];
+
+								mSelectedObject.UpdateDrawable( false );
+
+								meshComp.Material = material;
+								mesh.Shader = shader;
+
+								// Not calling this here causes the garbage collector
+								// to accumulate shared_ptr counters.
+								//
+								mesh.Dispose();
+							}
+							else
+							{
+								WModelComponent modelComp = WModelComponent.Cast( component );
+
+								if( modelComp != null )
 								{
-									WMaterial material = new WMaterial( meshComp.Material );
-									meshComp.Material  = mMaterial_Selected;
-
-									WMesh mesh = meshComp.Mesh;
-									WShader shader = mesh.Shader;
-
-									mesh.Shader = mShader[ (int)ShaderTypes.COLOR_ONLY ];
-
+									WStdVector_Material material = modelComp.GetMaterial();
+									modelComp.SetMaterial( mMaterial_Selected );
+									
+									WModel model = modelComp.Model;
+									//WShader shader = model.Shader;
+									
 									mSelectedObject.UpdateDrawable( false );
 
-									meshComp.Material = material;
-									mesh.Shader = shader;
+									modelComp.SetMaterial( material );
 
 									// Not calling this here causes the garbage collector
 									// to accumulate shared_ptr counters.
 									//
-									mesh.Dispose();
+									model.Dispose();
 								}
-								else
-								{
-									WModelComponent modelComp = WModelComponent.Cast( component );
-
-									if( modelComp != null )
-									{
-										WStdVector_Material material = modelComp.GetMaterial();
-										modelComp.SetMaterial( mMaterial_Selected );
-									
-										WModel model = modelComp.Model;
-										//WShader shader = model.Shader;
-									
-										mSelectedObject.UpdateDrawable( false );
-
-										modelComp.SetMaterial( material );
-
-										// Not calling this here causes the garbage collector
-										// to accumulate shared_ptr counters.
-										//
-										model.Dispose();
-									}
-								}
-
-								WRenderer.SetFill( FillType.SOLID );
 							}
-						}
-						else
-						if( Translate_Object.IsChecked == true )
-						{
-							// Draw the translate object.
-							//
-							WTransformComponent transform = WTransformComponent.Cast( mTranslateObject.FindComponent( ComponentType.TRANSFORM ));
-							transform.Position = selectedObjectPosition;
 
-							WVector3f distance = mGameWindow.GetCamera().GetTransform().Position - transform.Position;
-							distance.x = Math.Abs( distance.x );
-							distance.y = Math.Abs( distance.y );
-							distance.z = Math.Abs( distance.z );
-							float d = distance.Length() * TRANSFORM_OBJECT_SCALE;
-							transform.Scale = new WVector3f( d, d, d );
-
-							WRenderer.SetCull( CullType.NONE );
-							WRenderer.SetDepthStencilState( StencilType.NO_ZBUFFER );
-
-							//(new WMeshComponent( mTranslateObject.GetChild( 0 ).FindComponent( ComponentType.DRAWABLE ))).Material = mMaterial_Selected;
-							mTranslateObject.UpdateTransform();
-							mTranslateObject.UpdateDrawable();
+							WRenderer.SetFill( FillType.SOLID );
 						}
 					}
-				}
+					else
+					if( Translate_Object.IsChecked == true )
+					{
+						// Draw the translate object.
+						//
+						WTransformComponent transform = WTransformComponent.Cast( mTranslateObject.FindComponent( ComponentType.TRANSFORM ));
+						transform.Position = selectedObjectPosition;
 
-				WRenderer.Present();
+						WVector3f distance = mGameWindow.GetCamera().GetTransform().Position - transform.Position;
+						distance.x = Math.Abs( distance.x );
+						distance.y = Math.Abs( distance.y );
+						distance.z = Math.Abs( distance.z );
+						float d = distance.Length() * TRANSFORM_OBJECT_SCALE;
+						transform.Scale = new WVector3f( d, d, d );
+
+						WRenderer.SetCull( CullType.NONE );
+						WRenderer.SetDepthStencilState( StencilType.NO_ZBUFFER );
+
+						//(new WMeshComponent( mTranslateObject.GetChild( 0 ).FindComponent( ComponentType.DRAWABLE ))).Material = mMaterial_Selected;
+						mTranslateObject.UpdateTransform();
+						mTranslateObject.UpdateDrawable();
+					}
+				}
 			}
 		}
 
@@ -298,11 +321,11 @@ namespace Sentinel_Editor
 		///
 		/// Game Objects Tree.
 		/// 
-		private void AddObjectToTree( WGameObject obj, GameObject_TreeViewItem item = null )
+		private void AddObjectToTree( WGameObject obj, OGameObject item = null )
 		{
 			if( item == null )
 			{
-				item = new GameObject_TreeViewItem( obj );
+				item = new OGameObject( obj );
 
 				// Add the children.
 				//
@@ -313,38 +336,107 @@ namespace Sentinel_Editor
 			}
 			else
 			{
-				item.Items.Add( new GameObject_TreeViewItem( obj ));
+				item.Items.Add( new OGameObject( obj ));
 			}
 		}
 
 		private void Objects_TreeView_Selected( Object sender, RoutedEventArgs e )
 		{
-			GameObject_TreeViewItem item = (GameObject_TreeViewItem)Objects_TreeView.SelectedItem;
+			OGameObject item = Objects_TreeView.SelectedItem as OGameObject;
 			
 			mSelectedObject = item.mData;
 
-			//Objects_TreeView.Items.Refresh();
-			//Objects_TreeView.UpdateLayout();
-
 			Inspector_TreeView.Items.Clear();
-			Inspector_TreeView.Items.Add( new GameObject_Inspector( mSelectedObject ));
+			Inspector_TreeView.Items.Add( new IGameObject( mSelectedObject ));
 		}
 
 		private void Inspector_TreeView_Selected( Object sender, RoutedEventArgs e )
-		{}
+		{
+			// TODO: Find a way to prevent the Grid type from being selected.
+		}
 
 		///
 		/// Assets Tree.
 		/// 
-		private void AddAssetToTree( String name )
+		private void AssetsFolderSelected( Object sender, RoutedEventArgs e )
 		{
-			// TODO: Create new TreeViewItem(s) to support various assets.
+			(sender as TreeViewItem).IsSelected = false;
+			e.Handled = true;
+		}
 
-			TreeViewItem item = new TreeViewItem();
-			item.Foreground = Brushes.White;
-			item.Header     = name;
-			
+		private void CreateAssetFolder( ref TreeViewItem item, String name )
+		{
+			item = new TreeViewItem();
+			item.Header		= name;
+			item.Focusable	= false;
+			item.Selected	+= AssetsFolderSelected;
 			Assets_TreeView.Items.Add( item );
+		}
+
+		private void AssetSelected( Object sender, RoutedEventArgs e )
+		{
+			mSelectedAsset = sender as EditorAsset;
+		}
+
+		private Panel CreateDefaultAssetPanel( String filename, String name )
+		{
+			StackPanel panel = new StackPanel();
+			panel.Orientation = Orientation.Horizontal;
+			
+			Image image = new Image();
+			image.Source = new BitmapImage( new Uri( filename ));
+
+			image.HorizontalAlignment = HorizontalAlignment.Left;
+			image.VerticalAlignment   = VerticalAlignment.Center;
+			image.Width  = 22;
+			image.Height = 16;
+
+			TextBlock text = new TextBlock();
+			text.Text = name;
+
+			panel.Children.Add( image );
+			panel.Children.Add( text );
+
+			return panel;
+		}
+
+		private void AddAsset( WTexture texture, String name )
+		{
+			ATexture item = new ATexture( texture, name );
+			item.Header		= CreateDefaultAssetPanel( "pack://application:,,,/Images/Asset_Image.png", name );
+			item.Selected	+= AssetSelected;
+			
+			mAsset_Texture.Items.Add( item );
+		}
+
+		private void AddAsset( WShader shader, String name )
+		{
+			AShader item = new AShader( shader, name );
+			item.Header		= CreateDefaultAssetPanel( "pack://application:,,,/Images/Asset_Image.png", name );
+			item.Selected	+= AssetSelected;
+			
+			mAsset_Shader.Items.Add( item );
+		}
+
+		private void AddAsset( WMesh mesh, String name )
+		{
+			AMesh item = new AMesh( mesh, name );
+			item.Header		= CreateDefaultAssetPanel( "pack://application:,,,/Images/Asset_Image.png", name );
+			item.Selected	+= AssetSelected;
+			
+			mAsset_Mesh.Items.Add( item );
+		}
+
+		///
+		/// Find an Asset by Type.
+		///
+		static public AMesh FindAsset( WMesh mesh )
+		{
+			foreach( AMesh item in mAsset_Mesh.Items )
+				if( item.mData == mesh )
+					return item;
+			
+			return null;
 		}
 
 		///
@@ -360,6 +452,9 @@ namespace Sentinel_Editor
 				MessageBox.Show( "Failed to load shader: color", "Shader Load Failure" );
 				System.Environment.Exit( -1 );
 			}
+			AddAsset( mShader[ (int)ShaderTypes.COLOR_ONLY ], "Color Only" );
+
+			////////////////////////////
 
 			mShader[ (int)ShaderTypes.COLOR ] = WRenderer.CreateShader( "Shaders\\colnorm", "PN", "PpVML" );
 			if( mShader[ (int)ShaderTypes.COLOR ] == null )
@@ -367,6 +462,9 @@ namespace Sentinel_Editor
 				MessageBox.Show( "Failed to load shader: colnorm", "Shader Load Failure" );
 				System.Environment.Exit( -1 );
 			}
+			AddAsset( mShader[ (int)ShaderTypes.COLOR ], "Color" );
+
+			////////////////////////////
 
 			mShader[ (int)ShaderTypes.TEXTURE ] = WRenderer.CreateShader( "Shaders\\texture", "PXN", "PpXVML" );
 			if( mShader[ (int)ShaderTypes.TEXTURE ] == null )
@@ -374,6 +472,9 @@ namespace Sentinel_Editor
 				MessageBox.Show( "Failed to load 'texture' shader.", "Shader Load Failure" );
 				System.Environment.Exit( -1 );
 			}
+			AddAsset( mShader[ (int)ShaderTypes.TEXTURE ], "Texture" );
+
+			////////////////////////////
 		}
 
 		///
@@ -389,6 +490,7 @@ namespace Sentinel_Editor
 			////////////////////////////////////
 
 			mTexture = WRenderer.CreateTextureFromFile( "Assets\\Images\\default-alpha.png" );
+			AddAsset( mTexture, "default-alpha.png" );
 
 			// Camera.
 			//
@@ -420,13 +522,15 @@ namespace Sentinel_Editor
 			meshBuilder.Shader    = mShader[ (int)ShaderTypes.COLOR ];
 			meshBuilder.Primitive = PrimitiveType.TRIANGLE_LIST;
 
+			mesh = meshBuilder.BuildMesh();
+			AddAsset( mesh, "Ground" );
+
 			obj = WGameWorld.AddGameObject( new WGameObject(), "Ground" );
 
 			transform = (WTransformComponent)obj.AttachComponent( new WTransformComponent(), "Transform" );
 			transform.Position	 = new WVector3f( 0, 0, 0 );
 			transform.Scale		 = new WVector3f( 100, 1, 100 );
 
-			mesh = meshBuilder.BuildMesh();
 			obj.AttachComponent( new WMeshComponent( mesh ), "Mesh" );
 
 			AddObjectToTree( obj );
@@ -435,6 +539,9 @@ namespace Sentinel_Editor
 			//
 			meshBuilder.Shader = mShader[ (int)ShaderTypes.TEXTURE ];
 			meshBuilder.Texture( (int)TextureType.DIFFUSE ).Set( mTexture );
+
+			mesh = meshBuilder.BuildMesh();
+			AddAsset( mesh, "Cube" );
 			
 			WGameObject obj2 = WGameWorld.AddGameObject( new WGameObject(), "Cube" );
 
@@ -443,7 +550,6 @@ namespace Sentinel_Editor
 			transform.Scale		= new WVector3f( 0.5f, 0.5f, 0.5f );
 			transform.Rotation	= new WVector3f( 90, 180, 270 );
 
-			mesh = meshBuilder.BuildMesh();
 			obj2.AttachComponent( new WMeshComponent( mesh ), "Mesh" );
 
 			// Parent test object.

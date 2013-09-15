@@ -12,7 +12,7 @@ using Sentinel.Components;
 
 namespace Sentinel_Editor
 {
-	class Inspector_TreeViewItem : TreeViewItem
+	public class Inspector : TreeViewItem
 	{
 		public delegate void ChangedValueDelegate();
 		public ChangedValueDelegate ChangedValue;
@@ -26,16 +26,9 @@ namespace Sentinel_Editor
 		public static Style mTextStyle;
 		public static Style mTreeStyle;
 
-		public Inspector_TreeViewItem()
+		public Inspector()
 		{
-			Selected += Selected_Inspector;
-
 			Style = mTreeStyle;
-		}
-
-		static public void Selected_Inspector( Object sender, RoutedEventArgs e )
-		{
-			(sender as TreeViewItem).IsSelected = false;
 		}
 
 		static public Label CreateLabel( String name )
@@ -48,17 +41,60 @@ namespace Sentinel_Editor
 			return label;
 		}
 
-		static public TextBox CreateEdit( String name )
+		static public TextBox CreateEdit( String name, double width = EDIT_WIDTH, double height = EDIT_HEIGHT,
+										  double padding = 0 )
 		{
 			TextBox box = new TextBox();
 
 			box.SelectedText = name;
-			box.MinWidth	 = EDIT_WIDTH;
-			box.MaxWidth	 = EDIT_WIDTH;
-			box.MinHeight	 = EDIT_HEIGHT;
-			box.MaxHeight	 = EDIT_HEIGHT;
+			box.MinWidth	 = width;
+			box.MaxWidth	 = width;
+			box.MinHeight	 = height;
+			box.MaxHeight	 = height;
+			box.Padding		 = new Thickness( padding );
 
 			return box;
+		}
+
+		static public TextBox CreateEdit( float value, double width = EDIT_WIDTH, double height = EDIT_HEIGHT,
+										  double padding = 0 )
+		{
+			TextBox box = new TextBox();
+
+			box.SelectedText = "" + value;
+			box.MinWidth	 = width;
+			box.MaxWidth	 = width;
+			box.MinHeight	 = height;
+			box.MaxHeight	 = height;
+			box.Padding		 = new Thickness( padding );
+			box.PreviewTextInput  += PreviewTextInput_Float;
+			box.LostKeyboardFocus += LostKeyboardFocus_Float;
+			DataObject.AddPastingHandler( box, PreviewTextInput_FloatPaste );
+
+			return box;
+		}
+
+		static public Grid CreateEdit( String labelName, String editName, 
+									   double width = EDIT_WIDTH, double height = EDIT_HEIGHT,
+									   double padding = 0 )
+		{
+			Grid	grid = new Grid();
+			Label	label;
+			TextBox	box;
+
+			for( int x = 0; x < 2; ++x )
+				grid.ColumnDefinitions.Add( new ColumnDefinition() );
+
+			label = CreateLabel( labelName );
+			label.SetValue( Grid.ColumnProperty, 0 );
+
+			box = CreateEdit( editName, EDIT_WIDTH, EDIT_HEIGHT, padding );
+			box.SetValue( Grid.ColumnProperty, 1 );
+
+			grid.Children.Add( label );
+			grid.Children.Add( box );
+
+			return grid;
 		}
 
 		static private void PreviewTextInput_Float( Object sender, TextCompositionEventArgs e )
@@ -119,23 +155,6 @@ namespace Sentinel_Editor
 
 			if( !float.TryParse( box.Text, out value ))
 				box.Text = "0";
-		}
-
-		static public TextBox CreateEdit( float v )
-		{
-			TextBox box = new TextBox();
-
-			box.SelectedText = "" + v;
-			box.MinWidth	 = EDIT_WIDTH;
-			box.MaxWidth	 = EDIT_WIDTH;
-			box.MinHeight	 = EDIT_HEIGHT;
-			box.MaxHeight	 = EDIT_HEIGHT;
-			box.Padding		 = new Thickness( 0 );
-			box.PreviewTextInput  += PreviewTextInput_Float;
-			box.LostKeyboardFocus += LostKeyboardFocus_Float;
-			DataObject.AddPastingHandler( box, PreviewTextInput_FloatPaste );
-
-			return box;
 		}
 	}
 }

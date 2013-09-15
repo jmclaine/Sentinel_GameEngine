@@ -50,21 +50,31 @@ public:
 		System::GC::SuppressFinalize( this );
     }
 
+	std::shared_ptr< T >* GetPtr()
+	{
+		return mPtr;
+	}
+
     operator std::shared_ptr< T >()
 	{
         return *mPtr;
     }
 
-    m_shared_ptr< T >% operator = ( T* ptr )
+	bool operator == ( m_shared_ptr< T >^ ptr )
+	{
+		return (*mPtr) == *(*ptr).mPtr;
+	}
+
+	m_shared_ptr< T >% operator = ( T* ptr )
 	{
         mPtr = new std::shared_ptr< T >(ptr);
         return *this;
     }
 
-	T* operator->()
+	std::shared_ptr< T > operator->()
 	{
-        return (*mPtr).get();
-    }
+		return *mPtr;
+	}
 
 	void reset()
 	{

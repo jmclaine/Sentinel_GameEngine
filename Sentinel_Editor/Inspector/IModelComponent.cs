@@ -6,20 +6,22 @@ using System.Windows.Controls;
 using System.Windows;
 using System.Windows.Media;
 using System.ComponentModel;
-using System.Collections.ObjectModel;
 
 using Sentinel.Components;
 
 namespace Sentinel_Editor
 {
-	class GameObject_TreeViewItem : TreeViewItem
+	class IModelComponent : Inspector
 	{
-		public WGameObject mData;
-		
-		public GameObject_TreeViewItem( WGameObject obj )
+		public WModelComponent mData;
+
+		public IModelComponent( WModelComponent component )
 		{
-			Header	= obj.Name;
-			mData	= obj;
+			Header	= "Model";
+			mData	= component;
+
+			Grid grid = Inspector.CreateEdit( "Name: ", mData.Name );
+			Items.Add( grid );
 		}
 	}
 }

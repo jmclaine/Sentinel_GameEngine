@@ -13,25 +13,28 @@ using Sentinel.Math;
 
 namespace Sentinel_Editor
 {
-	class TransformComponent_Inspector : Inspector_TreeViewItem
+	class ITransformComponent : Inspector
 	{
 		public WTransformComponent mData;
 
-		public TransformComponent_Inspector( WTransformComponent component )
+		public ITransformComponent( WTransformComponent component )
 		{
 			Header	= "Transform";
 			mData	= component;
 
-			Items.Add( new Vector3f_Inspector( mData.Position, "Position" ));
+			Grid grid = Inspector.CreateEdit( "Name: ", mData.Name );
+			Items.Add( grid );
 
-			Vector3f_Inspector inspector = new Vector3f_Inspector( mData.Rotation, "Rotation" );
-			inspector.ChangedValue = Update;
+			Items.Add( new IVector3f( mData.Position, "Position" ));
+
+			IVector3f inspector = new IVector3f( mData.Rotation, "Rotation" );
+			inspector.ChangedValue = UpdateRotation;
 			Items.Add( inspector );
 
-			Items.Add( new Vector3f_Inspector( mData.Scale, "Scale" ));
+			Items.Add( new IVector3f( mData.Scale, "Scale" ));
 		}
 
-		private void Update()
+		private void UpdateRotation()
 		{
 			mData.Update();
 		}

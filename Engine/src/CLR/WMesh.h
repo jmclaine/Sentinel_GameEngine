@@ -30,6 +30,8 @@ namespace Sentinel { namespace Assets
 
 	public:
 
+		static bool operator == ( WMesh^ mesh0, WMesh^ mesh1 );
+
 		DECLARE_PROPERTY( Sentinel::Systems::PrimitiveType,	Primitive );
 		
 		DECLARE_PROPERTY( WBuffer^,			VBO );

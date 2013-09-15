@@ -6,6 +6,11 @@ namespace Sentinel { namespace Assets
 
 	////////////////////////////////
 
+	bool WMesh::operator == ( WMesh^ mesh0, WMesh^ mesh1 )
+	{
+		return mesh0->mRef == mesh1->mRef;
+	}
+
 	DEFINE_PROPERTY_E( Mesh, Systems, PrimitiveType, Primitive );
 	
 	DEFINE_PROPERTY_PR( Mesh, Buffer,		VBO );
