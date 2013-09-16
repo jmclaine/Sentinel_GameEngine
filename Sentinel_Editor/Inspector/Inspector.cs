@@ -23,12 +23,18 @@ namespace Sentinel_Editor
 		///
 		/// Must be initialized before creating a new object.
 		///
-		public static Style mTextStyle;
-		public static Style mTreeStyle;
+		public static Style TreeStyle { get; set; }
+		public static Style TextStyle { get; set; }
 
 		public Inspector()
 		{
-			Style = mTreeStyle;
+			Style = TreeStyle;
+		}
+
+		public Inspector( Object obj )
+		{
+			Style  = TreeStyle;
+			Header = obj;
 		}
 
 		static public Label CreateLabel( String name )
@@ -36,7 +42,7 @@ namespace Sentinel_Editor
 			Label label = new Label();
 
 			label.Content = name;
-			label.Style   = mTextStyle;
+			label.Style   = TextStyle;
 
 			return label;
 		}
@@ -74,27 +80,22 @@ namespace Sentinel_Editor
 			return box;
 		}
 
-		static public Grid CreateEdit( String labelName, String editName, 
+		static public Panel CreateEdit( String labelName, String editName, 
 									   double width = EDIT_WIDTH, double height = EDIT_HEIGHT,
 									   double padding = 0 )
 		{
-			Grid	grid = new Grid();
-			Label	label;
-			TextBox	box;
+			StackPanel	panel = new StackPanel();
+			panel.Orientation = Orientation.Horizontal;
+			panel.Focusable   = false;
+			
+			Label label = CreateLabel( labelName );
+			label.Focusable   = false;
+			panel.Children.Add( label );
+			
+			TextBox box = CreateEdit( editName, EDIT_WIDTH, EDIT_HEIGHT, padding );
+			panel.Children.Add( box );
 
-			for( int x = 0; x < 2; ++x )
-				grid.ColumnDefinitions.Add( new ColumnDefinition() );
-
-			label = CreateLabel( labelName );
-			label.SetValue( Grid.ColumnProperty, 0 );
-
-			box = CreateEdit( editName, EDIT_WIDTH, EDIT_HEIGHT, padding );
-			box.SetValue( Grid.ColumnProperty, 1 );
-
-			grid.Children.Add( label );
-			grid.Children.Add( box );
-
-			return grid;
+			return panel;
 		}
 
 		static private void PreviewTextInput_Float( Object sender, TextCompositionEventArgs e )

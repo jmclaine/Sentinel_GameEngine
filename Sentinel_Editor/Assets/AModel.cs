@@ -6,7 +6,7 @@ using Sentinel.Assets;
 
 namespace Sentinel_Editor
 {
-	public class AShader : EditorAsset
+	public class AModel : EditorAsset
 	{
 		///
 		/// Initialize this image to get an icon
@@ -14,13 +14,13 @@ namespace Sentinel_Editor
 		///
 		public static BitmapImage DefaultImage { get; set; }
 
-		public WShader Data { get; set; }
+		public WModel Data { get; set; }
 
-		public AShader( WShader shader, String name )
+		public AModel( WModel mesh, String name )
 		{
-			mType	= EditorAssetType.SHADER;
+			mType	= EditorAssetType.MODEL;
 
-			Data	= shader;
+			Data	= mesh;
 			Name	= name;
 
 			Header  = EditorAsset.CreateDefaultAssetPanel( name, DefaultImage );

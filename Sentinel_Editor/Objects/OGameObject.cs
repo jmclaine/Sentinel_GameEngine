@@ -6,12 +6,12 @@ namespace Sentinel_Editor
 {
 	class OGameObject : TreeViewItem
 	{
-		public WGameObject mData;
+		public WGameObject Data { get; set; }
 		
 		public OGameObject( WGameObject obj )
 		{
 			Header	= obj.Name;
-			mData	= obj;
+			Data	= obj;
 		}
 	}
 }

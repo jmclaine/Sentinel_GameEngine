@@ -14,12 +14,12 @@ namespace Sentinel_Editor
 {
 	public class IGameObject : Inspector
 	{
-		public WGameObject mData;
+		public WGameObject Data { get; set; }
 		
 		public IGameObject( WGameObject obj )
 		{
 			Header	= obj.Name;
-			mData	= obj;
+			Data	= obj;
 
 			WTransformComponent transform = WTransformComponent.Cast( obj.FindComponent( ComponentType.TRANSFORM ));
 

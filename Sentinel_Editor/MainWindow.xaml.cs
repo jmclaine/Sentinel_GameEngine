@@ -95,10 +95,15 @@ namespace Sentinel_Editor
 
 		private void Window_Loaded( Object sender, RoutedEventArgs e )
 		{
-			Inspector.mTreeStyle = (Style)FindResource( "Inspector_TreeStyle" );
-			Inspector.mTextStyle = (Style)FindResource( "Inspector_TextStyle" );
+			Inspector.TreeStyle  = (Style)FindResource( "Inspector_TreeStyle" );
+			Inspector.TextStyle  = (Style)FindResource( "Inspector_TextStyle" );
 
 			EditorAsset.TreeStyle = (Style)FindResource( "Assets_TreeStyle" );
+
+			ATexture.DefaultImage = new BitmapImage( new Uri( "pack://application:,,,/Images/Asset_Image.png" ));
+			AShader.DefaultImage  = new BitmapImage( new Uri( "pack://application:,,,/Images/Asset_Shader.png" ));
+			AMesh.DefaultImage    = new BitmapImage( new Uri( "pack://application:,,,/Images/Asset_Model.png" ));
+			AModel.DefaultImage   = AMesh.DefaultImage;
 
 			///////////////////////////////////////
 			// Initialize Renderer.
@@ -139,8 +144,6 @@ namespace Sentinel_Editor
 			//
 			PrepareShaders();
 			PrepareObjects();
-
-			//Status_Image.Source = new BitmapImage( new Uri( "pack://application:,,,/Images/Warning.png" ));
 
 			///////////////////////////////////////
 			// Setup game loop.
@@ -318,6 +321,7 @@ namespace Sentinel_Editor
 			WGameWorld.Shutdown();
 		}
 
+		#region Game Objects Tree
 		///
 		/// Game Objects Tree.
 		/// 
@@ -344,20 +348,107 @@ namespace Sentinel_Editor
 		{
 			OGameObject item = Objects_TreeView.SelectedItem as OGameObject;
 			
-			mSelectedObject = item.mData;
+			mSelectedObject = item.Data;
 
 			Inspector_TreeView.Items.Clear();
 			Inspector_TreeView.Items.Add( new IGameObject( mSelectedObject ));
 		}
+		#endregion
 
-		private void Inspector_TreeView_Selected( Object sender, RoutedEventArgs e )
+		#region Objects_TreeView Drag
+		private Point Objects_LastMouseDown;
+		private TreeViewItem Objects_DraggedItem;
+		private TreeViewItem Objects_Target;
+
+		private void Objects_TreeView_MouseDown( Object sender, MouseButtonEventArgs e )
 		{
-			// TODO: Find a way to prevent the Grid type from being selected.
+			if( e.ChangedButton == System.Windows.Input.MouseButton.Left )
+			{
+				Objects_LastMouseDown = e.GetPosition( Objects_TreeView );
+			}
 		}
 
-		///
-		/// Assets Tree.
-		/// 
+		private void Objects_TreeView_MouseMove( Object sender, MouseEventArgs e )
+		{
+			try
+			{
+				if( e.LeftButton == MouseButtonState.Pressed )
+				{
+					Point currentPosition = e.GetPosition( Objects_TreeView );
+                
+					if( Math.Abs( currentPosition.X - Objects_LastMouseDown.X ) > 10.0 ||
+						Math.Abs( currentPosition.Y - Objects_LastMouseDown.Y ) > 10.0 )
+					{
+						Objects_DraggedItem = (TreeViewItem)Objects_TreeView.SelectedItem;
+						if( Objects_DraggedItem != null )
+						{
+							DragDropEffects finalDropEffect = DragDrop.DoDragDrop( Objects_TreeView, Objects_TreeView.SelectedValue, DragDropEffects.Move );
+
+							if( finalDropEffect == DragDropEffects.Move && Objects_Target != null )
+							{
+								if( !Objects_DraggedItem.Header.ToString().Equals( Objects_Target.Header.ToString() ))
+								{
+									//CopyItem( Objects_DraggedItem, Objects_Target );
+									Objects_Target = null;
+									Objects_DraggedItem = null;
+								}   
+							}
+						}
+					}
+				}
+			}
+			catch( Exception )
+			{}
+		}
+
+		private void Objects_TreeView_DragOver( Object sender, DragEventArgs e )
+		{
+			try
+			{
+				Point currentPosition = e.GetPosition( Objects_TreeView );
+      
+				if( Math.Abs( currentPosition.X - Objects_LastMouseDown.X ) > 10.0 ||
+					Math.Abs( currentPosition.Y - Objects_LastMouseDown.Y ) > 10.0 )
+				{
+					//TreeViewItem item = GetNearestContainer( e.OriginalSource as UIElement );
+
+					/*
+					if( CheckDropTarget( Objects_DraggedItem, item ))
+						e.Effects = DragDropEffects.Move;
+					else
+						e.Effects = DragDropEffects.None;
+					 */
+				}
+
+				e.Handled = true;
+			}
+			catch( Exception )
+			{}
+		}
+
+		private void Objects_TreeView_Drop( Object sender, DragEventArgs e )
+		{
+			try
+			{
+				e.Effects = DragDropEffects.None;
+				e.Handled = true;
+            
+				/*
+				TreeViewItem TargetItem = GetNearestContainer( e.OriginalSource as UIElement );
+
+				if( TargetItem != null && Objects_DraggedItem != null )
+				{
+					Objects_Target = TargetItem;
+					e.Effects = DragDropEffects.Move;
+				}
+				*/
+			}
+			catch( Exception )
+			{}
+		}
+		#endregion
+
+		#region Assets Tree
 		private void AssetsFolderSelected( Object sender, RoutedEventArgs e )
 		{
 			(sender as TreeViewItem).IsSelected = false;
@@ -378,33 +469,10 @@ namespace Sentinel_Editor
 			mSelectedAsset = sender as EditorAsset;
 		}
 
-		private Panel CreateDefaultAssetPanel( String filename, String name )
-		{
-			StackPanel panel = new StackPanel();
-			panel.Orientation = Orientation.Horizontal;
-			
-			Image image = new Image();
-			image.Source = new BitmapImage( new Uri( filename ));
-
-			image.HorizontalAlignment = HorizontalAlignment.Left;
-			image.VerticalAlignment   = VerticalAlignment.Center;
-			image.Width  = 22;
-			image.Height = 16;
-
-			TextBlock text = new TextBlock();
-			text.Text = name;
-
-			panel.Children.Add( image );
-			panel.Children.Add( text );
-
-			return panel;
-		}
-
 		private void AddAsset( WTexture texture, String name )
 		{
 			ATexture item = new ATexture( texture, name );
-			item.Header		= CreateDefaultAssetPanel( "pack://application:,,,/Images/Asset_Image.png", name );
-			item.Selected	+= AssetSelected;
+			item.Selected += AssetSelected;
 			
 			mAsset_Texture.Items.Add( item );
 		}
@@ -412,8 +480,7 @@ namespace Sentinel_Editor
 		private void AddAsset( WShader shader, String name )
 		{
 			AShader item = new AShader( shader, name );
-			item.Header		= CreateDefaultAssetPanel( "pack://application:,,,/Images/Asset_Image.png", name );
-			item.Selected	+= AssetSelected;
+			item.Selected += AssetSelected;
 			
 			mAsset_Shader.Items.Add( item );
 		}
@@ -421,8 +488,7 @@ namespace Sentinel_Editor
 		private void AddAsset( WMesh mesh, String name )
 		{
 			AMesh item = new AMesh( mesh, name );
-			item.Header		= CreateDefaultAssetPanel( "pack://application:,,,/Images/Asset_Image.png", name );
-			item.Selected	+= AssetSelected;
+			item.Selected += AssetSelected;
 			
 			mAsset_Mesh.Items.Add( item );
 		}
@@ -433,12 +499,14 @@ namespace Sentinel_Editor
 		static public AMesh FindAsset( WMesh mesh )
 		{
 			foreach( AMesh item in mAsset_Mesh.Items )
-				if( item.mData == mesh )
+				if( item.Data == mesh )
 					return item;
 			
 			return null;
 		}
+		#endregion
 
+		#region Object Preparation
 		///
 		/// Prepare Shaders.
 		///
@@ -652,7 +720,9 @@ namespace Sentinel_Editor
 		{
 			mScaleObject = new WGameObject();
 		}
+		#endregion
 
+		#region Menu and Toolbar Clicks
 		///
 		/// File
 		///
@@ -742,5 +812,6 @@ namespace Sentinel_Editor
 			Rotate_Object.IsChecked		= false;
 			Scale_Object.IsChecked		= true;
 		}
+		#endregion
 	}
 }

@@ -145,7 +145,7 @@
                              Value="true">
                                 <Setter TargetName="Bd"
                                 Property="Background"
-                                Value="#FF0066DD"/>
+                                Value="#FF0066BB"/>
                                 <Setter Property="Foreground"
                                 Value="#FFFFFFFF"/>
                             </Trigger>
@@ -158,7 +158,7 @@
                                 </MultiTrigger.Conditions>
                                 <Setter TargetName="Bd"
                                 Property="Background"
-                                Value="#FFDD6600"/>
+                                Value="#FF662266"/>
                                 <Setter Property="Foreground"
                                 Value="#FFFFFFFF"/>
                             </MultiTrigger>

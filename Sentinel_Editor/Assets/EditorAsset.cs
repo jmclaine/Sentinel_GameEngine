@@ -45,5 +45,26 @@ namespace Sentinel_Editor
 
 			Focusable	= true;
 		}
+
+		protected static Panel CreateDefaultAssetPanel( String name, BitmapImage bitmap )
+		{
+			StackPanel panel = new StackPanel();
+			panel.Orientation = Orientation.Horizontal;
+			
+			Image image  = new Image();
+			image.Source = bitmap;
+			image.HorizontalAlignment = HorizontalAlignment.Left;
+			image.VerticalAlignment   = VerticalAlignment.Center;
+			image.Width  = 22;
+			image.Height = 16;
+
+			TextBlock text = new TextBlock();
+			text.Text = name;
+
+			panel.Children.Add( image );
+			panel.Children.Add( text );
+
+			return panel;
+		}
 	}
 }

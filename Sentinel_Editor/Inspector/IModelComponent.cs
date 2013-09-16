@@ -13,15 +13,14 @@ namespace Sentinel_Editor
 {
 	class IModelComponent : Inspector
 	{
-		public WModelComponent mData;
+		public WModelComponent Data { get; set; }
 
 		public IModelComponent( WModelComponent component )
 		{
 			Header	= "Model";
-			mData	= component;
+			Data	= component;
 
-			Grid grid = Inspector.CreateEdit( "Name: ", mData.Name );
-			Items.Add( grid );
+			Items.Add( new Inspector( Inspector.CreateEdit( "Name: ", Data.Name )));
 		}
 	}
 }

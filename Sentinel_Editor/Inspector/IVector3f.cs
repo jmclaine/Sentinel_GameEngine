@@ -13,64 +13,53 @@ namespace Sentinel_Editor
 {
 	class IVector3f : Inspector
 	{
-		public WVector3f mData;
+		public WVector3f Data { get; set; }
 
 		public IVector3f( WVector3f v, String name )
 		{
 			Header	= name;
-			mData	= v;
+			Data	= v;
 
-			Grid	grid = new Grid();
-			Label	label;
-			TextBox	box;
-
-			for( int x = 0; x < 6; ++x )
-			{
-				ColumnDefinition col = new ColumnDefinition();
-				grid.ColumnDefinitions.Add( col );
-			}
-
-			grid.Focusable = false;
+			StackPanel panel  = new StackPanel();
+			panel.Orientation = Orientation.Horizontal;
+			panel.Focusable   = false;
+			
+			Label   label;
+			TextBox box;
 			
 			//////////////////////////////////
 
 			label = Inspector.CreateLabel( "X: " );
-			label.SetValue( Grid.ColumnProperty, 0 );
 			label.Focusable = false;
-			grid.Children.Add( label );
+			panel.Children.Add( label );
 
 			box = Inspector.CreateEdit( v.x );
-			box.SetValue( Grid.ColumnProperty, 1 );
 			box.TextChanged += TextChanged_X;
-			grid.Children.Add( box );
+			panel.Children.Add( box );
 
 			//////////////////////////////////
 
 			label = Inspector.CreateLabel( "Y: " );
-			label.SetValue( Grid.ColumnProperty, 2 );
 			label.Focusable = false;
-			grid.Children.Add( label );
+			panel.Children.Add( label );
 
 			box = Inspector.CreateEdit( v.y );
-			box.SetValue( Grid.ColumnProperty, 3 );
 			box.TextChanged += TextChanged_Y;
-			grid.Children.Add( box );
+			panel.Children.Add( box );
 
 			//////////////////////////////////
 
 			label = Inspector.CreateLabel( "Z: " );
-			label.SetValue( Grid.ColumnProperty, 4 );
 			label.Focusable = false;
-			grid.Children.Add( label );
+			panel.Children.Add( label );
 
 			box = Inspector.CreateEdit( v.z );
-			box.SetValue( Grid.ColumnProperty, 5 );
 			box.TextChanged += TextChanged_Z;
-			grid.Children.Add( box );
+			panel.Children.Add( box );
 
 			//////////////////////////////////
 
-			Items.Add( grid );
+			Items.Add( new Inspector( panel ));
 		}
 
 		private void TextChanged_X( Object sender, TextChangedEventArgs e )
@@ -81,7 +70,7 @@ namespace Sentinel_Editor
 
 			if( float.TryParse( box.Text, out result ))
 			{
-				mData.x = result;
+				Data.x = result;
 
 				if( ChangedValue != null )
 					ChangedValue();
@@ -96,7 +85,7 @@ namespace Sentinel_Editor
 
 			if( float.TryParse( box.Text, out result ))
 			{
-				mData.y = result;
+				Data.y = result;
 				
 				if( ChangedValue != null )
 					ChangedValue();
@@ -111,7 +100,7 @@ namespace Sentinel_Editor
 
 			if( float.TryParse( box.Text, out result ))
 			{
-				mData.z = result;
+				Data.z = result;
 				
 				if( ChangedValue != null )
 					ChangedValue();
