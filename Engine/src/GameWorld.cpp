@@ -115,6 +115,8 @@ namespace Sentinel
 		// Use distance from camera to center.
 		// This will not be 100% accurate, but is faster than trying to be perfect.
 		//
+		// TODO: Raycast from center screen to AABB for more accuracy.
+		//
 		Vector3f camPos = mCurrentCamera->GetTransform()->mPosition;
 		
 		mAlphaOrder.clear();
@@ -146,13 +148,27 @@ namespace Sentinel
 
 	/////////////////////////////////
 
-	GameObject* GameWorld::AddGameObject( GameObject* entity, const std::string& name )
+	GameObject* GameWorld::AddGameObject( GameObject* entity )
 	{
-		entity->mName = name;
+		TRAVERSE_VECTOR( x, mGameObject )
+			if( mGameObject[ x ] == entity )
+				return entity;
+
+		if( entity->mParent )
+		{
+			entity->mParent->RemoveChild( entity );
+		}
 
 		mGameObject.push_back( entity );
 
 		return entity;
+	}
+
+	GameObject* GameWorld::AddGameObject( GameObject* entity, const std::string& name )
+	{
+		entity->mName = name;
+
+		return AddGameObject( entity );
 	}
 
 	GameObject* GameWorld::RemoveGameObject( GameObject* entity )
@@ -165,6 +181,18 @@ namespace Sentinel
 			}
 		
 		return entity;
+	}
+
+	GameObject* GameWorld::GetGameObject( UINT index )
+	{
+		_ASSERT( index < mGameObject.size() );
+
+		return mGameObject[ index ];
+	}
+
+	UINT GameWorld::NumGameObjects()
+	{
+		return mGameObject.size();
 	}
 
 	/////////////////////////////////
@@ -189,12 +217,5 @@ namespace Sentinel
 		_ASSERT( index < mLight.size() );
 
 		return mLight[ index ];
-	}
-
-	GameObject* GameWorld::GetGameObject( UINT index )
-	{
-		_ASSERT( index < mGameObject.size() );
-
-		return mGameObject[ index ];
 	}
 }

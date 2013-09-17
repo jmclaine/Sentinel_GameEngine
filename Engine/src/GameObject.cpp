@@ -97,18 +97,25 @@ namespace Sentinel
 
 	void GameObject::AddChild( GameObject* obj )
 	{
+		TRAVERSE_VECTOR( x, mChild )
+			if( mChild[ x ] == obj )
+				return;
+
 		mChild.push_back( obj );
 		obj->mParent = this;
 
 		GameWorld::Inst()->RemoveGameObject( obj );
 	}
 
-	void GameObject::RemoveChild( UINT index )
+	void GameObject::RemoveChild( GameObject* obj )
 	{
-		_ASSERT( index < NumChildren() );
-
-		mChild[ index ]->mParent = NULL;
-		mChild.erase( mChild.begin() + index );
+		TRAVERSE_LIST( it, mChild )
+			if( *it == obj )
+			{
+				(*it)->mParent = NULL;
+				mChild.erase( it );
+				return;
+			}
 	}
 
 	GameObject* GameObject::GetChild( UINT index )

@@ -57,6 +57,12 @@ namespace Sentinel { namespace Components
 
 	//////////////////////////////
 
+	WGameObject^ WGameWorld::AddGameObject( WGameObject^ entity )
+	{
+		GameWorld::Inst()->AddGameObject( entity->GetRef() );
+		return entity;
+	}
+
 	WGameObject^ WGameWorld::AddGameObject( WGameObject^ entity, System::String^ name )
 	{
 		GameWorld::Inst()->AddGameObject( entity->GetRef(), RString::ToString( name ));
@@ -67,6 +73,18 @@ namespace Sentinel { namespace Components
 	{
 		GameWorld::Inst()->RemoveGameObject( entity->GetRef() );
 		return entity;
+	}
+
+	WGameObject^ WGameWorld::GetGameObject( int index )
+	{
+		_ASSERT( index >= 0 );
+
+		return gcnew WGameObject( GameWorld::Inst()->GetGameObject( index ));
+	}
+
+	int WGameWorld::NumGameObjects()
+	{
+		return (int)GameWorld::Inst()->NumGameObjects();
 	}
 
 	//////////////////////////////
@@ -84,10 +102,5 @@ namespace Sentinel { namespace Components
 	WLightComponent^ WGameWorld::GetLight( UINT index )
 	{
 		return gcnew WLightComponent( GameWorld::Inst()->GetLight( index ));
-	}
-
-	WGameObject^ WGameWorld::GetGameObject( UINT index )
-	{
-		return gcnew WGameObject( GameWorld::Inst()->GetGameObject( index ));
 	}
 }}

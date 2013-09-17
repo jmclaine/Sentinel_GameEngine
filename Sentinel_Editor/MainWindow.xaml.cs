@@ -355,17 +355,18 @@ namespace Sentinel_Editor
 		}
 		#endregion
 
-		#region Objects_TreeView Drag
-		private Point Objects_LastMouseDown;
-		private TreeViewItem Objects_DraggedItem;
-		private TreeViewItem Objects_Target;
+		#region Objects_TreeView Drag and Drop
+		///
+		/// Objects_TreeView Drag and Drop
+		///
+		private Point		Objects_LastMouseDown;
+		private OGameObject Objects_DraggedItem;
+		private OGameObject Objects_Target;
 
 		private void Objects_TreeView_MouseDown( Object sender, MouseButtonEventArgs e )
 		{
 			if( e.ChangedButton == System.Windows.Input.MouseButton.Left )
-			{
 				Objects_LastMouseDown = e.GetPosition( Objects_TreeView );
-			}
 		}
 
 		private void Objects_TreeView_MouseMove( Object sender, MouseEventArgs e )
@@ -376,22 +377,36 @@ namespace Sentinel_Editor
 				{
 					Point currentPosition = e.GetPosition( Objects_TreeView );
                 
-					if( Math.Abs( currentPosition.X - Objects_LastMouseDown.X ) > 10.0 ||
-						Math.Abs( currentPosition.Y - Objects_LastMouseDown.Y ) > 10.0 )
+					if( Math.Abs( currentPosition.X - Objects_LastMouseDown.X ) > SystemParameters.MinimumHorizontalDragDistance ||
+						Math.Abs( currentPosition.Y - Objects_LastMouseDown.Y ) > SystemParameters.MinimumVerticalDragDistance )
 					{
-						Objects_DraggedItem = (TreeViewItem)Objects_TreeView.SelectedItem;
+						Objects_DraggedItem = Objects_TreeView.SelectedItem as OGameObject;
+
 						if( Objects_DraggedItem != null )
 						{
 							DragDropEffects finalDropEffect = DragDrop.DoDragDrop( Objects_TreeView, Objects_TreeView.SelectedValue, DragDropEffects.Move );
 
-							if( finalDropEffect == DragDropEffects.Move && Objects_Target != null )
+							if( finalDropEffect == DragDropEffects.Move )
 							{
-								if( !Objects_DraggedItem.Header.ToString().Equals( Objects_Target.Header.ToString() ))
+								if( Objects_DraggedItem != Objects_Target )
 								{
-									//CopyItem( Objects_DraggedItem, Objects_Target );
-									Objects_Target = null;
+									if( Objects_DraggedItem.Parent != Objects_TreeView )
+										(Objects_DraggedItem.Parent as OGameObject).Items.Remove( Objects_DraggedItem );
+									else
+										Objects_TreeView.Items.Remove( Objects_DraggedItem );
+									
+									if( Objects_Target == null )
+										WGameWorld.AddGameObject( Objects_DraggedItem.Data );
+									else
+										Objects_Target.Data.AddChild( Objects_DraggedItem.Data );
+									
+									AddObjectToTree( Objects_DraggedItem.Data, Objects_Target );
+
+									Objects_DraggedItem.Data.Startup();
+									
 									Objects_DraggedItem = null;
-								}   
+									Objects_Target      = null;
+								}
 							}
 						}
 					}
@@ -407,23 +422,40 @@ namespace Sentinel_Editor
 			{
 				Point currentPosition = e.GetPosition( Objects_TreeView );
       
-				if( Math.Abs( currentPosition.X - Objects_LastMouseDown.X ) > 10.0 ||
-					Math.Abs( currentPosition.Y - Objects_LastMouseDown.Y ) > 10.0 )
+				if( Math.Abs( currentPosition.X - Objects_LastMouseDown.X ) > SystemParameters.MinimumHorizontalDragDistance ||
+					Math.Abs( currentPosition.Y - Objects_LastMouseDown.Y ) > SystemParameters.MinimumVerticalDragDistance )
 				{
-					//TreeViewItem item = GetNearestContainer( e.OriginalSource as UIElement );
+					e.Effects = DragDropEffects.None;
 
-					/*
-					if( CheckDropTarget( Objects_DraggedItem, item ))
-						e.Effects = DragDropEffects.Move;
-					else
-						e.Effects = DragDropEffects.None;
-					 */
+					OGameObject item = e.Source as OGameObject;
+					if( item != null )
+					{
+						if( Objects_DraggedItem != item )
+						{
+							OGameObject parent = item.Parent as OGameObject;
+							while( parent != null )
+							{
+								if( parent == Objects_DraggedItem )
+								{
+									e.Handled = true;
+									return;
+								}
+
+								parent = parent.Parent as OGameObject;
+							}
+
+							e.Effects = DragDropEffects.Move;
+						}
+					}
 				}
 
 				e.Handled = true;
 			}
 			catch( Exception )
-			{}
+			{
+				e.Effects = DragDropEffects.None;
+				e.Handled = true;
+			}
 		}
 
 		private void Objects_TreeView_Drop( Object sender, DragEventArgs e )
@@ -433,15 +465,14 @@ namespace Sentinel_Editor
 				e.Effects = DragDropEffects.None;
 				e.Handled = true;
             
-				/*
-				TreeViewItem TargetItem = GetNearestContainer( e.OriginalSource as UIElement );
-
-				if( TargetItem != null && Objects_DraggedItem != null )
+				OGameObject item = e.Source as OGameObject;
+				if( item != null && Objects_DraggedItem != null )
 				{
-					Objects_Target = TargetItem;
+					Objects_Target = item;
 					e.Effects = DragDropEffects.Move;
 				}
-				*/
+				else
+					Objects_Target = null;
 			}
 			catch( Exception )
 			{}

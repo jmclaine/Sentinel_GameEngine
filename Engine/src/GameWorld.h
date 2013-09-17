@@ -52,11 +52,15 @@ namespace Sentinel
 
 		// Returns entity.
 		//
+		GameObject*			AddGameObject( GameObject* entity );
 		GameObject*			AddGameObject( GameObject* entity, const std::string& name );
 
 		// Removes and returns entity.
 		//
 		GameObject*			RemoveGameObject( GameObject* entity );
+
+		GameObject*			GetGameObject( UINT index );
+		UINT				NumGameObjects();
 
 		//////////////////////////////
 
@@ -64,6 +68,5 @@ namespace Sentinel
 
 		CameraComponent*	GetCamera( int index = -1 );	// -1 = mCurrentCamera
 		LightComponent*		GetLight( UINT index );
-		GameObject*			GetGameObject( UINT index );
 	};
 }

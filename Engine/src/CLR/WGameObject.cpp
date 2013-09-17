@@ -38,13 +38,13 @@ namespace Sentinel { namespace Components
 
 	WGameComponent^ WGameObject::AttachComponent( WGameComponent^ component, String^ name )
 	{
-		mRef->AttachComponent( component->GetRef(), RString::ToString( name ));
+		mRef->AttachComponent( component, RString::ToString( name ));
 		return component;
 	}
 
 	WGameComponent^ WGameObject::DetachComponent( WGameComponent^ component )
 	{
-		mRef->DetachComponent( component->GetRef() );
+		mRef->DetachComponent( component );
 		return component;
 	}
 
@@ -52,22 +52,19 @@ namespace Sentinel { namespace Components
 
 	void WGameObject::AddChild( WGameObject^ obj )
 	{
-		mRef->AddChild( obj->GetRef() );
+		mRef->AddChild( obj );
 	}
 
-	void WGameObject::RemoveChild( int index )
+	void WGameObject::RemoveChild( WGameObject^ obj )
 	{
-		_ASSERT( index >= 0 );
-
-		mRef->RemoveChild( (UINT)index );
+		mRef->RemoveChild( obj );
 	}
 
 	WGameObject^ WGameObject::GetChild( int index )
 	{
 		_ASSERT( index >= 0 );
 
-		GameObject* obj = mRef->GetChild( (UINT)index );
-		return gcnew WGameObject( obj );
+		return gcnew WGameObject( mRef->GetChild( (UINT)index ));
 	}
 
 	int WGameObject::NumChildren()

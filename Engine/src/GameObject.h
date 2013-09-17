@@ -45,7 +45,7 @@ namespace Sentinel
 		//////////////////////////////
 
 		void			AddChild( GameObject* obj );
-		void			RemoveChild( UINT index );
+		void			RemoveChild( GameObject* obj );
 		GameObject*		GetChild( UINT index );
 		UINT			NumChildren();
 

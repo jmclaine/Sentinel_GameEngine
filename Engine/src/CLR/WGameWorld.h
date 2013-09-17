@@ -27,9 +27,13 @@ namespace Sentinel { namespace Components
 
 		//////////////////////////////
 
+		static WGameObject^			AddGameObject( WGameObject^ entity );
 		static WGameObject^			AddGameObject( WGameObject^ entity, System::String^ name );
 
 		static WGameObject^			RemoveGameObject( WGameObject^ entity );
+
+		static WGameObject^			GetGameObject( int index );
+		static int					NumGameObjects();
 
 		//////////////////////////////
 
@@ -37,6 +41,5 @@ namespace Sentinel { namespace Components
 
 		static WCameraComponent^	GetCamera( int index );	// -1 = mCurrentCamera
 		static WLightComponent^		GetLight( UINT index );
-		static WGameObject^			GetGameObject( UINT index );
 	};
 }}

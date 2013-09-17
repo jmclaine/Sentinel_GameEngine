@@ -41,7 +41,7 @@ namespace Sentinel { namespace Components
 		////////////////////////////////
 
 		void			AddChild( WGameObject^ obj );
-		void			RemoveChild( int index );
+		void			RemoveChild( WGameObject^ obj );
 		WGameObject^	GetChild( int index );
 		int				NumChildren();
 

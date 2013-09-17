@@ -177,13 +177,13 @@
 
 #define DEFINE_REF_EX( wrapClass, refClass )\
 	wrapClass::~wrapClass()			{ Delete(); }\
-	wrapClass::!wrapClass()			{ Delete(); }\
+	wrapClass::!wrapClass()			{ Delete(); System::GC::SuppressFinalize( this ); }\
 	void wrapClass::Delete()		{ delete mRef; }\
 	DEFINE_REF_PTR_EX( wrapClass, refClass );
 
 #define DEFINE_REF_EX_BASE( baseClass, wrapClass, refClass )\
 	baseClass::wrapClass::~wrapClass()			{ Delete(); }\
-	baseClass::wrapClass::!wrapClass()			{ Delete(); }\
+	baseClass::wrapClass::!wrapClass()			{ Delete(); System::GC::SuppressFinalize( this ); }\
 	void baseClass::wrapClass::Delete()			{ delete mRef; }\
 	DEFINE_REF_PTR_EX( baseClass::wrapClass, refClass );
 
@@ -208,7 +208,7 @@
 	W##refClass::W##refClass( refClass* obj )					{ mRef = gcnew m_shared_ptr< refClass >( obj ); }\
 	W##refClass::W##refClass( std::shared_ptr< refClass > obj )	{ mRef = gcnew m_shared_ptr< refClass >( obj ); }\
 	W##refClass::~W##refClass()									{ Delete(); }\
-	W##refClass::!W##refClass()									{ Delete(); }\
+	W##refClass::!W##refClass()									{ Delete(); System::GC::SuppressFinalize( this ); }\
 	void W##refClass::Delete()									{ delete mRef; }\
 	std::shared_ptr< refClass > W##refClass::GetRef()			{ return mRef; }
 

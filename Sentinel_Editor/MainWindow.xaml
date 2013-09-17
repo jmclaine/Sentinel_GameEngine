@@ -219,8 +219,7 @@
                                           MinWidth="10" MinHeight="10" 
                                           OverridesDefaultStyle="False" 
                                           Panel.ZIndex="-1" 
-                                          ScrollViewer.VerticalScrollBarVisibility="Auto" 
-                                          AllowDrop="true" />
+                                          ScrollViewer.VerticalScrollBarVisibility="Auto" />
                             </Grid>
                         </Grid>
 

@@ -28,17 +28,24 @@ namespace Sentinel_Editor
 
 			//////////////////////////////
 
-			WMeshComponent mesh = WMeshComponent.Cast( obj.FindComponent( ComponentType.DRAWABLE ));
+			WGameComponent drawable = obj.FindComponent( ComponentType.DRAWABLE );
 
-			if( mesh != null )
-				Items.Add( new IMeshComponent( mesh ));
+			if( drawable != null )
+			{
+				WMeshComponent mesh = WMeshComponent.Cast( drawable );
 
-			//////////////////////////////
+				if( mesh != null )
+				{
+					Items.Add( new IMeshComponent( mesh ));
+				}
+				else
+				{
+					WModelComponent model = WModelComponent.Cast( drawable );
 
-			WModelComponent model = WModelComponent.Cast( obj.FindComponent( ComponentType.DRAWABLE ));
-
-			if( model != null )
-				Items.Add( new IModelComponent( model ));
+					if( model != null )
+						Items.Add( new IModelComponent( model ));
+				}
+			}
 
 			//////////////////////////////
 
