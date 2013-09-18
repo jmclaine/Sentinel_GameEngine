@@ -146,38 +146,63 @@ namespace Sentinel
 			if( mProgramID < 0 )
 				REPORT_ERROR( "Could not create shader program.", "Shader Loader Error" );
 			
-			// Create the shaders.
-			//
-			std::string filenameVS = filename;
-			filenameVS.append( ".vsh" );
-			if( CreateFromFile( filenameVS.c_str(), mVertexShader, GL_VERTEX_SHADER ) != 1 )
-				return S_FALSE;
-			
-			// Allow no geometry shader.
-			//
-			bool useGS = false;
-			std::string filenameGS = filename;
-			filenameGS.append( ".gsh" );
+			filename.append( ".gls" );
 
-			int result = CreateFromFile( filenameGS.c_str(), mGeometryShader, GL_GEOMETRY_SHADER );
-			if( result == -1 )
+			GLchar* source;
+			
+			if( !FileToBuffer( filename.c_str(), source ))
 			{
+				REPORT_ERROR( "Could not open '" << filename << "'", "Shader Loader Error" );
 				return S_FALSE;
 			}
-			else
-			if( result == 1 )
+			
+			TRACE( "Compiling " << filename << " ..." );
+
+			if( strstr( source, "VERTEX_SHADER" ) != NULL )
 			{
+				const char *vshader[2] = { "#define VERTEX_SHADER\n\0", source };
+				
+				if( !CreateFromFile( vshader, mVertexShader, GL_VERTEX_SHADER ))
+				{
+					free( source );
+					return S_FALSE;
+				}
+			}
+			
+			bool useGS = false;
+			if( strstr( source, "GEOMETRY_SHADER" ) != NULL )
+			{
+				const char *gshader[2] = { "#define GEOMETRY_SHADER\n\0", source };
+
+				if( !CreateFromFile( gshader, mGeometryShader, GL_GEOMETRY_SHADER ))
+				{
+					free( source );
+					return S_FALSE;
+				}
+
 				useGS = true;
 
+				// Figure out a way to allow customization of this:
+				//
 				glProgramParameteriEXT( mProgramID, GL_GEOMETRY_INPUT_TYPE_EXT, GL_POINTS );
 				glProgramParameteriEXT( mProgramID, GL_GEOMETRY_OUTPUT_TYPE_EXT, GL_TRIANGLE_STRIP );
 				glProgramParameteriEXT( mProgramID, GL_GEOMETRY_VERTICES_OUT_EXT, 4 );
 			}
 
-			std::string filenamePS = filename;
-			filenamePS.append( ".psh" );
-			if( CreateFromFile( filenamePS.c_str(), mFragmentShader, GL_FRAGMENT_SHADER ) != 1 )
-				return S_FALSE;
+			if( strstr( source, "FRAGMENT_SHADER" ) != NULL )
+			{
+				const char *fshader[2] = { "#define FRAGMENT_SHADER\n\0", source };
+
+				if( !CreateFromFile( fshader, mFragmentShader, GL_FRAGMENT_SHADER ))
+				{
+					free( source );
+					return S_FALSE;
+				}
+			}
+			
+			TRACE( filename << " Shader Created Successfully!" );
+
+			free( source );
 
 			// Create the attributes.
 			//
@@ -337,24 +362,16 @@ namespace Sentinel
 
 	private:
 
-		int CreateFromFile( const char* filename, GLuint& shader, GLenum type )
+		int CreateFromFile( const GLchar** source, GLuint& shader, GLenum type )
 		{
 			_ASSERT( type == GL_VERTEX_SHADER || type == GL_FRAGMENT_SHADER || type == GL_GEOMETRY_SHADER );
 
-			GLchar* source;
-			int didCompile;
-
-			if( !FileToBuffer( filename, source ))
-			{
-				shader = 0;
-				return 0;
-			}
-
 			shader = glCreateShader( type );
 
-			glShaderSource( shader, 1, (const GLchar**)&source, NULL );
+			glShaderSource( shader, 2, (const GLchar**)source, NULL );
 			glCompileShader( shader );
 
+			int didCompile = 0;
 			glGetShaderiv( shader, GL_COMPILE_STATUS, &didCompile );
 
 			// Report compile errors.
@@ -370,24 +387,19 @@ namespace Sentinel
  
 				glGetShaderInfoLog( shader, length, &length, compileLog );
 
-				TRACE( "\n" << filename << " - Shader Compile Log" );
+				TRACE( "\nShader Compile Log" );
 				TRACE( compileLog );
 
 				free( compileLog );
-				free( source );
-
+				
 				glDeleteShader( shader );
 
-				return -1;
+				return 0;
 			}
-
-			free( source );
-
-			TRACE( filename << " Shader Created Successfully!" );
 
 			return 1;
 		}
-
+		
 	public:
 
 		UINT AttributeSize()
@@ -525,6 +537,7 @@ namespace Sentinel
 		void Release()
 		{
 			glDeleteBuffers( 1, &mID );
+			mID = 0;
 		}
 	};
 

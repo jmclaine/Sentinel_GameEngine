@@ -1,23 +1,54 @@
+varying vec2 vTexture0;
+varying vec3 vNormal;
+varying vec3 vCamDir;
+varying vec3 vLPos0;
+
+#ifdef VERTEX_SHADER
+
+uniform mat4 wvp;
+uniform mat4 world;
+
+uniform vec3 light_pos0;
+uniform vec3 cam_pos;
+
+attribute vec4 aPosition;
+attribute vec2 aTexture0;
+attribute vec3 aNormal;
+
+void main()
+{
+	gl_Position   = mul(wvp, aPosition);
+	vec3 worldPos = mul(world, aPosition);
+
+	// Light direction
+	vLPos0  = light_pos0 - worldPos;
+	
+	// Camera direction
+	vCamDir = cam_pos - worldPos;
+
+	// Texture
+	vTexture0 = aTexture0;
+
+	// Normal
+	vNormal = mul(world, vec4(aNormal, 0));
+}
+
+#endif
+#ifdef FRAGMENT_SHADER
+
 uniform sampler2D tex0;
-uniform sampler2D tex1;
+
+uniform vec3 light_color0;
+uniform vec4 light_attn0;
 
 uniform vec4 ambient;
 uniform vec4 diffuse;
 uniform vec4 specular;
 uniform float spec_comp;
 
-uniform vec3 light_color0;
-uniform vec4 light_attn0;
-
-varying vec2 vTexture0;
-varying vec3 vNormal;
-varying vec3 vCamDir;
-varying vec3 vLPos0;
-varying vec3 vLDist0;
-
-vec4 GetColor( vec3 LPos, vec3 LDist, vec3 camDir, vec3 N, vec3 color, vec4 attn )
+vec4 GetColor( vec3 LPos, vec3 camDir, vec3 N, vec3 color, vec4 attn )
 {
-	float dist = max(0.0, length(LDist)-attn.w);
+	float dist = max(0.0, length(LPos)-attn.w);
 
 	LPos = normalize(LPos);
 	vec3 H = normalize(LPos + camDir);
@@ -45,11 +76,13 @@ void main()
 	vec3 camDir = normalize(vCamDir);
 
 	// Normal
-	vec3 N = normalize(texture2D(tex1, vTexture0).xyz * 2.0 - 1.0);
+	vec3 N = normalize(vNormal);
 
 	// Attenuation
-	vec4 color0 = GetColor(vLPos0, vLDist0, camDir, N, light_color0, light_attn0);
+	vec4 color0 = GetColor(vLPos0, camDir, N, light_color0, light_attn0);
 
 	// Final fragment color
 	gl_FragColor = texture2D(tex0, vTexture0) * color0;
 }
+
+#endif

@@ -100,18 +100,13 @@
     <None Include="config.xml" />
     <None Include="Sentinel_Test.ico" />
     <None Include="Shaders\colnorm.fx" />
-    <None Include="Shaders\colnorm.psh" />
-    <None Include="Shaders\colnorm.vsh" />
+    <None Include="Shaders\colnorm.gls" />
     <None Include="Shaders\normmap.fx" />
-    <None Include="Shaders\normmap.psh" />
-    <None Include="Shaders\normmap.vsh" />
+    <None Include="Shaders\normmap.gls" />
     <None Include="Shaders\spriteGO.fx" />
-    <None Include="Shaders\spriteGO.gsh" />
-    <None Include="Shaders\spriteGO.psh" />
-    <None Include="Shaders\spriteGO.vsh" />
+    <None Include="Shaders\spriteGO.gls" />
     <None Include="Shaders\texture.fx" />
-    <None Include="Shaders\texture.psh" />
-    <None Include="Shaders\texture.vsh" />
+    <None Include="Shaders\texture.gls" />
     <None Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
