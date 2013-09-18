@@ -80,5 +80,6 @@ namespace Sentinel { namespace Assets
 
 	////////////////////////////////
 
+	DEFINE_CLASS_REF( Shader );
 	DEFINE_CLASS_REF_PTR( Shader );
 }}

@@ -141,6 +141,9 @@
     <ClInclude Include="..\Engine\src\CLR\WStdVector.h">
       <Filter>Sentinel_Engine\Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WShaderManager.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sentinel_CLR.cpp">
@@ -236,16 +239,19 @@
     <ClCompile Include="..\Engine\src\CLR\WShape.cpp">
       <Filter>Sentinel_Engine\Math</Filter>
     </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WShaderManager.cpp">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
     <None Include="app.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\Sentinel_Test\Debug\SCopyD.bat">
+    <None Include="..\Sentinel_Test\Debug\ECopyD.bat">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\Sentinel_Test\Release\SCopyR.bat">
+    <None Include="..\Sentinel_Test\Release\ECopyR.bat">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

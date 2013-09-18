@@ -189,6 +189,9 @@
     <ClInclude Include="..\Engine\src\GameObject.h">
       <Filter>Source Files\Sentinel_Engine\Components</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\src\ShaderManager.h">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\Shader.cpp">
@@ -338,6 +341,9 @@
     <ClCompile Include="..\Engine\src\ModelOBJ.cpp">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClCompile>
+    <ClCompile Include="..\Engine\src\ShaderManager.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Engine\src\sin16.inl">
@@ -345,6 +351,12 @@
     </None>
     <None Include="..\Engine\src\sin8.inl">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </None>
+    <None Include="..\Sentinel_Test\Debug\SCopyD.bat">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\Sentinel_Test\Release\SCopyR.bat">
+      <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
 </Project>

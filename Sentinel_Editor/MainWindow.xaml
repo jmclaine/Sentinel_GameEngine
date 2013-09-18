@@ -219,7 +219,15 @@
                                           MinWidth="10" MinHeight="10" 
                                           OverridesDefaultStyle="False" 
                                           Panel.ZIndex="-1" 
-                                          ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                                          ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                    <TreeView.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Add Texture" Click="Assets_AddTexture" />
+                                            <MenuItem Header="Add Shader" Click="Assets_AddShader" />
+                                            <MenuItem Header="Add Model" Click="Assets_AddModel" />
+                                        </ContextMenu>
+                                    </TreeView.ContextMenu>
+                                </TreeView>
                             </Grid>
                         </Grid>
 

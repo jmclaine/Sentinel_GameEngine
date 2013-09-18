@@ -1,15 +1,9 @@
 #pragma once
 /*
 Shaders are created from WRenderer.CreateShader()
-
-Delete() does nothing in RShader.
 */
-#include "Property.h"
-#include "m_shared_ptr.h"
-#include "Shader.h"
 #include "WTexture.h"
-
-using namespace System;
+#include "Shader.h"
 
 namespace Sentinel { namespace Assets
 {
@@ -29,8 +23,8 @@ namespace Sentinel { namespace Assets
 
 		DECLARE_OP_PTR( Shader );
 
-		String^			AttributeDecl();
-		String^			UniformDecl();
+		System::String^	AttributeDecl();
+		System::String^	UniformDecl();
 
 		UINT  			VertexSize();
 
@@ -47,5 +41,6 @@ namespace Sentinel { namespace Assets
 		void			SetTexture( UINT uniform, WTexture^ texture );
 	};
 
+	DECLARE_CLASS_REF( Shader );
 	DECLARE_CLASS_REF_PTR( Shader );
 }}

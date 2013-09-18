@@ -44,7 +44,7 @@ namespace Sentinel { namespace Assets
 		DECLARE_PROPERTY( WShader^,			Shader );
 		DECLARE_PROPERTY( WMaterial^,		Material );
 
-		RTexture^	Texture( TextureType type );
+		RPTexture^	Texture( TextureType type );
 
 		void		Draw();
 		void		Draw( UINT count );

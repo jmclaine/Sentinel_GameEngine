@@ -35,5 +35,6 @@ namespace Sentinel { namespace Assets
 
 	////////////////////////////////
 
+	DEFINE_CLASS_REF( Buffer );
 	DEFINE_CLASS_REF_PTR( Buffer );
 }}

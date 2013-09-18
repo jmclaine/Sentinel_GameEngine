@@ -40,5 +40,6 @@ namespace Sentinel { namespace Assets
 
 	////////////////////////////////
 
+	DEFINE_CLASS_REF( Texture );
 	DEFINE_CLASS_REF_PTR( Texture );
 }}

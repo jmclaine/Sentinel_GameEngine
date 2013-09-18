@@ -101,6 +101,9 @@ namespace Sentinel
 			if( mChild[ x ] == obj )
 				return;
 
+		if( obj->mParent )
+			obj->mParent->RemoveChild( obj );
+
 		mChild.push_back( obj );
 		obj->mParent = this;
 
@@ -112,7 +115,7 @@ namespace Sentinel
 		TRAVERSE_LIST( it, mChild )
 			if( *it == obj )
 			{
-				(*it)->mParent = NULL;
+				obj->mParent = NULL;
 				mChild.erase( it );
 				return;
 			}

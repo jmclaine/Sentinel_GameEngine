@@ -123,6 +123,7 @@
     <ClInclude Include="..\Engine\src\Renderer.h" />
     <ClInclude Include="..\Engine\src\GameWindow.h" />
     <ClInclude Include="..\Engine\src\Shader.h" />
+    <ClInclude Include="..\Engine\src\ShaderManager.h" />
     <ClInclude Include="..\Engine\src\Shape.h" />
     <ClInclude Include="..\Engine\src\Singleton.h" />
     <ClInclude Include="..\Engine\src\SpriteComponent.h" />
@@ -172,6 +173,7 @@
     <ClCompile Include="..\Engine\src\RendererGL.cpp" />
     <ClCompile Include="..\Engine\src\GameWindow.cpp" />
     <ClCompile Include="..\Engine\src\Shader.cpp" />
+    <ClCompile Include="..\Engine\src\ShaderManager.cpp" />
     <ClCompile Include="..\Engine\src\Shape.cpp" />
     <ClCompile Include="..\Engine\src\SpriteComponent.cpp" />
     <ClCompile Include="..\Engine\src\stb_image.c" />
@@ -193,6 +195,12 @@
       <FileType>Document</FileType>
     </None>
     <None Include="..\Engine\src\sin8.inl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\Sentinel_Test\Debug\SCopyD.bat">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\Sentinel_Test\Release\SCopyR.bat">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

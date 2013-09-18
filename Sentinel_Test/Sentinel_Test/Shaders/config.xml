@@ -1,0 +1,183 @@
+<?xml version="1.0" ?>
+<Shaders>
+  <Definition FileName="colnorm"  Attribute="PN"   Uniform="PpVML" />>
+  <Definition FileName="texture"  Attribute="PXN"  Uniform="PpXVML" />
+  <Definition FileName="normmap"  Attribute="PXNT" Uniform="PpXXVML" />
+  <Definition FileName="spriteGO" Attribute="XCx"  Uniform="PXx" />
+  
+  <!--Definition FileName="colnorm"-->
+    <!-- 
+    TODO:
+    Allow the user to create custom named Attributes.
+    
+    Value:
+        f:  float
+        f#: float#
+        i:  int
+        i#: int#
+        m:  matrix
+    -->
+    <!--
+    <Attribute Name="Position" Value="f4" />
+    <Attribute Name="Texture"  Value="f2" />
+    <Attribute Name="Normal"   Value="f3" />
+    <Attribute Name="Tangent"  Value="f4" />
+    <Attribute Name="Color"    Value="f4" />
+    <Attribute Name="Matrix"   Value="m" />
+    -->
+  
+    <!-- 
+    TODO:
+    Allow the user to create custom Uniforms with a bound function.
+    Most likely will involve custom scripting language; however,
+    this would be much faster with native function calls.
+    -->
+    <!--
+    <Uniform Name="wvp" Binding="SetMVP" />
+    -->
+  <!--/Definition-->
+</Shaders>
+
+<!--
+Vertex Attributes:
+
+Code:     P
+Type:     Position
+Variable: 
+      DX: float4 Position :POSITION;
+      GL: vec4 aPosition;
+    
+Code:     X
+Type:     Texture Coordinate
+Variable:
+      DX: float2 Texture# :TEXCOORD#;
+      GL: vec2 aTexture#;
+
+Code:     N
+Type:     Normal
+Variable:
+      DX: float3 Normal :NORMAL;
+      GL: vec3 aNormal;
+
+Code:     C
+Type:     Color RGBA
+Variable:
+      DX: float4 Color :COLOR0;
+      GL: vec4 aColor;
+      
+Code:     T
+Type:     Tangent
+Variable:
+      DX: float4 Tangent :TANGENT;
+      GL: vec4 aTangent;
+
+Code:     x
+Type:     Transform Matrix
+Variable:
+      DX: row_major float4x4 Matrix :MATRIX;
+      GL: mat4 aMatrix;
+
+Code:     B
+Type:     Bones
+Variable:
+      DX: int     NumBones	:NORMAL1;
+	        int4    BoneIndex	:BONE_INDEX;
+	        float4  Weight		:BONE_WEIGHT;
+          
+      GL: int     aNumBones;
+          int4    aBoneIndex;
+          vec4    aWeight;
+
+-------------------------------------------------
+          
+Uniforms:
+
+Code:     P
+Type:     Model-View-Projection
+Variable:
+      DX: matrix wvp :WORLDVIEWPROJECTION;
+      GL: mat4 wvp;
+
+Code:     p
+Type:     World Matrix
+Variable:
+      DX: matrix world :WORLD;
+      GL: mat4 world;
+
+Code:     X
+Type:     Texture Bitmap
+Variable:
+      DX: Texture2d tex#;
+      GL: sampler2D tex#;
+      
+Code:     x
+Type:     Texture Scale, i.e. start and end texture coordinates
+Variable:
+      DX: float4 texScale;
+      GL: vec4 texScale;
+
+Code:     V
+Type:     Camera Position
+Variable:
+      DX: float3 cam_pos;
+      GL: vec3 cam_pos;
+
+Code:     L
+Type:     Light
+Variable:
+      DX: float3 light_pos#;
+          float3 light_color#;
+          float4 light_attn#;
+          
+      GL: vec3   light_pos#;
+          vec3   light_color#;
+				  vec4   light_attn#;
+        
+Code:     M
+Type:     Material
+Variable:
+      DX: float4 ambient;
+          float4 diffuse;
+          float4 specular;
+          float  spec_comp;
+          
+      GL: vec4   ambient;
+          vec4   diffuse;
+				  vec4   specular;       
+          float  spec_comp;
+
+Code:     S
+Type:     Shadows
+Variable:
+      DX: matrix mlvlp;
+          float  shadow_epsilon;
+          
+      GL: mat4   mlvlp;
+          float  shadow_epsilon;
+          
+Code:     s
+Type:     Render Target Scale
+Variable:
+      DX: float4 rtScale;
+      GL: vec4   rtScale;
+
+Code:     s
+Type:     Render Target Scale
+Variable:
+      DX: float4 rtScale;
+      GL: vec4   rtScale;
+      
+Code:     B
+Type:     Bone Matrices
+Variable:
+      DX: matrix bone[ 100 ];
+      GL: mat4   bone[ 100 ];
+Note:     100 is default; should be max bone count.
+          Automatically set in Mesh.
+
+Code:     t
+Type:     Delta Time; per frame
+Variable:
+      DX: float deltaTime;
+      GL: float deltaTime;
+-->

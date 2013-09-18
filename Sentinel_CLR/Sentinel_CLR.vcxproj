@@ -95,6 +95,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Engine\src\CLR\WShaderManager.h" />
     <ClInclude Include="..\Engine\src\CLR\WStdVector.h" />
     <ClInclude Include="..\Engine\src\CLR\Property.h" />
     <ClInclude Include="..\Engine\src\CLR\m_shared_ptr.h" />
@@ -153,6 +154,7 @@
     <ClCompile Include="..\Engine\src\CLR\WRenderer.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WShader.cpp" />
     <ClCompile Include="..\Engine\src\CLR\RString.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WShaderManager.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WShape.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WTexture.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WTransformComponent.cpp" />
@@ -167,8 +169,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Sentinel_Test\Debug\SCopyD.bat" />
-    <None Include="..\Sentinel_Test\Release\SCopyR.bat" />
+    <None Include="..\Sentinel_Test\Debug\ECopyD.bat" />
+    <None Include="..\Sentinel_Test\Release\ECopyR.bat" />
     <None Include="app.ico" />
     <None Include="ReadMe.txt" />
   </ItemGroup>

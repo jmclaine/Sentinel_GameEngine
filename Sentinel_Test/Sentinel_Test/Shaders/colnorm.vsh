@@ -1,4 +1,4 @@
-uniform mat4 mvp;
+uniform mat4 wvp;
 uniform mat4 world;
 
 uniform vec3 light_pos0;
@@ -13,7 +13,7 @@ varying vec3 vLPos0;
 
 void main()
 {
-	gl_Position   = mul(mvp, aPosition);
+	gl_Position   = mul(wvp, aPosition);
 	vec3 worldPos = mul(world, aPosition);
 
 	// Light direction

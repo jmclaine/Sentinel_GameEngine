@@ -1,6 +1,6 @@
 // Uniforms.
 //
-uniform matrix mvp	 :WORLDVIEWPROJECTION;
+uniform matrix wvp	 :WORLDVIEWPROJECTION;
 uniform matrix world :WORLD;
 
 uniform float3 light_pos0;
@@ -45,7 +45,7 @@ VSOutput MyVS( VSInput input )
 {
 	VSOutput output;
 
-	output.Position = mul(input.Position, mvp);
+	output.Position = mul(input.Position, wvp);
 	float3 worldPos = mul(input.Position, world).xyz;
 
 	// Transform light direction into tangent space.

@@ -1,4 +1,4 @@
-uniform float4x4 mvp:WORLDVIEWPROJECTION;
+uniform float4x4 wvp:WORLDVIEWPROJECTION;
 uniform float4   texScale;
 
 Texture2D tex0;
@@ -37,7 +37,7 @@ VSOutput MyVS(VSInput input)
 	output.Texture0 = input.Texture0 * texScale.xy;
 	output.Color    = input.Color;
 
-	output.Matrix   = mul(input.Matrix, mvp);
+	output.Matrix   = mul(input.Matrix, wvp);
 
 	return output;
 }

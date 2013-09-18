@@ -11,7 +11,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Interop;
 using System.Windows.Threading;
 using System.ComponentModel;
@@ -95,6 +94,8 @@ namespace Sentinel_Editor
 
 		private void Window_Loaded( Object sender, RoutedEventArgs e )
 		{
+			// Initialize Resources.
+			//
 			Inspector.TreeStyle  = (Style)FindResource( "Inspector_TreeStyle" );
 			Inspector.TextStyle  = (Style)FindResource( "Inspector_TextStyle" );
 
@@ -102,10 +103,9 @@ namespace Sentinel_Editor
 
 			ATexture.DefaultImage = new BitmapImage( new Uri( "pack://application:,,,/Images/Asset_Image.png" ));
 			AShader.DefaultImage  = new BitmapImage( new Uri( "pack://application:,,,/Images/Asset_Shader.png" ));
-			AMesh.DefaultImage    = new BitmapImage( new Uri( "pack://application:,,,/Images/Asset_Model.png" ));
-			AModel.DefaultImage   = AMesh.DefaultImage;
+			AMesh.DefaultImage    = new BitmapImage( new Uri( "pack://application:,,,/Images/Asset_Mesh.png" ));
+			AModel.DefaultImage   = new BitmapImage( new Uri( "pack://application:,,,/Images/Asset_Model.png" ));
 
-			///////////////////////////////////////
 			// Initialize Renderer.
 			//
 			WWindowInfo info = WRenderer.Load( "config.xml" );
@@ -340,7 +340,14 @@ namespace Sentinel_Editor
 			}
 			else
 			{
-				item.Items.Add( new OGameObject( obj ));
+				OGameObject child = new OGameObject( obj );
+				
+				// Add the children.
+				//
+				for( int x = 0; x < obj.NumChildren(); ++x )
+					AddObjectToTree( obj.GetChild( x ), child );
+
+				item.Items.Add( child );
 			}
 		}
 
@@ -391,7 +398,12 @@ namespace Sentinel_Editor
 								if( Objects_DraggedItem != Objects_Target )
 								{
 									if( Objects_DraggedItem.Parent != Objects_TreeView )
+									{
 										(Objects_DraggedItem.Parent as OGameObject).Items.Remove( Objects_DraggedItem );
+
+										if( Objects_DraggedItem.Data.Parent != null )
+											Objects_DraggedItem.Data.Parent.RemoveChild( Objects_DraggedItem.Data );
+									}
 									else
 										Objects_TreeView.Items.Remove( Objects_DraggedItem );
 									
@@ -413,7 +425,10 @@ namespace Sentinel_Editor
 				}
 			}
 			catch( Exception )
-			{}
+			{
+				Objects_DraggedItem = null;
+				Objects_Target      = null;
+			}
 		}
 
 		private void Objects_TreeView_DragOver( Object sender, DragEventArgs e )
@@ -475,7 +490,9 @@ namespace Sentinel_Editor
 					Objects_Target = null;
 			}
 			catch( Exception )
-			{}
+			{
+				Objects_Target = null;
+			}
 		}
 		#endregion
 
@@ -535,6 +552,42 @@ namespace Sentinel_Editor
 			
 			return null;
 		}
+
+		///
+		/// Context Menu
+		///
+		private void Assets_AddTexture( Object sender, RoutedEventArgs e )
+		{
+			System.Windows.Forms.OpenFileDialog dialog = new System.Windows.Forms.OpenFileDialog();
+
+			dialog.Title  = "Add Texture to Project";
+			dialog.Filter = "PNG (.png)|*.png|All Files (*.*)|*.*";
+			dialog.FilterIndex = 1;
+
+			//dialog.Multiselect = true;
+
+			if( dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK )
+				AddAsset( WRenderer.CreateTextureFromFile( dialog.FileName ), Path.GetFileName( dialog.FileName ));
+		}
+
+		private void Assets_AddShader( Object sender, RoutedEventArgs e )
+		{
+			System.Windows.Forms.OpenFileDialog dialog = new System.Windows.Forms.OpenFileDialog();
+
+			dialog.Title  = "Add Shader to Project";
+			dialog.Filter = "HLSL (.fx)|*.fx|GLSL (.vsh)|*.vsh|All Files (*.*)|*.*";
+			dialog.FilterIndex = 1;
+
+			//dialog.Multiselect = true;
+
+			//if( dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK )
+			//	AddAsset( WRenderer.CreateShader( dialog.FileName ), Path.GetFileName( dialog.FileName ));
+		}
+
+		private void Assets_AddModel( Object sender, RoutedEventArgs e )
+		{
+			// TODO: Open explorer.
+		}
 		#endregion
 
 		#region Object Preparation
@@ -589,7 +642,7 @@ namespace Sentinel_Editor
 			////////////////////////////////////
 
 			mTexture = WRenderer.CreateTextureFromFile( "Assets\\Images\\default-alpha.png" );
-			AddAsset( mTexture, "default-alpha.png" );
+			AddAsset( mTexture, Path.GetFileName( mTexture.Filename() ));
 
 			// Camera.
 			//

@@ -36,7 +36,7 @@ namespace Sentinel
 			switch( mUniform[ i ] )
 			{
 				case 'P':
-					CreateUniform( "mvp" );
+					CreateUniform( "wvp" );
 					break;
 
 				case 'p':

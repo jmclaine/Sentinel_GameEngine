@@ -1,6 +1,6 @@
 #version 330 
 
-uniform mat4 mvp;
+uniform mat4 wvp;
 uniform vec4 texScale;
 
 in vec2 aTexture0;
@@ -23,5 +23,5 @@ void main()
 	gvColor = aColor;
 
 	// Matrix
-	gvMatrix = mvp * aMatrix;
+	gvMatrix = wvp * aMatrix;
 }

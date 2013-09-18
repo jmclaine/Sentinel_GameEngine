@@ -13,6 +13,8 @@
 #include "ParticleSystem.h"
 #include "NetworkSocket.h"
 
+#include "ShaderManager.h"
+
 #include "Input.h"
 #include "Timing.h"
 #include "Util.h"
@@ -64,7 +66,6 @@ class MainApp
 {
 	HACCEL					mAccelTable;
 	
-	Shader*					mShader[ NUM_SHADERS ];
 	Texture*				mTexture;
 
 	GameWindow*				mWindow0;
@@ -75,9 +76,6 @@ public:
 	MainApp()
 	{
 		srand( (UINT)time( (time_t*)0 ));
-
-		for( UINT x = 0; x < NUM_SHADERS; ++x )
-			mShader[ x ] = NULL;
 
 		mTexture = NULL;
 
@@ -143,7 +141,7 @@ public:
 		PrepareObjects();
 		PrepareFont();
 
-		ParticleSystem::Inst()->Startup( mShader[ SHADER_SPRITE ], 100 );
+		ParticleSystem::Inst()->Startup( ShaderManager::Inst()->Get( "SPRITE" ), 100 );
 
 		// Enter main game loop.
 		//
@@ -218,25 +216,14 @@ public:
 	{
 		SetDirectory( "Shaders" );
 
-		mShader[ SHADER_COLOR ] = Renderer::Inst()->CreateShader( "colnorm", "PN", "PpVML" );
-		if( !mShader[ SHADER_COLOR ] )
-			throw AppException( "Failed to load 'colnorm' shader." );
+		ShaderManager::Inst()->Add( Renderer::Inst()->CreateShader( "colnorm",  "PN",   "PpVML" ),	 "COLOR" );
+		ShaderManager::Inst()->Add( Renderer::Inst()->CreateShader( "texture",  "PXN",  "PpXVML" ),	 "TEXTURE" );
+		ShaderManager::Inst()->Add( Renderer::Inst()->CreateShader( "normmap",  "PXNT", "PpXXVML" ), "NORMAL_MAP" );
+		ShaderManager::Inst()->Add( Renderer::Inst()->CreateShader( "spriteGO", "XCx",  "PXx" ),	 "SPRITE" );
 
-		mShader[ SHADER_TEXTURE ] = Renderer::Inst()->CreateShader( "texture", "PXN", "PpXVML" );
-		if( !mShader[ SHADER_TEXTURE ] )
-			throw AppException( "Failed to load 'texture' shader." );
-		
-		mShader[ SHADER_NORMAL_MAP ] = Renderer::Inst()->CreateShader( "normmap", "PXNT", "PpXXVML" );
-		if( !mShader[ SHADER_NORMAL_MAP ] )
-			throw AppException( "Failed to load 'normmap' shader." );
-
-		mShader[ SHADER_SPRITE ] = Renderer::Inst()->CreateShader( "spriteGO", "XCx", "PXx" );
-		if( !mShader[ SHADER_SPRITE ] )
-			throw AppException( "Failed to load 'spriteGO' shader." );
-
-		Model::SHADER_COLOR			= mShader[ SHADER_COLOR ];
-		Model::SHADER_TEXTURE		= mShader[ SHADER_TEXTURE ];
-		Model::SHADER_NORMAL_MAP	= mShader[ SHADER_NORMAL_MAP ];
+		Model::SHADER_COLOR			= ShaderManager::Inst()->Get( "COLOR" );
+		Model::SHADER_TEXTURE		= ShaderManager::Inst()->Get( "TEXTURE" );
+		Model::SHADER_NORMAL_MAP	= ShaderManager::Inst()->Get( "NORMAL_MAP" );
 
 		SetDirectory( ".." );
 	}
@@ -316,7 +303,7 @@ public:
 		MeshBuilder				meshBuilder;
 		std::shared_ptr< Mesh >	mesh[ NUM_SHAPES ];
 
-		meshBuilder.mShader = mShader[ SHADER_TEXTURE ];
+		meshBuilder.mShader = ShaderManager::Inst()->Get( "TEXTURE" );
 		meshBuilder.mTexture[ TEXTURE_DIFFUSE ] = mTexture;
 
 		meshBuilder.CreateCube( 1 );
@@ -344,7 +331,7 @@ public:
 
 		meshBuilder.ClearGeometry();
 		meshBuilder.CreateWireSphere( 1, 10, 10 );
-		meshBuilder.mShader = mShader[ SHADER_COLOR ];
+		meshBuilder.mShader = ShaderManager::Inst()->Get( "COLOR" );
 		mesh[ SHAPE_WIRE_SPHERE ] = std::shared_ptr< Mesh >( meshBuilder.BuildMesh() );
 
 		std::shared_ptr< Model > model = std::shared_ptr< Model >( Model::Load( "Player.M3D" ));
@@ -463,22 +450,16 @@ public:
 	{
 		SAFE_DELETE( mTexture );
 
-		for( UINT x = 0; x < NUM_SHADERS; ++x )
-		{
-			if( mShader[ x ] )
-			{
-				mShader[ x ]->Release();
-				delete mShader[ x ];
-			}
-			mShader[ x ] = NULL;
-		}
-
 		Mouse::Destroy();
 		Keyboard::Destroy();
+
 		Timing::Destroy();
 		PhysicsSystem::Destroy();
 		ParticleSystem::Destroy();
+
 		GameWorld::Destroy();
+
+		ShaderManager::Destroy();
 
 		mWindow0->Shutdown();
 		delete mWindow0;

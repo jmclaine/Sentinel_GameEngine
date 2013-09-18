@@ -13,10 +13,10 @@ namespace Sentinel
 	{
 	protected:
 		
-		UINT				mVertexSize;
-
 		std::string			mAttribute;
 		std::string			mUniform;
+
+		UINT				mVertexSize;
 
 		////////////////////////////////////
 

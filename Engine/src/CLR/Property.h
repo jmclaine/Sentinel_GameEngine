@@ -121,10 +121,10 @@
 
 // Pointer variables.
 //
-#define DEFINE_PROPERTY_PR( refClass, varType, varName )\
+#define DEFINE_PROPERTY_RP( refClass, varType, varName )\
 	W##varType^ W##refClass::varName::get()\
 	{\
-		return (mRef->m##varName) ? gcnew R##varType( mRef->m##varName ) : nullptr;\
+		return (mRef->m##varName) ? gcnew RP##varType( mRef->m##varName ) : nullptr;\
 	}\
 	void W##refClass::varName::set( W##varType^ v )\
 	{\
@@ -256,12 +256,12 @@
 	void R##refClass::Delete() {}
 
 #define DECLARE_CLASS_REF_PTR( refClass )\
-	public ref class R##refClass sealed : public W##refClass\
+	public ref class RP##refClass sealed : public W##refClass\
 	{\
 	private:\
 		refClass*& mRefPtr;\
 	public:\
-		R##refClass( refClass*& obj );\
+		RP##refClass( refClass*& obj );\
 		void Set( refClass*& obj );\
 		void Set( W##refClass^ obj );\
 	protected:\
@@ -269,10 +269,10 @@
 	};
 
 #define DEFINE_CLASS_REF_PTR( refClass )\
-	R##refClass::R##refClass( refClass*& obj ) : mRefPtr( obj ) { Set( obj ); }\
-	void R##refClass::Set( refClass*& obj )		{ mRefPtr = obj; mRef = mRefPtr; }\
-	void R##refClass::Set( W##refClass^ obj )	{ mRefPtr = obj->GetRef(); mRef = mRefPtr; }\
-	void R##refClass::Delete() {}
+	RP##refClass::RP##refClass( refClass*& obj ) : mRefPtr( obj ) { Set( obj ); }\
+	void RP##refClass::Set( refClass*& obj )	{ mRefPtr = obj; mRef = mRefPtr; }\
+	void RP##refClass::Set( W##refClass^ obj )	{ mRefPtr = obj->GetRef(); mRef = mRefPtr; }\
+	void RP##refClass::Delete() {}
 
 #define DECLARE_CLASS_REF_BASE( baseClass, refClass )\
 	ref class R##refClass sealed : public W##refClass\

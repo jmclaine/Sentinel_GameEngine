@@ -63,13 +63,13 @@ namespace Sentinel { namespace Assets
 
 	//////////////////////////////////
 
-	DEFINE_PROPERTY_PR( MeshBuilder, Shader,	Shader );
+	DEFINE_PROPERTY_RP( MeshBuilder, Shader,	Shader );
 	DEFINE_PROPERTY_E(  MeshBuilder, Systems,	PrimitiveType, Primitive );
 	DEFINE_PROPERTY_R(  MeshBuilder, Vector4f,	TextureScale );
 
-	RTexture^ WMeshBuilder::Texture( TextureType type )
+	RPTexture^ WMeshBuilder::Texture( TextureType type )
 	{
-		return gcnew RTexture( mRef->mTexture[ (int)type ] );
+		return gcnew RPTexture( mRef->mTexture[ (int)type ] );
 	}
 	
 	//////////////////////////////////

@@ -34,5 +34,6 @@ namespace Sentinel { namespace Assets
 		void		Release();
 	};
 
+	DECLARE_CLASS_REF( Buffer );
 	DECLARE_CLASS_REF_PTR( Buffer );
 }}

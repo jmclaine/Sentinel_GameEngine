@@ -4,8 +4,6 @@
 #include "m_shared_ptr.h"
 #include "Texture.h"
 
-using namespace System;
-
 namespace Sentinel { namespace Assets
 {
 	public ref class WTexture
@@ -24,12 +22,13 @@ namespace Sentinel { namespace Assets
 
 		DECLARE_OP_PTR( Texture );
 
-		void		Release();
+		void			Release();
 
-		String^		Filename();
-		UINT		Width();
-		UINT		Height();
+		System::String^	Filename();
+		UINT			Width();
+		UINT			Height();
 	};
 
+	DECLARE_CLASS_REF( Texture );
 	DECLARE_CLASS_REF_PTR( Texture );
 }}

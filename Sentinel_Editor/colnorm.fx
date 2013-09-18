@@ -1,6 +1,6 @@
 // Uniforms.
 //
-uniform matrix wvp	 :WORLDVIEWPROJECTION;
+uniform matrix mvp	 :WORLDVIEWPROJECTION;
 uniform matrix world :WORLD;
 
 uniform float3 light_pos0;
@@ -31,7 +31,7 @@ VSOutput MyVS( VSInput input )
 	VSOutput output;
 
 	// Position
-	output.Position = mul(input.Position, wvp);
+	output.Position = mul(input.Position, mvp);
 	float3 worldPos = mul(input.Position, world).xyz;
 	
 	// Light direction
@@ -75,7 +75,8 @@ float4 GetColor(float3 LPos, float3 camDir, float3 N, float3 color, float4 attn)
 	// Specular
 	float4 specularFinal = max(specular * pow(saturate(dot(N, H)), spec_comp), 0.0);
 
-	return saturate(float4(ambientFinal.rgb + (diffuseFinal.rgb + specularFinal.rgb) * attnFinal * color, 1));
+	return saturate(float4(ambientFinal.rgb + (diffuseFinal.rgb + specularFinal.rgb) * attnFinal * color, 
+					ambientFinal.a + diffuseFinal.a + specularFinal.a));
 }
 
 float4 MyPS(VSOutput input):SV_Target

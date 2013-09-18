@@ -59,12 +59,12 @@ namespace Sentinel { namespace Systems
 
 	WTexture^ WRenderer::NullTexture()
 	{
-		return gcnew RTexture( Renderer::Inst()->NULL_TEXTURE );
+		return gcnew RPTexture( Renderer::Inst()->NULL_TEXTURE );
 	}
 
 	WTexture^ WRenderer::BaseTexture()
 	{
-		return gcnew RTexture( Renderer::Inst()->BASE_TEXTURE );
+		return gcnew RPTexture( Renderer::Inst()->BASE_TEXTURE );
 	}
 
 	WWindowInfo^ WRenderer::Load( String^ filename )
