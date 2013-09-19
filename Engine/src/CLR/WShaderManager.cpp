@@ -6,6 +6,18 @@ using namespace Sentinel::Utilities;
 
 namespace Sentinel { namespace Assets
 {
+	bool WShaderManager::Load( System::String^ filename )
+	{
+		ShaderManager* obj = ShaderManager::Load( RString::ToString( filename ).c_str() );
+
+		if( !obj )
+			return false;
+
+		ShaderManager::Inst( obj );
+
+		return true;
+	}
+
 	WShaderManager::Result WShaderManager::Add( WShader^ shader, System::String^ name )
 	{
 		return (WShaderManager::Result)ShaderManager::Inst()->Add( shader, RString::ToString( name ));

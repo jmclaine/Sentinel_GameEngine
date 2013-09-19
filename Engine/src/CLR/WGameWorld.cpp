@@ -75,10 +75,8 @@ namespace Sentinel { namespace Components
 		return entity;
 	}
 
-	WGameObject^ WGameWorld::GetGameObject( int index )
+	WGameObject^ WGameWorld::GetGameObject( UINT index )
 	{
-		_ASSERT( index >= 0 );
-
 		return gcnew WGameObject( GameWorld::Inst()->GetGameObject( index ));
 	}
 

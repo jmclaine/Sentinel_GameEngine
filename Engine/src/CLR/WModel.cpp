@@ -15,7 +15,7 @@ namespace Sentinel { namespace Assets
 
 	WModel^ WModel::Load( System::String^ filename )
 	{
-		return gcnew WModel( Model::Load( RString::ToString( filename ).c_str() ));
+		return gcnew WModel( std::shared_ptr< Model >( Model::Load( RString::ToString( filename ).c_str() )));
 	}
 
 	void WModel::SetShaderColor( WShader^ shader )

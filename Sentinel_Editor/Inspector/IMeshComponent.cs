@@ -1,6 +1,7 @@
 ﻿using System.Windows.Controls;
 
 using Sentinel.Components;
+using Sentinel.Assets;
 
 namespace Sentinel_Editor
 {
@@ -15,12 +16,15 @@ namespace Sentinel_Editor
 
 			Items.Add( new Inspector( Inspector.CreateEdit( "Name: ", Data.Name )));
 
-			AMesh mesh = MainWindow.FindAsset( Data.Mesh );
+			WMesh mesh = Data.Mesh;
+			AMesh asset = MainWindow.FindAsset( mesh );
 
-			if( mesh != null )
+			if( asset != null )
 				Items.Add( Create() );
 			else
 				Items.Add( "null" );
+
+			mesh.Dispose();
 		}
 
 		private Inspector Create()
@@ -29,8 +33,6 @@ namespace Sentinel_Editor
 			panel.Orientation = Orientation.Horizontal;
 
 			panel.Children.Add( Inspector.CreateLabel( "Mesh: " ));
-
-
 
 			return new Inspector( panel );
 		}

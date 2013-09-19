@@ -441,7 +441,6 @@ namespace Sentinel
 		std::vector< ID3D11RenderTargetView* >	mRenderTarget;
 		ID3D11RenderTargetView*					mCurrTarget;
 
-		std::vector< D3D11_VIEWPORT >			mViewport;
 		std::vector< ID3D11BlendState* >		mBlendState;
 
 		DXGI_SAMPLE_DESC						mSampleDesc;
@@ -662,7 +661,6 @@ namespace Sentinel
 
 				// Create depth STENCIL_PARTICLE.
 				//
-				stencilDesc.DepthEnable						= TRUE;
 				stencilDesc.DepthWriteMask					= D3D11_DEPTH_WRITE_MASK_ZERO;
 				stencilDesc.DepthFunc						= D3D11_COMPARISON_ALWAYS;
 				HV_PTR( mCurrWindow->mDevice->CreateDepthStencilState( &stencilDesc, &stencilState ));
@@ -670,7 +668,6 @@ namespace Sentinel
 
 				// Create depth STENCIL_NO_ZBUFFER.
 				//
-				stencilDesc.DepthEnable						= TRUE;
 				stencilDesc.DepthWriteMask					= D3D11_DEPTH_WRITE_MASK_ZERO;
 				stencilDesc.DepthFunc						= D3D11_COMPARISON_LESS;
 				HV_PTR( mCurrWindow->mDevice->CreateDepthStencilState( &stencilDesc, &stencilState ));
@@ -1016,20 +1013,6 @@ namespace Sentinel
 			return mDepthStencil.size()-1;
 		}
 
-		UINT CreateViewport( UINT width, UINT height )
-		{
-			D3D11_VIEWPORT vp = 
-			{
-				0.0f, 0.0f,
-				(float)width, (float)height,
-				0.0f, 1.0f
-			};
-
-			mViewport.push_back( vp );
-
-			return mViewport.size()-1;
-		}
-
 		UINT ResizeBuffers( UINT width, UINT height )
 		{
 			mCurrWindow->mWidth			= width;
@@ -1086,12 +1069,19 @@ namespace Sentinel
 			mCurrWindow->mContext->OMSetDepthStencilState( mDepthStencilState[ state ], 0 );
 		}
 
-		void SetViewport( UINT viewport )
+		void SetViewport( int x, int y, UINT width, UINT height )
 		{
 			_ASSERT( mCurrWindow );
-			_ASSERT( viewport < mViewport.size() );
+			
+			D3D11_VIEWPORT vp = 
+			{
+				static_cast< float >(x),     static_cast< float >(y),
+				static_cast< float >(width)  / mCurrWindow->mWidthRatio, 
+				static_cast< float >(height) / mCurrWindow->mHeightRatio,
+				0.0f, 1.0f
+			};
 
-			mCurrWindow->mContext->RSSetViewports( 1, &mViewport[ viewport ] );
+			mCurrWindow->mContext->RSSetViewports( 1, &vp );
 		}
 
 		UINT SetCull( CullType type )

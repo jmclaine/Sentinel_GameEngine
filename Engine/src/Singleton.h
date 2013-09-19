@@ -41,6 +41,21 @@ namespace Sentinel
 			return const_cast< T* >(mSingle);
 		}
 
+		static T* volatile Inst( T* obj )
+		{
+			if( !mSingle )
+			{
+				mCS.Lock();
+
+				if( !mSingle )
+					mSingle = obj;
+
+				mCS.Unlock();
+			}
+			
+			return const_cast< T* >(mSingle);
+		}
+
 		static void volatile Destroy()
 		{
 			if( mSingle )

@@ -58,6 +58,9 @@
     <None Include="Shaders\normmap.gls">
       <Filter>Source Files\Shaders\OpenGL</Filter>
     </None>
+    <None Include="Shaders\config.xml">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">

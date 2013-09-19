@@ -58,7 +58,7 @@ namespace Sentinel_Editor
 		{
 			base.Update();
 
-			mCamera.Set( (float)GetInfo().Width()/2, (float)GetInfo().Height()/2 );
+			mCamera.Set( (float)GetInfo().Width(), (float)GetInfo().Height() );
 
 			if( mIsMoving )
 			{

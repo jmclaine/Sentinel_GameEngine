@@ -32,7 +32,7 @@ namespace Sentinel { namespace Components
 
 		static WGameObject^			RemoveGameObject( WGameObject^ entity );
 
-		static WGameObject^			GetGameObject( int index );
+		static WGameObject^			GetGameObject( UINT index );
 		static int					NumGameObjects();
 
 		//////////////////////////////

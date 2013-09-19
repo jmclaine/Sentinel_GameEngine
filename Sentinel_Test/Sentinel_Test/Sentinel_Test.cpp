@@ -112,7 +112,6 @@ public:
 		mWindow0->Startup( hInstance, nCmdShow, "Sentinel_Test", "SentinelClass0", info );
 
 		Renderer::Inst()->CreateDepthStencil( info.Width(), info.Height() );
-		Renderer::Inst()->CreateViewport( info.Width(), info.Height() );
 		Renderer::Inst()->CreateBackbuffer();
 
 		// Prepare second window for testing.
@@ -120,7 +119,6 @@ public:
 		mWindow1->Startup( hInstance, nCmdShow, "Sentinel_Dup",  "SentinelClass1", info );
 
 		Renderer::Inst()->CreateDepthStencil( info.Width(), info.Height() );
-		Renderer::Inst()->CreateViewport( info.Width(), info.Height() );
 		Renderer::Inst()->CreateBackbuffer();
 
 		////////////////////////////////////
@@ -183,7 +181,7 @@ public:
 		mWindow0->SetActive();
 
 		Renderer::Inst()->SetDepthStencil( 0 );
-		Renderer::Inst()->SetViewport( 0 );
+		Renderer::Inst()->SetViewport( 0, 0, mWindow0->GetInfo()->Width(), mWindow0->GetInfo()->Height() );
 		Renderer::Inst()->SetRenderTarget( 0 );
 
 		Renderer::Inst()->Clear( color );
@@ -197,7 +195,7 @@ public:
 		mWindow1->SetActive();
 
 		Renderer::Inst()->SetDepthStencil( 1 );
-		Renderer::Inst()->SetViewport( 1 );
+		Renderer::Inst()->SetViewport( 0, 0, mWindow1->GetInfo()->Width(), mWindow1->GetInfo()->Height() );
 		Renderer::Inst()->SetRenderTarget( 1 );
 
 		Renderer::Inst()->Clear( color );
@@ -215,11 +213,9 @@ public:
 	void PrepareShaders()
 	{
 		SetDirectory( "Shaders" );
-
-		ShaderManager::Inst()->Add( Renderer::Inst()->CreateShader( "colnorm",  "PN",   "PpVML" ),	 "COLOR" );
-		ShaderManager::Inst()->Add( Renderer::Inst()->CreateShader( "texture",  "PXN",  "PpXVML" ),	 "TEXTURE" );
-		ShaderManager::Inst()->Add( Renderer::Inst()->CreateShader( "normmap",  "PXNT", "PpXXVML" ), "NORMAL_MAP" );
-		ShaderManager::Inst()->Add( Renderer::Inst()->CreateShader( "spriteGO", "XCx",  "PXx" ),	 "SPRITE" );
+		
+		if( !ShaderManager::Load( "config.xml" ))
+			throw AppException( "Failed to load 'Shaders\\config.xml'" );
 
 		Model::SHADER_COLOR			= ShaderManager::Inst()->Get( "COLOR" );
 		Model::SHADER_TEXTURE		= ShaderManager::Inst()->Get( "TEXTURE" );

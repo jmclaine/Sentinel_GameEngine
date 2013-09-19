@@ -181,7 +181,7 @@ namespace Sentinel { namespace Assets
 	//
 	WMesh^ WMeshBuilder::BuildMesh()
 	{
-		return gcnew WMesh( mRef->BuildMesh() );
+		return gcnew WMesh( std::shared_ptr< Mesh >( mRef->BuildMesh() ));
 	}
 
 	//////////////////////////////////

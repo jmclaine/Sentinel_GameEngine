@@ -1,0 +1,25 @@
+#ifdef VERTEX_SHADER
+
+uniform mat4 wvp;
+
+attribute vec4 aPosition;
+
+void main()
+{
+	gl_Position = wvp * aPosition;
+}
+
+#endif
+#ifdef FRAGMENT_SHADER
+
+uniform vec4 ambient;
+uniform vec4 diffuse;
+uniform vec4 specular;
+uniform float spec_comp;
+
+void main()
+{
+   gl_FragColor = clamp(ambient + diffuse + specular, 0.0, 1.0);
+}
+
+#endif

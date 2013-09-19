@@ -20,7 +20,7 @@ namespace Sentinel { namespace Components
 		DECLARE_PROPERTY( WModel^, Model );
 
 		void	SetMaterial( WMaterial^ material );
-		void	SetMaterial( int index, WMaterial^ material );
+		void	SetMaterial( UINT index, WMaterial^ material );
 		void	SetMaterial( WStdVector_Material^ material );
 		WStdVector_Material^ GetMaterial();
 		int		GetMaterialSize();

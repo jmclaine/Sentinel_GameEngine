@@ -193,6 +193,7 @@ namespace Sentinel { namespace Systems
 	void WGameWindow::OnRenderSizeChanged( SizeChangedInfo^ sizeInfo )
 	{
 		Renderer::Inst()->ResizeBuffers( (UINT)sizeInfo->NewSize.Width, (UINT)sizeInfo->NewSize.Height );
+		Renderer::Inst()->SetViewport( 0, 0, mWindowInfo->Width(), mWindowInfo->Height() );
 	}
 
 	void WGameWindow::OnRender( DrawingContext^ drawingContext )
@@ -250,8 +251,9 @@ namespace Sentinel { namespace Systems
 			// Create default settings.
 			//
 			WRenderer::CreateDepthStencil( mWindowInfo->Width(), mWindowInfo->Height() );
-			WRenderer::CreateViewport( mWindowInfo->Width(), mWindowInfo->Height() );
 			WRenderer::CreateBackbuffer();
+
+			WRenderer::SetViewport( 0, 0, mWindowInfo->Width(), mWindowInfo->Height() );
 			
 			return HandleRef( this, IntPtr( mHWND ));
 		}

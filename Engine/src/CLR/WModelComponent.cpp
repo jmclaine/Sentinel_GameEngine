@@ -22,11 +22,9 @@ namespace Sentinel { namespace Components
 		static_cast< ModelComponent* >(mRef)->SetMaterial( material );
 	}
 
-	void WModelComponent::SetMaterial( int index, WMaterial^ material )
+	void WModelComponent::SetMaterial( UINT index, WMaterial^ material )
 	{
-		_ASSERT( index >= 0 );
-
-		static_cast< ModelComponent* >(mRef)->SetMaterial( (UINT)index, material );
+		static_cast< ModelComponent* >(mRef)->SetMaterial( index, material );
 	}
 
 	void WModelComponent::SetMaterial( WStdVector_Material^ material )

@@ -24,11 +24,6 @@ private:
 
 public:
 
-	m_shared_ptr( T* t )
-	{
-        mPtr = new std::shared_ptr< T >(t);
-    }
-
 	m_shared_ptr( std::shared_ptr< T > t )
 	{
         mPtr = new std::shared_ptr< T >(t);
@@ -36,7 +31,7 @@ public:
 
 	m_shared_ptr( const m_shared_ptr< T >% t )
 	{
-        mPtr = new std::shared_ptr< T >(*t.mPtr);
+        mPtr = new std::shared_ptr< T >(t);
     }
 
 	~m_shared_ptr()

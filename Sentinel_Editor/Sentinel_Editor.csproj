@@ -102,7 +102,7 @@
     <Compile Include="Assets\AShader.cs" />
     <Compile Include="Assets\EditorAsset.cs" />
     <Compile Include="Objects\OGameObject.cs" />
-    <Compile Include="GameWindow.cs" />
+    <Compile Include="Source\GameWindow.cs" />
     <Compile Include="Inspector\IGameObject.cs" />
     <Compile Include="Inspector\Inspector.cs" />
     <Compile Include="Inspector\IMeshComponent.cs" />
@@ -133,6 +133,39 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Assets\Editor\Translate.M3D">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\Shaders\colnorm.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\Shaders\colnorm.gls">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\Shaders\color.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\Shaders\color.gls">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\Shaders\normmap.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\Shaders\normmap.gls">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\Shaders\spriteGO.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\Shaders\spriteGO.gls">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\Shaders\texture.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\Shaders\texture.gls">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -162,42 +195,42 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Resource Include="Images\Open.png" />
+    <Resource Include="Resources\Asset_Image.png" />
+    <Resource Include="Resources\Asset_Material.png" />
+    <Resource Include="Resources\Asset_Mesh.png" />
+    <Resource Include="Resources\Asset_Model.png" />
+    <Resource Include="Resources\Asset_Shader.png" />
+    <Resource Include="Resources\Draw.png" />
+    <Resource Include="Resources\Erase.png" />
+    <Resource Include="Resources\Error.png" />
+    <Resource Include="Resources\Good.png" />
+    <Resource Include="Resources\New.png" />
+    <Resource Include="Resources\Open.png" />
+    <Resource Include="Resources\Remove.png" />
+    <Resource Include="Resources\Rotate.png" />
+    <Resource Include="Resources\Save.png" />
+    <Resource Include="Resources\Scale.png" />
+    <Resource Include="Resources\Select.png" />
+    <Resource Include="Resources\Translate.png" />
+    <Resource Include="Resources\Warning.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\Save.png" />
+    <Resource Include="Assets\Textures\default-alpha.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\New.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\Rotate.png" />
-    <Resource Include="Images\Scale.png" />
-    <Resource Include="Images\Translate.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\Warning.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\Good.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\Error.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\Select.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\Asset_Image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\Asset_Material.png" />
-    <Resource Include="Images\Asset_Model.png" />
-    <Resource Include="Images\Asset_Shader.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\Asset_Mesh.png" />
+    <Resource Include="Assets\Shaders\config.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="config.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Content Include="glew32.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

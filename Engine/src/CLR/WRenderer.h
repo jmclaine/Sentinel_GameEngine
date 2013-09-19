@@ -105,8 +105,8 @@ namespace Sentinel { namespace Systems
 
 		bool			Fullscreen();
 
-		int				Width();
-		int				Height();
+		UINT			Width();
+		UINT			Height();
 
 		float			WidthRatio();
 		float			HeightRatio();
@@ -154,14 +154,13 @@ namespace Sentinel { namespace Systems
 		static UINT			CreateBackbuffer();
 		static UINT			CreateRenderTarget( WTexture^ texture );
 		static UINT			CreateDepthStencil( UINT width, UINT height );
-		static UINT			CreateViewport( UINT width, UINT height );
 		static UINT			ResizeBuffers( UINT width, UINT height );
 
 		static void			SetRenderType( PrimitiveType type );
 		static void			SetRenderTarget( UINT target );
 		static void			SetDepthStencil( UINT stencil );
 		static void			SetDepthStencilState( StencilType state );
-		static void			SetViewport( UINT viewport );
+		static void			SetViewport( int x, int y, UINT width, UINT height );
 		static UINT			SetCull( CullType type );
 		static UINT			SetFill( FillType type );
 		static void			SetBlend( BlendType type );

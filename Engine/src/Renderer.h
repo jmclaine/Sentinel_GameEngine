@@ -200,6 +200,8 @@ namespace Sentinel
 
 		/////////////////////////////////
 
+		// Initializes the Renderer as either DirectX11 or OpenGL from an XML file.
+		//
 		static Renderer*	Load( const char* filename, WindowInfo& info );
 
 		virtual WindowInfo*	Startup( void* hWnd, bool fullscreen, UINT width, UINT height ) = 0;
@@ -232,14 +234,13 @@ namespace Sentinel
 		virtual UINT		CreateBackbuffer() = 0;
 		virtual UINT		CreateRenderTarget( Texture* texture ) = 0;
 		virtual UINT		CreateDepthStencil( UINT width, UINT height ) = 0;
-		virtual UINT		CreateViewport( UINT width, UINT height ) = 0;
 		virtual UINT		ResizeBuffers( UINT width, UINT height ) = 0;
 
 		virtual void		SetRenderType( PrimitiveType type ) = 0;
 		virtual void		SetRenderTarget( UINT target ) = 0;
 		virtual void		SetDepthStencil( UINT stencil ) = 0;
 		virtual void		SetDepthStencilState( UINT state ) = 0;
-		virtual void		SetViewport( UINT viewport ) = 0;
+		virtual void		SetViewport( int x, int y, UINT width, UINT height ) = 0;
 		virtual UINT		SetCull( CullType type ) = 0;
 		virtual UINT		SetFill( FillType type ) = 0;
 		virtual void		SetBlend( BlendType type ) = 0;

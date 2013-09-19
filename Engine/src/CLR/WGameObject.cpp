@@ -60,16 +60,14 @@ namespace Sentinel { namespace Components
 		mRef->RemoveChild( obj );
 	}
 
-	WGameObject^ WGameObject::GetChild( int index )
+	WGameObject^ WGameObject::GetChild( UINT index )
 	{
-		_ASSERT( index >= 0 );
-
-		return gcnew WGameObject( mRef->GetChild( (UINT)index ));
+		return gcnew WGameObject( mRef->GetChild( index ));
 	}
 
-	int WGameObject::NumChildren()
+	UINT WGameObject::NumChildren()
 	{
-		return (int)mRef->NumChildren();
+		return mRef->NumChildren();
 	}
 
 	////////////////////////////////

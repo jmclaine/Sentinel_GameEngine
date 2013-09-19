@@ -12,7 +12,10 @@ namespace Sentinel { namespace Assets
 		{
 			SUCCESS,
 			DUPLICATE_NAME,
+			LOAD_FILE_FAILED,
 		};
+
+		static bool		Load( System::String^ filename );
 
 		static Result	Add( WShader^ shader, System::String^ name );
 

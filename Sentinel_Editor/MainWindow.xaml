@@ -41,7 +41,7 @@
                     <MenuItem Header="New" Click="New_Click">
                         <MenuItem.Icon>
                             <StackPanel>
-                                <Image Width="18" Height="18" Source="/Sentinel_Editor;component/Images/New.png" />
+                                <Image Width="18" Height="18" Source="/Sentinel_Editor;component/Resources/New.png" />
                             </StackPanel>
                         </MenuItem.Icon>
                     </MenuItem>
@@ -67,7 +67,7 @@
                          BorderThickness="1" DataContext="{Binding}">
                     <Button Name="New_File" Width="22" Height="22" Click="ToolBar_New_Click">
                         <Button.Content>
-                            <Image Source="/Sentinel_Editor;component/Images/New.png" 
+                            <Image Source="/Sentinel_Editor;component/Resources/New.png" 
                                    Width="18" Height="18" Stretch="Fill" StretchDirection="Both" 
                                    HorizontalAlignment="Center" VerticalAlignment="Center" 
                                    ToolTip="New" />
@@ -76,7 +76,7 @@
                     
                     <Button Name="Open_File" Width="22" Height="22" Click="ToolBar_Open_Click">
                         <Button.Content>
-                            <Image Source="/Sentinel_Editor;component/Images/Open.png" 
+                            <Image Source="/Sentinel_Editor;component/Resources/Open.png" 
                                    Width="18" Height="18" Stretch="Fill" StretchDirection="Both" 
                                    HorizontalAlignment="Center" VerticalAlignment="Center" 
                                    ToolTip="Open" />
@@ -85,7 +85,7 @@
 
                     <Button Name="Save_File" Width="22" Height="22" Click="ToolBar_Save_Click">
                         <Button.Content>
-                            <Image Source="/Sentinel_Editor;component/Images/Save.png" 
+                            <Image Source="/Sentinel_Editor;component/Resources/Save.png" 
                                    Width="18" Height="18" Stretch="Fill" StretchDirection="Both" 
                                    HorizontalAlignment="Center" VerticalAlignment="Center" 
                                    ToolTip="Save" />
@@ -98,7 +98,7 @@
                     <ToggleButton Name="Select_Object" Width="22" Height="22" 
                                   Click="ToolBar_Select_Click" IsChecked="True">
                         <ToggleButton.Content>
-                            <Image Source="/Sentinel_Editor;component/Images/Select.png" 
+                            <Image Source="/Sentinel_Editor;component/Resources/Select.png" 
                                    Width="18" Height="18" Stretch="Fill" StretchDirection="Both" 
                                    HorizontalAlignment="Center" VerticalAlignment="Center" 
                                    ToolTip="Select Object" />
@@ -107,7 +107,7 @@
                     
                     <ToggleButton Name="Translate_Object" Width="22" Height="22" Click="ToolBar_Translate_Click">
                         <ToggleButton.Content>
-                            <Image Source="/Sentinel_Editor;component/Images/Translate.png" 
+                            <Image Source="/Sentinel_Editor;component/Resources/Translate.png" 
                                    Width="18" Height="18" Stretch="Fill" StretchDirection="Both" 
                                    HorizontalAlignment="Center" VerticalAlignment="Center" 
                                    ToolTip="Translate" />
@@ -116,7 +116,7 @@
 
                     <ToggleButton Name="Rotate_Object" Width="22" Height="22" Click="ToolBar_Rotate_Click">
                         <ToggleButton.Content>
-                            <Image Source="/Sentinel_Editor;component/Images/Rotate.png" 
+                            <Image Source="/Sentinel_Editor;component/Resources/Rotate.png" 
                                    Width="18" Height="18" Stretch="Fill" StretchDirection="Both" 
                                    HorizontalAlignment="Center" VerticalAlignment="Center" 
                                    ToolTip="Rotate" />
@@ -125,7 +125,7 @@
 
                     <ToggleButton Name="Scale_Object" Width="22" Height="22" Click="ToolBar_Scale_Click">
                         <ToggleButton.Content>
-                            <Image Source="/Sentinel_Editor;component/Images/Scale.png" 
+                            <Image Source="/Sentinel_Editor;component/Resources/Scale.png" 
                                    Width="18" Height="18" Stretch="Fill" StretchDirection="Both" 
                                    HorizontalAlignment="Center" VerticalAlignment="Center" 
                                    ToolTip="Scale" />
@@ -223,8 +223,9 @@
                                     <TreeView.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem Header="Add Texture" Click="Assets_AddTexture" />
-                                            <MenuItem Header="Add Shader" Click="Assets_AddShader" />
                                             <MenuItem Header="Add Model" Click="Assets_AddModel" />
+                                            <Separator />
+                                            <MenuItem Header="Refresh" Click="Assets_Refresh" />
                                         </ContextMenu>
                                     </TreeView.ContextMenu>
                                 </TreeView>
@@ -263,7 +264,7 @@
 
                 <Label Grid.Row="1" Content="Ready" Foreground="White" IsEnabled="True" Margin="18,0,6,0" />
                 <Image Grid.Row="1" Width="16" Height="16" Name="Status_Image" 
-                       Source="/Sentinel_Editor;component/Images/Good.png" 
+                       Source="/Sentinel_Editor;component/Resources/Good.png" 
                        HorizontalAlignment="Left" Margin="4,5,0,3" />
             </Grid>
         </Grid>

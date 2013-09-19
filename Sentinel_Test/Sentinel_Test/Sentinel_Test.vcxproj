@@ -101,6 +101,7 @@
     <None Include="Sentinel_Test.ico" />
     <None Include="Shaders\colnorm.fx" />
     <None Include="Shaders\colnorm.gls" />
+    <None Include="Shaders\config.xml" />
     <None Include="Shaders\normmap.fx" />
     <None Include="Shaders\normmap.gls" />
     <None Include="Shaders\spriteGO.fx" />

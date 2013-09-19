@@ -33,12 +33,12 @@ namespace Sentinel { namespace Systems
 		return mRef->Fullscreen();
 	}
 
-	int WWindowInfo::Width()
+	UINT WWindowInfo::Width()
 	{
 		return mRef->Width();
 	}
 
-	int WWindowInfo::Height()
+	UINT WWindowInfo::Height()
 	{
 		return mRef->Height();
 	}
@@ -156,11 +156,6 @@ namespace Sentinel { namespace Systems
 		return Renderer::Inst()->CreateDepthStencil( width, height );
 	}
 
-	UINT WRenderer::CreateViewport( UINT width, UINT height )
-	{
-		return Renderer::Inst()->CreateViewport( width, height );
-	}
-
 	UINT WRenderer::ResizeBuffers( UINT width, UINT height )
 	{
 		return Renderer::Inst()->ResizeBuffers( width, height );
@@ -186,9 +181,9 @@ namespace Sentinel { namespace Systems
 		Renderer::Inst()->SetDepthStencilState( (Sentinel::StencilType)state );
 	}
 
-	void WRenderer::SetViewport( UINT viewport )
+	void WRenderer::SetViewport( int x, int y, UINT width, UINT height )
 	{
-		Renderer::Inst()->SetViewport( viewport );
+		Renderer::Inst()->SetViewport( x, y, width, height );
 	}
 
 	UINT WRenderer::SetCull( CullType type )

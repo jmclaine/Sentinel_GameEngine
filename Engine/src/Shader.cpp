@@ -1,5 +1,6 @@
 #include "Util.h"
 #include "Shader.h"
+#include "ShaderManager.h"
 
 namespace Sentinel
 {

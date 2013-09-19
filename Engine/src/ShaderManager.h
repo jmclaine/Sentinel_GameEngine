@@ -15,6 +15,7 @@ namespace Sentinel
 		{
 			SUCCESS,
 			DUPLICATE_NAME,
+			LOAD_FILE_FAILED,
 		};
 
 	private:
@@ -28,10 +29,14 @@ namespace Sentinel
 
 	public:
 
-		Result		Add( Shader* shader, const std::string& name );
+		// Adds shaders to the ShaderManager from an XML file.
+		//
+		static ShaderManager* Load( const char* filename );
 
-		void		Remove( const std::string& name );
+		Result			Add( Shader* shader, const std::string& name );
+
+		void			Remove( const std::string& name );
 		
-		Shader*		Get( const std::string& name );
+		Shader*			Get( const std::string& name );
 	};
 }

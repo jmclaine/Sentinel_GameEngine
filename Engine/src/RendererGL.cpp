@@ -562,20 +562,6 @@ namespace Sentinel
 			}
 		};
 
-		class Viewport
-		{
-		public:
-
-			GLuint		mWidth;
-			GLuint		mHeight;
-
-			Viewport( GLuint width, GLuint height )
-			{
-				mWidth  = width;
-				mHeight = height;
-			}
-		};
-
 		class WindowInfoGL : public WindowInfo
 		{
 			friend class RendererGL;
@@ -593,7 +579,6 @@ namespace Sentinel
 
 		std::vector< RenderTarget >		mRenderTarget;
 		std::vector< GLuint >			mDepthStencil;
-		std::vector< Viewport >			mViewport;
 		
 		UINT IMAGE_FORMAT[ NUM_IMAGE_FORMATS ];
 
@@ -903,13 +888,6 @@ namespace Sentinel
 			return mDepthStencil.size()-1;
 		}
 
-		UINT CreateViewport( UINT width, UINT height )
-		{
-			mViewport.push_back( Viewport( width, height ));
-
-			return mViewport.size()-1;
-		}
-
 		UINT ResizeBuffers( UINT width, UINT height )
 		{
 			mCurrWindow->mWidth			= width;
@@ -947,9 +925,11 @@ namespace Sentinel
 		void SetDepthStencilState( UINT state )
 		{}
 
-		void SetViewport( UINT viewport )
+		void SetViewport( int x, int y, UINT width, UINT height )
 		{
-			glViewport( 0, 0, mViewport[ viewport ].mWidth, mViewport[ viewport ].mHeight );
+			_ASSERT( mCurrWindow );
+
+			glViewport( x, y, width, height );
 		}
 
 		UINT SetCull( CullType type )

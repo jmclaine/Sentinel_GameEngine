@@ -1,11 +1,12 @@
 <?xml version="1.0" ?>
 <Shaders>
+  <Definition FileName="color"    Attribute="P"    Uniform="PM"      Name="COLOR_ONLY" />
   <Definition FileName="colnorm"  Attribute="PN"   Uniform="PpVML"   Name="COLOR" />
   <Definition FileName="texture"  Attribute="PXN"  Uniform="PpXVML"  Name="TEXTURE" />
   <Definition FileName="normmap"  Attribute="PXNT" Uniform="PpXXVML" Name="NORMAL_MAP" />
   <Definition FileName="spriteGO" Attribute="XCx"  Uniform="PXx"     Name="SPRITE" />
   
-  <!--Definition FileName="colnorm" Name="COLOR"-->
+  <!--Definition FileName="colnorm"-->
     <!-- 
     TODO:
     Allow the user to create custom named Attributes.
@@ -39,7 +40,7 @@
 </Shaders>
 
 <!--
-Vertex Attributes:
+Attributes:
 
 Code:     P
 Type:     Position

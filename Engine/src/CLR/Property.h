@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Util.h"
+
 // Declare variables for easy access as a property.
 //
 #define DECLARE_PROPERTY( varType, varName )\
@@ -178,13 +180,13 @@
 #define DEFINE_REF_EX( wrapClass, refClass )\
 	wrapClass::~wrapClass()			{ Delete(); }\
 	wrapClass::!wrapClass()			{ Delete(); System::GC::SuppressFinalize( this ); }\
-	void wrapClass::Delete()		{ delete mRef; }\
+	void wrapClass::Delete()		{ SAFE_DELETE( mRef ); }\
 	DEFINE_REF_PTR_EX( wrapClass, refClass );
 
 #define DEFINE_REF_EX_BASE( baseClass, wrapClass, refClass )\
 	baseClass::wrapClass::~wrapClass()			{ Delete(); }\
 	baseClass::wrapClass::!wrapClass()			{ Delete(); System::GC::SuppressFinalize( this ); }\
-	void baseClass::wrapClass::Delete()			{ delete mRef; }\
+	void baseClass::wrapClass::Delete()			{ SAFE_DELETE( mRef ); }\
 	DEFINE_REF_PTR_EX( baseClass::wrapClass, refClass );
 
 #define DECLARE_REF( refClass )\
@@ -196,20 +198,18 @@
 #define DECLARE_REF_SHARED( refClass )\
 	protected:\
 		m_shared_ptr< refClass >^ mRef;\
+		virtual void Delete();\
 	public:\
-		W##refClass( refClass* obj );\
 		W##refClass( std::shared_ptr< refClass > obj );\
 		~W##refClass();\
 		!W##refClass();\
-		virtual void Delete();\
 		std::shared_ptr< refClass > GetRef();
 
 #define DEFINE_REF_SHARED( refClass )\
-	W##refClass::W##refClass( refClass* obj )					{ mRef = gcnew m_shared_ptr< refClass >( obj ); }\
-	W##refClass::W##refClass( std::shared_ptr< refClass > obj )	{ mRef = gcnew m_shared_ptr< refClass >( obj ); }\
+	void W##refClass::Delete()									{ delete mRef; }\
+	W##refClass::W##refClass( std::shared_ptr< refClass > obj ) { mRef = gcnew m_shared_ptr< refClass >( obj ); }\
 	W##refClass::~W##refClass()									{ Delete(); }\
 	W##refClass::!W##refClass()									{ Delete(); System::GC::SuppressFinalize( this ); }\
-	void W##refClass::Delete()									{ delete mRef; }\
 	std::shared_ptr< refClass > W##refClass::GetRef()			{ return mRef; }
 
 
