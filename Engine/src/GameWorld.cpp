@@ -13,7 +13,7 @@ namespace Sentinel
 		Shutdown();
 	}
 
-	GameWorld* GameWorld::Load( const std::string& mapName, void* hWnd )
+	GameWorld* GameWorld::Load( const char* mapName, void* hWnd )
 	{
 		GameWorld* world = GameWorld::Inst( hWnd );
 
@@ -164,7 +164,7 @@ namespace Sentinel
 		return entity;
 	}
 
-	GameObject* GameWorld::AddGameObject( GameObject* entity, const std::string& name )
+	GameObject* GameWorld::AddGameObject( GameObject* entity, const char* name )
 	{
 		entity->mName = name;
 

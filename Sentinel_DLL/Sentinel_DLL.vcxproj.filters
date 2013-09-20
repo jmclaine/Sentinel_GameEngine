@@ -192,6 +192,9 @@
     <ClInclude Include="..\Engine\src\ShaderManager.h">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\src\CDPI.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\Shader.cpp">

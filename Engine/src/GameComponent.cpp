@@ -2,7 +2,8 @@
 
 namespace Sentinel
 {
-	GameComponent::GameComponent()
+	GameComponent::GameComponent() :
+		mName( NULL )
 	{
 		mComponentType = COMPONENT_GAME;
 	}

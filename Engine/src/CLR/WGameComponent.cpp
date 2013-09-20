@@ -1,6 +1,6 @@
 #include "WGameComponent.h"
 #include "WGameObject.h"
-#include "RString.h"
+#include "WString.h"
 
 using namespace Sentinel::Utilities;
 
@@ -23,12 +23,13 @@ namespace Sentinel { namespace Components
 
 	void WGameComponent::Delete()
 	{
+		WString::Free( const_cast< char*& >(mRef->mName) );
 		delete mRef;
 	}
 
 	System::String^ WGameComponent::ToString()
 	{
-		return gcnew System::String( mRef->mName.c_str() );
+		return gcnew System::String( mRef->mName );
 	}
 
 	DEFINE_OP_PTR( GameComponent );

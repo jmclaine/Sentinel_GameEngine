@@ -38,5 +38,7 @@ namespace Sentinel
 		void			Remove( const std::string& name );
 		
 		Shader*			Get( const std::string& name );
+
+		void			GetAll( std::vector< std::string >& names, std::vector< const Shader* >& shaders );
 	};
 }

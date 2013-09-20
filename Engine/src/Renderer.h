@@ -239,7 +239,7 @@ namespace Sentinel
 		virtual void		SetRenderType( PrimitiveType type ) = 0;
 		virtual void		SetRenderTarget( UINT target ) = 0;
 		virtual void		SetDepthStencil( UINT stencil ) = 0;
-		virtual void		SetDepthStencilState( UINT state ) = 0;
+		virtual void		SetDepthStencilState( StencilType state ) = 0;
 		virtual void		SetViewport( int x, int y, UINT width, UINT height ) = 0;
 		virtual UINT		SetCull( CullType type ) = 0;
 		virtual UINT		SetFill( FillType type ) = 0;

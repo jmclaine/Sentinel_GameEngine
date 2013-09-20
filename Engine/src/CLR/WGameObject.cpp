@@ -1,5 +1,5 @@
 #include "WGameObject.h"
-#include "RString.h"
+#include "WString.h"
 
 using namespace Sentinel::Utilities;
 
@@ -19,12 +19,13 @@ namespace Sentinel { namespace Components
 
 	void WGameObject::Delete()
 	{
+		WString::Free( const_cast< char*& >(mRef->mName) );
 		delete mRef;
 	}
 
 	String^ WGameObject::ToString()
 	{
-		return gcnew String( mRef->mName.c_str() );
+		return gcnew String( mRef->mName );
 	}
 
 	DEFINE_OP_PTR( GameObject );
@@ -32,13 +33,13 @@ namespace Sentinel { namespace Components
 	////////////////////////////////
 
 	DEFINE_PROPERTY_STR( GameObject, Name );
-	DEFINE_PROPERTY_PS( GameObject, GameObject, Parent );
+	DEFINE_PROPERTY_PS(  GameObject, GameObject, Parent );
 
 	////////////////////////////////
 
 	WGameComponent^ WGameObject::AttachComponent( WGameComponent^ component, String^ name )
 	{
-		mRef->AttachComponent( component, RString::ToString( name ));
+		mRef->AttachComponent( component, WString::Alloc( name ));
 		return component;
 	}
 

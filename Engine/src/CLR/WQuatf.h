@@ -4,8 +4,6 @@
 #include "Property.h"
 #include "WVector3f.h"
 
-using namespace System;
-
 namespace Sentinel { namespace Math
 {
 	public ref class WQuatf

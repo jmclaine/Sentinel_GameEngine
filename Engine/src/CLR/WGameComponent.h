@@ -3,9 +3,11 @@
 All GameComponent(s) are freed when their associated GameObject is Shutdown()
 Delete() should be called manually for a controlled free memory.
 */
-#include "m_shared_ptr.h"
+#include "WString.h"
 #include "Property.h"
 #include "GameComponent.h"
+
+using namespace Sentinel::Utilities;
 
 // Create macro to cast the GameComponent to another type.
 // Upcasting a WGameComponent to a derived version does

@@ -7,7 +7,8 @@ namespace Sentinel
 	Matrix4f TransformComponent::mMatrixScale;
 	Matrix4f TransformComponent::mMatrixRotation;
 
-	TransformComponent::TransformComponent()
+	TransformComponent::TransformComponent() :
+		GameComponent()
 	{
 		mComponentType = COMPONENT_TRANSFORM;
 

@@ -82,11 +82,13 @@
 #define DEFINE_PROPERTY_STR( refClass, varName )\
 	String^ W##refClass::varName::get()\
 	{\
-		return gcnew String( mRef->m##varName.c_str() );\
+		return gcnew String( mRef->m##varName );\
 	}\
 	void W##refClass::varName::set( String^ str )\
 	{\
-		mRef->m##varName = RString::ToString( str );\
+		if( mRef->m##varName )\
+			WString::Free( const_cast< char* >(mRef->m##varName) );\
+		mRef->m##varName = WString::Alloc( str );\
 	}
 
 // Referenced variables.
@@ -262,15 +264,13 @@
 		refClass*& mRefPtr;\
 	public:\
 		RP##refClass( refClass*& obj );\
-		void Set( refClass*& obj );\
 		void Set( W##refClass^ obj );\
 	protected:\
 		virtual void Delete() override;\
 	};
 
 #define DEFINE_CLASS_REF_PTR( refClass )\
-	RP##refClass::RP##refClass( refClass*& obj ) : mRefPtr( obj ) { Set( obj ); }\
-	void RP##refClass::Set( refClass*& obj )	{ mRefPtr = obj; mRef = mRefPtr; }\
+	RP##refClass::RP##refClass( refClass*& obj ) : mRefPtr( obj ) { mRef = mRefPtr; }\
 	void RP##refClass::Set( W##refClass^ obj )	{ mRefPtr = obj->GetRef(); mRef = mRefPtr; }\
 	void RP##refClass::Delete() {}
 

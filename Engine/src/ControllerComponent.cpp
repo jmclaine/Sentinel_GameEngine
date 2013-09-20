@@ -13,13 +13,13 @@ namespace Sentinel
 		mPhysics = (PhysicsComponent*)mOwner->FindComponent( COMPONENT_PHYSICS );
 
 		if( mPhysics == NULL )
-			throw AppException( "ControllerComponent::Startup()\n" + mOwner->mName + " does not contain PhysicsComponent" );
+			throw AppException( "ControllerComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain PhysicsComponent" );
 
 
 		mTransform = (TransformComponent*)mOwner->FindComponent( COMPONENT_TRANSFORM );
 
 		if( mTransform == NULL )
-			throw AppException( "ControllerComponent::Startup()\n" + mOwner->mName + " does not contain TransformComponent" );
+			throw AppException( "ControllerComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain TransformComponent" );
 	}
 
 	void ControllerComponent::Update()

@@ -42,6 +42,53 @@ namespace Sentinel
 	class RendererDX;
 	class ShaderDX;
 
+	////////////////////////////////////////////////////////////////////////////////////
+
+	class BufferDX : public Buffer
+	{
+		friend class RendererDX;
+
+	private:
+
+		ID3D11DeviceContext*	mContext;
+		ID3D11Buffer*			mBuffer;
+
+		BufferDX()
+		{
+			mBuffer = NULL;
+			mStride = 0;
+		}
+
+	public:
+
+		~BufferDX()
+		{
+			Release();
+		}
+
+		void* Lock()
+		{
+			D3D11_MAPPED_SUBRESOURCE mapRes;
+				
+			mContext->Map( mBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapRes );
+
+			return mapRes.pData;
+		}
+
+		void Unlock()
+		{
+			mContext->Unmap( mBuffer, 0 );
+		}
+
+		void Release()
+		{
+			SAFE_RELEASE_PTR( mBuffer );
+			mStride = 0;
+		}
+	};
+
+	////////////////////////////////////////////////////////////////////////////////////
+
 	class TextureDX : public Texture
 	{
 		friend class RendererDX;
@@ -368,51 +415,6 @@ namespace Sentinel
 	};
 
 	////////////////////////////////////////////////////////////////////////////////////
-
-	class BufferDX : public Buffer
-	{
-		friend class RendererDX;
-
-	private:
-
-		ID3D11DeviceContext*	mContext;
-		ID3D11Buffer*			mBuffer;
-
-		BufferDX()
-		{
-			mBuffer = NULL;
-			mStride = 0;
-		}
-
-	public:
-
-		~BufferDX()
-		{
-			Release();
-		}
-
-		void* Lock()
-		{
-			D3D11_MAPPED_SUBRESOURCE mapRes;
-				
-			mContext->Map( mBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapRes );
-
-			return mapRes.pData;
-		}
-
-		void Unlock()
-		{
-			mContext->Unmap( mBuffer, 0 );
-		}
-
-		void Release()
-		{
-			SAFE_RELEASE_PTR( mBuffer );
-			mStride = 0;
-		}
-	};
-
-	////////////////////////////////////////////////////////////////////////////////////
 	// DirectX11 Renderer.
 	//
 	class RendererDX : public Renderer
@@ -651,7 +653,7 @@ namespace Sentinel
 				stencilDesc.FrontFace.StencilFunc			= D3D11_COMPARISON_ALWAYS;
 
 				stencilDesc.BackFace.StencilFailOp			= D3D11_STENCIL_OP_KEEP;
-				stencilDesc.BackFace.StencilDepthFailOp		= D3D11_STENCIL_OP_DECR;
+				stencilDesc.BackFace.StencilDepthFailOp		= D3D11_STENCIL_OP_INCR;
 				stencilDesc.BackFace.StencilPassOp			= D3D11_STENCIL_OP_KEEP;
 				stencilDesc.BackFace.StencilFunc			= D3D11_COMPARISON_ALWAYS;
 
@@ -1061,11 +1063,10 @@ namespace Sentinel
 			mCurrStencil = mDepthStencil[ stencil ];
 		}
 
-		void SetDepthStencilState( UINT state )
+		void SetDepthStencilState( StencilType state )
 		{
 			_ASSERT( mCurrWindow );
-			_ASSERT( state < mDepthStencilState.size() );
-
+			
 			mCurrWindow->mContext->OMSetDepthStencilState( mDepthStencilState[ state ], 0 );
 		}
 

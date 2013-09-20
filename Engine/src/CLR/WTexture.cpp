@@ -1,8 +1,11 @@
 #include "WTexture.h"
+#include "WString.h"
+
+using namespace Sentinel::Utilities;
 
 namespace Sentinel { namespace Assets
 {
-	DEFINE_REF( Texture );
+	DEFINE_REF_PTR( Texture );
 
 	WTexture::WTexture()
 	{
@@ -12,6 +15,23 @@ namespace Sentinel { namespace Assets
 	WTexture::WTexture( Texture* texture )
 	{
 		mRef = texture;
+	}
+
+	WTexture::~WTexture()
+	{
+		Delete();
+	}
+
+	WTexture::!WTexture()
+	{
+		Delete();
+		System::GC::SuppressFinalize( this );
+	}
+
+	void WTexture::Delete()
+	{
+		WString::Free( const_cast< char* >(mRef->Filename()) );
+		SAFE_DELETE( mRef );
 	}
 
 	////////////////////////////////
@@ -25,7 +45,7 @@ namespace Sentinel { namespace Assets
 
 	System::String^ WTexture::Filename()
 	{
-		return gcnew System::String( mRef->Filename().c_str() );
+		return gcnew System::String( mRef->Filename() );
 	}
 
 	UINT WTexture::Width()

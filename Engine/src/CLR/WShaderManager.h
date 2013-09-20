@@ -2,6 +2,8 @@
 
 #include "WShader.h"
 
+using namespace System::Collections::Generic;
+
 namespace Sentinel { namespace Assets
 {
 	public ref class WShaderManager
@@ -22,5 +24,7 @@ namespace Sentinel { namespace Assets
 		static void		Remove( System::String^ name );
 		
 		static WShader^	Get( System::String^ name );
+
+		static void		GetAll( List< System::String^ >^% names, List< WShader^ >^% shaders );
 	};
 }}

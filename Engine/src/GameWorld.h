@@ -35,7 +35,7 @@ namespace Sentinel
 
 	public:
 
-		static GameWorld*	Load( const std::string& mapName, void* hWnd = NULL );
+		static GameWorld*	Load( const char* mapName, void* hWnd = NULL );
 		
 		void				Startup();
 
@@ -53,7 +53,7 @@ namespace Sentinel
 		// Returns entity.
 		//
 		GameObject*			AddGameObject( GameObject* entity );
-		GameObject*			AddGameObject( GameObject* entity, const std::string& name );
+		GameObject*			AddGameObject( GameObject* entity, const char* name );
 
 		// Removes and returns entity.
 		//

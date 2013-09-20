@@ -8,7 +8,7 @@ namespace Sentinel
 	{
 	protected:
 
-		std::string		mFilename;
+		const char*		mFilename;
 		UINT			mWidth;
 		UINT			mHeight;
 		
@@ -23,7 +23,7 @@ namespace Sentinel
 
 		virtual void		Release();
 
-		const std::string&	Filename();
+		const char*			Filename();
 		UINT				Width();
 		UINT				Height();
 	};

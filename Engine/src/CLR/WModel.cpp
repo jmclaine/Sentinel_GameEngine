@@ -1,5 +1,5 @@
 #include "WModel.h"
-#include "RString.h"
+#include "WString.h"
 
 using namespace Sentinel::Utilities;
 
@@ -15,7 +15,7 @@ namespace Sentinel { namespace Assets
 
 	WModel^ WModel::Load( System::String^ filename )
 	{
-		return gcnew WModel( std::shared_ptr< Model >( Model::Load( RString::ToString( filename ).c_str() )));
+		return gcnew WModel( std::shared_ptr< Model >( Model::Load( msclr::interop::marshal_as< std::string >(filename).c_str() )));
 	}
 
 	void WModel::SetShaderColor( WShader^ shader )
@@ -70,7 +70,7 @@ namespace Sentinel { namespace Assets
 
 	bool WModel::Create( System::String^ filename )
 	{
-		return mRef->Create( RString::ToString( filename ).c_str() );
+		return mRef->Create( msclr::interop::marshal_as< std::string >(filename).c_str() );
 	}
 
 	void WModel::Release()

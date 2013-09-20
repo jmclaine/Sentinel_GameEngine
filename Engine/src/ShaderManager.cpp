@@ -79,4 +79,19 @@ namespace Sentinel
 
 		return NULL;
 	}
+
+	void ShaderManager::GetAll( std::vector< std::string >& names, std::vector< const Shader* >& shaders )
+	{
+		shaders.clear();
+		shaders.reserve( mData.size() );
+		
+		names.clear();
+		names.reserve( mData.size() );
+		
+		for( auto kv = mData.begin(); kv != mData.end(); ++kv )
+		{
+			names.push_back( kv->first );
+			shaders.push_back( kv->second );
+		} 
+	}
 }

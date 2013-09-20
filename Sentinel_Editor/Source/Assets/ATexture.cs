@@ -14,9 +14,9 @@ namespace Sentinel_Editor
 		///
 		public static BitmapImage DefaultImage { get; set; }
 
-		public WTexture Data { get; set; }
+		public WTexture Data { get; private set; }
 
-		public ATexture( WTexture texture, String name )
+		public ATexture( ref WTexture texture, String name )
 		{
 			mType	= EditorAssetType.TEXTURE;
 

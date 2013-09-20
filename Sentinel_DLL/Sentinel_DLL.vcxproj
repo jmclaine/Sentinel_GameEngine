@@ -71,7 +71,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>$(SolutionDir)\..\Engine\tinyxml;$(SolutionDir)\..\Engine\bullet-2.81-rev2613\src;$(SolutionDir)\..\Engine\glew\include;$(SolutionDir)\..\Engine\src\;$(SolutionDir)\..\Engine\DirectX11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAsManaged>false</CompileAsManaged>
-      <PreprocessorDefinitions>WIN32;_WINDLL;BUILD_DLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDLL;BUILD_DLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
     </ClCompile>
@@ -92,6 +92,7 @@
     <ClInclude Include="..\Engine\src\AIControllerComponent.h" />
     <ClInclude Include="..\Engine\src\Buffer.h" />
     <ClInclude Include="..\Engine\src\CameraComponent.h" />
+    <ClInclude Include="..\Engine\src\CDPI.h" />
     <ClInclude Include="..\Engine\src\Color.h" />
     <ClInclude Include="..\Engine\src\Common.h" />
     <ClInclude Include="..\Engine\src\ControllerComponent.h" />

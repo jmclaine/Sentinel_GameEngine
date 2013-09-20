@@ -1,5 +1,5 @@
 #include "WGameWorld.h"
-#include "RString.h"
+#include "WString.h"
 
 using namespace Sentinel::Utilities;
 
@@ -7,12 +7,12 @@ namespace Sentinel { namespace Components
 {
 	void WGameWorld::Load( System::String^ mapName )
 	{
-		GameWorld::Inst( GameWorld::Load( RString::ToString( mapName )));
+		GameWorld::Inst( GameWorld::Load( WString::Cast( mapName )));
 	}
 
 	void WGameWorld::Load( System::String^ mapName, IntPtr hWnd )
 	{
-		GameWorld::Inst( GameWorld::Load( RString::ToString( mapName ), hWnd.ToPointer() ));
+		GameWorld::Inst( GameWorld::Load( WString::Cast( mapName ), hWnd.ToPointer() ));
 	}
 
 	void WGameWorld::Startup()
@@ -65,7 +65,7 @@ namespace Sentinel { namespace Components
 
 	WGameObject^ WGameWorld::AddGameObject( WGameObject^ entity, System::String^ name )
 	{
-		GameWorld::Inst()->AddGameObject( entity->GetRef(), RString::ToString( name ));
+		GameWorld::Inst()->AddGameObject( entity->GetRef(), WString::Alloc( name ));
 		return entity;
 	}
 

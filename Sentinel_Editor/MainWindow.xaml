@@ -10,7 +10,7 @@
         Closing="Window_Closing"
         Closed="Window_Closed"
         Name="Window_Main">
-    
+
     <Window.Resources>
         <Style TargetType="{x:Type local:OGameObject}" BasedOn="{StaticResource {x:Type TreeViewItem}}" />
         <Style x:Key="Assets_TreeStyle" TargetType="{x:Type local:EditorAsset}" BasedOn="{StaticResource {x:Type TreeViewItem}}"/>

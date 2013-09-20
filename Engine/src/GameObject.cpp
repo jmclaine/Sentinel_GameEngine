@@ -8,8 +8,8 @@
 namespace Sentinel
 {
 	GameObject::GameObject() :
-		mTransform( NULL ), mController( NULL ), mPhysics( NULL ), mDrawable( NULL ),
-		mParent( NULL )
+		mTransform( NULL ), mController( NULL ), mPhysics( NULL ), mDrawable( NULL ), 
+		mParent( NULL ), mName( NULL )
 	{}
 
 	GameObject::~GameObject()
@@ -17,7 +17,7 @@ namespace Sentinel
 		Shutdown();
 	}
 
-	GameComponent* GameObject::AttachComponent( GameComponent* component, const std::string& name )
+	GameComponent* GameObject::AttachComponent( GameComponent* component, const char* name )
 	{
 		component->SetOwner( this );
 		component->mName = name;

@@ -19,7 +19,7 @@ namespace Sentinel
 	void Texture::Release()
 	{}
 
-	const std::string& Texture::Filename()
+	const char* Texture::Filename()
 	{
 		return mFilename;
 	}

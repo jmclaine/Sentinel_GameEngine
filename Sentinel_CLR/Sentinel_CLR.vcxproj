@@ -120,7 +120,7 @@
     <ClInclude Include="..\Engine\src\CLR\WQuatf.h" />
     <ClInclude Include="..\Engine\src\CLR\WRenderer.h" />
     <ClInclude Include="..\Engine\src\CLR\WShader.h" />
-    <ClInclude Include="..\Engine\src\CLR\RString.h" />
+    <ClInclude Include="..\Engine\src\CLR\WString.h" />
     <ClInclude Include="..\Engine\src\CLR\WShape.h" />
     <ClInclude Include="..\Engine\src\CLR\WTexture.h" />
     <ClInclude Include="..\Engine\src\CLR\WTransformComponent.h" />
@@ -153,7 +153,7 @@
     <ClCompile Include="..\Engine\src\CLR\WQuatf.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WRenderer.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WShader.cpp" />
-    <ClCompile Include="..\Engine\src\CLR\RString.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WString.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WShaderManager.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WShape.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WTexture.cpp" />

@@ -124,6 +124,7 @@ namespace Sentinel_Editor
 			mGameWindow.SetCameraRotation( new WVector3f( -45, 0, 0 ));
 			
 			Window_World.Child = mGameWindow;
+			Window_World.UpdateLayout();
 
 			// Create editor materials.
 			//
@@ -517,9 +518,9 @@ namespace Sentinel_Editor
 			mSelectedAsset = sender as EditorAsset;
 		}
 
-		private void AddAsset( WTexture texture, String name )
+		private void AddAsset( ref WTexture texture, String name )
 		{
-			ATexture item = new ATexture( texture, name );
+			ATexture item = new ATexture( ref texture, name );
 			item.Selected += AssetSelected;
 			
 			mAsset_Texture.Items.Add( item );
@@ -574,8 +575,8 @@ namespace Sentinel_Editor
 
 			//dialog.Multiselect = true;
 
-			if( dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK )
-				AddAsset( WRenderer.CreateTextureFromFile( dialog.FileName ), Path.GetFileName( dialog.FileName ));
+			//if( dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK )
+			//	AddAsset( ref WRenderer.CreateTextureFromFile( dialog.FileName ), Path.GetFileName( dialog.FileName ));
 		}
 
 		private void Assets_AddModel( Object sender, RoutedEventArgs e )
@@ -610,6 +611,14 @@ namespace Sentinel_Editor
 				System.Environment.Exit( -1 );
 			}
 
+			List< String >  names   = new List< String >();
+			List< WShader > shaders = new List< WShader >();
+
+			WShaderManager.GetAll( ref names, ref shaders );
+
+			for( int x = 0; x < names.Count; ++x )
+				AddAsset( shaders[ x ], names[ x ] );
+
 			Directory.SetCurrentDirectory( "..\\.." );
 		}
 
@@ -626,8 +635,8 @@ namespace Sentinel_Editor
 			////////////////////////////////////
 
 			mTexture = WRenderer.CreateTextureFromFile( "Assets\\Textures\\default-alpha.png" );
-			AddAsset( mTexture, Path.GetFileName( mTexture.Filename() ));
-
+			AddAsset( ref mTexture, Path.GetFileName( mTexture.Filename() ));
+			
 			// Camera.
 			//
 			obj = WGameWorld.AddGameObject( new WGameObject(), "Main_Camera" );
@@ -673,13 +682,15 @@ namespace Sentinel_Editor
 			
 			// Test object.
 			//
+			meshBuilder.ClearGeometry();
+			meshBuilder.CreateDodecahedron( 1.0f );
 			meshBuilder.Shader = WShaderManager.Get( "TEXTURE" );
 			meshBuilder.Texture( (int)TextureType.DIFFUSE ).Set( mTexture );
 
 			mesh = meshBuilder.BuildMesh();
-			AddAsset( mesh, "Cube" );
+			AddAsset( mesh, "Dodecahedron" );
 			
-			WGameObject obj2 = WGameWorld.AddGameObject( new WGameObject(), "Cube" );
+			WGameObject obj2 = WGameWorld.AddGameObject( new WGameObject(), "Dodecahedron" );
 
 			transform = (WTransformComponent)obj2.AttachComponent( new WTransformComponent(), "Transform" );
 			transform.Position	= new WVector3f( 0, 4, 0 );
@@ -687,10 +698,16 @@ namespace Sentinel_Editor
 			transform.Rotation	= new WVector3f( 90, 180, 270 );
 
 			obj2.AttachComponent( new WMeshComponent( mesh ), "Mesh" );
-
+			
 			// Parent test object.
 			//
-			obj = WGameWorld.AddGameObject( new WGameObject(), "Cube2" );
+			meshBuilder.ClearGeometry();
+			meshBuilder.CreateSphere( 1.0f, 10, 10 );
+			
+			mesh = meshBuilder.BuildMesh();
+			AddAsset( mesh, "Sphere" );
+
+			obj = WGameWorld.AddGameObject( new WGameObject(), "Sphere" );
 
 			transform = (WTransformComponent)obj.AttachComponent( new WTransformComponent(), "Transform" );
 			transform.Position	= new WVector3f( -10, 4, 0 );

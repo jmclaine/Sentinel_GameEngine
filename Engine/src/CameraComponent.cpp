@@ -25,7 +25,7 @@ namespace Sentinel
 		mTransform = (TransformComponent*)mOwner->FindComponent( COMPONENT_TRANSFORM );
 
 		if( mTransform == NULL )
-			throw AppException( "CameraComponent::Startup()\n" + mOwner->mName + " does not contain TransformComponent" );
+			throw AppException( "CameraComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain TransformComponent" );
 	}
 
 	void CameraComponent::Update()

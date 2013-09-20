@@ -17,7 +17,7 @@ namespace Sentinel
 		mTransform = (TransformComponent*)mOwner->FindComponent( COMPONENT_TRANSFORM );
 
 		if( mTransform == NULL )
-			throw AppException( "PhysicsComponent::Startup()\n" + mOwner->mName + " does not contain TransformComponent" );
+			throw AppException( "PhysicsComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain TransformComponent" );
 	}
 
 	void PhysicsComponent::Update()

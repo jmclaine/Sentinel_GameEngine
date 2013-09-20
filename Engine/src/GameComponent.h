@@ -34,7 +34,7 @@ namespace Sentinel
 
 	public:
 
-		std::string		mName;
+		const char*		mName;
 
 		////////////////////////////////
 

@@ -16,7 +16,7 @@ namespace Sentinel
 		mPhysics = (PhysicsComponent*)mOwner->FindComponent( COMPONENT_TRANSFORM );
 
 		if( mPhysics == NULL )
-			throw AppException( "TriggerComponent::Startup()\n" + mOwner->mName + " does not contain PhysicsComponent" );
+			throw AppException( "TriggerComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain PhysicsComponent" );
 	}
 
 	void TriggerComponent::Update()

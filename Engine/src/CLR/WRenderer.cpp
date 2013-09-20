@@ -1,6 +1,6 @@
 #include "WRenderer.h"
 #include "Renderer.h"
-#include "RString.h"
+#include "WString.h"
 
 using namespace Sentinel::Utilities;
 
@@ -75,7 +75,7 @@ namespace Sentinel { namespace Systems
 		//
 		WindowInfo info;
 
-		bool result = (Renderer::Inst( (Renderer*)(Renderer::Load( RString::ToString( filename ).c_str(), info ))) != NULL);
+		bool result = (Renderer::Inst( (Renderer*)(Renderer::Load( msclr::interop::marshal_as< std::string >(filename).c_str(), info ))) != NULL);
 
 		if( !result )
 			return nullptr;
@@ -131,7 +131,7 @@ namespace Sentinel { namespace Systems
 
 	WTexture^ WRenderer::CreateTextureFromFile( String^ filename )
 	{
-		return gcnew WTexture( Renderer::Inst()->CreateTextureFromFile( RString::ToString( filename ).c_str() ));
+		return gcnew WTexture( Renderer::Inst()->CreateTextureFromFile( WString::Alloc( filename )));
 	}
 
 	WTexture^ WRenderer::CreateTextureFromMemory( IntPtr data, UINT width, UINT height, ImageFormatType format, bool createMips )
@@ -205,7 +205,7 @@ namespace Sentinel { namespace Systems
 	//
 	WShader^ WRenderer::CreateShader( String^ filename, String^ attrib, String^ uniform )
 	{
-		Shader* shader = Renderer::Inst()->CreateShader( RString::ToString( filename ).c_str(), RString::ToString( attrib ).c_str(), RString::ToString( uniform ).c_str() );
+		Shader* shader = Renderer::Inst()->CreateShader( msclr::interop::marshal_as< std::string >(filename).c_str(), msclr::interop::marshal_as< std::string >(attrib).c_str(), msclr::interop::marshal_as< std::string >(uniform).c_str() );
 
 		return (shader) ? gcnew WShader( shader ) : nullptr;
 	}

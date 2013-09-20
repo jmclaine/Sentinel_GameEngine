@@ -32,6 +32,63 @@ namespace Sentinel
 {
 	class RendererGL;
 
+	////////////////////////////////////////////////////////////////////////////////////
+
+	class BufferGL : public Buffer
+	{
+		friend class RendererGL;
+
+	private:
+
+		GLuint	mID;
+
+		////////////////////////
+
+		BufferGL()
+		{
+			mID = 0;
+		}
+
+	public:
+
+		~BufferGL()
+		{
+			Release();
+		}
+
+		void Startup( BufferType type )
+		{
+			mType = type;
+		}
+
+		void* Lock()
+		{
+			if( mType == VERTEX_BUFFER )
+			{
+				Renderer::Inst()->SetVBO( this );
+				return glMapBuffer( GL_ARRAY_BUFFER, GL_READ_WRITE );
+			}
+			else
+			{
+				Renderer::Inst()->SetIBO( this );
+				return glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
+			}
+		}
+
+		void Unlock()
+		{
+			(mType == VERTEX_BUFFER) ? glUnmapBuffer( GL_ARRAY_BUFFER ) : glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
+		}
+
+		void Release()
+		{
+			glDeleteBuffers( 1, &mID );
+			mID = 0;
+		}
+	};
+
+	////////////////////////////////////////////////////////////////////////////////////
+
 	class TextureGL : public Texture
 	{
 		friend class RendererGL;
@@ -368,7 +425,7 @@ namespace Sentinel
 
 			shader = glCreateShader( type );
 
-			glShaderSource( shader, 2, (const GLchar**)source, NULL );
+			glShaderSource( shader, 2, source, NULL );
 			glCompileShader( shader );
 
 			int didCompile = 0;
@@ -427,8 +484,13 @@ namespace Sentinel
 
 		void ApplyLayout()
 		{
+			ApplyLayout( mVertexSize );
+		}
+
+		void ApplyLayout( UINT stride )
+		{
 			for( UINT i = 0; i < mAttributeSize; ++i )
-				glVertexAttribPointer( i, mAttributeGL[ i ].mOffsetSize, mAttributeGL[ i ].mType, mAttributeGL[ i ].mNormalize, mVertexSize, \
+				glVertexAttribPointer( i, mAttributeGL[ i ].mOffsetSize, mAttributeGL[ i ].mType, mAttributeGL[ i ].mNormalize, stride, \
 									   reinterpret_cast< const GLvoid* >( mAttributeGL[ i ].mOffset ));
 			
 			mTextureLevel = 0;
@@ -487,61 +549,6 @@ namespace Sentinel
 	};
 
 	////////////////////////////////////////////////////////////////////////////////////
-
-	class BufferGL : public Buffer
-	{
-		friend class RendererGL;
-
-	private:
-
-		GLuint	mID;
-
-		////////////////////////
-
-		BufferGL()
-		{
-			mID = 0;
-		}
-
-	public:
-
-		~BufferGL()
-		{
-			Release();
-		}
-
-		void Startup( BufferType type )
-		{
-			mType = type;
-		}
-
-		void* Lock()
-		{
-			if( mType == VERTEX_BUFFER )
-			{
-				Renderer::Inst()->SetVBO( this );
-				return glMapBuffer( GL_ARRAY_BUFFER, GL_READ_WRITE );
-			}
-			else
-			{
-				Renderer::Inst()->SetIBO( this );
-				return glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
-			}
-		}
-
-		void Unlock()
-		{
-			(mType == VERTEX_BUFFER) ? glUnmapBuffer( GL_ARRAY_BUFFER ) : glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
-		}
-
-		void Release()
-		{
-			glDeleteBuffers( 1, &mID );
-			mID = 0;
-		}
-	};
-
-	////////////////////////////////////////////////////////////////////////////////////
 	// OpenGL 4.1 Renderer.
 	//
 	class RendererGL : public Renderer
@@ -582,6 +589,8 @@ namespace Sentinel
 		
 		UINT IMAGE_FORMAT[ NUM_IMAGE_FORMATS ];
 
+		BufferGL*						mCurrVBO;
+
 	public:
 		
 		RendererGL()
@@ -607,6 +616,8 @@ namespace Sentinel
 
 			mCurrShader = NULL;
 			mCurrWindow = NULL;
+
+			mCurrVBO    = NULL;
 		}
 
 		RendererGL::~RendererGL()
@@ -777,7 +788,9 @@ namespace Sentinel
 
 		void SetVBO( Buffer* buffer )
 		{
-			glBindBuffer( GL_ARRAY_BUFFER, static_cast< BufferGL* >(buffer)->mID );
+			BufferGL* b = static_cast< BufferGL* >(buffer);
+			glBindBuffer( GL_ARRAY_BUFFER, b->mID );
+			mCurrVBO = b;
 		}
 
 		void SetIBO( Buffer* buffer )
@@ -904,7 +917,7 @@ namespace Sentinel
 			_ASSERT( mCurrShader );
 			_ASSERT( mCurrWindow );
 
-			mCurrShader->ApplyLayout();
+			static_cast< ShaderGL* >(mCurrShader)->ApplyLayout( mCurrVBO->Stride() );
 			mCurrWindow->mRenderMode = type;
 		}
 
@@ -922,8 +935,26 @@ namespace Sentinel
 			glBindRenderbuffer( GL_RENDERBUFFER, mDepthStencil[ stencil ] );
 		}
 
-		void SetDepthStencilState( UINT state )
-		{}
+		void SetDepthStencilState( StencilType state )
+		{
+			switch( state )
+			{
+				case STENCIL_DEFAULT:
+					glDepthFunc( GL_LESS );
+					//glDepthMask( GL_TRUE );
+					break;
+
+				case STENCIL_NO_ZBUFFER:
+					glDepthFunc( GL_ALWAYS );
+					//glDepthMask( GL_FALSE );
+					break;
+
+				case STENCIL_PARTICLE:
+					glDepthFunc( GL_LESS );
+					//glDepthMask( GL_TRUE );
+					break;
+			}
+		}
 
 		void SetViewport( int x, int y, UINT width, UINT height )
 		{
@@ -976,12 +1007,6 @@ namespace Sentinel
 
 		void SetShader( Shader* shader )
 		{
-			if( mCurrShader != NULL )
-			{
-				for( UINT i = 0; i < static_cast< ShaderGL* >(mCurrShader)->AttributeSize(); ++i )
-					glDisableVertexAttribArray( i );
-			}
-
 			mCurrShader = shader;
 			mCurrShader->ApplyPass();
 		}

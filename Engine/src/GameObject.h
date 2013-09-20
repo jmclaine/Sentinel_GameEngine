@@ -27,7 +27,7 @@ namespace Sentinel
 
 	public:
 
-		std::string							mName;
+		const char*							mName;
 		GameObject*							mParent;
 
 		//////////////////////////////
@@ -38,7 +38,7 @@ namespace Sentinel
 
 		//////////////////////////////
 
-		GameComponent*	AttachComponent( GameComponent* component, const std::string& name );
+		GameComponent*	AttachComponent( GameComponent* component, const char* name );
 
 		GameComponent*	DetachComponent( GameComponent* component );
 
