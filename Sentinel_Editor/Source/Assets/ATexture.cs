@@ -16,7 +16,7 @@ namespace Sentinel_Editor
 
 		public WTexture Data { get; private set; }
 
-		public ATexture( ref WTexture texture, String name )
+		public ATexture( WTexture texture, String name )
 		{
 			mType	= EditorAssetType.TEXTURE;
 

@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "FileIO.h"
 
 #include <GL/glew.h>
 #include <gl/gl.h>
@@ -207,7 +208,7 @@ namespace Sentinel
 
 			GLchar* source;
 			
-			if( !FileToBuffer( filename.c_str(), source ))
+			if( !FileIO::ToBuffer( filename.c_str(), source ))
 			{
 				REPORT_ERROR( "Could not open '" << filename << "'", "Shader Loader Error" );
 				return S_FALSE;

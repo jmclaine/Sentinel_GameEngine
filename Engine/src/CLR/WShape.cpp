@@ -104,6 +104,11 @@ namespace Sentinel { namespace Math
 		mRef = new BoundingSphere( v0, v1, v2, v3 );
 	}
 
+	WBoundingSphere::WBoundingSphere( System::IntPtr^ data, UINT count, UINT stride )
+	{
+		mRef = new BoundingSphere( (char*)data->ToPointer(), count, stride );
+	}
+
 	WBoundingSphere::WBoundingSphere( const BoundingSphere& sphere )
 	{
 		mRef = new BoundingSphere( sphere.mCenter, sphere.mRadius );
@@ -124,11 +129,6 @@ namespace Sentinel { namespace Math
 		return mRef->Intersects( sphere );
 	}
 
-	WBoundingSphere^ FindSmallestSphere( WBuffer^ vbo )
-	{
-		return gcnew WBoundingSphere( Sentinel::FindSmallestSphere( vbo ));
-	}
-
 	DEFINE_CLASS_REF( BoundingSphere );
 
 	//////////////////////////////////////////////////////
@@ -144,7 +144,12 @@ namespace Sentinel { namespace Math
 	{
 		mRef = new BoundingBox( minBounds, maxBounds );
 	}
-
+	
+	WBoundingBox::WBoundingBox( System::IntPtr^ data, UINT count, UINT stride )
+	{
+		mRef = new BoundingBox( (char*)data->ToPointer(), count, stride );
+	}
+	
 	WBoundingBox::WBoundingBox( const BoundingBox& box )
 	{
 		mRef = new BoundingBox( box.GetMinBounds(), box.GetMaxBounds() );
@@ -178,9 +183,4 @@ namespace Sentinel { namespace Math
 	}
 
 	DEFINE_CLASS_REF( BoundingBox );
-
-	WBoundingBox^ FindSmallestBox( WBuffer^ vbo )
-	{
-		return gcnew WBoundingBox( Sentinel::FindSmallestBox( vbo ));
-	}
 }}

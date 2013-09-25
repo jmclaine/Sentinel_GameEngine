@@ -149,6 +149,379 @@ namespace Sentinel
 		mCenter = v0 + u0;
 	}
 
+	// Find the smallest sphere.
+	// Based on code by:
+	// Nicolas Capens @ www.flipcode.com/archives/Smallest_Enclosing_Spheres.html
+	// Guest @ pastebin.com/04b1GBA2
+	//
+	BoundingSphere::BoundingSphere( char* verts, UINT count, UINT stride )
+	{
+		std::vector< Vector3f > points;		// points of interest
+		mCenter = *(Vector3f*)verts;
+		
+		points.push_back( mCenter );
+
+		Vector3f pos;
+		UINT currIndex = 0;
+
+		while( currIndex < count )
+		{
+			pos = *(Vector3f*)(verts + currIndex * stride);
+
+			if( !Intersects( pos ))
+			{
+				BoundingSphere minSphere;
+				BoundingSphere newSphere;
+				int index = -1;
+
+				switch( points.size() )
+				{
+					case 1:
+						minSphere = BoundingSphere( pos, points[ 0 ] );
+						points.push_back( pos );
+						break;
+
+					case 2:
+						newSphere = BoundingSphere( pos, points[ 0 ] );
+						if( newSphere.Intersects( points[ 1 ] ))
+						{
+							minSphere = newSphere;
+							index = 0;
+						}
+
+						newSphere = BoundingSphere( pos, points[ 1 ] );
+						if( newSphere.mRadius < minSphere.mRadius &&
+							newSphere.Intersects( points[ 0 ] ))
+						{
+							minSphere = newSphere;
+							index = 1;
+						}
+
+						if( index > -1 )
+						{
+							points[ 1 - index ] = pos;
+						}
+						else
+						{
+							minSphere = BoundingSphere( pos, points[ 0 ], points[ 1 ] );
+							points.push_back( pos );
+						}
+						break;
+
+					case 3:
+						newSphere = BoundingSphere( pos, points[ 0 ] );
+						if( newSphere.Intersects( points[ 1 ] ) &&
+							newSphere.Intersects( points[ 2 ] ))
+						{
+							minSphere = newSphere;
+							index = 0;
+						}
+
+						newSphere = BoundingSphere( pos, points[ 1 ] );
+						if( newSphere.mRadius < minSphere.mRadius &&
+							newSphere.Intersects( points[ 0 ] ) &&
+							newSphere.Intersects( points[ 2 ] ))
+						{
+							minSphere = newSphere;
+							index = 1;
+						}
+
+						newSphere = BoundingSphere( pos, points[ 2 ] );
+						if( newSphere.mRadius < minSphere.mRadius &&
+							newSphere.Intersects( points[ 0 ] ) &&
+							newSphere.Intersects( points[ 1 ] ))
+						{
+							minSphere = newSphere;
+							index = 2;
+						}
+
+						newSphere = BoundingSphere( pos, points[ 0 ], points[ 1 ] );
+						if( newSphere.mRadius < minSphere.mRadius &&
+							newSphere.Intersects( points[ 2 ] ))
+						{
+							minSphere = newSphere;
+							index = 3;
+						}
+
+						newSphere = BoundingSphere( pos, points[ 0 ], points[ 2 ] );
+						if( newSphere.mRadius < minSphere.mRadius &&
+							newSphere.Intersects( points[ 1 ] ))
+						{
+							minSphere = newSphere;
+							index = 4;
+						}
+
+						newSphere = BoundingSphere( pos, points[ 1 ], points[ 2 ] );
+						if( newSphere.mRadius < minSphere.mRadius &&
+							newSphere.Intersects( points[ 0 ] ))
+						{
+							minSphere = newSphere;
+							index = 5;
+						}
+
+						switch( index )
+						{
+							case 0:
+								points.resize( 2 );
+								points[ 1 ] = pos;
+								break;
+
+							case 1:
+								points.resize( 2 );
+								points[ 0 ] = pos;
+								break;
+
+							case 2:
+								points[ 0 ] = points[ 2 ];
+								points.resize( 2 );
+								points[ 1 ] = pos;
+								break;
+
+							case 3:
+								points[ 2 ] = pos;
+								break;
+
+							case 4:
+								points[ 1 ] = pos;
+								break;
+
+							case 5:
+								points[ 0 ] = pos;
+								break;
+
+							default:
+								minSphere = BoundingSphere( pos, points[ 0 ], points[ 1 ], points[ 2 ] );
+								points.push_back( pos );
+								break;
+						}
+						break;
+
+					case 4:
+						// Check 2 point spheres.
+						//
+						newSphere = BoundingSphere( pos, points[ 0 ] );
+						if( newSphere.Intersects( points[ 1 ] ) &&
+							newSphere.Intersects( points[ 2 ] ) &&
+							newSphere.Intersects( points[ 3 ] ))
+						{
+							minSphere = newSphere;
+							index = 0;
+						}
+
+						newSphere = BoundingSphere( pos, points[ 1 ] );
+						if( newSphere.mRadius < minSphere.mRadius &&
+							newSphere.Intersects( points[ 0 ] ) &&
+							newSphere.Intersects( points[ 2 ] ) &&
+							newSphere.Intersects( points[ 3 ] ))
+						{
+							minSphere = newSphere;
+							index = 1;
+						}
+
+						newSphere = BoundingSphere( pos, points[ 2 ] );
+						if( newSphere.mRadius < minSphere.mRadius &&
+							newSphere.Intersects( points[ 0 ] ) &&
+							newSphere.Intersects( points[ 1 ] ) &&
+							newSphere.Intersects( points[ 3 ] ))
+						{
+							minSphere = newSphere;
+							index = 2;
+						}
+
+						newSphere = BoundingSphere( pos, points[ 3 ] );
+						if( newSphere.mRadius < minSphere.mRadius &&
+							newSphere.Intersects( points[ 0 ] ) &&
+							newSphere.Intersects( points[ 1 ] ) &&
+							newSphere.Intersects( points[ 2 ] ))
+						{
+							minSphere = newSphere;
+							index = 3;
+						}
+
+						// Check 3 point spheres.
+						//
+						newSphere = BoundingSphere( pos, points[ 0 ], points[ 1 ] );
+						if( newSphere.mRadius < minSphere.mRadius &&
+							newSphere.Intersects( points[ 2 ] ) &&
+							newSphere.Intersects( points[ 3 ] ))
+						{
+							minSphere = newSphere;
+							index = 4;
+						}
+
+						newSphere = BoundingSphere( pos, points[ 0 ], points[ 2 ] );
+						if( newSphere.mRadius < minSphere.mRadius &&
+							newSphere.Intersects( points[ 1 ] ) &&
+							newSphere.Intersects( points[ 3 ] ))
+						{
+							minSphere = newSphere;
+							index = 5;
+						}
+
+						newSphere = BoundingSphere( pos, points[ 0 ], points[ 3 ] );
+						if( newSphere.mRadius < minSphere.mRadius &&
+							newSphere.Intersects( points[ 1 ] ) &&
+							newSphere.Intersects( points[ 2 ] ))
+						{
+							minSphere = newSphere;
+							index = 6;
+						}
+
+						newSphere = BoundingSphere( pos, points[ 1 ], points[ 2 ] );
+						if( newSphere.mRadius < minSphere.mRadius &&
+							newSphere.Intersects( points[ 0 ] ) &&
+							newSphere.Intersects( points[ 3 ] ))
+						{
+							minSphere = newSphere;
+							index = 7;
+						}
+
+						newSphere = BoundingSphere( pos, points[ 1 ], points[ 3 ] );
+						if( newSphere.mRadius < minSphere.mRadius &&
+							newSphere.Intersects( points[ 0 ] ) &&
+							newSphere.Intersects( points[ 2 ] ))
+						{
+							minSphere = newSphere;
+							index = 8;
+						}
+
+						newSphere = BoundingSphere( pos, points[ 2 ], points[ 3 ] );
+						if( newSphere.mRadius < minSphere.mRadius &&
+							newSphere.Intersects( points[ 0 ] ) &&
+							newSphere.Intersects( points[ 1 ] ))
+						{
+							minSphere = newSphere;
+							index = 9;
+						}
+
+						// Check 4 point spheres.
+						//
+						newSphere = BoundingSphere( pos, points[ 0 ], points[ 1 ], points[ 2 ] );
+						if( newSphere.mRadius < minSphere.mRadius &&
+							newSphere.Intersects( points[ 3 ] ))
+						{
+							minSphere = newSphere;
+							index = 10;
+						}
+
+						newSphere = BoundingSphere( pos, points[ 0 ], points[ 1 ], points[ 3 ] );
+						if( newSphere.mRadius < minSphere.mRadius &&
+							newSphere.Intersects( points[ 2 ] ))
+						{
+							minSphere = newSphere;
+							index = 11;
+						}
+
+						newSphere = BoundingSphere( pos, points[ 1 ], points[ 2 ], points[ 3 ] );
+						if( newSphere.mRadius < minSphere.mRadius &&
+							newSphere.Intersects( points[ 0 ] ))
+						{
+							minSphere = newSphere;
+							index = 12;
+						}
+
+						newSphere = BoundingSphere( pos, points[ 0 ], points[ 2 ], points[ 3 ] );
+						if( newSphere.mRadius < minSphere.mRadius &&
+							newSphere.Intersects( points[ 1 ] ))
+						{
+							minSphere = newSphere;
+							index = 13;
+						}
+
+						switch( index )
+						{
+							case 0:
+								points.resize( 2 );
+								points[ 1 ] = pos;
+								break;
+
+							case 1:
+								points.resize( 2 );
+								points[ 0 ] = pos;
+								break;
+
+							case 2:
+								points[ 0 ] = points[ 2 ];
+								points.resize( 2 );
+								points[ 1 ] = pos;
+								break;
+
+							case 3:
+								points[ 0 ] = points[ 3 ];
+								points.resize( 2 );
+								points[ 1 ] = pos;
+								break;
+
+							case 4:
+								points.resize( 3 );
+								points[ 2 ] = pos;
+								break;
+
+							case 5:
+								points.resize( 3 );
+								points[ 1 ] = pos;
+								break;
+
+							case 6:
+								points[ 1 ] = points[ 3 ];
+								points.resize( 3 );
+								points[ 2 ] = pos;
+								break;
+
+							case 7:
+								points[ 0 ] = points[ 2 ];
+								points.resize( 3 );
+								points[ 2 ] = pos;
+								break;
+
+							case 8:
+								points[ 0 ] = points[ 3 ];
+								points.resize( 3 );
+								points[ 2 ] = pos;
+								break;
+
+							case 9:
+								points[ 0 ] = points[ 3 ];
+								points[ 1 ] = pos;
+								points.resize( 3 );
+								break;
+
+							case 10:
+								points[ 3 ] = pos;
+								break;
+
+							case 11:
+								points[ 2 ] = pos;
+								break;
+
+							case 12:
+								points[ 0 ] = pos;
+								break;
+
+							case 13:
+								points[ 1 ] = pos;
+								break;
+						}
+						break;
+				}
+
+				if( minSphere.mRadius > mRadius )
+				{
+					mCenter = minSphere.mCenter;
+					mRadius = minSphere.mRadius;
+
+					// Must recheck all points to be certain they
+					// all fit within the newly created sphere.
+					//
+					currIndex = 0;
+					continue;
+				}
+			}
+		
+			++currIndex;
+		}
+	}
+
 	bool BoundingSphere::Intersects( const Vector3f& point )
 	{
 		return (point - mCenter).LengthSquared() < (mRadius * mRadius);
@@ -162,408 +535,32 @@ namespace Sentinel
 		return (d < r*r);
 	}
 
-	// Find the smallest sphere.
-	// Based on code by:
-	// Nicolas Capens @ www.flipcode.com/archives/Smallest_Enclosing_Spheres.html
-	// Guest @ pastebin.com/04b1GBA2
-	//
-	BoundingSphere FindSmallestSphere( Buffer* vbo )
-	{
-		unsigned char* verts = (unsigned char*)vbo->Lock();
-
-		std::vector< Vector3f > points;					// points of interest
-		BoundingSphere sphere( *(Vector3f*)verts );		// final bounding sphere
-		BoundingSphere newSphere[ 14 ];					// create possible spheres
-
-		points.push_back( sphere.mCenter );
-
-		UINT currIndex = 0;
-		while( currIndex < vbo->Count() )
-		{
-			Vector3f pos = *(Vector3f*)(verts + currIndex * vbo->Stride());
-			bool isContained = false;
-
-			for( UINT x = 0; x < points.size(); ++x )
-			{
-				if( points[ x ].Equals( pos ))
-					isContained = true;
-			}
-
-			if( !isContained )
-			{
-				if( !sphere.Intersects( pos ))
-				{
-					BoundingSphere minSphere;
-					float minRadius = FLT_MAX;
-					int index = -1;
-
-					switch( points.size() )
-					{
-						case 1:
-							minSphere = BoundingSphere( pos, points[ 0 ] );
-							points.push_back( pos );
-							break;
-
-						case 2:
-							newSphere[ 0 ] = BoundingSphere( pos, points[ 0 ] );
-							newSphere[ 1 ] = BoundingSphere( pos, points[ 1 ] );
-
-							if( newSphere[ 0 ].Intersects( points[ 1 ] ))
-							{
-								minRadius = newSphere[ 0 ].mRadius;
-								index = 0;
-							}
-							else
-							if( newSphere[ 1 ].mRadius < minRadius &&
-								newSphere[ 1 ].Intersects( points[ 0 ] ))
-							{
-								minRadius = newSphere[ 1 ].mRadius;
-								index = 1;
-							}
-
-							if( index > -1 )
-							{
-								minSphere = newSphere[ index ];
-								points[ 1 - index ] = pos;
-							}
-							else
-							{
-								minSphere = BoundingSphere( pos, points[ 0 ], points[ 1 ] );
-								points.push_back( pos );
-							}
-							break;
-
-						case 3:
-							for( UINT y = 0; y < points.size(); ++y )
-							{
-								newSphere[ y ] = BoundingSphere( pos, points[ y ] );
-							}
-							newSphere[ 3 ] = BoundingSphere( pos, points[ 0 ], points[ 1 ] );
-							newSphere[ 4 ] = BoundingSphere( pos, points[ 0 ], points[ 2 ] );
-							newSphere[ 5 ] = BoundingSphere( pos, points[ 1 ], points[ 2 ] );
-
-							if( newSphere[ 0 ].Intersects( points[ 1 ] ) &&
-								newSphere[ 0 ].Intersects( points[ 2 ] ))
-							{
-								index = 0;
-								minRadius = newSphere[ 0 ].mRadius;
-							}
-
-							if( newSphere[ 1 ].mRadius < minRadius &&
-								newSphere[ 1 ].Intersects( points[ 0 ] ) &&
-								newSphere[ 1 ].Intersects( points[ 2 ] ))
-							{
-								index = 1;
-								minRadius = newSphere[ 1 ].mRadius;
-							}
-
-							if( newSphere[ 2 ].mRadius < minRadius &&
-								newSphere[ 2 ].Intersects( points[ 0 ] ) &&
-								newSphere[ 2 ].Intersects( points[ 1 ] ))
-							{
-								index = 2;
-								minRadius = newSphere[ 2 ].mRadius;
-							}
-
-							if( newSphere[ 3 ].mRadius < minRadius &&
-								newSphere[ 3 ].Intersects( points[ 2 ] ))
-							{
-								index = 3;
-								minRadius = newSphere[ 3 ].mRadius;
-							}
-
-							if( newSphere[ 4 ].mRadius < minRadius &&
-								newSphere[ 4 ].Intersects( points[ 1 ] ))
-							{
-								index = 4;
-								minRadius = newSphere[ 4 ].mRadius;
-							}
-
-							if( newSphere[ 5 ].mRadius < minRadius &&
-								newSphere[ 5 ].Intersects( points[ 0 ] ))
-							{
-								index = 5;
-								minRadius = newSphere[ 5 ].mRadius;
-							}
-
-							if( index > -1 )
-							{
-								minSphere = newSphere[ index ];
-
-								switch( index )
-								{
-									case 0:
-										points.resize( 2 );
-										points[ 1 ] = pos;
-										break;
-
-									case 1:
-										points.resize( 2 );
-										points[ 0 ] = pos;
-										break;
-
-									case 2:
-										points[ 0 ] = points[ 2 ];
-										points.resize( 2 );
-										points[ 1 ] = pos;
-										break;
-
-									case 3:
-										points[ 2 ] = pos;
-										break;
-
-									case 4:
-										points[ 1 ] = pos;
-										break;
-
-									case 5:
-										points[ 0 ] = pos;
-										break;
-								}
-							}
-							else
-							{
-								minSphere = BoundingSphere( pos, points[ 0 ], points[ 1 ], points[ 2 ] );
-								points.push_back( pos );
-							}
-							break;
-
-						case 4:
-							for( UINT y = 0; y < 4; ++y )
-							{
-								newSphere[ y ] = BoundingSphere( pos, points[ y ] );
-							}
-
-							for( UINT y = 4; y < 7; ++y )
-							{
-								newSphere[ y ] = BoundingSphere( pos, points[ 0 ], points[ y - 3 ] );
-							}
-
-							newSphere[ 7 ]  = BoundingSphere( pos, points[ 1 ], points[ 2 ] );
-							newSphere[ 8 ]  = BoundingSphere( pos, points[ 1 ], points[ 3 ] );
-							newSphere[ 9 ]  = BoundingSphere( pos, points[ 2 ], points[ 3 ] );
-							newSphere[ 10 ] = BoundingSphere( pos, points[ 0 ], points[ 1 ], points[ 2 ] );
-							newSphere[ 11 ] = BoundingSphere( pos, points[ 0 ], points[ 1 ], points[ 3 ] );
-							newSphere[ 12 ] = BoundingSphere( pos, points[ 1 ], points[ 2 ], points[ 3 ] );
-							newSphere[ 13 ] = BoundingSphere( pos, points[ 0 ], points[ 2 ], points[ 3 ] );
-
-							// Check 2 point spheres.
-							//
-							if( newSphere[ 0 ].Intersects( points[ 1 ] ) &&
-								newSphere[ 0 ].Intersects( points[ 2 ] ) &&
-								newSphere[ 0 ].Intersects( points[ 3 ] ))
-							{
-								index = 0;
-								minRadius = newSphere[ 0 ].mRadius;
-							}
-
-							if( newSphere[ 1 ].mRadius < minRadius &&
-								newSphere[ 1 ].Intersects( points[ 0 ] ) &&
-								newSphere[ 1 ].Intersects( points[ 2 ] ) &&
-								newSphere[ 1 ].Intersects( points[ 3 ] ))
-							{
-								index = 1;
-								minRadius = newSphere[ 1 ].mRadius;
-							}
-
-							if( newSphere[ 2 ].mRadius < minRadius &&
-								newSphere[ 2 ].Intersects( points[ 0 ] ) &&
-								newSphere[ 2 ].Intersects( points[ 1 ] ) &&
-								newSphere[ 2 ].Intersects( points[ 3 ] ))
-							{
-								index = 2;
-								minRadius = newSphere[ 2 ].mRadius;
-							}
-
-							if( newSphere[ 3 ].mRadius < minRadius &&
-								newSphere[ 3 ].Intersects( points[ 0 ] ) &&
-								newSphere[ 3 ].Intersects( points[ 1 ] ) &&
-								newSphere[ 3 ].Intersects( points[ 2 ] ))
-							{
-								index = 3;
-								minRadius = newSphere[ 3 ].mRadius;
-							}
-
-							// Check 3 point spheres.
-							//
-							if( newSphere[ 4 ].mRadius < minRadius &&
-								newSphere[ 4 ].Intersects( points[ 2 ] ) &&
-								newSphere[ 4 ].Intersects( points[ 3 ] ))
-							{
-								index = 4;
-								minRadius = newSphere[ 4 ].mRadius;
-							}
-
-							if( newSphere[ 5 ].mRadius < minRadius &&
-								newSphere[ 5 ].Intersects( points[ 1 ] ) &&
-								newSphere[ 5 ].Intersects( points[ 3 ] ))
-							{
-								index = 5;
-								minRadius = newSphere[ 5 ].mRadius;
-							}
-
-							if( newSphere[ 6 ].mRadius < minRadius &&
-								newSphere[ 6 ].Intersects( points[ 1 ] ) &&
-								newSphere[ 6 ].Intersects( points[ 2 ] ))
-							{
-								index = 6;
-								minRadius = newSphere[ 6 ].mRadius;
-							}
-
-							if( newSphere[ 7 ].mRadius < minRadius &&
-								newSphere[ 7 ].Intersects( points[ 0 ] ) &&
-								newSphere[ 7 ].Intersects( points[ 3 ] ))
-							{
-								index = 7;
-								minRadius = newSphere[ 7 ].mRadius;
-							}
-
-							if( newSphere[ 8 ].mRadius < minRadius &&
-								newSphere[ 8 ].Intersects( points[ 0 ] ) &&
-								newSphere[ 8 ].Intersects( points[ 2 ] ))
-							{
-								index = 8;
-								minRadius = newSphere[ 8 ].mRadius;
-							}
-
-							if( newSphere[ 9 ].mRadius < minRadius &&
-								newSphere[ 9 ].Intersects( points[ 0 ] ) &&
-								newSphere[ 9 ].Intersects( points[ 1 ] ))
-							{
-								index = 9;
-								minRadius = newSphere[ 9 ].mRadius;
-							}
-
-							// Check 4 point spheres.
-							//
-							if( newSphere[ 10 ].mRadius < minRadius &&
-								newSphere[ 10 ].Intersects( points[ 3 ] ))
-							{
-								index = 10;
-								minRadius = newSphere[ 10 ].mRadius;
-							}
-
-							if( newSphere[ 11 ].mRadius < minRadius &&
-								newSphere[ 11 ].Intersects( points[ 2 ] ))
-							{
-								index = 11;
-								minRadius = newSphere[ 11 ].mRadius;
-							}
-
-							if( newSphere[ 12 ].mRadius < minRadius &&
-								newSphere[ 12 ].Intersects( points[ 0 ] ))
-							{
-								index = 12;
-								minRadius = newSphere[ 12 ].mRadius;
-							}
-
-							if( newSphere[ 13 ].mRadius < minRadius &&
-								newSphere[ 13 ].Intersects( points[ 1 ] ))
-							{
-								index = 13;
-								minRadius = newSphere[ 13 ].mRadius;
-							}
-
-							minSphere = newSphere[ index ];
-
-							switch( index )
-							{
-								case 0:
-									points.resize( 2 );
-									points[ 1 ] = pos;
-									break;
-
-								case 1:
-									points.resize( 2 );
-									points[ 0 ] = pos;
-									break;
-
-								case 2:
-									points[ 0 ] = points[ 2 ];
-									points.resize( 2 );
-									points[ 1 ] = pos;
-									break;
-
-								case 3:
-									points[ 0 ] = points[ 3 ];
-									points.resize( 2 );
-									points[ 1 ] = pos;
-									break;
-
-								case 4:
-									points.resize( 3 );
-									points[ 2 ] = pos;
-									break;
-
-								case 5:
-									points.resize( 3 );
-									points[ 1 ] = pos;
-									break;
-
-								case 6:
-									points[ 1 ] = points[ 3 ];
-									points.resize( 3 );
-									points[ 2 ] = pos;
-									break;
-
-								case 7:
-									points[ 0 ] = points[ 2 ];
-									points.resize( 3 );
-									points[ 2 ] = pos;
-									break;
-
-								case 8:
-									points[ 0 ] = points[ 3 ];
-									points.resize( 3 );
-									points[ 2 ] = pos;
-									break;
-
-								case 9:
-									points[ 0 ] = points[ 3 ];
-									points[ 1 ] = pos;
-									points.resize( 3 );
-									break;
-
-								case 10:
-									points[ 3 ] = pos;
-									break;
-
-								case 11:
-									points[ 2 ] = pos;
-									break;
-
-								case 12:
-									points[ 0 ] = pos;
-									break;
-
-								case 13:
-									points[ 1 ] = pos;
-									break;
-							}
-							break;
-					}
-
-					if( minSphere.mRadius > sphere.mRadius )
-					{
-						sphere = minSphere;
-						currIndex = 0;
-						continue;
-					}
-				}
-			}
-
-			++currIndex;
-		}
-
-		vbo->Unlock();
-
-		return sphere;
-	}
-
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	BoundingBox::BoundingBox( const Vector3f& minBounds, const Vector3f& maxBounds )
 	{
+		Set( minBounds, maxBounds );
+	}
+
+	BoundingBox::BoundingBox( char* verts, UINT count, UINT stride )
+	{
+		Vector3f minBounds( FLT_MAX, FLT_MAX, FLT_MAX );
+		Vector3f maxBounds( FLT_MIN, FLT_MIN, FLT_MIN );
+		
+		for( UINT x = 0; x < count; ++x )
+		{
+			Vector3f pos = *(Vector3f*)(verts + count * stride);
+
+			for( int y = 0; y < 3; ++y )
+			{
+				if( pos[ y ] < minBounds[ y ] )
+					minBounds[ y ] = pos[ y ];
+
+				if( pos[ y ] > maxBounds[ y ] )
+					maxBounds[ y ] = pos[ y ];
+			}
+		}
+
 		Set( minBounds, maxBounds );
 	}
 
@@ -637,33 +634,5 @@ namespace Sentinel
 		}
 
 		return false;
-	}
-
-	BoundingBox FindSmallestBox( Buffer* vbo )
-	{
-		unsigned char* verts = (unsigned char*)vbo->Lock();
-
-		Vector3f minBounds( FLT_MAX, FLT_MAX, FLT_MAX );
-		Vector3f maxBounds( FLT_MIN, FLT_MIN, FLT_MIN );
-		
-		for( UINT x = 0; x < vbo->Count(); ++x )
-		{
-			Vector3f pos = *(Vector3f*)(verts);
-
-			for( int y = 0; y < 3; ++y )
-			{
-				if( pos[ y ] < minBounds[ y ] )
-					minBounds[ y ] = pos[ y ];
-
-				if( pos[ y ] > maxBounds[ y ] )
-					maxBounds[ y ] = pos[ y ];
-			}
-
-			verts += vbo->Stride();
-		}
-
-		vbo->Unlock();
-
-		return BoundingBox( minBounds, maxBounds );
 	}
 }

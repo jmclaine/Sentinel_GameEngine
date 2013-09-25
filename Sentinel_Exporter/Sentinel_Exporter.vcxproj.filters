@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Sentinel">
+      <UniqueIdentifier>{f0c96e7c-7332-4d14-b533-66314738e7f1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -24,6 +27,27 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Engine\src\Vector3f.cpp">
+      <Filter>Sentinel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\MathCommon.cpp">
+      <Filter>Sentinel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\FileIO.cpp">
+      <Filter>Sentinel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Shape.cpp">
+      <Filter>Sentinel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Matrix4f.cpp">
+      <Filter>Sentinel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Vector2f.cpp">
+      <Filter>Sentinel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Quatf.cpp">
+      <Filter>Sentinel</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sentinel_Exporter.h">
@@ -34,6 +58,33 @@
     </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\FloatCompressor.h">
+      <Filter>Sentinel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Common.h">
+      <Filter>Sentinel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Vector3f.h">
+      <Filter>Sentinel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\MathCommon.h">
+      <Filter>Sentinel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\FileIO.h">
+      <Filter>Sentinel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Shape.h">
+      <Filter>Sentinel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Matrix4f.h">
+      <Filter>Sentinel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Vector2f.h">
+      <Filter>Sentinel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Quatf.h">
+      <Filter>Sentinel</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

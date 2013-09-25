@@ -57,17 +57,25 @@
       <Optimization>Full</Optimization>
       <PreprocessorDefinitions>WIN32;BUILD_DLL;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\Engine\tinyxml;$(SolutionDir)\..\Engine\glew\include; $(SolutionDir)\..\Engine\src\;$(SolutionDir)\..\Engine\DirectX11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Engine\tinyxml;$(SolutionDir)\..\Engine\glew\include;$(SolutionDir)\..\Engine\src;$(SolutionDir)\..\Engine\DirectX11;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CallingConvention>Cdecl</CallingConvention>
       <DisableSpecificWarnings>4835</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>SentinelEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\..\Engine\lib\Debug\;$(SolutionDir)\..\Engine\glew\lib;$(SolutionDir)\..\Engine\DirectX11\Debug;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\Engine\lib\$(Configuration);$(SolutionDir)\..\Engine\glew\lib;$(SolutionDir)\..\Engine\DirectX11\$(Configuration);C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>$(SolutionDir)$(Configuration)\SCopyD.bat</Command>
+      <Command>echo Copying DLL to Engine\lib...
+xcopy "$(SolutionDir)$(Configuration)\Sentinel.dll" "$(SolutionDir)\..\Engine\lib\$(Configuration)" /D /Y
+echo Copying LIB to Engine\lib...
+xcopy "$(SolutionDir)$(Configuration)\Sentinel.lib" "$(SolutionDir)\..\Engine\lib\$(Configuration)" /D /Y
+echo Copying SentinelEngine DLL to Sentinel_Editor...
+xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\..\Sentinel_Editor\bin\$(Configuration)" /D /Y
+echo Copying Sentinel DLL to Sentinel_Editor...
+xcopy "$(SolutionDir)$(Configuration)\Sentinel.dll" "$(SolutionDir)\..\Sentinel_Editor\bin\$(Configuration)" /D /Y
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -75,7 +83,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;BUILD_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\Engine\tinyxml;$(SolutionDir)\..\Engine\bullet-2.81-rev2613\src;$(SolutionDir)\..\Engine\glew\include; $(SolutionDir)\..\Engine\src\;$(SolutionDir)\..\Engine\DirectX11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Engine\tinyxml;$(SolutionDir)\..\Engine\glew\include;$(SolutionDir)\..\Engine\src;$(SolutionDir)\..\Engine\DirectX11;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <CallingConvention>Cdecl</CallingConvention>
       <DisableSpecificWarnings>4835</DisableSpecificWarnings>
@@ -83,10 +91,18 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>SentinelEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\..\Engine\lib\Release\;$(SolutionDir)\..\Engine\bullet-2.81-rev2613\lib;$(SolutionDir)\..\Engine\glew\lib;$(SolutionDir)\..\Engine\DirectX11\Release;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\Engine\lib\$(Configuration);$(SolutionDir)\..\Engine\glew\lib;$(SolutionDir)\..\Engine\DirectX11\$(Configuration);C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>$(SolutionDir)$(Configuration)\SCopyR.bat</Command>
+      <Command>echo Copying DLL to Engine\lib...
+xcopy "$(SolutionDir)$(Configuration)\Sentinel.dll" "$(SolutionDir)\..\Engine\lib\$(Configuration)" /D /Y
+echo Copying LIB to Engine\lib...
+xcopy "$(SolutionDir)$(Configuration)\Sentinel.lib" "$(SolutionDir)\..\Engine\lib\$(Configuration)" /D /Y
+echo Copying SentinelEngine DLL to Sentinel_Editor...
+xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\..\Sentinel_Editor\bin\$(Configuration)" /D /Y
+echo Copying Sentinel DLL to Sentinel_Editor...
+xcopy "$(SolutionDir)$(Configuration)\Sentinel.dll" "$(SolutionDir)\..\Sentinel_Editor\bin\$(Configuration)" /D /Y
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -169,8 +185,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Sentinel_Test\Debug\ECopyD.bat" />
-    <None Include="..\Sentinel_Test\Release\ECopyR.bat" />
     <None Include="app.ico" />
     <None Include="ReadMe.txt" />
   </ItemGroup>

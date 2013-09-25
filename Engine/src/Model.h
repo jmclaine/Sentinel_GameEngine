@@ -5,6 +5,7 @@
 #include "Common.h"
 #include "Shader.h"
 #include "Mesh.h"
+#include "Shape.h"
 
 namespace Sentinel
 {
@@ -25,7 +26,7 @@ namespace Sentinel
 
 	protected:
 
-		//BoundingSphere	mSphere;
+		BoundingSphere	mSphere;
 
 		struct KeyFrame
 		{

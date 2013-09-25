@@ -31,36 +31,11 @@ namespace Sentinel_Editor
 	///
 	public partial class MainWindow : Window
 	{
-		private enum ShaderTypes
-		{
-			COLOR_ONLY,
-			COLOR,
-			TEXTURE,
-			//NORMAL_MAP,
-			//SPRITE,
-
-			NUM_SHADERS
-		};
-
-		private enum ShapeTypes
-		{
-			CUBE,
-			CYLINDER,
-			OCTAHEDRON,
-			TETRAHEDRON,
-			DODECAHEDRON,
-			SPHERE,
-			WIRE_SPHERE,
-
-			NUM_SHAPES
-		};
-
 		private static WColorRGBA   mClearColor = new WColorRGBA( 0.0f, 0.2f, 0.8f, 1.0f );
 
 		private GameWindow			mGameWindow;
 		private WTexture			mTexture;
-		private bool				mDoUpdate;
-
+		
 		private static TreeViewItem	mAsset_Texture;
 		private static TreeViewItem	mAsset_Shader;
 		private static TreeViewItem	mAsset_Mesh;
@@ -88,7 +63,14 @@ namespace Sentinel_Editor
 		///
 		public MainWindow()
 		{
-			InitializeComponent();
+			try
+			{
+				InitializeComponent();
+			}
+			catch( Exception e )
+			{
+				MessageBox.Show( e.Message );
+			}
 		}
 
 		#region Window Initialization and Shutdown
@@ -117,6 +99,7 @@ namespace Sentinel_Editor
 			}
 
 			WGameWorld.Load( "Default.MAP" );
+			Window_Main.Title = "Sentinel Editor - Default.MAP";
 
 			mGameWindow = new GameWindow();
 			mGameWindow.Startup( "World", "WorldClass", info );
@@ -124,8 +107,8 @@ namespace Sentinel_Editor
 			mGameWindow.SetCameraRotation( new WVector3f( -45, 0, 0 ));
 			
 			Window_World.Child = mGameWindow;
-			Window_World.UpdateLayout();
-
+			CompositionTarget.Rendering += Update;
+			
 			// Create editor materials.
 			//
 			mMaterial_X_Axis   = new WMaterial( new WColorRGBA( 1, 0, 0, TRANSFORM_OBJECT_ALPHA ), new WColorRGBA( 0, 0, 0, 0 ), new WColorRGBA( 0, 0, 0, 0 ), 0 );
@@ -145,16 +128,6 @@ namespace Sentinel_Editor
 			//
 			PrepareShaders();
 			PrepareObjects();
-
-			///////////////////////////////////////
-			// Setup game loop.
-			//
-			mDoUpdate = true;
-
-			DispatcherTimer timer = new DispatcherTimer();
-			timer.Tick += new EventHandler( Update );
-			timer.Interval = new TimeSpan( 16 );
-			timer.Start();
 		}
 
 		private void Window_Closing( Object sender, CancelEventArgs e )
@@ -182,8 +155,6 @@ namespace Sentinel_Editor
 
 		private void Window_Closed( Object sender, EventArgs e )
 		{
-			mDoUpdate = false;
-
 			mTranslateObject.Shutdown();
 			mTranslateObject.Delete();
 
@@ -206,27 +177,25 @@ namespace Sentinel_Editor
 		}
 		#endregion
 
+		#region Game World Rendering
 		private void Update( Object sender, EventArgs e )
 		{
-			if( mDoUpdate )
-			{
-				WMouse.Update();
+			WMouse.Update();
 
-				WRenderer.SetDepthStencil( 0 );
-				WRenderer.SetViewport( 0, 0, mGameWindow.GetInfo().Width(), mGameWindow.GetInfo().Height() );
-				WRenderer.SetRenderTarget( 0 );
+			WRenderer.SetDepthStencil( 0 );
+			WRenderer.SetViewport( 0, 0, mGameWindow.GetInfo().Width(), mGameWindow.GetInfo().Height() );
+			WRenderer.SetRenderTarget( 0 );
 
-				WRenderer.Clear( mClearColor );
+			WRenderer.Clear( mClearColor );
 
-				WRenderer.SetCull( CullType.CCW );
-				WRenderer.SetDepthStencilState( StencilType.DEFAULT );
+			WRenderer.SetCull( CullType.CCW );
+			WRenderer.SetDepthStencilState( StencilType.DEFAULT );
 
-				mGameWindow.Update();
+			mGameWindow.Update();
 
-				DrawSelection();
+			DrawSelection();
 
-				WRenderer.Present();
-			}
+			WRenderer.Present();
 		}
 
 		private void DrawSelection()
@@ -321,6 +290,7 @@ namespace Sentinel_Editor
 				}
 			}
 		}
+		#endregion
 
 		#region Game Objects Tree
 		///
@@ -518,9 +488,9 @@ namespace Sentinel_Editor
 			mSelectedAsset = sender as EditorAsset;
 		}
 
-		private void AddAsset( ref WTexture texture, String name )
+		private void AddAsset( WTexture texture, String name )
 		{
-			ATexture item = new ATexture( ref texture, name );
+			ATexture item = new ATexture( texture, name );
 			item.Selected += AssetSelected;
 			
 			mAsset_Texture.Items.Add( item );
@@ -575,8 +545,8 @@ namespace Sentinel_Editor
 
 			//dialog.Multiselect = true;
 
-			//if( dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK )
-			//	AddAsset( ref WRenderer.CreateTextureFromFile( dialog.FileName ), Path.GetFileName( dialog.FileName ));
+			if( dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK )
+				AddAsset( WRenderer.CreateTextureFromFile( dialog.FileName ), Path.GetFileName( dialog.FileName ));
 		}
 
 		private void Assets_AddModel( Object sender, RoutedEventArgs e )
@@ -635,7 +605,7 @@ namespace Sentinel_Editor
 			////////////////////////////////////
 
 			mTexture = WRenderer.CreateTextureFromFile( "Assets\\Textures\\default-alpha.png" );
-			AddAsset( ref mTexture, Path.GetFileName( mTexture.Filename() ));
+			AddAsset( mTexture, Path.GetFileName( mTexture.Filename() ));
 			
 			// Camera.
 			//

@@ -195,6 +195,12 @@
     <ClInclude Include="..\Engine\src\CDPI.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\src\FileIO.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\FloatCompressor.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\Shader.cpp">
@@ -347,6 +353,9 @@
     <ClCompile Include="..\Engine\src\ShaderManager.cpp">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClCompile>
+    <ClCompile Include="..\Engine\src\FileIO.cpp">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Engine\src\sin16.inl">
@@ -354,12 +363,6 @@
     </None>
     <None Include="..\Engine\src\sin8.inl">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
-    </None>
-    <None Include="..\Sentinel_Test\Debug\SCopyD.bat">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\Sentinel_Test\Release\SCopyR.bat">
-      <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
 </Project>

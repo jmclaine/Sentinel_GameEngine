@@ -13,7 +13,7 @@ namespace Sentinel
 		NUM_BUFFER_TYPES
 	};
 
-	class Buffer
+	class SENTINEL_DLL Buffer
 	{
 	protected:
 

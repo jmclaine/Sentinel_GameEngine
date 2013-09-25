@@ -7,13 +7,17 @@ template class __declspec(dllexport) std::basic_string< char, std::char_traits< 
 #ifdef BUILD_DLL
 	#define SENTINEL_DLL	__declspec(dllexport)
 #else
-	#define SENTINEL_DLL	__declspec(dllimport)
+	#ifdef NBUILD_DLL
+		#define SENTINEL_DLL
+	#else
+		#define SENTINEL_DLL	__declspec(dllimport)
+	#endif
 #endif
-
-#define SENTINEL_DLL_C	extern "C" SENTINEL_DLL
 
 typedef unsigned int	UINT;
 typedef unsigned char	UCHAR;
+typedef unsigned short	WORD;
+typedef unsigned long	DWORD;
 
 // These warnings can be disabled safely.
 // They only appear when using STL in a DLL.

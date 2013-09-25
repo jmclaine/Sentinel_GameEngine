@@ -4,6 +4,8 @@ Attached GameObject(s) are automatically shutdown and removed during Shutdown()
 */
 #include <vector>
 #include <map>
+#include <iostream>
+#include <fstream>
 
 #include "Common.h"
 #include "Singleton.h"
@@ -36,6 +38,7 @@ namespace Sentinel
 	public:
 
 		static GameWorld*	Load( const char* mapName, void* hWnd = NULL );
+		static void			Save( const char* mapName );
 		
 		void				Startup();
 

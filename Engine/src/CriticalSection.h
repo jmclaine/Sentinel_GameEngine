@@ -2,6 +2,8 @@
 
 #include <windows.h>
 
+#include "Common.h"
+
 namespace Sentinel
 {
 	class CriticalSection

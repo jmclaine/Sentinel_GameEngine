@@ -2,7 +2,6 @@
 
 #include "Common.h"
 #include "Vector3f.h"
-#include "Buffer.h"
 
 namespace Sentinel
 {
@@ -56,12 +55,11 @@ namespace Sentinel
 		BoundingSphere( const Vector3f& v0, const Vector3f& v1 );
 		BoundingSphere( const Vector3f& v0, const Vector3f& v1, const Vector3f& v2 );
 		BoundingSphere( const Vector3f& v0, const Vector3f& v1, const Vector3f& v2, const Vector3f& v3 );
+		BoundingSphere( char* verts, UINT count, UINT stride = sizeof( Vector3f ));	// Takes in a pointer to 3 float points.
 
 		bool		Intersects( const Vector3f& point );
 		bool		Intersects( const BoundingSphere& sphere );
 	};
-
-	SENTINEL_DLL BoundingSphere FindSmallestSphere( Buffer* vbo );
 
 	//////////////////////////////////////////////////////
 
@@ -74,6 +72,7 @@ namespace Sentinel
 	public:
 
 		BoundingBox( const Vector3f& minBounds, const Vector3f& maxBounds );
+		BoundingBox( char* verts, UINT count, UINT stride = sizeof( Vector3f ));	// Takes in a pointer to 3 float points.
 
 		void		Set( const Vector3f& minBounds, const Vector3f& maxBounds );
 
@@ -83,6 +82,4 @@ namespace Sentinel
 		bool		Intersects( const Vector3f& point );
 		bool		Intersects( const Ray& ray );
 	};
-
-	SENTINEL_DLL BoundingBox FindSmallestBox( Buffer* vbo );
 }

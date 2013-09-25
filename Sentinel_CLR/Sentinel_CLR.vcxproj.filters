@@ -248,12 +248,6 @@
     <None Include="app.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\Sentinel_Test\Debug\ECopyD.bat">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\Sentinel_Test\Release\ECopyR.bat">
-      <Filter>Resource Files</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc">

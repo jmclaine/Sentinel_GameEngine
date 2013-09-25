@@ -2,29 +2,15 @@
 /*
 Supports keyframes and skinning animations.
 */
+#include <stdio.h>
+#include <iostream>
+#include <fstream>
 
-////////////////////////////////////////
+#include "FloatCompressor.h"
+#include "..\Engine\src\Shape.h"
 
-struct BoundingSphere
-{
-	Point3	center;
-	float	radius;
+using namespace Sentinel;
 
-	BoundingSphere( const Point3& _center = Point3( 0, 0, 0 ), float _radius = 0 );
-	BoundingSphere( const Point3& v0, const Point3& v1 );
-	BoundingSphere( const Point3& v0, const Point3& v1, const Point3& v2 );
-	BoundingSphere( const Point3& v0, const Point3& v1, const Point3& v2, const Point3& v3 );
-};
-
-// Find the area of a triangle.
-//
-float TriangleArea( const Point3& pos0, const Point3& pos1, const Point3& pos2 );
-
-// Check for a point in a sphere.
-//
-bool CheckPointInSphere( const Point3& v, const BoundingSphere& sphere );
-
-////////////////////////////////////////
 
 /**
  * 3dsmax exporter plugin.
@@ -32,6 +18,7 @@ bool CheckPointInSphere( const Point3& v, const BoundingSphere& sphere );
 class MaxExporter : public SceneExport
 {
 public:
+
 	// Texture types from 3DStudio Max 2012.
 	//
 	enum TextureTypes
@@ -98,14 +85,15 @@ private:
 	//
 	struct Weight
 	{
-		int			bone;
-		float		weight;
+		int			mBone;
+		float		mAmount;
 	};
 
 	struct Vertex
 	{
-		Point3		pos;
-		std::vector< Weight > weights;
+		Point3		mPosition;
+		Weight		mWeight[ 4 ];
+		int			mNumBones;
 	};
 
 	std::vector< Vertex >			mVertex;
@@ -116,19 +104,19 @@ private:
 
 	// Store the smallest bounding sphere.
 	//
-	BoundingSphere mMinSphere;
+	BoundingSphere					mMinSphere;
 
 	// Stores the textures with what type they are.
 	//
 	struct Texture
 	{
-		std::string filename;
-		int			type;
+		std::string		mFilename;
+		int				mType;
 
-		Texture( std::string filename, int type )
+		Texture( const std::string& filename, int type )
 		{
-			this->filename = filename;
-			this->type = type;
+			this->mFilename = filename;
+			this->mType		= type;
 		}
 	};
 
@@ -136,25 +124,25 @@ private:
 	//
 	struct FatIndex
 	{
-		int vertex, normal, texCoord;
+		int mVertex, mNormal, mTexCoord;
 	};
 
 	struct FatIndexWORD
 	{
-		WORD vertex, normal, texCoord;
+		WORD mVertex, mNormal, mTexCoord;
 	};
 
 	// Standard keyframe animation.
 	//
 	struct KeyFrame
 	{
-		GMatrix		matWorld;
-		int			frame;
+		GMatrix		mMatrixWorld;
+		int			mFrame;
 
 		KeyFrame( const GMatrix& _matWorld, int _frame )
 		{
-			matWorld = _matWorld;
-			frame	 = _frame;
+			mMatrixWorld = _matWorld;
+			mFrame		 = _frame;
 		}
 	};
 
@@ -162,17 +150,17 @@ private:
 	//
 	struct Object
 	{
-		IGameNode*							  node;
-		std::vector< int >					  matID;
-		std::vector< std::vector< FatIndex >> indices;
-		std::vector< KeyFrame >				  keyframe;
-		int									  hierarchy;
-		BYTE								  isSkinned;
+		IGameNode*							  mNode;
+		std::vector< int >					  mMaterialID;
+		std::vector< std::vector< FatIndex >> mFatIndex;
+		std::vector< KeyFrame >				  mKeyFrame;
+		int									  mHierarchy;
+		BYTE								  mIsSkinned;
 
 		Object()
 		{
-			hierarchy = 0;
-			isSkinned = 0;
+			mHierarchy = 0;
+			mIsSkinned = 0;
 		}
 	};
 
@@ -187,154 +175,61 @@ private:
 	void deinit();
 
 	MaxExporter( const MaxExporter& );
-	MaxExporter& operator=( const MaxExporter& );
+	MaxExporter& operator = ( const MaxExporter& );
 
-	void writeByte( BYTE& value );
-	void writeInt( int& num, bool is32bit = false );
-	void writeFloat( IGameProperty* prop );
-	void writeFloat( float& num );
-	void writeFloat32( float& num );
-	void writeString( std::string& str );
+	void WriteFloat( IGameProperty* prop );
+	void WritePoint3( IGameProperty* prop, bool is32bit = false );
+	
+	void WriteFatIndex( FatIndex& index, bool is32bit = false );
+	void WriteMatrix( GMatrix& mat );
 
-	void writePoint2( Point2& point, bool is32bit = false );
-
-	void writePoint3( IGameProperty* prop, bool is32bit = false  );
-	void writePoint3( Point3& point, bool is32bit = false  );
-
-	void writeFatIndex( FatIndex& index, bool is32bit = false );
-	void writeMatrix( GMatrix& mat );
-
-	void writeMaterial( IGameMaterial* material );
+	void WriteMaterial( IGameMaterial* material );
 
 	// Find an object within a vector.
 	//
 	template< typename OBJ  >
-	int findObject( std::vector< OBJ >& obj, OBJ& objCompare )
+	int FindObject( const std::vector< OBJ >& obj, const OBJ& objCompare )
 	{
 		for( UINT x = 0; x < obj.size(); ++x )
-		{
 			if( obj[ x ] == objCompare )
-			{
 				return (int)x;	// found object
-			}
-		}
+
 		return -1;	// failed to find
 	};
 
 	// Find a specific vertex.
 	//
-	int findVertex( Point3 pos )
+	int FindVertex( const Point3& pos )
 	{
 		for( UINT x = 0; x < mVertex.size(); ++x )
-		{
-			if( mVertex[ x ].pos == pos )
-			{
+			if( mVertex[ x ].mPosition == pos )
 				return (int)x;	// found object
-			}
-		}
+
 		return -1;	// failed to find
 	}
 
 	// Find a specific bone.
 	//
-	int findBone( IGameNode* bone )
+	int FindBone( const IGameNode* bone )
 	{
 		for( UINT x = 0; x < mObject.size(); ++x )
-		{
-			if( mObject[ x ].node == bone )
-			{
+			if( mObject[ x ].mNode == bone )
 				return (int)x;	// found object
-			}
-		}
+
 		return -1;	// failed to find
 	}
 
+	// Create an object one face at a time.
+	//
+	void CreateFatIndex( IGameMesh* mesh, FaceEx* face, IGameSkin* skin, std::vector< FatIndex >& vFatIndex );
+
 	// Get mesh data for a non-material node.
 	//
-	void getNoMaterialMesh( IGameMesh* mesh, IGameSkin* skin, int currObjectIndex );
+	void GetNoMaterialMesh( IGameMesh* mesh, IGameSkin* skin, int currObjectIndex );
 
 	// Get mesh data for a node.
 	//
-	void getNodeMesh( IGameNode* node, int heirarchy = 0, bool doParentWT = true  );
-
-	// Find the smallest bounding sphere.
-	//
-	BoundingSphere FindSmallestSphere( std::vector< Vertex >& verts, UINT size );
-
-	// Floating point compressor.
-	// Provided by Phernost @ stackoverflow.com
-	//
-	class FloatCompressor
-	{
-		union Bits
-		{
-			float f;
-			__int32 si;
-			__int32 ui;
-		};
-
-		static int const shift = 13;
-		static int const shiftSign = 16;
-
-		static __int32 const infN = 0x7F800000; // flt32 infinity
-		static __int32 const maxN = 0x477FE000; // max flt16 normal as a flt32
-		static __int32 const minN = 0x38800000; // min flt16 normal as a flt32
-		static __int32 const signN = 0x80000000; // flt32 sign bit
-
-		static __int32 const infC = infN >> shift;
-		static __int32 const nanN = (infC + 1) << shift; // minimum flt16 nan as a flt32
-		static __int32 const maxC = maxN >> shift;
-		static __int32 const minC = minN >> shift;
-		static __int32 const signC = signN >> shiftSign; // flt16 sign bit
-
-		static __int32 const mulN = 0x52000000; // (1 << 23) / minN
-		static __int32 const mulC = 0x33800000; // minN / (1 << (23 - shift))
-
-		static __int32 const subC = 0x003FF; // max flt32 subnormal down shifted
-		static __int32 const norC = 0x00400; // min flt32 normal down shifted
-
-		static __int32 const maxD = infC - maxC - 1;
-		static __int32 const minD = minC - subC - 1;
-
-	public:
-
-		static __int16 compress( float value )
-		{
-			Bits v, s;
-			v.f = value;
-			__int32 sign = v.si & signN;
-			v.si ^= sign;
-			sign >>= shiftSign; // logical shift
-			s.si = mulN;
-			s.si = (int)(s.f * v.f); // correct submNormal
-			v.si ^= (s.si ^ v.si) & -(minN > v.si);
-			v.si ^= (infN ^ v.si) & -((infN > v.si) & (v.si > maxN));
-			v.si ^= (nanN ^ v.si) & -((nanN > v.si) & (v.si > infN));
-			v.ui >>= shift; // logical shift
-			v.si ^= ((v.si - maxD) ^ v.si) & -(v.si > maxC);
-			v.si ^= ((v.si - minD) ^ v.si) & -(v.si > subC);
-			return v.ui | sign;
-		}
-
-		static float decompress( __int16 value )
-		{
-			Bits v;
-			v.ui = value;
-			__int32 sign = v.si & signC;
-			v.si ^= sign;
-			sign <<= shiftSign;
-			v.si ^= ((v.si + minD) ^ v.si) & -(v.si > subC);
-			v.si ^= ((v.si + maxD) ^ v.si) & -(v.si > maxC);
-			Bits s;
-			s.si = mulC;
-			s.f *= v.si;
-			__int32 mask = -(norC > v.si);
-			v.si <<= shift;
-			v.si ^= (s.si ^ v.si) & mask;
-			v.si |= sign;
-			return v.f;
-		}
-	};
+	void GetNodeMesh( IGameNode* node, int heirarchy = 0, bool doParentWT = true  );
 
 	struct Point2S
 	{

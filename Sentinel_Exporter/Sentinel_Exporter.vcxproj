@@ -118,26 +118,47 @@
       <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(MAX2012SDK)\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;DLLEXAMPLES_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(MAX2012SDK)\include;$(SolutionDir)\..\Engine\src\</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;NBUILD_DLL;_WINDOWS;_USRDLL;DLLEXAMPLES_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <OutputFile>$(ADSK_3DSMAX_x64_2012)plugins\$(TargetName)$(TargetExt)</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(MAX2012SDK)\x64\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;paramblk2.lib;msxml2.lib;igame.lib;bmm.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
+    <PostBuildEvent>
+      <Command>echo Copying DLE to 3ds Max directory...
+xcopy "$(OutDir)$(TargetName)$(TargetExt)" "$(ADSK_3DSMAX_x64_2012)plugins\" /D /Y
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Engine\src\FileIO.cpp" />
+    <ClCompile Include="..\Engine\src\MathCommon.cpp" />
+    <ClCompile Include="..\Engine\src\Matrix4f.cpp" />
+    <ClCompile Include="..\Engine\src\Quatf.cpp" />
+    <ClCompile Include="..\Engine\src\Shape.cpp" />
+    <ClCompile Include="..\Engine\src\Vector2f.cpp" />
+    <ClCompile Include="..\Engine\src\Vector3f.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Sentinel_Exporter.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Engine\src\Common.h" />
+    <ClInclude Include="..\Engine\src\FileIO.h" />
+    <ClInclude Include="..\Engine\src\FloatCompressor.h" />
+    <ClInclude Include="..\Engine\src\MathCommon.h" />
+    <ClInclude Include="..\Engine\src\Matrix4f.h" />
+    <ClInclude Include="..\Engine\src\Quatf.h" />
+    <ClInclude Include="..\Engine\src\Shape.h" />
+    <ClInclude Include="..\Engine\src\Vector2f.h" />
+    <ClInclude Include="..\Engine\src\Vector3f.h" />
     <ClInclude Include="Sentinel_Exporter.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />

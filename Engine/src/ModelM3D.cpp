@@ -1,8 +1,7 @@
 #include <map>
 #include <vector>
-#include <fstream>
-#include <sstream>
 
+#include "FileIO.h"
 #include "Model.h"
 #include "Util.h"
 #include "MeshBuilder.h"
@@ -10,35 +9,21 @@
 
 namespace Sentinel
 {
-	bool gReadASCII = false;
-
-	#define READ_FROM_FILE( a, b ) { (gReadASCII) ? a : b; }
-
-	#define OPEN_FILE( file_ptr, filename, mode, mode_bin )\
-		(gReadASCII) ? file_ptr.open( filename, mode ) : \
-					   file_ptr.open( filename, mode_bin )
-
-	//////////////////////////////////////////
-
 	class ModelM3D : public Model
 	{
-		Object*		mObject;
-		UINT		mNumObjects;
-
 		struct Vertex
 		{
 			Vector3f	mPosition;
 
 			// Bones.
 			//
-			float	mWeight[ 4 ];
-			int		mMatrixIndex[ 4 ];
-			int		mNumBones;
+			float		mWeight[ 4 ];
+			int			mMatrixIndex[ 4 ];
+			int			mNumBones;
 
 			Vertex() : mNumBones( 0 ) {}
 		};
-		bool isWeighted;		// Are the vertices weighted?
-
+		
 		// Texture types from 3DStudio Max 2012.
 		//
 		enum AutodeskTextureTypes
@@ -75,37 +60,47 @@ namespace Sentinel
 					SAFE_DELETE( mTexture[ x ] );
 			}
 		};
+
+		Object*				mObject;
+		UINT				mNumObjects;
+
 		MaterialTexture*	mMaterials;
 		UINT				mNumMaterials;
 
+		bool				mIsWeighted;		// Are the vertices weighted?
+
 	private:
 
-		void ReadMaterial( std::ifstream& file, MaterialTexture& matTex )
+		void ReadMaterial( FILE* file, MaterialTexture& matTex )
 		{
 			// Set the material.
 			//
 			Vector3f color;
-			color = ReadPoint3( file );
+			FileIO::Read( file, color );
 			ColorRGBA ambient( color.x, color.y, color.z );
 
-			color = ReadPoint3( file );
+			FileIO::Read( file, color );
 			ColorRGBA diffuse( color.x, color.y, color.z );
 
-			color = ReadPoint3( file );
+			FileIO::Read( file, color );
 			ColorRGBA specular( color.x, color.y, color.z );
 
-			float spec_comp = ReadFloat( file ) * 100.0f;
+			float spec_comp;
+			FileIO::Read( file, spec_comp );
+			spec_comp *= 100.0f;
 
 			matTex.mMaterial = Material( ambient, diffuse, specular, spec_comp );
 
 			// Read filenames of each texture.
 			//
-			int numTextures = ReadInt( file );
+			int numTextures;
+			FileIO::Read( file, numTextures );
 
 			char name[ 256 ];
 			for( int x = 0; x < numTextures; ++x )
 			{
-				int type = ReadInt( file );
+				int type;
+				FileIO::Read( file, type );
 
 				if( type == AUTODESK_BUMP )
 				{
@@ -121,8 +116,9 @@ namespace Sentinel
 					type = TEXTURE_DIFFUSE;
 				}
 
-				int len = ReadInt( file );
-				ReadString( file, name, len );
+				int len;
+				FileIO::Read( file, len );
+				FileIO::Read( file, name, len );
 
 				matTex.mTexture[ type ] = Renderer::Inst()->CreateTextureFromFile( name );
 			}
@@ -138,7 +134,7 @@ namespace Sentinel
 			mMaterials		= NULL;
 			mNumMaterials	= 0;
 
-			isWeighted		= false;
+			mIsWeighted		= false;
 
 			mMatrixWorld.Identity();
 
@@ -158,31 +154,29 @@ namespace Sentinel
 
 			try
 			{
-				std::ifstream file;
+				FILE* file = fopen( filename, "rb" );
 
-				OPEN_FILE( file, filename, std::ios::in, std::ios::binary );
-				if( !file.is_open() )
+				if( !file )
 					throw AppException( "Failed to load " + std::string( filename ));
 
 				// Read version.
 				//
-				ReadInt( file );
+				int version;
+				FileIO::Read( file, version );
 
 				// Read the materials and create meshes.
 				//
-				mNumMaterials = ReadInt( file );
+				FileIO::Read( file, mNumMaterials );
 				mMaterials = new MaterialTexture[ mNumMaterials ];
 				for( UINT x = 0; x < mNumMaterials; ++x )
-				{
 					ReadMaterial( file, mMaterials[ x ] );
-				}
-
+				
 				// Read the smallest bounding sphere.
 				//
-				Vector3f center = ReadPoint3( file );
-				float radius = ReadFloat( file );
+				FileIO::Read( file, mSphere.mCenter );
+				FileIO::Read( file, mSphere.mRadius );
 
-				// Read whether any data should be exported using 32-bit.
+				// Read whether any data was exported using 32-bit.
 				//
 				const BYTE WEIGHTED = 0x01;
 				const BYTE VERTS_32 = 0x02;
@@ -190,60 +184,62 @@ namespace Sentinel
 				const BYTE TEXCS_32 = 0x08;
 				const BYTE INDEX_32 = 0x10;
 
-				BYTE export32 = ReadByte( file );
+				BYTE export32;
+				FileIO::Read( file, export32 );
 
 				bool bVerts32 = (export32 & VERTS_32) ? true : false;
 				bool bNorms32 = (export32 & NORMS_32) ? true : false;
 				bool bTexcs32 = (export32 & TEXCS_32) ? true : false;
 				bool bIndex32 = (export32 & INDEX_32) ? true : false;
 
-				isWeighted = (export32 & WEIGHTED) ? true : false;
+				mIsWeighted = (export32 & WEIGHTED) ? true : false;
 
 				// Read vertices.
 				//
-				int numVerts = ReadInt( file, bVerts32 );
+				int numVerts;
+				FileIO::Read( file, numVerts, bVerts32 );
 				vertices = new Vertex[ numVerts ];
 
 				for( int x = 0; x < numVerts; ++x )
 				{
-					vertices[ x ].mPosition = ReadPoint3( file );
+					FileIO::Read( file, vertices[ x ].mPosition );
 
-					if( isWeighted )
+					if( mIsWeighted )
 					{
-						vertices[ x ].mNumBones = ReadInt( file );
+						FileIO::Read( file, vertices[ x ].mNumBones );
 
 						for( int y = 0; y < vertices[ x ].mNumBones; ++y )
 						{
-							vertices[ x ].mMatrixIndex[ y ] = ReadInt( file );
-							vertices[ x ].mWeight[ y ]		= ReadFloat( file );
+							FileIO::Read( file, vertices[ x ].mMatrixIndex[ y ] );
+							FileIO::Read( file, vertices[ x ].mWeight[ y ] );
 						}
 					}
 				}
 
 				// Read normals.
 				//
-				int numNormals = ReadInt( file, bNorms32 );
+				int numNormals;
+				FileIO::Read( file, numNormals, bNorms32 );
 				normals = new Vector3f[ numNormals ];
 
 				for( int x = 0; x < numNormals; ++x )
-				{
-					normals[ x ] = ReadPoint3( file );
-				}
-
+					FileIO::Read( file, normals[ x ] );
+				
 				// Read texture coordinates.
 				//
-				int numTexCoords = ReadInt( file, bTexcs32 );
+				int numTexCoords;
+				FileIO::Read( file, numTexCoords, bTexcs32 );
 				texCoords = new Vector2f[ numTexCoords ];
 
 				for( int x = 0; x < numTexCoords; ++x )
 				{
-					texCoords[ x ] = ReadPoint2( file );
+					FileIO::Read( file, texCoords[ x ] );
 					texCoords[ x ].y = 1.0f - texCoords[ x ].y;
 				}
 
 				// Read fat indices.
 				//
-				mNumObjects = ReadInt( file );
+				FileIO::Read( file, mNumObjects );
 				mObject = new Object[ mNumObjects ];
 				int currHierarchy = 0;
 
@@ -251,7 +247,9 @@ namespace Sentinel
 				{
 					// Read the hierarchy number.
 					//
-					int hierarchy = ReadInt( file );
+					int hierarchy;
+					FileIO::Read( file, hierarchy );
+
 					if( hierarchy > 0 )
 						mObject[ x ].mParent = &mObject[ currHierarchy + hierarchy - 1 ];
 					else
@@ -259,11 +257,12 @@ namespace Sentinel
 
 					// Read if this object is skinned.
 					//
-					bool isSkinned = ReadByte( file ) > 0;
+					BYTE isSkinned;
+					FileIO::Read( file, isSkinned );
 
 					// Read the keyframe animations.
 					//
-					mObject[ x ].mNumKeyFrames = ReadInt( file );
+					FileIO::Read( file, mObject[ x ].mNumKeyFrames );
 					mObject[ x ].mKeyFrame = new KeyFrame[ mObject[ x ].mNumKeyFrames ];
 
 					for( UINT y = 0; y < mObject[ x ].mNumKeyFrames; ++y )
@@ -272,28 +271,21 @@ namespace Sentinel
 
 						// Read matrix.
 						//
-						for( int z = 0; z < 4; ++z )
-						{
-							for( int w = 0; w < 4; ++w )
-							{
-								float f = ReadFloat( file );
-								currKey->mMatrix[ (z<<2)+w ] = f;
-							}
-						}
-
+						FileIO::Read( file, currKey->mMatrix );
+						
 						// Read frame timestamp.
 						//
-						currKey->mFrame = ReadInt( file );
+						FileIO::Read( file, currKey->mFrame );
 					}
 
 					// Prepare keyframes for skinned animation if necessary.
 					//
-					if( isWeighted )
+					if( mIsWeighted )
 						mObject[ x ].mInverseBone = mObject[ x ].mKeyFrame[ 0 ].mMatrix.Inverse();
 					
 					// Read indices.
 					//
-					mObject[ x ].mNumMeshes = ReadInt( file );
+					FileIO::Read( file, mObject[ x ].mNumMeshes );
 					mObject[ x ].mMesh = new Mesh*[ mObject[ x ].mNumMeshes ];
 
 					for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
@@ -312,22 +304,18 @@ namespace Sentinel
 
 						// Read the material ID for this object.
 						//
-						int matID = ReadInt( file );
-						if( matID != 65535 )
+						int matID;
+						FileIO::Read( file, matID );
+
+						if( matID != -1 )
 						{
 							MaterialTexture& mtex = mMaterials[ matID ];
 							material = mtex.mMaterial;
 
 							for( UINT z = 0; z < NUM_AUTODESK_TYPES; ++z )
-							{
 								if( mtex.mTexture[ z ] != NULL )
-								{
 									if( builder.mTexture[ numTextures ] = mtex.mTexture[ z ] )
-									{
 										++numTextures;
-									}
-								}
-							}
 						}
 						else
 						{
@@ -377,12 +365,19 @@ namespace Sentinel
 						//
 						MeshBuilder::Vertex meshVertex;
 
-						int count = ReadInt( file, bIndex32 );
+						int count;
+						FileIO::Read( file, count, bIndex32 );
+
 						for( int z = 0; z < count; ++z )
 						{
-							int vertex   = ReadInt( file, bVerts32 );
-							int normal   = ReadInt( file, bNorms32 );
-							int texCoord = ReadInt( file, bTexcs32 );
+							int vertex;
+							FileIO::Read( file, vertex, bVerts32 );
+
+							int normal;
+							FileIO::Read( file, normal, bNorms32 );
+
+							int texCoord;
+							FileIO::Read( file, texCoord, bTexcs32 );
 
 							meshVertex.mPosition = vertices[ vertex ].mPosition;
 
@@ -408,12 +403,6 @@ namespace Sentinel
 
 						builder.ApplyMatrix( mObject[ x ].mKeyFrame[ 0 ].mMatrix );
 
-						/*BoundingSphere sphere = FindSmallestSphere( &builder.vertices().front(), builder.numVertices() );
-						if( sphere.radius > m_sphere.radius )
-						{
-							m_sphere = sphere;
-						}*/
-
 						builder.ClearAll();
 					}
 				}
@@ -422,7 +411,7 @@ namespace Sentinel
 				delete[] normals;
 				delete[] texCoords;
 
-				file.close();
+				fclose( file );
 			}
 			catch( AppException e )
 			{
@@ -534,7 +523,7 @@ namespace Sentinel
 		{
 			// Setup Bone Matrix.
 			//
-			if( isWeighted )
+			if( mIsWeighted )
 			{
 				static Matrix4f matBone;
 
@@ -542,10 +531,11 @@ namespace Sentinel
 
 				for( UINT x = 0; x < mNumObjects; ++x )
 				{
-					_ASSERT(0);
-
 					matBone = mObject[ x ].mKeyFrame[ mObject[ x ].mCurrKey ].mMatrix * mObject[ x ].mInverseBone;
-					//m_shaderSkinning->setMatrix( SHADER_UNIF_BONE_MATRIX, matBone.m, x, 1 );
+
+					// Set the B designation first to ensure this works correctly.
+					//
+					SHADER_SKINNING->SetMatrix( SHADER_SKINNING->UniformDecl().find( 'B' ), matBone.Ptr(), x, 1 );
 				}
 			}
 

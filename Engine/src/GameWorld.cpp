@@ -17,9 +17,17 @@ namespace Sentinel
 	{
 		GameWorld* world = GameWorld::Inst( hWnd );
 
+		//ifstream file;
 		// No map file format to load...yet.
 
 		return world;
+	}
+
+	void GameWorld::Save( const char* mapName )
+	{
+		std::ofstream file;
+
+		//file.open( mapName, ios::binary );
 	}
 
 	void GameWorld::Startup()

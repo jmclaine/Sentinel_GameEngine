@@ -1,4 +1,5 @@
 #include <Windows.h>
+
 #include "Singleton.h"
 
 namespace Sentinel

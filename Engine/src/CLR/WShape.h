@@ -98,6 +98,7 @@ namespace Sentinel { namespace Math
 		WBoundingSphere( WVector3f^ v0, WVector3f^ v1 );
 		WBoundingSphere( WVector3f^ v0, WVector3f^ v1, WVector3f^ v2 );
 		WBoundingSphere( WVector3f^ v0, WVector3f^ v1, WVector3f^ v2, WVector3f^ v3 );
+		WBoundingSphere( System::IntPtr^ data, UINT count, UINT stride );
 		WBoundingSphere( const BoundingSphere& sphere );
 		
 		/////////////////////////////////
@@ -115,8 +116,6 @@ namespace Sentinel { namespace Math
 
 	DECLARE_CLASS_REF( BoundingSphere );
 
-	WBoundingSphere^	FindSmallestSphere( WBuffer^ vbo );
-
 	//////////////////////////////////////////////////////
 
 	public ref class WBoundingBox
@@ -130,6 +129,7 @@ namespace Sentinel { namespace Math
 	public:
 
 		WBoundingBox( WVector3f^ minBounds, WVector3f^ maxBounds );
+		WBoundingBox( System::IntPtr^ data, UINT count, UINT stride );
 		WBoundingBox( const BoundingBox& box );
 
 		/////////////////////////////////
@@ -148,6 +148,4 @@ namespace Sentinel { namespace Math
 	};
 
 	DECLARE_CLASS_REF( BoundingBox );
-
-	WBoundingBox^		FindSmallestBox( WBuffer^ vbo );
 }}

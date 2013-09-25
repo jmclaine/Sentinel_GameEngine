@@ -3,6 +3,8 @@
 #include "Property.h"
 #include "Buffer.h"
 
+using namespace Sentinel;
+
 namespace Sentinel { namespace Assets
 {
 	public enum class BufferType
@@ -29,9 +31,14 @@ namespace Sentinel { namespace Assets
 		
 		////////////////////////////////
 
-		UCHAR*		Lock();
+		System::IntPtr^ Lock();
 		void		Unlock();
 		void		Release();
+
+		Sentinel::Assets::BufferType Type();
+		UINT		Size();
+		UINT		Stride();
+		UINT		Count();
 	};
 
 	DECLARE_CLASS_REF( Buffer );
