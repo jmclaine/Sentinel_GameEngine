@@ -6,6 +6,7 @@
 
 #include "Util.h"
 #include "Script.h"
+#include "FileIO.h"
 
 namespace Sentinel
 {
@@ -54,7 +55,7 @@ namespace Sentinel
 
 	int ScriptLexer::Load( const char* filename )
 	{
-		int i = FileToBuffer( filename, data );
+		int i = FileIO::ToBuffer( filename, data );
 		copy = data;
 		return i;
 	}

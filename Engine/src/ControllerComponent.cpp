@@ -5,18 +5,18 @@ namespace Sentinel
 {
 	ControllerComponent::ControllerComponent()
 	{
-		mComponentType = COMPONENT_CONTROLLER;
+		mType = GameComponent::CONTROLLER;
 	}
 
 	void ControllerComponent::Startup()
 	{
-		mPhysics = (PhysicsComponent*)mOwner->FindComponent( COMPONENT_PHYSICS );
+		mPhysics = (PhysicsComponent*)mOwner->FindComponent( GameComponent::PHYSICS );
 
 		if( mPhysics == NULL )
 			throw AppException( "ControllerComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain PhysicsComponent" );
 
 
-		mTransform = (TransformComponent*)mOwner->FindComponent( COMPONENT_TRANSFORM );
+		mTransform = (TransformComponent*)mOwner->FindComponent( GameComponent::TRANSFORM );
 
 		if( mTransform == NULL )
 			throw AppException( "ControllerComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain TransformComponent" );

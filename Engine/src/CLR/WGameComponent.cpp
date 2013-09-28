@@ -56,9 +56,9 @@ namespace Sentinel { namespace Components
 		mRef->SetOwner( owner->GetRef() );
 	}
 
-	ComponentType WGameComponent::Type()
+	ComponentType WGameComponent::GetType()
 	{
-		return (Sentinel::Components::ComponentType)mRef->Type();
+		return (Sentinel::Components::ComponentType)mRef->GetType();
 	}
 
 	DEFINE_PROPERTY_STR( GameComponent, Name );

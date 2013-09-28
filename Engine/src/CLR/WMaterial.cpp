@@ -1,5 +1,5 @@
 #include "WMaterial.h"
-#include "Color.h"
+#include "ColorRGBA.h"
 #include "Util.h"
 
 namespace Sentinel { namespace Assets

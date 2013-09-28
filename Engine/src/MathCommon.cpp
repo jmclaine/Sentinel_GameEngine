@@ -1,5 +1,4 @@
 #include "MathCommon.h"
-#include <cmath>
 
 namespace Sentinel
 {

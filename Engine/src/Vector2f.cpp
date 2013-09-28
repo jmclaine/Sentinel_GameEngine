@@ -143,6 +143,16 @@ namespace Sentinel
 		return Vector2f();
 	}
 
+	Vector2f Vector2f::NormalizeFast() const
+	{
+		float len = LengthSquared();
+
+		if( len > 0 )
+			return Mul( invsqrt( len ));
+
+		return Vector2f();
+	}
+
 	float Vector2f::Dot( const Vector2f& v ) const
 	{
 		return x*v.x + y*v.y;

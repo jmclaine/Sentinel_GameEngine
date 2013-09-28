@@ -93,9 +93,6 @@
     <ClInclude Include="..\Engine\tinyxml\tinyxml.h">
       <Filter>Source Files\Sentinel_Engine\Script</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\Color.h">
-      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\Singleton.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClInclude>
@@ -201,6 +198,21 @@
     <ClInclude Include="..\Engine\src\FloatCompressor.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\src\RandomValue.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\ColorRGBA.h">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\RefCounter.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Script.h">
+      <Filter>Source Files\Sentinel_Engine\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Serializeable.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\Shader.cpp">
@@ -256,9 +268,6 @@
     </ClCompile>
     <ClCompile Include="..\Engine\tinyxml\tinyxmlerror.cpp">
       <Filter>Source Files\Sentinel_Engine\Script</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\Color.cpp">
-      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\Input.cpp">
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
@@ -354,6 +363,27 @@
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\FileIO.cpp">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\ColorRGBA.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Script.cpp">
+      <Filter>Source Files\Sentinel_Engine\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\ScriptCompiler.cpp">
+      <Filter>Source Files\Sentinel_Engine\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\ScriptLexer.cpp">
+      <Filter>Source Files\Sentinel_Engine\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\ScriptNode.cpp">
+      <Filter>Source Files\Sentinel_Engine\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\ScriptParser.cpp">
+      <Filter>Source Files\Sentinel_Engine\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Serializeable.cpp">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClCompile>
   </ItemGroup>

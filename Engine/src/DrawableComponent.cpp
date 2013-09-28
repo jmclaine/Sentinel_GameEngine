@@ -5,14 +5,14 @@ namespace Sentinel
 {
 	DrawableComponent::DrawableComponent()
 	{
-		mComponentType = COMPONENT_DRAWABLE;
+		mType = GameComponent::DRAWABLE;
 
 		mTransform = NULL;
 	}
 
 	void DrawableComponent::Startup()
 	{
-		mTransform = (TransformComponent*)mOwner->FindComponent( COMPONENT_TRANSFORM );
+		mTransform = (TransformComponent*)mOwner->FindComponent( GameComponent::TRANSFORM );
 
 		if( mTransform == NULL )
 			throw AppException( "DrawableComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain TransformComponent" );

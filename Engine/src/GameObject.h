@@ -9,11 +9,14 @@ All attached GameComponent(s) are freed on Shutdown()
 #include "Common.h"
 #include "Util.h"
 #include "GameComponent.h"
+#include "Serializeable.h"
 
 namespace Sentinel
 {
-	class SENTINEL_DLL GameObject
+	class SENTINEL_DLL GameObject : public Serializeable
 	{
+		DECLARE_SERIAL( GameObject );
+
 	protected:
 
 		GameComponent*						mTransform;
@@ -45,8 +48,11 @@ namespace Sentinel
 		//////////////////////////////
 
 		void			AddChild( GameObject* obj );
+
 		void			RemoveChild( GameObject* obj );
+
 		GameObject*		GetChild( UINT index );
+
 		UINT			NumChildren();
 
 		//////////////////////////////
@@ -69,16 +75,16 @@ namespace Sentinel
 
 		// Find the first occurrence of a component by type.
 		//
-		GameComponent*	FindComponent( ComponentType type );
+		GameComponent*	FindComponent( GameComponent::Type type );
 
 		// Find all components of a type to the componentList.
 		//
 		template< class COMPONENT >
-		void FindComponent( ComponentType type, std::vector< COMPONENT* >& componentList )
+		void FindComponent( GameComponent::Type type, std::vector< COMPONENT* >& componentList )
 		{
 			TRAVERSE_VECTOR( x, mComponent )
 			{
-				if( mComponent[ x ]->Type() == type )
+				if( mComponent[ x ]->GetType() == type )
 					componentList.push_back( (COMPONENT*)mComponent[ x ] );
 			}
 		}

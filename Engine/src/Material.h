@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common.h"
-#include "Color.h"
+#include "ColorRGBA.h"
 
 namespace Sentinel
 {

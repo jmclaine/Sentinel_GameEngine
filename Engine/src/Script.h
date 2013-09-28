@@ -9,6 +9,7 @@
 
 #include "Util.h"
 #include "FixedPoint.h"
+#include "RefCounter.h"
 
 namespace Sentinel
 {

@@ -36,12 +36,12 @@ namespace Sentinel
 		{
 			GameObject* obj = mGameObject[ x ];
 
-			CameraComponent* camera = (CameraComponent*)obj->FindComponent( COMPONENT_CAMERA );
+			CameraComponent* camera = (CameraComponent*)obj->FindComponent( GameComponent::CAMERA );
 		
 			if( camera )
 				mCamera.push_back( camera );
 			
-			LightComponent* light = (LightComponent*)obj->FindComponent( COMPONENT_LIGHT );
+			LightComponent* light = (LightComponent*)obj->FindComponent( GameComponent::LIGHT );
 			
 			if( light )
 				mLight.push_back( light );
@@ -130,7 +130,7 @@ namespace Sentinel
 		mAlphaOrder.clear();
 		TRAVERSE_VECTOR( x, mGameObject )
 		{
-			TransformComponent* transform = (TransformComponent*)mGameObject[ x ]->FindComponent( COMPONENT_TRANSFORM );
+			TransformComponent* transform = (TransformComponent*)mGameObject[ x ]->FindComponent( GameComponent::TRANSFORM );
 			
 			if( transform )
 				mAlphaOrder.insert( std::pair< float, GameObject* >( -(camPos - transform->mPosition).LengthSquared(), mGameObject[ x ] ));

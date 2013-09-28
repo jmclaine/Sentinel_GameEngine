@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Color.h"
+#include "ColorRGBA.h"
 #include "Property.h"
 
 namespace Sentinel { namespace Assets

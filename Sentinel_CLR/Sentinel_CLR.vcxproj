@@ -117,7 +117,7 @@ xcopy "$(SolutionDir)$(Configuration)\Sentinel.dll" "$(SolutionDir)\..\Sentinel_
     <ClInclude Include="..\Engine\src\CLR\m_shared_ptr.h" />
     <ClInclude Include="..\Engine\src\CLR\WCameraComponent.h" />
     <ClInclude Include="..\Engine\src\CLR\WBuffer.h" />
-    <ClInclude Include="..\Engine\src\CLR\WColor.h" />
+    <ClInclude Include="..\Engine\src\CLR\WColorRGBA.h" />
     <ClInclude Include="..\Engine\src\CLR\WDrawableComponent.h" />
     <ClInclude Include="..\Engine\src\CLR\WGameComponent.h" />
     <ClInclude Include="..\Engine\src\CLR\WGameObject.h" />
@@ -150,7 +150,7 @@ xcopy "$(SolutionDir)$(Configuration)\Sentinel.dll" "$(SolutionDir)\..\Sentinel_
   <ItemGroup>
     <ClCompile Include="..\Engine\src\CLR\WBuffer.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WCameraComponent.cpp" />
-    <ClCompile Include="..\Engine\src\CLR\WColor.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WColorRGBA.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WDrawableComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WGameComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WGameObject.cpp" />

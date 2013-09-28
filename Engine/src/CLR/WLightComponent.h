@@ -3,7 +3,7 @@
 #include "LightComponent.h"
 #include "WGameComponent.h"
 #include "WTransformComponent.h"
-#include "WColor.h"
+#include "WColorRGBA.h"
 #include "WVector4f.h"
 
 using namespace Sentinel::Math;

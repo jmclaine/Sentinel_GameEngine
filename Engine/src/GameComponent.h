@@ -2,35 +2,36 @@
 
 #include <exception>
 #include <string>
-#include <sstream>
+#include <typeinfo>
 
 #include "Common.h"
+#include "FileIO.h"
 
 namespace Sentinel
 {
 	class GameObject;
 
-	enum ComponentType
-	{
-		COMPONENT_GAME,
-		COMPONENT_CONTROLLER,
-		COMPONENT_COLLISION,
-		COMPONENT_PHYSICS,
-		COMPONENT_TRANSFORM,
-		COMPONENT_CAMERA,
-		COMPONENT_LIGHT,
-		COMPONENT_DRAWABLE,
-		COMPONENT_TRIGGER,
-
-		NUM_COMPONENTS
-	};
-
 	class SENTINEL_DLL GameComponent
 	{
+	public:
+
+		enum Type
+		{
+			DEFAULT,
+			CONTROLLER,
+			COLLISION,
+			PHYSICS,
+			TRANSFORM,
+			CAMERA,
+			LIGHT,
+			DRAWABLE,
+			TRIGGER,
+		};
+
 	protected:
 
-		GameObject*		mOwner;
-		ComponentType	mComponentType;
+		GameObject*			mOwner;
+		GameComponent::Type	mType;
 
 	public:
 
@@ -52,6 +53,11 @@ namespace Sentinel
 
 		void SetOwner( GameObject* owner );
 
-		ComponentType Type();
+		GameComponent::Type GetType();
+
+		////////////////////////////////
+
+		virtual void Save( FILE* file );
+		virtual void Load( FILE* file );
 	};
 }

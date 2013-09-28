@@ -36,6 +36,7 @@ namespace Sentinel
 		float		LengthManhattan() const;
 
 		Quatf		Normalize() const;
+		Quatf		NormalizeFast() const;
 
 		Quatf&		AxisAngle( float _x, float _y, float _z, float _degrees );
 		Quatf&		AxisAngle();

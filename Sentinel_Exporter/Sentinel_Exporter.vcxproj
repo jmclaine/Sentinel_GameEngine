@@ -139,12 +139,6 @@ xcopy "$(OutDir)$(TargetName)$(TargetExt)" "$(ADSK_3DSMAX_x64_2012)plugins\" /D 
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\FileIO.cpp" />
-    <ClCompile Include="..\Engine\src\MathCommon.cpp" />
-    <ClCompile Include="..\Engine\src\Matrix4f.cpp" />
-    <ClCompile Include="..\Engine\src\Quatf.cpp" />
-    <ClCompile Include="..\Engine\src\Shape.cpp" />
-    <ClCompile Include="..\Engine\src\Vector2f.cpp" />
-    <ClCompile Include="..\Engine\src\Vector3f.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Sentinel_Exporter.cpp" />
     <ClCompile Include="stdafx.cpp" />
@@ -153,12 +147,6 @@ xcopy "$(OutDir)$(TargetName)$(TargetExt)" "$(ADSK_3DSMAX_x64_2012)plugins\" /D 
     <ClInclude Include="..\Engine\src\Common.h" />
     <ClInclude Include="..\Engine\src\FileIO.h" />
     <ClInclude Include="..\Engine\src\FloatCompressor.h" />
-    <ClInclude Include="..\Engine\src\MathCommon.h" />
-    <ClInclude Include="..\Engine\src\Matrix4f.h" />
-    <ClInclude Include="..\Engine\src\Quatf.h" />
-    <ClInclude Include="..\Engine\src\Shape.h" />
-    <ClInclude Include="..\Engine\src\Vector2f.h" />
-    <ClInclude Include="..\Engine\src\Vector3f.h" />
     <ClInclude Include="Sentinel_Exporter.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />

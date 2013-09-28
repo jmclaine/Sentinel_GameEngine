@@ -27,25 +27,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\Vector3f.cpp">
-      <Filter>Sentinel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\MathCommon.cpp">
-      <Filter>Sentinel</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\FileIO.cpp">
-      <Filter>Sentinel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\Shape.cpp">
-      <Filter>Sentinel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\Matrix4f.cpp">
-      <Filter>Sentinel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\Vector2f.cpp">
-      <Filter>Sentinel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\Quatf.cpp">
       <Filter>Sentinel</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,25 +47,7 @@
     <ClInclude Include="..\Engine\src\Common.h">
       <Filter>Sentinel</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\Vector3f.h">
-      <Filter>Sentinel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\MathCommon.h">
-      <Filter>Sentinel</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\FileIO.h">
-      <Filter>Sentinel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\Shape.h">
-      <Filter>Sentinel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\Matrix4f.h">
-      <Filter>Sentinel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\Vector2f.h">
-      <Filter>Sentinel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\Quatf.h">
       <Filter>Sentinel</Filter>
     </ClInclude>
   </ItemGroup>

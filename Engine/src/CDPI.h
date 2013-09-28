@@ -7,7 +7,7 @@ namespace Sentinel
 	// Taken directly from http://msdn.microsoft.com/en-us/library/dd464660%28VS.85%29.aspx
 	// Definition: relative pixel = 1 pixel at 96 DPI and scaled based on actual DPI.
 	//
-	class CDPI : public Singleton< CDPI >
+	class CDPI : public SingletonSafe< CDPI >
 	{
 	public:
 		CDPI() : _fInitialized(false), _dpiX(96), _dpiY(96) { }

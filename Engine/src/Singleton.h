@@ -13,9 +13,7 @@ namespace Sentinel
 	{
 	protected:
 
-		static CriticalSection		mCS;
-
-		static volatile T* volatile mSingle;
+		static T* mSingle;
 
 		/////////////////////////////////////////
 
@@ -23,6 +21,101 @@ namespace Sentinel
 		Singleton( const Singleton& ) {}
 		Singleton& operator = ( const Singleton& ) { return *this; }
 		~Singleton() {}
+
+	public:
+
+		static T* volatile Inst()
+		{
+			if( !mSingle )
+				mSingle = new T();
+			
+			return const_cast< T* >(mSingle);
+		}
+
+		static T* volatile Inst( T* obj )
+		{
+			if( !mSingle )
+				mSingle = obj;
+
+			return const_cast< T* >(mSingle);
+		}
+
+		static void volatile Destroy()
+		{
+			if( mSingle )
+			{
+				delete mSingle;
+				mSingle = NULL;
+			}
+		}
+	};
+
+	template< class T > T* Singleton< T >::mSingle = NULL;
+	
+	//////////////////////////////////////////////////////////////////////////
+
+	// Singleton for the entire application for abstract classes.
+	//
+	template< class T >
+	class SingletonAbstract
+	{
+	protected:
+
+		static T* mSingle;
+
+		/////////////////////////////////////////
+
+		SingletonAbstract() {}
+		SingletonAbstract( const SingletonAbstract& ) {}
+		SingletonAbstract& operator = ( const SingletonAbstract& ) { return *this; }
+		~SingletonAbstract() {}
+
+	public:
+
+		static T* Inst( T* obj )
+		{
+			if( !mSingle )
+				mSingle = obj;
+			
+			return const_cast< T* >(mSingle);
+		}
+
+		static T* Inst()
+		{
+			return const_cast< T* >(mSingle);
+		}
+
+		static void Destroy()
+		{
+			if( mSingle )
+			{
+				delete mSingle;
+				mSingle = NULL;
+			}
+		}
+	};
+
+	template< class T > T* SingletonAbstract< T >::mSingle = NULL;
+	
+	//////////////////////////////////////////////////////////////////////////
+
+	// Singleton for the entire application.
+	//
+	template< class T >
+	class SingletonSafe
+	{
+	protected:
+
+		static CriticalSection		mCS;
+
+		static volatile T* volatile mSingle;
+
+		/////////////////////////////////////////
+
+		SingletonSafe() {}
+		SingletonSafe( const SingletonSafe& ) {}
+		SingletonSafe& operator = ( const SingletonSafe& ) { return *this; }
+		~SingletonSafe() {}
 
 	public:
 
@@ -70,15 +163,15 @@ namespace Sentinel
 		}
 	};
 
-	template< class T > volatile T* volatile Singleton< T >::mSingle = NULL;
-	template< class T > CriticalSection Singleton< T >::mCS;
+	template< class T > volatile T* volatile SingletonSafe< T >::mSingle = NULL;
+	template< class T > CriticalSection SingletonSafe< T >::mCS;
 
 	//////////////////////////////////////////////////////////////////////////
 
 	// Singleton for the entire application for abstract classes.
 	//
 	template< class T >
-	class SingletonAbstract
+	class SingletonAbstractSafe
 	{
 	protected:
 
@@ -88,10 +181,10 @@ namespace Sentinel
 
 		/////////////////////////////////////////
 
-		SingletonAbstract() {}
-		SingletonAbstract( const SingletonAbstract& ) {}
-		SingletonAbstract& operator = ( const SingletonAbstract& ) { return *this; }
-		~SingletonAbstract() {}
+		SingletonAbstractSafe() {}
+		SingletonAbstractSafe( const SingletonAbstractSafe& ) {}
+		SingletonAbstractSafe& operator = ( const SingletonAbstractSafe& ) { return *this; }
+		~SingletonAbstractSafe() {}
 
 	public:
 
@@ -129,8 +222,8 @@ namespace Sentinel
 		}
 	};
 
-	template< class T > volatile T* volatile SingletonAbstract< T >::mSingle = NULL;
-	template< class T > CriticalSection SingletonAbstract< T >::mCS;
+	template< class T > volatile T* volatile SingletonAbstractSafe< T >::mSingle = NULL;
+	template< class T > CriticalSection SingletonAbstractSafe< T >::mCS;
 
 	//////////////////////////////////////////////////////////////////////////
 

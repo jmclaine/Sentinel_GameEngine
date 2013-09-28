@@ -13,6 +13,8 @@ into another buffer of the shader specifications.
 
 #include "Common.h"
 #include "Mesh.h"
+#include "Vector2f.h"
+#include "Vector3f.h"
 
 namespace Sentinel
 {

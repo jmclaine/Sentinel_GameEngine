@@ -32,21 +32,13 @@
 #include "MeshComponent.h"
 #include "ModelComponent.h"
 
+#include "RandomValue.h"
+
 using namespace Sentinel;
 
 
 // Main Application.
 //
-enum ShaderTypes
-{
-	SHADER_COLOR,
-	SHADER_TEXTURE,
-	SHADER_NORMAL_MAP,
-	SHADER_SPRITE,
-
-	NUM_SHADERS
-};
-
 enum ShapeTypes
 {
 	SHAPE_CUBE,
@@ -238,7 +230,7 @@ public:
 
 		//////////////////////////////
 
-		GameWorld::Load( "NoMap.MAP" );
+		GameWorld::Load( "Default.MAP" );
 		
 		// Create main perspective camera.
 		//
@@ -399,7 +391,9 @@ public:
 			else
 			{
 				if( shape < NUM_SHAPES )
+				{
 					physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateMesh( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mesh[ shape ].get(), mass ));
+				}
 				else
 				{
 					// Create a sphere for models...for now.

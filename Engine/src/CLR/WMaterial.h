@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Material.h"
-#include "WColor.h"
+#include "WColorRGBA.h"
 #include "WStdVector.h"
 
 namespace Sentinel { namespace Assets

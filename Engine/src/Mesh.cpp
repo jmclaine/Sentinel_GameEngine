@@ -1,6 +1,7 @@
 #include "Timing.h"
 #include "Mesh.h"
 #include "GameWorld.h"
+#include "Vector2f.h"
 
 namespace Sentinel
 {

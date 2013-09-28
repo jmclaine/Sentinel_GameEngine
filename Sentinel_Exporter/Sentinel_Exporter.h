@@ -3,11 +3,8 @@
 Supports keyframes and skinning animations.
 */
 #include <stdio.h>
-#include <iostream>
-#include <fstream>
 
 #include "FloatCompressor.h"
-#include "..\Engine\src\Shape.h"
 
 using namespace Sentinel;
 
@@ -102,10 +99,6 @@ private:
 	std::vector< Point3 >			mColor;
 	std::vector< IGameMaterial* >	mMaterial;
 
-	// Store the smallest bounding sphere.
-	//
-	BoundingSphere					mMinSphere;
-
 	// Stores the textures with what type they are.
 	//
 	struct Texture
@@ -179,6 +172,9 @@ private:
 
 	void WriteFloat( IGameProperty* prop );
 	void WritePoint3( IGameProperty* prop, bool is32bit = false );
+
+	void WritePoint2( const Point2& point, bool is32bit = false );
+	void WritePoint3( const Point3& point, bool is32bit = false );
 	
 	void WriteFatIndex( FatIndex& index, bool is32bit = false );
 	void WriteMatrix( GMatrix& mat );

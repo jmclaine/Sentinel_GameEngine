@@ -48,12 +48,12 @@ namespace Sentinel
 	POINT Mouse::GetPosition( HWND hWnd ) const
 	{
 		POINT mousePos;
-		RECT rc;
-
+		
 		GetCursorPos( &mousePos );
 
 		if( hWnd )
 		{
+			RECT rc;
 			GetClientRect( hWnd, &rc );
 			ScreenToClient( hWnd, &mousePos );
 

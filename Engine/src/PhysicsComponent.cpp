@@ -6,15 +6,15 @@ namespace Sentinel
 {
 	PhysicsComponent::PhysicsComponent( btRigidBody* body )
 	{
-		mComponentType	= COMPONENT_PHYSICS;
+		mType		= GameComponent::PHYSICS;
 
-		mTransform		= NULL;
-		mRigidBody		= body;
+		mTransform	= NULL;
+		mRigidBody	= body;
 	}
 
 	void PhysicsComponent::Startup()
 	{
-		mTransform = (TransformComponent*)mOwner->FindComponent( COMPONENT_TRANSFORM );
+		mTransform = (TransformComponent*)mOwner->FindComponent( GameComponent::TRANSFORM );
 
 		if( mTransform == NULL )
 			throw AppException( "PhysicsComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain TransformComponent" );

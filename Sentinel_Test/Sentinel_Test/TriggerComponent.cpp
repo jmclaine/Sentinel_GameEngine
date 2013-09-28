@@ -5,6 +5,8 @@ namespace Sentinel
 {
 	TriggerComponent::TriggerComponent()
 	{
+		mType = GameComponent::TRIGGER;
+
 		mPhysics = NULL;
 	}
 
@@ -13,7 +15,7 @@ namespace Sentinel
 
 	void TriggerComponent::Startup()
 	{
-		mPhysics = (PhysicsComponent*)mOwner->FindComponent( COMPONENT_TRANSFORM );
+		mPhysics = (PhysicsComponent*)mOwner->FindComponent( GameComponent::TRANSFORM );
 
 		if( mPhysics == NULL )
 			throw AppException( "TriggerComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain PhysicsComponent" );

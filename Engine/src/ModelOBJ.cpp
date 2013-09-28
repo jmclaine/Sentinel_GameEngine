@@ -8,7 +8,6 @@
 #include "Util.h"
 #include "Renderer.h"
 
-
 namespace Sentinel
 {
 	class ModelOBJ : public Model
@@ -17,8 +16,8 @@ namespace Sentinel
 
 		// Create materials to map to their string names.
 		//
-		typedef std::map< std::string, MeshBuilder* >  MeshBuilderMap;
-		typedef std::pair< std::string, MeshBuilder* > MeshBuilderPair;
+		typedef std::unordered_map< std::string, MeshBuilder* > MeshBuilderMap;
+		typedef std::pair< std::string, MeshBuilder* >			MeshBuilderPair;
 
 		Mesh**		mMesh;
 		UINT		mNumMeshes;
@@ -40,9 +39,9 @@ namespace Sentinel
 			// OBJ files start with the first index as 1,
 			// so push a dummy into the vectors to align.
 			//
-			std::vector< Vector3f > positions(1);
-			std::vector< Vector2f > texCoords(1);
-			std::vector< Vector3f > normals(1);
+			std::vector< Vector3f > positions( 1 );
+			std::vector< Vector2f > texCoords( 1 );
+			std::vector< Vector3f > normals( 1 );
 
 			// Initialize the minimum and maximum vertex positions for the bounding sphere.
 			//
@@ -89,10 +88,10 @@ namespace Sentinel
 						parsehelper >> p.x >> p.y >> p.z;
 						positions.push_back( p );
 
-						for(UINT x=0; x<3; ++x)
+						for( UINT x = 0; x < 3; ++x )
 						{
-							maxPosition[x] = MAX_VALUE( maxPosition[x], p[x] );
-							minPosition[x] = MIN_VALUE( minPosition[x], p[x] );
+							maxPosition[ x ] = MAX_VALUE( maxPosition[ x ], p[ x ] );
+							minPosition[ x ] = MIN_VALUE( minPosition[ x ], p[ x ] );
 						}
 					}
 					// Texture coordinates.
@@ -149,7 +148,7 @@ namespace Sentinel
 									mtlParsehelper >> mtlName;
 									builder.insert( MeshBuilderPair( mtlName, new MeshBuilder() ));
 
-									MeshBuilder* meshBuilder = builder.find( mtlName )->second;
+									MeshBuilder* meshBuilder = builder[ mtlName ];
 									meshBuilder->mShader = SHADER_COLOR;
 								}
 								// Load a texture.
@@ -185,13 +184,9 @@ namespace Sentinel
 						// If the material was not found, reference the default material.
 						//
 						if( mtl_iter == builder.end() )
-						{
-							meshBuilder = builder.find( defaultMaterial )->second;
-						}
-                        else
-                        {
+							meshBuilder = builder[ defaultMaterial ];
+						else
                             meshBuilder = mtl_iter->second;
-                        }
 					}
 					// Fat indices.
 					//
@@ -216,10 +211,8 @@ namespace Sentinel
 							// Check if the last token has already been read.
 							//
 							if( parsehelper.fail() )
-							{
 								break;
-							}
-
+							
 							// Position.
 							// Texture coord.
 							// Normal.
@@ -331,9 +324,7 @@ namespace Sentinel
 		void GetMaterials( std::vector< Material >* material )
 		{
 			for( UINT x = 0; x < mNumMeshes; ++x )
-			{
 				material->push_back( mMesh[ x ]->mMaterial );
-			}
 		}
 		/*
 		void SetShader( Shader* shader )

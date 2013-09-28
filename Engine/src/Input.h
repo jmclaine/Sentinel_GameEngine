@@ -25,9 +25,9 @@ namespace Sentinel
 		NUM_BUTTONS
 	};
 
-	class SENTINEL_DLL Mouse : public Singleton< Mouse >
+	class SENTINEL_DLL Mouse : public SingletonSafe< Mouse >
 	{
-		friend class Singleton< Mouse >;
+		friend class SingletonSafe< Mouse >;
 
 	private:
 
@@ -71,9 +71,9 @@ namespace Sentinel
 		KEY_DOWN,
 	};
 
-	class SENTINEL_DLL Keyboard : public Singleton< Keyboard >
+	class SENTINEL_DLL Keyboard : public SingletonSafe< Keyboard >
 	{
-		friend class Singleton< Keyboard >;
+		friend class SingletonSafe< Keyboard >;
 
 	private:
 

@@ -54,7 +54,17 @@ void MaxExporter::WritePoint3( IGameProperty* prop, bool is32bit  )
 	if( prop != NULL )
 		prop->GetPropertyValue( point );
 	
-	FileIO::Write( mFile, (Vector3f)point, is32bit );
+	WritePoint3( point );
+}
+
+void MaxExporter::WritePoint2( const Point2& point, bool is32bit )
+{
+	FileIO::Write( mFile, const_cast< const float* >(&point.x), 2, is32bit );
+}
+
+void MaxExporter::WritePoint3( const Point3& point, bool is32bit )
+{
+	FileIO::Write( mFile, const_cast< const float* >(&point.x), 3, is32bit );
 }
 
 void MaxExporter::WriteFatIndex( FatIndex& index, bool is32bit )
@@ -83,7 +93,7 @@ void MaxExporter::WriteMaterial( IGameMaterial* material )
 		if( prop != NULL )
 			WritePoint3( prop );
 		else
-			FileIO::Write( mFile, Vector3f( 0.2f, 0.2f, 0.2f ));
+			WritePoint3( Point3( 0.2f, 0.2f, 0.2f ));
 		
 		// Diffuse.
 		//
@@ -91,7 +101,7 @@ void MaxExporter::WriteMaterial( IGameMaterial* material )
 		if( prop != NULL )
 			WritePoint3( prop );
 		else
-			FileIO::Write( mFile, Vector3f( 0.6f, 0.6f, 0.6f ));
+			WritePoint3( Point3( 0.6f, 0.6f, 0.6f ));
 		
 		// Specular.
 		//
@@ -99,7 +109,7 @@ void MaxExporter::WriteMaterial( IGameMaterial* material )
 		if( prop != NULL )
 			WritePoint3( prop );
 		else
-			FileIO::Write( mFile, Vector3f( 0.2f, 0.2f, 0.2f ));
+			WritePoint3( Point3( 0.2f, 0.2f, 0.2f ));
 		
 		// Specular Component.
 		//
@@ -113,15 +123,15 @@ void MaxExporter::WriteMaterial( IGameMaterial* material )
 	{
 		// Ambient.
 		//
-		FileIO::Write( mFile, Vector3f( 0.2f, 0.2f, 0.2f ));
+		WritePoint3( Point3( 0.2f, 0.2f, 0.2f ));
 		
 		// Diffuse.
 		//
-		FileIO::Write( mFile, Vector3f( 0.6f, 0.6f, 0.6f ));
+		WritePoint3( Point3( 0.6f, 0.6f, 0.6f ));
 		
 		// Specular.
 		//
-		FileIO::Write( mFile, Vector3f( 0.2f, 0.2f, 0.2f ));
+		WritePoint3( Point3( 0.2f, 0.2f, 0.2f ));
 		
 		// Specular Component.
 		//
@@ -141,9 +151,64 @@ void MaxExporter::WriteMaterial( IGameMaterial* material )
 			// Ensure the texture is of a supported type.
 			//
 			int type = texture->GetStdMapSlot();
+
 			if( type == -1 )
-				type = 0;	// assume diffuse
+				type = TEXTURE_DIFFUSE;
 			
+			if( type == TEXTURE_BUMP )
+			{
+				if( !texture->IsEntitySupported() )
+				{
+					if( strcmp( texture->GetClassName(), "Normal Bump" ) == 0 )
+					{
+						Texmap* texmap = texture->GetMaxTexmap();
+
+						if( texmap->NumSubTexmaps() > 0 )
+						{
+							// Convert the long name into only the texture filename.
+							//
+							MSTR currName = texmap->GetSubTexmapTVName(0);
+							
+							int len = currName.length();
+							int index = 0;
+
+							for( int y = len-1; y > -1; --y )		// ignore starting '('
+								if( currName[ y ] == '(' )
+								{
+									index = y+1;
+									break;
+								}
+
+							std::string newName;
+							for( int y = index; y < len-1; ++y )	// ignore ending ')'
+								newName.push_back( currName[ y ] );
+
+							texNames.push_back( Texture( newName, type ));
+
+							// Copy texture to export directory.
+							//
+							char filename[ 256 ];
+							BMMGetFullFilename( newName.c_str(), filename );
+
+							char command[ 256 ];
+							memset( command, 0, 256 );
+							sprintf( command, "xcopy %s /D /Y", filename );
+							system( command );
+						}
+						else
+						{
+							MessageBox( NULL, "No texture on 'Bump' channel.", "Texture Export Warning", MB_ICONEXCLAMATION );
+						}
+					}
+					else
+					{
+						MessageBox( NULL, "Failed to export texture on 'Bump' channel.\nSet to 'Normal Bump' or place the 'Bitmap' directly.", "Texture Export Warning", MB_ICONEXCLAMATION );
+					}
+
+					continue;
+				}
+			}
+
 			if( texture->IsEntitySupported() )
 			{
 				// Remove everything in the file name except for the actual image name with extension.
@@ -154,19 +219,24 @@ void MaxExporter::WriteMaterial( IGameMaterial* material )
 				int index = 0;
 
 				for( int y = len-1; y > -1; --y )
-				{
 					if( currName[ y ] == '\\' )
 					{
 						index = y+1;
 						break;
 					}
-				}
 
 				std::string newName;
 				for( int y = index; y < len; ++y )
 					newName.push_back( currName[ y ] );
 
 				texNames.push_back( Texture( newName, type ));
+
+				// Copy texture to export directory.
+				//
+				char command[ 256 ];
+				memset( command, 0, 256 );
+				sprintf( command, "xcopy %s /D /Y", currName );
+				system( command );
 			}
 		}
 	}
@@ -182,7 +252,7 @@ void MaxExporter::WriteMaterial( IGameMaterial* material )
 
 		FileIO::Write( mFile, texNames[ x ].mType );
 		FileIO::Write( mFile, len );
-		FileIO::Write( mFile, texNames[ x ].mFilename.c_str() );
+		FileIO::Write( mFile, texNames[ x ].mFilename.c_str(), len );
 	}
 }
 
@@ -309,13 +379,6 @@ int MaxExporter::DoExport( const TCHAR* name, ExpInterface* ei, Interface* i, BO
 		for( int x = 0; x < count; ++x )
 			GetNodeMesh( mesh[ x ] );
 
-		// Find the smallest bounding sphere.
-		//
-		BoundingSphere mMinSphere( (UCHAR*)mVertex.data(), (UINT)mVertex.size(), sizeof( Vertex ));
-
-		FileIO::Write( mFile, mMinSphere.mCenter );
-		FileIO::Write( mFile, mMinSphere.mRadius );
-
 		// Determine if these mVertex should include weights.
 		//
 		mIsWeighted = false;
@@ -390,7 +453,7 @@ int MaxExporter::DoExport( const TCHAR* name, ExpInterface* ei, Interface* i, BO
 
 		for( int x = 0; x < count; ++x )
 		{
-			FileIO::Write( mFile, (Vector3f)mVertex[ x ].mPosition );
+			WritePoint3( mVertex[ x ].mPosition );
 			
 			if( mIsWeighted )
 			{
@@ -411,7 +474,7 @@ int MaxExporter::DoExport( const TCHAR* name, ExpInterface* ei, Interface* i, BO
 		FileIO::Write( mFile, count, bNorms32 );
 
 		for( int x = 0; x < count; ++x )
-			FileIO::Write( mFile, (Vector3f)mNormal[ x ] );
+			WritePoint3( mNormal[ x ] );
 
 		// Write texture coordinates.
 		//
@@ -419,7 +482,7 @@ int MaxExporter::DoExport( const TCHAR* name, ExpInterface* ei, Interface* i, BO
 		FileIO::Write( mFile, count, bTexcs32 );
 
 		for( int x = 0; x < count; ++x )
-			FileIO::Write( mFile, (Vector2f)mTexCoord[ x ] );
+			WritePoint2( mTexCoord[ x ] );
 		
 		// Write fat indices, and keyframe animation.
 		//
@@ -708,6 +771,7 @@ void MaxExporter::GetNodeMesh( IGameNode* node, int hierarchy, bool doParentWT )
 
 void MaxExporter::ShowAbout( HWND hwnd )
 {
+	MessageBox( hwnd, "Sentinel Exporter\nVersion 1.3\nCopyright © BEHOLDER Software 2013", "About", 0 );
 }
 
 int MaxExporter::ExtCount()
@@ -722,7 +786,7 @@ const TCHAR* MaxExporter::Ext( int /*n*/ )
 
 const TCHAR* MaxExporter::LongDesc()
 {
-	return _T( "Sentinel 3D Model Max Exporter" );
+	return _T( "Sentinel 3D Model Exporter" );
 }
 
 const TCHAR* MaxExporter::ShortDesc()

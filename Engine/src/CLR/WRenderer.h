@@ -20,7 +20,7 @@ Adjusted Load to return WWindowInfo instead.
 #include "WTexture.h"
 #include "WBuffer.h"
 #include "WShader.h"
-#include "WColor.h"
+#include "WColorRGBA.h"
 
 using namespace System;
 using namespace System::Windows;

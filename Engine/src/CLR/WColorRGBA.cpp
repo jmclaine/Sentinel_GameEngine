@@ -1,4 +1,4 @@
-#include "WColor.h"
+#include "WColorRGBA.h"
 
 namespace Sentinel { namespace Assets
 {

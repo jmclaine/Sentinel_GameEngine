@@ -1,6 +1,7 @@
 // Custom scripting language.
 //
 #include "Script.h"
+#include "RandomValue.h"
 
 namespace Sentinel
 {

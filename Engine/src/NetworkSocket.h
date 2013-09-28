@@ -60,9 +60,9 @@ namespace Sentinel
 
 	////////////////////////////////////////////////
 	
-	class SENTINEL_DLL NetworkSocket : public Singleton< NetworkSocket >
+	class SENTINEL_DLL NetworkSocket : public SingletonSafe< NetworkSocket >
 	{
-		friend class Singleton< NetworkSocket >;
+		friend class SingletonSafe< NetworkSocket >;
 
 	public:
 

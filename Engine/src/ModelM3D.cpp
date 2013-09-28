@@ -76,13 +76,13 @@ namespace Sentinel
 			// Set the material.
 			//
 			Vector3f color;
-			FileIO::Read( file, color );
+			FileIO::Read( file, color.Ptr(), 3 );
 			ColorRGBA ambient( color.x, color.y, color.z );
 
-			FileIO::Read( file, color );
+			FileIO::Read( file, color.Ptr(), 3 );
 			ColorRGBA diffuse( color.x, color.y, color.z );
 
-			FileIO::Read( file, color );
+			FileIO::Read( file, color.Ptr(), 3 );
 			ColorRGBA specular( color.x, color.y, color.z );
 
 			float spec_comp;
@@ -171,11 +171,6 @@ namespace Sentinel
 				for( UINT x = 0; x < mNumMaterials; ++x )
 					ReadMaterial( file, mMaterials[ x ] );
 				
-				// Read the smallest bounding sphere.
-				//
-				FileIO::Read( file, mSphere.mCenter );
-				FileIO::Read( file, mSphere.mRadius );
-
 				// Read whether any data was exported using 32-bit.
 				//
 				const BYTE WEIGHTED = 0x01;
@@ -202,7 +197,7 @@ namespace Sentinel
 
 				for( int x = 0; x < numVerts; ++x )
 				{
-					FileIO::Read( file, vertices[ x ].mPosition );
+					FileIO::Read( file, vertices[ x ].mPosition.Ptr(), 3 );
 
 					if( mIsWeighted )
 					{
@@ -223,7 +218,8 @@ namespace Sentinel
 				normals = new Vector3f[ numNormals ];
 
 				for( int x = 0; x < numNormals; ++x )
-					FileIO::Read( file, normals[ x ] );
+					FileIO::Read( file, normals[ x ].Ptr(), 3 );
+
 				
 				// Read texture coordinates.
 				//
@@ -233,7 +229,7 @@ namespace Sentinel
 
 				for( int x = 0; x < numTexCoords; ++x )
 				{
-					FileIO::Read( file, texCoords[ x ] );
+					FileIO::Read( file, texCoords[ x ].Ptr(), 2 );
 					texCoords[ x ].y = 1.0f - texCoords[ x ].y;
 				}
 
@@ -271,7 +267,8 @@ namespace Sentinel
 
 						// Read matrix.
 						//
-						FileIO::Read( file, currKey->mMatrix );
+						//FileIO::Read( file, currKey->mMatrix );
+						FileIO::Read( file, currKey->mMatrix.Ptr(), 16 );
 						
 						// Read frame timestamp.
 						//
@@ -324,40 +321,35 @@ namespace Sentinel
 
 						if( numTextures == 0 )
 						{
-							if( SHADER_COLOR == NULL )
-								throw AppException( "ModelM3D::SHADER_COLOR not set!" );
+							_ASSERT( SHADER_COLOR );
 
 							builder.mShader = SHADER_COLOR;
 						}
 						else
 						if( isSkinned )
 						{
-							if( SHADER_SKINNING == NULL )
-								throw AppException( "ModelM3D::SHADER_SKINNING not set!" );
+							_ASSERT( SHADER_SKINNING );
 
 							builder.mShader = SHADER_SKINNING;
 						}
 						else
 						if( numTextures == 1 )
 						{
-							if( SHADER_TEXTURE == NULL )
-								throw AppException( "ModelM3D::SHADER_TEXTURE not set!" );
-
+							_ASSERT( SHADER_TEXTURE );
+							
 							builder.mShader = SHADER_TEXTURE;
 						}
 						else
 						if( numTextures == 2 )
 						{
-							if( SHADER_NORMAL_MAP == NULL )
-								throw AppException( "ModelM3D::SHADER_NORMAL_MAP not set!" );
-
+							_ASSERT( SHADER_NORMAL_MAP );
+							
 							builder.mShader = SHADER_NORMAL_MAP;
 						}
 						else
 						{
-							if( SHADER_PARALLAX == NULL )
-								throw AppException( "ModelM3D::SHADER_PARALLAX not set!" );
-
+							_ASSERT( SHADER_PARALLAX );
+							
 							builder.mShader = SHADER_PARALLAX;
 						}
 
@@ -454,13 +446,11 @@ namespace Sentinel
 			auto it = material.begin();
 
 			for( UINT x = 0; x < mNumObjects; ++x )
-			{
 				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
 				{
 					mObject[ x ].mMesh[ y ]->mMaterial = *it;
 					++it;
 				}
-			}
 		}
 
 		void GetMaterials( std::vector< Material >* material )
@@ -468,23 +458,15 @@ namespace Sentinel
 			material->clear();
 
 			for( UINT x = 0; x < mNumObjects; ++x )
-			{
 				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
-				{
 					material->push_back( mObject[ x ].mMesh[ y ]->mMaterial );
-				}
-			}
 		}
 		/*
 		void SetShader( Shader* shader )
 		{
 			for( UINT x = 0; x < mNumObjects; ++x )
-			{
 				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
-				{
 					mObject[ x ].mMesh[ y ]->mShader = shader;
-				}
-			}
 		}
 		*/
 		// Set a keyframe, and append it if the index is -1.
@@ -568,15 +550,12 @@ namespace Sentinel
 			for( UINT x = 0; x < mNumObjects; ++x )
 			{
 				static Matrix4f matWorldObject;
-				if( mObject[ x ].mParent == NULL )
-				{
-					matWorldObject = mMatrixWorld * mObject[ x ].mKeyFrame[ mObject[ x ].mCurrKey ].mMatrix;
-				}
-				else
-				{
-					matWorldObject = mObject[ x ].mParent->mMatrixWorld * mObject[ x ].mKeyFrame[ mObject[ x ].mCurrKey ].mMatrix;
-				}
 
+				if( mObject[ x ].mParent == NULL )
+					matWorldObject = mMatrixWorld * mObject[ x ].mKeyFrame[ mObject[ x ].mCurrKey ].mMatrix;
+				else
+					matWorldObject = mObject[ x ].mParent->mMatrixWorld * mObject[ x ].mKeyFrame[ mObject[ x ].mCurrKey ].mMatrix;
+				
 				mObject[ x ].mMatrixWorld = matWorldObject;
 
 				// Render each mesh by material.

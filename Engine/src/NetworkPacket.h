@@ -130,9 +130,9 @@ namespace Sentinel
 	//
 	// NetworkPacketSender::Inst()->Send();
 	//
-	class SENTINEL_DLL NetworkPacketSender : public NetworkPacket, public Singleton< NetworkPacketSender >
+	class SENTINEL_DLL NetworkPacketSender : public NetworkPacket, public SingletonSafe< NetworkPacketSender >
 	{
-		friend class Singleton< NetworkPacketSender >;
+		friend class SingletonSafe< NetworkPacketSender >;
 
 	private:
 
@@ -169,9 +169,9 @@ namespace Sentinel
 	//     BYTE value = NetworkPacketReceiver::Inst()->GetValue< BYTE >();
 	// }
 	//
-	class SENTINEL_DLL NetworkPacketReceiver : public NetworkPacket, public Singleton< NetworkPacketReceiver >
+	class SENTINEL_DLL NetworkPacketReceiver : public NetworkPacket, public SingletonSafe< NetworkPacketReceiver >
 	{
-		friend class Singleton< NetworkPacketReceiver >;
+		friend class SingletonSafe< NetworkPacketReceiver >;
 
 	private:
 

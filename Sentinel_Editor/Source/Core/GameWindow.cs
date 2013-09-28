@@ -116,7 +116,9 @@ namespace Sentinel_Editor
 		/// Window for the World View 
 		///
 		protected override void OnLeftMouseDown()
-		{}
+		{
+
+		}
 
 		protected override void OnRightMouseDown()
 		{}

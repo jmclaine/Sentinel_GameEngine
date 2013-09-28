@@ -619,12 +619,12 @@ namespace Sentinel
 			float a = -mPlane[ axis ].mNormal.Dot( w0 );
 			float b = mPlane[ axis ].mNormal.Dot( ray.mDirection );
 
-			//if (fabs(b) < 0.001f)	// ray is parallel to the plane
-			//	return false;
+			if (fabs(b) < 0.001f)	// ray is parallel to the plane
+				return false;
 
 			float r = a / b;
-			//if (r < 0.0f)			// ray goes away from plane
-			//	return false;
+			if (r < 0.0f)			// ray goes away from plane
+				return false;
 
 			// add a little to ensure the point has a chance to be within the box
 			Vector3f point = ray.mPosition + ray.mDirection * r + mPlane[ axis ].mNormal * 0.001f;

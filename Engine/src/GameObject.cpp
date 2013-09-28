@@ -7,6 +7,8 @@
 
 namespace Sentinel
 {
+	DEFINE_SERIAL_OBJ( GameObject );
+
 	GameObject::GameObject() :
 		mTransform( NULL ), mController( NULL ), mPhysics( NULL ), mDrawable( NULL ), 
 		mParent( NULL ), mName( NULL )
@@ -17,32 +19,44 @@ namespace Sentinel
 		Shutdown();
 	}
 
+	//////////////////////////////
+
+	DEFINE_SERIAL_CLONE( GameObject );
+
+	void GameObject::Serialize( FILE* file )
+	{}
+
+	void GameObject::Deserialize( FILE* file )
+	{}
+
+	//////////////////////////////
+
 	GameComponent* GameObject::AttachComponent( GameComponent* component, const char* name )
 	{
 		component->SetOwner( this );
 		component->mName = name;
 		
-		switch( component->Type() )
+		switch( component->GetType() )
 		{
-			case COMPONENT_TRANSFORM:
+			case GameComponent::TRANSFORM:
 				_ASSERT( !mTransform );
 
 				mTransform = component;
 				return component;
 
-			case COMPONENT_CONTROLLER:
+			case GameComponent::CONTROLLER:
 				_ASSERT( !mController );
 
 				mController = component;
 				return component;
 
-			case COMPONENT_PHYSICS:
+			case GameComponent::PHYSICS:
 				_ASSERT( !mPhysics );
 				
 				mPhysics = component;
 				return component;
 
-			case COMPONENT_DRAWABLE:
+			case GameComponent::DRAWABLE:
 				_ASSERT( !mDrawable );
 
 				mDrawable = component;
@@ -65,18 +79,18 @@ namespace Sentinel
 	{
 		_ASSERT( component );
 
-		switch( component->Type() )
+		switch( component->GetType() )
 		{
-			case COMPONENT_TRANSFORM:
+			case GameComponent::TRANSFORM:
 				DETACH_COMPONENT( mTransform );
 
-			case COMPONENT_CONTROLLER:
+			case GameComponent::CONTROLLER:
 				DETACH_COMPONENT( mController );
 
-			case COMPONENT_PHYSICS:
+			case GameComponent::PHYSICS:
 				DETACH_COMPONENT( mPhysics );
 
-			case COMPONENT_DRAWABLE:
+			case GameComponent::DRAWABLE:
 				DETACH_COMPONENT( mDrawable );
 
 			default:
@@ -97,16 +111,25 @@ namespace Sentinel
 
 	void GameObject::AddChild( GameObject* obj )
 	{
+		// Check if the object is already a child.
+		//
 		TRAVERSE_VECTOR( x, mChild )
 			if( mChild[ x ] == obj )
 				return;
 
+		// Remove the object from its parent.
+		//
 		if( obj->mParent )
 			obj->mParent->RemoveChild( obj );
 
+		// Add the object as a child.
+		//
 		mChild.push_back( obj );
 		obj->mParent = this;
 
+		// Ensure the GameWorld no longer has
+		// the object as a parent object.
+		//
 		GameWorld::Inst()->RemoveGameObject( obj );
 	}
 
@@ -186,8 +209,8 @@ namespace Sentinel
 	void GameObject::UpdateComponents()
 	{
 		TRAVERSE_VECTOR( x, mComponent )
-			if( mComponent[ x ]->Type() != COMPONENT_CAMERA && 
-				mComponent[ x ]->Type() != COMPONENT_LIGHT )
+			if( mComponent[ x ]->GetType() != GameComponent::CAMERA && 
+				mComponent[ x ]->GetType() != GameComponent::LIGHT )
 				mComponent[ x ]->Update();
 	}
 
@@ -227,26 +250,26 @@ namespace Sentinel
 			mChild[ x ]->Shutdown();
 	}
 
-	GameComponent* GameObject::FindComponent( ComponentType type )
+	GameComponent* GameObject::FindComponent( GameComponent::Type type )
 	{
 		switch( type )
 		{
-			case COMPONENT_TRANSFORM:
+			case GameComponent::TRANSFORM:
 				return mTransform;
 				
-			case COMPONENT_CONTROLLER:
+			case GameComponent::CONTROLLER:
 				return mController;
 
-			case COMPONENT_PHYSICS:
+			case GameComponent::PHYSICS:
 				return mPhysics;
 				
-			case COMPONENT_DRAWABLE:
+			case GameComponent::DRAWABLE:
 				return mDrawable;
 				
 			default:
 				TRAVERSE_VECTOR( x, mComponent )
 				{
-					if( mComponent[ x ]->Type() == type )
+					if( mComponent[ x ]->GetType() == type )
 						return mComponent[ x ];
 				}
 				break;

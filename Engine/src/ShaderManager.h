@@ -5,9 +5,9 @@
 
 namespace Sentinel
 {
-	class SENTINEL_DLL ShaderManager : public Singleton< ShaderManager >
+	class SENTINEL_DLL ShaderManager : public SingletonSafe< ShaderManager >
 	{
-		friend class Singleton< ShaderManager >;
+		friend class SingletonSafe< ShaderManager >;
 
 	public:
 

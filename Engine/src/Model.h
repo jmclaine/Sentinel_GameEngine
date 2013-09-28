@@ -26,8 +26,6 @@ namespace Sentinel
 
 	protected:
 
-		BoundingSphere	mSphere;
-
 		struct KeyFrame
 		{
 			Matrix4f	mMatrix;

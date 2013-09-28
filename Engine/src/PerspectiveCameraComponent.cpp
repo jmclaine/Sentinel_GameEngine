@@ -32,6 +32,26 @@ namespace Sentinel
 		mMatrixProjection.ProjectionPerspective( windowWidth, windowHeight, nearZ, farZ, FOV );
 	}
 
+	float PerspectiveCameraComponent::NearZ()
+	{
+		return mNearZ;
+	}
+
+	float PerspectiveCameraComponent::FarZ()
+	{
+		return mFarZ;
+	}
+
+	float PerspectiveCameraComponent::FOV()
+	{
+		return mFOV;
+	}
+
+	const Vector3f& PerspectiveCameraComponent::LookAt()
+	{
+		return mLookAt;
+	}
+
 	// Create the frustum.
 	//
 	/*void PerspectiveCameraComponent::CreateFrustum()

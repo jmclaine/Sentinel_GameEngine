@@ -33,7 +33,7 @@ namespace Sentinel { namespace Components
 
 	public enum class ComponentType
 	{
-		GAME,
+		DEFAULT,
 		CONTROLLER,
 		COLLISION,
 		PHYSICS,
@@ -42,8 +42,6 @@ namespace Sentinel { namespace Components
 		LIGHT,
 		DRAWABLE,
 		TRIGGER,
-
-		NUM_COMPONENTS
 	};
 
 	public ref class WGameComponent
@@ -77,7 +75,7 @@ namespace Sentinel { namespace Components
 
 		void			SetOwner( WGameObject^ owner );
 
-		ComponentType	Type();
+		ComponentType	GetType();
 
 		DECLARE_PROPERTY( System::String^, Name );
 	};

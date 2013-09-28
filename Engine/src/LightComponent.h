@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Common.h"
-#include "Util.h"
+#include "ColorRGBA.h"
+#include "Vector4f.h"
 #include "TransformComponent.h"
 
 namespace Sentinel

@@ -14,8 +14,9 @@ template class __declspec(dllexport) std::basic_string< char, std::char_traits< 
 	#endif
 #endif
 
-typedef unsigned int	UINT;
+typedef unsigned char	BYTE;
 typedef unsigned char	UCHAR;
+typedef unsigned int	UINT;
 typedef unsigned short	WORD;
 typedef unsigned long	DWORD;
 

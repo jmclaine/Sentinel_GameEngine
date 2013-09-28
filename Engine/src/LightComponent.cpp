@@ -5,7 +5,7 @@ namespace Sentinel
 {
 	LightComponent::LightComponent()
 	{
-		mComponentType = COMPONENT_LIGHT;
+		mType = GameComponent::LIGHT;
 
 		mTransform = NULL;
 
@@ -19,7 +19,7 @@ namespace Sentinel
 
 	void LightComponent::Startup()
 	{
-		mTransform = (TransformComponent*)mOwner->FindComponent( COMPONENT_TRANSFORM );
+		mTransform = (TransformComponent*)mOwner->FindComponent( GameComponent::TRANSFORM );
 
 		if( mTransform == NULL )
 			throw AppException( "LightComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain TransformComponent" );

@@ -176,7 +176,7 @@ namespace Sentinel
 	// prevents a user from creating both OpenGL and DirectX at the
 	// same time.
 	//
-	class SENTINEL_DLL Renderer : public SingletonAbstract< Renderer >
+	class SENTINEL_DLL Renderer : public SingletonAbstractSafe< Renderer >
 	{
 	protected:
 

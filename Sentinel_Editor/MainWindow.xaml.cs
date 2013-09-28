@@ -816,7 +816,7 @@ namespace Sentinel_Editor
 		///
 		private void About_Click( Object sender, RoutedEventArgs e )
 		{
-			MessageBox.Show( "Sentinel Editor\nVersion 1.0.0.0\nCopyright © BEHOLDER Software 2013", "About..." );
+			MessageBox.Show( "Sentinel Editor\nVersion 1.0\nCopyright © BEHOLDER Software 2013", "About..." );
 		}
 
 		///

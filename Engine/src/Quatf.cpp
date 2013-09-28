@@ -94,6 +94,16 @@ namespace Sentinel
 		return Quatf( 0, 0, 0, 0 );
 	}
 
+	Quatf Quatf::NormalizeFast() const
+	{
+		float len = LengthSquared();
+
+		if( len > 0 )
+			return Mul( invsqrt( len ));
+
+		return Quatf( 0, 0, 0, 0 );
+	}
+
 	Quatf& Quatf::AxisAngle( float _x, float _y, float _z, float _degrees )
 	{
 		float a = (float)DEGREES_TO_RADIANS * _degrees * 0.5f;

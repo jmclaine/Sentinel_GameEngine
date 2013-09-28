@@ -101,7 +101,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
     <ClInclude Include="..\Engine\src\Buffer.h" />
     <ClInclude Include="..\Engine\src\CameraComponent.h" />
     <ClInclude Include="..\Engine\src\CDPI.h" />
-    <ClInclude Include="..\Engine\src\Color.h" />
+    <ClInclude Include="..\Engine\src\ColorRGBA.h" />
     <ClInclude Include="..\Engine\src\Common.h" />
     <ClInclude Include="..\Engine\src\ControllerComponent.h" />
     <ClInclude Include="..\Engine\src\CriticalSection.h" />
@@ -131,8 +131,12 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
     <ClInclude Include="..\Engine\src\PhysicsSystem.h" />
     <ClInclude Include="..\Engine\src\PlayerControllerComponent.h" />
     <ClInclude Include="..\Engine\src\Quatf.h" />
+    <ClInclude Include="..\Engine\src\RandomValue.h" />
+    <ClInclude Include="..\Engine\src\RefCounter.h" />
     <ClInclude Include="..\Engine\src\Renderer.h" />
     <ClInclude Include="..\Engine\src\GameWindow.h" />
+    <ClInclude Include="..\Engine\src\Script.h" />
+    <ClInclude Include="..\Engine\src\Serializeable.h" />
     <ClInclude Include="..\Engine\src\Shader.h" />
     <ClInclude Include="..\Engine\src\ShaderManager.h" />
     <ClInclude Include="..\Engine\src\Shape.h" />
@@ -152,7 +156,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
   <ItemGroup>
     <ClCompile Include="..\Engine\src\Buffer.cpp" />
     <ClCompile Include="..\Engine\src\CameraComponent.cpp" />
-    <ClCompile Include="..\Engine\src\Color.cpp" />
+    <ClCompile Include="..\Engine\src\ColorRGBA.cpp" />
     <ClCompile Include="..\Engine\src\ControllerComponent.cpp" />
     <ClCompile Include="..\Engine\src\DrawableComponent.cpp" />
     <ClCompile Include="..\Engine\src\FileIO.cpp" />
@@ -184,6 +188,12 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
     <ClCompile Include="..\Engine\src\RendererDX.cpp" />
     <ClCompile Include="..\Engine\src\RendererGL.cpp" />
     <ClCompile Include="..\Engine\src\GameWindow.cpp" />
+    <ClCompile Include="..\Engine\src\Script.cpp" />
+    <ClCompile Include="..\Engine\src\ScriptCompiler.cpp" />
+    <ClCompile Include="..\Engine\src\ScriptLexer.cpp" />
+    <ClCompile Include="..\Engine\src\ScriptNode.cpp" />
+    <ClCompile Include="..\Engine\src\ScriptParser.cpp" />
+    <ClCompile Include="..\Engine\src\Serializeable.cpp" />
     <ClCompile Include="..\Engine\src\Shader.cpp" />
     <ClCompile Include="..\Engine\src\ShaderManager.cpp" />
     <ClCompile Include="..\Engine\src\Shape.cpp" />

@@ -5,7 +5,7 @@ namespace Sentinel
 	GameComponent::GameComponent() :
 		mName( NULL )
 	{
-		mComponentType = COMPONENT_GAME;
+		mType = DEFAULT;
 	}
 
 	GameComponent::~GameComponent()
@@ -16,8 +16,16 @@ namespace Sentinel
 		mOwner = owner;
 	}
 
-	ComponentType GameComponent::Type()
+	GameComponent::Type GameComponent::GetType()
 	{
-		return mComponentType;
+		return mType;
 	}
+
+	void GameComponent::Save( FILE* file )
+	{
+		const char* id = typeid( this ).name();
+	}
+	
+	void GameComponent::Load( FILE* file )
+	{}
 }

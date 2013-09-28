@@ -2,9 +2,7 @@
 
 #include "Common.h"
 
-#include <stdio.h>
 #include <iostream>
-#include <fstream>
 #include <sstream>
 #include <stdlib.h>
 #include <string.h>
@@ -19,19 +17,9 @@
 
     #define strcat_s    strcat
     #define sprintf_s   sprintf
-
-	typedef unsigned int   DWORD;
-	typedef unsigned short WORD;
-	typedef unsigned char  UCHAR;
-	typedef unsigned char  BYTE;
 #else
 	#include <windows.h>
 #endif
-
-#include "Vector2f.h"
-#include "Vector3f.h"
-#include "Vector4f.h"
-#include "Color.h"
 
 namespace Sentinel
 {
@@ -125,6 +113,11 @@ namespace Sentinel
 
 	#define INTERP( start, end, alpha ) ((start) + ((end) - (start)) * (alpha))
 
+	// Convert a string into an integer value.
+	// Only the first 16 characters will guarantee a unique ID.
+	//
+	int SENTINEL_DLL StringToID( const std::string& name );
+
 	////////////////////////////////////////////////////////////////////
 
 	class AppException : public std::exception
@@ -154,9 +147,7 @@ namespace Sentinel
 	inline void CopyArray( Real& dest, const Real& src, UINT size )
 	{
 		for( UINT x = 0; x < size; ++x )
-		{
 			dest[ x ] = src[ x ];
-		}
 	}
 
 	template< class ForwardIterator, class T >
@@ -165,38 +156,6 @@ namespace Sentinel
 		ForwardIterator i = std::lower_bound( begin, end, val );
 
 		return (i != end && *i == val) ? i : end;
-	}
-
-	////////////////////////////////////////////////////////////////////
-
-	inline int RandomValue( int minValue, int maxValue )
-	{
-		return minValue + rand()%(maxValue - minValue);
-	}
-
-	inline float RandomValue( float minValue, float maxValue )
-	{
-		return minValue + (maxValue - minValue) * (rand() / static_cast< float >( RAND_MAX ));
-	}
-
-	inline double RandomValue( double minValue, double maxValue )
-	{
-		return minValue + (maxValue - minValue) * (rand() / static_cast< double >( RAND_MAX ));
-	}
-
-	inline Vector3f RandomValue( const Vector3f& minValue, const Vector3f& maxValue )
-	{
-		return Vector3f( RandomValue( minValue.x, maxValue.x ), \
-						 RandomValue( minValue.y, maxValue.y ), \
-						 RandomValue( minValue.z, maxValue.z ));
-	}
-
-	inline ColorRGBA RandomValue( const ColorRGBA& minColor, const ColorRGBA& maxColor )
-	{
-		return ColorRGBA( RandomValue( minColor.r, maxColor.r ), \
-						  RandomValue( minColor.g, maxColor.g ), \
-						  RandomValue( minColor.b, maxColor.b ), \
-						  RandomValue( minColor.a, maxColor.a ));
 	}
 
 	////////////////////////////////////////////////////////////////////
@@ -260,55 +219,4 @@ namespace Sentinel
 
 		type = *(reinterpret_cast< Real* >( &result ));
 	}
-
-	////////////////////////////////////////////////////////////////////
-
-	class RefCounter
-	{
-		int refc;
-
-	public:
-
-		RefCounter() :
-			refc( 0 )
-		{}
-
-		void incRef()
-		{
-			refc++;
-		}
-
-		int decRef()
-		{
-			return --refc;
-		}
-	};
-
-	template< typename T >
-	class RefObject : public RefCounter
-	{
-	public:
-
-		T data;
-
-		RefObject()
-		{
-			incRef();
-		}
-
-		RefObject( T _data )
-		{
-			data = _data;
-			incRef();
-		}
-
-		void assign( const T& right )
-		{
-			incRef();
-			data = right;
-		}
-
-		operator T () { return data; }
-		T& operator -> () { return data; }
-	};
 }

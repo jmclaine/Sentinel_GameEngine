@@ -147,6 +147,16 @@ namespace Sentinel
 		return Vector4f();
 	}
 
+	Vector4f Vector4f::NormalizeFast() const
+	{
+		float len = LengthSquared();
+
+		if( len > 0 )
+			return Mul( invsqrt( len ));
+
+		return Vector4f();
+	}
+
 	float Vector4f::Dot( const Vector4f& v ) const
 	{
 		return x*v.x + y*v.y + z*v.z + w*v.w;

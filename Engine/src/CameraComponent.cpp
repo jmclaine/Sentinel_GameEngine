@@ -6,7 +6,7 @@ namespace Sentinel
 {
 	CameraComponent::CameraComponent()
 	{
-		mComponentType = COMPONENT_CAMERA;
+		mType = GameComponent::CAMERA;
 
 		mTransform = NULL;
 
@@ -22,7 +22,7 @@ namespace Sentinel
 
 	void CameraComponent::Startup()
 	{
-		mTransform = (TransformComponent*)mOwner->FindComponent( COMPONENT_TRANSFORM );
+		mTransform = (TransformComponent*)mOwner->FindComponent( GameComponent::TRANSFORM );
 
 		if( mTransform == NULL )
 			throw AppException( "CameraComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain TransformComponent" );

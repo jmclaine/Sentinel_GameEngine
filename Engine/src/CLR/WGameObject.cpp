@@ -119,7 +119,7 @@ namespace Sentinel { namespace Components
 	//
 	WGameComponent^ WGameObject::FindComponent( Sentinel::Components::ComponentType type )
 	{
-		GameComponent* component = mRef->FindComponent( (Sentinel::ComponentType)type );
+		GameComponent* component = mRef->FindComponent( (Sentinel::GameComponent::Type)type );
 
 		return (component) ? gcnew WGameComponent( component ) : nullptr;
 	}

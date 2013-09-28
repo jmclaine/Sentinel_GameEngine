@@ -1,4 +1,5 @@
 #include "SpriteComponent.h"
+#include "Vector2f.h"
 
 namespace Sentinel
 {
@@ -6,8 +7,6 @@ namespace Sentinel
 	{
 		_ASSERT( mTexture );
 		_ASSERT( spriteSize.x > 0 && spriteSize.y > 0 );
-
-		mComponentType	= COMPONENT_DRAWABLE;
 
 		mTexture		= texture;
 		mSpriteSize		= spriteSize;

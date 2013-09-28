@@ -5,6 +5,11 @@
 
 namespace Sentinel
 {
+	class Plane;
+	class Triangle;
+	class BoundingSphere;
+	class BoundingBox;
+
 	class SENTINEL_DLL Ray
 	{
 	public:
@@ -27,6 +32,9 @@ namespace Sentinel
 		Plane( const Vector3f& pos = Vector3f(), const Vector3f& normal = Vector3f() );
 
 		float		Distance( const Vector3f& pos );
+
+		bool		Intersects( const Ray& ray );
+		bool		Intersects( const BoundingBox& box );
 	};
 
 	//////////////////////////////////////////////////////

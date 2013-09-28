@@ -10,9 +10,9 @@ namespace Sentinel
 {
 	class SpriteComponent;
 
-	class SENTINEL_DLL ParticleSystem : public Singleton< ParticleSystem >
+	class SENTINEL_DLL ParticleSystem : public SingletonSafe< ParticleSystem >
 	{
-		friend class Singleton< ParticleSystem >;
+		friend class SingletonSafe< ParticleSystem >;
 		friend class SpriteComponent;
 
 	private:

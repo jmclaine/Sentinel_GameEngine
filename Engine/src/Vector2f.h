@@ -46,6 +46,7 @@ namespace Sentinel
 		float		LengthManhattan() const;
 
 		Vector2f	Normalize() const;
+		Vector2f	NormalizeFast() const;
 
 		float		Dot( const Vector2f& v ) const;
 		Vector2f	Cross() const;

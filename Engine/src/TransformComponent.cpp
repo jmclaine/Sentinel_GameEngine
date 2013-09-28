@@ -10,7 +10,7 @@ namespace Sentinel
 	TransformComponent::TransformComponent() :
 		GameComponent()
 	{
-		mComponentType = COMPONENT_TRANSFORM;
+		mType = GameComponent::TRANSFORM;
 
 		mParentTransform = NULL;
 
@@ -20,7 +20,7 @@ namespace Sentinel
 	void TransformComponent::Startup()
 	{
 		if( mOwner->mParent )
-			mParentTransform = static_cast< TransformComponent* >(mOwner->mParent->FindComponent( COMPONENT_TRANSFORM ));
+			mParentTransform = static_cast< TransformComponent* >(mOwner->mParent->FindComponent( GameComponent::TRANSFORM ));
 		else
 			mParentTransform = NULL;
 	}
