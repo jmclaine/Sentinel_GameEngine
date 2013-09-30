@@ -1,5 +1,5 @@
 #include "Renderer.h"
-#include "FileIO.h"
+#include "Archive.h"
 
 #include <GL/glew.h>
 #include <gl/gl.h>
@@ -100,12 +100,12 @@ namespace Sentinel
 
 	public:
 
-		TextureGL( const char* filename, UINT width, UINT height )
+		TextureGL( const char* name, UINT width, UINT height )
 		{
-			mFilename	= filename;
-			mWidth		= width;
-			mHeight		= height;
-			mID			= 0;
+			mName	= name;
+			mWidth	= width;
+			mHeight	= height;
+			mID		= 0;
 		}
 
 		GLuint ID()
@@ -192,7 +192,7 @@ namespace Sentinel
 
 	public:
 
-		UINT Startup( std::string filename, std::string attrib, std::string uniform )
+		UINT Startup( std::string filename, const std::string& attrib, const std::string& uniform )
 		{
 			mAttribute  = attrib;
 			mUniform	= uniform;
@@ -208,7 +208,7 @@ namespace Sentinel
 
 			GLchar* source;
 			
-			if( !FileIO::ToBuffer( filename.c_str(), source ))
+			if( !Archive::ToBuffer( filename.c_str(), source ))
 			{
 				REPORT_ERROR( "Could not open '" << filename << "'", "Shader Loader Error" );
 				return S_FALSE;
@@ -825,7 +825,7 @@ namespace Sentinel
 
 			TextureGL* texture = static_cast< TextureGL* >(CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA ));
 
-			texture->mFilename = filename;
+			texture->mName = filename;
 
 			stbi_image_free( pixels );
 

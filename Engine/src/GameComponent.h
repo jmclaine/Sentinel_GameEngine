@@ -5,13 +5,13 @@
 #include <typeinfo>
 
 #include "Common.h"
-#include "FileIO.h"
+#include "Serializeable.h"
 
 namespace Sentinel
 {
 	class GameObject;
 
-	class SENTINEL_DLL GameComponent
+	class SENTINEL_DLL GameComponent : public Serializeable
 	{
 	public:
 
@@ -54,10 +54,5 @@ namespace Sentinel
 		void SetOwner( GameObject* owner );
 
 		GameComponent::Type GetType();
-
-		////////////////////////////////
-
-		virtual void Save( FILE* file );
-		virtual void Load( FILE* file );
 	};
 }

@@ -12,12 +12,12 @@ namespace Sentinel
 	Shader::~Shader()
 	{}
 
-	const std::string& Shader::AttributeDecl()
+	const std::string& Shader::Attribute()
 	{
 		return mAttribute;
 	}
 
-	const std::string& Shader::UniformDecl()
+	const std::string& Shader::Uniform()
 	{
 		return mUniform;
 	}

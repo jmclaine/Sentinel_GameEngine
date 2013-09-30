@@ -6,10 +6,18 @@
 
 namespace Sentinel
 {
+	DEFINE_SERIAL_REGISTER( PlayerControllerComponent );
+	DEFINE_SERIAL_CLONE( PlayerControllerComponent );
+
 	PlayerControllerComponent::PlayerControllerComponent()
 	{
 		mSpeed			= 1.0f;
 		mAngularSpeed	= 0.2f;
+	}
+
+	void PlayerControllerComponent::Startup()
+	{
+		ControllerComponent::Startup();
 	}
 
 	void PlayerControllerComponent::Update()
@@ -94,5 +102,26 @@ namespace Sentinel
 			transform.setRotation( qResult );
 		
 		mPhysics->GetRigidBody()->setWorldTransform( transform );
+	}
+
+	void PlayerControllerComponent::Shutdown()
+	{
+		ControllerComponent::Shutdown();
+	}
+
+	/////////////////////////////////
+
+	void PlayerControllerComponent::Save( Archive& archive )
+	{
+		mSerialRegistry.Save( archive );
+
+		archive.Write( &mSpeed );
+		archive.Write( &mAngularSpeed );
+	}
+
+	void PlayerControllerComponent::Load( Archive& archive )
+	{
+		archive.Read( &mSpeed );
+		archive.Read( &mAngularSpeed );
 	}
 }

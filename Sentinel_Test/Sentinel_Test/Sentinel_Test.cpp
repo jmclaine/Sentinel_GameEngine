@@ -14,6 +14,7 @@
 #include "NetworkSocket.h"
 
 #include "ShaderManager.h"
+#include "TextureManager.h"
 
 #include "Input.h"
 #include "Timing.h"
@@ -58,8 +59,6 @@ class MainApp
 {
 	HACCEL					mAccelTable;
 	
-	Texture*				mTexture;
-
 	GameWindow*				mWindow0;
 	GameWindow*				mWindow1;
 
@@ -68,8 +67,6 @@ public:
 	MainApp()
 	{
 		srand( (UINT)time( (time_t*)0 ));
-
-		mTexture = NULL;
 
 		mWindow0 = NULL;
 		mWindow1 = NULL;
@@ -91,7 +88,7 @@ public:
 		// Load config file to setup windows for the renderer.
 		//
 		WindowInfo info;
-		if( !Renderer::Load( "config.xml", info ))
+		if( !Renderer::Create( "config.xml", info ))
 		{
 			REPORT_ERROR( "Failed to load 'config.xml'\nDefaulting to OpenGL", "Renderer Setup Failure" );
 
@@ -230,7 +227,7 @@ public:
 
 		//////////////////////////////
 
-		GameWorld::Load( "Default.MAP" );
+		//GameWorld::Inst()->Load( "Default.MAP" );
 		
 		// Create main perspective camera.
 		//
@@ -286,13 +283,13 @@ public:
 
 		// Create meshes and model for object instancing.
 		//
-		mTexture = Renderer::Inst()->CreateTextureFromFile( "default-alpha.png" );
+		TextureManager::Inst()->Add( Renderer::Inst()->CreateTextureFromFile( "default-alpha.png" ), "DEFAULT" );
 
 		MeshBuilder				meshBuilder;
 		std::shared_ptr< Mesh >	mesh[ NUM_SHAPES ];
 
 		meshBuilder.mShader = ShaderManager::Inst()->Get( "TEXTURE" );
-		meshBuilder.mTexture[ TEXTURE_DIFFUSE ] = mTexture;
+		meshBuilder.mTexture[ TEXTURE_DIFFUSE ] = TextureManager::Inst()->Get( "DEFAULT" );
 
 		meshBuilder.CreateCube( 1 );
 		mesh[ SHAPE_CUBE ] = std::shared_ptr< Mesh >( meshBuilder.BuildMesh() );
@@ -438,8 +435,6 @@ public:
 
 	void Shutdown()
 	{
-		SAFE_DELETE( mTexture );
-
 		Mouse::Destroy();
 		Keyboard::Destroy();
 
@@ -450,6 +445,7 @@ public:
 		GameWorld::Destroy();
 
 		ShaderManager::Destroy();
+		TextureManager::Destroy();
 
 		mWindow0->Shutdown();
 		delete mWindow0;

@@ -18,14 +18,14 @@ namespace Sentinel { namespace Assets
 
 	DEFINE_OP_PTR( Shader );
 
-	System::String^	WShader::AttributeDecl()
+	System::String^	WShader::Attribute()
 	{
-		return gcnew System::String( mRef->AttributeDecl().c_str() );
+		return gcnew System::String( mRef->Attribute().c_str() );
 	}
 
-	System::String^	WShader::UniformDecl()
+	System::String^	WShader::Uniform()
 	{
-		return gcnew System::String( mRef->UniformDecl().c_str() );
+		return gcnew System::String( mRef->Uniform().c_str() );
 	}
 
 	UINT WShader::VertexSize()

@@ -107,6 +107,11 @@ namespace Sentinel { namespace Systems
 		return mWindowInfo;
 	}
 
+	System::IntPtr^ WGameWindow::GetHWND()
+	{
+		return gcnew System::IntPtr( mHWND );
+	}
+
 	///////////////////////////
 
 #define RETURN_HANDLE( isHandled )\

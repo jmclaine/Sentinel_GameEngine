@@ -202,7 +202,7 @@ namespace Sentinel
 
 		// Initializes the Renderer as either DirectX11 or OpenGL from an XML file.
 		//
-		static Renderer*	Load( const char* filename, WindowInfo& info );
+		static Renderer*	Create( const char* filename, WindowInfo& info );
 
 		virtual WindowInfo*	Startup( void* hWnd, bool fullscreen, UINT width, UINT height ) = 0;
 

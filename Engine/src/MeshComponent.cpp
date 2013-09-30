@@ -4,6 +4,12 @@
 
 namespace Sentinel
 {
+	DEFINE_SERIAL_REGISTER( MeshComponent );
+	DEFINE_SERIAL_CLONE( MeshComponent );
+
+	MeshComponent::MeshComponent()
+	{}
+
 	MeshComponent::MeshComponent( std::shared_ptr< Mesh > mesh )
 	{
 		mMesh = mesh;
@@ -31,4 +37,14 @@ namespace Sentinel
 	{
 		mMesh.reset();
 	}
+
+	///////////////////////////////////
+
+	void MeshComponent::Save( Archive& archive )
+	{
+		mSerialRegistry.Save( archive );
+	}
+
+	void MeshComponent::Load( Archive& archive )
+	{}
 }

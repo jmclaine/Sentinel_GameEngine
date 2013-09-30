@@ -3,45 +3,52 @@
 #include <map>
 #include <stdio.h>
 
-#include "Util.h"
+#include "Common.h"
+#include "Archive.h"
 
 namespace Sentinel
 {
 
 #define DECLARE_SERIAL( clazz )\
-	static SerialObject mSerialRegistry;\
-	Serializeable*	Clone() const;\
-	void Serialize( FILE* file );\
-	void Deserialize( FILE* file );
+	private:\
+		static SerialRegister mSerialRegistry;\
+		static Serializeable* Clone();\
+		void Save( Archive& archive );\
+		void Load( Archive& archive );
 
-#define DEFINE_SERIAL_OBJ( clazz )\
-	SerialObject clazz::mSerialRegistry( #clazz, new clazz() );
+#define DEFINE_SERIAL_REGISTER( clazz )\
+	SerialRegister clazz::mSerialRegistry( #clazz, clazz::Clone );
 
 #define DEFINE_SERIAL_CLONE( clazz )\
-	Serializeable* clazz::Clone() const { return new clazz(); }
+	Serializeable* clazz::Clone() {\
+		return new clazz(); }
 
-#define DEFINE_SERIALIZE( clazz )\
-	void clazz::Serialize( FILE* file ) { FileIO::Write( file, (const char*)this, sizeof( clazz )); }
+#define DEFINE_SERIAL_SAVE( clazz )\
+	void clazz::Save( Archive& archive ) {\
+		mSerialRegistry.Save( archive );\
+		archive.Write( (const char*)this, sizeof( clazz )); }
 
-#define DEFINE_DESERIALIZE( clazz )\
-	void clazz::Deserialize( FILE* file ) { FileIO::Read( file, (char*)this, sizeof( clazz )); }
+#define DEFINE_SERIAL_LOAD( clazz )\
+	void clazz::Load( Archive& archive ) {\
+		archive.Read( (char*)this, sizeof( clazz )); }
 
 #define DEFINE_SERIAL( clazz )\
-	DEFINE_SERIAL_OBJ( clazz )\
+	DEFINE_SERIAL_REGISTER( clazz )\
 	DEFINE_SERIAL_CLONE( clazz )\
-	DEFINE_SERIALIZE( clazz )\
-	DEFINE_DESERIALIZE( clazz )
+	DEFINE_SERIAL_SAVE( clazz )\
+	DEFINE_SERIAL_LOAD( clazz )
+
 
 	// Inherit from this class.
 	//
 	// Clone() recreates the object as a Serializable object.
 	//
-	// Serialize() allows customization for output to a file
+	// Save() allows customization for output to a file
 	// as it is relatively unknown how an object should be
 	// exported. In some cases, pointers need specific
 	// functions in order to be initialized correctly.
 	//
-	// Deserialize() should be the inverse of Serialize()
+	// Load() should be the inverse of Save()
 	//
 	class Serializeable
 	{
@@ -49,22 +56,25 @@ namespace Sentinel
 
 		virtual ~Serializeable() {}
 
-		virtual Serializeable*	Clone() const = 0;
-
-		virtual void			Serialize( FILE* file ) = 0;
+		virtual void	Save( Archive& archive ) = 0;
 		
-		virtual void			Deserialize( FILE* file ) = 0;
+		virtual void	Load( Archive& archive ) = 0;
 	};
 
-	// A simple singleton implementation.
+	// Stores the Serializable->Clone() function of each object.
+	// Singleton instantiation.
 	//
-	// Stores the Serializable objects for Cloning.
-	//
-	class SerialFactory
+	class SENTINEL_DLL SerialFactory
 	{
-	private:
+	public:
 
-		std::map< int, Serializeable* >		mRegistry;
+		typedef Serializeable* (*CloneFunc)();
+
+	private:
+		
+		static Serializeable* NullClone();
+
+		std::map< int, CloneFunc > mRegistry;
 
 	protected:
 
@@ -74,26 +84,27 @@ namespace Sentinel
 
 		~SerialFactory();
 
-		static SerialFactory* Inst();
+		static SerialFactory* Inst();	// ptr for consistency
 		
 		///////////////////////////
 
-		void			Register( int value, Serializeable* obj );
+		void			Register( int value, CloneFunc func );
 
 		Serializeable*	Create( int value );
 	};
 
 	// Automatically registers the class within the SerialFactory.
 	//
-	class SerialObject
+	class SENTINEL_DLL SerialRegister
 	{
 	public:
 
-		SerialObject( const std::string& clazz, Serializeable* obj )
-		{
-			// Convert the class into a likely unique ID.
-			//
-			SerialFactory::Inst()->Register( StringToID( clazz ), obj );
-		}
+		int mID;
+
+		SerialRegister( const char* clazz, SerialFactory::CloneFunc func );
+
+		void					Save( Archive& archive );
+
+		static Serializeable*	Load( Archive& archive );
 	};
 }

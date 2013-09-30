@@ -7,7 +7,7 @@
 
 namespace Sentinel
 {
-	DEFINE_SERIAL_OBJ( GameObject );
+	DEFINE_SERIAL_REGISTER( GameObject );
 
 	GameObject::GameObject() :
 		mTransform( NULL ), mController( NULL ), mPhysics( NULL ), mDrawable( NULL ), 
@@ -23,18 +23,67 @@ namespace Sentinel
 
 	DEFINE_SERIAL_CLONE( GameObject );
 
-	void GameObject::Serialize( FILE* file )
-	{}
+#define SAVE_COMPONENT( component )\
+	(component) ? component->Save( archive ) : archive.Write( &noValue );
 
-	void GameObject::Deserialize( FILE* file )
-	{}
+	void GameObject::Save( Archive& archive )
+	{
+		mSerialRegistry.Save( archive );
+		
+		UINT len = strlen( mName );
+		archive.Write( &len );
+		archive.Write( mName, len );
+		
+		int noValue = 0;
+		SAVE_COMPONENT( mTransform );
+		SAVE_COMPONENT( mController );
+		SAVE_COMPONENT( mPhysics );
+		SAVE_COMPONENT( mDrawable );
+
+		UINT size = mComponent.size();
+		archive.Write( &size );
+
+		TRAVERSE_VECTOR( x, mComponent )
+			mComponent[ x ]->Save( archive );
+		
+		size = mChild.size();
+		archive.Write( &size );
+
+		TRAVERSE_VECTOR( x, mChild )
+			mChild[ x ]->Save( archive );
+	}
+
+	void GameObject::Load( Archive& archive )
+	{
+		UINT len = 0;
+		archive.Read( &len );
+
+		char name[ 32 ];
+		archive.Read( name, len );
+
+		int id = 0;
+		mTransform  = (GameComponent*)SerialRegister::Load( archive );
+		mController = (GameComponent*)SerialRegister::Load( archive );
+		mPhysics    = (GameComponent*)SerialRegister::Load( archive );
+		mDrawable   = (GameComponent*)SerialRegister::Load( archive );
+
+		UINT size = 0;
+		archive.Read( &size );
+
+		for( UINT x = 0; x < size; ++x )
+			mComponent.push_back( (GameComponent*)SerialRegister::Load( archive ));
+
+		archive.Read( &size );
+
+		for( UINT x = 0; x < size; ++x )
+			AddChild( (GameObject*)SerialRegister::Load( archive ));
+	}
 
 	//////////////////////////////
 
-	GameComponent* GameObject::AttachComponent( GameComponent* component, const char* name )
+	GameComponent* GameObject::AttachComponent( GameComponent* component )
 	{
 		component->SetOwner( this );
-		component->mName = name;
 		
 		switch( component->GetType() )
 		{
@@ -66,6 +115,12 @@ namespace Sentinel
 				mComponent.push_back( component );
 				return component;
 		}
+	}
+
+	GameComponent* GameObject::AttachComponent( GameComponent* component, const char* name )
+	{
+		component->mName = name;
+		return AttachComponent( component );
 	}
 
 #define DETACH_COMPONENT( obj )\

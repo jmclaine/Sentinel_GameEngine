@@ -61,6 +61,8 @@ namespace Sentinel { namespace Systems
 
 		WWindowInfo^		GetInfo();
 
+		System::IntPtr^		GetHWND();
+
 	protected:
 		
 		virtual IntPtr		WndProc( IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, bool% handled ) override;

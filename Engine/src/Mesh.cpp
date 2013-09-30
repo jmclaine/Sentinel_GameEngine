@@ -47,7 +47,7 @@ namespace Sentinel
 			UINT uniformIndex = 0;
 			Vector3f pos;
 
-			std::string uniform = mShader->UniformDecl();
+			const std::string& uniform = mShader->Uniform();
 			
 			for( UINT i = 0; i < uniform.size(); ++i )
 			{

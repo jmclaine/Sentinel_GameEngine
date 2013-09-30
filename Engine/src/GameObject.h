@@ -15,6 +15,8 @@ namespace Sentinel
 {
 	class SENTINEL_DLL GameObject : public Serializeable
 	{
+		friend class GameWorld;
+
 		DECLARE_SERIAL( GameObject );
 
 	protected:
@@ -41,6 +43,7 @@ namespace Sentinel
 
 		//////////////////////////////
 
+		GameComponent*	AttachComponent( GameComponent* component );
 		GameComponent*	AttachComponent( GameComponent* component, const char* name );
 
 		GameComponent*	DetachComponent( GameComponent* component );

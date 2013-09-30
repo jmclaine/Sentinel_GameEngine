@@ -13,6 +13,7 @@ namespace Sentinel
 	{
 	protected:
 		
+		std::string			mName;
 		std::string			mAttribute;
 		std::string			mUniform;
 
@@ -26,8 +27,8 @@ namespace Sentinel
 
 		virtual ~Shader();
 
-		const std::string&	AttributeDecl();
-		const std::string&	UniformDecl();
+		const std::string&	Attribute();
+		const std::string&	Uniform();
 
 		UINT  				VertexSize();
 

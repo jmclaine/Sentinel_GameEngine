@@ -19,12 +19,13 @@ namespace Sentinel
 	#endif
 	}
 
-	int StringToID( const std::string& name )
+	int StringToID( const char* name )
 	{
 		int id = 0;
 		BYTE value = 0;
+		UINT len = strlen( name );
 
-		for( UINT x = 0; x < name.size() && x < 16; ++x )
+		for( UINT x = 0; x < len && x < 16; ++x )
 		{
 			if( name[ x ] >= 'A' && name[ x ] <= 'Z' )
 				value = name[ x ] - 'A';

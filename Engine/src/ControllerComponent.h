@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Common.h"
 #include "PhysicsComponent.h"
 
 namespace Sentinel
@@ -18,10 +17,10 @@ namespace Sentinel
 
 	public:
 
-		void Startup();
+		virtual void Startup();
 
-		void Update();
+		virtual void Update();
 
-		void Shutdown();
+		virtual void Shutdown();
 	};
 }

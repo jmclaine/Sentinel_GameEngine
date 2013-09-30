@@ -54,25 +54,28 @@ namespace Sentinel
 		if( !shader )
 			return ShaderManager::LOAD_FILE_FAILED;
 
-		if( mData.find( name.c_str() ) != mData.end() )
+		if( mData.find( name ) != mData.end() )
 			return ShaderManager::DUPLICATE_NAME;
 
-		mData.insert( std::pair< std::string, Shader* >( name.c_str(), shader ));
+		mData.insert( std::pair< std::string, Shader* >( name, shader ));
 
 		return ShaderManager::SUCCESS;
 	}
 
 	void ShaderManager::Remove( const std::string& name )
 	{
-		auto it = mData.find( name.c_str() );
+		auto it = mData.find( name );
 
 		if( it != mData.end() )
+		{
+			delete it->second;
 			mData.erase( it );
+		}
 	}
 
 	Shader* ShaderManager::Get( const std::string& name )
 	{
-		auto it = mData.find( name.c_str() );
+		auto it = mData.find( name );
 
 		if( it != mData.end() )
 			return it->second;

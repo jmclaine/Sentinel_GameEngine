@@ -1,5 +1,6 @@
 #include "GameWorld.h"
 #include "PhysicsSystem.h"
+#include "Archive.h"
 
 namespace Sentinel
 {
@@ -13,21 +14,47 @@ namespace Sentinel
 		Shutdown();
 	}
 
-	GameWorld* GameWorld::Load( const char* mapName, void* hWnd )
+	GameWorld* GameWorld::Create()
 	{
-		GameWorld* world = GameWorld::Inst( hWnd );
-
-		//ifstream file;
-		// No map file format to load...yet.
-
-		return world;
+		return GameWorld::Inst();
 	}
 
 	void GameWorld::Save( const char* mapName )
 	{
-		std::ofstream file;
+		FILE* file = fopen( mapName, "wb" );
 
-		//file.open( mapName, ios::binary );
+		if( !file )
+			throw AppException( "Failed to save " + std::string( mapName ));
+
+		Archive archive( file );
+
+		UINT size = mGameObject.size();
+		archive.Write( &size );
+
+		TRAVERSE_VECTOR( x, mGameObject )
+			mGameObject[ x ]->Save( archive );
+
+		fclose( file );
+	}
+
+	void GameWorld::Load( const char* mapName )
+	{
+		FILE* file = fopen( mapName, "rb" );
+		
+		if( !file )
+			throw AppException( "Failed to load " + std::string( mapName ));
+
+		Shutdown();
+
+		Archive archive( file );
+
+		UINT size = 0;
+		archive.Read( &size );
+
+		for( UINT x = 0; x < size; ++x )
+			AddGameObject( (GameObject*)SerialRegister::Load( archive ));
+
+		fclose( file );
 	}
 
 	void GameWorld::Startup()
@@ -163,10 +190,8 @@ namespace Sentinel
 				return entity;
 
 		if( entity->mParent )
-		{
 			entity->mParent->RemoveChild( entity );
-		}
-
+		
 		mGameObject.push_back( entity );
 
 		return entity;

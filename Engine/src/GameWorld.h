@@ -15,9 +15,9 @@ Attached GameObject(s) are automatically shutdown and removed during Shutdown()
 
 namespace Sentinel
 {
-	class SENTINEL_DLL GameWorld : public SingletonWindow< GameWorld >
+	class SENTINEL_DLL GameWorld : public SingletonSafe< GameWorld >
 	{
-		friend class SingletonWindow< GameWorld >;
+		friend class SingletonSafe< GameWorld >;
 
 	private:
 
@@ -37,8 +37,13 @@ namespace Sentinel
 
 	public:
 
-		static GameWorld*	Load( const char* mapName, void* hWnd = NULL );
-		static void			Save( const char* mapName );
+		// Since CLR will not save the pointer that gets
+		// created by Inst(), this function is required.
+		//
+		static GameWorld*	Create();
+
+		void				Save( const char* mapName );
+		void				Load( const char* mapName );
 		
 		void				Startup();
 

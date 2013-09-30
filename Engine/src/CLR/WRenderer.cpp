@@ -67,7 +67,7 @@ namespace Sentinel { namespace Systems
 		return gcnew RPTexture( Renderer::Inst()->BASE_TEXTURE );
 	}
 
-	WWindowInfo^ WRenderer::Load( String^ filename )
+	WWindowInfo^ WRenderer::Create( String^ filename )
 	{
 		// Somehow the pointer created in the DLL SingletonAbstract
 		// is not the same as the SingletonAbstract located here,
@@ -75,7 +75,7 @@ namespace Sentinel { namespace Systems
 		//
 		WindowInfo info;
 
-		bool result = (Renderer::Inst( (Renderer*)(Renderer::Load( msclr::interop::marshal_as< std::string >(filename).c_str(), info ))) != NULL);
+		bool result = (Renderer::Inst( (Renderer*)(Renderer::Create( msclr::interop::marshal_as< std::string >(filename).c_str(), info ))) != NULL);
 
 		if( !result )
 			return nullptr;

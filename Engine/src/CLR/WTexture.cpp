@@ -30,7 +30,6 @@ namespace Sentinel { namespace Assets
 
 	void WTexture::Delete()
 	{
-		WString::Free( const_cast< char* >(mRef->Filename()) );
 		SAFE_DELETE( mRef );
 	}
 
@@ -43,9 +42,9 @@ namespace Sentinel { namespace Assets
 		mRef->Release();
 	}
 
-	System::String^ WTexture::Filename()
+	System::String^ WTexture::Name()
 	{
-		return gcnew System::String( mRef->Filename() );
+		return WString::Cast( mRef->Name().c_str() );
 	}
 
 	UINT WTexture::Width()

@@ -2,7 +2,6 @@
 
 #include <vector>
 
-#include "Common.h"
 #include "PhysicsSystem.h"
 #include "TransformComponent.h"
 
@@ -10,22 +9,26 @@ namespace Sentinel
 {
 	class SENTINEL_DLL PhysicsComponent : public GameComponent
 	{
+		DECLARE_SERIAL( PhysicsComponent );
+
 		TransformComponent*	mTransform;
 
 		btRigidBody*		mRigidBody;
 
 	public:
 
+		PhysicsComponent();
 		PhysicsComponent( btRigidBody* body );
 
-		void Startup();
+		void			Startup();
 
-		void Update();
+		void			Update();
 		
-		void Shutdown();
+		void			Shutdown();
 
-		////////////////////////
+		/////////////////////////////////
 
-		btRigidBody* GetRigidBody();
+		btRigidBody*	GetRigidBody();
+		void			SetRigidBody( btRigidBody* body );
 	};
 }

@@ -192,9 +192,6 @@
     <ClInclude Include="..\Engine\src\CDPI.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\FileIO.h">
-      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\FloatCompressor.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClInclude>
@@ -212,6 +209,12 @@
     </ClInclude>
     <ClInclude Include="..\Engine\src\Serializeable.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Archive.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\TextureManager.h">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -362,9 +365,6 @@
     <ClCompile Include="..\Engine\src\ShaderManager.cpp">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\FileIO.cpp">
-      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\ColorRGBA.cpp">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClCompile>
@@ -385,6 +385,12 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\Serializeable.cpp">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Archive.cpp">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\TextureManager.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

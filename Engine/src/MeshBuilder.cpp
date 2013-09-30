@@ -1455,11 +1455,11 @@ namespace Sentinel
 		_ASSERT( mVertex.size() > 0 );
 		_ASSERT( mIndex.size() > 0 );
 
-		std::string attrib	= mShader->AttributeDecl();
-		UINT vertexSize		= mShader->VertexSize();
+		const std::string& attrib = mShader->Attribute();
 
-		UINT numVerts		= mVertex.size();
-		UINT totalSize		= vertexSize * numVerts;
+		UINT vertexSize	= mShader->VertexSize();
+		UINT numVerts	= mVertex.size();
+		UINT totalSize	= vertexSize * numVerts;
 
 		// Copy the generic vertex into a custom vertex using memory management.
 		//

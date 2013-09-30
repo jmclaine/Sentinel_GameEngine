@@ -47,7 +47,7 @@ namespace Sentinel
 	// to the SingletonAbstract instance; however, doing so results
 	// in the pointer being set back to NULL in the CLR wrapper.
 	//
-	Renderer* Renderer::Load( const char* filename, WindowInfo& info )
+	Renderer* Renderer::Create( const char* filename, WindowInfo& info )
 	{
 		TiXmlDocument doc;
 		if( !doc.LoadFile( filename ))

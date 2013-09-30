@@ -101,12 +101,12 @@ namespace Sentinel
 
 	public:
 
-		TextureDX( const char* filename, UINT width, UINT height )
+		TextureDX( const char* name, UINT width, UINT height )
 		{
 			mResource	= NULL;
 			mTexture	= NULL;
 
-			mFilename	= filename;
+			mName		= name;
 			mWidth		= width;
 			mHeight		= height;
 		}
@@ -336,7 +336,7 @@ namespace Sentinel
 
 			ProcessUniforms();
 
-			TRACE( filename.c_str() << " Shader Created Successfully!" );
+			TRACE( filename << " Shader Created Successfully!" );
 
 			return S_OK;
 		}
@@ -386,13 +386,9 @@ namespace Sentinel
 		void SetVector( UINT uniform, float* data, UINT offset, UINT count )
 		{
 			if( count == 1 )
-			{
 				mUniformDX[ uniform ]->AsVector()->SetFloatVector( data );
-			}
 			else
-			{
 				mUniformDX[ uniform ]->AsVector()->SetFloatVectorArray( data, offset, count );
-			}
 		}
 
 		void SetMatrix( UINT uniform, float* matrix, UINT offset, UINT count )
@@ -824,7 +820,7 @@ namespace Sentinel
 
 			// Rename the texture because loading from memory sets a default.
 			//
-			texture->mFilename = filename;
+			texture->mName = filename;
 
 			stbi_image_free( pixels );
 

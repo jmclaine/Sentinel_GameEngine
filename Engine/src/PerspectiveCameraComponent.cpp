@@ -2,6 +2,12 @@
 
 namespace Sentinel
 {
+	DEFINE_SERIAL_REGISTER( PerspectiveCameraComponent );
+	DEFINE_SERIAL_CLONE( PerspectiveCameraComponent );
+
+	PerspectiveCameraComponent::PerspectiveCameraComponent()
+	{}
+
 	PerspectiveCameraComponent::PerspectiveCameraComponent( float windowWidth, float windowHeight, float nearZ, float farZ, float FOV ) :
 		mNearZ( nearZ ), mFarZ( farZ ), mFOV( FOV )
 	{
@@ -50,6 +56,26 @@ namespace Sentinel
 	const Vector3f& PerspectiveCameraComponent::LookAt()
 	{
 		return mLookAt;
+	}
+
+	//////////////////////////////
+
+	void PerspectiveCameraComponent::Save( Archive& archive )
+	{
+		mSerialRegistry.Save( archive );
+
+		archive.Write( mMatrixProjection.Ptr(), 16 );
+		archive.Write( &mNearZ );
+		archive.Write( &mFarZ );
+		archive.Write( &mFOV );
+	}
+
+	void PerspectiveCameraComponent::Load( Archive& archive )
+	{
+		archive.Read( mMatrixProjection.Ptr(), 16 );
+		archive.Read( &mNearZ );
+		archive.Read( &mFarZ );
+		archive.Read( &mFOV );
 	}
 
 	// Create the frustum.

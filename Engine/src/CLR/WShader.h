@@ -23,8 +23,8 @@ namespace Sentinel { namespace Assets
 
 		DECLARE_OP_PTR( Shader );
 
-		System::String^	AttributeDecl();
-		System::String^	UniformDecl();
+		System::String^	Attribute();
+		System::String^	Uniform();
 
 		UINT  			VertexSize();
 

@@ -3,6 +3,9 @@
 
 namespace Sentinel
 {
+	DEFINE_SERIAL_REGISTER( LightComponent );
+	DEFINE_SERIAL_CLONE( LightComponent );
+
 	LightComponent::LightComponent()
 	{
 		mType = GameComponent::LIGHT;
@@ -30,4 +33,20 @@ namespace Sentinel
 
 	void LightComponent::Shutdown()
 	{}
+
+	//////////////////////////////
+
+	void LightComponent::Save( Archive& archive )
+	{
+		mSerialRegistry.Save( archive );
+
+		archive.Write( mColor.Ptr(), 4 );
+		archive.Write( mAttenuation.Ptr(), 4 );
+	}
+
+	void LightComponent::Load( Archive& archive )
+	{
+		archive.Read( mColor.Ptr(), 4 );
+		archive.Read( mAttenuation.Ptr(), 4 );
+	}
 }

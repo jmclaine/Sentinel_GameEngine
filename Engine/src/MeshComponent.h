@@ -2,7 +2,6 @@
 
 #include <memory>
 
-#include "Common.h"
 #include "Mesh.h"
 #include "DrawableComponent.h"
 
@@ -10,6 +9,8 @@ namespace Sentinel
 {
 	class SENTINEL_DLL MeshComponent : public DrawableComponent
 	{
+		DECLARE_SERIAL( MeshComponent );
+
 	public:
 
 		std::shared_ptr< Mesh > mMesh;
@@ -18,6 +19,7 @@ namespace Sentinel
 
 		/////////////////////////////
 
+		MeshComponent();
 		MeshComponent( std::shared_ptr< Mesh > mesh );
 
 		void	Startup();

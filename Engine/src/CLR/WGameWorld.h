@@ -11,8 +11,10 @@ namespace Sentinel { namespace Components
 	{
 	public:
 
+		static void					Create();
+		
+		static void					Save( System::String^ mapName );
 		static void					Load( System::String^ mapName );
-		static void					Load( System::String^ mapName, IntPtr hWnd );
 
 		static void					Startup();
 

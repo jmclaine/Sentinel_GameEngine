@@ -20,12 +20,4 @@ namespace Sentinel
 	{
 		return mType;
 	}
-
-	void GameComponent::Save( FILE* file )
-	{
-		const char* id = typeid( this ).name();
-	}
-	
-	void GameComponent::Load( FILE* file )
-	{}
 }

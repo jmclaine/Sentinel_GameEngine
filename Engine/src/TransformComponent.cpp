@@ -7,6 +7,9 @@ namespace Sentinel
 	Matrix4f TransformComponent::mMatrixScale;
 	Matrix4f TransformComponent::mMatrixRotation;
 
+	DEFINE_SERIAL_REGISTER( TransformComponent );
+	DEFINE_SERIAL_CLONE( TransformComponent );
+
 	TransformComponent::TransformComponent() :
 		GameComponent()
 	{
@@ -45,5 +48,23 @@ namespace Sentinel
 	const Matrix4f& TransformComponent::GetMatrixWorld()
 	{
 		return mMatrixWorld;
+	}
+
+	///////////////////////////////////
+
+	void TransformComponent::Save( Archive& archive )
+	{
+		mSerialRegistry.Save( archive );
+
+		archive.Write( mPosition.Ptr(), 3 );
+		archive.Write( mOrientation.Ptr(), 4 );
+		archive.Write( mScale.Ptr(), 3 );
+	}
+
+	void TransformComponent::Load( Archive& archive )
+	{
+		archive.Read( mPosition.Ptr(), 3 );
+		archive.Read( mOrientation.Ptr(), 4 );
+		archive.Read( mScale.Ptr(), 3 );
 	}
 }

@@ -1,18 +1,27 @@
 #include "WGameWorld.h"
 #include "WString.h"
 
+#include <msclr\marshal_cppstd.h>
+
+using namespace System::Runtime::InteropServices;
+
 using namespace Sentinel::Utilities;
 
 namespace Sentinel { namespace Components
 {
-	void WGameWorld::Load( System::String^ mapName )
+	void WGameWorld::Create()
 	{
-		GameWorld::Inst( GameWorld::Load( WString::Cast( mapName )));
+		GameWorld::Inst( GameWorld::Create() );
 	}
 
-	void WGameWorld::Load( System::String^ mapName, IntPtr hWnd )
+	void WGameWorld::Save( System::String^ mapName )
 	{
-		GameWorld::Inst( GameWorld::Load( WString::Cast( mapName ), hWnd.ToPointer() ));
+		GameWorld::Inst()->Save( WString::Cast( mapName ).c_str() );
+	}
+
+	void WGameWorld::Load( System::String^ mapName )
+	{
+		GameWorld::Inst()->Load( WString::Cast( mapName ).c_str() );
 	}
 
 	void WGameWorld::Startup()

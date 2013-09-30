@@ -1,12 +1,13 @@
 #pragma once
 
-#include "Common.h"
 #include "PhysicsComponent.h"
 
 namespace Sentinel
 {
 	class SENTINEL_DLL TriggerComponent : public GameComponent
 	{
+		DECLARE_SERIAL( TriggerComponent );
+
 		PhysicsComponent*	mPhysics;
 
 	public:

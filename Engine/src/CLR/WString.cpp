@@ -63,9 +63,9 @@ namespace Sentinel { namespace Utilities
 			Marshal::FreeHGlobal( System::IntPtr( str ));
 	}
 
-	const char* WString::Cast( System::String^ str )
+	std::string WString::Cast( System::String^ str )
 	{
-		return msclr::interop::marshal_as< std::string >(str).c_str();
+		return msclr::interop::marshal_as< std::string >(str);
 	}
 
 	System::String^ WString::Cast( const char* str )

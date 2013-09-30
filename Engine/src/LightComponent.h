@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Common.h"
 #include "ColorRGBA.h"
 #include "Vector4f.h"
 #include "TransformComponent.h"
@@ -9,6 +8,8 @@ namespace Sentinel
 {
 	class SENTINEL_DLL LightComponent : public GameComponent
 	{
+		DECLARE_SERIAL( LightComponent );
+
 		TransformComponent* mTransform;		// light must possess a position / direction
 
 	public:

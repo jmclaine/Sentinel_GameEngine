@@ -98,6 +98,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Engine\src\AIControllerComponent.h" />
+    <ClInclude Include="..\Engine\src\Archive.h" />
     <ClInclude Include="..\Engine\src\Buffer.h" />
     <ClInclude Include="..\Engine\src\CameraComponent.h" />
     <ClInclude Include="..\Engine\src\CDPI.h" />
@@ -106,7 +107,6 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
     <ClInclude Include="..\Engine\src\ControllerComponent.h" />
     <ClInclude Include="..\Engine\src\CriticalSection.h" />
     <ClInclude Include="..\Engine\src\DrawableComponent.h" />
-    <ClInclude Include="..\Engine\src\FileIO.h" />
     <ClInclude Include="..\Engine\src\FixedPoint.h" />
     <ClInclude Include="..\Engine\src\FloatCompressor.h" />
     <ClInclude Include="..\Engine\src\GameComponent.h" />
@@ -143,6 +143,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
     <ClInclude Include="..\Engine\src\Singleton.h" />
     <ClInclude Include="..\Engine\src\SpriteComponent.h" />
     <ClInclude Include="..\Engine\src\Texture.h" />
+    <ClInclude Include="..\Engine\src\TextureManager.h" />
     <ClInclude Include="..\Engine\src\Timing.h" />
     <ClInclude Include="..\Engine\src\TransformComponent.h" />
     <ClInclude Include="..\Engine\src\Util.h" />
@@ -154,12 +155,12 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
     <ClInclude Include="..\Sentinel_Test\Sentinel_Test\TriggerComponent.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Engine\src\Archive.cpp" />
     <ClCompile Include="..\Engine\src\Buffer.cpp" />
     <ClCompile Include="..\Engine\src\CameraComponent.cpp" />
     <ClCompile Include="..\Engine\src\ColorRGBA.cpp" />
     <ClCompile Include="..\Engine\src\ControllerComponent.cpp" />
     <ClCompile Include="..\Engine\src\DrawableComponent.cpp" />
-    <ClCompile Include="..\Engine\src\FileIO.cpp" />
     <ClCompile Include="..\Engine\src\GameComponent.cpp" />
     <ClCompile Include="..\Engine\src\GameObject.cpp" />
     <ClCompile Include="..\Engine\src\GameWorld.cpp" />
@@ -200,6 +201,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
     <ClCompile Include="..\Engine\src\SpriteComponent.cpp" />
     <ClCompile Include="..\Engine\src\stb_image.c" />
     <ClCompile Include="..\Engine\src\Texture.cpp" />
+    <ClCompile Include="..\Engine\src\TextureManager.cpp" />
     <ClCompile Include="..\Engine\src\Timing.cpp" />
     <ClCompile Include="..\Engine\src\TransformComponent.cpp" />
     <ClCompile Include="..\Engine\src\Util.cpp" />

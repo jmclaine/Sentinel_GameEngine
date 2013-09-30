@@ -116,7 +116,7 @@ namespace Sentinel
 	// Convert a string into an integer value.
 	// Only the first 16 characters will guarantee a unique ID.
 	//
-	int SENTINEL_DLL StringToID( const std::string& name );
+	int SENTINEL_DLL StringToID( const char* name );
 
 	////////////////////////////////////////////////////////////////////
 

@@ -3,6 +3,9 @@
 
 namespace Sentinel
 {
+	DEFINE_SERIAL_REGISTER( TriggerComponent );
+	DEFINE_SERIAL_CLONE( TriggerComponent );
+
 	TriggerComponent::TriggerComponent()
 	{
 		mType = GameComponent::TRIGGER;
@@ -28,4 +31,14 @@ namespace Sentinel
 	{
 		mPhysics = NULL;
 	}
+
+	/////////////////////////////////
+
+	void TriggerComponent::Save( Archive& archive )
+	{
+		mSerialRegistry.Save( archive );
+	}
+
+	void TriggerComponent::Load( Archive& archive )
+	{}
 }

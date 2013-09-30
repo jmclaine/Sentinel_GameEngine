@@ -57,6 +57,8 @@ namespace Sentinel_Editor
 		private const float			TRANSFORM_OBJECT_ALPHA = 0.75f;
 		private const float			TRANSFORM_OBJECT_SCALE = 0.0025f;
 
+		private String				mMapName;
+
 		
 		///
 		/// Starting Point of Application.
@@ -90,7 +92,7 @@ namespace Sentinel_Editor
 
 			// Initialize Renderer.
 			//
-			WWindowInfo info = WRenderer.Load( "config.xml" );
+			WWindowInfo info = WRenderer.Create( "config.xml" );
 			if( info == null )
 			{
 				MessageBox.Show( "Failed to load config.xml", "Application Failure" );
@@ -98,15 +100,17 @@ namespace Sentinel_Editor
 				System.Environment.Exit( 0 );
 			}
 
-			WGameWorld.Load( "Default.MAP" );
-			Window_Main.Title = "Sentinel Editor - Default.MAP";
-
 			mGameWindow = new GameWindow();
 			mGameWindow.Startup( "World", "WorldClass", info );
 			mGameWindow.SetCameraPosition( new WVector3f( 0, 25, 25 ));
 			mGameWindow.SetCameraRotation( new WVector3f( -45, 0, 0 ));
 			
 			Window_World.Child = mGameWindow;
+			
+			mMapName = "Default.MAP";
+			//WGameWorld.Load( "Default.MAP" );
+			Window_Main.Title = "Sentinel Editor - " + mMapName;
+
 			CompositionTarget.Rendering += Update;
 			
 			// Create editor materials.
@@ -140,16 +144,15 @@ namespace Sentinel_Editor
 			switch( result )
 			{
 				case MessageBoxResult.Yes:
-					MessageBox.Show( "Saving..." );
+					Save_Click( sender, null );
 					break;
 
 				case MessageBoxResult.No:
-					MessageBox.Show( "Not Saving..." );
 					break;
 
 				case MessageBoxResult.Cancel:
 					e.Cancel = true;
-					return;
+					break;
 			}
 		}
 
@@ -540,7 +543,7 @@ namespace Sentinel_Editor
 			System.Windows.Forms.OpenFileDialog dialog = new System.Windows.Forms.OpenFileDialog();
 
 			dialog.Title  = "Add Texture to Project";
-			dialog.Filter = "PNG (.png)|*.png|All Files (*.*)|*.*";
+			dialog.Filter = "PNG|*.png|All Files|*.*";
 			dialog.FilterIndex = 1;
 
 			//dialog.Multiselect = true;
@@ -554,7 +557,7 @@ namespace Sentinel_Editor
 			System.Windows.Forms.OpenFileDialog dialog = new System.Windows.Forms.OpenFileDialog();
 
 			dialog.Title  = "Add Shader to Project";
-			dialog.Filter = "Sentinel Model (.M3D)|*.M3D|Wavefront (.OBJ)|*.OBJ|All Files (*.*)|*.*";
+			dialog.Filter = "Sentinel Model|*.M3D|Wavefront|*.OBJ|All Files|*.*";
 			dialog.FilterIndex = 1;
 
 			if( dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK )
@@ -605,7 +608,7 @@ namespace Sentinel_Editor
 			////////////////////////////////////
 
 			mTexture = WRenderer.CreateTextureFromFile( "Assets\\Textures\\default-alpha.png" );
-			AddAsset( mTexture, Path.GetFileName( mTexture.Filename() ));
+			AddAsset( mTexture, Path.GetFileName( mTexture.Name() ));
 			
 			// Camera.
 			//
@@ -789,17 +792,39 @@ namespace Sentinel_Editor
 
 		private void Open_Click( Object sender, RoutedEventArgs e )
 		{
-			MessageBox.Show( "You clicked 'Open...'" );
+			System.Windows.Forms.OpenFileDialog dialog = new System.Windows.Forms.OpenFileDialog();
+
+			dialog.Title  = "Open Map";
+			dialog.Filter = "Sentinel Level|*.MAP|All Files|*.*";
+			dialog.FilterIndex = 1;
+
+			if( dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK )
+			{
+				mMapName = dialog.FileName;
+				Window_Main.Title = "Sentinel Editor - " + dialog.FileName;
+				WGameWorld.Load( mMapName );
+			}
 		}
 
 		private void Save_Click( Object sender, RoutedEventArgs e )
 		{
-			MessageBox.Show( "You clicked 'Save...'" );
+			WGameWorld.Save( mMapName );
 		}
 
 		private void SaveAs_Click( Object sender, RoutedEventArgs e )
 		{
-			MessageBox.Show( "You clicked 'Save As...'" );
+			System.Windows.Forms.SaveFileDialog dialog = new System.Windows.Forms.SaveFileDialog();
+
+			dialog.Title  = "Save Map";
+			dialog.Filter = "Sentinel Level|*.MAP|All Files|*.*";
+			dialog.FilterIndex = 1;
+
+			if( dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK )
+			{
+				mMapName = dialog.FileName;
+				Window_Main.Title = "Sentinel Editor - " + dialog.FileName;
+				WGameWorld.Save( mMapName );
+			}
 		}
 
 		private void Exit_Click( Object sender, RoutedEventArgs e )

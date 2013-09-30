@@ -1,12 +1,13 @@
 #pragma once
 
-#include "Common.h"
 #include "CameraComponent.h"
 
 namespace Sentinel
 {
 	class SENTINEL_DLL PerspectiveCameraComponent : public CameraComponent
 	{
+		DECLARE_SERIAL( PerspectiveCameraComponent );
+
 	private:
 
 		float			mNearZ;
@@ -15,12 +16,9 @@ namespace Sentinel
 
 		Vector3f		mLookAt;
 
-		//////////////////////////////
-
-		PerspectiveCameraComponent();
-
 	public:
 
+		PerspectiveCameraComponent();
 		PerspectiveCameraComponent( float windowWidth, float windowHeight, float nearZ = 0.1f, float farZ = 10000.0f, float FOV = 45.0f );
 
 		void			Startup();

@@ -3,7 +3,18 @@
 
 namespace Sentinel
 {
+	DEFINE_SERIAL_REGISTER( SpriteComponent );
+	DEFINE_SERIAL_CLONE( SpriteComponent );
+
+	SpriteComponent::SpriteComponent()
+	{}
+
 	SpriteComponent::SpriteComponent( Texture* texture, const POINT& spriteSize )
+	{
+		Set( texture, spriteSize );
+	}
+
+	void SpriteComponent::Set( Texture* texture, const POINT& spriteSize )
 	{
 		_ASSERT( mTexture );
 		_ASSERT( spriteSize.x > 0 && spriteSize.y > 0 );
@@ -72,4 +83,14 @@ namespace Sentinel
 	{
 		mFrame = frame;
 	}
+
+	///////////////////////////////////
+
+	void SpriteComponent::Save( Archive& archive )
+	{
+		mSerialRegistry.Save( archive );
+	}
+
+	void SpriteComponent::Load( Archive& archive )
+	{}
 }

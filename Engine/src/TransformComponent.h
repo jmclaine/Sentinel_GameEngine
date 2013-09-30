@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Common.h"
 #include "GameComponent.h"
 #include "Matrix4f.h"
 #include "Vector3f.h"
@@ -10,6 +9,8 @@ namespace Sentinel
 {
 	class SENTINEL_DLL TransformComponent : public GameComponent
 	{
+		DECLARE_SERIAL( TransformComponent );
+
 	private:
 
 		// Matrices to calculate the final world matrix

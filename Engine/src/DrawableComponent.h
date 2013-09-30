@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Common.h"
 #include "Util.h"
 #include "Material.h"
 #include "TransformComponent.h"

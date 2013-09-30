@@ -2,7 +2,18 @@
 
 namespace Sentinel
 {
+	DEFINE_SERIAL_REGISTER( ModelComponent );
+	DEFINE_SERIAL_CLONE( ModelComponent );
+
+	ModelComponent::ModelComponent()
+	{}
+
 	ModelComponent::ModelComponent( std::shared_ptr< Model > model )
+	{
+		Set( model );
+	}
+
+	void ModelComponent::Set( std::shared_ptr< Model > model )
 	{
 		mModel = model;
 
@@ -30,7 +41,7 @@ namespace Sentinel
 		mModel.reset();
 	}
 
-	/////////////////////////////
+	///////////////////////////////////
 
 	void ModelComponent::SetMaterial( const Material& material )
 	{
@@ -59,4 +70,14 @@ namespace Sentinel
 	{
 		return mMaterial.size();
 	}
+
+	///////////////////////////////////
+
+	void ModelComponent::Save( Archive& archive )
+	{
+		mSerialRegistry.Save( archive );
+	}
+
+	void ModelComponent::Load( Archive& archive )
+	{}
 }

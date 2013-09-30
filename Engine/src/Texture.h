@@ -8,14 +8,14 @@ namespace Sentinel
 	{
 	protected:
 
-		const char*		mFilename;
+		std::string		mName;
 		UINT			mWidth;
 		UINT			mHeight;
 		
 		//////////////////////////////
 
 		Texture();
-		Texture( const char* filename, UINT width, UINT height );
+		Texture( const char* name, UINT width, UINT height );
 
 	public:
 
@@ -23,7 +23,7 @@ namespace Sentinel
 
 		virtual void		Release();
 
-		const char*			Filename();
+		const std::string&	Name();
 		UINT				Width();
 		UINT				Height();
 	};

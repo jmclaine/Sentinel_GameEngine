@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Common.h"
 #include "Matrix4f.h"
 #include "TransformComponent.h"
 

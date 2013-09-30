@@ -125,7 +125,7 @@ namespace Sentinel { namespace Systems
 
 		//////////////////////////////
 
-		static WWindowInfo^	Load( String^ filename );
+		static WWindowInfo^	Create( String^ filename );
 
 		static void			Shutdown();
 

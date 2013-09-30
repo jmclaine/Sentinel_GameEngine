@@ -5,8 +5,8 @@ namespace Sentinel
 	Texture::Texture()
 	{}
 
-	Texture::Texture( const char* filename, UINT width, UINT height ) :
-		mFilename( filename ),
+	Texture::Texture( const char* name, UINT width, UINT height ) :
+		mName( name ),
 		mWidth( width ),
 		mHeight( height )
 	{}
@@ -19,9 +19,9 @@ namespace Sentinel
 	void Texture::Release()
 	{}
 
-	const char* Texture::Filename()
+	const std::string& Texture::Name()
 	{
-		return mFilename;
+		return mName;
 	}
 
 	UINT Texture::Width()

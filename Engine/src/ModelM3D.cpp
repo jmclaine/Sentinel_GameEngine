@@ -1,11 +1,11 @@
 #include <map>
 #include <vector>
 
-#include "FileIO.h"
 #include "Model.h"
 #include "Util.h"
 #include "MeshBuilder.h"
 #include "Timing.h"
+#include "Archive.h"
 
 namespace Sentinel
 {
@@ -71,22 +71,22 @@ namespace Sentinel
 
 	private:
 
-		void ReadMaterial( FILE* file, MaterialTexture& matTex )
+		void ReadMaterial( Archive& archive, MaterialTexture& matTex )
 		{
 			// Set the material.
 			//
 			Vector3f color;
-			FileIO::Read( file, color.Ptr(), 3 );
+			archive.Read( color.Ptr(), 3 );
 			ColorRGBA ambient( color.x, color.y, color.z );
 
-			FileIO::Read( file, color.Ptr(), 3 );
+			archive.Read( color.Ptr(), 3 );
 			ColorRGBA diffuse( color.x, color.y, color.z );
 
-			FileIO::Read( file, color.Ptr(), 3 );
+			archive.Read( color.Ptr(), 3 );
 			ColorRGBA specular( color.x, color.y, color.z );
 
 			float spec_comp;
-			FileIO::Read( file, spec_comp );
+			archive.Read( &spec_comp );
 			spec_comp *= 100.0f;
 
 			matTex.mMaterial = Material( ambient, diffuse, specular, spec_comp );
@@ -94,13 +94,13 @@ namespace Sentinel
 			// Read filenames of each texture.
 			//
 			int numTextures;
-			FileIO::Read( file, numTextures );
+			archive.Read( &numTextures );
 
 			char name[ 256 ];
 			for( int x = 0; x < numTextures; ++x )
 			{
 				int type;
-				FileIO::Read( file, type );
+				archive.Read( &type );
 
 				if( type == AUTODESK_BUMP )
 				{
@@ -117,8 +117,9 @@ namespace Sentinel
 				}
 
 				int len;
-				FileIO::Read( file, len );
-				FileIO::Read( file, name, len );
+				archive.Read( &len );
+				archive.Read( name, len );
+				name[ len ] = 0;
 
 				matTex.mTexture[ type ] = Renderer::Inst()->CreateTextureFromFile( name );
 			}
@@ -159,17 +160,19 @@ namespace Sentinel
 				if( !file )
 					throw AppException( "Failed to load " + std::string( filename ));
 
+				Archive archive( file );
+
 				// Read version.
 				//
 				int version;
-				FileIO::Read( file, version );
+				archive.Read( &version );
 
 				// Read the materials and create meshes.
 				//
-				FileIO::Read( file, mNumMaterials );
+				archive.Read( &mNumMaterials );
 				mMaterials = new MaterialTexture[ mNumMaterials ];
 				for( UINT x = 0; x < mNumMaterials; ++x )
-					ReadMaterial( file, mMaterials[ x ] );
+					ReadMaterial( archive, mMaterials[ x ] );
 				
 				// Read whether any data was exported using 32-bit.
 				//
@@ -180,7 +183,7 @@ namespace Sentinel
 				const BYTE INDEX_32 = 0x10;
 
 				BYTE export32;
-				FileIO::Read( file, export32 );
+				archive.Read( &export32 );
 
 				bool bVerts32 = (export32 & VERTS_32) ? true : false;
 				bool bNorms32 = (export32 & NORMS_32) ? true : false;
@@ -192,21 +195,21 @@ namespace Sentinel
 				// Read vertices.
 				//
 				int numVerts;
-				FileIO::Read( file, numVerts, bVerts32 );
+				archive.Read( &numVerts, 1, bVerts32 );
 				vertices = new Vertex[ numVerts ];
 
 				for( int x = 0; x < numVerts; ++x )
 				{
-					FileIO::Read( file, vertices[ x ].mPosition.Ptr(), 3 );
+					archive.Read( vertices[ x ].mPosition.Ptr(), 3 );
 
 					if( mIsWeighted )
 					{
-						FileIO::Read( file, vertices[ x ].mNumBones );
+						archive.Read( &vertices[ x ].mNumBones );
 
 						for( int y = 0; y < vertices[ x ].mNumBones; ++y )
 						{
-							FileIO::Read( file, vertices[ x ].mMatrixIndex[ y ] );
-							FileIO::Read( file, vertices[ x ].mWeight[ y ] );
+							archive.Read( &vertices[ x ].mMatrixIndex[ y ] );
+							archive.Read( &vertices[ x ].mWeight[ y ] );
 						}
 					}
 				}
@@ -214,28 +217,28 @@ namespace Sentinel
 				// Read normals.
 				//
 				int numNormals;
-				FileIO::Read( file, numNormals, bNorms32 );
+				archive.Read( &numNormals, 1, bNorms32 );
 				normals = new Vector3f[ numNormals ];
 
 				for( int x = 0; x < numNormals; ++x )
-					FileIO::Read( file, normals[ x ].Ptr(), 3 );
+					archive.Read( normals[ x ].Ptr(), 3 );
 
 				
 				// Read texture coordinates.
 				//
 				int numTexCoords;
-				FileIO::Read( file, numTexCoords, bTexcs32 );
+				archive.Read( &numTexCoords, 1, bTexcs32 );
 				texCoords = new Vector2f[ numTexCoords ];
 
 				for( int x = 0; x < numTexCoords; ++x )
 				{
-					FileIO::Read( file, texCoords[ x ].Ptr(), 2 );
+					archive.Read( texCoords[ x ].Ptr(), 2 );
 					texCoords[ x ].y = 1.0f - texCoords[ x ].y;
 				}
 
 				// Read fat indices.
 				//
-				FileIO::Read( file, mNumObjects );
+				archive.Read( &mNumObjects );
 				mObject = new Object[ mNumObjects ];
 				int currHierarchy = 0;
 
@@ -244,7 +247,7 @@ namespace Sentinel
 					// Read the hierarchy number.
 					//
 					int hierarchy;
-					FileIO::Read( file, hierarchy );
+					archive.Read( &hierarchy );
 
 					if( hierarchy > 0 )
 						mObject[ x ].mParent = &mObject[ currHierarchy + hierarchy - 1 ];
@@ -254,11 +257,11 @@ namespace Sentinel
 					// Read if this object is skinned.
 					//
 					BYTE isSkinned;
-					FileIO::Read( file, isSkinned );
+					archive.Read( &isSkinned );
 
 					// Read the keyframe animations.
 					//
-					FileIO::Read( file, mObject[ x ].mNumKeyFrames );
+					archive.Read( &mObject[ x ].mNumKeyFrames );
 					mObject[ x ].mKeyFrame = new KeyFrame[ mObject[ x ].mNumKeyFrames ];
 
 					for( UINT y = 0; y < mObject[ x ].mNumKeyFrames; ++y )
@@ -267,12 +270,11 @@ namespace Sentinel
 
 						// Read matrix.
 						//
-						//FileIO::Read( file, currKey->mMatrix );
-						FileIO::Read( file, currKey->mMatrix.Ptr(), 16 );
+						archive.Read( currKey->mMatrix.Ptr(), 16 );
 						
 						// Read frame timestamp.
 						//
-						FileIO::Read( file, currKey->mFrame );
+						archive.Read( &currKey->mFrame );
 					}
 
 					// Prepare keyframes for skinned animation if necessary.
@@ -282,7 +284,7 @@ namespace Sentinel
 					
 					// Read indices.
 					//
-					FileIO::Read( file, mObject[ x ].mNumMeshes );
+					archive.Read( &mObject[ x ].mNumMeshes );
 					mObject[ x ].mMesh = new Mesh*[ mObject[ x ].mNumMeshes ];
 
 					for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
@@ -302,7 +304,7 @@ namespace Sentinel
 						// Read the material ID for this object.
 						//
 						int matID;
-						FileIO::Read( file, matID );
+						archive.Read( &matID );
 
 						if( matID != -1 )
 						{
@@ -358,18 +360,18 @@ namespace Sentinel
 						MeshBuilder::Vertex meshVertex;
 
 						int count;
-						FileIO::Read( file, count, bIndex32 );
+						archive.Read( &count, 1, bIndex32 );
 
 						for( int z = 0; z < count; ++z )
 						{
 							int vertex;
-							FileIO::Read( file, vertex, bVerts32 );
+							archive.Read( &vertex, 1, bVerts32 );
 
 							int normal;
-							FileIO::Read( file, normal, bNorms32 );
+							archive.Read( &normal, 1, bNorms32 );
 
 							int texCoord;
-							FileIO::Read( file, texCoord, bTexcs32 );
+							archive.Read( &texCoord, 1, bTexcs32 );
 
 							meshVertex.mPosition = vertices[ vertex ].mPosition;
 
@@ -517,7 +519,7 @@ namespace Sentinel
 
 					// Set the B designation first to ensure this works correctly.
 					//
-					SHADER_SKINNING->SetMatrix( SHADER_SKINNING->UniformDecl().find( 'B' ), matBone.Ptr(), x, 1 );
+					SHADER_SKINNING->SetMatrix( SHADER_SKINNING->Uniform().find( 'B' ), matBone.Ptr(), x, 1 );
 				}
 			}
 

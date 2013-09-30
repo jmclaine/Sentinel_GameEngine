@@ -51,6 +51,7 @@ namespace Sentinel_Editor
 			
 			mObject.Startup();
 
+			WGameWorld.Create();
 			WGameWorld.SetCamera( mCamera );
 		}
 
@@ -116,9 +117,7 @@ namespace Sentinel_Editor
 		/// Window for the World View 
 		///
 		protected override void OnLeftMouseDown()
-		{
-
-		}
+		{}
 
 		protected override void OnRightMouseDown()
 		{}

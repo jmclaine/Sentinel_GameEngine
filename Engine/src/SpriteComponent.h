@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Common.h"
 #include "Texture.h"
 #include "Util.h"
 #include "ParticleSystem.h"
@@ -12,24 +11,30 @@ namespace Sentinel
 	{
 		friend class ParticleSystem;
 
+		DECLARE_SERIAL( SpriteComponent );
+
 	private:
 
 		TransformComponent*		mTransform;
 
 		/////////////////////////////////
 		
-		Texture*				mTexture;
 		POINT					mSpriteSize;
 		POINT					mSpriteDimension;
 
 		UINT					mNumFrames;
+
+		Texture*				mTexture;
 
 		ColorRGBA				mColor;
 		UINT					mFrame;
 
 	public:
 
+		SpriteComponent();
 		SpriteComponent( Texture* texture, const POINT& spriteSize );
+
+		void	Set( Texture* texture, const POINT& spriteSize );
 
 		void	Startup();
 

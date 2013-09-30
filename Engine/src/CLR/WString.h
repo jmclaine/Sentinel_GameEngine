@@ -40,7 +40,7 @@ namespace Sentinel { namespace Utilities
 		static const char* Alloc( System::String^ str );
 		static void Free( char* str );
 
-		static const char* Cast( System::String^ str );
+		static std::string Cast( System::String^ str );
 		static System::String^ Cast( const char* str );
 	};
 }}
