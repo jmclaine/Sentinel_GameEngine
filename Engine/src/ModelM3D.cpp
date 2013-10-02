@@ -88,11 +88,11 @@ namespace Sentinel
 
 			// Read filenames of each texture.
 			//
-			int numTextures;
+			UINT numTextures;
 			archive.Read( &numTextures );
 
 			char name[ 256 ];
-			for( int x = 0; x < numTextures; ++x )
+			for( UINT x = 0; x < numTextures; ++x )
 			{
 				int type;
 				archive.Read( &type );
@@ -111,13 +111,12 @@ namespace Sentinel
 					type = TEXTURE_DIFFUSE;
 				}
 
-				int len;
+				UINT len;
 				archive.Read( &len );
 				archive.Read( name, len );
 				name[ len ] = 0;
 
-				//matTex.mTexture[ type ] = TextureManager::Inst()->Add( name, Renderer::Inst()->CreateTextureFromFile( name ));
-				matTex.mTexture[ type ] = Renderer::Inst()->CreateTextureFromFile( name );
+				matTex.mTexture[ type ] = TextureManager::Inst()->Add( name, Renderer::Inst()->CreateTextureFromFile( name ));
 			}
 		}
 

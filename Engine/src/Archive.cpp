@@ -16,7 +16,7 @@ namespace Sentinel
 
 #define READ_DATA( var, type, len )\
 	if( fread( var, sizeof( type ), len, mFile ) != len )\
-		throw std::exception( "Failed to read from mFile." );
+		throw std::exception( "Failed to read from file." );
 
 	void Archive::Read( char* data, unsigned int length )
 	{
@@ -83,16 +83,16 @@ namespace Sentinel
 
 #define WRITE_DATA( var, type, len )\
 	if( fwrite( var, sizeof( type ), len, mFile ) != len )\
-		throw std::exception( "Failed to write to mFile." );
+		throw std::exception( "Failed to write to file." );
 
 	void Archive::Write( const char* data, unsigned int length )
 	{
-		WRITE_DATA( data, sizeof( char ), length );
+		WRITE_DATA( data, char, length );
 	}
 
 	void Archive::Write( const unsigned char* data,	unsigned int length )
 	{
-		WRITE_DATA( data, sizeof( unsigned char ), length );
+		WRITE_DATA( data, unsigned char, length );
 	}
 
 	void Archive::Write( const int* data, unsigned int length, bool is32bit )

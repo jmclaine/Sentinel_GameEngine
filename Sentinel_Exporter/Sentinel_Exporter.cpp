@@ -1,13 +1,11 @@
 #include "stdafx.h"
 #include "Sentinel_Exporter.h"
-#include "FileIO.h"
 
 ///////////////////////////////
 
 MaxExporter::MaxExporter() :
 	mGameScene( 0 ),
-	mIsWeighted( 0 ),
-	mFile( 0 )
+	mIsWeighted( 0 )
 {}
 
 MaxExporter::~MaxExporter()
@@ -24,12 +22,6 @@ void MaxExporter::deinit()
 	// cause the editor to crash or not display
 	// the export file format.
 	//
-	if( mFile )
-	{
-		fclose( mFile );
-		mFile = 0;
-	}
-	
 	if( mGameScene != 0 )
 	{
 		mGameScene->ReleaseIGame();
@@ -37,51 +29,51 @@ void MaxExporter::deinit()
 	}
 }
 
-void MaxExporter::WriteFloat( IGameProperty* prop )
+void MaxExporter::WriteFloat( Archive& archive, IGameProperty* prop )
 {
 	float value = 0.0f;
 
 	if( prop != NULL )
 		prop->GetPropertyValue( value );
 	
-	FileIO::Write( mFile, value );
+	archive.Write( &value );
 }
 
-void MaxExporter::WritePoint3( IGameProperty* prop, bool is32bit  )
+void MaxExporter::WritePoint3( Archive& archive, IGameProperty* prop, bool is32bit  )
 {
 	Point3 point;
 
 	if( prop != NULL )
 		prop->GetPropertyValue( point );
 	
-	WritePoint3( point );
+	WritePoint3( archive, point );
 }
 
-void MaxExporter::WritePoint2( const Point2& point, bool is32bit )
+void MaxExporter::WritePoint2( Archive& archive, const Point2& point, bool is32bit )
 {
-	FileIO::Write( mFile, const_cast< const float* >(&point.x), 2, is32bit );
+	archive.Write( const_cast< const float* >(&point.x), 2, is32bit );
 }
 
-void MaxExporter::WritePoint3( const Point3& point, bool is32bit )
+void MaxExporter::WritePoint3( Archive& archive, const Point3& point, bool is32bit )
 {
-	FileIO::Write( mFile, const_cast< const float* >(&point.x), 3, is32bit );
+	archive.Write( const_cast< const float* >(&point.x), 3, is32bit );
 }
 
-void MaxExporter::WriteFatIndex( FatIndex& index, bool is32bit )
+void MaxExporter::WriteFatIndex( Archive& archive, FatIndex& index, bool is32bit )
 {
-	FileIO::Write( mFile, index.mVertex,   is32bit );
-	FileIO::Write( mFile, index.mNormal,   is32bit );
-	FileIO::Write( mFile, index.mTexCoord, is32bit );
+	archive.Write( &index.mVertex,   is32bit );
+	archive.Write( &index.mNormal,   is32bit );
+	archive.Write( &index.mTexCoord, is32bit );
 }
 
-void MaxExporter::WriteMatrix( GMatrix& mat )
+void MaxExporter::WriteMatrix( Archive& archive, GMatrix& mat )
 {
 	for( int z = 0; z < 4; ++z )
 		for( int w = 0; w < 4; ++w )
-			FileIO::Write( mFile, mat[ z ][ w ] );
+			archive.Write( &mat[ z ][ w ] );
 }
 
-void MaxExporter::WriteMaterial( IGameMaterial* material )
+void MaxExporter::WriteMaterial( Archive& archive, IGameMaterial* material )
 {
 	if( material->IsEntitySupported() )
 	{
@@ -91,51 +83,57 @@ void MaxExporter::WriteMaterial( IGameMaterial* material )
 		//
 		prop = material->GetAmbientData();
 		if( prop != NULL )
-			WritePoint3( prop );
+			WritePoint3( archive, prop );
 		else
-			WritePoint3( Point3( 0.2f, 0.2f, 0.2f ));
+			WritePoint3( archive, Point3( 0.2f, 0.2f, 0.2f ));
 		
 		// Diffuse.
 		//
 		prop = material->GetDiffuseData();
 		if( prop != NULL )
-			WritePoint3( prop );
+			WritePoint3( archive, prop );
 		else
-			WritePoint3( Point3( 0.6f, 0.6f, 0.6f ));
+			WritePoint3( archive, Point3( 0.6f, 0.6f, 0.6f ));
 		
 		// Specular.
 		//
 		prop = material->GetSpecularData();
 		if( prop != NULL )
-			WritePoint3( prop );
+			WritePoint3( archive, prop );
 		else
-			WritePoint3( Point3( 0.2f, 0.2f, 0.2f ));
+			WritePoint3( archive, Point3( 0.2f, 0.2f, 0.2f ));
 		
 		// Specular Component.
 		//
 		prop = material->GetSpecularLevelData();
 		if( prop != NULL )
-			WriteFloat( prop );
+		{
+			WriteFloat( archive, prop );
+		}
 		else
-			FileIO::Write( mFile, 8.0f );
+		{
+			float spec_comp = 8.0f;
+			archive.Write( &spec_comp );
+		}
 	}
 	else
 	{
 		// Ambient.
 		//
-		WritePoint3( Point3( 0.2f, 0.2f, 0.2f ));
+		WritePoint3( archive, Point3( 0.2f, 0.2f, 0.2f ));
 		
 		// Diffuse.
 		//
-		WritePoint3( Point3( 0.6f, 0.6f, 0.6f ));
+		WritePoint3( archive, Point3( 0.6f, 0.6f, 0.6f ));
 		
 		// Specular.
 		//
-		WritePoint3( Point3( 0.2f, 0.2f, 0.2f ));
+		WritePoint3( archive, Point3( 0.2f, 0.2f, 0.2f ));
 		
 		// Specular Component.
 		//
-		FileIO::Write( mFile, 8.0f );
+		float spec_comp = 8.0f;
+		archive.Write( &spec_comp );
 	}
 			
 	// Textures.
@@ -243,33 +241,35 @@ void MaxExporter::WriteMaterial( IGameMaterial* material )
 
 	// Output filenames if they exist.
 	//
-	int count = (int)texNames.size();
-	FileIO::Write( mFile, count );
+	UINT count = (UINT)texNames.size();
+	archive.Write( &count );
 	
-	for( int x = 0; x < count; ++x )
+	for( UINT x = 0; x < count; ++x )
 	{
-		int len = (int)texNames[ x ].mFilename.size();
+		UINT len = (UINT)texNames[ x ].mFilename.size();
 
-		FileIO::Write( mFile, texNames[ x ].mType );
-		FileIO::Write( mFile, len );
-		FileIO::Write( mFile, texNames[ x ].mFilename.c_str(), len );
+		archive.Write( &texNames[ x ].mType );
+		archive.Write( &len );
+		archive.Write( texNames[ x ].mFilename.c_str(), len );
 	}
 }
 
 int MaxExporter::DoExport( const TCHAR* name, ExpInterface* ei, Interface* i, BOOL suppressprompts, DWORD options )
 {
+	// Open file for writing.
+	//
+	FILE* file = fopen( name, "wb+" );
+
 	try
 	{
-		// Export only selected mObject.
+		if( !file )
+			throw std::exception( "Failed to open file for writing" );
+
+		Archive archive( file );
+
+		// Export selected object only.
 		//
 		const bool exportselected = 0 != (options & SCENE_EXPORT_SELECTED);
-
-		// Open file for writing.
-		//
-		mFile = fopen( name, "wb+" );
-		
-		if( !mFile )
-			throw std::exception( "Failed to open file for writing" );
 		
 		// Initialize IGame.
 		//
@@ -286,7 +286,7 @@ int MaxExporter::DoExport( const TCHAR* name, ExpInterface* ei, Interface* i, BO
 		// Write version.
 		//
 		int version = (int)Version();
-		FileIO::Write( mFile, version );
+		archive.Write( &version );
 		
 		// Get the materials.
 		//
@@ -323,10 +323,10 @@ int MaxExporter::DoExport( const TCHAR* name, ExpInterface* ei, Interface* i, BO
 		//
 		numMaterials = (int)mMaterial.size();
 		
-		FileIO::Write( mFile, numMaterials );
+		archive.Write( &numMaterials );
 		
 		for( int x = 0; x < numMaterials; ++x )
-			WriteMaterial( mMaterial[ x ] );
+			WriteMaterial( archive, mMaterial[ x ] );
 		
 		// Get the number of parent nodes.
 		//
@@ -445,25 +445,25 @@ int MaxExporter::DoExport( const TCHAR* name, ExpInterface* ei, Interface* i, BO
 			}
 		}
 
-		FileIO::Write( mFile, export32 );
+		archive.Write( &export32 );
 
 		// Write vertices.
 		//
-		FileIO::Write( mFile, count, bVerts32 );
+		archive.Write( &count, 1, bVerts32 );
 
 		for( int x = 0; x < count; ++x )
 		{
-			WritePoint3( mVertex[ x ].mPosition );
+			WritePoint3( archive, mVertex[ x ].mPosition );
 			
 			if( mIsWeighted )
 			{
 				BYTE wCount = (BYTE)mVertex[ x ].mNumBones;
-				FileIO::Write( mFile, wCount );
+				archive.Write( &wCount );
 
 				for( int y = 0; y < (int)wCount; ++y )
 				{
-					FileIO::Write( mFile, mVertex[ x ].mWeight[ y ].mBone );
-					FileIO::Write( mFile, mVertex[ x ].mWeight[ y ].mAmount );
+					archive.Write( &mVertex[ x ].mWeight[ y ].mBone );
+					archive.Write( &mVertex[ x ].mWeight[ y ].mAmount );
 				}
 			}
 		}
@@ -471,68 +471,68 @@ int MaxExporter::DoExport( const TCHAR* name, ExpInterface* ei, Interface* i, BO
 		// Write normals.
 		//
 		count = (int)mNormal.size();
-		FileIO::Write( mFile, count, bNorms32 );
+		archive.Write( &count, 1, bNorms32 );
 
 		for( int x = 0; x < count; ++x )
-			WritePoint3( mNormal[ x ] );
+			WritePoint3( archive, mNormal[ x ] );
 
 		// Write texture coordinates.
 		//
 		count = (int)mTexCoord.size();
-		FileIO::Write( mFile, count, bTexcs32 );
+		archive.Write( &count, 1, bTexcs32 );
 
 		for( int x = 0; x < count; ++x )
-			WritePoint2( mTexCoord[ x ] );
+			WritePoint2( archive, mTexCoord[ x ] );
 		
 		// Write fat indices, and keyframe animation.
 		//
 		numObjects = (int)mObject.size();
-		FileIO::Write( mFile, numObjects );
+		archive.Write( &numObjects );
 
 		for( int x = 0; x < numObjects; ++x )
 		{
 			// Hierarchy.
 			//
-			FileIO::Write( mFile, mObject[ x ].mHierarchy );
+			archive.Write( &mObject[ x ].mHierarchy );
 
 			// Skinned Object?
 			//
-			FileIO::Write( mFile, mObject[ x ].mIsSkinned );
+			archive.Write( &mObject[ x ].mIsSkinned );
 
 			// KeyFrames.
 			//
 			int numKeyFrames = (int)mObject[ x ].mKeyFrame.size();
-			FileIO::Write( mFile, numKeyFrames );
+			archive.Write( &numKeyFrames );
 
 			for( int y = 0; y < numKeyFrames; ++y )
 			{
 				// Export matrix.
 				//
-				WriteMatrix( mObject[ x ].mKeyFrame[ y ].mMatrixWorld );
+				WriteMatrix( archive, mObject[ x ].mKeyFrame[ y ].mMatrixWorld );
 
 				// Export timestamp.
 				//
-				FileIO::Write( mFile, mObject[ x ].mKeyFrame[ y ].mFrame );
+				archive.Write( &mObject[ x ].mKeyFrame[ y ].mFrame );
 			}
 
 			// Write fat indices.
 			//
 			int numFatIndices = (int)mObject[ x ].mFatIndex.size();
-			FileIO::Write( mFile, numFatIndices );
+			archive.Write( &numFatIndices );
 
 			for( int y = 0; y < numFatIndices; ++y )
 			{
 				int count = (int)mObject[ x ].mFatIndex[ y ].size();
 
-				FileIO::Write( mFile, mObject[ x ].mMaterialID[ y ] );
+				archive.Write( &mObject[ x ].mMaterialID[ y ] );
 
-				FileIO::Write( mFile, count, bIndex32 );
+				archive.Write( &count, 1, bIndex32 );
 
 				for( int z = 0; z < count; ++z )
 				{
-					FileIO::Write( mFile, mObject[ x ].mFatIndex[ y ][ z ].mVertex,   bVerts32 );
-					FileIO::Write( mFile, mObject[ x ].mFatIndex[ y ][ z ].mNormal,   bNorms32 );
-					FileIO::Write( mFile, mObject[ x ].mFatIndex[ y ][ z ].mTexCoord, bTexcs32 );
+					archive.Write( &mObject[ x ].mFatIndex[ y ][ z ].mVertex,   1, bVerts32 );
+					archive.Write( &mObject[ x ].mFatIndex[ y ][ z ].mNormal,   1, bNorms32 );
+					archive.Write( &mObject[ x ].mFatIndex[ y ][ z ].mTexCoord, 1, bTexcs32 );
 				}
 			}
 		}
@@ -543,6 +543,7 @@ int MaxExporter::DoExport( const TCHAR* name, ExpInterface* ei, Interface* i, BO
 		MessageBox( i->GetMAXHWnd(), tstr, _T( "Export Error" ), MB_OK | MB_ICONERROR );
 	}
 
+	fclose( file );
 	deinit();
 
 	return TRUE;

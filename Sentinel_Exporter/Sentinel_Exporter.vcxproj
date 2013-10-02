@@ -138,14 +138,14 @@ xcopy "$(OutDir)$(TargetName)$(TargetExt)" "$(ADSK_3DSMAX_x64_2012)plugins\" /D 
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Engine\src\FileIO.cpp" />
+    <ClCompile Include="..\Engine\src\Archive.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Sentinel_Exporter.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Engine\src\Archive.h" />
     <ClInclude Include="..\Engine\src\Common.h" />
-    <ClInclude Include="..\Engine\src\FileIO.h" />
     <ClInclude Include="..\Engine\src\FloatCompressor.h" />
     <ClInclude Include="Sentinel_Exporter.h" />
     <ClInclude Include="stdafx.h" />

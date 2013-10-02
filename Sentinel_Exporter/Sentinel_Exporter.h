@@ -5,6 +5,7 @@ Supports keyframes and skinning animations.
 #include <stdio.h>
 
 #include "FloatCompressor.h"
+#include "Archive.h"
 
 using namespace Sentinel;
 
@@ -76,8 +77,7 @@ public:
 private:
 
 	IGameScene*		mGameScene;
-	FILE*			mFile;
-
+	
 	// Store object data for future writing.
 	//
 	struct Weight
@@ -170,16 +170,16 @@ private:
 	MaxExporter( const MaxExporter& );
 	MaxExporter& operator = ( const MaxExporter& );
 
-	void WriteFloat( IGameProperty* prop );
-	void WritePoint3( IGameProperty* prop, bool is32bit = false );
+	void WriteFloat( Archive& archive, IGameProperty* prop );
+	void WritePoint3( Archive& archive, IGameProperty* prop, bool is32bit = false );
 
-	void WritePoint2( const Point2& point, bool is32bit = false );
-	void WritePoint3( const Point3& point, bool is32bit = false );
+	void WritePoint2( Archive& archive, const Point2& point, bool is32bit = false );
+	void WritePoint3( Archive& archive, const Point3& point, bool is32bit = false );
 	
-	void WriteFatIndex( FatIndex& index, bool is32bit = false );
-	void WriteMatrix( GMatrix& mat );
+	void WriteFatIndex( Archive& archive, FatIndex& index, bool is32bit = false );
+	void WriteMatrix( Archive& archive, GMatrix& mat );
 
-	void WriteMaterial( IGameMaterial* material );
+	void WriteMaterial( Archive& archive, IGameMaterial* material );
 
 	// Find an object within a vector.
 	//

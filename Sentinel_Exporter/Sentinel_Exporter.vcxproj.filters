@@ -27,7 +27,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\FileIO.cpp">
+    <ClCompile Include="..\Engine\src\Archive.cpp">
       <Filter>Sentinel</Filter>
     </ClCompile>
   </ItemGroup>
@@ -47,7 +47,7 @@
     <ClInclude Include="..\Engine\src\Common.h">
       <Filter>Sentinel</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\FileIO.h">
+    <ClInclude Include="..\Engine\src\Archive.h">
       <Filter>Sentinel</Filter>
     </ClInclude>
   </ItemGroup>
