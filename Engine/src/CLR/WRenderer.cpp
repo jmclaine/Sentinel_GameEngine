@@ -59,12 +59,12 @@ namespace Sentinel { namespace Systems
 
 	WTexture^ WRenderer::NullTexture()
 	{
-		return gcnew RPTexture( Renderer::Inst()->NULL_TEXTURE );
+		return gcnew WTexture( std::shared_ptr< Texture >( Renderer::Inst()->NULL_TEXTURE ));
 	}
 
 	WTexture^ WRenderer::BaseTexture()
 	{
-		return gcnew RPTexture( Renderer::Inst()->BASE_TEXTURE );
+		return gcnew WTexture( std::shared_ptr< Texture >( Renderer::Inst()->BASE_TEXTURE ));
 	}
 
 	WWindowInfo^ WRenderer::Create( String^ filename )
@@ -126,17 +126,17 @@ namespace Sentinel { namespace Systems
 	//
 	WTexture^ WRenderer::CreateTexture( UINT width, UINT height, ImageFormatType format, bool createMips )
 	{
-		return gcnew WTexture( Renderer::Inst()->CreateTexture( width, height, (Sentinel::ImageFormatType)format, createMips ));
+		return gcnew WTexture( std::shared_ptr< Texture >( Renderer::Inst()->CreateTexture( width, height, (Sentinel::ImageFormatType)format, createMips )));
 	}
 
 	WTexture^ WRenderer::CreateTextureFromFile( String^ filename )
 	{
-		return gcnew WTexture( Renderer::Inst()->CreateTextureFromFile( WString::Alloc( filename )));
+		return gcnew WTexture( std::shared_ptr< Texture >( Renderer::Inst()->CreateTextureFromFile( WString::Alloc( filename ))));
 	}
 
 	WTexture^ WRenderer::CreateTextureFromMemory( IntPtr data, UINT width, UINT height, ImageFormatType format, bool createMips )
 	{
-		return gcnew WTexture( Renderer::Inst()->CreateTextureFromMemory( data.ToPointer(), width, height, (Sentinel::ImageFormatType)format, createMips ));
+		return gcnew WTexture( std::shared_ptr< Texture >( Renderer::Inst()->CreateTextureFromMemory( data.ToPointer(), width, height, (Sentinel::ImageFormatType)format, createMips )));
 	}
 	
 	// Special Rendering.
@@ -148,7 +148,7 @@ namespace Sentinel { namespace Systems
 
 	UINT WRenderer::CreateRenderTarget( WTexture^ texture )
 	{
-		return Renderer::Inst()->CreateRenderTarget( texture->GetRef() );
+		return Renderer::Inst()->CreateRenderTarget( texture );
 	}
 
 	UINT WRenderer::CreateDepthStencil( UINT width, UINT height )
@@ -205,14 +205,14 @@ namespace Sentinel { namespace Systems
 	//
 	WShader^ WRenderer::CreateShader( String^ filename, String^ attrib, String^ uniform )
 	{
-		Shader* shader = Renderer::Inst()->CreateShader( msclr::interop::marshal_as< std::string >(filename).c_str(), msclr::interop::marshal_as< std::string >(attrib).c_str(), msclr::interop::marshal_as< std::string >(uniform).c_str() );
+		std::shared_ptr< Shader > shader = std::shared_ptr< Shader >( Renderer::Inst()->CreateShader( WString::Cast( filename ).c_str(), WString::Cast( attrib ).c_str(), WString::Cast( uniform ).c_str() ));
 
 		return (shader) ? gcnew WShader( shader ) : nullptr;
 	}
 
 	void WRenderer::SetShader( WShader^ shader )
 	{
-		Renderer::Inst()->SetShader( shader->GetRef() );
+		Renderer::Inst()->SetShader( shader );
 	}
 
 	// Rendering.

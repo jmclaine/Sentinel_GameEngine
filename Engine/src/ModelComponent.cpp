@@ -13,6 +13,9 @@ namespace Sentinel
 		Set( model );
 	}
 
+	ModelComponent::~ModelComponent()
+	{}
+
 	void ModelComponent::Set( std::shared_ptr< Model > model )
 	{
 		mModel = model;
@@ -37,9 +40,7 @@ namespace Sentinel
 	}
 
 	void ModelComponent::Shutdown()
-	{
-		mModel.reset();
-	}
+	{}
 
 	///////////////////////////////////
 

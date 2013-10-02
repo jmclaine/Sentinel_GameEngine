@@ -42,5 +42,6 @@ namespace Sentinel { namespace Utilities
 
 		static std::string Cast( System::String^ str );
 		static System::String^ Cast( const char* str );
+		static System::String^ Cast( const std::string& str );
 	};
 }}

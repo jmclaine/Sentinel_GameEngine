@@ -2,21 +2,11 @@
 
 namespace Sentinel { namespace Assets
 {
-	DEFINE_REF( Shader );
+	DEFINE_REF_SHARED( Shader );
 
-	WShader::WShader()
-	{
-		mRef = NULL;
-	}
-
-	WShader::WShader( Shader* shader )
-	{
-		mRef = shader;
-	}
+	DEFINE_OP_SHARED( Shader );
 
 	////////////////////////////////
-
-	DEFINE_OP_PTR( Shader );
 
 	System::String^	WShader::Attribute()
 	{
@@ -75,11 +65,10 @@ namespace Sentinel { namespace Assets
 
 	void WShader::SetTexture( UINT uniform, WTexture^ texture )
 	{
-		mRef->SetTexture( uniform, texture->GetRef() );
+		mRef->SetTexture( uniform, texture->GetRef().get() );
 	}
 
 	////////////////////////////////
 
-	DEFINE_CLASS_REF( Shader );
-	DEFINE_CLASS_REF_PTR( Shader );
+	DEFINE_CLASS_REF_SHARED( Shader );
 }}

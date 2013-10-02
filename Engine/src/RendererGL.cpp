@@ -100,12 +100,12 @@ namespace Sentinel
 
 	public:
 
-		TextureGL( const char* name, UINT width, UINT height )
+		TextureGL( const char* name, UINT width, UINT height, GLuint id )
 		{
 			mName	= name;
 			mWidth	= width;
 			mHeight	= height;
-			mID		= 0;
+			mID		= id;
 		}
 
 		GLuint ID()
@@ -560,13 +560,13 @@ namespace Sentinel
 		{
 		public:
 
-			Texture*	mTexture;
+			std::shared_ptr< Texture >	mTexture;
 			GLuint		mID;
 			
-			RenderTarget( Texture* texture, GLuint id )
+			RenderTarget( const std::shared_ptr< Texture >& texture, GLuint id )
 			{
 				mTexture = texture;
-				mID = id;
+				mID		 = id;
 			}
 		};
 
@@ -622,10 +622,7 @@ namespace Sentinel
 		}
 
 		RendererGL::~RendererGL()
-		{
-			SAFE_DELETE( NULL_TEXTURE );
-			SAFE_DELETE( BASE_TEXTURE );
-		}
+		{}
 		
 		WindowInfo* Startup( void* hWnd, bool fullscreen, UINT width, UINT height )
 		{
@@ -694,9 +691,7 @@ namespace Sentinel
 			// Create NULL_TEXTURE.
 			//
 			if( !NULL_TEXTURE )
-			{
-				NULL_TEXTURE = new TextureGL( "", 0, 0 );
-			}
+				NULL_TEXTURE = std::shared_ptr< Texture >( new TextureGL( "", 0, 0, 0 ));
 
 			// Create initial white texture as BASE_TEXTURE.
 			//
@@ -803,7 +798,7 @@ namespace Sentinel
 
 		// Textures.
 		//
-		Texture* CreateTextureFromFile( const char* filename )
+		std::shared_ptr< Texture > CreateTextureFromFile( const char* filename )
 		{
 			// TODO: Check for compatible texture size.
 
@@ -823,16 +818,16 @@ namespace Sentinel
 				return NULL;
 			}
 
-			TextureGL* texture = static_cast< TextureGL* >(CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA ));
+			std::shared_ptr< Texture > texture = CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA );
 
-			texture->mName = filename;
+			static_cast< TextureGL* >(texture.get())->mName = filename;
 
 			stbi_image_free( pixels );
 
 			return texture;
 		}
 
-		Texture* CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormatType format, bool createMips = true )
+		std::shared_ptr< Texture > CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormatType format, bool createMips = true )
 		{
 			UINT texID;
 			glGenTextures( 1, &texID );
@@ -860,10 +855,7 @@ namespace Sentinel
 			if( createMips )
 				glGenerateMipmap( GL_TEXTURE_2D );
 			
-			TextureGL* texture = new TextureGL( "~Memory~", width, height );
-			texture->mID = texID;
-
-			return texture;
+			return std::shared_ptr< Texture >( new TextureGL( "~Memory~", width, height, texID ));
 		}
 
 		// Special Rendering.
@@ -874,7 +866,7 @@ namespace Sentinel
 			return mRenderTarget.size()-1;
 		}
 
-		UINT CreateRenderTarget( Texture* texture )
+		UINT CreateRenderTarget( const std::shared_ptr< Texture >& texture )
 		{
 			UINT renderID = mRenderTarget.size();
 
@@ -882,7 +874,7 @@ namespace Sentinel
 			
 			glGenFramebuffers( 1, &mRenderTarget.back().mID );
 			glBindFramebuffer( GL_DRAW_FRAMEBUFFER, mRenderTarget.back().mID );
-			glFramebufferTexture( GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, static_cast< TextureGL* >(texture)->mID, 0 );
+			glFramebufferTexture( GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, static_cast< TextureGL* >(texture.get())->mID, 0 );
 			
 			if( glCheckFramebufferStatus( GL_FRAMEBUFFER ) != GL_FRAMEBUFFER_COMPLETE )
 				REPORT_ERROR( "Failed to create Render Target #" << renderID, "OpenGL Render Target" );
@@ -918,7 +910,7 @@ namespace Sentinel
 			_ASSERT( mCurrShader );
 			_ASSERT( mCurrWindow );
 
-			static_cast< ShaderGL* >(mCurrShader)->ApplyLayout( mCurrVBO->Stride() );
+			static_cast< ShaderGL* >(mCurrShader.get())->ApplyLayout( mCurrVBO->Stride() );
 			mCurrWindow->mRenderMode = type;
 		}
 
@@ -993,7 +985,7 @@ namespace Sentinel
 		
 		// Shaders.
 		//
-		Shader* CreateShader( const char* filename, const char* attrib, const char* uniform )
+		std::shared_ptr< Shader > CreateShader( const char* filename, const char* attrib, const char* uniform )
 		{
 			ShaderGL* shader = new ShaderGL();
 
@@ -1003,10 +995,10 @@ namespace Sentinel
 				return NULL;
 			}
 
-			return shader;
+			return std::shared_ptr< Shader >( shader );
 		}
 
-		void SetShader( Shader* shader )
+		void SetShader( const std::shared_ptr< Shader >& shader )
 		{
 			mCurrShader = shader;
 			mCurrShader->ApplyPass();
@@ -1025,13 +1017,13 @@ namespace Sentinel
 		{
 			_ASSERT( mCurrShader != NULL );
 
-			for( UINT i = 0; i < static_cast< ShaderGL* >(mCurrShader)->AttributeSize(); ++i )
+			for( UINT i = 0; i < static_cast< ShaderGL* >(mCurrShader.get())->AttributeSize(); ++i )
 				glEnableVertexAttribArray( i );
 			
 			glDrawRangeElementsBaseVertex( PRIMITIVE[ mCurrWindow->mRenderMode ], startIndex, startIndex + count, count, GL_UNSIGNED_INT, \
 										   reinterpret_cast< void* >( startIndex * sizeof( UINT )), baseVertex );
 			
-			for( UINT i = 0; i < static_cast< ShaderGL* >(mCurrShader)->AttributeSize(); ++i )
+			for( UINT i = 0; i < static_cast< ShaderGL* >(mCurrShader.get())->AttributeSize(); ++i )
 				glDisableVertexAttribArray( i );
 				
 			glFlush();

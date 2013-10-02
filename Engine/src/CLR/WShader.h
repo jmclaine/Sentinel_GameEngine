@@ -9,19 +9,11 @@ namespace Sentinel { namespace Assets
 {
 	public ref class WShader
 	{
-		DECLARE_REF( Shader );
-
-	protected:
-
-		WShader();
+		DECLARE_REF_SHARED( Shader );
 
 	public:
 
-		WShader( Shader* shader );
-
-		////////////////////////////////
-
-		DECLARE_OP_PTR( Shader );
+		DECLARE_OP_SHARED( Shader );
 
 		System::String^	Attribute();
 		System::String^	Uniform();
@@ -41,6 +33,5 @@ namespace Sentinel { namespace Assets
 		void			SetTexture( UINT uniform, WTexture^ texture );
 	};
 
-	DECLARE_CLASS_REF( Shader );
-	DECLARE_CLASS_REF_PTR( Shader );
+	DECLARE_CLASS_REF_SHARED( Shader );
 }}

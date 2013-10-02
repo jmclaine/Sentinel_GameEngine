@@ -18,11 +18,11 @@ namespace Sentinel
 	{
 	public:
 
-		static Shader*  SHADER_COLOR;
-		static Shader*  SHADER_TEXTURE;
-		static Shader*  SHADER_NORMAL_MAP;
-		static Shader*  SHADER_PARALLAX;
-		static Shader*  SHADER_SKINNING;
+		static std::shared_ptr< Shader > SHADER_COLOR;
+		static std::shared_ptr< Shader > SHADER_TEXTURE;
+		static std::shared_ptr< Shader > SHADER_NORMAL_MAP;
+		static std::shared_ptr< Shader > SHADER_PARALLAX;
+		static std::shared_ptr< Shader > SHADER_SKINNING;
 
 	protected:
 
@@ -87,20 +87,20 @@ namespace Sentinel
 		// The public static variables do not get set
 		// correctly in the CLR without these functions:
 		//
-		static void		SetShaderColor( Shader* shader );
-		static Shader*&	GetShaderColor();
+		static void		SetShaderColor( const std::shared_ptr< Shader >& shader );
+		static std::shared_ptr< Shader >&	GetShaderColor();
 
-		static void		SetShaderTexture( Shader* shader );
-		static Shader*&	GetShaderTexture();
+		static void		SetShaderTexture( const std::shared_ptr< Shader >& shader );
+		static std::shared_ptr< Shader >&	GetShaderTexture();
 
-		static void		SetShaderNormalMap( Shader* shader );
-		static Shader*&	GetShaderNormalMap();
+		static void		SetShaderNormalMap( const std::shared_ptr< Shader >& shader );
+		static std::shared_ptr< Shader >&	GetShaderNormalMap();
 
-		static void		SetShaderParallax( Shader* shader );
-		static Shader*&	GetShaderParallax();
+		static void		SetShaderParallax( const std::shared_ptr< Shader >& shader );
+		static std::shared_ptr< Shader >&	GetShaderParallax();
 
-		static void		SetShaderSkinning( Shader* shader );
-		static Shader*&	GetShaderSkinning();
+		static void		SetShaderSkinning( const std::shared_ptr< Shader >& shader );
+		static std::shared_ptr< Shader >&	GetShaderSkinning();
 
 		/////////////////////////////////////
 

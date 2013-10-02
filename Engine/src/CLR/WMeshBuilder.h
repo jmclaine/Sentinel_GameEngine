@@ -66,7 +66,7 @@ namespace Sentinel { namespace Assets
 		DECLARE_PROPERTY( Sentinel::Systems::PrimitiveType, Primitive );
 		DECLARE_PROPERTY( WVector4f^,	TextureScale );
 
-		RPTexture^		Texture( TextureType type );
+		RTexture^		Texture( TextureType type );
 
 		//////////////////////////////////
 

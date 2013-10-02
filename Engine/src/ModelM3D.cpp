@@ -6,6 +6,7 @@
 #include "MeshBuilder.h"
 #include "Timing.h"
 #include "Archive.h"
+#include "AssetManager.h"
 
 namespace Sentinel
 {
@@ -46,19 +47,13 @@ namespace Sentinel
 		struct MaterialTexture
 		{
 			Material	mMaterial;
-			Texture*	mTexture[ NUM_AUTODESK_TYPES ];
+			std::shared_ptr< Texture > mTexture[ NUM_AUTODESK_TYPES ];
 
 			MaterialTexture()
-			{
-				for( UINT x = 0; x < NUM_AUTODESK_TYPES; ++x )
-					mTexture[ x ] = NULL;
-			}
+			{}
 
 			~MaterialTexture()
-			{
-				for( UINT x = 0; x < NUM_AUTODESK_TYPES; ++x )
-					SAFE_DELETE( mTexture[ x ] );
-			}
+			{}
 		};
 
 		Object*				mObject;
@@ -121,6 +116,7 @@ namespace Sentinel
 				archive.Read( name, len );
 				name[ len ] = 0;
 
+				//matTex.mTexture[ type ] = TextureManager::Inst()->Add( name, Renderer::Inst()->CreateTextureFromFile( name ));
 				matTex.mTexture[ type ] = Renderer::Inst()->CreateTextureFromFile( name );
 			}
 		}

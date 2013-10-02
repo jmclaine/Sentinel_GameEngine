@@ -21,6 +21,7 @@ namespace Sentinel
 
 		MeshComponent();
 		MeshComponent( std::shared_ptr< Mesh > mesh );
+		~MeshComponent();
 
 		void	Startup();
 

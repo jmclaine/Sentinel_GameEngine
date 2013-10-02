@@ -20,12 +20,12 @@ namespace Sentinel { namespace Assets
 	DEFINE_PROPERTY_R(  Mesh, Matrix4f,		MatrixShadow );
 	DEFINE_PROPERTY_R(  Mesh, Vector4f,		TextureScale );
 		
-	DEFINE_PROPERTY_RP( Mesh, Shader,		Shader );
+	DEFINE_PROPERTY_RT( Mesh, Shader,		Shader );
 	DEFINE_PROPERTY_R(  Mesh, Material,		Material );
 
-	RPTexture^ WMesh::Texture( TextureType type )
+	RTexture^ WMesh::Texture( TextureType type )
 	{
-		return gcnew RPTexture( mRef->mTexture[ (int)type ] );
+		return gcnew RTexture( mRef->mTexture[ (int)type ] );
 	}
 
 	void WMesh::Draw()

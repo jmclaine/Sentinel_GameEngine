@@ -16,7 +16,18 @@ namespace Sentinel
 
 	GameObject::~GameObject()
 	{
-		Shutdown();
+		SAFE_DELETE( mTransform );
+		SAFE_DELETE( mController );
+		SAFE_DELETE( mPhysics );
+		SAFE_DELETE( mDrawable );
+
+		TRAVERSE_VECTOR( x, mComponent )
+			delete mComponent[ x ];
+		mComponent.clear();
+
+		TRAVERSE_VECTOR( x, mChild )
+			SAFE_DELETE( mChild[ x ] );
+		mChild.clear();
 	}
 
 	//////////////////////////////
@@ -125,9 +136,7 @@ namespace Sentinel
 
 #define DETACH_COMPONENT( obj )\
 	if( component == obj )\
-	{\
 		obj = NULL;\
-	}\
 	return component;
 
 	GameComponent* GameObject::DetachComponent( GameComponent* component )
@@ -279,27 +288,15 @@ namespace Sentinel
 				mChild[ x ]->UpdateDrawable();
 	}
 
-#define SHUTDOWN_COMPONENT( obj )\
-	if( obj )\
-	{\
-		obj->Shutdown();\
-		delete obj;\
-		obj = NULL;\
-	}
-
 	void GameObject::Shutdown()
 	{
-		SHUTDOWN_COMPONENT( mTransform );
-		SHUTDOWN_COMPONENT( mController );
-		SHUTDOWN_COMPONENT( mPhysics );
-		SHUTDOWN_COMPONENT( mDrawable );
+		mTransform->Shutdown();
+		mController->Shutdown();
+		mPhysics->Shutdown();
+		mDrawable->Shutdown();
 
 		TRAVERSE_VECTOR( x, mComponent )
-		{
 			mComponent[ x ]->Shutdown();
-			delete mComponent[ x ];
-		}
-		mComponent.clear();
 
 		TRAVERSE_VECTOR( x, mChild )
 			mChild[ x ]->Shutdown();

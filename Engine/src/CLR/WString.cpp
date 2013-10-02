@@ -72,4 +72,9 @@ namespace Sentinel { namespace Utilities
 	{
 		return msclr::interop::marshal_as< System::String^ >(str);
 	}
+
+	System::String^ WString::Cast( const std::string& str )
+	{
+		return msclr::interop::marshal_as< System::String^ >(str);
+	}
 }}

@@ -7,6 +7,7 @@
 #include "MeshBuilder.h"
 #include "Util.h"
 #include "Renderer.h"
+#include "AssetManager.h"
 
 namespace Sentinel
 {
@@ -163,7 +164,8 @@ namespace Sentinel
 										mtlParsehelper >> mtlToken;
 										MeshBuilder* meshBuilder = mtl_iter->second;
 										meshBuilder->mShader = SHADER_TEXTURE;
-										meshBuilder->mTexture[ TEXTURE_DIFFUSE ] = Renderer::Inst()->CreateTextureFromFile( mtlToken.c_str() );
+
+										meshBuilder->mTexture[ TEXTURE_DIFFUSE ] = TextureManager::Inst()->Add( mtlToken, Renderer::Inst()->CreateTextureFromFile( mtlToken.c_str() ));
 									}
 								}
 							}

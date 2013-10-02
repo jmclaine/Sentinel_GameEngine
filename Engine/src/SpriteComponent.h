@@ -24,7 +24,7 @@ namespace Sentinel
 
 		UINT					mNumFrames;
 
-		Texture*				mTexture;
+		std::shared_ptr< Texture >	mTexture;
 
 		ColorRGBA				mColor;
 		UINT					mFrame;
@@ -32,9 +32,9 @@ namespace Sentinel
 	public:
 
 		SpriteComponent();
-		SpriteComponent( Texture* texture, const POINT& spriteSize );
+		SpriteComponent( std::shared_ptr< Texture > texture, const POINT& spriteSize );
 
-		void	Set( Texture* texture, const POINT& spriteSize );
+		void	Set( std::shared_ptr< Texture > texture, const POINT& spriteSize );
 
 		void	Startup();
 

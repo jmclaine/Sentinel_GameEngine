@@ -34,7 +34,6 @@ namespace Sentinel_Editor
 		private static WColorRGBA   mClearColor = new WColorRGBA( 0.0f, 0.2f, 0.8f, 1.0f );
 
 		private GameWindow			mGameWindow;
-		private WTexture			mTexture;
 		
 		private static TreeViewItem	mAsset_Texture;
 		private static TreeViewItem	mAsset_Shader;
@@ -68,6 +67,9 @@ namespace Sentinel_Editor
 			try
 			{
 				InitializeComponent();
+
+				WShaderManager.Create();
+				WTextureManager.Create();
 			}
 			catch( Exception e )
 			{
@@ -607,8 +609,8 @@ namespace Sentinel_Editor
 			
 			////////////////////////////////////
 
-			mTexture = WRenderer.CreateTextureFromFile( "Assets\\Textures\\default-alpha.png" );
-			AddAsset( mTexture, Path.GetFileName( mTexture.Name() ));
+			WTexture texture = WTextureManager.Add( "DEFAULT", WRenderer.CreateTextureFromFile( "Assets\\Textures\\default-alpha.png" ));
+			AddAsset( texture, Path.GetFileName( texture.Name() ));
 			
 			// Camera.
 			//
@@ -658,7 +660,7 @@ namespace Sentinel_Editor
 			meshBuilder.ClearGeometry();
 			meshBuilder.CreateDodecahedron( 1.0f );
 			meshBuilder.Shader = WShaderManager.Get( "TEXTURE" );
-			meshBuilder.Texture( (int)TextureType.DIFFUSE ).Set( mTexture );
+			meshBuilder.Texture( (int)TextureType.DIFFUSE ).Set( WTextureManager.Get( "DEFAULT" ));
 
 			mesh = meshBuilder.BuildMesh();
 			AddAsset( mesh, "Dodecahedron" );

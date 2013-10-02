@@ -2,11 +2,11 @@
 
 namespace Sentinel
 {
-	Shader*	Model::SHADER_COLOR			= NULL;
-	Shader*	Model::SHADER_TEXTURE		= NULL;
-	Shader*	Model::SHADER_NORMAL_MAP	= NULL;
-	Shader*	Model::SHADER_PARALLAX		= NULL;
-	Shader*	Model::SHADER_SKINNING		= NULL;
+	std::shared_ptr< Shader > Model::SHADER_COLOR		= NULL;
+	std::shared_ptr< Shader > Model::SHADER_TEXTURE		= NULL;
+	std::shared_ptr< Shader > Model::SHADER_NORMAL_MAP	= NULL;
+	std::shared_ptr< Shader > Model::SHADER_PARALLAX	= NULL;
+	std::shared_ptr< Shader > Model::SHADER_SKINNING	= NULL;
 
 	Model::~Model()
 	{}
@@ -30,52 +30,52 @@ namespace Sentinel
 		return NULL;
 	}
 
-	void Model::SetShaderColor( Shader* shader )
+	void Model::SetShaderColor( const std::shared_ptr< Shader >& shader )
 	{
 		SHADER_COLOR = shader;
 	}
 
-	Shader*& Model::GetShaderColor()
+	std::shared_ptr< Shader >& Model::GetShaderColor()
 	{
 		return SHADER_COLOR;
 	}
 
-	void Model::SetShaderTexture( Shader* shader )
+	void Model::SetShaderTexture( const std::shared_ptr< Shader >& shader )
 	{
 		SHADER_TEXTURE = shader;
 	}
 
-	Shader*& Model::GetShaderTexture()
+	std::shared_ptr< Shader >& Model::GetShaderTexture()
 	{
 		return SHADER_TEXTURE;
 	}
 	
-	void Model::SetShaderNormalMap( Shader* shader )
+	void Model::SetShaderNormalMap( const std::shared_ptr< Shader >& shader )
 	{
 		SHADER_NORMAL_MAP = shader;
 	}
 
-	Shader*& Model::GetShaderNormalMap()
+	std::shared_ptr< Shader >& Model::GetShaderNormalMap()
 	{
 		return SHADER_NORMAL_MAP;
 	}
 	
-	void Model::SetShaderParallax( Shader* shader )
+	void Model::SetShaderParallax( const std::shared_ptr< Shader >& shader )
 	{
 		SHADER_PARALLAX = shader;
 	}
 
-	Shader*& Model::GetShaderParallax()
+	std::shared_ptr< Shader >& Model::GetShaderParallax()
 	{
 		return SHADER_PARALLAX;
 	}
 	
-	void Model::SetShaderSkinning( Shader* shader )
+	void Model::SetShaderSkinning( const std::shared_ptr< Shader >& shader )
 	{
 		SHADER_SKINNING = shader;
 	}
 
-	Shader*& Model::GetShaderSkinning()
+	std::shared_ptr< Shader >& Model::GetShaderSkinning()
 	{
 		return SHADER_SKINNING;
 	}

@@ -12,9 +12,7 @@
 #include "PhysicsSystem.h"
 #include "ParticleSystem.h"
 #include "NetworkSocket.h"
-
-#include "ShaderManager.h"
-#include "TextureManager.h"
+#include "AssetManager.h"
 
 #include "Input.h"
 #include "Timing.h"
@@ -64,12 +62,46 @@ class MainApp
 
 public:
 
+	/*ShaderManager* LoadShaders( const char* filename )
+	{
+		TiXmlDocument doc;
+		if( !doc.LoadFile( filename ))
+			return NULL;
+
+		TiXmlHandle	hDoc( &doc );
+
+		// Starting enclosure: <Shaders>
+		//
+		TiXmlElement* pMain = hDoc.FirstChild( "Shaders" ).Element();
+
+		// Read <Definition>
+		//
+		TiXmlElement* pElem = pMain->FirstChild( "Definition" )->ToElement();
+		
+		while( pElem != NULL )
+		{
+			const char* pFile = pElem->Attribute( "FileName" );
+			const char* pAttr = pElem->Attribute( "Attribute" );
+			const char* pUnif = pElem->Attribute( "Uniform" );
+			const char* pName = pElem->Attribute( "Name" );
+
+			ShaderManager::Inst()->Add( pName, Renderer::Inst()->CreateShader( pFile, pAttr, pUnif ));
+
+			pElem = pElem->NextSiblingElement();
+		}
+
+		return 0;//ShaderManager::Inst();
+	}*/
+
 	MainApp()
 	{
 		srand( (UINT)time( (time_t*)0 ));
 
 		mWindow0 = NULL;
 		mWindow1 = NULL;
+
+		TextureManager::Create();
+		ShaderManager::Create();
 	}
 
 	~MainApp()
@@ -203,7 +235,7 @@ public:
 	{
 		SetDirectory( "Shaders" );
 		
-		if( !ShaderManager::Load( "config.xml" ))
+		if( !(ShaderManager::Inst()->Load( "config.xml" )))
 			throw AppException( "Failed to load 'Shaders\\config.xml'" );
 
 		Model::SHADER_COLOR			= ShaderManager::Inst()->Get( "COLOR" );
@@ -283,13 +315,11 @@ public:
 
 		// Create meshes and model for object instancing.
 		//
-		TextureManager::Inst()->Add( Renderer::Inst()->CreateTextureFromFile( "default-alpha.png" ), "DEFAULT" );
-
 		MeshBuilder				meshBuilder;
 		std::shared_ptr< Mesh >	mesh[ NUM_SHAPES ];
 
 		meshBuilder.mShader = ShaderManager::Inst()->Get( "TEXTURE" );
-		meshBuilder.mTexture[ TEXTURE_DIFFUSE ] = TextureManager::Inst()->Get( "DEFAULT" );
+		meshBuilder.mTexture[ TEXTURE_DIFFUSE ] = TextureManager::Inst()->Add( "DEFAULT", Renderer::Inst()->CreateTextureFromFile( "default-alpha.png" ));
 
 		meshBuilder.CreateCube( 1 );
 		mesh[ SHAPE_CUBE ] = std::shared_ptr< Mesh >( meshBuilder.BuildMesh() );
@@ -412,13 +442,6 @@ public:
 				obj->AttachComponent( new ModelComponent( model ),			"Model" );
 		}
 
-		//////////////////////////////
-
-		for( UINT x = 0; x < NUM_SHAPES; ++x )
-			mesh[ x ].reset();
-		
-		model.reset();
-
 		GameWorld::Inst()->Startup();
 
 		SetDirectory( ".." );
@@ -469,7 +492,7 @@ int APIENTRY _tWinMain( HINSTANCE hInstance,
 	//
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	_CrtSetReportMode( _CRT_ERROR, _CRTDBG_MODE_DEBUG );
-	//_CrtSetBreakAlloc( 246 );
+	//_CrtSetBreakAlloc( 898 );
 
 	UNREFERENCED_PARAMETER( hPrevInstance );
 	UNREFERENCED_PARAMETER( lpCmdLine );

@@ -17,6 +17,9 @@ namespace Sentinel
 		mMaterial = mMesh->mMaterial;
 	}
 
+	MeshComponent::~MeshComponent()
+	{}
+
 	void MeshComponent::Startup()
 	{
 		DrawableComponent::Startup();
@@ -24,8 +27,6 @@ namespace Sentinel
 
 	void MeshComponent::Update()
 	{
-		DrawableComponent::Update();
-
 		mMesh->mMaterial = mMaterial;
 
 		mMesh->mMatrixWorld = mTransform->GetMatrixWorld();
@@ -34,9 +35,7 @@ namespace Sentinel
 	}
 
 	void MeshComponent::Shutdown()
-	{
-		mMesh.reset();
-	}
+	{}
 
 	///////////////////////////////////
 

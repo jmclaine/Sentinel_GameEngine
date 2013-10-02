@@ -99,6 +99,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
   <ItemGroup>
     <ClInclude Include="..\Engine\src\AIControllerComponent.h" />
     <ClInclude Include="..\Engine\src\Archive.h" />
+    <ClInclude Include="..\Engine\src\AssetManager.h" />
     <ClInclude Include="..\Engine\src\Buffer.h" />
     <ClInclude Include="..\Engine\src\CameraComponent.h" />
     <ClInclude Include="..\Engine\src\CDPI.h" />
@@ -138,12 +139,10 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
     <ClInclude Include="..\Engine\src\Script.h" />
     <ClInclude Include="..\Engine\src\Serializeable.h" />
     <ClInclude Include="..\Engine\src\Shader.h" />
-    <ClInclude Include="..\Engine\src\ShaderManager.h" />
     <ClInclude Include="..\Engine\src\Shape.h" />
     <ClInclude Include="..\Engine\src\Singleton.h" />
     <ClInclude Include="..\Engine\src\SpriteComponent.h" />
     <ClInclude Include="..\Engine\src\Texture.h" />
-    <ClInclude Include="..\Engine\src\TextureManager.h" />
     <ClInclude Include="..\Engine\src\Timing.h" />
     <ClInclude Include="..\Engine\src\TransformComponent.h" />
     <ClInclude Include="..\Engine\src\Util.h" />
@@ -156,6 +155,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\Archive.cpp" />
+    <ClCompile Include="..\Engine\src\AssetManager.cpp" />
     <ClCompile Include="..\Engine\src\Buffer.cpp" />
     <ClCompile Include="..\Engine\src\CameraComponent.cpp" />
     <ClCompile Include="..\Engine\src\ColorRGBA.cpp" />
@@ -196,12 +196,10 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
     <ClCompile Include="..\Engine\src\ScriptParser.cpp" />
     <ClCompile Include="..\Engine\src\Serializeable.cpp" />
     <ClCompile Include="..\Engine\src\Shader.cpp" />
-    <ClCompile Include="..\Engine\src\ShaderManager.cpp" />
     <ClCompile Include="..\Engine\src\Shape.cpp" />
     <ClCompile Include="..\Engine\src\SpriteComponent.cpp" />
     <ClCompile Include="..\Engine\src\stb_image.c" />
     <ClCompile Include="..\Engine\src\Texture.cpp" />
-    <ClCompile Include="..\Engine\src\TextureManager.cpp" />
     <ClCompile Include="..\Engine\src\Timing.cpp" />
     <ClCompile Include="..\Engine\src\TransformComponent.cpp" />
     <ClCompile Include="..\Engine\src\Util.cpp" />

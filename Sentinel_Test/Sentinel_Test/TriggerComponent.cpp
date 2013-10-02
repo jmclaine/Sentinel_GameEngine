@@ -28,9 +28,7 @@ namespace Sentinel
 	{}
 
 	void TriggerComponent::Shutdown()
-	{
-		mPhysics = NULL;
-	}
+	{}
 
 	/////////////////////////////////
 

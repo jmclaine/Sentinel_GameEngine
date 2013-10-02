@@ -8,19 +8,11 @@ namespace Sentinel { namespace Assets
 {
 	public ref class WTexture
 	{
-		DECLARE_REF( Texture );
-
-	protected:
-
-		WTexture();
+		DECLARE_REF_SHARED( Texture );
 
 	public:
 
-		WTexture( Texture* texture );
-		
-		////////////////////////////////
-
-		DECLARE_OP_PTR( Texture );
+		DECLARE_OP_SHARED( Texture );
 
 		void			Release();
 
@@ -29,6 +21,5 @@ namespace Sentinel { namespace Assets
 		UINT			Height();
 	};
 
-	DECLARE_CLASS_REF( Texture );
-	DECLARE_CLASS_REF_PTR( Texture );
+	DECLARE_CLASS_REF_SHARED( Texture );
 }}

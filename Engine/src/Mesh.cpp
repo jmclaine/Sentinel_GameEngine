@@ -68,7 +68,7 @@ namespace Sentinel
 					// Textures.
 					//
 					case 'X':
-						mShader->SetTexture( uniformIndex, mTexture[ texCount ] );
+						mShader->SetTexture( uniformIndex, mTexture[ texCount ].get() );
 						++texCount;
 						break;
 

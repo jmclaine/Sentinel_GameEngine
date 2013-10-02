@@ -25,7 +25,7 @@ namespace Sentinel { namespace Assets
 
 	WShader^ WModel::GetShaderColor()
 	{
-		return gcnew RPShader( Model::GetShaderColor() );
+		return gcnew RShader( Model::GetShaderColor() );
 	}
 
 	void WModel::SetShaderTexture( WShader^ shader )
@@ -35,7 +35,7 @@ namespace Sentinel { namespace Assets
 
 	WShader^ WModel::GetShaderTexture()
 	{
-		return gcnew RPShader( Model::GetShaderTexture() );
+		return gcnew RShader( Model::GetShaderTexture() );
 	}
 	
 	void WModel::SetShaderNormalMap( WShader^ shader )
@@ -45,7 +45,7 @@ namespace Sentinel { namespace Assets
 
 	WShader^ WModel::GetShaderNormalMap()
 	{
-		return gcnew RPShader( Model::GetShaderNormalMap() );
+		return gcnew RShader( Model::GetShaderNormalMap() );
 	}
 	
 	void WModel::SetShaderParallax( WShader^ shader )
@@ -55,7 +55,7 @@ namespace Sentinel { namespace Assets
 
 	WShader^ WModel::GetShaderParallax()
 	{
-		return gcnew RPShader( Model::GetShaderParallax() );
+		return gcnew RShader( Model::GetShaderParallax() );
 	}
 	
 	void WModel::SetShaderSkinning( WShader^ shader )
@@ -65,7 +65,7 @@ namespace Sentinel { namespace Assets
 
 	WShader^ WModel::GetShaderSkinning()
 	{
-		return gcnew RPShader( Model::GetShaderSkinning() );
+		return gcnew RShader( Model::GetShaderSkinning() );
 	}
 
 	bool WModel::Create( System::String^ filename )

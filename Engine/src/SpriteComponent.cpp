@@ -9,12 +9,12 @@ namespace Sentinel
 	SpriteComponent::SpriteComponent()
 	{}
 
-	SpriteComponent::SpriteComponent( Texture* texture, const POINT& spriteSize )
+	SpriteComponent::SpriteComponent( std::shared_ptr< Texture >texture, const POINT& spriteSize )
 	{
 		Set( texture, spriteSize );
 	}
 
-	void SpriteComponent::Set( Texture* texture, const POINT& spriteSize )
+	void SpriteComponent::Set( std::shared_ptr< Texture > texture, const POINT& spriteSize )
 	{
 		_ASSERT( mTexture );
 		_ASSERT( spriteSize.x > 0 && spriteSize.y > 0 );

@@ -19,11 +19,11 @@ namespace Sentinel
 	{
 		mPrimitive = TRIANGLE_LIST;
 
+		mShader.reset();
+
 		for( UINT i = 0; i < NUM_TEXTURES; ++i )
 			mTexture[ i ] = Renderer::Inst()->BASE_TEXTURE;
 		
-		mShader = NULL;
-
 		ClearGeometry();
 
 		mTextureScale = Vector4f( 0, 0, 1, 1 );
@@ -1576,10 +1576,8 @@ namespace Sentinel
 		mesh->mIBO = mIBO;
 
 		for( UINT x = 0; x < NUM_TEXTURES; ++x )
-		{
 			mesh->mTexture[ x ] = mTexture[ x ];
-		}
-
+		
 		mesh->mShader		= mShader;
 		mesh->mPrimitive	= mPrimitive;
 		mesh->mTextureScale = mTextureScale;

@@ -461,9 +461,6 @@ namespace Sentinel
 			mSampleDesc.Count   = 1;
 			mSampleDesc.Quality = 0;
 
-			NULL_TEXTURE = NULL;
-			BASE_TEXTURE = NULL;
-
 			mCurrWindow  = NULL;
 			mCurrStencil = NULL;
 			mCurrTarget  = NULL;
@@ -475,9 +472,6 @@ namespace Sentinel
 			SAFE_RELEASE_PTR_LIST( mDepthStencil );
 			SAFE_RELEASE_PTR_LIST( mBlendState );
 			SAFE_RELEASE_PTR_LIST( mDepthStencilState );
-
-			SAFE_DELETE( NULL_TEXTURE );
-			SAFE_DELETE( BASE_TEXTURE );
 		}
 
 	private:
@@ -773,7 +767,7 @@ namespace Sentinel
 
 		// Textures.
 		//
-		Texture* CreateTextureFromFile( const char* filename )
+		std::shared_ptr< Texture > CreateTextureFromFile( const char* filename )
 		{
 			// TODO: Check for compatible texture size.
 
@@ -792,7 +786,7 @@ namespace Sentinel
 				{
 					TextureDX* texture = new TextureDX( filename, info.Width, info.Height );
 					texture->mResource = image;
-					return texture;
+					return std::shared_ptr< Texture >( texture );
 				}
 				else
 				{
@@ -815,19 +809,18 @@ namespace Sentinel
 				return NULL;
 			}
 
-			TextureDX* texture = static_cast< TextureDX* >(CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA ));
-			SAFE_RELEASE_PTR( texture->mTexture );
+			std::shared_ptr< Texture > texture = CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA );
 
-			// Rename the texture because loading from memory sets a default.
-			//
-			texture->mName = filename;
+			TextureDX* texDX = static_cast< TextureDX* >(texture.get());
+			SAFE_RELEASE_PTR( texDX->mTexture );
+			texDX->mName = filename;
 
 			stbi_image_free( pixels );
 
 			return texture;
 		}
 
-		Texture* CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormatType format, bool createMips = true )
+		std::shared_ptr< Texture > CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormatType format, bool createMips = true )
 		{
 			TextureDX* texture = new TextureDX( "~Memory~", width, height );
 
@@ -946,7 +939,7 @@ namespace Sentinel
 				SET_DEBUG_NAME( texture->mTexture );
 			#endif
 
-			return texture;
+			return std::shared_ptr< Texture >( texture );
 		}
 
 		// Special Rendering.
@@ -975,9 +968,9 @@ namespace Sentinel
 			return mRenderTarget.size()-1;
 		}
 
-		UINT CreateRenderTarget( Texture* texture )
+		UINT CreateRenderTarget( const std::shared_ptr< Texture >& texture )
 		{
-			return CreateRenderTarget( ((TextureDX*)texture)->mTexture );
+			return CreateRenderTarget( static_cast< TextureDX* >(texture.get())->mTexture );
 		}
 
 		UINT CreateDepthStencil( UINT width, UINT height )
@@ -1126,7 +1119,7 @@ namespace Sentinel
 
 		// Shaders.
 		//
-		Shader* CreateShader( const char* filename, const char* attrib, const char* uniform )
+		std::shared_ptr< Shader > CreateShader( const char* filename, const char* attrib, const char* uniform )
 		{
 			ShaderDX* shader = new ShaderDX();
 
@@ -1136,10 +1129,10 @@ namespace Sentinel
 				return NULL;
 			}
 
-			return shader;
+			return std::shared_ptr< Shader >( shader );
 		}
 
-		void SetShader( Shader* shader )
+		void SetShader( const std::shared_ptr< Shader >& shader )
 		{
 			mCurrShader = shader;
 		}

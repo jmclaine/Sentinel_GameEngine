@@ -11,7 +11,10 @@ namespace Sentinel
 
 	GameWorld::~GameWorld()
 	{
-		Shutdown();
+		TRAVERSE_VECTOR( x, mGameObject )
+			SAFE_DELETE( mGameObject[ x ] );
+
+		mGameObject.clear();
 	}
 
 	GameWorld* GameWorld::Create()
@@ -172,13 +175,7 @@ namespace Sentinel
 	void GameWorld::Shutdown()
 	{
 		TRAVERSE_VECTOR( x, mGameObject )
-		{
 			mGameObject[ x ]->Shutdown();
-
-			SAFE_DELETE( mGameObject[ x ] );
-		}
-
-		mGameObject.clear();
 	}
 
 	/////////////////////////////////

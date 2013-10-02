@@ -155,6 +155,16 @@
 		static_cast< refClass* >(mRef)->m##varName = v->GetRef();\
 	}
 
+#define DEFINE_PROPERTY_RT( refClass, varType, varName )\
+	W##varType^ W##refClass::varName::get()\
+	{\
+		return (mRef->m##varName) ? gcnew R##varType( mRef->m##varName ) : nullptr;\
+	}\
+	void W##refClass::varName::set( W##varType^ v )\
+	{\
+		mRef->m##varName = v->GetRef();\
+	}
+
 ///////////////////////////////////////////////////
 
 // Create standard wrapper reference for a class.
@@ -226,6 +236,15 @@
 #define DEFINE_OP_DEREF( refClass )\
 	DEFINE_OP_DEREF_EX( W##refClass, refClass );
 	
+#define DECLARE_OP_SHARED( refClass )\
+	operator std::shared_ptr< refClass > ();
+
+#define DEFINE_OP_SHARED_EX( wrapClass, refClass )\
+	wrapClass::operator std::shared_ptr< refClass > () { return mRef; }
+
+#define DEFINE_OP_SHARED( refClass )\
+	DEFINE_OP_SHARED_EX( W##refClass, refClass );
+
 #define DECLARE_OP_PTR( refClass )\
 	operator refClass* ();
 
@@ -255,6 +274,23 @@
 	R##refClass::R##refClass( W##refClass^ obj )	{ mRef = obj->GetRef(); }\
 	void R##refClass::Set( const refClass& obj )	{ *mRef = obj; }\
 	void R##refClass::Set( W##refClass^ obj )		{ *mRef = *obj->GetRef(); }\
+	void R##refClass::Delete() {}
+
+#define DECLARE_CLASS_REF_SHARED( refClass )\
+	public ref class R##refClass sealed : public W##refClass\
+	{\
+	private:\
+		std::shared_ptr< refClass >& mRefPtr;\
+	public:\
+		R##refClass( std::shared_ptr< refClass >& obj );\
+		void Set( W##refClass^ obj );\
+	protected:\
+		virtual void Delete() override;\
+	};
+
+#define DEFINE_CLASS_REF_SHARED( refClass )\
+	R##refClass::R##refClass( std::shared_ptr< refClass >& obj ) : mRefPtr( obj ), W##refClass( obj ) {}\
+	void R##refClass::Set( W##refClass^ obj ) { mRefPtr = obj->GetRef(); }\
 	void R##refClass::Delete() {}
 
 #define DECLARE_CLASS_REF_PTR( refClass )\

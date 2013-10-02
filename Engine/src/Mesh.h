@@ -36,10 +36,10 @@ namespace Sentinel
 		Matrix4f			mMatrixShadow;		// camera matrix
 		Vector4f			mTextureScale;
 
-		Shader*				mShader;
+		std::shared_ptr< Shader >	mShader;
 		
 		Material			mMaterial;
-		Texture*			mTexture[ NUM_TEXTURES ];
+		std::shared_ptr< Texture >	mTexture[ NUM_TEXTURES ];
 
 		//////////////////////////////
 

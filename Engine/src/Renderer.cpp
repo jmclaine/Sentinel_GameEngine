@@ -69,7 +69,7 @@ namespace Sentinel
 		return Renderer::Inst();
 	}
 
-	Texture* Renderer::CreateTexture( UINT width, UINT height, ImageFormatType format, bool createMips )
+	std::shared_ptr< Texture > Renderer::CreateTexture( UINT width, UINT height, ImageFormatType format, bool createMips )
 	{
 		return CreateTextureFromMemory( 0, width, height, format, createMips );
 	}

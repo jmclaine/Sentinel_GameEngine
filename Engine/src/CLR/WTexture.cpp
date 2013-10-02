@@ -5,37 +5,11 @@ using namespace Sentinel::Utilities;
 
 namespace Sentinel { namespace Assets
 {
-	DEFINE_REF_PTR( Texture );
+	DEFINE_REF_SHARED( Texture );
 
-	WTexture::WTexture()
-	{
-		mRef = NULL;
-	}
-
-	WTexture::WTexture( Texture* texture )
-	{
-		mRef = texture;
-	}
-
-	WTexture::~WTexture()
-	{
-		Delete();
-	}
-
-	WTexture::!WTexture()
-	{
-		Delete();
-		System::GC::SuppressFinalize( this );
-	}
-
-	void WTexture::Delete()
-	{
-		SAFE_DELETE( mRef );
-	}
+	DEFINE_OP_SHARED( Texture );
 
 	////////////////////////////////
-
-	DEFINE_OP_PTR( Texture );
 
 	void WTexture::Release()
 	{
@@ -59,6 +33,5 @@ namespace Sentinel { namespace Assets
 
 	////////////////////////////////
 
-	DEFINE_CLASS_REF( Texture );
-	DEFINE_CLASS_REF_PTR( Texture );
+	DEFINE_CLASS_REF_SHARED( Texture );
 }}

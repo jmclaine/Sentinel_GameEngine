@@ -63,19 +63,19 @@ namespace Sentinel
 
 	private:
 
-		Buffer*					mVBO;
-		Buffer*					mIBO;
+		Buffer*						mVBO;
+		Buffer*						mIBO;
 
 	public:
 
-		Shader*					mShader;
-		PrimitiveType			mPrimitive;
+		std::shared_ptr< Shader >	mShader;
+		PrimitiveType				mPrimitive;
 
-		Texture*				mTexture[ NUM_TEXTURES ];	// uses TextureType
-		Vector4f				mTextureScale;
+		std::shared_ptr< Texture >	mTexture[ NUM_TEXTURES ];	// uses TextureType
+		Vector4f					mTextureScale;
 
-		std::vector< Vertex >	mVertex;
-		std::vector< UINT >		mIndex;
+		std::vector< Vertex >		mVertex;
+		std::vector< UINT >			mIndex;
 
 		//////////////////////////////
 

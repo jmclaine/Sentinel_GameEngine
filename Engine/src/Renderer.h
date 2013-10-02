@@ -184,15 +184,15 @@ namespace Sentinel
 		UINT				CULL_TYPE[ NUM_CULL_TYPES ];
 		UINT				FILL_TYPE[ NUM_FILL_TYPES ];
 
-		Shader*				mCurrShader;
+		std::shared_ptr< Shader >	mCurrShader;
 
 	public:
 
 		static const UINT	WINDOW_WIDTH_BASE  = 1920;
 		static const UINT	WINDOW_HEIGHT_BASE = 1080;
 
-		Texture*			NULL_TEXTURE;	// black default texture
-		Texture*			BASE_TEXTURE;	// white default texture
+		std::shared_ptr< Texture >	NULL_TEXTURE;	// black default texture
+		std::shared_ptr< Texture >	BASE_TEXTURE;	// white default texture
 
 	public:
 
@@ -224,15 +224,15 @@ namespace Sentinel
 
 		// Textures.
 		//
-		Texture*			CreateTexture( UINT width, UINT height, ImageFormatType format = IMAGE_FORMAT_RGBA, bool createMips = false );
+		std::shared_ptr< Texture > CreateTexture( UINT width, UINT height, ImageFormatType format = IMAGE_FORMAT_RGBA, bool createMips = false );
 
-		virtual Texture*	CreateTextureFromFile( const char* filename ) = 0;
-		virtual Texture*	CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormatType format, bool createMips = true ) = 0;
+		virtual std::shared_ptr< Texture > CreateTextureFromFile( const char* filename ) = 0;
+		virtual std::shared_ptr< Texture > CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormatType format, bool createMips = true ) = 0;
 	
 		// Special Rendering.
 		//
 		virtual UINT		CreateBackbuffer() = 0;
-		virtual UINT		CreateRenderTarget( Texture* texture ) = 0;
+		virtual UINT		CreateRenderTarget( const std::shared_ptr< Texture >& texture ) = 0;
 		virtual UINT		CreateDepthStencil( UINT width, UINT height ) = 0;
 		virtual UINT		ResizeBuffers( UINT width, UINT height ) = 0;
 
@@ -247,8 +247,8 @@ namespace Sentinel
 
 		// Shaders.
 		//
-		virtual Shader*		CreateShader( const char* filename, const char* attrib, const char* uniform ) = 0;
-		virtual void		SetShader( Shader* shader ) = 0;
+		virtual std::shared_ptr< Shader > CreateShader( const char* filename, const char* attrib, const char* uniform ) = 0;
+		virtual void		SetShader( const std::shared_ptr< Shader >& shader ) = 0;
 
 		// Rendering.
 		//

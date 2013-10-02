@@ -15,7 +15,7 @@ namespace Sentinel
 		
 	// Based on a geometry shader that generates quads from points.
 	//
-	void ParticleSystem::Startup( Shader* shader, UINT maxSprites )
+	void ParticleSystem::Startup( const std::shared_ptr< Shader >& shader, UINT maxSprites )
 	{
 		MeshBuilder builder;
 
