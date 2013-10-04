@@ -12,7 +12,9 @@
 #include "PhysicsSystem.h"
 #include "ParticleSystem.h"
 #include "NetworkSocket.h"
-#include "AssetManager.h"
+
+#include "TextureManager.h"
+#include "ShaderManager.h"
 
 #include "Input.h"
 #include "Timing.h"
@@ -61,37 +63,6 @@ class MainApp
 	GameWindow*				mWindow1;
 
 public:
-
-	/*ShaderManager* LoadShaders( const char* filename )
-	{
-		TiXmlDocument doc;
-		if( !doc.LoadFile( filename ))
-			return NULL;
-
-		TiXmlHandle	hDoc( &doc );
-
-		// Starting enclosure: <Shaders>
-		//
-		TiXmlElement* pMain = hDoc.FirstChild( "Shaders" ).Element();
-
-		// Read <Definition>
-		//
-		TiXmlElement* pElem = pMain->FirstChild( "Definition" )->ToElement();
-		
-		while( pElem != NULL )
-		{
-			const char* pFile = pElem->Attribute( "FileName" );
-			const char* pAttr = pElem->Attribute( "Attribute" );
-			const char* pUnif = pElem->Attribute( "Uniform" );
-			const char* pName = pElem->Attribute( "Name" );
-
-			ShaderManager::Inst()->Add( pName, Renderer::Inst()->CreateShader( pFile, pAttr, pUnif ));
-
-			pElem = pElem->NextSiblingElement();
-		}
-
-		return 0;//ShaderManager::Inst();
-	}*/
 
 	MainApp()
 	{
@@ -235,7 +206,7 @@ public:
 	{
 		SetDirectory( "Shaders" );
 		
-		if( !(ShaderManager::Inst()->Load( "config.xml" )))
+		if( !(ShaderManager::Inst()->LoadConfig( "config.xml" )))
 			throw AppException( "Failed to load 'Shaders\\config.xml'" );
 
 		Model::SHADER_COLOR			= ShaderManager::Inst()->Get( "COLOR" );
@@ -272,7 +243,7 @@ public:
 		controller = new PlayerControllerComponent();
 		
 		physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateSphere( transform->mPosition, transform->mOrientation, 1, 1 ));
-		physics->GetRigidBody()->setGravity( btVector3( 0, 0, 0 ));
+		physics->GetRigidBody()->setFlags( BT_DISABLE_WORLD_GRAVITY );
 		physics->GetRigidBody()->setDamping( 0.9f, 0.9f );
 		physics->GetRigidBody()->setRestitution( 1 );
 		physics->GetRigidBody()->setAngularFactor( 0 );
@@ -431,6 +402,8 @@ public:
 			}
 
 			sprintf_s( name, "Object %d", x );
+
+			//physics->GetRigidBody()->setGravity( btVector3( 0, -9.81f, 0 ));
 
 			obj = GameWorld::Inst()->AddGameObject( new GameObject(), name );
 			obj->AttachComponent( transform,	"Transform" );

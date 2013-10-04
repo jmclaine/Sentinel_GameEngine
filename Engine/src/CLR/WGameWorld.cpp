@@ -21,6 +21,7 @@ namespace Sentinel { namespace Components
 
 	void WGameWorld::Load( System::String^ mapName )
 	{
+		GameWorld::Destroy();
 		GameWorld::Inst()->Load( WString::Cast( mapName ).c_str() );
 	}
 

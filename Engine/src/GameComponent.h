@@ -35,7 +35,7 @@ namespace Sentinel
 
 	public:
 
-		const char*		mName;
+		std::string			mName;
 
 		////////////////////////////////
 
@@ -54,5 +54,11 @@ namespace Sentinel
 		void SetOwner( GameObject* owner );
 
 		GameComponent::Type GetType();
+
+		////////////////////////////////
+
+		virtual void Save( Archive& archive );
+
+		virtual void Load( Archive& archive );
 	};
 }

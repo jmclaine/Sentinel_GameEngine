@@ -8,8 +8,6 @@ Delete() should be called manually for a controlled free memory.
 #include "GameObject.h"
 #include "WGameComponent.h"
 
-using namespace System;
-
 namespace Sentinel { namespace Components
 {
 	public ref class WGameObject
@@ -23,18 +21,18 @@ namespace Sentinel { namespace Components
 
 		void Delete();
 
-		virtual String^	ToString() override;
+		virtual System::String^	ToString() override;
 
 		DECLARE_OP_PTR( GameObject );
 
 		////////////////////////////////
 
-		DECLARE_PROPERTY( String^,		Name );
+		DECLARE_PROPERTY( System::String^,		Name );
 		DECLARE_PROPERTY( WGameObject^, Parent );
 
 		////////////////////////////////
 
-		WGameComponent^ AttachComponent( WGameComponent^ component, String^ name );
+		WGameComponent^ AttachComponent( WGameComponent^ component, System::String^ name );
 
 		WGameComponent^	DetachComponent( WGameComponent^ component );
 

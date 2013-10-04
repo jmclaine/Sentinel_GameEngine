@@ -8,14 +8,13 @@ namespace Sentinel
 	{
 	protected:
 
-		std::string		mName;
 		UINT			mWidth;
 		UINT			mHeight;
 		
 		//////////////////////////////
 
 		Texture();
-		Texture( const char* name, UINT width, UINT height );
+		Texture( UINT width, UINT height );
 
 	public:
 
@@ -23,8 +22,9 @@ namespace Sentinel
 
 		virtual void		Release();
 
-		const std::string&	Name();
 		UINT				Width();
 		UINT				Height();
+
+		virtual void*		GetPixels() = 0;
 	};
 }

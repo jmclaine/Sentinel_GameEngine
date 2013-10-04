@@ -11,7 +11,7 @@ namespace Sentinel
 	{
 		friend class ParticleSystem;
 
-		DECLARE_SERIAL( SpriteComponent );
+		DECLARE_SERIAL();
 
 	private:
 

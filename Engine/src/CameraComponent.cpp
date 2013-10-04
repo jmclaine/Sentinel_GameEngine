@@ -8,7 +8,7 @@ namespace Sentinel
 	{
 		mType = GameComponent::CAMERA;
 
-		mTransform = NULL;
+		Shutdown();
 
 		mMatrixView.Identity();
 		mMatrixProjection.Identity();
@@ -32,5 +32,7 @@ namespace Sentinel
 	{}
 
 	void CameraComponent::Shutdown()
-	{}
+	{
+		mTransform = NULL;
+	}
 }

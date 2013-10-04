@@ -62,6 +62,40 @@ namespace Sentinel
 		}
 	}
 
+	void Archive::Read( long* data, unsigned int length, bool is32bit )
+	{
+		if( !is32bit )
+		{
+			for( unsigned long x = 0; x < length; ++x )
+			{
+				short d;
+				READ_DATA( &d, short, 1 );
+				data[ x ] = d;
+			}
+		}
+		else
+		{
+			READ_DATA( data, long, length );
+		}
+	}
+
+	void Archive::Read( unsigned long* data, unsigned int length, bool is32bit )
+	{
+		if( !is32bit )
+		{
+			for( unsigned long x = 0; x < length; ++x )
+			{
+				unsigned short d;
+				READ_DATA( &d, unsigned short, 1 );
+				data[ x ] = d;
+			}
+		}
+		else
+		{
+			READ_DATA( data, unsigned long, length );
+		}
+	}
+
 	void Archive::Read( float* data, unsigned int length, bool is32bit )
 	{
 		if( !is32bit )
@@ -76,6 +110,25 @@ namespace Sentinel
 		else
 		{
 			READ_DATA( data, float, length );
+		}
+	}
+
+	void Archive::Read( double* data, unsigned int length )
+	{
+		READ_DATA( data, double, length );
+	}
+
+	void Archive::Read( std::string* data )
+	{
+		data->clear();
+		
+		char c = 0;
+		Read( &c );
+
+		while( c != 0 )
+		{
+			data->push_back( c );
+			Read( &c );
 		}
 	}
 	
@@ -127,6 +180,38 @@ namespace Sentinel
 		}
 	}
 
+	void Archive::Write( const long* data, unsigned int length, bool is32bit )
+	{
+		if( !is32bit )
+		{
+			for( unsigned long x = 0; x < length; ++x )
+			{
+				short d = (short)data[ x ];
+				WRITE_DATA( &d, short, 1 );
+			}
+		}
+		else
+		{
+			WRITE_DATA( data, long, length );
+		}
+	}
+
+	void Archive::Write( const unsigned long* data, unsigned int length, bool is32bit )
+	{
+		if( !is32bit )
+		{
+			for( unsigned long x = 0; x < length; ++x )
+			{
+				unsigned short d = (unsigned short)data[ x ];
+				WRITE_DATA( &d, unsigned short, 1 );
+			}
+		}
+		else
+		{
+			WRITE_DATA( data, unsigned long, length );
+		}
+	}
+
 	void Archive::Write( const float* data, unsigned int length, bool is32bit )
 	{
 		if( !is32bit )
@@ -141,6 +226,19 @@ namespace Sentinel
 		{
 			WRITE_DATA( data, float, length );
 		}
+	}
+
+	void Archive::Write( const double* data, unsigned int length )
+	{
+		WRITE_DATA( data, double, length );
+	}
+
+	void Archive::Write( const std::string* data )
+	{
+		Write( data->c_str(), (unsigned int)data->size() );
+
+		char end = 0;
+		Write( &end );
 	}
 
 	/////////////////////////////////////////////////////////////

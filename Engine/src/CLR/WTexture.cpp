@@ -16,11 +16,6 @@ namespace Sentinel { namespace Assets
 		mRef->Release();
 	}
 
-	System::String^ WTexture::Name()
-	{
-		return WString::Cast( mRef->Name().c_str() );
-	}
-
 	UINT WTexture::Width()
 	{
 		return mRef->Width();

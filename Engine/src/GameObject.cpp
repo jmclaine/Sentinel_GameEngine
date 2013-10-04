@@ -11,7 +11,7 @@ namespace Sentinel
 
 	GameObject::GameObject() :
 		mTransform( NULL ), mController( NULL ), mPhysics( NULL ), mDrawable( NULL ), 
-		mParent( NULL ), mName( NULL )
+		mParent( NULL )
 	{}
 
 	GameObject::~GameObject()
@@ -35,15 +35,13 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE( GameObject );
 
 #define SAVE_COMPONENT( component )\
-	(component) ? component->Save( archive ) : archive.Write( &noValue );
+	(component) ? component->Save( archive ) : archive.Write( &noValue, 1, true );
 
 	void GameObject::Save( Archive& archive )
 	{
 		mSerialRegistry.Save( archive );
 		
-		UINT len = strlen( mName );
-		archive.Write( &len );
-		archive.Write( mName, len );
+		archive.Write( &mName );
 		
 		int noValue = 0;
 		SAVE_COMPONENT( mTransform );
@@ -51,13 +49,13 @@ namespace Sentinel
 		SAVE_COMPONENT( mPhysics );
 		SAVE_COMPONENT( mDrawable );
 
-		UINT size = mComponent.size();
+		BYTE size = (BYTE)mComponent.size();
 		archive.Write( &size );
 
 		TRAVERSE_VECTOR( x, mComponent )
 			mComponent[ x ]->Save( archive );
 		
-		size = mChild.size();
+		size = (BYTE)mChild.size();
 		archive.Write( &size );
 
 		TRAVERSE_VECTOR( x, mChild )
@@ -66,11 +64,7 @@ namespace Sentinel
 
 	void GameObject::Load( Archive& archive )
 	{
-		UINT len = 0;
-		archive.Read( &len );
-
-		char name[ 32 ];
-		archive.Read( name, len );
+		archive.Read( &mName );
 
 		int id = 0;
 		mTransform  = (GameComponent*)SerialRegister::Load( archive );
@@ -78,15 +72,15 @@ namespace Sentinel
 		mPhysics    = (GameComponent*)SerialRegister::Load( archive );
 		mDrawable   = (GameComponent*)SerialRegister::Load( archive );
 
-		UINT size = 0;
+		BYTE size = 0;
 		archive.Read( &size );
 
-		for( UINT x = 0; x < size; ++x )
+		for( BYTE x = 0; x < size; ++x )
 			mComponent.push_back( (GameComponent*)SerialRegister::Load( archive ));
 
 		archive.Read( &size );
 
-		for( UINT x = 0; x < size; ++x )
+		for( BYTE x = 0; x < size; ++x )
 			AddChild( (GameObject*)SerialRegister::Load( archive ));
 	}
 
@@ -288,12 +282,15 @@ namespace Sentinel
 				mChild[ x ]->UpdateDrawable();
 	}
 
+#define SHUTDOWN_COMPONENT( component )\
+	if( component ) { component->Shutdown(); }
+
 	void GameObject::Shutdown()
 	{
-		mTransform->Shutdown();
-		mController->Shutdown();
-		mPhysics->Shutdown();
-		mDrawable->Shutdown();
+		SHUTDOWN_COMPONENT( mTransform );
+		SHUTDOWN_COMPONENT( mController );
+		SHUTDOWN_COMPONENT( mPhysics );
+		SHUTDOWN_COMPONENT( mDrawable );
 
 		TRAVERSE_VECTOR( x, mComponent )
 			mComponent[ x ]->Shutdown();

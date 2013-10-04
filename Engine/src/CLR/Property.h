@@ -80,15 +80,13 @@
 // Strings.
 //
 #define DEFINE_PROPERTY_STR( refClass, varName )\
-	String^ W##refClass::varName::get()\
+	System::String^ W##refClass::varName::get()\
 	{\
-		return gcnew String( mRef->m##varName );\
+		return gcnew System::String( mRef->m##varName.c_str() );\
 	}\
-	void W##refClass::varName::set( String^ str )\
+	void W##refClass::varName::set( System::String^ str )\
 	{\
-		if( mRef->m##varName )\
-			WString::Free( const_cast< char* >(mRef->m##varName) );\
-		mRef->m##varName = WString::Alloc( str );\
+		mRef->m##varName = WString::Cast( str );\
 	}
 
 // Referenced variables.

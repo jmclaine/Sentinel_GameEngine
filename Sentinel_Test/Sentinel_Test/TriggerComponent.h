@@ -6,7 +6,7 @@ namespace Sentinel
 {
 	class SENTINEL_DLL TriggerComponent : public GameComponent
 	{
-		DECLARE_SERIAL( TriggerComponent );
+		DECLARE_SERIAL();
 
 		PhysicsComponent*	mPhysics;
 

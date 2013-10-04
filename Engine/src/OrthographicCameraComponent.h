@@ -6,7 +6,7 @@ namespace Sentinel
 {
 	class SENTINEL_DLL OrthographicCameraComponent : public CameraComponent
 	{
-		DECLARE_SERIAL( OrthographicCameraComponent );
+		DECLARE_SERIAL();
 
 	public:
 

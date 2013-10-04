@@ -56,8 +56,14 @@ namespace Sentinel
 	{
 		int id;
 		archive.Read( &id, 1, true );
-		Serializeable* obj = SerialFactory::Inst()->Create( id );
-		obj->Load( archive );
-		return obj;
+
+		if( id != 0 )
+		{
+			Serializeable* obj = SerialFactory::Inst()->Create( id );
+			obj->Load( archive );
+			return obj;
+		}
+
+		return NULL;
 	}
 }

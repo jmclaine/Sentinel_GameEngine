@@ -12,18 +12,13 @@
 #include <fstream>
 #include <vector>
 
-#define STBI_HEADER_FILE_ONLY
-#include "stb_image.c"
-
 #ifdef _DEBUG
 inline void HANDLE_GL_ERRORS()
 {
 	GLenum err = glGetError();
 
 	if( err != GL_NO_ERROR )
-	{
 		REPORT_ERROR( gluErrorUnicodeStringEXT(err), "OpenGL Error" );
-	}
 }
 #else
 #define HANDLE_GL_ERRORS();
@@ -100,9 +95,8 @@ namespace Sentinel
 
 	public:
 
-		TextureGL( const char* name, UINT width, UINT height, GLuint id )
+		TextureGL( UINT width, UINT height, GLuint id )
 		{
-			mName	= name;
 			mWidth	= width;
 			mHeight	= height;
 			mID		= id;
@@ -116,6 +110,14 @@ namespace Sentinel
 		void Release()
 		{
 			glDeleteTextures( 1, &mID );
+		}
+
+		void* GetPixels()
+		{
+			BYTE* pixels = new BYTE[ (mWidth * mHeight) << 4 ];
+			glBindTexture( GL_TEXTURE_2D, mID );
+			glGetTexImage( GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
+			return pixels;
 		}
 	};
 
@@ -691,7 +693,7 @@ namespace Sentinel
 			// Create NULL_TEXTURE.
 			//
 			if( !NULL_TEXTURE )
-				NULL_TEXTURE = std::shared_ptr< Texture >( new TextureGL( "", 0, 0, 0 ));
+				NULL_TEXTURE = std::shared_ptr< Texture >( new TextureGL( 0, 0, 0 ));
 
 			// Create initial white texture as BASE_TEXTURE.
 			//
@@ -820,8 +822,6 @@ namespace Sentinel
 
 			std::shared_ptr< Texture > texture = CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA );
 
-			static_cast< TextureGL* >(texture.get())->mName = filename;
-
 			stbi_image_free( pixels );
 
 			return texture;
@@ -855,7 +855,7 @@ namespace Sentinel
 			if( createMips )
 				glGenerateMipmap( GL_TEXTURE_2D );
 			
-			return std::shared_ptr< Texture >( new TextureGL( "~Memory~", width, height, texID ));
+			return std::shared_ptr< Texture >( new TextureGL( width, height, texID ));
 		}
 
 		// Special Rendering.

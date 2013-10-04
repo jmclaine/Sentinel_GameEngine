@@ -12,6 +12,7 @@ namespace Sentinel
 		mType		= GameComponent::PHYSICS;
 
 		mTransform	= NULL;
+		mRigidBody  = NULL;
 	}
 
 	PhysicsComponent::PhysicsComponent( btRigidBody* body )
@@ -28,25 +29,32 @@ namespace Sentinel
 
 		if( mTransform == NULL )
 			throw AppException( "PhysicsComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain TransformComponent" );
+
+		if( mRigidBody == NULL )
+			throw AppException( "PhysicsComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain RigidBody" );
+
+		PhysicsSystem::Inst()->AddRigidBody( mRigidBody );
 	}
 
 	void PhysicsComponent::Update()
 	{
-		btVector3 v( mRigidBody->getCenterOfMassPosition() );
+		if( mTransform )
+		{
+			btVector3 v( mRigidBody->getCenterOfMassPosition() );
 
-		mTransform->mPosition = Vector3f( v.x(), v.y(), v.z() );
+			mTransform->mPosition = Vector3f( v.x(), v.y(), v.z() );
 		
-		btQuaternion q( mRigidBody->getOrientation() );
+			btQuaternion q( mRigidBody->getOrientation() );
 
-		mTransform->mOrientation.x = q.x();
-		mTransform->mOrientation.y = q.y();
-		mTransform->mOrientation.z = q.z();
-		mTransform->mOrientation.w = q.w();
+			mTransform->mOrientation = Quatf( q.x(), q.y(), q.z(), q.w() );
+		}
 	}
 
 	void PhysicsComponent::Shutdown()
 	{
 		mTransform = NULL;
+
+		PhysicsSystem::Inst()->RemoveRigidBody( mRigidBody );
 	}
 
 	/////////////////////////////////
@@ -64,8 +72,11 @@ namespace Sentinel
 		{
 			mRigidBody = body;
 		}
-		//else
-		//{}
+		else
+		{
+			PhysicsSystem::Inst()->RemoveRigidBody( mRigidBody );
+			delete mRigidBody->getCollisionShape();
+		}
 	}
 
 	/////////////////////////////////
@@ -73,6 +84,8 @@ namespace Sentinel
 	void PhysicsComponent::Save( Archive& archive )
 	{
 		mSerialRegistry.Save( archive );
+
+		GameComponent::Save( archive );
 
 		int type = mRigidBody->getCollisionShape()->getShapeType();
 		
@@ -97,6 +110,8 @@ namespace Sentinel
 
 	void PhysicsComponent::Load( Archive& archive )
 	{
+		GameComponent::Load( archive );
+
 		int type;
 		archive.Read( &type );
 		

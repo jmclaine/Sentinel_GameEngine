@@ -24,6 +24,8 @@ namespace Sentinel
 		btAlignedObjectArray< btCollisionShape* >			mShape;
 		btAlignedObjectArray< btTriangleIndexVertexArray* > mShapeData;
 
+		bool mIsActive;
+
 		//////////////////////////////////
 
 		PhysicsSystem();
@@ -49,6 +51,12 @@ namespace Sentinel
 
 	private:
 
-		btRigidBody*	CreateObject( btCollisionShape* shape, const btVector3& position, const btQuaternion& orientation, btScalar mass );
+		btRigidBody*	CreateRigidBody( btCollisionShape* shape, const btVector3& position, const btQuaternion& orientation, btScalar mass );
+
+	public:
+
+		void			AddRigidBody( btRigidBody* body );
+
+		void			RemoveRigidBody( btRigidBody* body );
 	};
 }

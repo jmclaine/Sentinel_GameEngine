@@ -46,9 +46,9 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\Engine\tinyxml;$(SolutionDir)\..\Engine\bullet-2.81-rev2613\src;$(SolutionDir)\..\Engine\glew\include;$(SolutionDir)\..\Engine\src\;$(SolutionDir)\..\Engine\DirectX11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Engine\zlib-1.2.8;$(SolutionDir)\..\Engine\tinyxml;$(SolutionDir)\..\Engine\bullet-2.81-rev2613\src;$(SolutionDir)\..\Engine\glew\include;$(SolutionDir)\..\Engine\src\;$(SolutionDir)\..\Engine\DirectX11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAsManaged>false</CompileAsManaged>
-      <PreprocessorDefinitions>WIN32;_WINDLL;BUILD_DLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32; _CRT_NONSTDC_NO_DEPRECATE;_WINDLL;BUILD_DLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
     </ClCompile>
@@ -73,9 +73,9 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\Engine\tinyxml;$(SolutionDir)\..\Engine\bullet-2.81-rev2613\src;$(SolutionDir)\..\Engine\glew\include;$(SolutionDir)\..\Engine\src\;$(SolutionDir)\..\Engine\DirectX11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Engine\zlib-1.2.8;$(SolutionDir)\..\Engine\tinyxml;$(SolutionDir)\..\Engine\bullet-2.81-rev2613\src;$(SolutionDir)\..\Engine\glew\include;$(SolutionDir)\..\Engine\src\;$(SolutionDir)\..\Engine\DirectX11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAsManaged>false</CompileAsManaged>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDLL;BUILD_DLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32; _CRT_NONSTDC_NO_DEPRECATE;_WINDLL;BUILD_DLL;_CRT_SECURE_NO_WARNINGS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
     </ClCompile>
@@ -139,10 +139,12 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
     <ClInclude Include="..\Engine\src\Script.h" />
     <ClInclude Include="..\Engine\src\Serializeable.h" />
     <ClInclude Include="..\Engine\src\Shader.h" />
+    <ClInclude Include="..\Engine\src\ShaderManager.h" />
     <ClInclude Include="..\Engine\src\Shape.h" />
     <ClInclude Include="..\Engine\src\Singleton.h" />
     <ClInclude Include="..\Engine\src\SpriteComponent.h" />
     <ClInclude Include="..\Engine\src\Texture.h" />
+    <ClInclude Include="..\Engine\src\TextureManager.h" />
     <ClInclude Include="..\Engine\src\Timing.h" />
     <ClInclude Include="..\Engine\src\TransformComponent.h" />
     <ClInclude Include="..\Engine\src\Util.h" />
@@ -155,7 +157,6 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\Archive.cpp" />
-    <ClCompile Include="..\Engine\src\AssetManager.cpp" />
     <ClCompile Include="..\Engine\src\Buffer.cpp" />
     <ClCompile Include="..\Engine\src\CameraComponent.cpp" />
     <ClCompile Include="..\Engine\src\ColorRGBA.cpp" />
@@ -196,10 +197,12 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
     <ClCompile Include="..\Engine\src\ScriptParser.cpp" />
     <ClCompile Include="..\Engine\src\Serializeable.cpp" />
     <ClCompile Include="..\Engine\src\Shader.cpp" />
+    <ClCompile Include="..\Engine\src\ShaderManager.cpp" />
     <ClCompile Include="..\Engine\src\Shape.cpp" />
     <ClCompile Include="..\Engine\src\SpriteComponent.cpp" />
     <ClCompile Include="..\Engine\src\stb_image.c" />
     <ClCompile Include="..\Engine\src\Texture.cpp" />
+    <ClCompile Include="..\Engine\src\TextureManager.cpp" />
     <ClCompile Include="..\Engine\src\Timing.cpp" />
     <ClCompile Include="..\Engine\src\TransformComponent.cpp" />
     <ClCompile Include="..\Engine\src\Util.cpp" />
@@ -210,6 +213,21 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
     <ClCompile Include="..\Engine\tinyxml\tinyxml.cpp" />
     <ClCompile Include="..\Engine\tinyxml\tinyxmlerror.cpp" />
     <ClCompile Include="..\Engine\tinyxml\tinyxmlparser.cpp" />
+    <ClCompile Include="..\Engine\zlib-1.2.8\adler32.c" />
+    <ClCompile Include="..\Engine\zlib-1.2.8\compress.c" />
+    <ClCompile Include="..\Engine\zlib-1.2.8\crc32.c" />
+    <ClCompile Include="..\Engine\zlib-1.2.8\deflate.c" />
+    <ClCompile Include="..\Engine\zlib-1.2.8\gzclose.c" />
+    <ClCompile Include="..\Engine\zlib-1.2.8\gzlib.c" />
+    <ClCompile Include="..\Engine\zlib-1.2.8\gzread.c" />
+    <ClCompile Include="..\Engine\zlib-1.2.8\gzwrite.c" />
+    <ClCompile Include="..\Engine\zlib-1.2.8\infback.c" />
+    <ClCompile Include="..\Engine\zlib-1.2.8\inffast.c" />
+    <ClCompile Include="..\Engine\zlib-1.2.8\inflate.c" />
+    <ClCompile Include="..\Engine\zlib-1.2.8\inftrees.c" />
+    <ClCompile Include="..\Engine\zlib-1.2.8\trees.c" />
+    <ClCompile Include="..\Engine\zlib-1.2.8\uncompr.c" />
+    <ClCompile Include="..\Engine\zlib-1.2.8\zutil.c" />
     <ClCompile Include="..\Sentinel_Test\Sentinel_Test\TriggerComponent.cpp" />
   </ItemGroup>
   <ItemGroup>

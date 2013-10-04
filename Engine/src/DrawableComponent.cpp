@@ -7,7 +7,7 @@ namespace Sentinel
 	{
 		mType = GameComponent::DRAWABLE;
 
-		mTransform = NULL;
+		Shutdown();
 	}
 
 	void DrawableComponent::Startup()
@@ -22,5 +22,7 @@ namespace Sentinel
 	{}
 
 	void DrawableComponent::Shutdown()
-	{}
+	{
+		mTransform = NULL;
+	}
 }

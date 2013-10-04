@@ -17,7 +17,7 @@ namespace Sentinel
 	{
 		friend class GameWorld;
 
-		DECLARE_SERIAL( GameObject );
+		DECLARE_SERIAL();
 
 	protected:
 
@@ -32,7 +32,7 @@ namespace Sentinel
 
 	public:
 
-		const char*							mName;
+		std::string							mName;
 		GameObject*							mParent;
 
 		//////////////////////////////

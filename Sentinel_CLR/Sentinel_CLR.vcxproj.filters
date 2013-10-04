@@ -141,8 +141,14 @@
     <ClInclude Include="..\Engine\src\CLR\WColorRGBA.h">
       <Filter>Sentinel_Engine\Assets</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WTextureManager.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
     <ClInclude Include="..\Engine\src\CLR\WAssetManager.h">
-      <Filter>Sentinel_Engine\Utilities</Filter>
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WShaderManager.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -239,8 +245,11 @@
     <ClCompile Include="..\Engine\src\CLR\WColorRGBA.cpp">
       <Filter>Sentinel_Engine\Assets</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\WAssetManager.cpp">
-      <Filter>Sentinel_Engine\Utilities</Filter>
+    <ClCompile Include="..\Engine\src\CLR\WTextureManager.cpp">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WShaderManager.cpp">
+      <Filter>Sentinel_Engine\Assets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

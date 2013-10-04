@@ -6,7 +6,7 @@
 #include "MeshBuilder.h"
 #include "Timing.h"
 #include "Archive.h"
-#include "AssetManager.h"
+#include "TextureManager.h"
 
 namespace Sentinel
 {

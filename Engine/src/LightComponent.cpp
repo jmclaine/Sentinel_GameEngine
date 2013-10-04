@@ -10,7 +10,7 @@ namespace Sentinel
 	{
 		mType = GameComponent::LIGHT;
 
-		mTransform = NULL;
+		Shutdown();
 
 		mAttenuation = Vector4f( 1, 1, 1, 10000 );
 	}
@@ -32,7 +32,9 @@ namespace Sentinel
 	{}
 
 	void LightComponent::Shutdown()
-	{}
+	{
+		mTransform = NULL;
+	}
 
 	//////////////////////////////
 
@@ -40,12 +42,16 @@ namespace Sentinel
 	{
 		mSerialRegistry.Save( archive );
 
+		GameComponent::Save( archive );
+
 		archive.Write( mColor.Ptr(), 4 );
 		archive.Write( mAttenuation.Ptr(), 4 );
 	}
 
 	void LightComponent::Load( Archive& archive )
 	{
+		GameComponent::Load( archive );
+
 		archive.Read( mColor.Ptr(), 4 );
 		archive.Read( mAttenuation.Ptr(), 4 );
 	}

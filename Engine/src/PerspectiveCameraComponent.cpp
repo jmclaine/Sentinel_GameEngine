@@ -21,15 +21,22 @@ namespace Sentinel
 
 	void PerspectiveCameraComponent::Update()
 	{
-		mMatrixView.Rotate( mTransform->mOrientation );
-		mLookAt = mTransform->mPosition + mMatrixView.Forward();
+		CameraComponent::Update();
 
-		mMatrixView.LookAtView( mTransform->mPosition, mLookAt, mMatrixView.Up() );
-		mMatrixFinal = mMatrixProjection * mMatrixView;
+		if( mTransform )
+		{
+			mMatrixView.Rotate( mTransform->mOrientation );
+			mLookAt = mTransform->mPosition + mMatrixView.Forward();
+
+			mMatrixView.LookAtView( mTransform->mPosition, mLookAt, mMatrixView.Up() );
+			mMatrixFinal = mMatrixProjection * mMatrixView;
+		}
 	}
 
 	void PerspectiveCameraComponent::Shutdown()
-	{}
+	{
+		CameraComponent::Shutdown();
+	}
 
 	//////////////////////////////
 
@@ -64,6 +71,8 @@ namespace Sentinel
 	{
 		mSerialRegistry.Save( archive );
 
+		GameComponent::Save( archive );
+
 		archive.Write( mMatrixProjection.Ptr(), 16 );
 		archive.Write( &mNearZ );
 		archive.Write( &mFarZ );
@@ -72,6 +81,8 @@ namespace Sentinel
 
 	void PerspectiveCameraComponent::Load( Archive& archive )
 	{
+		GameComponent::Load( archive );
+
 		archive.Read( mMatrixProjection.Ptr(), 16 );
 		archive.Read( &mNearZ );
 		archive.Read( &mFarZ );

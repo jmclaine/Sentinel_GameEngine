@@ -9,7 +9,7 @@ namespace Sentinel
 {
 	class SENTINEL_DLL PhysicsComponent : public GameComponent
 	{
-		DECLARE_SERIAL( PhysicsComponent );
+		DECLARE_SERIAL();
 
 		TransformComponent*	mTransform;
 

@@ -16,7 +16,6 @@ namespace Sentinel { namespace Assets
 
 		void			Release();
 
-		System::String^	Name();
 		UINT			Width();
 		UINT			Height();
 	};

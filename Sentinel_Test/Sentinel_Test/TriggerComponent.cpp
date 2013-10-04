@@ -10,7 +10,7 @@ namespace Sentinel
 	{
 		mType = GameComponent::TRIGGER;
 
-		mPhysics = NULL;
+		Shutdown();
 	}
 
 	TriggerComponent::~TriggerComponent()
@@ -28,15 +28,21 @@ namespace Sentinel
 	{}
 
 	void TriggerComponent::Shutdown()
-	{}
+	{
+		mPhysics = NULL;
+	}
 
 	/////////////////////////////////
 
 	void TriggerComponent::Save( Archive& archive )
 	{
 		mSerialRegistry.Save( archive );
+
+		GameComponent::Save( archive );
 	}
 
 	void TriggerComponent::Load( Archive& archive )
-	{}
+	{
+		GameComponent::Load( archive );
+	}
 }

@@ -20,13 +20,20 @@ namespace Sentinel
 
 	void OrthographicCameraComponent::Update()
 	{
-		mMatrixView.Translate( GetTransform()->mPosition );
+		CameraComponent::Update();
+
+		if( mTransform )
+		{
+			mMatrixView.Translate( mTransform->mPosition );
 		
-		mMatrixFinal = mMatrixProjection * mMatrixView;
+			mMatrixFinal = mMatrixProjection * mMatrixView;
+		}
 	}
 
 	void OrthographicCameraComponent::Shutdown()
-	{}
+	{
+		CameraComponent::Shutdown();
+	}
 
 	//////////////////////////////
 
@@ -41,11 +48,15 @@ namespace Sentinel
 	{
 		mSerialRegistry.Save( archive );
 
+		GameComponent::Save( archive );
+
 		archive.Write( mMatrixProjection.Ptr(), 16 );
 	}
 
 	void OrthographicCameraComponent::Load( Archive& archive )
 	{
+		GameComponent::Load( archive );
+
 		archive.Read( mMatrixProjection.Ptr(), 16 );
 	}
 }

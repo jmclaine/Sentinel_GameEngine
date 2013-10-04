@@ -7,16 +7,7 @@
 
 namespace Sentinel
 {
-	PhysicsSystem::PhysicsSystem() :
-		mConfig( NULL ), mDispatcher( NULL ), mCache( NULL ), mSolver( NULL ), mWorld( NULL )
-	{}
-
-	PhysicsSystem::~PhysicsSystem()
-	{
-		Shutdown();
-	}
-
-	void PhysicsSystem::Startup()
+	PhysicsSystem::PhysicsSystem()
 	{
 		mConfig		= new btDefaultCollisionConfiguration();
 		mDispatcher	= new btCollisionDispatcher( mConfig );
@@ -26,21 +17,11 @@ namespace Sentinel
 		mWorld		= new btDiscreteDynamicsWorld( mDispatcher, mCache, mSolver, mConfig );
 
 		mWorld->setGravity( btVector3( 0, -9.81f, 0 ));
+
+		mIsActive = false;
 	}
 
-	void PhysicsSystem::Update()
-	{
-		float DT = Timing::Inst()->DeltaTime();
-
-		while( DT > 0 )
-		{
-			PhysicsSystem::Inst()->mWorld->stepSimulation( btScalar( DT ));
-
-			DT -= (float)Timing::DESIRED_FRAME_RATE;
-		}
-	}
-
-	void PhysicsSystem::Shutdown()
+	PhysicsSystem::~PhysicsSystem()
 	{
 		for( int i = mWorld->getNumCollisionObjects()-1; i >=0; --i )
 		{
@@ -73,24 +54,49 @@ namespace Sentinel
 		SAFE_DELETE( mSolver );
 	}
 
-#define CREATE_OBJECT()\
-	return CreateObject( shape, \
-						 btVector3( position.x, position.y, position.z ), \
-						 btQuaternion( orientation.x, orientation.y, orientation.z, orientation.w ), \
-						 mass );
+	void PhysicsSystem::Startup()
+	{
+		mIsActive = true;
+	}
+
+	void PhysicsSystem::Update()
+	{
+		if( mIsActive )
+		{
+			float DT = Timing::Inst()->DeltaTime();
+
+			while( DT > 0 )
+			{
+				mWorld->stepSimulation( btScalar( DT ));
+
+				DT -= (float)Timing::DESIRED_FRAME_RATE;
+			}
+		}
+	}
+
+	void PhysicsSystem::Shutdown()
+	{
+		mIsActive = false;
+	}
+
+#define CREATE_RIGID_BODY()\
+	return CreateRigidBody( shape, \
+							btVector3( position.x, position.y, position.z ), \
+							btQuaternion( orientation.x, orientation.y, orientation.z, orientation.w ), \
+							mass );
 
 	btRigidBody* PhysicsSystem::CreateSphere( const Vector3f& position, const Quatf& orientation, float radius, float mass )
 	{
 		btCollisionShape* shape = new btSphereShape( btScalar( radius ));
 
-		CREATE_OBJECT();
+		CREATE_RIGID_BODY();
 	}
 
 	btRigidBody* PhysicsSystem::CreateBox( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, float mass )
 	{
 		btCollisionShape* shape = new btBoxShape( btVector3( scale.x, scale.y, scale.z ));
 
-		CREATE_OBJECT();
+		CREATE_RIGID_BODY();
 	}
 
 	btRigidBody* PhysicsSystem::CreateCylinder( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, float mass )
@@ -98,7 +104,7 @@ namespace Sentinel
 		// scale.Z() is unused
 		btCollisionShape* shape = new btCylinderShape( btVector3( scale.x, scale.y*0.5f, scale.x ));
 
-		CREATE_OBJECT();
+		CREATE_RIGID_BODY();
 	}
 
 	btRigidBody* PhysicsSystem::CreateMesh( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, Mesh* mesh, float mass )
@@ -148,10 +154,10 @@ namespace Sentinel
 
 		btConvexTriangleMeshShape* shape = new btConvexTriangleMeshShape( tiva, true );
 
-		CREATE_OBJECT();
+		CREATE_RIGID_BODY();
 	}
 
-	btRigidBody* PhysicsSystem::CreateObject( btCollisionShape* shape, const btVector3& position, const btQuaternion& orientation, btScalar mass )
+	btRigidBody* PhysicsSystem::CreateRigidBody( btCollisionShape* shape, const btVector3& position, const btQuaternion& orientation, btScalar mass )
 	{
 		mShape.push_back( shape );
 
@@ -170,10 +176,16 @@ namespace Sentinel
 
 		btRigidBody::btRigidBodyConstructionInfo rbInfo( tMass, myMotionState, shape, localInertia );
 
-		btRigidBody* body = new btRigidBody( rbInfo );
+		return new btRigidBody( rbInfo );
+	}
 
+	void PhysicsSystem::AddRigidBody( btRigidBody* body )
+	{
 		mWorld->addRigidBody( body );
+	}
 
-		return body;
+	void PhysicsSystem::RemoveRigidBody( btRigidBody* body )
+	{
+		mWorld->removeRigidBody( body );
 	}
 }

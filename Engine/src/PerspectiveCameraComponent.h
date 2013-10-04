@@ -6,7 +6,7 @@ namespace Sentinel
 {
 	class SENTINEL_DLL PerspectiveCameraComponent : public CameraComponent
 	{
-		DECLARE_SERIAL( PerspectiveCameraComponent );
+		DECLARE_SERIAL();
 
 	private:
 

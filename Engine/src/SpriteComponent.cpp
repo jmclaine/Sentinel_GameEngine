@@ -37,30 +37,35 @@ namespace Sentinel
 	{
 		DrawableComponent::Update();
 
-		ParticleSystem::Inst()->Begin( this );
-
-		UCHAR* verts = (UCHAR*)ParticleSystem::Inst()->mVertex;
-
-		if( mTexture )
+		if( mTransform )
 		{
-			ParticleSystem::Inst()->mMesh->mTexture[ TEXTURE_DIFFUSE ] = mTexture;
+			ParticleSystem::Inst()->Begin( this );
 
-			*(Vector2f*)verts = Vector2f( (float)(mFrame % mSpriteDimension.x), \
-										  (float)(mFrame / mSpriteDimension.x) );
+			UCHAR* verts = (UCHAR*)ParticleSystem::Inst()->mVertex;
+
+			if( mTexture )
+			{
+				ParticleSystem::Inst()->mMesh->mTexture[ TEXTURE_DIFFUSE ] = mTexture;
+
+				*(Vector2f*)verts = Vector2f( (float)(mFrame % mSpriteDimension.x), \
+											  (float)(mFrame / mSpriteDimension.x) );
+			}
+			verts += sizeof( Vector2f );
+
+			*(UINT*)verts = mColor.ToUINT();
+			verts += sizeof( UINT );
+
+			*(Matrix4f*)verts = mTransform->GetMatrixWorld();
+			verts += sizeof( Matrix4f );
+
+			ParticleSystem::Inst()->End();
 		}
-		verts += sizeof( Vector2f );
-
-		*(UINT*)verts = mColor.ToUINT();
-		verts += sizeof( UINT );
-
-		*(Matrix4f*)verts = mTransform->GetMatrixWorld();
-		verts += sizeof( Matrix4f );
-
-		ParticleSystem::Inst()->End();
 	}
 
 	void SpriteComponent::Shutdown()
-	{}
+	{
+		DrawableComponent::Shutdown();
+	}
 
 	/////////////////////////////////
 
@@ -89,8 +94,12 @@ namespace Sentinel
 	void SpriteComponent::Save( Archive& archive )
 	{
 		mSerialRegistry.Save( archive );
+
+		GameComponent::Save( archive );
 	}
 
 	void SpriteComponent::Load( Archive& archive )
-	{}
+	{
+		GameComponent::Load( archive );
+	}
 }

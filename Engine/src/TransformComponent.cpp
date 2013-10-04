@@ -10,12 +10,11 @@ namespace Sentinel
 	DEFINE_SERIAL_REGISTER( TransformComponent );
 	DEFINE_SERIAL_CLONE( TransformComponent );
 
-	TransformComponent::TransformComponent() :
-		GameComponent()
+	TransformComponent::TransformComponent()
 	{
 		mType = GameComponent::TRANSFORM;
 
-		mParentTransform = NULL;
+		Shutdown();
 
 		mScale = Vector3f( 1, 1, 1 );
 	}
@@ -41,7 +40,9 @@ namespace Sentinel
 	}
 
 	void TransformComponent::Shutdown()
-	{}
+	{
+		mParentTransform = NULL;
+	}
 
 	///////////////////////////////////
 
@@ -56,6 +57,8 @@ namespace Sentinel
 	{
 		mSerialRegistry.Save( archive );
 
+		GameComponent::Save( archive );
+
 		archive.Write( mPosition.Ptr(), 3 );
 		archive.Write( mOrientation.Ptr(), 4 );
 		archive.Write( mScale.Ptr(), 3 );
@@ -63,6 +66,8 @@ namespace Sentinel
 
 	void TransformComponent::Load( Archive& archive )
 	{
+		GameComponent::Load( archive );
+
 		archive.Read( mPosition.Ptr(), 3 );
 		archive.Read( mOrientation.Ptr(), 4 );
 		archive.Read( mScale.Ptr(), 3 );

@@ -24,9 +24,6 @@
 #include <vector>
 #include <crtdbg.h>
 
-#define STBI_HEADER_FILE_ONLY
-#include "stb_image.c"
-
 namespace Sentinel
 {
 	#define HV( func )\
@@ -101,12 +98,11 @@ namespace Sentinel
 
 	public:
 
-		TextureDX( const char* name, UINT width, UINT height )
+		TextureDX( UINT width, UINT height )
 		{
 			mResource	= NULL;
 			mTexture	= NULL;
 
-			mName		= name;
 			mWidth		= width;
 			mHeight		= height;
 		}
@@ -115,6 +111,11 @@ namespace Sentinel
 		{
 			SAFE_RELEASE_PTR( mTexture );
 			SAFE_RELEASE_PTR( mResource );
+		}
+
+		void* GetPixels()
+		{
+			return NULL;
 		}
 	};
 
@@ -784,7 +785,7 @@ namespace Sentinel
 
 				if( D3DX11CreateShaderResourceViewFromFileA( mCurrWindow->mDevice, filename, &info, NULL, &image, NULL ) == S_OK )
 				{
-					TextureDX* texture = new TextureDX( filename, info.Width, info.Height );
+					TextureDX* texture = new TextureDX( info.Width, info.Height );
 					texture->mResource = image;
 					return std::shared_ptr< Texture >( texture );
 				}
@@ -799,9 +800,7 @@ namespace Sentinel
 			//
 			int width, height;
 			int nChannels;
-			unsigned char *pixels = stbi_load( filename,
-											   &width, &height,
-											   &nChannels, 4 );
+			unsigned char* pixels = stbi_load( filename, &width, &height, &nChannels, 4 );
 
 			if( pixels == NULL )
 			{
@@ -813,8 +812,7 @@ namespace Sentinel
 
 			TextureDX* texDX = static_cast< TextureDX* >(texture.get());
 			SAFE_RELEASE_PTR( texDX->mTexture );
-			texDX->mName = filename;
-
+			
 			stbi_image_free( pixels );
 
 			return texture;
@@ -822,7 +820,7 @@ namespace Sentinel
 
 		std::shared_ptr< Texture > CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormatType format, bool createMips = true )
 		{
-			TextureDX* texture = new TextureDX( "~Memory~", width, height );
+			TextureDX* texture = new TextureDX( width, height );
 
 			UCHAR* newData = NULL;
 			

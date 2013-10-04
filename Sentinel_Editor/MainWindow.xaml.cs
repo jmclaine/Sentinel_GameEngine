@@ -580,7 +580,7 @@ namespace Sentinel_Editor
 		{
 			Directory.SetCurrentDirectory( "Assets\\Shaders" );
 
-			if( !WShaderManager.Load( "config.xml" ))
+			if( !WShaderManager.LoadConfig( "config.xml" ))
 			{
 				MessageBox.Show( "Failed to load 'Assets\\Shaders\\config.xml'", "Shader Load Failure" );
 				System.Environment.Exit( -1 );
@@ -609,8 +609,8 @@ namespace Sentinel_Editor
 			
 			////////////////////////////////////
 
-			WTexture texture = WTextureManager.Add( "DEFAULT", WRenderer.CreateTextureFromFile( "Assets\\Textures\\default-alpha.png" ));
-			AddAsset( texture, Path.GetFileName( texture.Name() ));
+			WTexture texture = WTextureManager.Add( "default-alpha.png", WRenderer.CreateTextureFromFile( "Assets\\Textures\\default-alpha.png" ));
+			AddAsset( texture, "default-alpha.png" );
 			
 			// Camera.
 			//
@@ -660,7 +660,7 @@ namespace Sentinel_Editor
 			meshBuilder.ClearGeometry();
 			meshBuilder.CreateDodecahedron( 1.0f );
 			meshBuilder.Shader = WShaderManager.Get( "TEXTURE" );
-			meshBuilder.Texture( (int)TextureType.DIFFUSE ).Set( WTextureManager.Get( "DEFAULT" ));
+			meshBuilder.Texture( (int)TextureType.DIFFUSE ).Set( WTextureManager.Get( "default-alpha.png" ));
 
 			mesh = meshBuilder.BuildMesh();
 			AddAsset( mesh, "Dodecahedron" );

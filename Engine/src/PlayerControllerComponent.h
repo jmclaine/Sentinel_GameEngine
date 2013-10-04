@@ -6,7 +6,7 @@ namespace Sentinel
 {
 	class SENTINEL_DLL PlayerControllerComponent : public ControllerComponent
 	{
-		DECLARE_SERIAL( PlayerControllerComponent );
+		DECLARE_SERIAL();
 
 	public:
 

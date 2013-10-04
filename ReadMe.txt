@@ -16,7 +16,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
-This engine has integrated Bullet Physics (bullet-2.81-rev2613) and TinyXML.
+This engine has integrated:
+
+	Bullet Physics (bullet-2.81-rev2613)
+	http://bulletphysics.org/wordpress/
+
+	TinyXML
+	http://www.grinninglizard.com/tinyxml/
+
+	zlib-1.2.8
+	http://www.zlib.net/
 
 
 

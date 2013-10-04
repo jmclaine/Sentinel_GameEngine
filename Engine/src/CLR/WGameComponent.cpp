@@ -23,13 +23,12 @@ namespace Sentinel { namespace Components
 
 	void WGameComponent::Delete()
 	{
-		WString::Free( const_cast< char*& >(mRef->mName) );
 		delete mRef;
 	}
 
 	System::String^ WGameComponent::ToString()
 	{
-		return gcnew System::String( mRef->mName );
+		return gcnew System::String( mRef->mName.c_str() );
 	}
 
 	DEFINE_OP_PTR( GameComponent );

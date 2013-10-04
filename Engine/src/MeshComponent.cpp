@@ -17,9 +17,6 @@ namespace Sentinel
 		mMaterial = mMesh->mMaterial;
 	}
 
-	MeshComponent::~MeshComponent()
-	{}
-
 	void MeshComponent::Startup()
 	{
 		DrawableComponent::Startup();
@@ -27,23 +24,34 @@ namespace Sentinel
 
 	void MeshComponent::Update()
 	{
-		mMesh->mMaterial = mMaterial;
+		DrawableComponent::Update();
 
-		mMesh->mMatrixWorld = mTransform->GetMatrixWorld();
+		if( mTransform )
+		{
+			mMesh->mMaterial = mMaterial;
 
-		mMesh->Draw();
+			mMesh->mMatrixWorld = mTransform->GetMatrixWorld();
+
+			mMesh->Draw();
+		}
 	}
 
 	void MeshComponent::Shutdown()
-	{}
+	{
+		DrawableComponent::Shutdown();
+	}
 
 	///////////////////////////////////
 
 	void MeshComponent::Save( Archive& archive )
 	{
 		mSerialRegistry.Save( archive );
+
+		GameComponent::Save( archive );
 	}
 
 	void MeshComponent::Load( Archive& archive )
-	{}
+	{
+		GameComponent::Load( archive );
+	}
 }

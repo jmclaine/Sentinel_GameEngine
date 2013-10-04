@@ -8,7 +8,7 @@ namespace Sentinel
 {
 	class SENTINEL_DLL LightComponent : public GameComponent
 	{
-		DECLARE_SERIAL( LightComponent );
+		DECLARE_SERIAL();
 
 		TransformComponent* mTransform;		// light must possess a position / direction
 

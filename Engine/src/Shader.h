@@ -13,7 +13,6 @@ namespace Sentinel
 	{
 	protected:
 		
-		std::string			mName;
 		std::string			mAttribute;
 		std::string			mUniform;
 

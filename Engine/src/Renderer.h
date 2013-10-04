@@ -83,6 +83,9 @@ Renderer::Destroy();
 #include "Texture.h"
 #include "Buffer.h"
 
+#define STBI_HEADER_FILE_ONLY
+#include "stb_image.c"
+
 #include <sstream>
 #include <vector>
 
@@ -225,6 +228,7 @@ namespace Sentinel
 		// Textures.
 		//
 		std::shared_ptr< Texture > CreateTexture( UINT width, UINT height, ImageFormatType format = IMAGE_FORMAT_RGBA, bool createMips = false );
+		std::shared_ptr< Texture > CreateTextureFromResource( void* data, UINT length );
 
 		virtual std::shared_ptr< Texture > CreateTextureFromFile( const char* filename ) = 0;
 		virtual std::shared_ptr< Texture > CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormatType format, bool createMips = true ) = 0;

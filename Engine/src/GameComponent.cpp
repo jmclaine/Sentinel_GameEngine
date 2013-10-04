@@ -3,7 +3,7 @@
 namespace Sentinel
 {
 	GameComponent::GameComponent() :
-		mName( NULL )
+		mOwner( NULL )
 	{
 		mType = DEFAULT;
 	}
@@ -19,5 +19,17 @@ namespace Sentinel
 	GameComponent::Type GameComponent::GetType()
 	{
 		return mType;
+	}
+
+	////////////////////////////////
+
+	void GameComponent::Save( Archive& archive )
+	{
+		archive.Write( &mName );
+	}
+
+	void GameComponent::Load( Archive& archive )
+	{
+		archive.Read( &mName );
 	}
 }

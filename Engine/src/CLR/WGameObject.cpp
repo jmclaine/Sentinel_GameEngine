@@ -19,13 +19,12 @@ namespace Sentinel { namespace Components
 
 	void WGameObject::Delete()
 	{
-		WString::Free( const_cast< char*& >(mRef->mName) );
 		delete mRef;
 	}
 
-	String^ WGameObject::ToString()
+	System::String^ WGameObject::ToString()
 	{
-		return gcnew String( mRef->mName );
+		return gcnew System::String( mRef->mName.c_str() );
 	}
 
 	DEFINE_OP_PTR( GameObject );
@@ -37,7 +36,7 @@ namespace Sentinel { namespace Components
 
 	////////////////////////////////
 
-	WGameComponent^ WGameObject::AttachComponent( WGameComponent^ component, String^ name )
+	WGameComponent^ WGameObject::AttachComponent( WGameComponent^ component, System::String^ name )
 	{
 		mRef->AttachComponent( component, WString::Alloc( name ));
 		return component;

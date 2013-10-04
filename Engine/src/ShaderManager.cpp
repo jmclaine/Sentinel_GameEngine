@@ -1,22 +1,27 @@
-#include "AssetManager.h"
+#include "ShaderManager.h"
 #include "Renderer.h"
 #include "tinyxml.h"
 
 namespace Sentinel
 {
-#define DEFINE_MANAGER( refClass )\
-	refClass##Manager::refClass##Manager() {}\
-	refClass##Manager::~refClass##Manager() {}\
-	refClass##Manager* refClass##Manager::Create() { return refClass##Manager::Inst(); }
+	ShaderManager::ShaderManager()
+	{}
 
-#define DEFINE_MANAGER_EX( refClass )\
-	DEFINE_MANAGER( refClass );\
-	bool refClass##Manager::Load( const char* filename ) { return false; }
+	ShaderManager::~ShaderManager()
+	{}
 
-	DEFINE_MANAGER_EX( Texture );
-	DEFINE_MANAGER( Shader );
+	ShaderManager* ShaderManager::Create()
+	{
+		return ShaderManager::Inst();
+	}
 
-	bool ShaderManager::Load( const char* filename )
+	void ShaderManager::Save( Archive& archive )
+	{}
+
+	void ShaderManager::Load( Archive& archive )
+	{}
+
+	bool ShaderManager::LoadConfig( const char* filename )
 	{
 		TiXmlDocument doc;
 		if( !doc.LoadFile( filename ))
@@ -39,7 +44,9 @@ namespace Sentinel
 			const char* pUnif = pElem->Attribute( "Uniform" );
 			const char* pName = pElem->Attribute( "Name" );
 
-			if( !ShaderManager::Inst()->Add( pName, Renderer::Inst()->CreateShader( pFile, pAttr, pUnif )))
+			std::shared_ptr< Shader > shader = ShaderManager::Inst()->Add( pName, Renderer::Inst()->CreateShader( pFile, pAttr, pUnif ));
+			
+			if( !shader )
 				return false;
 
 			pElem = pElem->NextSiblingElement();

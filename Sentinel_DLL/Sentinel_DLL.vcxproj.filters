@@ -46,6 +46,9 @@
     <Filter Include="Source Files\Sentinel_Engine\Components\Physics">
       <UniqueIdentifier>{7d929b97-e255-4090-9633-1b1aac43e26f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Sentinel_Engine\Utilities\zlib">
+      <UniqueIdentifier>{78949fcc-380a-4bc3-9628-0eb31c44e922}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Engine\src\Common.h">
@@ -189,9 +192,6 @@
     <ClInclude Include="..\Engine\src\CDPI.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\FloatCompressor.h">
-      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\RandomValue.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClInclude>
@@ -211,7 +211,16 @@
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\AssetManager.h">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\TextureManager.h">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\FloatCompressor.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\ShaderManager.h">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -383,8 +392,56 @@
     <ClCompile Include="..\Engine\src\Archive.cpp">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\AssetManager.cpp">
-      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    <ClCompile Include="..\Engine\src\TextureManager.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\ShaderManager.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\zlib-1.2.8\compress.c">
+      <Filter>Source Files\Sentinel_Engine\Utilities\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\zlib-1.2.8\uncompr.c">
+      <Filter>Source Files\Sentinel_Engine\Utilities\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\zlib-1.2.8\deflate.c">
+      <Filter>Source Files\Sentinel_Engine\Utilities\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\zlib-1.2.8\inflate.c">
+      <Filter>Source Files\Sentinel_Engine\Utilities\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\zlib-1.2.8\adler32.c">
+      <Filter>Source Files\Sentinel_Engine\Utilities\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\zlib-1.2.8\crc32.c">
+      <Filter>Source Files\Sentinel_Engine\Utilities\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\zlib-1.2.8\gzclose.c">
+      <Filter>Source Files\Sentinel_Engine\Utilities\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\zlib-1.2.8\gzlib.c">
+      <Filter>Source Files\Sentinel_Engine\Utilities\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\zlib-1.2.8\gzread.c">
+      <Filter>Source Files\Sentinel_Engine\Utilities\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\zlib-1.2.8\gzwrite.c">
+      <Filter>Source Files\Sentinel_Engine\Utilities\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\zlib-1.2.8\infback.c">
+      <Filter>Source Files\Sentinel_Engine\Utilities\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\zlib-1.2.8\inffast.c">
+      <Filter>Source Files\Sentinel_Engine\Utilities\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\zlib-1.2.8\inftrees.c">
+      <Filter>Source Files\Sentinel_Engine\Utilities\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\zlib-1.2.8\trees.c">
+      <Filter>Source Files\Sentinel_Engine\Utilities\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\zlib-1.2.8\zutil.c">
+      <Filter>Source Files\Sentinel_Engine\Utilities\zlib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -2,12 +2,11 @@
 
 #include <string>
 #include <memory>
-#include <map>
+#include <unordered_map>
 #include <vector>
 
 #include "Common.h"
-#include "Util.h"
-#include "Singleton.h"
+#include "Archive.h"
 
 namespace Sentinel
 {
@@ -72,24 +71,9 @@ namespace Sentinel
 				data.push_back( kv->second );
 			}
 		}
+
+		virtual void Save( Archive& archive ) = 0;
+
+		virtual void Load( Archive& archive ) = 0;
 	};
-
-	/////////////////////////////////////////////////////
-
-#define DECLARE_MANAGER( refClass )\
-	class refClass;\
-	class SENTINEL_DLL refClass##Manager : public AssetManager< refClass >, public SingletonSafe< refClass##Manager >\
-	{\
-		friend class SingletonSafe< refClass##Manager >;\
-		friend class AssetManager< refClass >;\
-	private:\
-		refClass##Manager();\
-		~refClass##Manager();\
-	public:\
-		static refClass##Manager* Create();\
-		static bool Load( const char* filename );\
-	};
-
-	DECLARE_MANAGER( Texture );
-	DECLARE_MANAGER( Shader );
 }

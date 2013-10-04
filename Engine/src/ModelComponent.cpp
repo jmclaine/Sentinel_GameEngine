@@ -13,9 +13,6 @@ namespace Sentinel
 		Set( model );
 	}
 
-	ModelComponent::~ModelComponent()
-	{}
-
 	void ModelComponent::Set( std::shared_ptr< Model > model )
 	{
 		mModel = model;
@@ -32,15 +29,20 @@ namespace Sentinel
 	{
 		DrawableComponent::Update();
 
-		mModel->SetMaterials( mMaterial );
+		if( mTransform )
+		{
+			mModel->SetMaterials( mMaterial );
 
-		mModel->mMatrixWorld = mTransform->GetMatrixWorld();
+			mModel->mMatrixWorld = mTransform->GetMatrixWorld();
 
-		mModel->Draw();
+			mModel->Draw();
+		}
 	}
 
 	void ModelComponent::Shutdown()
-	{}
+	{
+		DrawableComponent::Shutdown();
+	}
 
 	///////////////////////////////////
 
@@ -77,8 +79,12 @@ namespace Sentinel
 	void ModelComponent::Save( Archive& archive )
 	{
 		mSerialRegistry.Save( archive );
+
+		GameComponent::Save( archive );
 	}
 
 	void ModelComponent::Load( Archive& archive )
-	{}
+	{
+		GameComponent::Load( archive );
+	}
 }

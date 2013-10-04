@@ -9,7 +9,7 @@
 namespace Sentinel
 {
 
-#define DECLARE_SERIAL( clazz )\
+#define DECLARE_SERIAL()\
 	private:\
 		static SerialRegister mSerialRegistry;\
 		static Serializeable* Clone();\

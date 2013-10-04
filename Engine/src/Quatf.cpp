@@ -3,11 +3,9 @@
 
 namespace Sentinel
 {
-	Quatf::Quatf()
-	{
-		x = y = z = 0;
-		w = 1;
-	}
+	Quatf::Quatf() :
+		x(0), y(0), z(0), w(1)
+	{}
 
 	Quatf::Quatf( float _pitch, float _yaw, float _roll )
 	{
@@ -19,13 +17,9 @@ namespace Sentinel
 		Euler( rotation.x, rotation.y, rotation.z );
 	}
 
-	Quatf::Quatf( float _x, float _y, float _z, float _w )
-	{
-		x = _x;
-		y = _y;
-		z = _z;
-		w = _w;
-	}
+	Quatf::Quatf( float _x, float _y, float _z, float _w ) :
+		x(_x), y(_y), z(_z), w(_w)
+	{}
 
 	float* Quatf::Ptr()
 	{

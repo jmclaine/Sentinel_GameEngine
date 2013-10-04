@@ -9,7 +9,7 @@ namespace Sentinel
 {
 	class SENTINEL_DLL TransformComponent : public GameComponent
 	{
-		DECLARE_SERIAL( TransformComponent );
+		DECLARE_SERIAL();
 
 	private:
 

@@ -6,6 +6,8 @@ namespace Sentinel
 	ControllerComponent::ControllerComponent()
 	{
 		mType = GameComponent::CONTROLLER;
+
+		Shutdown();
 	}
 
 	void ControllerComponent::Startup()
@@ -26,5 +28,8 @@ namespace Sentinel
 	{}
 
 	void ControllerComponent::Shutdown()
-	{}
+	{
+		mPhysics   = NULL;
+		mTransform = NULL;
+	}
 }

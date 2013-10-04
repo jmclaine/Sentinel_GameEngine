@@ -73,4 +73,17 @@ namespace Sentinel
 	{
 		return CreateTextureFromMemory( 0, width, height, format, createMips );
 	}
+
+	std::shared_ptr< Texture > Renderer::CreateTextureFromResource( void* data, UINT length )
+	{
+		int width, height;
+		int nChannels;
+
+		unsigned char* pixels = stbi_load_from_memory( (const unsigned char*)data, (int)length, &width, &height, &nChannels, 4 );
+
+		if( pixels == NULL )
+			return NULL;
+
+		return CreateTextureFromMemory( pixels, (UINT)width, (UINT)height, IMAGE_FORMAT_RGBA );
+	}
 }
