@@ -30,6 +30,8 @@ namespace Sentinel { namespace Assets
 
 	public:
 
+		DECLARE_OP_SHARED( Mesh );
+
 		static bool operator == ( WMesh^ mesh0, WMesh^ mesh1 );
 
 		DECLARE_PROPERTY( Sentinel::Systems::PrimitiveType,	Primitive );
@@ -49,4 +51,6 @@ namespace Sentinel { namespace Assets
 		void		Draw();
 		void		Draw( UINT count );
 	};
+
+	DECLARE_CLASS_REF_SHARED( Mesh );
 }}

@@ -4,6 +4,9 @@
 #include "WGameObject.h"
 #include "WCameraComponent.h"
 #include "WLightComponent.h"
+#include "WArchive.h"
+
+using namespace Sentinel::Utilities;
 
 namespace Sentinel { namespace Components
 {
@@ -13,8 +16,8 @@ namespace Sentinel { namespace Components
 
 		static void					Create();
 		
-		static void					Save( System::String^ mapName );
-		static void					Load( System::String^ mapName );
+		static void					Save( WArchive^ archive );
+		static void					Load( WArchive^ archive );
 
 		static void					Startup();
 

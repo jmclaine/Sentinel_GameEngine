@@ -232,6 +232,8 @@ namespace Sentinel
 
 		virtual std::shared_ptr< Texture > CreateTextureFromFile( const char* filename ) = 0;
 		virtual std::shared_ptr< Texture > CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormatType format, bool createMips = true ) = 0;
+
+		virtual void*		GetTexturePixels( std::shared_ptr< Texture > texture ) = 0;
 	
 		// Special Rendering.
 		//
@@ -251,7 +253,9 @@ namespace Sentinel
 
 		// Shaders.
 		//
-		virtual std::shared_ptr< Shader > CreateShader( const char* filename, const char* attrib, const char* uniform ) = 0;
+		virtual std::shared_ptr< Shader > CreateShaderFromFile( const char* filename, const char* attrib, const char* uniform ) = 0;
+		virtual std::shared_ptr< Shader > CreateShaderFromMemory( const char* filename, const char* attrib, const char* uniform ) = 0;
+
 		virtual void		SetShader( const std::shared_ptr< Shader >& shader ) = 0;
 
 		// Rendering.

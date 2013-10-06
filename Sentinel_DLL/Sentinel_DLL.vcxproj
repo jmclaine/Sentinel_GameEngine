@@ -121,6 +121,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
     <ClInclude Include="..\Engine\src\Mesh.h" />
     <ClInclude Include="..\Engine\src\MeshBuilder.h" />
     <ClInclude Include="..\Engine\src\MeshComponent.h" />
+    <ClInclude Include="..\Engine\src\MeshManager.h" />
     <ClInclude Include="..\Engine\src\Model.h" />
     <ClInclude Include="..\Engine\src\ModelComponent.h" />
     <ClInclude Include="..\Engine\src\NetworkPacket.h" />
@@ -173,6 +174,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
     <ClCompile Include="..\Engine\src\Mesh.cpp" />
     <ClCompile Include="..\Engine\src\MeshBuilder.cpp" />
     <ClCompile Include="..\Engine\src\MeshComponent.cpp" />
+    <ClCompile Include="..\Engine\src\MeshManager.cpp" />
     <ClCompile Include="..\Engine\src\Model.cpp" />
     <ClCompile Include="..\Engine\src\ModelComponent.cpp" />
     <ClCompile Include="..\Engine\src\ModelM3D.cpp" />

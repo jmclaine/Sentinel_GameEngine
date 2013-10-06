@@ -12,6 +12,8 @@ namespace Sentinel
 	class SENTINEL_DLL Shader
 	{
 	protected:
+
+		char*				mShaderSource;
 		
 		std::string			mAttribute;
 		std::string			mUniform;
@@ -26,6 +28,7 @@ namespace Sentinel
 
 		virtual ~Shader();
 
+		const char*			Source();
 		const std::string&	Attribute();
 		const std::string&	Uniform();
 

@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "Archive.h"
 
 #include <d3d11.h>
 #include <d3dx11.h>
@@ -93,16 +94,16 @@ namespace Sentinel
 
 	private:
 
-		ID3D11ShaderResourceView*	mResource;
 		ID3D11Texture2D*			mTexture;
+		ID3D11ShaderResourceView*	mResource;
 
 	public:
 
 		TextureDX( UINT width, UINT height )
 		{
-			mResource	= NULL;
 			mTexture	= NULL;
-
+			mResource	= NULL;
+			
 			mWidth		= width;
 			mHeight		= height;
 		}
@@ -111,11 +112,6 @@ namespace Sentinel
 		{
 			SAFE_RELEASE_PTR( mTexture );
 			SAFE_RELEASE_PTR( mResource );
-		}
-
-		void* GetPixels()
-		{
-			return NULL;
 		}
 	};
 
@@ -156,14 +152,34 @@ namespace Sentinel
 		// Use the filename without the extension.
 		// DirectX uses .fx files.
 		//
-		UINT Startup( std::string filename, const std::string& attrib, const std::string& uniform, 
-					  ID3D11Device* device, ID3D11DeviceContext* context )
+		UINT CreateFromFile( std::string filename, const std::string& attrib, const std::string& uniform, 
+							 ID3D11Device* device, ID3D11DeviceContext* context )
 		{
-			mAttribute  = attrib;
-			mUniform	= uniform;
+			filename.append( ".fx" );
 
-			mDevice		= device;
-			mContext	= context;
+			UINT size = Archive::ToBuffer( filename.c_str(), mShaderSource );
+
+			if( size == 0 )
+			{
+				TRACE( filename.c_str() << " failed to open." );
+
+				return S_FALSE;
+			}
+
+			TRACE( "Compiling " << filename << " ..." );
+
+			return CreateFromMemory( mShaderSource, attrib, uniform, device, context );
+		}
+
+		UINT CreateFromMemory( char* source, const std::string& attrib, const std::string& uniform, 
+							   ID3D11Device* device, ID3D11DeviceContext* context)
+		{
+			mShaderSource	= source;
+			mAttribute		= attrib;
+			mUniform		= uniform;
+
+			mDevice			= device;
+			mContext		= context;
 
 			// Compile the shader and report errors.
 			//
@@ -171,9 +187,7 @@ namespace Sentinel
 			ID3D10Blob* fxblob  = NULL;
 			ID3D10Blob* errblob = NULL;
 
-			filename.append( ".fx" );
-
-			if( FAILED( D3DX11CompileFromFileA( filename.c_str(), NULL, NULL, "", "fx_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &fxblob, &errblob, NULL )))
+			if( FAILED( D3DX11CompileFromMemory( mShaderSource, strlen( mShaderSource ), 0, NULL, NULL, "", "fx_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &fxblob, &errblob, NULL )))
 			{
 				if( errblob )
 				{
@@ -181,7 +195,7 @@ namespace Sentinel
 				}
 				else
 				{
-					TRACE( filename.c_str() << " failed to load." );
+					TRACE( "Failed to compile shader." );
 				}
 
 				SAFE_RELEASE_PTR( errblob );
@@ -196,6 +210,8 @@ namespace Sentinel
 
 			mPass = mEffect->GetTechniqueByIndex( 0 )->GetPassByIndex( 0 );
 			HV( mPass->GetDesc( &desc ));
+
+			TRACE( "Shader Compiled Successfully!" );
 			
 			int len = attrib.size();
 
@@ -337,7 +353,7 @@ namespace Sentinel
 
 			ProcessUniforms();
 
-			TRACE( filename << " Shader Created Successfully!" );
+			TRACE( "Shader Created Successfully!" );
 
 			return S_OK;
 		}
@@ -416,6 +432,8 @@ namespace Sentinel
 	//
 	class RendererDX : public Renderer
 	{
+		friend class TextureDX;
+
 	private:
 
 		class WindowInfoDX : public WindowInfo
@@ -554,7 +572,7 @@ namespace Sentinel
 				newTex[ 3 ] = 255;
 
 				NULL_TEXTURE = CreateTextureFromMemory( newTex, 1, 1, IMAGE_FORMAT_RGBA );
-
+				
 				delete newTex;
 			}
 
@@ -570,7 +588,7 @@ namespace Sentinel
 				newTex[ 3 ] = 255;
 
 				BASE_TEXTURE = CreateTextureFromMemory( newTex, 1, 1, IMAGE_FORMAT_RGBA );
-
+				
 				delete newTex;
 			}
 
@@ -604,6 +622,7 @@ namespace Sentinel
 				{
 					blend_desc.RenderTarget[ x ].BlendEnable			= TRUE;
 				}
+
 				HV_PTR( mCurrWindow->mDevice->CreateBlendState( &blend_desc, &blend_state ));
 				mBlendState.push_back( blend_state );
 			
@@ -619,6 +638,7 @@ namespace Sentinel
 					blend_desc.RenderTarget[ x ].BlendOpAlpha			= D3D11_BLEND_OP_ADD;
 					blend_desc.RenderTarget[ x ].RenderTargetWriteMask	= D3D11_COLOR_WRITE_ENABLE_ALL;
 				}
+
 				HV_PTR( mCurrWindow->mDevice->CreateBlendState( &blend_desc, &blend_state ));
 				mBlendState.push_back( blend_state );
 			}
@@ -787,6 +807,7 @@ namespace Sentinel
 				{
 					TextureDX* texture = new TextureDX( info.Width, info.Height );
 					texture->mResource = image;
+
 					return std::shared_ptr< Texture >( texture );
 				}
 				else
@@ -811,7 +832,6 @@ namespace Sentinel
 			std::shared_ptr< Texture > texture = CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA );
 
 			TextureDX* texDX = static_cast< TextureDX* >(texture.get());
-			SAFE_RELEASE_PTR( texDX->mTexture );
 			
 			stbi_image_free( pixels );
 
@@ -837,11 +857,9 @@ namespace Sentinel
 					for( UINT i = 0; i < prevSize; ++i )
 					{
 						for( UINT j = 0; j < 3; ++j )
-						{
-							newData[(i<<2)+j] = reinterpret_cast<UCHAR*>(data)[i*3+j];
-						}
+							newData[ (i<<2)+j ] = reinterpret_cast<UCHAR*>(data)[ i*3+j ];
 
-						newData[(i<<2)+3] = (UCHAR)(255);
+						newData[ (i<<2)+3 ] = (UCHAR)(255);
 					}
 
 					newFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -905,10 +923,10 @@ namespace Sentinel
 
 				rsv.Texture2D.MipLevels = UINT_MAX;
 
-				desc.Usage			= D3D11_USAGE_STAGING;
 				desc.MipLevels		= 1;
-				desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+				desc.Usage			= D3D11_USAGE_STAGING;
 				desc.BindFlags		= D3D11_USAGE_DEFAULT;
+				desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 				desc.MiscFlags		= D3D11_USAGE_DEFAULT;
 
 				ID3D11Texture2D* tex1;
@@ -940,6 +958,45 @@ namespace Sentinel
 			return std::shared_ptr< Texture >( texture );
 		}
 
+		void* GetTexturePixels( std::shared_ptr< Texture > texture )
+		{
+			_ASSERT( mCurrWindow );
+
+			TextureDX* texDX = static_cast< TextureDX* >(texture.get());
+
+			ID3D11Texture2D* texCopy = NULL;
+
+			D3D11_TEXTURE2D_DESC desc;
+			texDX->mTexture->GetDesc( &desc );
+			desc.MipLevels		= 0;
+			desc.BindFlags		= 0;
+			desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE;
+			desc.Usage			= D3D11_USAGE_STAGING;
+			desc.MiscFlags		= D3D11_USAGE_DEFAULT;
+
+			HRESULT hr = mCurrWindow->mDevice->CreateTexture2D( &desc, NULL, &texCopy );
+			if( texCopy )
+			{
+				mCurrWindow->mContext->CopyResource( texCopy, texDX->mTexture );
+
+				D3D11_MAPPED_SUBRESOURCE res;
+				UINT subres = D3D11CalcSubresource( 0, 0, 0 );
+
+				HV_PTR( mCurrWindow->mContext->Map( texCopy, subres, D3D11_MAP_READ_WRITE, 0, &res ));
+				
+				UINT  size = (texDX->mWidth << 2) * texDX->mHeight;
+				BYTE* data = new BYTE[ size ];
+
+				memcpy( data, res.pData, size );
+
+				mCurrWindow->mContext->Unmap( texCopy, 0 );
+
+				return data;
+			}
+
+			return NULL;
+		}
+
 		// Special Rendering.
 		//
 		UINT CreateBackbuffer()
@@ -948,7 +1005,7 @@ namespace Sentinel
 
 			ID3D11Texture2D *tex = NULL;
 
-			HV_PTR( mCurrWindow->mSwapChain->GetBuffer( 0, __uuidof(ID3D11Texture2D), (void **)&tex ));
+			HV_PTR( mCurrWindow->mSwapChain->GetBuffer( 0, __uuidof(ID3D11Texture2D), (void**)&tex ));
 
 			return CreateRenderTarget( tex );
 		}
@@ -961,8 +1018,7 @@ namespace Sentinel
 			
 			HV( mCurrWindow->mDevice->CreateRenderTargetView( backbuffer, NULL, &rendertarget ));
 			mRenderTarget.push_back( rendertarget );
-			SAFE_RELEASE_PTR( backbuffer );
-
+			
 			return mRenderTarget.size()-1;
 		}
 
@@ -1117,11 +1173,24 @@ namespace Sentinel
 
 		// Shaders.
 		//
-		std::shared_ptr< Shader > CreateShader( const char* filename, const char* attrib, const char* uniform )
+		std::shared_ptr< Shader > CreateShaderFromFile( const char* filename, const char* attrib, const char* uniform )
 		{
 			ShaderDX* shader = new ShaderDX();
 
-			if( shader->Startup( filename, attrib, uniform, mCurrWindow->mDevice, mCurrWindow->mContext ) != S_OK )
+			if( shader->CreateFromFile( filename, attrib, uniform, mCurrWindow->mDevice, mCurrWindow->mContext ) != S_OK )
+			{
+				delete shader;
+				return NULL;
+			}
+
+			return std::shared_ptr< Shader >( shader );
+		}
+
+		std::shared_ptr< Shader > CreateShaderFromMemory( const char* source, const char* attrib, const char* uniform )
+		{
+			ShaderDX* shader = new ShaderDX();
+
+			if( shader->CreateFromMemory( const_cast< char* >(source), attrib, uniform, mCurrWindow->mDevice, mCurrWindow->mContext ) != S_OK )
 			{
 				delete shader;
 				return NULL;

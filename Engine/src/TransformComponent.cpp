@@ -59,17 +59,17 @@ namespace Sentinel
 
 		GameComponent::Save( archive );
 
-		archive.Write( mPosition.Ptr(), 3 );
-		archive.Write( mOrientation.Ptr(), 4 );
-		archive.Write( mScale.Ptr(), 3 );
+		archive.Write( mPosition.Ptr(), sizeof( Vector3f ));
+		archive.Write( mOrientation.Ptr(), sizeof( Quatf ));
+		archive.Write( mScale.Ptr(), sizeof( Vector3f ));
 	}
 
 	void TransformComponent::Load( Archive& archive )
 	{
 		GameComponent::Load( archive );
 
-		archive.Read( mPosition.Ptr(), 3 );
-		archive.Read( mOrientation.Ptr(), 4 );
-		archive.Read( mScale.Ptr(), 3 );
+		archive.Read( mPosition.Ptr(), sizeof( Vector3f ));
+		archive.Read( mOrientation.Ptr(), sizeof( Quatf ));
+		archive.Read( mScale.Ptr(), sizeof( Vector3f ));
 	}
 }

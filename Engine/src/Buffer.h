@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Common.h"
+#include "Archive.h"
 
 namespace Sentinel
 {
@@ -38,5 +39,10 @@ namespace Sentinel
 		UINT			Size();
 		UINT			Stride();
 		UINT			Count();
+
+		//////////////////////////
+
+		void			Save( Archive& archive );
+		static Buffer*	Load( Archive& archive );
 	};
 }

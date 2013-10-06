@@ -1,8 +1,5 @@
 #include "WShaderManager.h"
-#include "WString.h"
 #include "ShaderManager.h"
-
-using namespace Sentinel::Utilities;
 
 namespace Sentinel { namespace Assets
 {

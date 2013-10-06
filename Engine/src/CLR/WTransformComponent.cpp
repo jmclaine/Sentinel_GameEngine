@@ -39,10 +39,8 @@ namespace Sentinel { namespace Components
 
 	void WTransformComponent::Rotation::set( WVector3f^ v )
 	{
-		mRotation->x = v->x;
-		mRotation->y = v->y;
-		mRotation->z = v->z;
-
+		mRotation = v;
+		
 		static_cast< TransformComponent* >(mRef)->mOrientation = Quatf( mRotation );
 	}
 

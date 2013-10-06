@@ -203,9 +203,9 @@ namespace Sentinel { namespace Systems
 
 	// Shaders.
 	//
-	WShader^ WRenderer::CreateShader( String^ filename, String^ attrib, String^ uniform )
+	WShader^ WRenderer::CreateShaderFromFile( String^ filename, String^ attrib, String^ uniform )
 	{
-		std::shared_ptr< Shader > shader = std::shared_ptr< Shader >( Renderer::Inst()->CreateShader( WString::Cast( filename ).c_str(), WString::Cast( attrib ).c_str(), WString::Cast( uniform ).c_str() ));
+		std::shared_ptr< Shader > shader = std::shared_ptr< Shader >( Renderer::Inst()->CreateShaderFromFile( WString::Cast( filename ).c_str(), WString::Cast( attrib ).c_str(), WString::Cast( uniform ).c_str() ));
 
 		return (shader) ? gcnew WShader( shader ) : nullptr;
 	}

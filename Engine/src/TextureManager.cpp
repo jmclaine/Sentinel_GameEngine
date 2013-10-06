@@ -1,9 +1,5 @@
 #include "TextureManager.h"
 #include "Renderer.h"
-
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
 #include "zlib.h"
 
 namespace Sentinel
@@ -42,10 +38,14 @@ namespace Sentinel
 
 			// Store the texture file in place.
 			//
-			BYTE* pixels = (BYTE*)texture->GetPixels();
-			UINT  size   = (width * height) << 4; // RGBA; 32-bit color
+			BYTE* pixels = (BYTE*)Renderer::Inst()->GetTexturePixels( texture );
 
+			if( !pixels )
+				throw std::exception( "Failed to GetTexturePixels." );
+
+			UINT  size   = (width << 2) * height; // RGBA; 32-bit color
 			ULONG bound  = compressBound( size );
+
 			BYTE* comp_pixels = new BYTE[ bound ];
 
 			compress( comp_pixels, &bound, pixels, size );
@@ -86,7 +86,7 @@ namespace Sentinel
 			BYTE* comp_pixels = new BYTE[ size ];
 			archive.Read( comp_pixels, size );
 
-			ULONG bound = (width * height) << 4;
+			ULONG bound = (width << 2) * height;
 			BYTE* pixels = new BYTE[ bound ];
 
 			uncompress( pixels, &bound, comp_pixels, (ULONG)size );
@@ -94,10 +94,12 @@ namespace Sentinel
 			// Create the texture resource.
 			//
 			std::shared_ptr< Texture > texture = Renderer::Inst()->CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA );
-			Add( name, texture );
-
+			
 			delete[] comp_pixels;
 			delete[] pixels;
+
+			if( !Add( name, texture ))
+				throw std::exception( "Failed to load texture." );
 		}
 	}
 }

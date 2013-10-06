@@ -25,8 +25,11 @@ namespace Sentinel
 
 	public:
 
-		Archive( FILE* fp );
+		Archive();
 		~Archive();
+		
+		bool	Open( const char* filename, const char* mode );
+		void	Close();
 
 		void	Read(  char* data,					unsigned int length = 1 );
 		void	Read(  unsigned char* data,			unsigned int length = 1 );
@@ -50,6 +53,8 @@ namespace Sentinel
 
 		////////////////////////
 
-		static bool	ToBuffer( const char *filename, char*& buf );
+		// Returns the size of the allocation.
+		//
+		static unsigned int ToBuffer( const char *filename, char*& buf );
 	};
 }

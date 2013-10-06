@@ -642,7 +642,7 @@ namespace Sentinel_Editor
 			meshBuilder.Shader    = WShaderManager.Get( "COLOR" );
 			meshBuilder.Primitive = PrimitiveType.TRIANGLE_LIST;
 
-			mesh = meshBuilder.BuildMesh();
+			mesh = WMeshManager.Add( "Ground", meshBuilder.BuildMesh() );
 			AddAsset( mesh, "Ground" );
 
 			obj = WGameWorld.AddGameObject( new WGameObject(), "Ground" );
@@ -662,7 +662,7 @@ namespace Sentinel_Editor
 			meshBuilder.Shader = WShaderManager.Get( "TEXTURE" );
 			meshBuilder.Texture( (int)TextureType.DIFFUSE ).Set( WTextureManager.Get( "default-alpha.png" ));
 
-			mesh = meshBuilder.BuildMesh();
+			mesh = WMeshManager.Add( "Dodecahedron", meshBuilder.BuildMesh() );
 			AddAsset( mesh, "Dodecahedron" );
 			
 			WGameObject obj2 = WGameWorld.AddGameObject( new WGameObject(), "Dodecahedron" );
@@ -679,7 +679,7 @@ namespace Sentinel_Editor
 			meshBuilder.ClearGeometry();
 			meshBuilder.CreateSphere( 1.0f, 10, 10 );
 			
-			mesh = meshBuilder.BuildMesh();
+			mesh = WMeshManager.Add( "Sphere", meshBuilder.BuildMesh() );
 			AddAsset( mesh, "Sphere" );
 
 			obj = WGameWorld.AddGameObject( new WGameObject(), "Sphere" );
@@ -804,13 +804,22 @@ namespace Sentinel_Editor
 			{
 				mMapName = dialog.FileName;
 				Window_Main.Title = "Sentinel Editor - " + dialog.FileName;
-				WGameWorld.Load( mMapName );
+				//WGameWorld.Load( mMapName );
 			}
 		}
 
 		private void Save_Click( Object sender, RoutedEventArgs e )
 		{
-			WGameWorld.Save( mMapName );
+			WArchive archive = new WArchive();
+			archive.Open( mMapName, "wb+" );
+
+			WTextureManager.Save( archive );
+			WShaderManager.Save( archive );
+			WMeshManager.Save( archive );
+
+			WGameWorld.Save( archive );
+
+			archive.Close();
 		}
 
 		private void SaveAs_Click( Object sender, RoutedEventArgs e )
@@ -825,7 +834,7 @@ namespace Sentinel_Editor
 			{
 				mMapName = dialog.FileName;
 				Window_Main.Title = "Sentinel Editor - " + dialog.FileName;
-				WGameWorld.Save( mMapName );
+				//WGameWorld.Save( mMapName );
 			}
 		}
 

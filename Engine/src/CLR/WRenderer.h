@@ -167,7 +167,7 @@ namespace Sentinel { namespace Systems
 
 		// Shaders.
 		//
-		static WShader^		CreateShader( String^ filename, String^ attrib, String^ uniform );
+		static WShader^		CreateShaderFromFile( String^ filename, String^ attrib, String^ uniform );
 		static void			SetShader( WShader^ shader );
 
 		// Rendering.

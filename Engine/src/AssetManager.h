@@ -7,6 +7,7 @@
 
 #include "Common.h"
 #include "Archive.h"
+#include "Util.h"
 
 namespace Sentinel
 {
@@ -55,6 +56,17 @@ namespace Sentinel
 				return it->second;
 			else
 				return NULL;
+		}
+
+		std::string Get( std::shared_ptr< T > data )
+		{
+			TRAVERSE_LIST( it, mData )
+			{
+				if( it->second.get() == data.get() )
+					return it->first;
+			}
+
+			return "";
 		}
 
 		void GetAll( std::vector< std::string >& names, std::vector< std::shared_ptr< T >>& data )

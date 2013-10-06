@@ -22,42 +22,24 @@ namespace Sentinel
 		return GameWorld::Inst();
 	}
 
-	void GameWorld::Save( const char* mapName )
+	void GameWorld::Save( Archive& archive )
 	{
-		FILE* file = fopen( mapName, "wb" );
-
-		if( !file )
-			throw AppException( "Failed to save " + std::string( mapName ));
-
-		Archive archive( file );
-
 		UINT size = mGameObject.size();
 		archive.Write( &size );
 
 		TRAVERSE_VECTOR( x, mGameObject )
 			mGameObject[ x ]->Save( archive );
-
-		fclose( file );
 	}
 
-	void GameWorld::Load( const char* mapName )
+	void GameWorld::Load( Archive& archive )
 	{
-		FILE* file = fopen( mapName, "rb" );
-		
-		if( !file )
-			throw AppException( "Failed to load " + std::string( mapName ));
-
 		Shutdown();
-
-		Archive archive( file );
 
 		UINT size = 0;
 		archive.Read( &size );
 
 		for( UINT x = 0; x < size; ++x )
 			AddGameObject( (GameObject*)SerialRegister::Load( archive ));
-
-		fclose( file );
 	}
 
 	void GameWorld::Startup()

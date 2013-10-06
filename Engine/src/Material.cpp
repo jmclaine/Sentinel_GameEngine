@@ -8,4 +8,9 @@ namespace Sentinel
 						float spec_comp ) :
 		mAmbient( ambient ), mDiffuse( diffuse ), mSpecular( specular ), mSpecularComponent( spec_comp )
 	{}
+
+	float* Material::Ptr()
+	{
+		return mAmbient.Ptr();
+	}
 }

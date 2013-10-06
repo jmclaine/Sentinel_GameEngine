@@ -150,12 +150,9 @@ namespace Sentinel
 
 			try
 			{
-				FILE* file = fopen( filename, "rb" );
-
-				if( !file )
+				Archive archive;
+				if( !archive.Open( filename, "rb" ))
 					throw AppException( "Failed to load " + std::string( filename ));
-
-				Archive archive( file );
 
 				// Read version.
 				//
@@ -400,7 +397,7 @@ namespace Sentinel
 				delete[] normals;
 				delete[] texCoords;
 
-				fclose( file );
+				archive.Close();
 			}
 			catch( AppException e )
 			{

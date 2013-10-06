@@ -5,11 +5,19 @@ namespace Sentinel
 {
 	Shader::Shader()
 	{
-		mVertexSize = 0;
+		mShaderSource = NULL;
+		mVertexSize   = 0;
 	}
 
 	Shader::~Shader()
-	{}
+	{
+		free( mShaderSource );
+	}
+
+	const char* Shader::Source()
+	{
+		return mShaderSource;
+	}
 
 	const std::string& Shader::Attribute()
 	{

@@ -1,14 +1,14 @@
 #pragma once
 
 #include "WAssetManager.h"
-#include "WTexture.h"
+#include "WMesh.h"
 
 namespace Sentinel { namespace Assets
 {
-	public ref class WTextureManager
+	public ref class WMeshManager
 	{
 	public:
 
-		DECLARE_ASSET_MANAGER( Texture );
+		DECLARE_ASSET_MANAGER( Mesh );
 	};
 }}

@@ -14,15 +14,15 @@ namespace Sentinel { namespace Components
 		GameWorld::Inst( GameWorld::Create() );
 	}
 
-	void WGameWorld::Save( System::String^ mapName )
+	void WGameWorld::Save( WArchive^ archive )
 	{
-		GameWorld::Inst()->Save( WString::Cast( mapName ).c_str() );
+		GameWorld::Inst()->Save( *archive->GetRef() );
 	}
 
-	void WGameWorld::Load( System::String^ mapName )
+	void WGameWorld::Load( WArchive^ archive )
 	{
 		GameWorld::Destroy();
-		GameWorld::Inst()->Load( WString::Cast( mapName ).c_str() );
+		GameWorld::Inst()->Load( *archive->GetRef() );
 	}
 
 	void WGameWorld::Startup()

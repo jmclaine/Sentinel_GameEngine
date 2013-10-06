@@ -42,8 +42,8 @@ namespace Sentinel
 		//
 		static GameWorld*	Create();
 
-		void				Save( const char* mapName );
-		void				Load( const char* mapName );
+		void				Save( Archive& archive );
+		void				Load( Archive& archive );
 		
 		void				Startup();
 

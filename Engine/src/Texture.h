@@ -24,7 +24,5 @@ namespace Sentinel
 
 		UINT				Width();
 		UINT				Height();
-
-		virtual void*		GetPixels() = 0;
 	};
 }

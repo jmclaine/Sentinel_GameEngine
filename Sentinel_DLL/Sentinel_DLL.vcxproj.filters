@@ -222,6 +222,9 @@
     <ClInclude Include="..\Engine\src\ShaderManager.h">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\src\MeshManager.h">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\Shader.cpp">
@@ -442,6 +445,9 @@
     </ClCompile>
     <ClCompile Include="..\Engine\zlib-1.2.8\zutil.c">
       <Filter>Source Files\Sentinel_Engine\Utilities\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\MeshManager.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

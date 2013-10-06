@@ -6,13 +6,28 @@
 
 namespace Sentinel
 {
-	Archive::Archive( FILE* fp )
+	Archive::Archive()
 	{
-		mFile = fp;
+		mFile = NULL;
 	}
 
 	Archive::~Archive()
-	{}
+	{
+		fclose( mFile );
+		mFile = NULL;
+	}
+
+	bool Archive::Open( const char* filename, const char* mode )
+	{
+		mFile = fopen( filename, mode );
+
+		return (mFile != NULL);
+	}
+
+	void Archive::Close()
+	{
+		fclose( mFile );
+	}
 
 #define READ_DATA( var, type, len )\
 	if( fread( var, sizeof( type ), len, mFile ) != len )\
@@ -243,12 +258,12 @@ namespace Sentinel
 
 	/////////////////////////////////////////////////////////////
 
-	bool Archive::ToBuffer( const char *filename, char*& buf )
+	unsigned int Archive::ToBuffer( const char *filename, char*& buf )
 	{
 		FILE* file = fopen( filename, "rb" );
 
 		if( !file )
-			return false;
+			return 0;
 
 		fseek( file, 0, SEEK_END );
 		size_t length = (size_t)( ftell( file ));
@@ -259,6 +274,7 @@ namespace Sentinel
 		fclose( file );
 
 		buf[ length ] = 0;
-		return true;
+
+		return length;
 	}
 }

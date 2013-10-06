@@ -1,13 +1,19 @@
 #pragma once
 
+#include "WArchive.h"
+#include "WString.h"
+
+using namespace Sentinel::Utilities;
+
 #define DECLARE_ASSET_MANAGER( refClass )\
-	public:\
 		static void Create();\
 		static W##refClass^ Add( System::String^ name, W##refClass^ data );\
 		static void Remove( System::String^ name );\
 		static W##refClass^ Get( System::String^ name );\
 		static void GetAll( System::Collections::Generic::List< System::String^ >^% names,\
-							System::Collections::Generic::List< W##refClass^ >^% data );
+							System::Collections::Generic::List< W##refClass^ >^% data );\
+		static void Save( WArchive^ archive );\
+		static void Load( WArchive^ archive );
 
 #define DEFINE_ASSET_MANAGER( refClass )\
 	void W##refClass##Manager::Create()\
@@ -32,4 +38,8 @@
 			names->Add( WString::Cast( _names[ x ] ));\
 		TRAVERSE_VECTOR( x, _data )\
 			data->Add( gcnew R##refClass( _data[ x ] ));\
-	}
+	}\
+	void W##refClass##Manager::Save( WArchive^ archive )\
+	{ refClass##Manager::Inst()->Save( *archive->GetRef() ); }\
+	void W##refClass##Manager::Load( WArchive^ archive )\
+	{ refClass##Manager::Inst()->Load( *archive->GetRef() ); }

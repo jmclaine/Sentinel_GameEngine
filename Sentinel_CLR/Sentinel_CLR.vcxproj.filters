@@ -150,6 +150,12 @@
     <ClInclude Include="..\Engine\src\CLR\WShaderManager.h">
       <Filter>Sentinel_Engine\Assets</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WArchive.h">
+      <Filter>Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WMeshManager.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sentinel_CLR.cpp">
@@ -249,6 +255,12 @@
       <Filter>Sentinel_Engine\Assets</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\CLR\WShaderManager.cpp">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WArchive.cpp">
+      <Filter>Sentinel_Engine\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WMeshManager.cpp">
       <Filter>Sentinel_Engine\Assets</Filter>
     </ClCompile>
   </ItemGroup>

@@ -4,6 +4,8 @@ namespace Sentinel { namespace Assets
 {
 	DEFINE_REF_SHARED( Mesh );
 
+	DEFINE_OP_SHARED( Mesh );
+
 	////////////////////////////////
 
 	bool WMesh::operator == ( WMesh^ mesh0, WMesh^ mesh1 )
@@ -37,4 +39,8 @@ namespace Sentinel { namespace Assets
 	{
 		mRef->Draw( count );
 	}
+
+	////////////////////////////////
+
+	DEFINE_CLASS_REF_SHARED( Mesh );
 }}

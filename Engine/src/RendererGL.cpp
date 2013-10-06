@@ -111,14 +111,6 @@ namespace Sentinel
 		{
 			glDeleteTextures( 1, &mID );
 		}
-
-		void* GetPixels()
-		{
-			BYTE* pixels = new BYTE[ (mWidth * mHeight) << 4 ];
-			glBindTexture( GL_TEXTURE_2D, mID );
-			glGetTexImage( GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
-			return pixels;
-		}
 	};
 
 	////////////////////////////////////////////////////////////////////////////////////
@@ -194,11 +186,8 @@ namespace Sentinel
 
 	public:
 
-		UINT Startup( std::string filename, const std::string& attrib, const std::string& uniform )
+		UINT CreateFromFile( std::string filename, const std::string& attrib, const std::string& uniform )
 		{
-			mAttribute  = attrib;
-			mUniform	= uniform;
-
 			// Create a new program.
 			//
 			mProgramID = glCreateProgram();
@@ -208,9 +197,7 @@ namespace Sentinel
 			
 			filename.append( ".gls" );
 
-			GLchar* source;
-			
-			if( !Archive::ToBuffer( filename.c_str(), source ))
+			if( Archive::ToBuffer( filename.c_str(), mShaderSource ) == 0 )
 			{
 				REPORT_ERROR( "Could not open '" << filename << "'", "Shader Loader Error" );
 				return S_FALSE;
@@ -218,27 +205,30 @@ namespace Sentinel
 			
 			TRACE( "Compiling " << filename << " ..." );
 
-			if( strstr( source, "VERTEX_SHADER" ) != NULL )
+			return CreateFromMemory( mShaderSource, attrib, uniform );
+		}
+
+		UINT CreateFromMemory( char* source, const std::string& attrib, const std::string& uniform )
+		{
+			mShaderSource	= source;
+			mAttribute		= attrib;
+			mUniform		= uniform;
+
+			if( strstr( mShaderSource, "VERTEX_SHADER" ) != NULL )
 			{
-				const char *vshader[2] = { "#define VERTEX_SHADER\n\0", source };
+				const char *vshader[2] = { "#define VERTEX_SHADER\n\0", mShaderSource };
 				
-				if( !CreateFromFile( vshader, mVertexShader, GL_VERTEX_SHADER ))
-				{
-					free( source );
+				if( !Compile( vshader, mVertexShader, GL_VERTEX_SHADER ))
 					return S_FALSE;
-				}
 			}
 			
 			bool useGS = false;
-			if( strstr( source, "GEOMETRY_SHADER" ) != NULL )
+			if( strstr( mShaderSource, "GEOMETRY_SHADER" ) != NULL )
 			{
-				const char *gshader[2] = { "#define GEOMETRY_SHADER\n\0", source };
+				const char *gshader[2] = { "#define GEOMETRY_SHADER\n\0", mShaderSource };
 
-				if( !CreateFromFile( gshader, mGeometryShader, GL_GEOMETRY_SHADER ))
-				{
-					free( source );
+				if( !Compile( gshader, mGeometryShader, GL_GEOMETRY_SHADER ))
 					return S_FALSE;
-				}
 
 				useGS = true;
 
@@ -249,20 +239,15 @@ namespace Sentinel
 				glProgramParameteriEXT( mProgramID, GL_GEOMETRY_VERTICES_OUT_EXT, 4 );
 			}
 
-			if( strstr( source, "FRAGMENT_SHADER" ) != NULL )
+			if( strstr( mShaderSource, "FRAGMENT_SHADER" ) != NULL )
 			{
-				const char *fshader[2] = { "#define FRAGMENT_SHADER\n\0", source };
+				const char *fshader[2] = { "#define FRAGMENT_SHADER\n\0", mShaderSource };
 
-				if( !CreateFromFile( fshader, mFragmentShader, GL_FRAGMENT_SHADER ))
-				{
-					free( source );
+				if( !Compile( fshader, mFragmentShader, GL_FRAGMENT_SHADER ))
 					return S_FALSE;
-				}
 			}
 			
-			TRACE( filename << " Shader Created Successfully!" );
-
-			free( source );
+			TRACE( "Shader Compiled Successfully!" );
 
 			// Create the attributes.
 			//
@@ -409,20 +394,18 @@ namespace Sentinel
 				return S_FALSE;
 			}
 
-			TRACE( "Shader Linked Successfully!" );
-
 			ApplyPass();
 		
 			ProcessUniforms();
 
-			TRACE( "Shader Uniforms Created!" );
+			TRACE( "Shader Created Sucessfully!" );
 
 			return S_OK;
 		}
 
 	private:
 
-		int CreateFromFile( const GLchar** source, GLuint& shader, GLenum type )
+		int Compile( const GLchar** source, GLuint& shader, GLenum type )
 		{
 			_ASSERT( type == GL_VERTEX_SHADER || type == GL_FRAGMENT_SHADER || type == GL_GEOMETRY_SHADER );
 
@@ -858,6 +841,18 @@ namespace Sentinel
 			return std::shared_ptr< Texture >( new TextureGL( width, height, texID ));
 		}
 
+		void* GetTexturePixels( std::shared_ptr< Texture > texture )
+		{
+			TextureGL* texGL = static_cast< TextureGL* >(texture.get());
+
+			BYTE* pixels = new BYTE[ (texGL->mWidth << 2) * texGL->mHeight ];
+
+			glBindTexture( GL_TEXTURE_2D, texGL->mID );
+			glGetTexImage( GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
+
+			return pixels;
+		}
+
 		// Special Rendering.
 		//
 		UINT CreateBackbuffer()
@@ -985,11 +980,24 @@ namespace Sentinel
 		
 		// Shaders.
 		//
-		std::shared_ptr< Shader > CreateShader( const char* filename, const char* attrib, const char* uniform )
+		std::shared_ptr< Shader > CreateShaderFromFile( const char* filename, const char* attrib, const char* uniform )
 		{
 			ShaderGL* shader = new ShaderGL();
 
-			if( shader->Startup( filename, attrib, uniform ) != S_OK )
+			if( shader->CreateFromFile( filename, attrib, uniform ) != S_OK )
+			{
+				delete shader;
+				return NULL;
+			}
+
+			return std::shared_ptr< Shader >( shader );
+		}
+
+		std::shared_ptr< Shader > CreateShaderFromMemory( const char* source, const char* attrib, const char* uniform )
+		{
+			ShaderGL* shader = new ShaderGL();
+
+			if( shader->CreateFromMemory( const_cast< char* >(source), attrib, uniform ) != S_OK )
 			{
 				delete shader;
 				return NULL;

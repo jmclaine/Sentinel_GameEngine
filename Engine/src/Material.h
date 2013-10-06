@@ -20,5 +20,7 @@ namespace Sentinel
 				  const ColorRGBA& diffuse  = ColorRGBA( 0.6f, 0.6f, 0.6f, 1.0f ),
 				  const ColorRGBA& specular = ColorRGBA( 0.2f, 0.2f, 0.2f, 1.0f ),
 				  float spec_comp = 32.0f );
+
+		float* Ptr();
 	};
 }
