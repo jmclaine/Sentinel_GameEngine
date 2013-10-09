@@ -14,8 +14,6 @@ namespace Sentinel { namespace Assets
 
 		DECLARE_OP_SHARED( Texture );
 
-		void			Release();
-
 		UINT			Width();
 		UINT			Height();
 	};

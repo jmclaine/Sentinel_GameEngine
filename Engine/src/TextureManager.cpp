@@ -60,6 +60,8 @@ namespace Sentinel
 
 	void TextureManager::Load( Archive& archive )
 	{
+		RemoveAll();
+
 		// Read the number of textures to load.
 		//
 		UINT count;

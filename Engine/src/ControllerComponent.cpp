@@ -17,6 +17,7 @@ namespace Sentinel
 		if( mPhysics == NULL )
 			throw AppException( "ControllerComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain PhysicsComponent" );
 
+		///////////////////////////
 
 		mTransform = (TransformComponent*)mOwner->FindComponent( GameComponent::TRANSFORM );
 

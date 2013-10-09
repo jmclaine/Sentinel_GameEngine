@@ -16,7 +16,7 @@ namespace Sentinel_Editor
 
 		public WMesh Data { get; set; }
 
-		public AMesh( WMesh mesh, String name )
+		public AMesh( String name, WMesh mesh )
 		{
 			mType	= EditorAssetType.MESH;
 

@@ -20,7 +20,7 @@ namespace Sentinel
 
 		virtual ~Texture();
 
-		virtual void		Release();
+		virtual void		Release() = 0;
 
 		UINT				Width();
 		UINT				Height();

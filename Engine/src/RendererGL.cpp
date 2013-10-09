@@ -102,6 +102,11 @@ namespace Sentinel
 			mID		= id;
 		}
 
+		~TextureGL()
+		{
+			Release();
+		}
+
 		GLuint ID()
 		{
 			return mID;
@@ -188,22 +193,16 @@ namespace Sentinel
 
 		UINT CreateFromFile( std::string filename, const std::string& attrib, const std::string& uniform )
 		{
-			// Create a new program.
-			//
-			mProgramID = glCreateProgram();
-
-			if( mProgramID < 0 )
-				REPORT_ERROR( "Could not create shader program.", "Shader Loader Error" );
-			
 			filename.append( ".gls" );
 
 			if( Archive::ToBuffer( filename.c_str(), mShaderSource ) == 0 )
 			{
 				REPORT_ERROR( "Could not open '" << filename << "'", "Shader Loader Error" );
+
 				return S_FALSE;
 			}
 			
-			TRACE( "Compiling " << filename << " ..." );
+			TRACE( "Compiling '" << filename << "'..." );
 
 			return CreateFromMemory( mShaderSource, attrib, uniform );
 		}
@@ -213,6 +212,13 @@ namespace Sentinel
 			mShaderSource	= source;
 			mAttribute		= attrib;
 			mUniform		= uniform;
+
+			// Create a new program.
+			//
+			mProgramID = glCreateProgram();
+
+			if( mProgramID < 0 )
+				REPORT_ERROR( "Could not create shader program.", "Shader Loader Error" );
 
 			if( strstr( mShaderSource, "VERTEX_SHADER" ) != NULL )
 			{
@@ -457,9 +463,16 @@ namespace Sentinel
 			if( mProgramID != 0 )
 			{
 				glDeleteProgram( mProgramID );
+				mProgramID = 0;
+
 				glDeleteShader( mVertexShader );
+				mVertexShader = 0;
+
 				glDeleteShader( mGeometryShader );
+				mGeometryShader = 0;
+
 				glDeleteShader( mFragmentShader );
+				mFragmentShader = 0;
 			}
 		}
 
@@ -953,7 +966,15 @@ namespace Sentinel
 
 		UINT SetCull( CullType type )
 		{
-			glFrontFace( CULL_TYPE[ type ] );
+			if( type != CULL_NONE )
+			{
+				glEnable( GL_CULL_FACE );
+				glFrontFace( CULL_TYPE[ type ] );
+			}
+			else
+			{
+				glDisable( GL_CULL_FACE );
+			}
 
 			return S_OK;
 		}

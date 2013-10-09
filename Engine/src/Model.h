@@ -1,75 +1,51 @@
 #pragma once
+/*
+Loads a model from a file into a set of meshes.
+The underlying implementation is hidden within
+separate source files because the user should
+never need to know the model format, just that
+it contains geometry to be rendered.
 
+The OBJ file format does not contain keyframes;
+therefore, calling the time functions have 
+no effect.
+
+Add shaders to the ShaderManager with the 
+following string designations before loading 
+a model:
+
+// Color with normal
+ShaderManager::Inst()->Add( shader, "Color" );
+
+// Texture with normal
+ShaderManager::Inst()->Add( shader, "Texture" );
+
+// Normal mapping
+ShaderManager::Inst()->Add( shader, "Normal Map" );
+
+// Parallax mapping
+ShaderManager::Inst()->Add( shader, "Parallax" );
+
+// Skinning and bones
+ShaderManager::Inst()->Add( shader, "Skinning" );
+*/
 #include <vector>
 
 #include "Common.h"
-#include "Shader.h"
+#include "ShaderManager.h"
 #include "Mesh.h"
-#include "Shape.h"
 
 namespace Sentinel
 {
-	class Model;
-
-	extern Model* LoadModelOBJ( const char* filename );
-	extern Model* LoadModelM3D( const char* filename );
-
 	class SENTINEL_DLL Model
 	{
-	public:
-
-		static std::shared_ptr< Shader > SHADER_COLOR;
-		static std::shared_ptr< Shader > SHADER_TEXTURE;
-		static std::shared_ptr< Shader > SHADER_NORMAL_MAP;
-		static std::shared_ptr< Shader > SHADER_PARALLAX;
-		static std::shared_ptr< Shader > SHADER_SKINNING;
-
 	protected:
 
-		struct KeyFrame
+		enum Format
 		{
-			Matrix4f	mMatrix;
-			int			mFrame;
-
-			KeyFrame()
-			{
-				mMatrix.Identity();
-				mFrame = 0;
-			}
-		};
-
-		struct Object
-		{
-			Mesh**		mMesh;
-			UINT		mNumMeshes;
-
-			KeyFrame*	mKeyFrame;
-			UINT		mNumKeyFrames;
-
-			float		mCurrTime;
-			int			mCurrKey;
-
-			Matrix4f	mMatrixWorld;
-			Matrix4f	mInverseBone;
-
-			Object*		mParent;
-
-			Object()
-			{
-				mParent = NULL;
-
-				mCurrTime = 0.0f;
-				mCurrKey = 0;
-
-				mMatrixWorld.Identity();
-				mInverseBone.Identity();
-			}
-
-			~Object()
-			{
-				SAFE_DELETE_ARRAY( mMesh );
-				SAFE_DELETE_ARRAY( mKeyFrame );
-			}
+			INVALID,
+			OBJ,
+			M3D,
 		};
 
 	public:
@@ -81,30 +57,15 @@ namespace Sentinel
 		virtual ~Model();
 		
 		static Model*	Load( const char* filename );
-
-		/////////////////////////////////////
-
-		// The public static variables do not get set
-		// correctly in the CLR without these functions:
+		
+		// The Archive format is specifically created to make 
+		// the model files easy to save and load for the engine.
 		//
-		static void		SetShaderColor( const std::shared_ptr< Shader >& shader );
-		static std::shared_ptr< Shader >&	GetShaderColor();
-
-		static void		SetShaderTexture( const std::shared_ptr< Shader >& shader );
-		static std::shared_ptr< Shader >&	GetShaderTexture();
-
-		static void		SetShaderNormalMap( const std::shared_ptr< Shader >& shader );
-		static std::shared_ptr< Shader >&	GetShaderNormalMap();
-
-		static void		SetShaderParallax( const std::shared_ptr< Shader >& shader );
-		static std::shared_ptr< Shader >&	GetShaderParallax();
-
-		static void		SetShaderSkinning( const std::shared_ptr< Shader >& shader );
-		static std::shared_ptr< Shader >&	GetShaderSkinning();
+		virtual void	Save( Archive& archive ) = 0;
+		static Model*	Load( Archive& archive );
 
 		/////////////////////////////////////
 
-		virtual bool	Create( const char* filename ) = 0;
 		virtual void	Release() = 0;
 
 		// There is no way to tell which materials pertain to what portion of the model.
@@ -113,11 +74,24 @@ namespace Sentinel
 		virtual void	SetMaterials( const std::vector< Material >& material ) = 0;
 		virtual void	GetMaterials( std::vector< Material >* material ) = 0;
 
-		virtual void	SetKeyFrame( const KeyFrame& key, int keyIndex = -1, int objIndex = 0 ) = 0;
 		virtual void	SetTime( float _time, UINT objIndex = 0 ) = 0;
 		virtual float	GetTime( UINT objIndex = 0 ) = 0;
-
 		virtual void	Update() = 0;
+
 		virtual void	Draw() = 0;
 	};
+
+	extern Model* LoadModelOBJFromFile( const char* filename );
+	extern Model* LoadModelM3DFromFile( const char* filename );
+
+	// The Archive format is different than the native file format.
+	// It is designed specifically to be read quickly and easily
+	// by the engine, and is the inverse of Save().
+	//
+	// Save() creates a single BYTE header designating what the
+	// format of the following data represents. Use Model::Load()
+	// to create the Model with the correct format.
+	//
+	extern Model* LoadModelOBJFromArchive( Archive& archive );
+	extern Model* LoadModelM3DFromArchive( Archive& archive );
 }

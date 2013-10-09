@@ -1,6 +1,7 @@
 #include <vector>
 
 #include "MeshComponent.h"
+#include "MeshManager.h"
 
 namespace Sentinel
 {
@@ -19,6 +20,8 @@ namespace Sentinel
 
 	void MeshComponent::Startup()
 	{
+		_ASSERT( mMesh );
+
 		DrawableComponent::Startup();
 	}
 
@@ -48,10 +51,20 @@ namespace Sentinel
 		mSerialRegistry.Save( archive );
 
 		GameComponent::Save( archive );
+
+		archive.Write( &MeshManager::Inst()->Get( mMesh ));
+		archive.Write( mMaterial.Ptr(), ar_sizeof( mMaterial ));
 	}
 
 	void MeshComponent::Load( Archive& archive )
 	{
 		GameComponent::Load( archive );
+
+		std::string name;
+		archive.Read( &name );
+
+		mMesh = MeshManager::Inst()->Get( name );
+
+		archive.Read( mMaterial.Ptr(), ar_sizeof( mMaterial ));
 	}
 }

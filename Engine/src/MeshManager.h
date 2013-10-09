@@ -23,10 +23,8 @@ namespace Sentinel
 
 		void Load( Archive& archive );
 
-	private:
+		static void SaveMesh( Archive& archive, Mesh* mesh );
 
-		static void SaveMesh( Archive& archive, std::shared_ptr< Mesh > mesh );
-
-		static void LoadMesh( Archive& archive, std::shared_ptr< Mesh > mesh );
+		static void LoadMesh( Archive& archive, Mesh* mesh );
 	};
 }

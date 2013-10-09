@@ -24,6 +24,7 @@ namespace Sentinel
 	{
 		ControllerComponent::Update();
 
+#ifndef IGNORE_PHYSICS
 		if( mPhysics )
 		{
 			Keyboard* keyboard = Keyboard::Inst();
@@ -107,6 +108,7 @@ namespace Sentinel
 		
 			mPhysics->GetRigidBody()->setWorldTransform( transform );
 		}
+#endif
 	}
 
 	void PlayerControllerComponent::Shutdown()

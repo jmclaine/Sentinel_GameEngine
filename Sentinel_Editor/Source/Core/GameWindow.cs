@@ -95,7 +95,7 @@ namespace Sentinel_Editor
 			base.Shutdown();
 
 			mObject.Shutdown();
-			mObject.Delete();
+			mObject.Release();
 		}
 
 		public WCameraComponent GetCamera()

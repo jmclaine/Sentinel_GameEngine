@@ -16,7 +16,7 @@ namespace Sentinel_Editor
 
 		public WShader Data { get; set; }
 
-		public AShader( WShader shader, String name )
+		public AShader( String name, WShader shader )
 		{
 			mType	= EditorAssetType.SHADER;
 

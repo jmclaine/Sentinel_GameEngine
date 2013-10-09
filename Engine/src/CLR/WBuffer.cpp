@@ -30,11 +30,6 @@ namespace Sentinel { namespace Assets
 		mRef->Unlock();
 	}
 
-	void WBuffer::Release()
-	{
-		mRef->Release();
-	}
-
 	Sentinel::Assets::BufferType WBuffer::Type()
 	{
 		return (Sentinel::Assets::BufferType)mRef->Type();

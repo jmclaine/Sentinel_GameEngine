@@ -15,6 +15,7 @@ namespace Sentinel { namespace Components
 	public:
 
 		static void					Create();
+		static void					Release();
 		
 		static void					Save( WArchive^ archive );
 		static void					Load( WArchive^ archive );

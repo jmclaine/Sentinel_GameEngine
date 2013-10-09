@@ -1,7 +1,7 @@
 #pragma once
 /*
 All GameComponent(s) are freed when their associated GameObject is Shutdown()
-Delete() should be called manually for a controlled free memory.
+Release() should be called manually for a controlled free memory.
 */
 #include "WString.h"
 #include "Property.h"
@@ -57,7 +57,7 @@ namespace Sentinel { namespace Components
 		WGameComponent( GameComponent* component );
 		virtual ~WGameComponent();
 
-		void			Delete();
+		void			Release();
 
 		virtual System::String^	ToString() override;
 

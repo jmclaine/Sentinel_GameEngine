@@ -11,11 +11,6 @@ namespace Sentinel { namespace Assets
 
 	////////////////////////////////
 
-	void WTexture::Release()
-	{
-		mRef->Release();
-	}
-
 	UINT WTexture::Width()
 	{
 		return mRef->Width();

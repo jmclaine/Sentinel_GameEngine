@@ -55,6 +55,16 @@
 		mRef->m##varName = v;\
 	}
 
+#define DEFINE_PROPERTY_MS( refClass, varType, varName )\
+	varType W##refClass::varName::get()\
+	{\
+		return static_cast< refClass* >(mRef)->m##varName;\
+	}\
+	void W##refClass::varName::set( varType v )\
+	{\
+		static_cast< refClass* >(mRef)->m##varName = v;\
+	}
+
 #define DEFINE_PROPERTY_MB( baseClass, refClass, varType, varName )\
 	varType W##baseClass::W##refClass::varName::get()\
 	{\
@@ -75,6 +85,16 @@
 	void W##refClass::varName::set( Sentinel::_namespace::varType v )\
 	{\
 		mRef->m##varName = (Sentinel::varType)v;\
+	}
+
+#define DEFINE_PROPERTY_ES( refClass, _namespace, varType, varName )\
+	Sentinel::_namespace::varType W##refClass::varName::get()\
+	{\
+		return (Sentinel::_namespace::varType)static_cast< refClass* >(mRef)->m##varName;\
+	}\
+	void W##refClass::varName::set( Sentinel::_namespace::varType v )\
+	{\
+		static_cast< refClass* >(mRef)->m##varName = (Sentinel::varType)v;\
 	}
 
 // Strings.
@@ -182,21 +202,21 @@
 #define DECLARE_REF_EX( wrapClass, refClass )\
 	DECLARE_REF_PTR( refClass );\
 	protected:\
-		virtual void Delete();\
+		virtual void Release();\
 	public:\
 		~wrapClass();\
 		!wrapClass();
 
 #define DEFINE_REF_EX( wrapClass, refClass )\
-	wrapClass::~wrapClass()			{ Delete(); }\
-	wrapClass::!wrapClass()			{ Delete(); System::GC::SuppressFinalize( this ); }\
-	void wrapClass::Delete()		{ SAFE_DELETE( mRef ); }\
+	wrapClass::~wrapClass()			{ Release(); }\
+	wrapClass::!wrapClass()			{ Release(); System::GC::SuppressFinalize( this ); }\
+	void wrapClass::Release()		{ SAFE_DELETE( mRef ); }\
 	DEFINE_REF_PTR_EX( wrapClass, refClass );
 
 #define DEFINE_REF_EX_BASE( baseClass, wrapClass, refClass )\
-	baseClass::wrapClass::~wrapClass()			{ Delete(); }\
-	baseClass::wrapClass::!wrapClass()			{ Delete(); System::GC::SuppressFinalize( this ); }\
-	void baseClass::wrapClass::Delete()			{ SAFE_DELETE( mRef ); }\
+	baseClass::wrapClass::~wrapClass()			{ Release(); }\
+	baseClass::wrapClass::!wrapClass()			{ Release(); System::GC::SuppressFinalize( this ); }\
+	void baseClass::wrapClass::Release()			{ SAFE_DELETE( mRef ); }\
 	DEFINE_REF_PTR_EX( baseClass::wrapClass, refClass );
 
 #define DECLARE_REF( refClass )\
@@ -208,7 +228,7 @@
 #define DECLARE_REF_SHARED( refClass )\
 	protected:\
 		m_shared_ptr< refClass >^ mRef;\
-		virtual void Delete();\
+		virtual void Release();\
 	public:\
 		W##refClass( std::shared_ptr< refClass > obj );\
 		~W##refClass();\
@@ -216,10 +236,10 @@
 		std::shared_ptr< refClass > GetRef();
 
 #define DEFINE_REF_SHARED( refClass )\
-	void W##refClass::Delete()									{ delete mRef; }\
+	void W##refClass::Release()									{ delete mRef; }\
 	W##refClass::W##refClass( std::shared_ptr< refClass > obj ) { mRef = gcnew m_shared_ptr< refClass >( obj ); }\
-	W##refClass::~W##refClass()									{ Delete(); }\
-	W##refClass::!W##refClass()									{ Delete(); System::GC::SuppressFinalize( this ); }\
+	W##refClass::~W##refClass()									{ Release(); }\
+	W##refClass::!W##refClass()									{ Release(); System::GC::SuppressFinalize( this ); }\
 	std::shared_ptr< refClass > W##refClass::GetRef()			{ return mRef; }
 
 
@@ -264,7 +284,7 @@
 		void Set( const refClass& obj );\
 		void Set( W##refClass^ obj );\
 	protected:\
-		virtual void Delete() override;\
+		virtual void Release() override;\
 	};
 
 #define DEFINE_CLASS_REF( refClass )\
@@ -272,7 +292,7 @@
 	R##refClass::R##refClass( W##refClass^ obj )	{ mRef = obj->GetRef(); }\
 	void R##refClass::Set( const refClass& obj )	{ *mRef = obj; }\
 	void R##refClass::Set( W##refClass^ obj )		{ *mRef = *obj->GetRef(); }\
-	void R##refClass::Delete() {}
+	void R##refClass::Release() {}
 
 #define DECLARE_CLASS_REF_SHARED( refClass )\
 	public ref class R##refClass sealed : public W##refClass\
@@ -282,14 +302,12 @@
 	public:\
 		R##refClass( std::shared_ptr< refClass >& obj );\
 		void Set( W##refClass^ obj );\
-	protected:\
-		virtual void Delete() override;\
 	};
 
 #define DEFINE_CLASS_REF_SHARED( refClass )\
 	R##refClass::R##refClass( std::shared_ptr< refClass >& obj ) : mRefPtr( obj ), W##refClass( obj ) {}\
-	void R##refClass::Set( W##refClass^ obj ) { mRefPtr = obj->GetRef(); }\
-	void R##refClass::Delete() {}
+	void R##refClass::Set( W##refClass^ obj )\
+	{ mRefPtr = obj->GetRef(); mRef = gcnew m_shared_ptr< refClass >(obj->GetRef()); }
 
 #define DECLARE_CLASS_REF_PTR( refClass )\
 	public ref class RP##refClass sealed : public W##refClass\
@@ -300,13 +318,13 @@
 		RP##refClass( refClass*& obj );\
 		void Set( W##refClass^ obj );\
 	protected:\
-		virtual void Delete() override;\
+		virtual void Release() override;\
 	};
 
 #define DEFINE_CLASS_REF_PTR( refClass )\
 	RP##refClass::RP##refClass( refClass*& obj ) : mRefPtr( obj ) { mRef = mRefPtr; }\
 	void RP##refClass::Set( W##refClass^ obj )	{ mRefPtr = obj->GetRef(); mRef = mRefPtr; }\
-	void RP##refClass::Delete() {}
+	void RP##refClass::Release() {}
 
 #define DECLARE_CLASS_REF_BASE( baseClass, refClass )\
 	ref class R##refClass sealed : public W##refClass\
@@ -317,7 +335,7 @@
 		void Set( const baseClass::refClass& obj );\
 		void Set( W##refClass^ obj );\
 	protected:\
-		virtual void Delete() override;\
+		virtual void Release() override;\
 	};
 
 #define DEFINE_CLASS_REF_BASE( baseClass, refClass )\
@@ -325,4 +343,4 @@
 	W##baseClass::R##refClass::R##refClass( W##refClass^ obj )				{ mRef = &*obj->GetRef(); }\
 	void W##baseClass::R##refClass::Set( const baseClass::refClass& obj )	{ *mRef = obj; }\
 	void W##baseClass::R##refClass::Set( W##baseClass::W##refClass^ obj )	{ *mRef = *obj->GetRef(); }\
-	void W##baseClass::R##refClass::Delete() {}
+	void W##baseClass::R##refClass::Release() {}

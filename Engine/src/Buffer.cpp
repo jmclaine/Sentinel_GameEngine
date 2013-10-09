@@ -83,8 +83,9 @@ namespace Sentinel
 		BYTE* comp_data = (BYTE*)malloc( bound );
 		archive.Read( comp_data, bound );
 
-		BYTE* data = (BYTE*)malloc( size );
-		uncompress( data, (ULONG*)size, comp_data, bound );
+		BYTE*  data = (BYTE*)malloc( size );
+		ULONG uSize = (ULONG)size;
+		uncompress( data, (ULONG*)(&size), comp_data, bound );
 
 		Buffer* buffer = Renderer::Inst()->CreateBuffer( data, size, stride, (BufferType)type );
 

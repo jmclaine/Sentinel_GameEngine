@@ -108,6 +108,11 @@ namespace Sentinel
 			mHeight		= height;
 		}
 
+		~TextureDX()
+		{
+			Release();
+		}
+
 		void Release()
 		{
 			SAFE_RELEASE_PTR( mTexture );
@@ -157,16 +162,14 @@ namespace Sentinel
 		{
 			filename.append( ".fx" );
 
-			UINT size = Archive::ToBuffer( filename.c_str(), mShaderSource );
-
-			if( size == 0 )
+			if( Archive::ToBuffer( filename.c_str(), mShaderSource ) == 0 )
 			{
-				TRACE( filename.c_str() << " failed to open." );
+				REPORT_ERROR( "Could not open '" << filename << "'", "Shader Loader Error" );
 
 				return S_FALSE;
 			}
 
-			TRACE( "Compiling " << filename << " ..." );
+			TRACE( "Compiling '" << filename << "'..." );
 
 			return CreateFromMemory( mShaderSource, attrib, uniform, device, context );
 		}

@@ -11,11 +11,6 @@ namespace Sentinel
 	{}
 
 	Texture::~Texture()
-	{
-		Release();
-	}
-
-	void Texture::Release()
 	{}
 
 	UINT Texture::Width()

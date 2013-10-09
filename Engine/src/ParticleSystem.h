@@ -31,7 +31,7 @@ namespace Sentinel
 
 	public:
 
-		void	Startup( const std::shared_ptr< Shader >& shader, UINT maxSprites = 1000 );
+		void	Startup( std::shared_ptr< Shader > shader, UINT maxSprites = 1000 );
 
 		void	Shutdown();
 

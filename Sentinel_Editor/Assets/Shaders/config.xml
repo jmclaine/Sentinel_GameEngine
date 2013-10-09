@@ -1,10 +1,10 @@
 <?xml version="1.0" ?>
 <Shaders>
-  <Definition FileName="color"    Attribute="P"    Uniform="PM"      Name="COLOR_ONLY" />
-  <Definition FileName="colnorm"  Attribute="PN"   Uniform="PpVML"   Name="COLOR" />
-  <Definition FileName="texture"  Attribute="PXN"  Uniform="PpXVML"  Name="TEXTURE" />
-  <Definition FileName="normmap"  Attribute="PXNT" Uniform="PpXXVML" Name="NORMAL_MAP" />
-  <Definition FileName="spriteGO" Attribute="XCx"  Uniform="PXx"     Name="SPRITE" />
+  <Definition FileName="color"    Attribute="P"    Uniform="PM"      Name="Color Only" />
+  <Definition FileName="colnorm"  Attribute="PN"   Uniform="PpVML"   Name="Color" />
+  <Definition FileName="texture"  Attribute="PXN"  Uniform="PpXVML"  Name="Texture" />
+  <Definition FileName="normmap"  Attribute="PXNT" Uniform="PpXXVML" Name="Normal Map" />
+  <Definition FileName="spriteGO" Attribute="XCx"  Uniform="PXx"     Name="Sprite" />
   
   <!--Definition FileName="colnorm"-->
     <!-- 

@@ -2,7 +2,7 @@
 /*
 Creates a new GameObject.
 WGameObject frees automatically when attached to WGameWorld.
-Delete() should be called manually for a controlled free memory.
+Release() should be called manually for a controlled free memory.
 */
 #include "Property.h"
 #include "GameObject.h"
@@ -19,7 +19,7 @@ namespace Sentinel { namespace Components
 		WGameObject();
 		WGameObject( GameObject* obj );
 
-		void Delete();
+		void Release();
 
 		virtual System::String^	ToString() override;
 

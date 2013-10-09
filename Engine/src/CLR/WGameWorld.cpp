@@ -14,6 +14,11 @@ namespace Sentinel { namespace Components
 		GameWorld::Inst( GameWorld::Create() );
 	}
 
+	void WGameWorld::Release()
+	{
+		GameWorld::Inst()->Release();
+	}
+
 	void WGameWorld::Save( WArchive^ archive )
 	{
 		GameWorld::Inst()->Save( *archive->GetRef() );

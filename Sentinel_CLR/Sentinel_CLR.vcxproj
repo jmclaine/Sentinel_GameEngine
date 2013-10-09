@@ -55,7 +55,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Full</Optimization>
-      <PreprocessorDefinitions>WIN32;BUILD_DLL;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;BUILD_DLL;IGNORE_PHYSICS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(SolutionDir)\..\Engine\tinyxml;$(SolutionDir)\..\Engine\glew\include;$(SolutionDir)\..\Engine\src;$(SolutionDir)\..\Engine\DirectX11;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4835</DisableSpecificWarnings>
@@ -80,7 +80,7 @@ xcopy "$(SolutionDir)$(Configuration)\Sentinel.dll" "$(SolutionDir)\..\Sentinel_
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;BUILD_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;BUILD_DLL;IGNORE_PHYSICS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(SolutionDir)\..\Engine\tinyxml;$(SolutionDir)\..\Engine\glew\include;$(SolutionDir)\..\Engine\src;$(SolutionDir)\..\Engine\DirectX11;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
@@ -111,7 +111,11 @@ xcopy "$(SolutionDir)$(Configuration)\Sentinel.dll" "$(SolutionDir)\..\Sentinel_
   <ItemGroup>
     <ClInclude Include="..\Engine\src\CLR\WArchive.h" />
     <ClInclude Include="..\Engine\src\CLR\WAssetManager.h" />
+    <ClInclude Include="..\Engine\src\CLR\WControllerComponent.h" />
     <ClInclude Include="..\Engine\src\CLR\WMeshManager.h" />
+    <ClInclude Include="..\Engine\src\CLR\WModelManager.h" />
+    <ClInclude Include="..\Engine\src\CLR\WCustomPhysicsComponent.h" />
+    <ClInclude Include="..\Engine\src\CLR\WPlayerControllerComponent.h" />
     <ClInclude Include="..\Engine\src\CLR\WShaderManager.h" />
     <ClInclude Include="..\Engine\src\CLR\WStdVector.h" />
     <ClInclude Include="..\Engine\src\CLR\Property.h" />
@@ -154,6 +158,7 @@ xcopy "$(SolutionDir)$(Configuration)\Sentinel.dll" "$(SolutionDir)\..\Sentinel_
     <ClCompile Include="..\Engine\src\CLR\WBuffer.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WCameraComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WColorRGBA.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WControllerComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WDrawableComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WGameComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WGameObject.cpp" />
@@ -169,7 +174,10 @@ xcopy "$(SolutionDir)$(Configuration)\Sentinel.dll" "$(SolutionDir)\..\Sentinel_
     <ClCompile Include="..\Engine\src\CLR\WMeshBuilder.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WMeshComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WModelComponent.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WModelManager.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WPerspectiveCameraComponent.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WCustomPhysicsComponent.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WPlayerControllerComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WQuatf.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WRenderer.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WShader.cpp" />

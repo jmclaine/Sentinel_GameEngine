@@ -9,6 +9,7 @@ namespace Sentinel
 	protected:
 
 		PhysicsComponent*		mPhysics;
+
 		TransformComponent*		mTransform;
 
 		//////////////////////////////

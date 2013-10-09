@@ -16,7 +16,7 @@ namespace Sentinel_Editor
 
 		public WModel Data { get; set; }
 
-		public AModel( WModel mesh, String name )
+		public AModel( String name, WModel mesh )
 		{
 			mType	= EditorAssetType.MODEL;
 

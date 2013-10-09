@@ -15,6 +15,8 @@
 
 #include "TextureManager.h"
 #include "ShaderManager.h"
+#include "MeshManager.h"
+#include "ModelManager.h"
 
 #include "Input.h"
 #include "Timing.h"
@@ -40,39 +42,24 @@ using namespace Sentinel;
 
 // Main Application.
 //
-enum ShapeTypes
-{
-	SHAPE_CUBE,
-	SHAPE_CYLINDER,
-	SHAPE_OCTAHEDRON,
-	SHAPE_TETRAHEDRON,
-	SHAPE_DODECAHEDRON,
-	SHAPE_SPHERE,
-	SHAPE_WIRE_SPHERE,
-
-	NUM_SHAPES
-};
-
-//////////////////////////////////////////
-
 class MainApp
 {
 	HACCEL					mAccelTable;
 	
-	GameWindow*				mWindow0;
-	GameWindow*				mWindow1;
-
+	GameWindow*				mWindow;
+	
 public:
 
 	MainApp()
 	{
 		srand( (UINT)time( (time_t*)0 ));
 
-		mWindow0 = NULL;
-		mWindow1 = NULL;
-
+		mWindow = NULL;
+	
 		TextureManager::Create();
 		ShaderManager::Create();
+		MeshManager::Create();
+		ModelManager::Create();
 	}
 
 	~MainApp()
@@ -80,9 +67,8 @@ public:
 
 	int Run( HINSTANCE hInstance, int nCmdShow )
 	{
-		mWindow0 = new GameWindow( IDI_SENTINEL_TEST, IDI_SMALL, IDC_SENTINEL_TEST );
-		mWindow1 = new GameWindow( IDI_SENTINEL_TEST, IDI_SMALL, IDC_SENTINEL_TEST );
-
+		mWindow = new GameWindow( IDI_SENTINEL_TEST, IDI_SMALL, IDC_SENTINEL_TEST );
+		
 		//LoadString( hInstance, IDS_APP_TITLE, mTitle, GameWindow::MAX_LOADSTRING );
 		//LoadString( hInstance, IDC_SENTINEL_TEST, mWindowClass, GameWindow::MAX_LOADSTRING );
 		
@@ -101,37 +87,39 @@ public:
 
 		// Prepare main window.
 		//
-		mWindow0->Startup( hInstance, nCmdShow, "Sentinel_Test", "SentinelClass0", info );
-
-		Renderer::Inst()->CreateDepthStencil( info.Width(), info.Height() );
-		Renderer::Inst()->CreateBackbuffer();
-
-		// Prepare second window for testing.
-		//
-		mWindow1->Startup( hInstance, nCmdShow, "Sentinel_Dup",  "SentinelClass1", info );
+		mWindow->Startup( hInstance, nCmdShow, "Sentinel_Test", "SentinelClass0", info );
 
 		Renderer::Inst()->CreateDepthStencil( info.Width(), info.Height() );
 		Renderer::Inst()->CreateBackbuffer();
 
 		////////////////////////////////////
 
-		SetFocus( mWindow0->GetHandle() );
-
-		Mouse::Inst()->SetPosition( CenterHandle( mWindow0->GetHandle() ));
+		Mouse::Inst()->SetPosition( CenterHandle( mWindow->GetHandle() ));
 		ShowCursor( FALSE );
 
-		mWindow0->SetActive();
-		mWindow0->ShareResources( mWindow1 );
-		
 		////////////////////////////////////
 
 		PhysicsSystem::Inst()->Startup();
-
+		/*
 		PrepareShaders();
 		PrepareObjects();
 		PrepareFont();
+		//*/
+		
+		Archive archive;
+		archive.Open( "Default.MAP", "rb" );
 
-		ParticleSystem::Inst()->Startup( ShaderManager::Inst()->Get( "SPRITE" ), 100 );
+		TextureManager::Inst()->Load( archive );
+		ShaderManager::Inst()->Load( archive );
+		MeshManager::Inst()->Load( archive );
+		ModelManager::Inst()->Load( archive );
+		GameWorld::Inst()->Load( archive );
+
+		archive.Close();
+
+		GameWorld::Inst()->Startup();
+		//*/
+		ParticleSystem::Inst()->Startup( ShaderManager::Inst()->Get( "Sprite" ), 100 );
 
 		// Enter main game loop.
 		//
@@ -170,10 +158,8 @@ public:
 
 		static float color[] = {0.0f, 0.2f, 0.8f, 1.0f};
 
-		mWindow0->SetActive();
-
 		Renderer::Inst()->SetDepthStencil( 0 );
-		Renderer::Inst()->SetViewport( 0, 0, mWindow0->GetInfo()->Width(), mWindow0->GetInfo()->Height() );
+		Renderer::Inst()->SetViewport( 0, 0, mWindow->GetInfo()->Width(), mWindow->GetInfo()->Height() );
 		Renderer::Inst()->SetRenderTarget( 0 );
 
 		Renderer::Inst()->Clear( color );
@@ -209,10 +195,6 @@ public:
 		if( !(ShaderManager::Inst()->LoadConfig( "config.xml" )))
 			throw AppException( "Failed to load 'Shaders\\config.xml'" );
 
-		Model::SHADER_COLOR			= ShaderManager::Inst()->Get( "COLOR" );
-		Model::SHADER_TEXTURE		= ShaderManager::Inst()->Get( "TEXTURE" );
-		Model::SHADER_NORMAL_MAP	= ShaderManager::Inst()->Get( "NORMAL_MAP" );
-
 		SetDirectory( ".." );
 	}
 	
@@ -234,7 +216,7 @@ public:
 		
 		// Create main perspective camera.
 		//
-		info = mWindow0->GetInfo();
+		info = mWindow->GetInfo();
 		camera = new PerspectiveCameraComponent( (float)info->Width(), (float)info->Height() );
 		
 		transform = new TransformComponent();
@@ -286,44 +268,45 @@ public:
 
 		// Create meshes and model for object instancing.
 		//
-		MeshBuilder				meshBuilder;
-		std::shared_ptr< Mesh >	mesh[ NUM_SHAPES ];
-
-		meshBuilder.mShader = ShaderManager::Inst()->Get( "TEXTURE" );
+		MeshBuilder meshBuilder;
+		
+		meshBuilder.mShader = ShaderManager::Inst()->Get( "Texture" );
 		meshBuilder.mTexture[ TEXTURE_DIFFUSE ] = TextureManager::Inst()->Add( "DEFAULT", Renderer::Inst()->CreateTextureFromFile( "default-alpha.png" ));
 
 		meshBuilder.CreateCube( 1 );
-		mesh[ SHAPE_CUBE ] = std::shared_ptr< Mesh >( meshBuilder.BuildMesh() );
-
+		MeshManager::Inst()->Add( "Cube", std::shared_ptr< Mesh >( meshBuilder.BuildMesh() ));
+		
 		meshBuilder.ClearGeometry();
 		meshBuilder.CreateCylinder( 1, 1, 10 );
-		mesh[ SHAPE_CYLINDER ] = std::shared_ptr< Mesh >( meshBuilder.BuildMesh() );
+		MeshManager::Inst()->Add( "Cylinder", std::shared_ptr< Mesh >( meshBuilder.BuildMesh() ));
 
 		meshBuilder.ClearGeometry();
 		meshBuilder.CreateOctahedron( 1 );
-		mesh[ SHAPE_OCTAHEDRON ] = std::shared_ptr< Mesh >( meshBuilder.BuildMesh() );
+		MeshManager::Inst()->Add( "Octahedron", std::shared_ptr< Mesh >( meshBuilder.BuildMesh() ));
 
 		meshBuilder.ClearGeometry();
 		meshBuilder.CreateTetrahedron( 1 );
-		mesh[ SHAPE_TETRAHEDRON ] = std::shared_ptr< Mesh >( meshBuilder.BuildMesh() );
+		MeshManager::Inst()->Add( "Tetrahedron", std::shared_ptr< Mesh >( meshBuilder.BuildMesh() ));
 
 		meshBuilder.ClearGeometry();
 		meshBuilder.CreateDodecahedron( 1 );
-		mesh[ SHAPE_DODECAHEDRON ] = std::shared_ptr< Mesh >( meshBuilder.BuildMesh() );
+		MeshManager::Inst()->Add( "Dodecahedron", std::shared_ptr< Mesh >( meshBuilder.BuildMesh() ));
 
 		meshBuilder.ClearGeometry();
 		meshBuilder.CreateSphere( 1, 10, 10 );
-		mesh[ SHAPE_SPHERE ] = std::shared_ptr< Mesh >( meshBuilder.BuildMesh() );
+		MeshManager::Inst()->Add( "Sphere", std::shared_ptr< Mesh >( meshBuilder.BuildMesh() ));
 
 		meshBuilder.ClearGeometry();
 		meshBuilder.CreateWireSphere( 1, 10, 10 );
-		meshBuilder.mShader = ShaderManager::Inst()->Get( "COLOR" );
-		mesh[ SHAPE_WIRE_SPHERE ] = std::shared_ptr< Mesh >( meshBuilder.BuildMesh() );
+		meshBuilder.mShader = ShaderManager::Inst()->Get( "Color" );
+		MeshManager::Inst()->Add( "Wire Sphere", std::shared_ptr< Mesh >( meshBuilder.BuildMesh() ));
 
 		std::shared_ptr< Model > model = std::shared_ptr< Model >( Model::Load( "Player.M3D" ));
 
 		if( !model )
 			throw AppException( "Player.M3D failed to load." );
+
+		ModelManager::Inst()->Add( "Player", model );
 
 		// Create simple box in center of the world.
 		//
@@ -337,7 +320,7 @@ public:
 		obj = GameWorld::Inst()->AddGameObject( new GameObject(), "Origin" );
 		obj->AttachComponent( transform,	"Transform" );
 		obj->AttachComponent( physics,		"Physics" );
-		obj->AttachComponent( new MeshComponent( mesh[ SHAPE_CUBE ] ), "Mesh" );
+		obj->AttachComponent( new MeshComponent( MeshManager::Inst()->Get( "Cube" )), "Mesh" );
 
 		////////////////////////////////
 		
@@ -351,7 +334,7 @@ public:
 		obj = GameWorld::Inst()->AddGameObject( new GameObject(), "Origin" );
 		obj->AttachComponent( transform,	"Transform" );
 		obj->AttachComponent( physics,		"Physics" );
-		obj->AttachComponent( new MeshComponent( mesh[ SHAPE_CUBE ] ), "Mesh" );
+		obj->AttachComponent( new MeshComponent( MeshManager::Inst()->Get( "Cube" )), "Mesh" );
 		
 		////////////////////////////////
 		
@@ -362,57 +345,103 @@ public:
 		for( int x = 0; x < count; ++x )
 		{
 			Vector3f scale = Vector3f( RandomValue( 0.25f, 0.5f ), RandomValue( 0.25f, 0.5f ), RandomValue( 0.25f, 0.5f ));
-			float mass  = scale.Length();
-			UINT  shape = RandomValue( 0, NUM_SHAPES + 1 );
+			float mass     = scale.Length();
+			UINT  shape    = RandomValue( 0, 7 );
+			std::shared_ptr< Mesh >	mesh;
 
 			transform = new TransformComponent();
 			transform->mPosition = Vector3f( RandomValue( -20.0f, 20.0f ), 50.0f, RandomValue( -20.0f, 20.0f ));
 			transform->mScale    = scale;
 				
-			if( shape == SHAPE_CUBE )
+			switch( shape )
 			{
-				physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateBox( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mass ));
-			}
-			else
-			if( shape == SHAPE_CYLINDER )
-			{
-				transform->mScale.z = transform->mScale.x;
-				transform->mScale.y = transform->mScale.y * 5;
-				physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateCylinder( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mass ));
-			}
-			else
-			if( shape == SHAPE_SPHERE || shape == SHAPE_WIRE_SPHERE )
-			{
-				transform->mScale = Vector3f( mass, mass, mass );
-				physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateSphere( transform->mPosition, Quatf( 0, 0, 0, 1 ), mass, mass ));
-			}
-			else
-			{
-				if( shape < NUM_SHAPES )
-				{
-					physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateMesh( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mesh[ shape ].get(), mass ));
-				}
-				else
-				{
-					// Create a sphere for models...for now.
-					//
+				// Cube
+				//
+				case 0:
+					mesh = MeshManager::Inst()->Get( "Cube" );
+
+					physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateBox( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mass ));
+
+					break;
+
+				// Cylinder
+				//
+				case 1:
+					mesh = MeshManager::Inst()->Get( "Cylinder" );
+
+					transform->mScale.z = transform->mScale.x;
+					transform->mScale.y = transform->mScale.y * 5;
+					physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateCylinder( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mass ));
+
+					break;
+
+				// Sphere
+				//
+				case 2:
+					mesh = MeshManager::Inst()->Get( "Sphere" );
+
+					transform->mScale = Vector3f( mass, mass, mass );
+					physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateSphere( transform->mPosition, Quatf( 0, 0, 0, 1 ), mass, mass ));
+
+					break;
+
+				// Wire Sphere
+				//
+				case 3:
+					mesh = MeshManager::Inst()->Get( "Wire Sphere" );
+
+					transform->mScale = Vector3f( mass, mass, mass );
+					physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateSphere( transform->mPosition, Quatf( 0, 0, 0, 1 ), mass, mass ));
+
+					break;
+
+				// Tetrahedron
+				//
+				case 4:
+					mesh = MeshManager::Inst()->Get( "Tetrahedron" );
+
+					physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateMesh( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mesh.get(), mass ));
+
+					break;
+
+				// Octahedron
+				//
+				case 5:
+					mesh = MeshManager::Inst()->Get( "Octahedron" );
+
+					physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateMesh( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mesh.get(), mass ));
+
+					break;
+
+				// Dodecahedron
+				//
+				case 6:
+					mesh = MeshManager::Inst()->Get( "Dodecahedron" );
+
+					physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateMesh( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mesh.get(), mass ));
+
+					break;
+
+				// All others
+				//
+				default:
 					transform->mScale = Vector3f( mass, mass, mass ) * 0.025f;
+
 					physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateSphere( transform->mPosition, Quatf( 0, 0, 0, 1 ), mass * 0.6f, mass ));
-				}
+
+					break;
 			}
 
 			sprintf_s( name, "Object %d", x );
-
-			//physics->GetRigidBody()->setGravity( btVector3( 0, -9.81f, 0 ));
 
 			obj = GameWorld::Inst()->AddGameObject( new GameObject(), name );
 			obj->AttachComponent( transform,	"Transform" );
 			obj->AttachComponent( physics,		"Physics" );
 
-			if( shape < NUM_SHAPES )
-				obj->AttachComponent( new MeshComponent( mesh[ shape ] ),	"Mesh" );
+			if( shape < 7 )
+				obj->AttachComponent( new MeshComponent( mesh ),	"Mesh" );
 			else
-				obj->AttachComponent( new ModelComponent( model ),			"Model" );
+				obj->AttachComponent( new ModelComponent( model ),	"Model" );
 		}
 
 		GameWorld::Inst()->Startup();
@@ -434,20 +463,20 @@ public:
 		Mouse::Destroy();
 		Keyboard::Destroy();
 
-		Timing::Destroy();
-		PhysicsSystem::Destroy();
-		ParticleSystem::Destroy();
-
+		//GameWorld::Inst()->Shutdown();
 		GameWorld::Destroy();
 
+		ModelManager::Destroy();
+		MeshManager::Destroy();
 		ShaderManager::Destroy();
 		TextureManager::Destroy();
 
-		mWindow0->Shutdown();
-		delete mWindow0;
+		mWindow->Shutdown();
+		delete mWindow;
 		
-		mWindow1->Shutdown();
-		delete mWindow1;
+		Timing::Destroy();
+		PhysicsSystem::Destroy();
+		ParticleSystem::Destroy();
 
 		Renderer::Destroy();
 	}
@@ -465,7 +494,7 @@ int APIENTRY _tWinMain( HINSTANCE hInstance,
 	//
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	_CrtSetReportMode( _CRT_ERROR, _CRTDBG_MODE_DEBUG );
-	//_CrtSetBreakAlloc( 898 );
+	//_CrtSetBreakAlloc( 565 );
 
 	UNREFERENCED_PARAMETER( hPrevInstance );
 	UNREFERENCED_PARAMETER( lpCmdLine );

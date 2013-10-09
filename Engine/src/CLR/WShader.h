@@ -20,8 +20,6 @@ namespace Sentinel { namespace Assets
 
 		UINT  			VertexSize();
 
-		void			Release();
-
 		void			ApplyPass();
 		void			ApplyLayout();
 

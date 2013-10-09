@@ -36,23 +36,26 @@ namespace Sentinel
 
 			// Store the compressed shader source.
 			//
-			ULONG  size  = (ULONG)strlen( shader->Source() );
+			char* source = (char*)shader->Source();
+			ULONG  size  = (ULONG)strlen( source );
 			ULONG bound  = compressBound( size );
 
-			BYTE* comp_source = new BYTE[ bound ];
+			BYTE* comp_source = (BYTE*)malloc( bound );
 
-			compress( comp_source, &bound, reinterpret_cast< const Bytef* >(shader->Source()), size );
+			compress( comp_source, &bound, reinterpret_cast< const Bytef* >(source), size );
 
 			archive.Write( &size, 1, true );
 			archive.Write( &bound, 1, true );
 			archive.Write( comp_source, bound );
 
-			delete[] comp_source;
+			free( comp_source );
 		}
 	}
 
 	void ShaderManager::Load( Archive& archive )
 	{
+		RemoveAll();
+
 		// Read the number of shaders to load.
 		//
 		UINT count;
@@ -78,13 +81,17 @@ namespace Sentinel
 			char* comp_source = (char*)malloc( bound );
 			archive.Read( comp_source, bound );
 
-			char* source = (char*)malloc( size+1 );
+			char* source = (char*)malloc( size + 1 );
 			source[ size ] = 0;
 
 			uncompress( reinterpret_cast< Bytef* >(source), &size, reinterpret_cast< Bytef* >(comp_source), bound );
 
+			TRACE( "Compiling '" << name << "'..." );
+
 			if( !Add( name, Renderer::Inst()->CreateShaderFromMemory( source, attrib.c_str(), uniform.c_str() )))
 				throw std::exception( "Failed to read shader." );
+
+			free( comp_source );
 		}
 	}
 

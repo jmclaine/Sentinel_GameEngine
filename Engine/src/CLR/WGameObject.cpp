@@ -17,7 +17,7 @@ namespace Sentinel { namespace Components
 		mRef = obj;
 	}
 
-	void WGameObject::Delete()
+	void WGameObject::Release()
 	{
 		delete mRef;
 	}

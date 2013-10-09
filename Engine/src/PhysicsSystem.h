@@ -1,5 +1,8 @@
 #pragma once
-
+/*
+Bullet Physics is not compatible with the
+managed / wrapped version due to byte-alignment.
+*/
 #include "btBulletDynamicsCommon.h"
 
 #include "Mesh.h"

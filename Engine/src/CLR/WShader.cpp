@@ -23,11 +23,6 @@ namespace Sentinel { namespace Assets
 		return mRef->VertexSize();
 	}
 
-	void WShader::Release()
-	{
-		mRef->Release();
-	}
-
 	void WShader::ApplyPass()
 	{
 		mRef->ApplyPass();

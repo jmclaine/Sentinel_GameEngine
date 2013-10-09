@@ -33,8 +33,7 @@ namespace Sentinel { namespace Assets
 
 		System::IntPtr^ Lock();
 		void		Unlock();
-		void		Release();
-
+		
 		Sentinel::Assets::BufferType Type();
 		UINT		Size();
 		UINT		Stride();

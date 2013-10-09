@@ -22,7 +22,7 @@ namespace Sentinel
 
 		virtual ~AssetManager()
 		{
-			mData.clear();
+			RemoveAll();
 		}
 
 	public:
@@ -46,6 +46,11 @@ namespace Sentinel
 
 			if( it != mData.end() )
 				mData.erase( it );
+		}
+
+		void RemoveAll()
+		{
+			mData.clear();
 		}
 
 		std::shared_ptr< T > Get( const std::string& name )

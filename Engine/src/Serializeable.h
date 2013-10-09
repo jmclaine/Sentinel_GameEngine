@@ -10,7 +10,6 @@ namespace Sentinel
 {
 
 #define DECLARE_SERIAL()\
-	private:\
 		static SerialRegister mSerialRegistry;\
 		static Serializeable* Clone();\
 		void Save( Archive& archive );\

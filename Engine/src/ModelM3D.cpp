@@ -7,6 +7,8 @@
 #include "Timing.h"
 #include "Archive.h"
 #include "TextureManager.h"
+#include "ShaderManager.h"
+#include "MeshManager.h"
 
 namespace Sentinel
 {
@@ -23,6 +25,52 @@ namespace Sentinel
 			int			mNumBones;
 
 			Vertex() : mNumBones( 0 ) {}
+		};
+
+		struct KeyFrame
+		{
+			Matrix4f	mMatrix;
+			int			mFrame;
+
+			KeyFrame()
+			{
+				mMatrix.Identity();
+				mFrame = 0;
+			}
+		};
+
+		struct Object
+		{
+			Mesh**		mMesh;
+			UINT		mNumMeshes;
+
+			KeyFrame*	mKeyFrame;
+			UINT		mNumKeyFrames;
+
+			float		mCurrTime;
+			int			mCurrKey;
+
+			Matrix4f	mMatrixWorld;
+			Matrix4f	mInverseBone;
+
+			Object*		mParent;
+
+			Object()
+			{
+				mParent = NULL;
+
+				mCurrTime = 0.0f;
+				mCurrKey = 0;
+
+				mMatrixWorld.Identity();
+				mInverseBone.Identity();
+			}
+
+			~Object()
+			{
+				SAFE_DELETE_ARRAY( mMesh );
+				SAFE_DELETE_ARRAY( mKeyFrame );
+			}
 		};
 		
 		// Texture types from 3DStudio Max 2012.
@@ -48,12 +96,6 @@ namespace Sentinel
 		{
 			Material	mMaterial;
 			std::shared_ptr< Texture > mTexture[ NUM_AUTODESK_TYPES ];
-
-			MaterialTexture()
-			{}
-
-			~MaterialTexture()
-			{}
 		};
 
 		Object*				mObject;
@@ -64,65 +106,11 @@ namespace Sentinel
 
 		bool				mIsWeighted;		// Are the vertices weighted?
 
-	private:
-
-		void ReadMaterial( Archive& archive, MaterialTexture& matTex )
-		{
-			// Set the material.
-			//
-			Vector3f color;
-			archive.Read( color.Ptr(), 3 );
-			ColorRGBA ambient( color.x, color.y, color.z );
-
-			archive.Read( color.Ptr(), 3 );
-			ColorRGBA diffuse( color.x, color.y, color.z );
-
-			archive.Read( color.Ptr(), 3 );
-			ColorRGBA specular( color.x, color.y, color.z );
-
-			float spec_comp;
-			archive.Read( &spec_comp );
-			spec_comp *= 100.0f;
-
-			matTex.mMaterial = Material( ambient, diffuse, specular, spec_comp );
-
-			// Read filenames of each texture.
-			//
-			UINT numTextures;
-			archive.Read( &numTextures );
-
-			char name[ 256 ];
-			for( UINT x = 0; x < numTextures; ++x )
-			{
-				int type;
-				archive.Read( &type );
-
-				if( type == AUTODESK_BUMP )
-				{
-					type = TEXTURE_NORMAL;
-				}
-				else
-				if( type == AUTODESK_PARALLAX )
-				{
-					type = TEXTURE_DEPTH;
-				}
-				else
-				{
-					type = TEXTURE_DIFFUSE;
-				}
-
-				UINT len;
-				archive.Read( &len );
-				archive.Read( name, len );
-				name[ len ] = 0;
-
-				matTex.mTexture[ type ] = TextureManager::Inst()->Add( name, Renderer::Inst()->CreateTextureFromFile( name ));
-			}
-		}
+		int					mVersion;
 
 	public:
 
-		ModelM3D( const char* filename )
+		ModelM3D()
 		{
 			mObject			= NULL;
 			mNumObjects		= 0;
@@ -133,13 +121,146 @@ namespace Sentinel
 			mIsWeighted		= false;
 
 			mMatrixWorld.Identity();
-
-			Create( filename );
 		}
 
 		~ModelM3D()
 		{
 			Release();
+		}
+
+		void Release()
+		{
+			for( UINT x = 0; x < mNumObjects; ++x )
+			{
+				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
+					SAFE_DELETE( mObject[ x ].mMesh[ y ] );
+				
+				SAFE_DELETE_ARRAY( mObject[ x ].mMesh );
+				SAFE_DELETE_ARRAY( mObject[ x ].mKeyFrame );
+			}
+
+			SAFE_DELETE_ARRAY( mMaterials );
+			SAFE_DELETE_ARRAY( mObject );
+
+			mNumObjects   = 0;
+			mNumMaterials = 0;
+		}
+
+		void Save( Archive& archive )
+		{
+			// Save the format type.
+			//
+			BYTE format = M3D;
+			archive.Write( &format );
+
+			// Save if the model has weighted vertices.
+			//
+			BYTE weighted = mIsWeighted;
+			archive.Write( &weighted );
+
+			// Write the materials.
+			//
+			archive.Write( &mNumMaterials );
+			
+			for( UINT x = 0; x < mNumMaterials; ++x )
+				WriteMaterial( archive, mMaterials[ x ] );
+
+			// Write the objects.
+			//
+			archive.Write( &mNumObjects );
+
+			for( UINT x = 0; x < mNumObjects; ++x )
+			{
+				// Write the meshes.
+				//
+				archive.Write( &mObject[ x ].mNumMeshes );
+
+				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
+					MeshManager::SaveMesh( archive, mObject[ x ].mMesh[ y ] );
+
+				// Write the keyframes.
+				//
+				archive.Write( &mObject[ x ].mNumKeyFrames );
+
+				for( UINT y = 0; y < mObject[ x ].mNumKeyFrames; ++y )
+				{
+					archive.Write( mObject[ x ].mKeyFrame[ y ].mMatrix.Ptr(), 16 );
+					archive.Write( &mObject[ x ].mKeyFrame[ y ].mFrame );
+				}
+				
+				// Write the hierarchy.
+				//
+				if( mObject[ x ].mParent == NULL )
+				{
+					int hierarchy = -1;
+					archive.Write( &hierarchy );
+				}
+				else
+				{
+					for( int y = 0; y < (int)mNumObjects; ++y )
+					{
+						if( mObject[ x ].mParent == &mObject[ y ] )
+						{
+							archive.Write( &y );
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		void Create( Archive& archive )
+		{
+			// Read if the model has weighted vertices.
+			//
+			BYTE weighted;
+			archive.Read( &weighted );
+			mIsWeighted = (weighted == 1);
+
+			// Read the materials.
+			//
+			archive.Read( &mNumMaterials );
+			mMaterials = new MaterialTexture[ mNumMaterials ];
+
+			for( UINT x = 0; x < mNumMaterials; ++x )
+				ReadMaterial( archive, mMaterials[ x ] );
+
+			// Read the objects.
+			//
+			archive.Read( &mNumObjects );
+			mObject = new Object[ mNumObjects ];
+
+			for( UINT x = 0; x < mNumObjects; ++x )
+			{
+				// Read the meshes.
+				//
+				archive.Read( &mObject[ x ].mNumMeshes );
+				mObject[ x ].mMesh = new Mesh*[ mObject[ x ].mNumMeshes ];
+
+				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
+					MeshManager::LoadMesh( archive, mObject[ x ].mMesh[ y ] );
+
+				// Read the keyframes.
+				//
+				archive.Read( &mObject[ x ].mNumKeyFrames );
+				mObject[ x ].mKeyFrame = new KeyFrame[ mObject[ x ].mNumKeyFrames ];
+
+				for( UINT y = 0; y < mObject[ x ].mNumKeyFrames; ++y )
+				{
+					archive.Read( mObject[ x ].mKeyFrame[ y ].mMatrix.Ptr(), 16 );
+					archive.Read( &mObject[ x ].mKeyFrame[ y ].mFrame );
+				}
+				
+				// Read the hierarchy.
+				//
+				int hierarchy;
+				archive.Read( &hierarchy );
+
+				if( hierarchy == -1 )
+					mObject[ x ].mParent = NULL;
+				else
+					mObject[ x ].mParent = &mObject[ hierarchy ];
+			}
 		}
 
 		bool Create( const char* filename )
@@ -156,8 +277,7 @@ namespace Sentinel
 
 				// Read version.
 				//
-				int version;
-				archive.Read( &version );
+				archive.Read( &mVersion );
 
 				// Read the materials and create meshes.
 				//
@@ -315,36 +435,26 @@ namespace Sentinel
 
 						if( numTextures == 0 )
 						{
-							_ASSERT( SHADER_COLOR );
-
-							builder.mShader = SHADER_COLOR;
+							builder.mShader = ShaderManager::Inst()->Get( "Color" );
 						}
 						else
 						if( isSkinned )
 						{
-							_ASSERT( SHADER_SKINNING );
-
-							builder.mShader = SHADER_SKINNING;
+							builder.mShader = ShaderManager::Inst()->Get( "Skinning" );
 						}
 						else
 						if( numTextures == 1 )
 						{
-							_ASSERT( SHADER_TEXTURE );
-							
-							builder.mShader = SHADER_TEXTURE;
+							builder.mShader = ShaderManager::Inst()->Get( "Texture" );;
 						}
 						else
 						if( numTextures == 2 )
 						{
-							_ASSERT( SHADER_NORMAL_MAP );
-							
-							builder.mShader = SHADER_NORMAL_MAP;
+							builder.mShader = ShaderManager::Inst()->Get( "Normal Map" );;
 						}
 						else
 						{
-							_ASSERT( SHADER_PARALLAX );
-							
-							builder.mShader = SHADER_PARALLAX;
+							builder.mShader = ShaderManager::Inst()->Get( "Parallax" );;
 						}
 
 						// Read faces.
@@ -415,25 +525,98 @@ namespace Sentinel
 			return true;
 		}
 
-		void Release()
+	private:
+
+		void WriteMaterial( Archive& archive, MaterialTexture& matTex )
 		{
-			for( UINT x = 0; x < mNumObjects; ++x )
+			// Write base material.
+			//
+			archive.Write( matTex.mMaterial.mAmbient.Ptr(), 3 );
+			archive.Write( matTex.mMaterial.mDiffuse.Ptr(), 3 );
+			archive.Write( matTex.mMaterial.mSpecular.Ptr(), 3 );
+
+			float spec_comp = matTex.mMaterial.mSpecularComponent / 100.0f;
+			archive.Write( &spec_comp );
+			
+			// Write filenames of each texture.
+			//
+			UINT numTextures = 0;
+			for( UINT x = 0; x < NUM_AUTODESK_TYPES; ++x )
+				if( matTex.mTexture[ x ] != NULL )
+					++numTextures;
+
+			archive.Write( &numTextures );
+
+			for( UINT x = 0; x < NUM_AUTODESK_TYPES; ++x )
 			{
-				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
-					SAFE_DELETE( mObject[ x ].mMesh[ y ] );
-				
-				SAFE_DELETE_ARRAY( mObject[ x ].mMesh );
-				SAFE_DELETE_ARRAY( mObject[ x ].mKeyFrame );
+				if( matTex.mTexture[ x ] != NULL )
+				{
+					archive.Write( &x );
+
+					std::string name = TextureManager::Inst()->Get( matTex.mTexture[ x ] );
+
+					UINT len = name.size();
+					archive.Write( &len );
+					archive.Write( name.c_str(), len );
+				}
 			}
-
-			SAFE_DELETE_ARRAY( mMaterials );
-			SAFE_DELETE_ARRAY( mObject );
-
-			mNumObjects   = 0;
-			mNumMaterials = 0;
 		}
 
-		//////////////////////////////////////////////////////////////////////////
+		void ReadMaterial( Archive& archive, MaterialTexture& matTex )
+		{
+			// Set the material.
+			//
+			Vector3f color;
+			archive.Read( color.Ptr(), 3 );
+			ColorRGBA ambient( color.x, color.y, color.z );
+
+			archive.Read( color.Ptr(), 3 );
+			ColorRGBA diffuse( color.x, color.y, color.z );
+
+			archive.Read( color.Ptr(), 3 );
+			ColorRGBA specular( color.x, color.y, color.z );
+
+			float spec_comp;
+			archive.Read( &spec_comp );
+			spec_comp *= 100.0f;
+
+			matTex.mMaterial = Material( ambient, diffuse, specular, spec_comp );
+
+			// Read filenames of each texture.
+			//
+			UINT numTextures;
+			archive.Read( &numTextures );
+
+			char name[ 256 ];
+			for( UINT x = 0; x < numTextures; ++x )
+			{
+				int type;
+				archive.Read( &type );
+
+				if( type == AUTODESK_BUMP )
+				{
+					type = TEXTURE_NORMAL;
+				}
+				else
+				if( type == AUTODESK_PARALLAX )
+				{
+					type = TEXTURE_DEPTH;
+				}
+				else
+				{
+					type = TEXTURE_DIFFUSE;
+				}
+
+				UINT len;
+				archive.Read( &len );
+				archive.Read( name, len );
+				name[ len ] = 0;
+
+				matTex.mTexture[ type ] = TextureManager::Inst()->Add( name, Renderer::Inst()->CreateTextureFromFile( name ));
+			}
+		}
+
+	public:
 
 		void SetMaterials( const std::vector< Material >& material )
 		{
@@ -463,15 +646,6 @@ namespace Sentinel
 					mObject[ x ].mMesh[ y ]->mShader = shader;
 		}
 		*/
-		// Set a keyframe, and append it if the index is -1.
-		//
-		void SetKeyFrame( const KeyFrame& key, int keyIndex = -1, int objIndex = 0 )
-		{
-			_ASSERT( objIndex >= 0 && (UINT)objIndex < mNumObjects && keyIndex > -1 && keyIndex < (int)mObject[ objIndex ].mNumKeyFrames );
-
-			mObject[ objIndex ].mKeyFrame[ keyIndex ] = key;
-		}
-
 		void SetTime( float _time, UINT objIndex = 0 )
 		{
 			_ASSERT( objIndex < mNumObjects );
@@ -503,7 +677,9 @@ namespace Sentinel
 			{
 				static Matrix4f matBone;
 
-				Renderer::Inst()->SetShader( SHADER_SKINNING );
+				std::shared_ptr< Shader > skin = ShaderManager::Inst()->Get( "Skinning" );
+
+				Renderer::Inst()->SetShader( skin );
 
 				for( UINT x = 0; x < mNumObjects; ++x )
 				{
@@ -511,7 +687,7 @@ namespace Sentinel
 
 					// Set the B designation first to ensure this works correctly.
 					//
-					SHADER_SKINNING->SetMatrix( SHADER_SKINNING->Uniform().find( 'B' ), matBone.Ptr(), x, 1 );
+					skin->SetMatrix( skin->Uniform().find( 'B' ), matBone.Ptr(), x, 1 );
 				}
 			}
 
@@ -530,7 +706,7 @@ namespace Sentinel
 						if( (int)mObject[ x ].mCurrKey >= (int)mObject[ x ].mNumKeyFrames )
 						{
 							mObject[ x ].mCurrTime = 0;
-							mObject[ x ].mCurrKey = 0;
+							mObject[ x ].mCurrKey  = 0;
 						}
 					}
 				}
@@ -563,10 +739,23 @@ namespace Sentinel
 		}
 	};
 
-	// Create an M3D Model Loader.
+	// Create an M3D Model.
 	//
-	Model* LoadModelM3D( const char* filename )
+	Model* LoadModelM3DFromFile( const char* filename )
 	{
-		return new ModelM3D( filename );
+		ModelM3D* model = new ModelM3D();
+
+		model->Create( filename );
+
+		return model;
+	}
+
+	Model* LoadModelM3DFromArchive( Archive& archive )
+	{
+		ModelM3D* model = new ModelM3D();
+
+		model->Create( archive );
+
+		return model;
 	}
 }

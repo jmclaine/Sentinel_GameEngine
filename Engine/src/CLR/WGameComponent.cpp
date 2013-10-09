@@ -21,7 +21,7 @@ namespace Sentinel { namespace Components
 	WGameComponent::~WGameComponent()
 	{}
 
-	void WGameComponent::Delete()
+	void WGameComponent::Release()
 	{
 		delete mRef;
 	}

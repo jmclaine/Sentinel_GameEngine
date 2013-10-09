@@ -16,7 +16,7 @@ private:
 		mPtr( new std::shared_ptr< T >() ) 
     {}
 
-	void Delete()
+	void Release()
 	{
 		delete mPtr;
 		mPtr = 0;
@@ -36,12 +36,12 @@ public:
 
 	~m_shared_ptr()
 	{
-        Delete();
+        Release();
     }
 
     !m_shared_ptr()
 	{
-        Delete();
+        Release();
 		System::GC::SuppressFinalize( this );
     }
 

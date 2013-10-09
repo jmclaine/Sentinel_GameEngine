@@ -42,6 +42,8 @@ namespace Sentinel
 		//
 		static GameWorld*	Create();
 
+		void				Release();
+
 		void				Save( Archive& archive );
 		void				Load( Archive& archive );
 		

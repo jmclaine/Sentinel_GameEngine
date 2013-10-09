@@ -26,7 +26,7 @@ namespace Sentinel { namespace Utilities
 
 	protected:
 
-		virtual void Delete();
+		virtual void Release();
 
 	public:
 

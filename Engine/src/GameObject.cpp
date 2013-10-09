@@ -67,16 +67,16 @@ namespace Sentinel
 		archive.Read( &mName );
 
 		int id = 0;
-		mTransform  = (GameComponent*)SerialRegister::Load( archive );
-		mController = (GameComponent*)SerialRegister::Load( archive );
-		mPhysics    = (GameComponent*)SerialRegister::Load( archive );
-		mDrawable   = (GameComponent*)SerialRegister::Load( archive );
+		AttachComponent( (GameComponent*)SerialRegister::Load( archive ));
+		AttachComponent( (GameComponent*)SerialRegister::Load( archive ));
+		AttachComponent( (GameComponent*)SerialRegister::Load( archive ));
+		AttachComponent( (GameComponent*)SerialRegister::Load( archive ));
 
 		BYTE size = 0;
 		archive.Read( &size );
 
 		for( BYTE x = 0; x < size; ++x )
-			mComponent.push_back( (GameComponent*)SerialRegister::Load( archive ));
+			AttachComponent( (GameComponent*)SerialRegister::Load( archive ));
 
 		archive.Read( &size );
 
@@ -88,6 +88,9 @@ namespace Sentinel
 
 	GameComponent* GameObject::AttachComponent( GameComponent* component )
 	{
+		if( !component )
+			return NULL;
+
 		component->SetOwner( this );
 		
 		switch( component->GetType() )
@@ -124,6 +127,9 @@ namespace Sentinel
 
 	GameComponent* GameObject::AttachComponent( GameComponent* component, const char* name )
 	{
+		if( !component )
+			return NULL;
+
 		component->mName = name;
 		return AttachComponent( component );
 	}

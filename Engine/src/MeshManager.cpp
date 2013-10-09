@@ -24,12 +24,14 @@ namespace Sentinel
 		{
 			archive.Write( &it->first );
 
-			SaveMesh( archive, it->second );
+			SaveMesh( archive, it->second.get() );
 		}
 	}
 
 	void MeshManager::Load( Archive& archive )
 	{
+		RemoveAll();
+
 		UINT count;
 		archive.Read( &count );
 
@@ -40,14 +42,14 @@ namespace Sentinel
 			std::string name;
 			archive.Read( &name );
 
-			LoadMesh( archive, mesh );
+			LoadMesh( archive, mesh.get() );
 
 			if( !Add( name, mesh ))
 				throw std::exception( "Failed to load mesh." );
 		}
 	}
 
-	void MeshManager::SaveMesh( Archive& archive, std::shared_ptr< Mesh > mesh )
+	void MeshManager::SaveMesh( Archive& archive, Mesh* mesh )
 	{
 		BYTE primitive = mesh->mPrimitive;
 		archive.Write( &primitive );
@@ -57,7 +59,7 @@ namespace Sentinel
 
 		archive.Write( &ShaderManager::Inst()->Get( mesh->mShader ));
 
-		archive.Write( mesh->mMaterial.Ptr(), sizeof( Material ));
+		archive.Write( (BYTE*)mesh->mMaterial.Ptr(), sizeof( Material ));
 
 		for( UINT x = 0; x < NUM_TEXTURES; ++x )
 		{
@@ -72,12 +74,12 @@ namespace Sentinel
 
 			archive.Write( &type );
 
-			if( type == 2)
+			if( type == 2 )
 				archive.Write( &TextureManager::Inst()->Get( mesh->mTexture[ x ] ));
 		}
 	}
 
-	void MeshManager::LoadMesh( Archive& archive, std::shared_ptr< Mesh > mesh )
+	void MeshManager::LoadMesh( Archive& archive, Mesh* mesh )
 	{
 		BYTE primitive;
 		archive.Read( &primitive );
@@ -90,8 +92,8 @@ namespace Sentinel
 		archive.Read( &shader );
 		mesh->mShader = ShaderManager::Inst()->Get( shader );
 
-		archive.Read( mesh->mMaterial.Ptr(), sizeof( Material ));
-
+		archive.Read( (BYTE*)mesh->mMaterial.Ptr(), sizeof( Material ));
+		
 		std::string texture;
 		for( UINT x = 0; x < NUM_TEXTURES; ++x )
 		{
@@ -107,6 +109,7 @@ namespace Sentinel
 			{
 				std::string texture;
 				archive.Read( &texture );
+
 				mesh->mTexture[ x ] = TextureManager::Inst()->Get( texture );
 			}
 		}

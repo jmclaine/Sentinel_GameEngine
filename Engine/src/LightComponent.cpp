@@ -44,15 +44,15 @@ namespace Sentinel
 
 		GameComponent::Save( archive );
 
-		archive.Write( mColor.Ptr(), 4 );
-		archive.Write( mAttenuation.Ptr(), 4 );
+		archive.Write( mColor.Ptr(),		ar_sizeof( mColor ));
+		archive.Write( mAttenuation.Ptr(),	ar_sizeof( mAttenuation ));
 	}
 
 	void LightComponent::Load( Archive& archive )
 	{
 		GameComponent::Load( archive );
 
-		archive.Read( mColor.Ptr(), 4 );
-		archive.Read( mAttenuation.Ptr(), 4 );
+		archive.Read( mColor.Ptr(),			ar_sizeof( mColor ));
+		archive.Read( mAttenuation.Ptr(),	ar_sizeof( mAttenuation ));
 	}
 }

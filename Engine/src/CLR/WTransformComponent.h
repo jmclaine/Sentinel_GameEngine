@@ -1,6 +1,7 @@
 #pragma once
 /*
-Direct access to orientation quaternion removed for ease of editor use.
+Direct access to orientation quaternion removed.
+
 Added Rotation vector for clarity.
 */
 #include "TransformComponent.h"

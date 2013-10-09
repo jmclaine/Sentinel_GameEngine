@@ -37,6 +37,9 @@
     <Filter Include="Sentinel_Engine\Components\Drawables">
       <UniqueIdentifier>{66a5cd8f-b13f-4714-ba83-828c6b14ab4e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sentinel_Engine\Components\Physics">
+      <UniqueIdentifier>{a1e5d501-e965-4158-92db-14aee84c8dc3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sentinel_CLR.h">
@@ -156,6 +159,18 @@
     <ClInclude Include="..\Engine\src\CLR\WMeshManager.h">
       <Filter>Sentinel_Engine\Assets</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WModelManager.h">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WControllerComponent.h">
+      <Filter>Sentinel_Engine\Components\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WPlayerControllerComponent.h">
+      <Filter>Sentinel_Engine\Components\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\CLR\WCustomPhysicsComponent.h">
+      <Filter>Sentinel_Engine\Components\Physics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sentinel_CLR.cpp">
@@ -262,6 +277,18 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\CLR\WMeshManager.cpp">
       <Filter>Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WModelManager.cpp">
+      <Filter>Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WControllerComponent.cpp">
+      <Filter>Sentinel_Engine\Components\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WPlayerControllerComponent.cpp">
+      <Filter>Sentinel_Engine\Components\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\CLR\WCustomPhysicsComponent.cpp">
+      <Filter>Sentinel_Engine\Components\Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

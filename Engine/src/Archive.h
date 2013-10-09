@@ -4,10 +4,8 @@ The flag is32bit refers to whether or not
 the variable should be compressed to 16-bit
 or remain as it is.
 
-The default is to compress.
-
-Note that it is lossy, but should be accurate
-enough for most cases.
+The default is a lossy compression, which
+should be accurate enough for most cases.
 
 Also note that a double is never compressed.
 */
@@ -17,6 +15,12 @@ Also note that a double is never compressed.
 
 namespace Sentinel
 {
+	template< typename T >
+	unsigned int ar_sizeof( T& var )
+	{
+		return sizeof( var ) / sizeof( *(var.Ptr()) );
+	}
+
 	class SENTINEL_DLL Archive
 	{
 	private:

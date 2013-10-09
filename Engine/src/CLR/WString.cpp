@@ -14,12 +14,12 @@ namespace Sentinel { namespace Utilities
 
 	WString::~WString()
 	{
-		Delete();
+		Release();
 	}
 
 	WString::!WString()
 	{
-		Delete();
+		Release();
 	}
 
 	const char* WString::GetRef()
@@ -27,7 +27,7 @@ namespace Sentinel { namespace Utilities
 		return mRef;
 	}
 
-	void WString::Delete()
+	void WString::Release()
 	{
 		Marshal::FreeHGlobal( System::IntPtr( (char*)mRef ));
 	}

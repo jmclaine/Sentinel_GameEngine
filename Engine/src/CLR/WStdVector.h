@@ -18,13 +18,13 @@ namespace Sentinel { namespace Utilities
 	{\
 	protected:\
 		std::vector< nativeClass >* mRef;\
-		virtual void Delete() { delete mRef; }\
+		virtual void Release() { delete mRef; }\
 	public:\
 		WStdVector_##extName() { mRef = new std::vector< nativeClass >(); }\
 		WStdVector_##extName( const std::vector< nativeClass >& obj )\
 			{ mRef = new std::vector< nativeClass >( obj ); }\
-		~WStdVector_##extName() { Delete(); }\
-		!WStdVector_##extName() { Delete(); }\
+		~WStdVector_##extName() { Release(); }\
+		!WStdVector_##extName() { Release(); }\
 		std::vector< nativeClass >* GetRef() { return mRef; }\
 		operator const std::vector< nativeClass >& () { return *mRef; }\
 		void		Set( int loc, wrapClass^ item ) { mRef->at( loc ) = item; }\
@@ -41,7 +41,7 @@ namespace Sentinel { namespace Utilities
 	public ref class RStdVector_##extName sealed : public WStdVector_##extName\
 	{\
 	protected:\
-		virtual void Delete() override {}\
+		virtual void Release() override {}\
 	public:\
 		RStdVector_##extName( std::vector< nativeClass >* vec ) { Set( vec ); }\
 		void		Set( std::vector< nativeClass >* vec ) { mRef = vec; }\
@@ -54,13 +54,13 @@ namespace Sentinel { namespace Utilities
 	{\
 	protected:\
 		std::vector< nativeVar >* mRef;\
-		virtual void Delete() { delete mRef; }\
+		virtual void Release() { delete mRef; }\
 	public:\
 		WStdVector_##extName() { mRef = new std::vector< nativeVar >(); }\
 		WStdVector_##extName( const std::vector< nativeVar >& obj )\
 			{ mRef = new std::vector< nativeVar >( obj ); }\
-		~WStdVector_##extName() { Delete(); }\
-		!WStdVector_##extName() { Delete(); }\
+		~WStdVector_##extName() { Release(); }\
+		!WStdVector_##extName() { Release(); }\
 		std::vector< nativeVar >* GetRef() { return mRef; }\
 		operator const std::vector< nativeVar >& () { return *mRef; }\
 		void		Set( int loc, refVar item ) { mRef->at( loc ) = item; }\
@@ -77,7 +77,7 @@ namespace Sentinel { namespace Utilities
 	public ref class RStdVector_##extName sealed : public WStdVector_##extName\
 	{\
 	protected:\
-		virtual void Delete() override {}\
+		virtual void Release() override {}\
 	public:\
 		RStdVector_##extName( std::vector< nativeVar >* vec ) { Set( vec ); }\
 		void		Set( std::vector< nativeVar >* vec ) { mRef = vec; }\

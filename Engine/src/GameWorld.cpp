@@ -11,15 +11,25 @@ namespace Sentinel
 
 	GameWorld::~GameWorld()
 	{
-		TRAVERSE_VECTOR( x, mGameObject )
-			SAFE_DELETE( mGameObject[ x ] );
-
-		mGameObject.clear();
+		Release();
 	}
 
 	GameWorld* GameWorld::Create()
 	{
 		return GameWorld::Inst();
+	}
+
+	void GameWorld::Release()
+	{
+		TRAVERSE_VECTOR( x, mGameObject )
+			SAFE_DELETE( mGameObject[ x ] );
+
+		mGameObject.clear();
+		mAlphaOrder.clear();
+		mCamera.clear();
+		mLight.clear();
+
+		mCurrentCamera = NULL;
 	}
 
 	void GameWorld::Save( Archive& archive )
@@ -33,7 +43,7 @@ namespace Sentinel
 
 	void GameWorld::Load( Archive& archive )
 	{
-		Shutdown();
+		Release();
 
 		UINT size = 0;
 		archive.Read( &size );
@@ -64,7 +74,7 @@ namespace Sentinel
 
 		// Create a default light if none exist.
 		//
-		if( mLight.empty() )
+		if( mLight.empty() && mCurrentCamera )
 		{
 			LightComponent* light = new LightComponent();
 			light->mAttenuation = Vector4f( 1, 1, 1, 2000 );
@@ -121,37 +131,38 @@ namespace Sentinel
 
 	void GameWorld::UpdateDrawable()
 	{
-		_ASSERT( mCurrentCamera );
-
-		TRAVERSE_VECTOR( x, mCamera )
-			mCamera[ x ]->Update();
-
-		TRAVERSE_VECTOR( x, mLight )
-			mLight[ x ]->Update();
-
-		// Meshes may contain alpha values.
-		// Put them in order.
-		//
-		// Use distance from camera to center.
-		// This will not be 100% accurate, but is faster than trying to be perfect.
-		//
-		// TODO: Raycast from center screen to AABB for more accuracy.
-		//
-		Vector3f camPos = mCurrentCamera->GetTransform()->mPosition;
-		
-		mAlphaOrder.clear();
-		TRAVERSE_VECTOR( x, mGameObject )
+		if( mCurrentCamera )
 		{
-			TransformComponent* transform = (TransformComponent*)mGameObject[ x ]->FindComponent( GameComponent::TRANSFORM );
-			
-			if( transform )
-				mAlphaOrder.insert( std::pair< float, GameObject* >( -(camPos - transform->mPosition).LengthSquared(), mGameObject[ x ] ));
-		}
+			TRAVERSE_VECTOR( x, mCamera )
+				mCamera[ x ]->Update();
 
-		// Update and Render Meshes.
-		//
-		TRAVERSE_LIST( it, mAlphaOrder )
-			(*it).second->UpdateDrawable();
+			TRAVERSE_VECTOR( x, mLight )
+				mLight[ x ]->Update();
+
+			// Meshes may contain alpha values.
+			// Put them in order.
+			//
+			// Use distance from camera to center.
+			// This will not be 100% accurate, but is faster than trying to be perfect.
+			//
+			// TODO: Raycast from center screen to AABB for more accuracy.
+			//
+			Vector3f camPos = mCurrentCamera->GetTransform()->mPosition;
+		
+			mAlphaOrder.clear();
+			TRAVERSE_VECTOR( x, mGameObject )
+			{
+				TransformComponent* transform = (TransformComponent*)mGameObject[ x ]->FindComponent( GameComponent::TRANSFORM );
+			
+				if( transform )
+					mAlphaOrder.insert( std::pair< float, GameObject* >( -(camPos - transform->mPosition).LengthSquared(), mGameObject[ x ] ));
+			}
+
+			// Update and Render Meshes.
+			//
+			TRAVERSE_LIST( it, mAlphaOrder )
+				(*it).second->UpdateDrawable();
+		}
 	}
 
 	void GameWorld::Shutdown()
@@ -164,23 +175,31 @@ namespace Sentinel
 
 	GameObject* GameWorld::AddGameObject( GameObject* entity )
 	{
-		TRAVERSE_VECTOR( x, mGameObject )
-			if( mGameObject[ x ] == entity )
-				return entity;
+		if( entity )
+		{
+			TRAVERSE_VECTOR( x, mGameObject )
+				if( mGameObject[ x ] == entity )
+					return entity;
 
-		if( entity->mParent )
-			entity->mParent->RemoveChild( entity );
+			if( entity->mParent )
+				entity->mParent->RemoveChild( entity );
 		
-		mGameObject.push_back( entity );
+			mGameObject.push_back( entity );
+		}
 
 		return entity;
 	}
 
 	GameObject* GameWorld::AddGameObject( GameObject* entity, const char* name )
 	{
-		entity->mName = name;
+		if( entity )
+		{
+			entity->mName = name;
 
-		return AddGameObject( entity );
+			return AddGameObject( entity );
+		}
+
+		return NULL;
 	}
 
 	GameObject* GameWorld::RemoveGameObject( GameObject* entity )

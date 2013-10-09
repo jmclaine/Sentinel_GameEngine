@@ -1,3 +1,5 @@
+#ifndef IGNORE_PHYSICS
+
 #include <process.h>
 
 #include "PhysicsSystem.h"
@@ -186,6 +188,9 @@ namespace Sentinel
 
 	void PhysicsSystem::RemoveRigidBody( btRigidBody* body )
 	{
+		mWorld->removeCollisionObject( body );
 		mWorld->removeRigidBody( body );
 	}
 }
+
+#endif

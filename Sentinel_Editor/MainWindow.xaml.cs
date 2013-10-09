@@ -68,8 +68,10 @@ namespace Sentinel_Editor
 			{
 				InitializeComponent();
 
-				WShaderManager.Create();
 				WTextureManager.Create();
+				WShaderManager.Create();
+				WMeshManager.Create();
+				WModelManager.Create();
 			}
 			catch( Exception e )
 			{
@@ -161,23 +163,36 @@ namespace Sentinel_Editor
 		private void Window_Closed( Object sender, EventArgs e )
 		{
 			mTranslateObject.Shutdown();
-			mTranslateObject.Delete();
+			mTranslateObject.Release();
 
 			mRotateObject.Shutdown();
-			mRotateObject.Delete();
+			mRotateObject.Release();
 
 			mScaleObject.Shutdown();
-			mScaleObject.Delete();
-
-			foreach( AMesh item in mAsset_Mesh.Items )
-				item.Data.Dispose();
+			mScaleObject.Release();
 
 			foreach( AModel item in mAsset_Model.Items )
 				item.Data.Dispose();
 
+			foreach( AMesh item in mAsset_Mesh.Items )
+				item.Data.Dispose();
+
+			foreach( AShader item in mAsset_Shader.Items )
+				item.Data.Dispose();
+
+			foreach( ATexture item in mAsset_Texture.Items )
+				item.Data.Dispose();
+
 			WGameWorld.Shutdown();
+			WGameWorld.Release();
+
 			mGameWindow.Shutdown();
 
+			WModelManager.Destroy();
+			WMeshManager.Destroy();
+			WShaderManager.Destroy();
+			WTextureManager.Destroy();
+			
 			WRenderer.Shutdown();
 		}
 		#endregion
@@ -235,16 +250,19 @@ namespace Sentinel_Editor
 								WMaterial material = new WMaterial( meshComp.Material );
 								meshComp.Material  = mMaterial_Selected;
 
-								WMesh mesh = meshComp.Mesh;
+								WMesh   mesh   = meshComp.Mesh;
 								WShader shader = mesh.Shader;
+								WShader color  = WShaderManager.Get( "Color Only" );
 
-								mesh.Shader = WShaderManager.Get( "COLOR_ONLY" );
+								mesh.Shader = color;
 
 								mSelectedObject.UpdateDrawable( false );
 
 								meshComp.Material = material;
 								mesh.Shader = shader;
 
+								color.Dispose();
+								shader.Dispose();
 								mesh.Dispose();
 							}
 							else
@@ -278,6 +296,8 @@ namespace Sentinel_Editor
 						WTransformComponent transform = WTransformComponent.Cast( mTranslateObject.FindComponent( ComponentType.TRANSFORM ));
 						transform.Position = selectedObjectPosition;
 
+						// Scale object based on distance so it remains of equal size throughout the world view.
+						//
 						WVector3f distance = mGameWindow.GetCamera().GetTransform().Position - transform.Position;
 						distance.x = Math.Abs( distance.x );
 						distance.y = Math.Abs( distance.y );
@@ -286,9 +306,8 @@ namespace Sentinel_Editor
 						transform.Scale = new WVector3f( d, d, d );
 
 						WRenderer.SetCull( CullType.NONE );
-						WRenderer.SetDepthStencilState( StencilType.NO_ZBUFFER );
-
-						//(new WMeshComponent( mTranslateObject.GetChild( 0 ).FindComponent( ComponentType.DRAWABLE ))).Material = mMaterial_Selected;
+						
+						//WMeshComponent.Cast( mTranslateObject.GetChild( 0 ).FindComponent( ComponentType.DRAWABLE )).Material = mMaterial_Selected;
 						mTranslateObject.UpdateTransform();
 						mTranslateObject.UpdateDrawable();
 					}
@@ -493,33 +512,33 @@ namespace Sentinel_Editor
 			mSelectedAsset = sender as EditorAsset;
 		}
 
-		private void AddAsset( WTexture texture, String name )
+		private void AddAsset( String name, WTexture texture )
 		{
-			ATexture item = new ATexture( texture, name );
+			ATexture item = new ATexture( name, texture );
 			item.Selected += AssetSelected;
 			
 			mAsset_Texture.Items.Add( item );
 		}
 
-		private void AddAsset( WShader shader, String name )
+		private void AddAsset( String name, WShader shader )
 		{
-			AShader item = new AShader( shader, name );
+			AShader item = new AShader( name, shader );
 			item.Selected += AssetSelected;
 			
 			mAsset_Shader.Items.Add( item );
 		}
 
-		private void AddAsset( WMesh mesh, String name )
+		private void AddAsset( String name, WMesh mesh )
 		{
-			AMesh item = new AMesh( mesh, name );
+			AMesh item = new AMesh( name, mesh );
 			item.Selected += AssetSelected;
 			
 			mAsset_Mesh.Items.Add( item );
 		}
 
-		private void AddAsset( WModel model, String name )
+		private void AddAsset( String name, WModel model )
 		{
-			AModel item = new AModel( model, name );
+			AModel item = new AModel( name, model );
 			item.Selected += AssetSelected;
 
 			mAsset_Model.Items.Add( item );
@@ -551,7 +570,12 @@ namespace Sentinel_Editor
 			//dialog.Multiselect = true;
 
 			if( dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK )
-				AddAsset( WRenderer.CreateTextureFromFile( dialog.FileName ), Path.GetFileName( dialog.FileName ));
+			{
+				WTexture texture = WRenderer.CreateTextureFromFile( dialog.FileName );
+				String name  = Path.GetFileName( dialog.FileName );
+				WTextureManager.Add( name, texture );
+				AddAsset( name, texture );
+			}
 		}
 
 		private void Assets_AddModel( Object sender, RoutedEventArgs e )
@@ -563,7 +587,12 @@ namespace Sentinel_Editor
 			dialog.FilterIndex = 1;
 
 			if( dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK )
-				AddAsset( WModel.Load( dialog.FileName ), Path.GetFileName( dialog.FileName ));
+			{
+				WModel model = WModel.Load( dialog.FileName );
+				String name  = Path.GetFileName( dialog.FileName );
+				WModelManager.Add( name, model );
+				AddAsset( name, model );
+			}
 		}
 
 		private void Assets_Refresh( Object sender, RoutedEventArgs e )
@@ -585,15 +614,18 @@ namespace Sentinel_Editor
 				MessageBox.Show( "Failed to load 'Assets\\Shaders\\config.xml'", "Shader Load Failure" );
 				System.Environment.Exit( -1 );
 			}
-
+			
 			List< String >  names   = new List< String >();
 			List< WShader > shaders = new List< WShader >();
 
 			WShaderManager.GetAll( ref names, ref shaders );
 
 			for( int x = 0; x < names.Count; ++x )
-				AddAsset( shaders[ x ], names[ x ] );
-
+			{
+				AddAsset( names[ x ], shaders[ x ] );
+				shaders[ x ].Dispose();
+			}
+			
 			Directory.SetCurrentDirectory( "..\\.." );
 		}
 
@@ -605,12 +637,13 @@ namespace Sentinel_Editor
 			WMeshBuilder			meshBuilder = new WMeshBuilder();
 			WGameObject				obj;
 			WTransformComponent		transform;
+			WCustomPhysicsComponent physics;
 			WMesh					mesh;
 			
 			////////////////////////////////////
 
 			WTexture texture = WTextureManager.Add( "default-alpha.png", WRenderer.CreateTextureFromFile( "Assets\\Textures\\default-alpha.png" ));
-			AddAsset( texture, "default-alpha.png" );
+			AddAsset( "default-alpha.png", texture );
 			
 			// Camera.
 			//
@@ -620,6 +653,17 @@ namespace Sentinel_Editor
 			transform.Position = new WVector3f( 0, 25, 25 );
 			transform.Rotation = new WVector3f( -45, 0, 0 );
 
+			obj.AttachComponent( new WPlayerControllerComponent(), "Controller" );
+			
+			physics = (WCustomPhysicsComponent)obj.AttachComponent( new WCustomPhysicsComponent(), "Physics" );
+			physics.ShapeType			= ShapeType.SPHERE;
+			physics.Flags				= (int)PhysicsFlag.DISABLE_GRAVITY;
+			physics.ShapePosition		= transform.Position;
+			physics.ShapeOrientation	= new WQuatf( transform.Rotation );
+			physics.LinearDamping		= 0.9f;
+			physics.AngularDamping		= 0.9f;
+			physics.Restitution			= 1.0f;
+			
 			obj.AttachComponent( new WPerspectiveCameraComponent( mGameWindow.GetInfo().Width(), mGameWindow.GetInfo().Height() ), "Camera" );
 
 			AddObjectToTree( obj );
@@ -639,11 +683,11 @@ namespace Sentinel_Editor
 			// Ground object.
 			//
 			meshBuilder.CreateCube( 1.0f );
-			meshBuilder.Shader    = WShaderManager.Get( "COLOR" );
+			meshBuilder.Shader    = WShaderManager.Get( "Color" );
 			meshBuilder.Primitive = PrimitiveType.TRIANGLE_LIST;
 
 			mesh = WMeshManager.Add( "Ground", meshBuilder.BuildMesh() );
-			AddAsset( mesh, "Ground" );
+			AddAsset( "Ground", mesh );
 
 			obj = WGameWorld.AddGameObject( new WGameObject(), "Ground" );
 
@@ -651,6 +695,14 @@ namespace Sentinel_Editor
 			transform.Position	 = new WVector3f( 0, 0, 0 );
 			transform.Scale		 = new WVector3f( 100, 1, 100 );
 
+			physics = (WCustomPhysicsComponent)obj.AttachComponent( new WCustomPhysicsComponent(), "Physics" );
+			physics.ShapeType			= ShapeType.BOX;
+			physics.Flags				= (int)PhysicsFlag.DISABLE_GRAVITY;
+			physics.Mass				= 0;
+			physics.ShapePosition		= transform.Position;
+			physics.ShapeOrientation	= new WQuatf( transform.Rotation );
+			physics.ShapeScale			= transform.Scale;
+			
 			obj.AttachComponent( new WMeshComponent( mesh ), "Mesh" );
 			
 			AddObjectToTree( obj );
@@ -659,11 +711,11 @@ namespace Sentinel_Editor
 			//
 			meshBuilder.ClearGeometry();
 			meshBuilder.CreateDodecahedron( 1.0f );
-			meshBuilder.Shader = WShaderManager.Get( "TEXTURE" );
+			meshBuilder.Shader = WShaderManager.Get( "Texture" );
 			meshBuilder.Texture( (int)TextureType.DIFFUSE ).Set( WTextureManager.Get( "default-alpha.png" ));
 
 			mesh = WMeshManager.Add( "Dodecahedron", meshBuilder.BuildMesh() );
-			AddAsset( mesh, "Dodecahedron" );
+			AddAsset( "Dodecahedron", mesh );
 			
 			WGameObject obj2 = WGameWorld.AddGameObject( new WGameObject(), "Dodecahedron" );
 
@@ -680,7 +732,7 @@ namespace Sentinel_Editor
 			meshBuilder.CreateSphere( 1.0f, 10, 10 );
 			
 			mesh = WMeshManager.Add( "Sphere", meshBuilder.BuildMesh() );
-			AddAsset( mesh, "Sphere" );
+			AddAsset( "Sphere", mesh );
 
 			obj = WGameWorld.AddGameObject( new WGameObject(), "Sphere" );
 
@@ -714,9 +766,8 @@ namespace Sentinel_Editor
 			mTranslateObject = new WGameObject();
 			const float tileSize = 5;
 
-			WModel.SetShaderColor( WShaderManager.Get( "COLOR_ONLY" ));
 			WModel model = WModel.Load( "Assets\\Editor\\Translate.M3D" );
-
+			
 			// Root Translate Object.
 			//
 			mTranslateObject.AttachComponent( new WTransformComponent(), "Transform" );
@@ -803,8 +854,19 @@ namespace Sentinel_Editor
 			if( dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK )
 			{
 				mMapName = dialog.FileName;
-				Window_Main.Title = "Sentinel Editor - " + dialog.FileName;
-				//WGameWorld.Load( mMapName );
+				Window_Main.Title = "Sentinel Editor - " + Path.GetFileName( mMapName );
+				
+				WArchive archive = new WArchive();
+				archive.Open( mMapName, "rb" );
+
+				WTextureManager.Load( archive );
+				WShaderManager.Load( archive );
+				WMeshManager.Load( archive );
+				WModelManager.Load( archive );
+
+				WGameWorld.Load( archive );
+
+				archive.Close();
 			}
 		}
 
@@ -816,6 +878,7 @@ namespace Sentinel_Editor
 			WTextureManager.Save( archive );
 			WShaderManager.Save( archive );
 			WMeshManager.Save( archive );
+			WModelManager.Save( archive );
 
 			WGameWorld.Save( archive );
 
@@ -833,8 +896,9 @@ namespace Sentinel_Editor
 			if( dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK )
 			{
 				mMapName = dialog.FileName;
-				Window_Main.Title = "Sentinel Editor - " + dialog.FileName;
-				//WGameWorld.Save( mMapName );
+				Window_Main.Title = "Sentinel Editor - " + Path.GetFileName( mMapName );
+				
+				Save_Click( sender, e );
 			}
 		}
 

@@ -8,6 +8,8 @@
 #include "Util.h"
 #include "Renderer.h"
 #include "TextureManager.h"
+#include "ShaderManager.h"
+#include "MeshManager.h"
 
 namespace Sentinel
 {
@@ -25,17 +27,46 @@ namespace Sentinel
 
 	public:
 
-		ModelOBJ( const char* filename )
+		ModelOBJ()
 		{
-			Create( filename );
+			mMesh		= NULL;
+			mNumMeshes	= 0;
+		}
+
+		~ModelOBJ()
+		{
+			Release();
+		}
+
+		void Save( Archive& archive )
+		{
+			// Save the format type.
+			//
+			BYTE format = OBJ;
+			archive.Write( &format );
+
+			// Save each mesh.
+			//
+			archive.Write( &mNumMeshes );
+
+			for( UINT x = 0; x < mNumMeshes; ++x )
+				MeshManager::SaveMesh( archive, mMesh[ x ] );
+		}
+
+		void Create( Archive& archive )
+		{
+			// Load each mesh.
+			//
+			archive.Read( &mNumMeshes );
+
+			mMesh = new Mesh*[ mNumMeshes ];
+
+			for( UINT x = 0; x < mNumMeshes; ++x )
+				MeshManager::LoadMesh( archive, mMesh[ x ] );
 		}
 
 		bool Create( const char* filename )
 		{
-			// Clear out any model that may have existed previously.
-			//
-			Release();
-
 			// Model data.
 			// OBJ files start with the first index as 1,
 			// so push a dummy into the vectors to align.
@@ -56,7 +87,7 @@ namespace Sentinel
 			builder.insert( MeshBuilderPair( defaultMaterial, new MeshBuilder() ));
 
 			MeshBuilder* meshBuilder = builder.begin()->second;
-			meshBuilder->mShader = SHADER_COLOR;
+			meshBuilder->mShader = ShaderManager::Inst()->Get( "Color" );
 
 			// Read the file.
 			//
@@ -150,7 +181,7 @@ namespace Sentinel
 									builder.insert( MeshBuilderPair( mtlName, new MeshBuilder() ));
 
 									MeshBuilder* meshBuilder = builder[ mtlName ];
-									meshBuilder->mShader = SHADER_COLOR;
+									meshBuilder->mShader = ShaderManager::Inst()->Get( "Color" );
 								}
 								// Load a texture.
 								//
@@ -163,7 +194,7 @@ namespace Sentinel
 									{
 										mtlParsehelper >> mtlToken;
 										MeshBuilder* meshBuilder = mtl_iter->second;
-										meshBuilder->mShader = SHADER_TEXTURE;
+										meshBuilder->mShader = ShaderManager::Inst()->Get( "Texture" );
 
 										meshBuilder->mTexture[ TEXTURE_DIFFUSE ] = TextureManager::Inst()->Add( mtlToken, Renderer::Inst()->CreateTextureFromFile( mtlToken.c_str() ));
 									}
@@ -305,9 +336,9 @@ namespace Sentinel
 		void Release()
 		{
 			for( UINT x = 0; x < mNumMeshes; ++x )
-				delete mMesh[ x ];
+				SAFE_DELETE( mMesh[ x ] );
 			
-			delete[] mMesh;
+			SAFE_DELETE_ARRAY( mMesh );
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -339,27 +370,20 @@ namespace Sentinel
 		*/
 		// OBJ files do not support animation.
 		//
-		void SetKeyFrame( const KeyFrame& key, int keyIndex = -1, int objIndex = 0 )
-		{
-			_ASSERT(0);	// unsupported
-		}
-
 		void SetTime( float _time, UINT objIndex = 0 )
 		{
-			_ASSERT(0);	// unsupported
+			// unsupported
 		}
 
 		float GetTime( UINT objIndex = 0 )
 		{
-			_ASSERT(0);	// unsupported
+			// unsupported
 			return 0;
 		}
 
-		// Update the model by keyframe.
-		//
 		void Update()
 		{
-			_ASSERT(0);	// unsupported
+			// unsupported
 		}
 
 		// Render the model.
@@ -374,10 +398,23 @@ namespace Sentinel
 		}
 	};
 
-	// Create an OBJ Model Loader.
+	// Create an OBJ Model.
 	//
-	Model* LoadModelOBJ( const char* filename )
+	Model* LoadModelOBJFromFile( const char* filename )
 	{
-		return new ModelOBJ( filename );
+		ModelOBJ* model = new ModelOBJ();
+
+		model->Create( filename );
+
+		return model;
+	}
+
+	Model* LoadModelOBJFromArchive( Archive& archive )
+	{
+		ModelOBJ* model = new ModelOBJ();
+
+		model->Create( archive );
+
+		return model;
 	}
 }
