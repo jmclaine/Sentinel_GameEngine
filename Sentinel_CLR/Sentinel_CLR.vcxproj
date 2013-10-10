@@ -114,7 +114,7 @@ xcopy "$(SolutionDir)$(Configuration)\Sentinel.dll" "$(SolutionDir)\..\Sentinel_
     <ClInclude Include="..\Engine\src\CLR\WControllerComponent.h" />
     <ClInclude Include="..\Engine\src\CLR\WMeshManager.h" />
     <ClInclude Include="..\Engine\src\CLR\WModelManager.h" />
-    <ClInclude Include="..\Engine\src\CLR\WCustomPhysicsComponent.h" />
+    <ClInclude Include="..\Engine\src\CLR\WPhysicsComponent.h" />
     <ClInclude Include="..\Engine\src\CLR\WPlayerControllerComponent.h" />
     <ClInclude Include="..\Engine\src\CLR\WShaderManager.h" />
     <ClInclude Include="..\Engine\src\CLR\WStdVector.h" />
@@ -176,7 +176,7 @@ xcopy "$(SolutionDir)$(Configuration)\Sentinel.dll" "$(SolutionDir)\..\Sentinel_
     <ClCompile Include="..\Engine\src\CLR\WModelComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WModelManager.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WPerspectiveCameraComponent.cpp" />
-    <ClCompile Include="..\Engine\src\CLR\WCustomPhysicsComponent.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WPhysicsComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WPlayerControllerComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WQuatf.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WRenderer.cpp" />

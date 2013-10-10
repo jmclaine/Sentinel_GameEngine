@@ -39,7 +39,7 @@ void MaxExporter::WriteFloat( Archive& archive, IGameProperty* prop )
 	archive.Write( &value );
 }
 
-void MaxExporter::WritePoint3( Archive& archive, IGameProperty* prop, bool is32bit  )
+void MaxExporter::WritePoint3( Archive& archive, IGameProperty* prop  )
 {
 	Point3 point;
 
@@ -49,21 +49,21 @@ void MaxExporter::WritePoint3( Archive& archive, IGameProperty* prop, bool is32b
 	WritePoint3( archive, point );
 }
 
-void MaxExporter::WritePoint2( Archive& archive, const Point2& point, bool is32bit )
+void MaxExporter::WritePoint2( Archive& archive, const Point2& point )
 {
-	archive.Write( const_cast< const float* >(&point.x), 2, is32bit );
+	archive.Write( const_cast< const float* >(&point.x), 2 );
 }
 
-void MaxExporter::WritePoint3( Archive& archive, const Point3& point, bool is32bit )
+void MaxExporter::WritePoint3( Archive& archive, const Point3& point )
 {
-	archive.Write( const_cast< const float* >(&point.x), 3, is32bit );
+	archive.Write( const_cast< const float* >(&point.x), 3 );
 }
 
-void MaxExporter::WriteFatIndex( Archive& archive, FatIndex& index, bool is32bit )
+void MaxExporter::WriteFatIndex( Archive& archive, FatIndex& index )
 {
-	archive.Write( &index.mVertex,   is32bit );
-	archive.Write( &index.mNormal,   is32bit );
-	archive.Write( &index.mTexCoord, is32bit );
+	archive.Write( &index.mVertex );
+	archive.Write( &index.mNormal );
+	archive.Write( &index.mTexCoord );
 }
 
 void MaxExporter::WriteMatrix( Archive& archive, GMatrix& mat )
@@ -112,8 +112,21 @@ void MaxExporter::WriteMaterial( Archive& archive, IGameMaterial* material )
 		}
 		else
 		{
-			float spec_comp = 8.0f;
+			float spec_comp = 0.08f;
 			archive.Write( &spec_comp );
+		}
+
+		// Opacity.
+		//
+		prop = material->GetOpacityData();
+		if( prop != NULL )
+		{
+			WriteFloat( archive, prop );
+		}
+		else
+		{
+			float alpha = 1.0f;
+			archive.Write( &alpha );
 		}
 	}
 	else
@@ -132,8 +145,13 @@ void MaxExporter::WriteMaterial( Archive& archive, IGameMaterial* material )
 		
 		// Specular Component.
 		//
-		float spec_comp = 8.0f;
+		float spec_comp = 0.08f;
 		archive.Write( &spec_comp );
+
+		// Opacity.
+		//
+		float alpha = 1.0f;
+		archive.Write( &alpha );
 	}
 			
 	// Textures.
@@ -181,7 +199,7 @@ void MaxExporter::WriteMaterial( Archive& archive, IGameMaterial* material )
 							for( int y = index; y < len-1; ++y )	// ignore ending ')'
 								newName.push_back( currName[ y ] );
 
-							texNames.push_back( Texture( newName, type ));
+							texNames.push_back( Texture( newName, (BYTE)type ));
 
 							// Copy texture to export directory.
 							//
@@ -242,30 +260,25 @@ void MaxExporter::WriteMaterial( Archive& archive, IGameMaterial* material )
 	// Output filenames if they exist.
 	//
 	UINT count = (UINT)texNames.size();
-	archive.Write( &count );
+	archive.Write( &count, 1, false );
 	
 	for( UINT x = 0; x < count; ++x )
 	{
-		UINT len = (UINT)texNames[ x ].mFilename.size();
-
 		archive.Write( &texNames[ x ].mType );
-		archive.Write( &len );
-		archive.Write( texNames[ x ].mFilename.c_str(), len );
+		archive.Write( &texNames[ x ].mFilename );
 	}
 }
 
 int MaxExporter::DoExport( const TCHAR* name, ExpInterface* ei, Interface* i, BOOL suppressprompts, DWORD options )
 {
-	// Open file for writing.
-	//
-	FILE* file = fopen( name, "wb+" );
+	Archive archive;
 
 	try
 	{
-		if( !file )
+		// Open file for writing.
+		//
+		if( !archive.Open( name, "wb+" ))
 			throw std::exception( "Failed to open file for writing" );
-
-		Archive archive( file );
 
 		// Export selected object only.
 		//
@@ -543,7 +556,8 @@ int MaxExporter::DoExport( const TCHAR* name, ExpInterface* ei, Interface* i, BO
 		MessageBox( i->GetMAXHWnd(), tstr, _T( "Export Error" ), MB_OK | MB_ICONERROR );
 	}
 
-	fclose( file );
+	archive.Close();
+
 	deinit();
 
 	return TRUE;
@@ -817,7 +831,7 @@ const TCHAR* MaxExporter::OtherMessage2()
 
 unsigned int MaxExporter::Version()
 {
-	return 103;
+	return 104;
 }
 
 BOOL MaxExporter::SupportsOptions( int ext, DWORD options )

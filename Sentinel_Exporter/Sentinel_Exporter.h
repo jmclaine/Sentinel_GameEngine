@@ -104,9 +104,9 @@ private:
 	struct Texture
 	{
 		std::string		mFilename;
-		int				mType;
+		BYTE			mType;
 
-		Texture( const std::string& filename, int type )
+		Texture( const std::string& filename, BYTE type )
 		{
 			this->mFilename = filename;
 			this->mType		= type;
@@ -118,11 +118,6 @@ private:
 	struct FatIndex
 	{
 		int mVertex, mNormal, mTexCoord;
-	};
-
-	struct FatIndexWORD
-	{
-		WORD mVertex, mNormal, mTexCoord;
 	};
 
 	// Standard keyframe animation.
@@ -170,14 +165,14 @@ private:
 	MaxExporter( const MaxExporter& );
 	MaxExporter& operator = ( const MaxExporter& );
 
-	void WriteFloat( Archive& archive, IGameProperty* prop );
-	void WritePoint3( Archive& archive, IGameProperty* prop, bool is32bit = false );
+	void WriteFloat(    Archive& archive, IGameProperty* prop );
+	void WritePoint3(   Archive& archive, IGameProperty* prop );
 
-	void WritePoint2( Archive& archive, const Point2& point, bool is32bit = false );
-	void WritePoint3( Archive& archive, const Point3& point, bool is32bit = false );
+	void WritePoint2(   Archive& archive, const Point2& point );
+	void WritePoint3(   Archive& archive, const Point3& point );
 	
-	void WriteFatIndex( Archive& archive, FatIndex& index, bool is32bit = false );
-	void WriteMatrix( Archive& archive, GMatrix& mat );
+	void WriteFatIndex( Archive& archive, FatIndex& index );
+	void WriteMatrix(   Archive& archive, GMatrix& mat );
 
 	void WriteMaterial( Archive& archive, IGameMaterial* material );
 
@@ -226,14 +221,4 @@ private:
 	// Get mesh data for a node.
 	//
 	void GetNodeMesh( IGameNode* node, int heirarchy = 0, bool doParentWT = true  );
-
-	struct Point2S
-	{
-		short x, y;
-	};
-
-	struct Point3S
-	{
-		short x, y, z;
-	};
 };

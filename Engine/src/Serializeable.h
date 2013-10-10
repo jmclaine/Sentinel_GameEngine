@@ -15,8 +15,11 @@ namespace Sentinel
 		void Save( Archive& archive );\
 		void Load( Archive& archive );
 
+#define DEFINE_SERIAL_REGISTER_EX( refClass, cloneClass )\
+	SerialRegister cloneClass::mSerialRegistry( #refClass, cloneClass::Clone );
+
 #define DEFINE_SERIAL_REGISTER( clazz )\
-	SerialRegister clazz::mSerialRegistry( #clazz, clazz::Clone );
+	DEFINE_SERIAL_REGISTER_EX( clazz, clazz );
 
 #define DEFINE_SERIAL_CLONE( clazz )\
 	Serializeable* clazz::Clone() {\

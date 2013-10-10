@@ -26,7 +26,6 @@ namespace Sentinel { namespace Components
 
 	void WGameWorld::Load( WArchive^ archive )
 	{
-		GameWorld::Destroy();
 		GameWorld::Inst()->Load( *archive->GetRef() );
 	}
 
@@ -95,9 +94,9 @@ namespace Sentinel { namespace Components
 		return gcnew WGameObject( GameWorld::Inst()->GetGameObject( index ));
 	}
 
-	int WGameWorld::NumGameObjects()
+	UINT WGameWorld::NumGameObjects()
 	{
-		return (int)GameWorld::Inst()->NumGameObjects();
+		return GameWorld::Inst()->NumGameObjects();
 	}
 
 	//////////////////////////////

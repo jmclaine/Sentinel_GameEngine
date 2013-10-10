@@ -168,7 +168,7 @@
     <ClInclude Include="..\Engine\src\CLR\WPlayerControllerComponent.h">
       <Filter>Sentinel_Engine\Components\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\WCustomPhysicsComponent.h">
+    <ClInclude Include="..\Engine\src\CLR\WPhysicsComponent.h">
       <Filter>Sentinel_Engine\Components\Physics</Filter>
     </ClInclude>
   </ItemGroup>
@@ -287,7 +287,7 @@
     <ClCompile Include="..\Engine\src\CLR\WPlayerControllerComponent.cpp">
       <Filter>Sentinel_Engine\Components\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\WCustomPhysicsComponent.cpp">
+    <ClCompile Include="..\Engine\src\CLR\WPhysicsComponent.cpp">
       <Filter>Sentinel_Engine\Components\Physics</Filter>
     </ClCompile>
   </ItemGroup>

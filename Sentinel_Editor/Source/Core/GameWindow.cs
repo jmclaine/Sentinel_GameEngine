@@ -44,15 +44,15 @@ namespace Sentinel_Editor
 			// Create default viewing camera.
 			//
 			mObject = new WGameObject();
+
 			mObject.Name = "~Camera~";
 
-			mTransform	= (WTransformComponent)mObject.AttachComponent( new WTransformComponent(), "Transform" );
-			mCamera		= (WPerspectiveCameraComponent)mObject.AttachComponent( new WPerspectiveCameraComponent( (float)GetInfo().Width(), (float)GetInfo().Height() ), "Camera" );
+			mTransform	 = (WTransformComponent)mObject.AttachComponent( new WTransformComponent(), "Transform" );
+			mCamera		 = (WPerspectiveCameraComponent)mObject.AttachComponent( new WPerspectiveCameraComponent( (float)GetInfo().Width(), (float)GetInfo().Height() ), "Camera" );
 			
 			mObject.Startup();
 
-			WGameWorld.Create();
-			WGameWorld.SetCamera( mCamera );
+			SetCamera();
 		}
 
 		public override void Update()
@@ -96,6 +96,11 @@ namespace Sentinel_Editor
 
 			mObject.Shutdown();
 			mObject.Release();
+		}
+
+		public void SetCamera()
+		{
+			WGameWorld.SetCamera( mCamera );
 		}
 
 		public WCameraComponent GetCamera()

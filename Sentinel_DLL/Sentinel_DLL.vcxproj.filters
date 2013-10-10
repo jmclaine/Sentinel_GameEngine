@@ -228,9 +228,6 @@
     <ClInclude Include="..\Engine\src\ModelManager.h">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\CustomPhysicsComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\Shader.cpp">
@@ -457,9 +454,6 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\ModelManager.cpp">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\CustomPhysicsComponent.cpp">
-      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

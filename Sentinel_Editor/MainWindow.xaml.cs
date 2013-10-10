@@ -72,6 +72,8 @@ namespace Sentinel_Editor
 				WShaderManager.Create();
 				WMeshManager.Create();
 				WModelManager.Create();
+
+				WGameWorld.Create();
 			}
 			catch( Exception e )
 			{
@@ -320,7 +322,7 @@ namespace Sentinel_Editor
 		///
 		/// Game Objects Tree.
 		/// 
-		private void AddObjectToTree( WGameObject obj, OGameObject item = null )
+		private void AddObject( WGameObject obj, OGameObject item = null )
 		{
 			if( item == null )
 			{
@@ -329,7 +331,7 @@ namespace Sentinel_Editor
 				// Add the children.
 				//
 				for( uint x = 0; x < obj.NumChildren(); ++x )
-					AddObjectToTree( obj.GetChild( x ), item );
+					AddObject( obj.GetChild( x ), item );
 
 				Objects_TreeView.Items.Add( item );
 			}
@@ -340,7 +342,7 @@ namespace Sentinel_Editor
 				// Add the children.
 				//
 				for( uint x = 0; x < obj.NumChildren(); ++x )
-					AddObjectToTree( obj.GetChild( x ), child );
+					AddObject( obj.GetChild( x ), child );
 
 				item.Items.Add( child );
 			}
@@ -407,7 +409,7 @@ namespace Sentinel_Editor
 									else
 										Objects_Target.Data.AddChild( Objects_DraggedItem.Data );
 									
-									AddObjectToTree( Objects_DraggedItem.Data, Objects_Target );
+									AddObject( Objects_DraggedItem.Data, Objects_Target );
 
 									Objects_DraggedItem.Data.Startup();
 									
@@ -637,7 +639,7 @@ namespace Sentinel_Editor
 			WMeshBuilder			meshBuilder = new WMeshBuilder();
 			WGameObject				obj;
 			WTransformComponent		transform;
-			WCustomPhysicsComponent physics;
+			WPhysicsComponent		physics;
 			WMesh					mesh;
 			
 			////////////////////////////////////
@@ -655,8 +657,8 @@ namespace Sentinel_Editor
 
 			obj.AttachComponent( new WPlayerControllerComponent(), "Controller" );
 			
-			physics = (WCustomPhysicsComponent)obj.AttachComponent( new WCustomPhysicsComponent(), "Physics" );
-			physics.ShapeType			= ShapeType.SPHERE;
+			physics = (WPhysicsComponent)obj.AttachComponent( new WPhysicsComponent(), "Physics" );
+			physics.ShapeType			= PhysicsShapeType.SPHERE;
 			physics.Flags				= (int)PhysicsFlag.DISABLE_GRAVITY;
 			physics.ShapePosition		= transform.Position;
 			physics.ShapeOrientation	= new WQuatf( transform.Rotation );
@@ -666,7 +668,7 @@ namespace Sentinel_Editor
 			
 			obj.AttachComponent( new WPerspectiveCameraComponent( mGameWindow.GetInfo().Width(), mGameWindow.GetInfo().Height() ), "Camera" );
 
-			AddObjectToTree( obj );
+			AddObject( obj );
 			
 			// Point Light.
 			//
@@ -678,7 +680,7 @@ namespace Sentinel_Editor
 			WLightComponent light = (WLightComponent)obj.AttachComponent( new WLightComponent(), "Light" );
 			light.Attenuation = new WVector4f( 1, 1, 1, 25 );
 
-			AddObjectToTree( obj );
+			AddObject( obj );
 			
 			// Ground object.
 			//
@@ -695,8 +697,8 @@ namespace Sentinel_Editor
 			transform.Position	 = new WVector3f( 0, 0, 0 );
 			transform.Scale		 = new WVector3f( 100, 1, 100 );
 
-			physics = (WCustomPhysicsComponent)obj.AttachComponent( new WCustomPhysicsComponent(), "Physics" );
-			physics.ShapeType			= ShapeType.BOX;
+			physics = (WPhysicsComponent)obj.AttachComponent( new WPhysicsComponent(), "Physics" );
+			physics.ShapeType			= PhysicsShapeType.BOX;
 			physics.Flags				= (int)PhysicsFlag.DISABLE_GRAVITY;
 			physics.Mass				= 0;
 			physics.ShapePosition		= transform.Position;
@@ -705,7 +707,7 @@ namespace Sentinel_Editor
 			
 			obj.AttachComponent( new WMeshComponent( mesh ), "Mesh" );
 			
-			AddObjectToTree( obj );
+			AddObject( obj );
 			
 			// Test object.
 			//
@@ -717,7 +719,8 @@ namespace Sentinel_Editor
 			mesh = WMeshManager.Add( "Dodecahedron", meshBuilder.BuildMesh() );
 			AddAsset( "Dodecahedron", mesh );
 			
-			WGameObject obj2 = WGameWorld.AddGameObject( new WGameObject(), "Dodecahedron" );
+			WGameObject obj2 = new WGameObject();
+			obj2.Name = "Dodecahedron";
 
 			transform = (WTransformComponent)obj2.AttachComponent( new WTransformComponent(), "Transform" );
 			transform.Position	= new WVector3f( 0, 4, 0 );
@@ -745,7 +748,7 @@ namespace Sentinel_Editor
 
 			obj.AddChild( obj2 );
 
-			AddObjectToTree( obj );
+			AddObject( obj );
 			
 			///////////////////////////////
 			
@@ -856,15 +859,82 @@ namespace Sentinel_Editor
 				mMapName = dialog.FileName;
 				Window_Main.Title = "Sentinel Editor - " + Path.GetFileName( mMapName );
 				
+				foreach( AModel item in mAsset_Model.Items )
+					item.Data.Dispose();
+				mAsset_Model.Items.Clear();
+
+				foreach( AMesh item in mAsset_Mesh.Items )
+					item.Data.Dispose();
+				mAsset_Mesh.Items.Clear();
+
+				foreach( AShader item in mAsset_Shader.Items )
+					item.Data.Dispose();
+				mAsset_Shader.Items.Clear();
+
+				foreach( ATexture item in mAsset_Texture.Items )
+					item.Data.Dispose();
+				mAsset_Texture.Items.Clear();
+
 				WArchive archive = new WArchive();
 				archive.Open( mMapName, "rb" );
 
+				List< String > names = new List< String >();
+
 				WTextureManager.Load( archive );
+
+				List< WTexture > texture = new List< WTexture >();
+				WTextureManager.GetAll( ref names, ref texture );
+
+				for( int x = 0; x < names.Count; ++x )
+				{
+					AddAsset( names[ x ], texture[ x ] );
+				}
+
 				WShaderManager.Load( archive );
+
+				names.Clear();
+				List< WShader > shaders = new List< WShader >();
+				WShaderManager.GetAll( ref names, ref shaders );
+
+				for( int x = 0; x < names.Count; ++x )
+				{
+					AddAsset( names[ x ], shaders[ x ] );
+				}
+
 				WMeshManager.Load( archive );
+
+				names.Clear();
+				List< WMesh > mesh = new List< WMesh >();
+				WMeshManager.GetAll( ref names, ref mesh );
+
+				for( int x = 0; x < names.Count; ++x )
+				{
+					AddAsset( names[ x ], mesh[ x ] );
+				}
+
 				WModelManager.Load( archive );
 
+				names.Clear();
+				List< WModel > model = new List< WModel >();
+				WModelManager.GetAll( ref names, ref model );
+
+				for( int x = 0; x < names.Count; ++x )
+				{
+					AddAsset( names[ x ], model[ x ] );
+				}
+
+				Objects_TreeView.Items.Clear();
+
 				WGameWorld.Load( archive );
+				WGameWorld.Startup();
+
+				mGameWindow.SetCamera();
+
+				uint count = WGameWorld.NumGameObjects();
+				for( uint x = 0; x < count; ++x )
+				{
+					AddObject( WGameWorld.GetGameObject( x ));
+				}
 
 				archive.Close();
 			}

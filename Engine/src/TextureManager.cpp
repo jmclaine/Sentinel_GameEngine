@@ -30,10 +30,10 @@ namespace Sentinel
 			//
 			archive.Write( &it->first );
 
-			UINT width = texture->Width();
+			short width = texture->Width();
 			archive.Write( &width );
 
-			UINT height = texture->Height();
+			short height = texture->Height();
 			archive.Write( &height );
 
 			// Store the texture file in place.
@@ -74,16 +74,16 @@ namespace Sentinel
 			std::string name;
 			archive.Read( &name );
 
-			UINT width;
+			short width;
 			archive.Read( &width );
 
-			UINT height;
+			short height;
 			archive.Read( &height );
 
 			// Read the texture data.
 			//
 			UINT size;
-			archive.Read( &size, 1, true );
+			archive.Read( &size );
 
 			BYTE* comp_pixels = new BYTE[ size ];
 			archive.Read( comp_pixels, size );

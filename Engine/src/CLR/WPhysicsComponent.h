@@ -3,13 +3,13 @@
 #include "WGameComponent.h"
 #include "WVector3f.h"
 #include "WQuatf.h"
-#include "CustomPhysicsComponent.h"
+#include "PhysicsComponent.h"
 
 using namespace Sentinel::Math;
 
 namespace Sentinel { namespace Components
 {
-	public enum class ShapeType
+	public enum class PhysicsShapeType
 	{
 		INVALID,
 		SPHERE,
@@ -25,16 +25,16 @@ namespace Sentinel { namespace Components
 		ENABLE_GYROSCOPIC_FORCE,
 	};
 
-	public ref class WCustomPhysicsComponent : public WGameComponent
+	public ref class WPhysicsComponent : public WGameComponent
 	{
 	public:
 
-		WCustomPhysicsComponent();
-		WCustomPhysicsComponent( CustomPhysicsComponent* component );
+		WPhysicsComponent();
+		WPhysicsComponent( PhysicsComponent* component );
 
-		DECLARE_CAST_COMPONENT( CustomPhysicsComponent );
+		DECLARE_CAST_COMPONENT( PhysicsComponent );
 
-		DECLARE_PROPERTY( Sentinel::Components::ShapeType, ShapeType );
+		DECLARE_PROPERTY( Sentinel::Components::PhysicsShapeType, ShapeType );
 		DECLARE_PROPERTY( float,		Mass );
 
 		DECLARE_PROPERTY( WVector3f^,	ShapePosition );

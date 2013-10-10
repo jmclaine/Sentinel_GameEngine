@@ -178,8 +178,10 @@ namespace Sentinel
 		if( entity )
 		{
 			TRAVERSE_VECTOR( x, mGameObject )
+			{
 				if( mGameObject[ x ] == entity )
 					return entity;
+			}
 
 			if( entity->mParent )
 				entity->mParent->RemoveChild( entity );
@@ -199,7 +201,7 @@ namespace Sentinel
 			return AddGameObject( entity );
 		}
 
-		return NULL;
+		return entity;
 	}
 
 	GameObject* GameWorld::RemoveGameObject( GameObject* entity )

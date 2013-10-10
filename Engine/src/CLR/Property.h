@@ -29,6 +29,7 @@
 // S = static_cast required
 // P = pointer based
 // T = shared_ptr
+// C = casted class name required
 //
 
 // Native varTypes, e.g. int, float, double
@@ -55,15 +56,18 @@
 		mRef->m##varName = v;\
 	}
 
-#define DEFINE_PROPERTY_MS( refClass, varType, varName )\
+#define DEFINE_PROPERTY_MSC( refClass, castClass, varType, varName )\
 	varType W##refClass::varName::get()\
 	{\
-		return static_cast< refClass* >(mRef)->m##varName;\
+		return static_cast< castClass* >(mRef)->m##varName;\
 	}\
 	void W##refClass::varName::set( varType v )\
 	{\
-		static_cast< refClass* >(mRef)->m##varName = v;\
+		static_cast< castClass* >(mRef)->m##varName = v;\
 	}
+
+#define DEFINE_PROPERTY_MS( refClass, varType, varName )\
+	DEFINE_PROPERTY_MSC( refClass, refClass, varType, varName );
 
 #define DEFINE_PROPERTY_MB( baseClass, refClass, varType, varName )\
 	varType W##baseClass::W##refClass::varName::get()\
@@ -87,15 +91,18 @@
 		mRef->m##varName = (Sentinel::varType)v;\
 	}
 
-#define DEFINE_PROPERTY_ES( refClass, _namespace, varType, varName )\
+#define DEFINE_PROPERTY_ESC( refClass, castClass, _namespace, varType, varName )\
 	Sentinel::_namespace::varType W##refClass::varName::get()\
 	{\
-		return (Sentinel::_namespace::varType)static_cast< refClass* >(mRef)->m##varName;\
+		return (Sentinel::_namespace::varType)static_cast< castClass* >(mRef)->m##varName;\
 	}\
 	void W##refClass::varName::set( Sentinel::_namespace::varType v )\
 	{\
-		static_cast< refClass* >(mRef)->m##varName = (Sentinel::varType)v;\
+		static_cast< castClass* >(mRef)->m##varName = (Sentinel::varType)v;\
 	}
+
+#define DEFINE_PROPERTY_ES( refClass, _namespace, varType, varName )\
+	DEFINE_PROPERTY_ESC( refClass, refClass, _namespace, varType, varName );
 
 // Strings.
 //
@@ -121,15 +128,18 @@
 		mRef->m##varName = *v->GetRef();\
 	}
 
-#define DEFINE_PROPERTY_RS( refClass, varType, varName )\
+#define DEFINE_PROPERTY_RSC( refClass, castClass, varType, varName )\
 	W##varType^ W##refClass::varName::get()\
 	{\
-		return gcnew R##varType( &static_cast< refClass* >(mRef)->m##varName );\
+		return gcnew R##varType( &static_cast< castClass* >(mRef)->m##varName );\
 	}\
 	void W##refClass::varName::set( W##varType^ v )\
 	{\
-		static_cast< refClass* >(mRef)->m##varName = *v->GetRef();\
+		static_cast< castClass* >(mRef)->m##varName = *v->GetRef();\
 	}
+
+#define DEFINE_PROPERTY_RS( refClass, varType, varName )\
+	DEFINE_PROPERTY_RSC( refClass, refClass, varType, varName );
 
 #define DEFINE_PROPERTY_RSB( baseClass, refClass, varType, varName )\
 	W##varType^ W##baseClass::W##refClass::varName::get()\

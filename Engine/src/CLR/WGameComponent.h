@@ -17,15 +17,18 @@ using namespace Sentinel::Utilities;
 #define DECLARE_CAST_COMPONENT( refClass )\
 	static W##refClass^ Cast( WGameComponent^ component );
 
-#define DEFINE_CAST_COMPONENT( refClass )\
+#define DEFINE_CAST_COMPONENT_EX( refClass, castClass )\
 	W##refClass^ W##refClass::Cast( WGameComponent^ component ) \
 	{\
 		try {\
-			refClass* obj = dynamic_cast< refClass* >( component->GetRef() );\
+			castClass* obj = dynamic_cast< castClass* >( component->GetRef() );\
 			return (obj) ? gcnew W##refClass( obj ) : nullptr;\
 		} catch( System::Exception^ ) {}\
 		return nullptr;\
 	}
+
+#define DEFINE_CAST_COMPONENT( refClass )\
+	DEFINE_CAST_COMPONENT_EX( refClass, refClass );
 
 namespace Sentinel { namespace Components
 {

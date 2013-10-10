@@ -531,13 +531,16 @@ namespace Sentinel
 		{
 			// Write base material.
 			//
-			archive.Write( matTex.mMaterial.mAmbient.Ptr(), 3 );
-			archive.Write( matTex.mMaterial.mDiffuse.Ptr(), 3 );
+			archive.Write( matTex.mMaterial.mAmbient.Ptr(),  3 );
+			archive.Write( matTex.mMaterial.mDiffuse.Ptr(),  3 );
 			archive.Write( matTex.mMaterial.mSpecular.Ptr(), 3 );
 
 			float spec_comp = matTex.mMaterial.mSpecularComponent / 100.0f;
 			archive.Write( &spec_comp );
-			
+
+			float alpha = matTex.mMaterial.mAmbient.a + matTex.mMaterial.mDiffuse.a + matTex.mMaterial.mSpecular.a;
+			archive.Write( &alpha );
+
 			// Write filenames of each texture.
 			//
 			UINT numTextures = 0;
@@ -545,9 +548,9 @@ namespace Sentinel
 				if( matTex.mTexture[ x ] != NULL )
 					++numTextures;
 
-			archive.Write( &numTextures );
+			archive.Write( &numTextures, 1, false );
 
-			for( UINT x = 0; x < NUM_AUTODESK_TYPES; ++x )
+			for( BYTE x = 0; x < NUM_AUTODESK_TYPES; ++x )
 			{
 				if( matTex.mTexture[ x ] != NULL )
 				{
@@ -555,9 +558,7 @@ namespace Sentinel
 
 					std::string name = TextureManager::Inst()->Get( matTex.mTexture[ x ] );
 
-					UINT len = name.size();
-					archive.Write( &len );
-					archive.Write( name.c_str(), len );
+					archive.Write( &name );
 				}
 			}
 		}
@@ -566,31 +567,35 @@ namespace Sentinel
 		{
 			// Set the material.
 			//
-			Vector3f color;
-			archive.Read( color.Ptr(), 3 );
-			ColorRGBA ambient( color.x, color.y, color.z );
-
-			archive.Read( color.Ptr(), 3 );
-			ColorRGBA diffuse( color.x, color.y, color.z );
-
-			archive.Read( color.Ptr(), 3 );
-			ColorRGBA specular( color.x, color.y, color.z );
-
+			Vector3f ambient;
+			archive.Read( ambient.Ptr(), ar_sizeof( ambient ));
+			
+			Vector3f diffuse;
+			archive.Read( diffuse.Ptr(), ar_sizeof( diffuse ));
+			
+			Vector3f specular;
+			archive.Read( specular.Ptr(), ar_sizeof( specular ));
+			
 			float spec_comp;
 			archive.Read( &spec_comp );
 			spec_comp *= 100.0f;
 
-			matTex.mMaterial = Material( ambient, diffuse, specular, spec_comp );
+			float alpha;
+			archive.Read( &alpha );
+			
+			matTex.mMaterial = Material( ColorRGBA( ambient.x,  ambient.y,  ambient.z,  alpha ),\
+										 ColorRGBA( diffuse.x,  diffuse.y,  diffuse.z,  0 ),\
+										 ColorRGBA( specular.x, specular.y, specular.z, 0 ),\
+										 spec_comp );
 
 			// Read filenames of each texture.
 			//
 			UINT numTextures;
-			archive.Read( &numTextures );
+			archive.Read( &numTextures, 1, false );
 
-			char name[ 256 ];
 			for( UINT x = 0; x < numTextures; ++x )
 			{
-				int type;
+				BYTE type;
 				archive.Read( &type );
 
 				if( type == AUTODESK_BUMP )
@@ -607,12 +612,10 @@ namespace Sentinel
 					type = TEXTURE_DIFFUSE;
 				}
 
-				UINT len;
-				archive.Read( &len );
-				archive.Read( name, len );
-				name[ len ] = 0;
-
-				matTex.mTexture[ type ] = TextureManager::Inst()->Add( name, Renderer::Inst()->CreateTextureFromFile( name ));
+				std::string name;
+				archive.Read( &name );
+				
+				matTex.mTexture[ type ] = TextureManager::Inst()->Add( name, Renderer::Inst()->CreateTextureFromFile( name.c_str() ));
 			}
 		}
 

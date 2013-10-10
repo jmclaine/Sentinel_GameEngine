@@ -43,9 +43,23 @@ namespace Sentinel
 		READ_DATA( data, unsigned char, length );
 	}
 
+	void Archive::Read( short* data, unsigned int length )
+	{
+		READ_DATA( data, short, length );
+	}
+
+	void Archive::Read( unsigned short* data, unsigned int length )
+	{
+		READ_DATA( data, unsigned short, length );
+	}
+
 	void Archive::Read( int* data, unsigned int length, bool is32bit )
 	{
-		if( !is32bit )
+		if( is32bit )
+		{
+			READ_DATA( data, int, length );
+		}
+		else
 		{
 			for( unsigned int x = 0; x < length; ++x )
 			{
@@ -53,16 +67,16 @@ namespace Sentinel
 				READ_DATA( &d, short, 1 );
 				data[ x ] = d;
 			}
-		}
-		else
-		{
-			READ_DATA( data, int, length );
 		}
 	}
 
 	void Archive::Read( unsigned int* data, unsigned int length, bool is32bit )
 	{
-		if( !is32bit )
+		if( is32bit )
+		{
+			READ_DATA( data, unsigned int, length );
+		}
+		else
 		{
 			for( unsigned int x = 0; x < length; ++x )
 			{
@@ -71,15 +85,15 @@ namespace Sentinel
 				data[ x ] = d;
 			}
 		}
-		else
-		{
-			READ_DATA( data, unsigned int, length );
-		}
 	}
 
 	void Archive::Read( long* data, unsigned int length, bool is32bit )
 	{
-		if( !is32bit )
+		if( is32bit )
+		{
+			READ_DATA( data, long, length );
+		}
+		else
 		{
 			for( unsigned long x = 0; x < length; ++x )
 			{
@@ -88,15 +102,15 @@ namespace Sentinel
 				data[ x ] = d;
 			}
 		}
-		else
-		{
-			READ_DATA( data, long, length );
-		}
 	}
 
 	void Archive::Read( unsigned long* data, unsigned int length, bool is32bit )
 	{
-		if( !is32bit )
+		if( is32bit )
+		{
+			READ_DATA( data, unsigned long, length );
+		}
+		else
 		{
 			for( unsigned long x = 0; x < length; ++x )
 			{
@@ -105,15 +119,15 @@ namespace Sentinel
 				data[ x ] = d;
 			}
 		}
-		else
-		{
-			READ_DATA( data, unsigned long, length );
-		}
 	}
 
 	void Archive::Read( float* data, unsigned int length, bool is32bit )
 	{
-		if( !is32bit )
+		if( is32bit )
+		{
+			READ_DATA( data, float, length );
+		}
+		else
 		{
 			for( unsigned int x = 0; x < length; ++x )
 			{
@@ -121,10 +135,6 @@ namespace Sentinel
 				READ_DATA( &d, short, 1 );
 				data[ x ] = FloatCompressor::Decompress( d );
 			}
-		}
-		else
-		{
-			READ_DATA( data, float, length );
 		}
 	}
 
@@ -165,25 +175,39 @@ namespace Sentinel
 		WRITE_DATA( data, unsigned char, length );
 	}
 
+	void Archive::Write( short* data, unsigned int length )
+	{
+		WRITE_DATA( data, short, length );
+	}
+
+	void Archive::Write( unsigned short* data, unsigned int length )
+	{
+		WRITE_DATA( data, unsigned short, length );
+	}
+
 	void Archive::Write( const int* data, unsigned int length, bool is32bit )
 	{
-		if( !is32bit )
+		if( is32bit )
+		{
+			WRITE_DATA( data, int, length );
+		}
+		else
 		{
 			for( unsigned int x = 0; x < length; ++x )
 			{
 				short d = (short)data[ x ];
 				WRITE_DATA( &d, short, 1 );
 			}
-		}
-		else
-		{
-			WRITE_DATA( data, int, length );
 		}
 	}
 
 	void Archive::Write( const unsigned int* data, unsigned int length, bool is32bit )
 	{
-		if( !is32bit )
+		if( is32bit )
+		{
+			WRITE_DATA( data, unsigned int, length );
+		}
+		else
 		{
 			for( unsigned int x = 0; x < length; ++x )
 			{
@@ -191,15 +215,15 @@ namespace Sentinel
 				WRITE_DATA( &d, unsigned short, 1 );
 			}
 		}
-		else
-		{
-			WRITE_DATA( data, unsigned int, length );
-		}
 	}
 
 	void Archive::Write( const long* data, unsigned int length, bool is32bit )
 	{
-		if( !is32bit )
+		if( is32bit )
+		{
+			WRITE_DATA( data, long, length );
+		}
+		else
 		{
 			for( unsigned long x = 0; x < length; ++x )
 			{
@@ -207,15 +231,15 @@ namespace Sentinel
 				WRITE_DATA( &d, short, 1 );
 			}
 		}
-		else
-		{
-			WRITE_DATA( data, long, length );
-		}
 	}
 
 	void Archive::Write( const unsigned long* data, unsigned int length, bool is32bit )
 	{
-		if( !is32bit )
+		if( is32bit )
+		{
+			WRITE_DATA( data, unsigned long, length );
+		}
+		else
 		{
 			for( unsigned long x = 0; x < length; ++x )
 			{
@@ -223,25 +247,21 @@ namespace Sentinel
 				WRITE_DATA( &d, unsigned short, 1 );
 			}
 		}
-		else
-		{
-			WRITE_DATA( data, unsigned long, length );
-		}
 	}
 
 	void Archive::Write( const float* data, unsigned int length, bool is32bit )
 	{
-		if( !is32bit )
+		if( is32bit )
+		{
+			WRITE_DATA( data, float, length );
+		}
+		else
 		{
 			for( unsigned int x = 0; x < length; ++x )
 			{
 				short d = FloatCompressor::Compress( data[ x ] );
 				WRITE_DATA( &d, short, 1 );
 			}
-		}
-		else
-		{
-			WRITE_DATA( data, float, length );
 		}
 	}
 
@@ -268,7 +288,7 @@ namespace Sentinel
 			return 0;
 
 		fseek( file, 0, SEEK_END );
-		size_t length = (size_t)( ftell( file ));
+		unsigned int length = (unsigned int)( ftell( file ));
 		rewind( file );
 
 		buf = (char*)malloc( length + 1 );

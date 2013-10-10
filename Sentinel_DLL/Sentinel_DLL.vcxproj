@@ -113,7 +113,6 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
     <ClInclude Include="..\Engine\src\GameComponent.h" />
     <ClInclude Include="..\Engine\src\GameObject.h" />
     <ClInclude Include="..\Engine\src\GameWorld.h" />
-    <ClInclude Include="..\Engine\src\CustomPhysicsComponent.h" />
     <ClInclude Include="..\Engine\src\Input.h" />
     <ClInclude Include="..\Engine\src\LightComponent.h" />
     <ClInclude Include="..\Engine\src\Material.h" />
@@ -164,7 +163,6 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
     <ClCompile Include="..\Engine\src\CameraComponent.cpp" />
     <ClCompile Include="..\Engine\src\ColorRGBA.cpp" />
     <ClCompile Include="..\Engine\src\ControllerComponent.cpp" />
-    <ClCompile Include="..\Engine\src\CustomPhysicsComponent.cpp" />
     <ClCompile Include="..\Engine\src\DrawableComponent.cpp" />
     <ClCompile Include="..\Engine\src\GameComponent.cpp" />
     <ClCompile Include="..\Engine\src\GameObject.cpp" />
