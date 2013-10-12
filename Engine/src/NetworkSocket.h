@@ -114,13 +114,16 @@ namespace Sentinel
 		NetworkSocket();
 		~NetworkSocket();
 
-	public:
+	private:
 
 		// Initialize by connection type flags.
 		// Must use NETWORK_UDP or NETWORK_TCP.
 		// Defaults to Blocking; otherwise use | NETWORK_NONBLOCKING flag.
 		//
 		bool		Startup( WORD flags );
+
+	public:
+
 		bool		Startup( WORD flags, int port );						// Server
 		bool		Startup( WORD flags, const char* ipAddress, int port );	// Client
 

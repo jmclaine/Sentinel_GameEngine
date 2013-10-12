@@ -49,6 +49,9 @@
     <Filter Include="Source Files\Sentinel_Engine\Utilities\zlib">
       <UniqueIdentifier>{78949fcc-380a-4bc3-9628-0eb31c44e922}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Sentinel_Engine\Components\Audio">
+      <UniqueIdentifier>{e9224033-8b9b-461b-a977-8a390cab6f08}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Engine\src\Common.h">
@@ -226,6 +229,15 @@
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\ModelManager.h">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\AudioComponent.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\AudioSystem.h">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\AudioSource.h">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClInclude>
   </ItemGroup>
@@ -453,6 +465,12 @@
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\ModelManager.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\AudioSystem.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\AudioSource.cpp">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClCompile>
   </ItemGroup>

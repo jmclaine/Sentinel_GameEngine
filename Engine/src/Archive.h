@@ -4,7 +4,8 @@ The flag is32bit refers to whether or not
 the variable should be compressed to 16-bit
 or remain as it is.
 
-The compression is lossy.
+The compression is lossy for floats.
+All int based values are truncated to shorts.
 
 A double is never compressed.
 */
@@ -22,11 +23,11 @@ namespace Sentinel
 
 	class SENTINEL_DLL Archive
 	{
-	private:
-
-		FILE* mFile;
-
 	public:
+
+		FILE*	mFile;
+
+		////////////////////////
 
 		Archive();
 		~Archive();

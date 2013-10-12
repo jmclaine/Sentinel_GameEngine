@@ -3,6 +3,16 @@
 Bullet Physics is not compatible with the
 managed / wrapped version due to byte-alignment.
 */
+#ifdef NDEBUG
+	#pragma comment (lib, "BulletCollision_vs2010.lib")
+	#pragma comment (lib, "BulletDynamics_vs2010.lib")
+	#pragma comment (lib, "LinearMath_vs2010.lib")
+#else
+	#pragma comment (lib, "BulletCollision_vs2010_debug.lib")
+	#pragma comment (lib, "BulletDynamics_vs2010_debug.lib")
+	#pragma comment (lib, "LinearMath_vs2010_debug.lib")
+#endif
+
 #include "btBulletDynamicsCommon.h"
 
 #include "Mesh.h"

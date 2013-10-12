@@ -12,6 +12,7 @@
 #include "PhysicsSystem.h"
 #include "ParticleSystem.h"
 #include "NetworkSocket.h"
+#include "AudioSystem.h"
 
 #include "TextureManager.h"
 #include "ShaderManager.h"
@@ -47,6 +48,8 @@ class MainApp
 	HACCEL					mAccelTable;
 	
 	GameWindow*				mWindow;
+
+	AudioSource*			mSound;
 	
 public:
 
@@ -100,6 +103,13 @@ public:
 		////////////////////////////////////
 
 		PhysicsSystem::Inst()->Startup();
+
+		SetDirectory( "Sounds" );
+		AudioSystem::Inst( AudioSystem::Create() )->Startup();
+		mSound = AudioSystem::Inst()->CreateSound( "rtsoundthrow.wav" );
+		mSound->Play();
+		SetDirectory( ".." );
+
 		/*
 		PrepareShaders();
 		PrepareObjects();
@@ -460,10 +470,12 @@ public:
 
 	void Shutdown()
 	{
+		delete mSound;
+
 		Mouse::Destroy();
 		Keyboard::Destroy();
 
-		//GameWorld::Inst()->Shutdown();
+		GameWorld::Inst()->Shutdown();
 		GameWorld::Destroy();
 
 		ModelManager::Destroy();
@@ -474,6 +486,9 @@ public:
 		mWindow->Shutdown();
 		delete mWindow;
 		
+		AudioSystem::Inst()->Shutdown();
+		AudioSystem::Destroy();
+
 		Timing::Destroy();
 		PhysicsSystem::Destroy();
 		ParticleSystem::Destroy();

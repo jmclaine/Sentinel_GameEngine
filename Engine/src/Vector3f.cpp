@@ -36,9 +36,9 @@ namespace Sentinel
 		return (&x)[i];
 	}
 
-	float* Vector3f::Ptr()
+	float* Vector3f::Ptr() const
 	{
-		return static_cast< float* >(&x);
+		return const_cast< float* >(&x);
 	}
 
 	bool Vector3f::operator == ( const Vector3f& v ) const
