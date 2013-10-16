@@ -2,13 +2,13 @@
 
 #include "Property.h"
 #include "Shape.h"
-#include "WVector3f.h"
-#include "WBuffer.h"
 
-using namespace Sentinel::Assets;
-
-namespace Sentinel { namespace Math
+namespace Sentinel { namespace Wrapped
 {
+	ref class WVector3f;
+	ref class RVector3f;
+	ref class WBuffer;
+
 	public ref class WRay
 	{
 		DECLARE_REF( Ray );

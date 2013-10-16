@@ -1,9 +1,7 @@
 #include "WGameObject.h"
 #include "WString.h"
 
-using namespace Sentinel::Utilities;
-
-namespace Sentinel { namespace Components
+namespace Sentinel { namespace Wrapped
 {
 	DEFINE_REF_PTR( GameObject );
 
@@ -32,7 +30,7 @@ namespace Sentinel { namespace Components
 	////////////////////////////////
 
 	DEFINE_PROPERTY_STR( GameObject, Name );
-	DEFINE_PROPERTY_PS(  GameObject, GameObject, Parent );
+	DEFINE_PROPERTY_PFG( GameObject, GameObject, Parent );
 
 	////////////////////////////////
 
@@ -116,7 +114,7 @@ namespace Sentinel { namespace Components
 
 	// Find the first occurrence of a component by type.
 	//
-	WGameComponent^ WGameObject::FindComponent( Sentinel::Components::ComponentType type )
+	WGameComponent^ WGameObject::FindComponent( Sentinel::Wrapped::ComponentType type )
 	{
 		GameComponent* component = mRef->FindComponent( (Sentinel::GameComponent::Type)type );
 

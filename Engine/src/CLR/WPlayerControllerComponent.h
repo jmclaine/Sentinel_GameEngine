@@ -4,7 +4,7 @@
 #include "WControllerComponent.h"
 #include "PlayerControllerComponent.h"
 
-namespace Sentinel { namespace Components
+namespace Sentinel { namespace Wrapped
 {
 	public ref class WPlayerControllerComponent : public WControllerComponent
 	{

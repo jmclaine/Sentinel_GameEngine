@@ -1,7 +1,7 @@
 #include "WMeshComponent.h"
 #include "MeshComponent.h"
 
-namespace Sentinel { namespace Components
+namespace Sentinel { namespace Wrapped
 {
 	WMeshComponent::WMeshComponent( WMesh^ mesh )
 	{

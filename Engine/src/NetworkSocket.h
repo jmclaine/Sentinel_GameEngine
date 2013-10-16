@@ -1,7 +1,7 @@
-// NetworkSocket is compatible with Windows and Linux.
-//
 #pragma once
-
+/*
+NetworkSocket is compatible with Windows and Linux.
+*/
 #include <string>
 #include <unordered_map>
 
@@ -34,7 +34,6 @@
 #endif
 
 #include "Common.h"
-#include "Singleton.h"
 #include "Util.h"
 
 #define MAX_RTT_COUNT		5
@@ -60,10 +59,8 @@ namespace Sentinel
 
 	////////////////////////////////////////////////
 	
-	class SENTINEL_DLL NetworkSocket : public SingletonSafe< NetworkSocket >
+	class SENTINEL_DLL NetworkSocket
 	{
-		friend class SingletonSafe< NetworkSocket >;
-
 	public:
 
 		struct SENTINEL_DLL Connection
@@ -109,7 +106,7 @@ namespace Sentinel
 
 		WORD					mFlags;			// NetworkType
 
-		////////////////////////////////////
+	public:
 
 		NetworkSocket();
 		~NetworkSocket();
@@ -127,7 +124,7 @@ namespace Sentinel
 		bool		Startup( WORD flags, int port );						// Server
 		bool		Startup( WORD flags, const char* ipAddress, int port );	// Client
 
-		void		Update();
+		void		Update( float DT );
 
 		void		Shutdown();
 

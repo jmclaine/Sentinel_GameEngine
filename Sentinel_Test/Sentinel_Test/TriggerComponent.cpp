@@ -1,16 +1,16 @@
-#include "GameObject.h"
 #include "TriggerComponent.h"
+#include "GameObject.h"
+#include "PhysicsComponent.h"
 
 namespace Sentinel
 {
 	DEFINE_SERIAL_REGISTER( TriggerComponent );
 	DEFINE_SERIAL_CLONE( TriggerComponent );
 
-	TriggerComponent::TriggerComponent()
+	TriggerComponent::TriggerComponent() :
+		mPhysics( NULL )
 	{
 		mType = GameComponent::TRIGGER;
-
-		Shutdown();
 	}
 
 	TriggerComponent::~TriggerComponent()

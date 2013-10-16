@@ -1,5 +1,7 @@
-#include "GameObject.h"
 #include "ControllerComponent.h"
+#include "GameObject.h"
+#include "PhysicsComponent.h"
+#include "TransformComponent.h"
 
 namespace Sentinel
 {

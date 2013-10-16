@@ -1,8 +1,16 @@
-#include "MathCommon.h"
-#include "Util.h"
-#include "Input.h"
-#include "Timing.h"
 #include "PlayerControllerComponent.h"
+#include "PhysicsComponent.h"
+#include "TransformComponent.h"
+#include "MathCommon.h"
+#include "Input.h"
+#include "GameObject.h"
+#include "GameWorld.h"
+#include "Timing.h"
+#include "Vector3f.h"
+#include "Quatf.h"
+#include "Matrix4f.h"
+#include "Archive.h"
+#include "PhysicsSystem.h"
 
 namespace Sentinel
 {
@@ -22,93 +30,87 @@ namespace Sentinel
 
 	void PlayerControllerComponent::Update()
 	{
-		ControllerComponent::Update();
-
-#ifndef IGNORE_PHYSICS
 		if( mPhysics )
 		{
-			Keyboard* keyboard = Keyboard::Inst();
+			Keyboard& keyboard = Keyboard::Get();
 
 			Vector3f impulse( 0, 0, 0 );
 
-			mPhysics->GetRigidBody()->activate( true );
+			//mPhysics->GetRigidBody()->activate( true );
 
 			Matrix4f matRot( mTransform->mOrientation );
 		
 			// Forward.
 			//
-			if( keyboard->IsDown( 'W' ))
+			if( keyboard.IsDown( 'W' ))
 				impulse = impulse.Add( matRot.Forward() );
 		
 			// Backward.
 			//
-			if( keyboard->IsDown( 'S' ))
+			if( keyboard.IsDown( 'S' ))
 				impulse = impulse.Add( matRot.Forward() * -1.0f );
 		
 			// Left.
 			//
-			if( keyboard->IsDown( 'A' ))
+			if( keyboard.IsDown( 'A' ))
 				impulse = impulse.Add( matRot.Right() * -1.0f );
 		
 			// Right.
 			//
-			if( keyboard->IsDown( 'D' ))
+			if( keyboard.IsDown( 'D' ))
 				impulse = impulse.Add( matRot.Right() );
 		
 			// Up.
 			//
-			if( keyboard->IsDown( VK_SPACE ))
+			if( keyboard.IsDown( VK_SPACE ))
 				impulse = impulse.Add( matRot.Up() );
 		
 			// Down.
 			//
-			if( keyboard->IsDown( 'C' ))
+			if( keyboard.IsDown( 'C' ))
 				impulse = impulse.Add( matRot.Up() * -1.0f );
 
 			// Move in direction.
 			//
+			RigidBody* body = mPhysics->GetRigidBody();
+
 			if( impulse.LengthSquared() > 0 )
-				mPhysics->GetRigidBody()->applyCentralImpulse( btVector3( impulse.x, impulse.y, impulse.z ).normalize() * mSpeed );
+				body->ApplyCentralImpulse( impulse.Normalize() * mSpeed );
 		
 			///////////////////////////////////
 
-			Mouse* mouse = Mouse::Inst();
+			Mouse& mouse = Mouse::Get();
 			POINT  mousePos;
 
 			GetCursorPos( &mousePos );
 			POINT center = CenterHandle();
 			Vector3f diff = Vector3f( (float)(center.x-mousePos.x), (float)(center.y-mousePos.y), 0 ) * mAngularSpeed;
 
-			if( keyboard->IsDown( VK_UP ))
+			if( keyboard.IsDown( VK_UP ))
 				diff.z += 1.0f;
 
-			if( keyboard->IsDown( VK_DOWN ))
+			if( keyboard.IsDown( VK_DOWN ))
 				diff.z -= 1.0f;
 
 			SetCursorPos( center.x, center.y );
 
 			// Rotate in direction with spherical interpolation.
 			//
-			btTransform transform = mPhysics->GetRigidBody()->getWorldTransform();
-
-			static btQuaternion qFinal = transform.getRotation();
+			static Quatf qFinal = body->GetOrientation();
 		
 			if( diff.LengthSquared() > 0 )
 			{
 				static Vector3f rot;
-				rot = rot + diff * (float)DEGREES_TO_RADIANS;
+				rot += diff;
 	
-				qFinal = btQuaternion( rot.x, rot.y, rot.z );
+				qFinal = Quatf( rot.y, rot.x, rot.z );
 			}
 
-			btQuaternion qResult = slerp( transform.getRotation(), qFinal, clamp( Timing::Inst()->DeltaTime()*10.0f, 0.0f, 1.0f ));
+			Quatf qResult = body->GetOrientation().Slerp( qFinal, clamp( mOwner->World()->mTiming->DeltaTime()*10.0f, 0.0f, 1.0f ));
 
-			if( qResult.length2() > 0 )	// strangely, slerp can end with an invalid rotation
-				transform.setRotation( qResult );
-		
-			mPhysics->GetRigidBody()->setWorldTransform( transform );
+			if( qResult.LengthSquared() > 0 )	// strangely, slerp can end with an invalid rotation
+				body->SetOrientation( qResult );
 		}
-#endif
 	}
 
 	void PlayerControllerComponent::Shutdown()

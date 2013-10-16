@@ -99,6 +99,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
   <ItemGroup>
     <ClInclude Include="..\Engine\src\AIControllerComponent.h" />
     <ClInclude Include="..\Engine\src\Archive.h" />
+    <ClInclude Include="..\Engine\src\AssetArchive.h" />
     <ClInclude Include="..\Engine\src\AssetManager.h" />
     <ClInclude Include="..\Engine\src\AudioComponent.h" />
     <ClInclude Include="..\Engine\src\AudioSource.h" />
@@ -141,6 +142,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
     <ClInclude Include="..\Engine\src\RefCounter.h" />
     <ClInclude Include="..\Engine\src\Renderer.h" />
     <ClInclude Include="..\Engine\src\GameWindow.h" />
+    <ClInclude Include="..\Engine\src\RendererTypes.h" />
     <ClInclude Include="..\Engine\src\Script.h" />
     <ClInclude Include="..\Engine\src\Serializeable.h" />
     <ClInclude Include="..\Engine\src\Shader.h" />
@@ -162,6 +164,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\Archive.cpp" />
+    <ClCompile Include="..\Engine\src\AssetArchive.cpp" />
     <ClCompile Include="..\Engine\src\AudioSource.cpp" />
     <ClCompile Include="..\Engine\src\AudioSystem.cpp" />
     <ClCompile Include="..\Engine\src\Buffer.cpp" />
@@ -192,7 +195,8 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
     <ClCompile Include="..\Engine\src\ParticleSystem.cpp" />
     <ClCompile Include="..\Engine\src\PerspectiveCameraComponent.cpp" />
     <ClCompile Include="..\Engine\src\PhysicsComponent.cpp" />
-    <ClCompile Include="..\Engine\src\PhysicsSystem.cpp" />
+    <ClCompile Include="..\Engine\src\PhysicsSystemBT.cpp" />
+    <ClCompile Include="..\Engine\src\PhysicsSystemSE.cpp" />
     <ClCompile Include="..\Engine\src\PlayerControllerComponent.cpp" />
     <ClCompile Include="..\Engine\src\Quatf.cpp" />
     <ClCompile Include="..\Engine\src\Renderer.cpp" />

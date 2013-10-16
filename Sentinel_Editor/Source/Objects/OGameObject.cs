@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-using Sentinel.Components;
+using Sentinel.Wrapped;
 
 namespace Sentinel_Editor
 {

@@ -1,4 +1,6 @@
 #include "ShaderManager.h"
+#include "Shader.h"
+#include "Archive.h"
 #include "Renderer.h"
 #include "tinyxml.h"
 #include "zlib.h"
@@ -10,11 +12,6 @@ namespace Sentinel
 
 	ShaderManager::~ShaderManager()
 	{}
-
-	ShaderManager* ShaderManager::Create()
-	{
-		return ShaderManager::Inst();
-	}
 
 	void ShaderManager::Save( Archive& archive )
 	{
@@ -52,7 +49,7 @@ namespace Sentinel
 		}
 	}
 
-	void ShaderManager::Load( Archive& archive )
+	void ShaderManager::Load( Archive& archive, Renderer* renderer )
 	{
 		RemoveAll();
 
@@ -88,14 +85,14 @@ namespace Sentinel
 
 			TRACE( "Compiling '" << name << "'..." );
 
-			if( !Add( name, Renderer::Inst()->CreateShaderFromMemory( source, attrib.c_str(), uniform.c_str() )))
+			if( !Add( name, renderer->CreateShaderFromMemory( source, attrib.c_str(), uniform.c_str() )))
 				throw std::exception( "Failed to read shader." );
 
 			free( comp_source );
 		}
 	}
 
-	bool ShaderManager::LoadConfig( const char* filename )
+	ShaderManager* ShaderManager::LoadConfig( const char* filename, Renderer* renderer, ShaderManager* shaderManager )
 	{
 		TiXmlDocument doc;
 		if( !doc.LoadFile( filename ))
@@ -110,6 +107,11 @@ namespace Sentinel
 		// Read <Definition>
 		//
 		TiXmlElement* pElem = pMain->FirstChild( "Definition" )->ToElement();
+
+		// Store each shader.
+		//
+		if( !shaderManager )
+			shaderManager = new ShaderManager();
 		
 		while( pElem != NULL )
 		{
@@ -118,14 +120,14 @@ namespace Sentinel
 			const char* pUnif = pElem->Attribute( "Uniform" );
 			const char* pName = pElem->Attribute( "Name" );
 
-			std::shared_ptr< Shader > shader = ShaderManager::Inst()->Add( pName, Renderer::Inst()->CreateShaderFromFile( pFile, pAttr, pUnif ));
+			std::shared_ptr< Shader > shader = shaderManager->Add( pName, renderer->CreateShaderFromFile( pFile, pAttr, pUnif ));
 			
 			if( !shader )
-				return false;
+				throw AppException( "Failed to load shader '" + std::string( pFile ) + "." );
 
 			pElem = pElem->NextSiblingElement();
 		}
 
-		return true;
+		return shaderManager;
 	}
 }

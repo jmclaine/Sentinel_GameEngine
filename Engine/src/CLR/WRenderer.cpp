@@ -1,10 +1,14 @@
 #include "WRenderer.h"
-#include "Renderer.h"
+#include "GameWindow.h"
+#include "WTexture.h"
+#include "WBuffer.h"
+#include "WShader.h"
+#include "WColorRGBA.h"
 #include "WString.h"
 
-using namespace Sentinel::Utilities;
+using namespace Sentinel::Wrapped;
 
-namespace Sentinel { namespace Systems
+namespace Sentinel { namespace Wrapped
 {
 	DEFINE_REF( WindowInfo );
 
@@ -13,20 +17,14 @@ namespace Sentinel { namespace Systems
 		mRef = new WindowInfo();
 	}
 
-	WWindowInfo::WWindowInfo( const WindowInfo% info )
-	{
-		mRef = new WindowInfo( info );
-	}
-
 	WWindowInfo::WWindowInfo( WindowInfo* info )
 	{
 		mRef = info;
 	}
 
-	WWindowInfo::WWindowInfo( const WWindowInfo% info )
-	{
-		mRef = new WindowInfo( *info.mRef );
-	}
+	//////////////////////////////
+
+	DEFINE_OP_PTR( WindowInfo );
 
 	bool WWindowInfo::Fullscreen()
 	{
@@ -57,178 +55,185 @@ namespace Sentinel { namespace Systems
 
 	/////////////////////////////////////////////////
 
+	DEFINE_REF_PTR( Renderer );
+
+	WRenderer::WRenderer( Renderer* renderer )
+	{
+		mRef = renderer;
+	}
+
+	void WRenderer::Release()
+	{
+		delete mRef;
+	}
+
 	WTexture^ WRenderer::NullTexture()
 	{
-		return gcnew WTexture( std::shared_ptr< Texture >( Renderer::Inst()->NULL_TEXTURE ));
+		return gcnew WTexture( mRef->NULL_TEXTURE );
 	}
 
 	WTexture^ WRenderer::BaseTexture()
 	{
-		return gcnew WTexture( std::shared_ptr< Texture >( Renderer::Inst()->BASE_TEXTURE ));
+		return gcnew WTexture( mRef->BASE_TEXTURE );
 	}
 
-	WWindowInfo^ WRenderer::Create( String^ filename )
+	DEFINE_OP_PTR( Renderer );
+
+	//////////////////////////////
+
+	WRenderer^ WRenderer::Create( System::String^ filename, WWindowInfo^% info )
 	{
-		// Somehow the pointer created in the DLL SingletonAbstract
-		// is not the same as the SingletonAbstract located here,
-		// which is nullptr.
-		//
-		WindowInfo info;
+		Renderer* renderer = Renderer::Create( msclr::interop::marshal_as< std::string >(filename).c_str(), *info->GetRef() );
 
-		bool result = (Renderer::Inst( (Renderer*)(Renderer::Create( msclr::interop::marshal_as< std::string >(filename).c_str(), info ))) != NULL);
-
-		if( !result )
-			return nullptr;
-
-		return gcnew WWindowInfo( info );
+		return (renderer) ? gcnew WRenderer( renderer ) : nullptr;
 	}
 
 	void WRenderer::Shutdown()
 	{
-		Renderer::Inst()->Shutdown();
+		mRef->Shutdown();
 	}
 
 	// Windows.
 	//
 	void WRenderer::SetWindow( WWindowInfo^ info )
 	{
-		Renderer::Inst()->SetWindow( info->GetRef() );
+		mRef->SetWindow( info->GetRef() );
 	}
 
 	WWindowInfo^ WRenderer::GetWindow()
 	{
-		return gcnew RWindowInfo( Renderer::Inst()->GetWindow() );
+		return gcnew RWindowInfo( mRef->GetWindow() );
 	}
 
 	bool WRenderer::ShareResources( WWindowInfo^ info0, WWindowInfo^ info1 )
 	{
-		return Renderer::Inst()->ShareResources( info0->GetRef(), info1->GetRef() );
+		return mRef->ShareResources( info0->GetRef(), info1->GetRef() );
 	}
 
 	// Buffers.
 	//
-	WBuffer^ WRenderer::CreateBuffer( IntPtr data, UINT size, UINT stride, BufferType type )
+	WBuffer^ WRenderer::CreateBuffer( System::IntPtr data, UINT size, UINT stride, BufferType type )
 	{
-		return gcnew WBuffer( Renderer::Inst()->CreateBuffer( data.ToPointer(), size, stride, type ));
+		return gcnew WBuffer( mRef->CreateBuffer( data.ToPointer(), size, stride, (Sentinel::BufferType)type ));
 	}
 
 	void WRenderer::SetVBO( WBuffer^ buffer )
 	{
-		Renderer::Inst()->SetVBO( buffer );
+		mRef->SetVBO( buffer );
 	}
 
 	void WRenderer::SetIBO( WBuffer^ buffer )
 	{
-		Renderer::Inst()->SetIBO( buffer );
+		mRef->SetIBO( buffer );
 	}
 
 	// Textures.
 	//
 	WTexture^ WRenderer::CreateTexture( UINT width, UINT height, ImageFormatType format, bool createMips )
 	{
-		return gcnew WTexture( std::shared_ptr< Texture >( Renderer::Inst()->CreateTexture( width, height, (Sentinel::ImageFormatType)format, createMips )));
+		return gcnew WTexture( std::shared_ptr< Texture >( mRef->CreateTexture( width, height, (Sentinel::ImageFormatType)format, createMips )));
 	}
 
-	WTexture^ WRenderer::CreateTextureFromFile( String^ filename )
+	WTexture^ WRenderer::CreateTextureFromFile( System::String^ filename )
 	{
-		return gcnew WTexture( std::shared_ptr< Texture >( Renderer::Inst()->CreateTextureFromFile( WString::Alloc( filename ))));
+		return gcnew WTexture( std::shared_ptr< Texture >( mRef->CreateTextureFromFile( WString::Alloc( filename ))));
 	}
 
-	WTexture^ WRenderer::CreateTextureFromMemory( IntPtr data, UINT width, UINT height, ImageFormatType format, bool createMips )
+	WTexture^ WRenderer::CreateTextureFromMemory( System::IntPtr data, UINT width, UINT height, ImageFormatType format, bool createMips )
 	{
-		return gcnew WTexture( std::shared_ptr< Texture >( Renderer::Inst()->CreateTextureFromMemory( data.ToPointer(), width, height, (Sentinel::ImageFormatType)format, createMips )));
+		return gcnew WTexture( std::shared_ptr< Texture >( mRef->CreateTextureFromMemory( data.ToPointer(), width, height, (Sentinel::ImageFormatType)format, createMips )));
 	}
 	
 	// Special Rendering.
 	//
 	UINT WRenderer::CreateBackbuffer()
 	{
-		return Renderer::Inst()->CreateBackbuffer();
+		return mRef->CreateBackbuffer();
 	}
 
 	UINT WRenderer::CreateRenderTarget( WTexture^ texture )
 	{
-		return Renderer::Inst()->CreateRenderTarget( texture );
+		return mRef->CreateRenderTarget( texture );
 	}
 
 	UINT WRenderer::CreateDepthStencil( UINT width, UINT height )
 	{
-		return Renderer::Inst()->CreateDepthStencil( width, height );
+		return mRef->CreateDepthStencil( width, height );
 	}
 
 	UINT WRenderer::ResizeBuffers( UINT width, UINT height )
 	{
-		return Renderer::Inst()->ResizeBuffers( width, height );
+		return mRef->ResizeBuffers( width, height );
 	}
 
 	void WRenderer::SetRenderType( PrimitiveType type )
 	{
-		Renderer::Inst()->SetRenderType( (Sentinel::PrimitiveType)type );
+		mRef->SetRenderType( (Sentinel::PrimitiveType)type );
 	}
 
 	void WRenderer::SetRenderTarget( UINT target )
 	{
-		Renderer::Inst()->SetRenderTarget( target );
+		mRef->SetRenderTarget( target );
 	}
 
 	void WRenderer::SetDepthStencil( UINT stencil )
 	{
-		Renderer::Inst()->SetDepthStencil( stencil );
+		mRef->SetDepthStencil( stencil );
 	}
 
 	void WRenderer::SetDepthStencilState( StencilType state )
 	{
-		Renderer::Inst()->SetDepthStencilState( (Sentinel::StencilType)state );
+		mRef->SetDepthStencilState( (Sentinel::StencilType)state );
 	}
 
 	void WRenderer::SetViewport( int x, int y, UINT width, UINT height )
 	{
-		Renderer::Inst()->SetViewport( x, y, width, height );
+		mRef->SetViewport( x, y, width, height );
 	}
 
 	UINT WRenderer::SetCull( CullType type )
 	{
-		return Renderer::Inst()->SetCull( (Sentinel::CullType)type );
+		return mRef->SetCull( (Sentinel::CullType)type );
 	}
 
 	UINT WRenderer::SetFill( FillType type )
 	{
-		return Renderer::Inst()->SetFill( (Sentinel::FillType)type );
+		return mRef->SetFill( (Sentinel::FillType)type );
 	}
 
 	void WRenderer::SetBlend( BlendType type )
 	{
-		Renderer::Inst()->SetBlend( (Sentinel::BlendType)type );
+		mRef->SetBlend( (Sentinel::BlendType)type );
 	}
 
 	// Shaders.
 	//
-	WShader^ WRenderer::CreateShaderFromFile( String^ filename, String^ attrib, String^ uniform )
+	WShader^ WRenderer::CreateShaderFromFile( System::String^ filename, System::String^ attrib, System::String^ uniform )
 	{
-		std::shared_ptr< Shader > shader = std::shared_ptr< Shader >( Renderer::Inst()->CreateShaderFromFile( WString::Cast( filename ).c_str(), WString::Cast( attrib ).c_str(), WString::Cast( uniform ).c_str() ));
+		std::shared_ptr< Shader > shader( mRef->CreateShaderFromFile( WString::Cast( filename ).c_str(), WString::Cast( attrib ).c_str(), WString::Cast( uniform ).c_str() ));
 
 		return (shader) ? gcnew WShader( shader ) : nullptr;
 	}
 
 	void WRenderer::SetShader( WShader^ shader )
 	{
-		Renderer::Inst()->SetShader( shader );
+		mRef->SetShader( shader );
 	}
 
 	// Rendering.
 	//
 	void WRenderer::Clear( WColorRGBA^ color )
 	{
-		Renderer::Inst()->Clear( color->GetRef()->Ptr() );
+		mRef->Clear( color->GetRef()->Ptr() );
 	}
 
 	void WRenderer::DrawIndexed( UINT count, UINT startIndex, UINT baseVertex )
 	{
-		Renderer::Inst()->DrawIndexed( count, startIndex, baseVertex );
+		mRef->DrawIndexed( count, startIndex, baseVertex );
 	}
 
 	void WRenderer::Present()
 	{
-		Renderer::Inst()->Present();
+		mRef->Present();
 	}
 }}

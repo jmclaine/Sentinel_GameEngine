@@ -1,7 +1,7 @@
 #include "WPerspectiveCameraComponent.h"
 #include "PerspectiveCameraComponent.h"
 
-namespace Sentinel { namespace Components
+namespace Sentinel { namespace Wrapped
 {
 	WPerspectiveCameraComponent::WPerspectiveCameraComponent()
 	{

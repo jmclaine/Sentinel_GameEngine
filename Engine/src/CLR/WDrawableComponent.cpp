@@ -1,7 +1,7 @@
 #include "WDrawableComponent.h"
 #include "DrawableComponent.h"
 
-namespace Sentinel { namespace Components
+namespace Sentinel { namespace Wrapped
 {
 	WDrawableComponent::WDrawableComponent()
 	{

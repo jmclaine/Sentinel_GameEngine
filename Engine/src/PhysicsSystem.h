@@ -1,75 +1,115 @@
 #pragma once
 /*
-Bullet Physics is not compatible with the
-managed / wrapped version due to byte-alignment.
+There are two types of PhysicsSystems.
+
+BT uses Bullet physics.
+
+SE stores information for the editor.
+
+Each should save and load identically to
+ensure a smooth transition between them.
 */
-#ifdef NDEBUG
-	#pragma comment (lib, "BulletCollision_vs2010.lib")
-	#pragma comment (lib, "BulletDynamics_vs2010.lib")
-	#pragma comment (lib, "LinearMath_vs2010.lib")
-#else
-	#pragma comment (lib, "BulletCollision_vs2010_debug.lib")
-	#pragma comment (lib, "BulletDynamics_vs2010_debug.lib")
-	#pragma comment (lib, "LinearMath_vs2010_debug.lib")
-#endif
-
-#include "btBulletDynamicsCommon.h"
-
-#include "Mesh.h"
-#include "Singleton.h"
-#include "Vector3f.h"
-#include "Quatf.h"
+#include "Common.h"
 
 namespace Sentinel
 {
-	class SENTINEL_DLL PhysicsSystem : public SingletonThreaded< PhysicsSystem >
+	class Mesh;
+	class Quatf;
+	class Vector3f;
+
+	enum PhysicsShapeType
 	{
-		friend class SingletonThreaded< PhysicsSystem >;
-
-	private:
-
-		btDefaultCollisionConfiguration*					mConfig;
-		btCollisionDispatcher*								mDispatcher;
-		btBroadphaseInterface*								mCache;
-		btSequentialImpulseConstraintSolver*				mSolver;
-		btDiscreteDynamicsWorld*							mWorld;
-
-		btAlignedObjectArray< btCollisionShape* >			mShape;
-		btAlignedObjectArray< btTriangleIndexVertexArray* > mShapeData;
-
-		bool mIsActive;
-
-		//////////////////////////////////
-
-		PhysicsSystem();
-		~PhysicsSystem();
-
-	public:
-
-		void			Startup();
-
-		void			Update();
-
-		void			Shutdown();
-
-		//////////////////////////////////
-
-		btRigidBody*	CreateSphere( const Vector3f& position, const Quatf& orientation, float radius, float mass );
-
-		btRigidBody*	CreateBox( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, float mass );
-
-		btRigidBody*	CreateCylinder( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, float mass );
-
-		btRigidBody*	CreateMesh( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, Mesh* mesh, float mass );
-
-	private:
-
-		btRigidBody*	CreateRigidBody( btCollisionShape* shape, const btVector3& position, const btQuaternion& orientation, btScalar mass );
-
-	public:
-
-		void			AddRigidBody( btRigidBody* body );
-
-		void			RemoveRigidBody( btRigidBody* body );
+		PHYSICS_INVALID,
+		PHYSICS_SPHERE,
+		PHYSICS_BOX,
+		PHYSICS_CYLINDER,
+		PHYSICS_MESH,
 	};
+
+	enum PhysicsFlag
+	{
+		DISABLE_GRAVITY			= 1,
+		ENABLE_GYROSCOPIC_FORCE = 2,
+	};
+
+	class RigidBody
+	{
+	public:
+
+		virtual ~RigidBody() {}
+
+		virtual Vector3f	GetPosition() = 0;
+		virtual void		SetPosition( const Vector3f& position ) = 0;
+
+		virtual Quatf		GetOrientation() = 0;
+		virtual void		SetOrientation( const Quatf& orientation ) = 0;
+
+		virtual Vector3f	GetScale() = 0;
+		virtual void		SetScale( const Vector3f& scale ) = 0;
+
+		//////////////////////////////////
+
+		virtual float		GetMass() = 0;
+		virtual void		SetMass( float mass ) = 0;
+
+		virtual PhysicsShapeType GetShapeType() = 0;
+		virtual void		SetShapeType( PhysicsShapeType type ) = 0;
+		
+		virtual int			GetFlags() = 0;
+		virtual void		SetFlags( int flags ) = 0;
+
+		virtual float		GetLinearDamping() = 0;
+		virtual float		GetAngularDamping() = 0;
+		virtual void		SetDamping( float linear, float angular ) = 0;
+
+		virtual float		GetRestitution() = 0;
+		virtual void		SetRestitution( float rest ) = 0;
+
+		virtual float		GetFriction() = 0;
+		virtual void		SetFriction( float friction ) = 0;
+
+		virtual Vector3f	GetAngularFactor() = 0;
+		virtual void		SetAngularFactor( const Vector3f& factor ) = 0;
+
+		virtual Vector3f	GetGravity() = 0;
+		virtual void		SetGravity( const Vector3f& gravity ) = 0;
+
+		//////////////////////////////////
+
+		virtual void		ApplyCentralImpulse( const Vector3f& impulse ) = 0;
+	};
+
+	////////////////////////////////////////////////////////////////////
+
+	class PhysicsSystem
+	{
+	public:
+
+		virtual ~PhysicsSystem() {}
+
+		virtual void			Startup() = 0;
+
+		virtual void			Update( float DT ) = 0;
+
+		virtual void			Shutdown() = 0;
+
+		//////////////////////////////////
+
+		virtual RigidBody*		CreateSphere( const Vector3f& position, const Quatf& orientation, float radius, float mass ) = 0;
+
+		virtual RigidBody*		CreateBox( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, float mass ) = 0;
+
+		virtual RigidBody*		CreateCylinder( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, float mass ) = 0;
+
+		virtual RigidBody*		CreateMesh( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, Mesh* mesh, float mass ) = 0;
+
+		//////////////////////////////////
+
+		virtual void			AddRigidBody( RigidBody* body ) = 0;
+
+		virtual void			RemoveRigidBody( RigidBody* body ) = 0;
+	};
+
+	extern SENTINEL_DLL PhysicsSystem* BuildPhysicsSystemBT();
+	extern SENTINEL_DLL PhysicsSystem* BuildPhysicsSystemSE();
 }

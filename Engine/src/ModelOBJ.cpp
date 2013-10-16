@@ -10,6 +10,8 @@
 #include "TextureManager.h"
 #include "ShaderManager.h"
 #include "MeshManager.h"
+#include "AssetArchive.h"
+#include "Archive.h"
 
 namespace Sentinel
 {
@@ -38,7 +40,10 @@ namespace Sentinel
 			Release();
 		}
 
-		void Save( Archive& archive )
+		void Save( Archive&			archive,
+				   Renderer*		renderer, 
+				   ShaderManager*	shaderManager, 
+				   TextureManager*	textureManager )
 		{
 			// Save the format type.
 			//
@@ -50,10 +55,13 @@ namespace Sentinel
 			archive.Write( &mNumMeshes );
 
 			for( UINT x = 0; x < mNumMeshes; ++x )
-				MeshManager::SaveMesh( archive, mMesh[ x ] );
+				AssetArchive::SaveMesh( archive, mMesh[ x ], renderer, shaderManager, textureManager );
 		}
 
-		void Create( Archive& archive )
+		void Create( Archive&			archive,
+					 Renderer*			renderer, 
+					 ShaderManager*		shaderManager, 
+					 TextureManager*	textureManager )
 		{
 			// Load each mesh.
 			//
@@ -62,10 +70,13 @@ namespace Sentinel
 			mMesh = new Mesh*[ mNumMeshes ];
 
 			for( UINT x = 0; x < mNumMeshes; ++x )
-				MeshManager::LoadMesh( archive, mMesh[ x ] );
+				mMesh[ x ] = AssetArchive::LoadMesh( archive, renderer, shaderManager, textureManager );
 		}
 
-		bool Create( const char* filename )
+		bool Create( const char*		filename, 
+					 Renderer*			renderer, 
+					 ShaderManager*		shaderManager, 
+					 TextureManager*	textureManager )
 		{
 			// Model data.
 			// OBJ files start with the first index as 1,
@@ -87,7 +98,7 @@ namespace Sentinel
 			builder.insert( MeshBuilderPair( defaultMaterial, new MeshBuilder() ));
 
 			MeshBuilder* meshBuilder = builder.begin()->second;
-			meshBuilder->mShader = ShaderManager::Inst()->Get( "Color" );
+			meshBuilder->mShader = shaderManager->Get( "Color" );
 
 			// Read the file.
 			//
@@ -181,7 +192,7 @@ namespace Sentinel
 									builder.insert( MeshBuilderPair( mtlName, new MeshBuilder() ));
 
 									MeshBuilder* meshBuilder = builder[ mtlName ];
-									meshBuilder->mShader = ShaderManager::Inst()->Get( "Color" );
+									meshBuilder->mShader = shaderManager->Get( "Color" );
 								}
 								// Load a texture.
 								//
@@ -194,9 +205,9 @@ namespace Sentinel
 									{
 										mtlParsehelper >> mtlToken;
 										MeshBuilder* meshBuilder = mtl_iter->second;
-										meshBuilder->mShader = ShaderManager::Inst()->Get( "Texture" );
+										meshBuilder->mShader = shaderManager->Get( "Texture" );
 
-										meshBuilder->mTexture[ TEXTURE_DIFFUSE ] = TextureManager::Inst()->Add( mtlToken, Renderer::Inst()->CreateTextureFromFile( mtlToken.c_str() ));
+										meshBuilder->mTexture[ TEXTURE_DIFFUSE ] = textureManager->Add( mtlToken, renderer->CreateTextureFromFile( mtlToken.c_str() ));
 									}
 								}
 							}
@@ -315,7 +326,7 @@ namespace Sentinel
 				{
 					if( it->second->mVertex.size() > 0 )
 					{
-						mMesh[ i ] = it->second->BuildMesh();
+						mMesh[ i ] = it->second->BuildMesh( renderer );
 						++i;
 					}
 
@@ -363,9 +374,7 @@ namespace Sentinel
 		void SetShader( Shader* shader )
 		{
 			for( UINT x = 0; x < mNumMeshes; ++x )
-			{
 				mMesh[ x ]->mShader = shader;
-			}
 		}
 		*/
 		// OBJ files do not support animation.
@@ -381,39 +390,45 @@ namespace Sentinel
 			return 0;
 		}
 
-		void Update()
+		void Update( float DT )
 		{
 			// unsupported
 		}
 
 		// Render the model.
 		//
-		void Draw()
+		void Draw( Renderer* renderer, GameWorld* world )
 		{
 			for( UINT x = 0; x < mNumMeshes; ++x )
 			{
 				mMesh[ x ]->mMatrixWorld = mMatrixWorld;
-				mMesh[ x ]->Draw();
+				mMesh[ x ]->Draw( renderer, world );
 			}
 		}
 	};
 
 	// Create an OBJ Model.
 	//
-	Model* LoadModelOBJFromFile( const char* filename )
+	Model* LoadModelOBJFromFile( const char*		filename, 
+								 Renderer*			renderer, 
+								 ShaderManager*		shaderManager, 
+								 TextureManager*	textureManager )
 	{
 		ModelOBJ* model = new ModelOBJ();
 
-		model->Create( filename );
+		model->Create( filename, renderer, shaderManager, textureManager );
 
 		return model;
 	}
 
-	Model* LoadModelOBJFromArchive( Archive& archive )
+	Model* LoadModelOBJFromArchive( Archive&			archive,
+									Renderer*			renderer, 
+									ShaderManager*		shaderManager, 
+									TextureManager*		textureManager )
 	{
 		ModelOBJ* model = new ModelOBJ();
 
-		model->Create( archive );
+		model->Create( archive, renderer, shaderManager, textureManager );
 
 		return model;
 	}

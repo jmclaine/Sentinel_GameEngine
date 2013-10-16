@@ -1,11 +1,19 @@
 #include "ModelComponent.h"
+#include "Model.h"
+#include "ModelManager.h"
+#include "TransformComponent.h"
+#include "Material.h"
+#include "GameObject.h"
+#include "GameWorld.h"
+#include "Archive.h"
 
 namespace Sentinel
 {
 	DEFINE_SERIAL_REGISTER( ModelComponent );
 	DEFINE_SERIAL_CLONE( ModelComponent );
 
-	ModelComponent::ModelComponent()
+	ModelComponent::ModelComponent() :
+		mModel( NULL )
 	{}
 
 	ModelComponent::ModelComponent( std::shared_ptr< Model > model )
@@ -35,7 +43,8 @@ namespace Sentinel
 
 			mModel->mMatrixWorld = mTransform->GetMatrixWorld();
 
-			mModel->Draw();
+			GameWorld* world = mOwner->World();
+			mModel->Draw( world->mRenderer, world );
 		}
 	}
 
@@ -78,13 +87,42 @@ namespace Sentinel
 
 	void ModelComponent::Save( Archive& archive )
 	{
+		_ASSERT( mOwner );
+		_ASSERT( mOwner->World() );
+		_ASSERT( mOwner->World()->mModelManager );
+
 		mSerialRegistry.Save( archive );
 
 		GameComponent::Save( archive );
+
+		archive.Write( &mOwner->World()->mModelManager->Get( mModel ));
+
+		UINT count = (UINT)mMaterial.size();
+		archive.Write( &count );
+
+		for( UINT x = 0; x < count; ++x )
+			archive.Write( mMaterial[ x ].Ptr(), ar_sizeof( mMaterial[ x ] ));
 	}
 
 	void ModelComponent::Load( Archive& archive )
 	{
+		_ASSERT( mOwner );
+		_ASSERT( mOwner->World() );
+		_ASSERT( mOwner->World()->mModelManager );
+
 		GameComponent::Load( archive );
+
+		std::string name;
+		archive.Read( &name );
+
+		mModel = mOwner->World()->mModelManager->Get( name );
+
+		UINT count;
+		archive.Read( &count );
+
+		mMaterial.resize( count );
+
+		for( UINT x = 0; x < count; ++x )
+			archive.Read( mMaterial[ x ].Ptr(), ar_sizeof( mMaterial[ x ] ));
 	}
 }

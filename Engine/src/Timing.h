@@ -9,14 +9,11 @@
 #endif
 
 #include "Common.h"
-#include "Singleton.h"
 
 namespace Sentinel
 {
-	class SENTINEL_DLL Timing : public SingletonThreaded< Timing >
+	class SENTINEL_DLL Timing
 	{
-		friend class SingletonThreaded< Timing >;
-
 	public:
 
 		static const double DESIRED_FRAME_RATE;
@@ -33,18 +30,18 @@ namespace Sentinel
 
 		float			mDeltaTime;
 
-		///////////////////////////////////
-
-		Timing();
-
 	public:
 		
-		double	QueryCounter();
+		Timing();
+		
+		///////////////////////////////////
 
-		void	Update();
+		double			QueryCounter();
 
-		void	Limit( double frameRate = DESIRED_FRAME_RATE );
+		void			Update();
 
-		float	DeltaTime();
+		void			Limit( double frameRate = DESIRED_FRAME_RATE );
+
+		float			DeltaTime();
 	};
 }

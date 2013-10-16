@@ -1,7 +1,7 @@
 #include "WPhysicsComponent.h"
-#include "PhysicsComponent.cpp"
+#include "WPhysicsSystem.h"
 
-namespace Sentinel { namespace Components
+namespace Sentinel { namespace Wrapped
 {
 	WPhysicsComponent::WPhysicsComponent()
 	{
@@ -15,28 +15,13 @@ namespace Sentinel { namespace Components
 
 	DEFINE_CAST_COMPONENT( PhysicsComponent );
 	
-	Sentinel::Components::PhysicsShapeType WPhysicsComponent::ShapeType::get()
+	WRigidBody^ WPhysicsComponent::GetRigidBody()
 	{
-		return (Sentinel::Components::PhysicsShapeType)static_cast< PhysicsComponent* >(mRef)->mShapeType;
+		return gcnew WRigidBody( static_cast< PhysicsComponent* >(mRef)->GetRigidBody() );
 	}
 
-	void WPhysicsComponent::ShapeType::set( Sentinel::Components::PhysicsShapeType v )
+	void WPhysicsComponent::SetRigidBody( WRigidBody^ body )
 	{
-		static_cast< PhysicsComponent* >(mRef)->mShapeType = (Sentinel::PhysicsComponent::ShapeType)v;
+		static_cast< PhysicsComponent* >(mRef)->SetRigidBody( body->GetRef() );
 	}
-
-	DEFINE_PROPERTY_MS( PhysicsComponent, float,		Mass );
-
-	DEFINE_PROPERTY_RS( PhysicsComponent, Vector3f,		ShapePosition );
-	DEFINE_PROPERTY_RS( PhysicsComponent, Quatf,		ShapeOrientation );
-	DEFINE_PROPERTY_RS( PhysicsComponent, Vector3f,		ShapeScale );
-
-	DEFINE_PROPERTY_MS( PhysicsComponent, int,			Flags );
-	DEFINE_PROPERTY_MS( PhysicsComponent, float,		LinearDamping );
-	DEFINE_PROPERTY_MS( PhysicsComponent, float,		AngularDamping );
-	DEFINE_PROPERTY_MS( PhysicsComponent, float,		Restitution );
-	DEFINE_PROPERTY_MS( PhysicsComponent, float,		Friction );
-
-	DEFINE_PROPERTY_RS( PhysicsComponent, Vector3f,		AngularFactor );
-	DEFINE_PROPERTY_RS( PhysicsComponent, Vector3f,		Gravity );
 }}

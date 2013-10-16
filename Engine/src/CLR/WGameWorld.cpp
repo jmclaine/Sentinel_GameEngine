@@ -1,118 +1,130 @@
 #include "WGameWorld.h"
 #include "WString.h"
+#include "WRenderer.h"
+#include "WPhysicsSystem.h"
+#include "WTiming.h"
+#include "WTextureManager.h"
+#include "WShaderManager.h"
+#include "WMeshManager.h"
+#include "WModelManager.h"
+#include "WArchive.h"
+#include "WGameObject.h"
+#include "WCameraComponent.h"
+#include "WLightComponent.h"
 
-#include <msclr\marshal_cppstd.h>
-
-using namespace System::Runtime::InteropServices;
-
-using namespace Sentinel::Utilities;
-
-namespace Sentinel { namespace Components
+namespace Sentinel { namespace Wrapped
 {
-	void WGameWorld::Create()
+	DEFINE_REF_PTR( GameWorld );
+
+	WGameWorld::WGameWorld()
 	{
-		GameWorld::Inst( GameWorld::Create() );
+		mRef = new GameWorld();
 	}
 
 	void WGameWorld::Release()
 	{
-		GameWorld::Inst()->Release();
+		delete mRef;
 	}
 
+	DEFINE_OP_PTR( GameWorld );
+
+	DEFINE_PROPERTY_PS_EX( GameWorld, Renderer,			XRenderer,			Renderer );
+	DEFINE_PROPERTY_PS_EX( GameWorld, PhysicsSystem,	XPhysicsSystem,		PhysicsSystem );
+	DEFINE_PROPERTY_PS_EX( GameWorld, Timing,			XTiming,			Timing );
+	DEFINE_PROPERTY_PS_EX( GameWorld, TextureManager,	XTextureManager,	TextureManager );
+	DEFINE_PROPERTY_PS_EX( GameWorld, ShaderManager,	XShaderManager,		ShaderManager );
+	DEFINE_PROPERTY_PS_EX( GameWorld, MeshManager,		XMeshManager,		MeshManager );
+	DEFINE_PROPERTY_PS_EX( GameWorld, ModelManager,		XModelManager,		ModelManager );
+	
 	void WGameWorld::Save( WArchive^ archive )
 	{
-		GameWorld::Inst()->Save( *archive->GetRef() );
+		mRef->Save( *archive->GetRef() );
 	}
 
 	void WGameWorld::Load( WArchive^ archive )
 	{
-		GameWorld::Inst()->Load( *archive->GetRef() );
+		mRef->Load( *archive->GetRef() );
 	}
 
 	void WGameWorld::Startup()
 	{
-		GameWorld::Inst()->Startup();
-	}
-
-	void WGameWorld::Update()
-	{
-		GameWorld::Inst()->Update();
+		mRef->Startup();
 	}
 
 	void WGameWorld::UpdateController()
 	{
-		GameWorld::Inst()->UpdateController();
+		mRef->UpdateController();
 	}
 
 	void WGameWorld::UpdatePhysics()
 	{
-		GameWorld::Inst()->UpdatePhysics();
+		mRef->UpdatePhysics();
 	}
 
 	void WGameWorld::UpdateTransform()
 	{
-		GameWorld::Inst()->UpdateTransform();
+		mRef->UpdateTransform();
 	}
 
 	void WGameWorld::UpdateComponents()
 	{
-		GameWorld::Inst()->UpdateComponents();
+		mRef->UpdateComponents();
 	}
 
 	void WGameWorld::UpdateDrawable()
 	{
-		GameWorld::Inst()->UpdateDrawable();
+		mRef->UpdateDrawable();
 	}
 
 	void WGameWorld::Shutdown()
 	{
-		GameWorld::Inst()->Shutdown();
+		mRef->Shutdown();
 	}
 
 	//////////////////////////////
 
 	WGameObject^ WGameWorld::AddGameObject( WGameObject^ entity )
 	{
-		GameWorld::Inst()->AddGameObject( entity->GetRef() );
+		mRef->AddGameObject( entity->GetRef() );
 		return entity;
 	}
 
 	WGameObject^ WGameWorld::AddGameObject( WGameObject^ entity, System::String^ name )
 	{
-		GameWorld::Inst()->AddGameObject( entity->GetRef(), WString::Alloc( name ));
+		mRef->AddGameObject( entity->GetRef(), WString::Alloc( name ));
 		return entity;
 	}
 
 	WGameObject^ WGameWorld::RemoveGameObject( WGameObject^ entity )
 	{
-		GameWorld::Inst()->RemoveGameObject( entity->GetRef() );
+		mRef->RemoveGameObject( entity->GetRef() );
 		return entity;
 	}
 
 	WGameObject^ WGameWorld::GetGameObject( UINT index )
 	{
-		return gcnew WGameObject( GameWorld::Inst()->GetGameObject( index ));
+		return gcnew WGameObject( mRef->GetGameObject( index ));
 	}
 
 	UINT WGameWorld::NumGameObjects()
 	{
-		return GameWorld::Inst()->NumGameObjects();
+		return mRef->NumGameObjects();
 	}
 
 	//////////////////////////////
 
 	void WGameWorld::SetCamera( WCameraComponent^ camera )
 	{
-		GameWorld::Inst()->SetCamera( (CameraComponent*)camera->GetRef() );
+		mRef->SetCamera( (CameraComponent*)camera->GetRef() );
 	}
 
 	WCameraComponent^ WGameWorld::GetCamera( int index )
 	{
-		return gcnew WCameraComponent( GameWorld::Inst()->GetCamera( index ));
+		return gcnew WCameraComponent( mRef->GetCamera( index ));
 	}
 
 	WLightComponent^ WGameWorld::GetLight( UINT index )
 	{
-		return gcnew WLightComponent( GameWorld::Inst()->GetLight( index ));
+		return gcnew WLightComponent( mRef->GetLight( index ));
 	}
 }}

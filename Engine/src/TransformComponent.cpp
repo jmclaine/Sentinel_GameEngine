@@ -1,5 +1,6 @@
 #include "TransformComponent.h"
 #include "GameObject.h"
+#include "Archive.h"
 
 namespace Sentinel
 {
@@ -10,19 +11,17 @@ namespace Sentinel
 	DEFINE_SERIAL_REGISTER( TransformComponent );
 	DEFINE_SERIAL_CLONE( TransformComponent );
 
-	TransformComponent::TransformComponent()
+	TransformComponent::TransformComponent() :
+		mParentTransform( NULL ),
+		mScale( Vector3f( 1, 1, 1 ))
 	{
 		mType = GameComponent::TRANSFORM;
-
-		Shutdown();
-
-		mScale = Vector3f( 1, 1, 1 );
 	}
 
 	void TransformComponent::Startup()
 	{
-		if( mOwner->mParent )
-			mParentTransform = static_cast< TransformComponent* >(mOwner->mParent->FindComponent( GameComponent::TRANSFORM ));
+		if( mOwner->Parent() )
+			mParentTransform = static_cast< TransformComponent* >(mOwner->Parent()->FindComponent( GameComponent::TRANSFORM ));
 		else
 			mParentTransform = NULL;
 	}

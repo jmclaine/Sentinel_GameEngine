@@ -4,22 +4,21 @@ Mesh is fully customizable.
 
 Mesh creation helpers are in MeshBuilder.h or Model.h
 */
+#include <memory>
+
 #include "Common.h"
-#include "Renderer.h"
-#include "Material.h"
+#include "RendererTypes.h"
 #include "Matrix4f.h"
 #include "Vector4f.h"
+#include "Material.h"
 
 namespace Sentinel
 {
-	enum TextureType
-	{
-		TEXTURE_DIFFUSE,
-		TEXTURE_NORMAL,
-		TEXTURE_DEPTH,
-
-		NUM_TEXTURES,
-	};
+	class Renderer;
+	class GameWorld;
+	class Buffer;
+	class Shader;
+	class Texture;
 
 	class SENTINEL_DLL Mesh
 	{
@@ -46,6 +45,6 @@ namespace Sentinel
 		Mesh();
 		~Mesh();
 
-		void Draw( UINT count = UINT_MAX );
+		void Draw( Renderer* renderer, GameWorld* world, UINT count = UINT_MAX );
 	};
 }

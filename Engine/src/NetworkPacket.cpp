@@ -1,9 +1,8 @@
 #include "NetworkPacket.h"
+#include "NetworkSocket.h"
 
 namespace Sentinel
 {
-	/////////////////////////////////////////////////////////////////////
-
 	NetworkPacket::GuaranteedMessage::GuaranteedMessage( UINT size ) :
 		mSize( size ),
 		mData( new char[ size ] )
@@ -43,7 +42,8 @@ namespace Sentinel
 
 	/////////////////////////////////////////////////////////////////////
 
-	NetworkPacket::NetworkPacket()
+	NetworkPacket::NetworkPacket( NetworkSocket* networkSocket ) :
+		mSocket( networkSocket )
 	{
 		Startup( PACKET_SIZE );
 		Clear( PACKET_SIZE );
@@ -63,7 +63,7 @@ namespace Sentinel
 		mACK = 0;
 	}
 
-	void NetworkPacket::Update()
+	void NetworkPacket::Update( float DT )
 	{
 		TRAVERSE_LIST( it0, mGuaranteedSenderMap )
 		{
@@ -72,8 +72,8 @@ namespace Sentinel
 
 			TRAVERSE_LIST( it1, it0->second )
 			{
-				(*it1)->mResendTimer += Timing::Inst()->DeltaTime();
-				(*it1)->mTotalTime   += Timing::Inst()->DeltaTime();
+				(*it1)->mResendTimer += DT;
+				(*it1)->mTotalTime   += DT;
 
 				if( (*it1)->mResendTimer > resend )
 				{
@@ -86,7 +86,7 @@ namespace Sentinel
 					GuaranteedHeader* gHeader = (GuaranteedHeader*)data;
 					gHeader->mAdvanceTimer = (*it1)->mTotalTime;
 
-					NetworkSocket::Inst()->Send( msg->mData, msg->mSize, it0->first->mID );
+					mSocket->Send( msg->mData, msg->mSize, it0->first->mID );
 				}
 			}
 		}
@@ -113,14 +113,15 @@ namespace Sentinel
 
 	///////////////////////////////////////////////////
 
-	NetworkPacketSender::NetworkPacketSender()
+	NetworkPacketSender::NetworkPacketSender( NetworkSocket* networkSocket ) :
+		NetworkPacket( networkSocket )
 	{}
 
 	void NetworkPacketSender::AddHeader( UCHAR header, float advTimer )
 	{
 		mStart = mPosition;
 
-		AddValue( NetworkPacket::Header( header, NetworkSocket::Inst()->mConnection[ 0 ]->mID, (WORD)0 ));
+		AddValue( NetworkPacket::Header( header, mSocket->mConnection[ 0 ]->mID, (WORD)0 ));
 
 		if( header & HEADER_GUARANTEED )
 		{
@@ -193,7 +194,7 @@ namespace Sentinel
 						if( index == -1 )
 						{
 							isValid = true;
-							TRAVERSE_LIST( it, NetworkSocket::Inst()->mConnection )
+							TRAVERSE_LIST( it, mSocket->mConnection )
 							{
 								++counter;
 								mGuaranteedSenderMap[ it->second ].push_back( new GuaranteedSender( mACK ));
@@ -201,8 +202,8 @@ namespace Sentinel
 						}
 						else
 						{
-							auto itConn = NetworkSocket::Inst()->mConnection.find( index );
-							if( itConn != NetworkSocket::Inst()->mConnection.end() )
+							auto itConn = mSocket->mConnection.find( index );
+							if( itConn != mSocket->mConnection.end() )
 							{
 								isValid = true;
 								++counter;
@@ -229,7 +230,7 @@ namespace Sentinel
 				}
 			}
 				
-			result = NetworkSocket::Inst()->Send( mData, (UINT)size, index );
+			result = mSocket->Send( mData, (UINT)size, index );
 		}
 
 		Clear( size );
@@ -239,7 +240,8 @@ namespace Sentinel
 
 	///////////////////////////////////////////////////
 
-	NetworkPacketReceiver::NetworkPacketReceiver()
+	NetworkPacketReceiver::NetworkPacketReceiver( NetworkSocket* networkSocket, NetworkPacketSender* sender ) :
+		NetworkPacket( networkSocket ), mSender( sender )
 	{}
 
 	const NetworkPacket::Header& NetworkPacketReceiver::GetHeader()
@@ -265,7 +267,7 @@ namespace Sentinel
 	{
 		Clear( mSize );
 
-		bool result = NetworkSocket::Inst()->Recv( mData, mSize );
+		bool result = mSocket->Recv( mData, mSize );
 
 		// Process the received packet.
 		//
@@ -287,7 +289,7 @@ namespace Sentinel
 					//
 					if( pHeader->mSenderID != 0 )
 					{
-						connection = NetworkSocket::Inst()->mConnection[ pHeader->mSenderID ];
+						connection = mSocket->mConnection[ pHeader->mSenderID ];
 						connection->mConnectionTimer = 0;
 					}
 					else
@@ -379,7 +381,7 @@ namespace Sentinel
 								//
 								REPORT_ERROR( "This should not have happened.", "NetworkSocket Failure" );
 
-								connection->mID = NetworkSocket::Inst()->mNextID++;
+								connection->mID = mSocket->mNextID++;
 								strcpy_s( connection->mUserName, name.c_str() );
 							
 								TRACE( connection->mUserName << " Logged In." );
@@ -387,14 +389,14 @@ namespace Sentinel
 						}
 						else
 						{
-							NetworkSocket::Connection* baseConnection = NetworkSocket::Inst()->mConnection[ 0 ];
-							connection = new NetworkSocket::Connection( NetworkSocket::Inst()->mNextID++ );
+							NetworkSocket::Connection* baseConnection = mSocket->mConnection[ 0 ];
+							connection = new NetworkSocket::Connection( mSocket->mNextID++ );
 
 							connection->mNetworkSocket   = baseConnection->mNetworkSocket;
-							connection->mReceiver = NetworkSocket::Inst()->mReceiverInfo;
+							connection->mReceiver = mSocket->mReceiverInfo;
 							strcpy_s( connection->mUserName, name.c_str() );
 
-							NetworkSocket::Inst()->mConnection[ connection->mID ] = connection;
+							mSocket->mConnection[ connection->mID ] = connection;
 
 							TRACE( connection->mUserName << " Logged In." );
 						}
@@ -413,10 +415,10 @@ namespace Sentinel
 
 							// Send the client its ID on the server.
 							//
-							NetworkPacketSender::Inst()->AddHeader( HEADER_SERVER | HEADER_GUARANTEED );
-							NetworkPacketSender::Inst()->AddValue( (UINT)pHeader->mSenderID );
-							NetworkPacketSender::Inst()->AddEnd();
-							NetworkPacketSender::Inst()->Send( pHeader->mSenderID );
+							mSender->AddHeader( HEADER_SERVER | HEADER_GUARANTEED );
+							mSender->AddValue( (UINT)pHeader->mSenderID );
+							mSender->AddEnd();
+							mSender->Send( pHeader->mSenderID );
 						}
 					}
 					// Setup the client.
@@ -424,7 +426,7 @@ namespace Sentinel
 					else
 					if( pHeader->mType & HEADER_SERVER )
 					{
-						connection = NetworkSocket::Inst()->mConnection[ 0 ];
+						connection = mSocket->mConnection[ 0 ];
 
 						TRACE( "Logged In --> " << connection->mUserName );
 
@@ -433,7 +435,7 @@ namespace Sentinel
 						if( connection->mID == 0 )
 						{
 							//connection->mNetworkSocket		= client;
-							connection->mReceiver	= NetworkSocket::Inst()->mReceiverInfo;
+							connection->mReceiver	= mSocket->mReceiverInfo;
 						
 							connection->mID			= *(UINT*)mPosition;
 						}
@@ -455,10 +457,10 @@ namespace Sentinel
 					{
 						//TRACE( "Sending ACK #" << gHeader->ack << " --> " << mCurrReceiver->userName );
 
-						NetworkPacketSender::Inst()->AddHeader( HEADER_ACK );
-						NetworkPacketSender::Inst()->AddValue( (UINT)gHeader->mACK );
-						NetworkPacketSender::Inst()->AddEnd();
-						NetworkPacketSender::Inst()->Send( pHeader->mSenderID );
+						mSender->AddHeader( HEADER_ACK );
+						mSender->AddValue( (UINT)gHeader->mACK );
+						mSender->AddEnd();
+						mSender->Send( pHeader->mSenderID );
 					}
 
 					mStart += pHeader->mSize;

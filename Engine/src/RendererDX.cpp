@@ -1,6 +1,3 @@
-#include "Renderer.h"
-#include "Archive.h"
-
 #include <d3d11.h>
 #include <d3dx11.h>
 #include <D3D11Shader.h>
@@ -24,6 +21,12 @@
 
 #include <vector>
 #include <crtdbg.h>
+
+#include "Renderer.h"
+#include "Archive.h"
+#include "Buffer.h"
+#include "Texture.h"
+#include "Shader.h"
 
 namespace Sentinel
 {

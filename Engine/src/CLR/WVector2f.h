@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Vector2f.h"
 #include "Property.h"
+#include "Vector2f.h"
 
-namespace Sentinel { namespace Math
+namespace Sentinel { namespace Wrapped
 {
 	public ref class WVector2f
 	{

@@ -5,8 +5,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "Common.h"
-#include "Archive.h"
 #include "Util.h"
 
 namespace Sentinel
@@ -88,9 +86,5 @@ namespace Sentinel
 				data.push_back( kv->second );
 			}
 		}
-
-		virtual void Save( Archive& archive ) = 0;
-
-		virtual void Load( Archive& archive ) = 0;
 	};
 }

@@ -3,7 +3,7 @@
 #include "PerspectiveCameraComponent.h"
 #include "WCameraComponent.h"
 
-namespace Sentinel { namespace Components
+namespace Sentinel { namespace Wrapped
 {
 	public ref class WPerspectiveCameraComponent : public WCameraComponent
 	{

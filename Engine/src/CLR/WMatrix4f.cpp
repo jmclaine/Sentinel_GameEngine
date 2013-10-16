@@ -1,6 +1,9 @@
 #include "WMatrix4f.h"
+#include "WVector3f.h"
+#include "WVector4f.h"
+#include "WQuatf.h"
 
-namespace Sentinel { namespace Math
+namespace Sentinel { namespace Wrapped
 {
 	DEFINE_REF( Matrix4f );
 

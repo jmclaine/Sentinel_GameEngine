@@ -1,14 +1,31 @@
 #pragma once
 
+#include "Property.h"
 #include "WAssetManager.h"
-#include "WModel.h"
+#include "ModelManager.h"
 
-namespace Sentinel { namespace Assets
+namespace Sentinel { namespace Wrapped
 {
+	ref class WArchive;
+	ref class WModel;
+	ref class WRenderer;
+	ref class WShaderManager;
+	ref class WTextureManager;
+
 	public ref class WModelManager
 	{
+		DECLARE_ASSET_MANAGER( Model );
+
 	public:
 
-		DECLARE_ASSET_MANAGER( Model );
+		void	Save( WArchive^			archive, 
+					  WRenderer^		renderer, 
+					  WShaderManager^	shaderManager, 
+					  WTextureManager^	textureManager );
+
+		void	Load( WArchive^			archive, 
+					  WRenderer^		renderer, 
+					  WShaderManager^	shaderManager, 
+					  WTextureManager^	textureManager );
 	};
 }}

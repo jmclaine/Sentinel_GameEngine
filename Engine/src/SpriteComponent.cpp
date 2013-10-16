@@ -1,36 +1,50 @@
 #include "SpriteComponent.h"
+#include "ParticleSystem.h"
 #include "Vector2f.h"
+#include "Matrix4f.h"
+#include "Material.h"
+#include "Texture.h"
+#include "GameObject.h"
+#include "Mesh.h"
+#include "TransformComponent.h"
 
 namespace Sentinel
 {
 	DEFINE_SERIAL_REGISTER( SpriteComponent );
 	DEFINE_SERIAL_CLONE( SpriteComponent );
 
-	SpriteComponent::SpriteComponent()
+	SpriteComponent::SpriteComponent() :
+		mParticle( NULL ), mTexture( NULL )
 	{}
 
-	SpriteComponent::SpriteComponent( std::shared_ptr< Texture >texture, const POINT& spriteSize )
+	SpriteComponent::SpriteComponent( ParticleSystem* particle, std::shared_ptr< Texture >texture, const POINT& spriteSize )
 	{
-		Set( texture, spriteSize );
+		Set( particle, texture, spriteSize );
 	}
 
-	void SpriteComponent::Set( std::shared_ptr< Texture > texture, const POINT& spriteSize )
+	void SpriteComponent::Set( ParticleSystem* particle, std::shared_ptr< Texture > texture, const POINT& spriteSize )
 	{
 		_ASSERT( mTexture );
 		_ASSERT( spriteSize.x > 0 && spriteSize.y > 0 );
 
-		mTexture		= texture;
-		mSpriteSize		= spriteSize;
+		mTexture			= texture;
+		mSpriteSize			= spriteSize;
 
-		mSpriteDimension.x = texture->Width()  / mSpriteSize.x;
-		mSpriteDimension.y = texture->Height() / mSpriteSize.y;
+		mSpriteDimension.x	= texture->Width()  / mSpriteSize.x;
+		mSpriteDimension.y	= texture->Height() / mSpriteSize.y;
 
-		mNumFrames = mSpriteDimension.x * mSpriteDimension.y;
+		mNumFrames			= mSpriteDimension.x * mSpriteDimension.y;
 	}
 
 	void SpriteComponent::Startup()
 	{
 		DrawableComponent::Startup();
+
+		if( !mTexture )
+			throw AppException( "SpriteComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain Texture" );
+
+		if( !mParticle )
+			throw AppException( "SpriteComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain ParticleSystem" );
 	}
 
 	void SpriteComponent::Update()
@@ -39,13 +53,13 @@ namespace Sentinel
 
 		if( mTransform )
 		{
-			ParticleSystem::Inst()->Begin( this );
+			mParticle->Begin( this );
 
-			UCHAR* verts = (UCHAR*)ParticleSystem::Inst()->mVertex;
+			UCHAR* verts = (UCHAR*)mParticle->mVertex;
 
 			if( mTexture )
 			{
-				ParticleSystem::Inst()->mMesh->mTexture[ TEXTURE_DIFFUSE ] = mTexture;
+				mParticle->mMesh->mTexture[ TEXTURE_DIFFUSE ] = mTexture;
 
 				*(Vector2f*)verts = Vector2f( (float)(mFrame % mSpriteDimension.x), \
 											  (float)(mFrame / mSpriteDimension.x) );
@@ -58,7 +72,7 @@ namespace Sentinel
 			*(Matrix4f*)verts = mTransform->GetMatrixWorld();
 			verts += sizeof( Matrix4f );
 
-			ParticleSystem::Inst()->End();
+			mParticle->End();
 		}
 	}
 
@@ -71,12 +85,12 @@ namespace Sentinel
 
 	void SpriteComponent::SetMaterial( const Material& material )
 	{
-		ParticleSystem::Inst()->mMesh->mMaterial = material;
+		mParticle->mMesh->mMaterial = material;
 	}
 
 	const Material& SpriteComponent::GetMaterial()
 	{
-		return ParticleSystem::Inst()->mMesh->mMaterial;
+		return mParticle->mMesh->mMaterial;
 	}
 
 	void SpriteComponent::SetColor( const ColorRGBA& color )

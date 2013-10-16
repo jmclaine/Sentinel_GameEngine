@@ -240,6 +240,12 @@
     <ClInclude Include="..\Engine\src\AudioSource.h">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\src\AssetArchive.h">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\RendererTypes.h">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\Shader.cpp">
@@ -352,9 +358,6 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\SpriteComponent.cpp">
       <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\PhysicsSystem.cpp">
-      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
     </ClCompile>
     <ClCompile Include="..\Sentinel_Test\Sentinel_Test\TriggerComponent.cpp">
       <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
@@ -471,6 +474,15 @@
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\AudioSource.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\PhysicsSystemBT.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\PhysicsSystemSE.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\AssetArchive.cpp">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClCompile>
   </ItemGroup>

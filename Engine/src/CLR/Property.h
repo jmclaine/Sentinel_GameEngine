@@ -11,6 +11,12 @@
 		void set( varType v );\
 	}
 
+#define DECLARE_PROPERTY_G( varType, varName )\
+	property varType varName\
+	{\
+		varType get();\
+	}
+
 #define DECLARE_PROPERTY_ARRAY( varType, varName, indexType )\
 	property varType varName[ indexType ]\
 	{\
@@ -30,30 +36,94 @@
 // P = pointer based
 // T = shared_ptr
 // C = casted class name required
+// G = get only
+// F = function setter and getter
+// N = static const
 //
 
 // Native varTypes, e.g. int, float, double
 //
 #define DEFINE_PROPERTY( refClass, varType, varName )\
-	void W##refClass::varName::set( varType v )\
-	{\
-		mRef->varName = v;\
-	}\
 	varType W##refClass::varName::get()\
 	{\
 		return mRef->varName;\
+	}\
+	void W##refClass::varName::set( varType v )\
+	{\
+		mRef->varName = v;\
+	}
+
+// Function getter and setters.
+//
+#define DEFINE_PROPERTY_F( refClass, varType, varName )\
+	W##varType^ W##refClass::varName::get()\
+	{\
+		return gcnew W##varType( mRef->Get##varName() );\
+	}\
+	void W##refClass::varName::set( W##varType^ v )\
+	{\
+		mRef->Set##varName( v );\
+	}
+
+#define DEFINE_PROPERTY_FE( refClass, varType, varName )\
+	Sentinel::Wrapped::varType W##refClass::varName::get()\
+	{\
+		return (Sentinel::Wrapped::varType)mRef->Get##varName();\
+	}\
+	void W##refClass::varName::set( Sentinel::Wrapped::varType v )\
+	{\
+		mRef->Set##varName( (Sentinel::varType)v );\
+	}
+
+#define DEFINE_PROPERTY_FM( refClass, varType, varName )\
+	varType W##refClass::varName::get()\
+	{\
+		return mRef->Get##varName();\
+	}\
+	void W##refClass::varName::set( varType v )\
+	{\
+		mRef->Set##varName( v );\
+	}
+
+#define DEFINE_PROPERTY_FG( refClass, varType, varName )\
+	W##varType^ W##refClass::varName::get()\
+	{\
+		return gcnew W##varType( mRef->Get##varName() );\
+	}
+
+#define DEFINE_PROPERTY_FMG( refClass, varType, varName )\
+	varType W##refClass::varName::get()\
+	{\
+		return mRef->Get##varName();\
+	}
+
+// Static const variables.
+//
+#define DEFINE_PROPERTY_N( refClass, varType, varName )\
+	varType W##refClass::varName::get()\
+	{\
+		return refClass::varName;\
 	}
 
 // Member variables with native varTypes.
 //
-#define DEFINE_PROPERTY_M( refClass, varType, varName )\
+#define DEFINE_PROPERTY_M_EX( refClass, varType, varName, nativeName )\
 	varType W##refClass::varName::get()\
 	{\
-		return mRef->m##varName;\
+		return mRef->m##nativeName;\
 	}\
 	void W##refClass::varName::set( varType v )\
 	{\
-		mRef->m##varName = v;\
+		mRef->m##nativeName = v;\
+	}
+
+#define DEFINE_PROPERTY_M( refClass, varType, varName )\
+	DEFINE_PROPERTY_M_EX( refClass, varType, varName, varName );
+
+#define DEFINE_PROPERTY_MG( refClass, varType, varName )\
+	varType W##refClass::varName::get()\
+	{\
+		return mRef->m##varName;\
 	}
 
 #define DEFINE_PROPERTY_MSC( refClass, castClass, varType, varName )\
@@ -81,28 +151,28 @@
 
 // Member variables with enum varTypes.
 //
-#define DEFINE_PROPERTY_E( refClass, _namespace, varType, varName )\
-	Sentinel::_namespace::varType W##refClass::varName::get()\
+#define DEFINE_PROPERTY_E( refClass, varType, varName )\
+	Sentinel::Wrapped::varType W##refClass::varName::get()\
 	{\
-		return (Sentinel::_namespace::varType)mRef->m##varName;\
+		return (Sentinel::Wrapped::varType)mRef->m##varName;\
 	}\
-	void W##refClass::varName::set( Sentinel::_namespace::varType v )\
+	void W##refClass::varName::set( Sentinel::Wrapped::varType v )\
 	{\
 		mRef->m##varName = (Sentinel::varType)v;\
 	}
 
-#define DEFINE_PROPERTY_ESC( refClass, castClass, _namespace, varType, varName )\
-	Sentinel::_namespace::varType W##refClass::varName::get()\
+#define DEFINE_PROPERTY_ESC( refClass, castClass, varType, varName )\
+	Sentinel::Wrapped::varType W##refClass::varName::get()\
 	{\
-		return (Sentinel::_namespace::varType)static_cast< castClass* >(mRef)->m##varName;\
+		return (Sentinel::Wrapped::varType)static_cast< castClass* >(mRef)->m##varName;\
 	}\
-	void W##refClass::varName::set( Sentinel::_namespace::varType v )\
+	void W##refClass::varName::set( Sentinel::Wrapped::varType v )\
 	{\
 		static_cast< castClass* >(mRef)->m##varName = (Sentinel::varType)v;\
 	}
 
-#define DEFINE_PROPERTY_ES( refClass, _namespace, varType, varName )\
-	DEFINE_PROPERTY_ESC( refClass, refClass, _namespace, varType, varName );
+#define DEFINE_PROPERTY_ES( refClass, varType, varName )\
+	DEFINE_PROPERTY_ESC( refClass, refClass, varType, varName );
 
 // Strings.
 //
@@ -118,14 +188,23 @@
 
 // Referenced variables.
 //
-#define DEFINE_PROPERTY_R( refClass, varType, varName )\
+#define DEFINE_PROPERTY_R_EX( refClass, varType, varName, nativeName )\
 	W##varType^ W##refClass::varName::get()\
 	{\
-		return gcnew R##varType( &mRef->m##varName );\
+		return gcnew R##varType( &mRef->m##nativeName );\
 	}\
 	void W##refClass::varName::set( W##varType^ v )\
 	{\
-		mRef->m##varName = *v->GetRef();\
+		mRef->m##nativeName = *v->GetRef();\
+	}
+
+#define DEFINE_PROPERTY_R( refClass, varType, varName )\
+	DEFINE_PROPERTY_R_EX( refClass, varType, varName, varName );
+
+#define DEFINE_PROPERTY_RG( refClass, varType, varName )\
+	W##varType^ W##refClass::varName::get()\
+	{\
+		return gcnew R##varType( &mRef->m##varName );\
 	}
 
 #define DEFINE_PROPERTY_RSC( refClass, castClass, varType, varName )\
@@ -163,16 +242,31 @@
 		mRef->m##varName = v->GetRef();\
 	}
 
-#define DEFINE_PROPERTY_PS( refClass, varType, varName )\
+#define DEFINE_PROPERTY_PFG( refClass, varType, funcName )\
+	W##varType^ W##refClass::funcName::get()\
+	{\
+		return (mRef->funcName()) ? gcnew W##varType( mRef->funcName() ) : nullptr;\
+	}
+
+#define DEFINE_PROPERTY_PSFG( refClass, varType, funcName )\
+	W##varType^ W##refClass::funcName::get()\
+	{\
+		return (static_cast< refClass* >(mRef)->funcName()) ? gcnew W##varType( static_cast< refClass* >(mRef)->funcName() ) : nullptr;\
+	}
+
+#define DEFINE_PROPERTY_PS_EX( refClass, varType, varName, nativeName )\
 	W##varType^ W##refClass::varName::get()\
 	{\
-		return (static_cast< refClass* >(mRef)->m##varName) ? gcnew W##varType( static_cast< refClass* >(mRef)->m##varName ) : nullptr;\
+		return (static_cast< refClass* >(mRef)->m##nativeName) ? gcnew W##varType( static_cast< refClass* >(mRef)->m##nativeName ) : nullptr;\
 	}\
 	void W##refClass::varName::set( W##varType^ v )\
 	{\
-		static_cast< refClass* >(mRef)->m##varName = v->GetRef();\
+		static_cast< refClass* >(mRef)->m##nativeName = v->GetRef();\
 	}
 
+#define DEFINE_PROPERTY_PS( refClass, varType, varName )\
+	DEFINE_PROPERTY_PS_EX( refClass, varType, varName, varName );
+	
 #define DEFINE_PROPERTY_PRS( refClass, varType, varName )\
 	W##varType^ W##refClass::varName::get()\
 	{\
@@ -226,7 +320,7 @@
 #define DEFINE_REF_EX_BASE( baseClass, wrapClass, refClass )\
 	baseClass::wrapClass::~wrapClass()			{ Release(); }\
 	baseClass::wrapClass::!wrapClass()			{ Release(); System::GC::SuppressFinalize( this ); }\
-	void baseClass::wrapClass::Release()			{ SAFE_DELETE( mRef ); }\
+	void baseClass::wrapClass::Release()		{ SAFE_DELETE( mRef ); }\
 	DEFINE_REF_PTR_EX( baseClass::wrapClass, refClass );
 
 #define DECLARE_REF( refClass )\
@@ -256,10 +350,10 @@
 // Create conversion operator for ease of use.
 //
 #define DECLARE_OP_DEREF( refClass )\
-	operator const refClass& ();
+	operator refClass& ();
 
 #define DEFINE_OP_DEREF_EX( wrapClass, refClass )\
-	wrapClass::operator const refClass& () { return *mRef; }
+	wrapClass::operator refClass& () { return *mRef; }
 
 #define DEFINE_OP_DEREF( refClass )\
 	DEFINE_OP_DEREF_EX( W##refClass, refClass );

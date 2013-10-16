@@ -6,10 +6,10 @@
 #include "WColorRGBA.h"
 #include "WVector4f.h"
 
-using namespace Sentinel::Math;
-using namespace Sentinel::Assets;
+using namespace Sentinel::Wrapped;
+using namespace Sentinel::Wrapped;
 
-namespace Sentinel { namespace Components
+namespace Sentinel { namespace Wrapped
 {
 	public ref class WLightComponent : public WGameComponent
 	{

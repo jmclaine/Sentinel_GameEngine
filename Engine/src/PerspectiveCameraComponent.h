@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CameraComponent.h"
+#include "Vector3f.h"
 
 namespace Sentinel
 {

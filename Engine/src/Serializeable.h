@@ -4,10 +4,10 @@
 #include <stdio.h>
 
 #include "Common.h"
-#include "Archive.h"
 
 namespace Sentinel
 {
+	class Archive;
 
 #define DECLARE_SERIAL()\
 		static SerialRegister mSerialRegistry;\
@@ -64,7 +64,7 @@ namespace Sentinel
 	};
 
 	// Stores the Serializable->Clone() function of each object.
-	// Singleton instantiation.
+	// Singleton lazy instantiation.
 	//
 	class SENTINEL_DLL SerialFactory
 	{
@@ -86,7 +86,7 @@ namespace Sentinel
 
 		~SerialFactory();
 
-		static SerialFactory* Inst();	// ptr for consistency
+		static SerialFactory& Get();
 		
 		///////////////////////////
 

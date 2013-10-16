@@ -1,9 +1,14 @@
 #include "WModel.h"
+#include "WShader.h"
+#include "WMatrix4f.h"
+#include "WMaterial.h"
 #include "WString.h"
+#include "WRenderer.h"
+#include "WShaderManager.h"
+#include "WTextureManager.h"
+#include "WGameWorld.h"
 
-using namespace Sentinel::Utilities;
-
-namespace Sentinel { namespace Assets
+namespace Sentinel { namespace Wrapped
 {
 	DEFINE_REF_SHARED( Model );
 
@@ -15,9 +20,12 @@ namespace Sentinel { namespace Assets
 
 	////////////////////////////////
 
-	WModel^ WModel::Load( System::String^ filename )
+	WModel^ WModel::Load( System::String^	filename,
+						  WRenderer^		renderer, 
+						  WShaderManager^	shaderManager, 
+						  WTextureManager^	textureManager )
 	{
-		return gcnew WModel( std::shared_ptr< Model >( Model::Load( msclr::interop::marshal_as< std::string >(filename).c_str() )));
+		return gcnew WModel( std::shared_ptr< Model >( Model::Load( WString::Cast( filename ).c_str(), renderer, shaderManager, textureManager )));
 	}
 
 	void WModel::SetMaterials( WStdVector_Material^ material )
@@ -36,14 +44,14 @@ namespace Sentinel { namespace Assets
 	//float WModel::GetTime( UINT objIndex = 0 )
 	//{}
 
-	void WModel::Update()
+	void WModel::Update( float DT )
 	{
-		mRef->Update();
+		mRef->Update( DT );
 	}
 
-	void WModel::Draw()
+	void WModel::Draw( WRenderer^ renderer, WGameWorld^ world )
 	{
-		mRef->Draw();
+		mRef->Draw( renderer, world );
 	}
 
 	////////////////////////////////

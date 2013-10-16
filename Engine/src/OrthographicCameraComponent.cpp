@@ -1,4 +1,6 @@
 #include "OrthographicCameraComponent.h"
+#include "TransformComponent.h"
+#include "Archive.h"
 
 namespace Sentinel
 {

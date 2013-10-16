@@ -504,7 +504,7 @@ namespace Sentinel
 		return str.str();
 	}
 
-	void NetworkSocket::Update()
+	void NetworkSocket::Update( float DT )
 	{
 		// Check if a client has connected to the server.
 		//
@@ -530,7 +530,7 @@ namespace Sentinel
 
 			if( mCurrConnection->mStatus == STATUS_GOOD )
 			{
-				mCurrConnection->mConnectionTimer += Timing::Inst()->DeltaTime();
+				mCurrConnection->mConnectionTimer += DT;
 
 				if( mCurrConnection->mConnectionTimer > CONNECTION_TIMEOUT )
 				{

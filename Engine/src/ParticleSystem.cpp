@@ -1,6 +1,10 @@
 #include "ParticleSystem.h"
 #include "MeshBuilder.h"
 #include "SpriteComponent.h"
+#include "Mesh.h"
+#include "Shader.h"
+#include "Buffer.h"
+#include "Texture.h"
 
 namespace Sentinel
 {
@@ -31,7 +35,7 @@ namespace Sentinel
 
 		builder.mPrimitive = POINT_LIST;
 
-		mMesh = builder.BuildMesh();
+		//mMesh = builder.BuildMesh();
 	}
 
 	void ParticleSystem::Shutdown()
@@ -66,6 +70,6 @@ namespace Sentinel
 	{
 		mMesh->mVBO->Unlock();
 
-		mMesh->Draw( mCount );
+		//mMesh->Draw( mCount );
 	}
 }

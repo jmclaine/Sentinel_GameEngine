@@ -7,8 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-using Sentinel.Math;
-using Sentinel.Components;
+using Sentinel.Wrapped;
 
 namespace Sentinel_Editor
 {

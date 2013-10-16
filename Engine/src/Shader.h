@@ -1,13 +1,14 @@
 #pragma once
 
 #include "Common.h"
-#include "Texture.h"
 
 namespace Sentinel
 {
 	#define MAX_BONE_MATRICES		100
 	#define MAX_TEXTURES			4
 	#define MAX_LIGHTS				1
+
+	class Texture;
 
 	class SENTINEL_DLL Shader
 	{

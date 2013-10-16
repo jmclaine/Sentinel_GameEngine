@@ -5,14 +5,14 @@ using System.Text;
 using System.Windows;
 using System.Windows.Input;
 
-using Sentinel.Systems;
-using Sentinel.Components;
-using Sentinel.Math;
+using Sentinel.Wrapped;
 
 namespace Sentinel_Editor
 {
 	public class GameWindow : WGameWindow
 	{
+		private WGameWorld						mGameWorld;
+
 		private WGameObject						mObject;
 		private WPerspectiveCameraComponent		mCamera;
 		private WTransformComponent				mTransform;
@@ -29,17 +29,19 @@ namespace Sentinel_Editor
 		
 		///////////////////////////////
 
-		public GameWindow()
+		public GameWindow( WGameWorld world )
 		{
 			mIsMoving			= false;
 			mMovementDirection	= 0.0f;
 			mMovementSpeed		= 0.1f;
 			mAngularSpeed		= 1.0f;
+
+			mGameWorld			= world;
 		}
 
-		public override void Startup( String title, String windowClass, WWindowInfo info )
+		public override void Startup( WRenderer renderer, String title, String windowClass, WWindowInfo info )
 		{
-			base.Startup( title, windowClass, info );
+			base.Startup( renderer, title, windowClass, info );
 
 			// Create default viewing camera.
 			//
@@ -86,8 +88,8 @@ namespace Sentinel_Editor
 
 			mCamera.Update();
 
-			WGameWorld.UpdateTransform();
-			WGameWorld.UpdateDrawable();
+			mGameWorld.UpdateTransform();
+			mGameWorld.UpdateDrawable();
 		}
 
 		public override void Shutdown()
@@ -100,7 +102,7 @@ namespace Sentinel_Editor
 
 		public void SetCamera()
 		{
-			WGameWorld.SetCamera( mCamera );
+			mGameWorld.SetCamera( mCamera );
 		}
 
 		public WCameraComponent GetCamera()

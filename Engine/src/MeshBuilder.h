@@ -12,12 +12,21 @@ into another buffer of the shader specifications.
 #include <vector>
 
 #include "Common.h"
-#include "Mesh.h"
+#include "RendererTypes.h"
 #include "Vector2f.h"
 #include "Vector3f.h"
+#include "Vector4f.h"
+#include "Matrix4f.h"
+#include "ColorRGBA.h"
 
 namespace Sentinel
 {
+	class Mesh;
+	class Buffer;
+	class Texture;
+	class Shader;
+	class Renderer;
+
 	class SENTINEL_DLL MeshBuilder
 	{
 		friend class Mesh;
@@ -121,13 +130,13 @@ namespace Sentinel
 
 	private:
 
-		void	CreateBuffers();
+		void	CreateBuffers( Renderer* renderer );
 
 	public:
 
 		// Returns the mesh created from the buffers.
 		// Ensure mShader is set before calling this.
 		//
-		Mesh*	BuildMesh();
+		Mesh*	BuildMesh( Renderer* renderer );
 	};
 }

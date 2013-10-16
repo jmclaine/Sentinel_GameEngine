@@ -1,10 +1,11 @@
 #pragma once
 
+#include "Property.h"
 #include "Material.h"
 #include "WColorRGBA.h"
 #include "WStdVector.h"
 
-namespace Sentinel { namespace Assets
+namespace Sentinel { namespace Wrapped
 {
 	public ref class WMaterial
 	{

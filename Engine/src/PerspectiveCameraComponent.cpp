@@ -1,12 +1,17 @@
 #include "PerspectiveCameraComponent.h"
+#include "TransformComponent.h"
+#include "Archive.h"
 
 namespace Sentinel
 {
 	DEFINE_SERIAL_REGISTER( PerspectiveCameraComponent );
 	DEFINE_SERIAL_CLONE( PerspectiveCameraComponent );
 
-	PerspectiveCameraComponent::PerspectiveCameraComponent()
-	{}
+	PerspectiveCameraComponent::PerspectiveCameraComponent() :
+		mNearZ( 0.1f ), mFarZ( 10000.0f ), mFOV( 45.0f )
+	{
+		Set( 1920.0f, 1080.0f, mNearZ, mFarZ, mFOV );
+	}
 
 	PerspectiveCameraComponent::PerspectiveCameraComponent( float windowWidth, float windowHeight, float nearZ, float farZ, float FOV ) :
 		mNearZ( nearZ ), mFarZ( farZ ), mFOV( FOV )

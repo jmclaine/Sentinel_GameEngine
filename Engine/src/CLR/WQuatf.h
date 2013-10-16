@@ -1,11 +1,12 @@
 #pragma once
 
-#include "Quatf.h"
 #include "Property.h"
-#include "WVector3f.h"
+#include "Quatf.h"
 
-namespace Sentinel { namespace Math
+namespace Sentinel { namespace Wrapped
 {
+	ref class WVector3f;
+
 	public ref class WQuatf
 	{
 		DECLARE_REF( Quatf );

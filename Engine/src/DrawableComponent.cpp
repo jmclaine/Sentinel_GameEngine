@@ -3,11 +3,10 @@
 
 namespace Sentinel
 {
-	DrawableComponent::DrawableComponent()
+	DrawableComponent::DrawableComponent() :
+		mTransform( NULL )
 	{
 		mType = GameComponent::DRAWABLE;
-
-		Shutdown();
 	}
 
 	void DrawableComponent::Startup()

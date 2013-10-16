@@ -4,9 +4,9 @@
 #include "WDrawableComponent.h"
 #include "WModel.h"
 
-using namespace Sentinel::Assets;
+using namespace Sentinel::Wrapped;
 
-namespace Sentinel { namespace Components
+namespace Sentinel { namespace Wrapped
 {
 	public ref class WModelComponent : public WDrawableComponent
 	{

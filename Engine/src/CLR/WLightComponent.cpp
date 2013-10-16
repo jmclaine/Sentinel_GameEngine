@@ -1,6 +1,6 @@
 #include "WLightComponent.h"
 
-namespace Sentinel { namespace Components
+namespace Sentinel { namespace Wrapped
 {
 	WLightComponent::WLightComponent()
 	{

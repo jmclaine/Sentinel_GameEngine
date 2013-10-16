@@ -10,6 +10,7 @@
 namespace Sentinel
 {
 	class GameObject;
+	class Archive;
 
 	class SENTINEL_DLL GameComponent : public Serializeable
 	{

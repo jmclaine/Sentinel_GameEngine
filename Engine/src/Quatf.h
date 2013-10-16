@@ -38,11 +38,15 @@ namespace Sentinel
 		Quatf		Normalize() const;
 		Quatf		NormalizeFast() const;
 
+		float		Dot( const Quatf& q ) const;
+
 		Quatf&		AxisAngle( float _x, float _y, float _z, float _degrees );
 		Quatf&		AxisAngle();
 
 		Quatf&		Euler( float _pitch, float _yaw, float _roll );
 		Quatf&		Euler();
 		Vector3f	ToEuler();
+
+		Quatf		Slerp( const Quatf& q, float t );
 	};
 }

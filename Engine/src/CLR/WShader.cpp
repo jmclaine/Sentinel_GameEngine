@@ -1,6 +1,6 @@
 #include "WShader.h"
 
-namespace Sentinel { namespace Assets
+namespace Sentinel { namespace Wrapped
 {
 	DEFINE_REF_SHARED( Shader );
 

@@ -1,22 +1,38 @@
 #include "WGameWindow.h"
+#include "WRenderer.h"
 #include "WInput.h"
-#include "CDPI.h"
 
-namespace Sentinel { namespace Systems
+namespace Sentinel { namespace Wrapped
 {
 	WGameWindow::WGameWindow()
 	{
 		mTitle		 = NULL;
 		mWindowClass = NULL;
+		mCDPI		 = new CDPI();
 	}
 
 	WGameWindow::~WGameWindow()
 	{
-		delete mTitle;
-		delete mWindowClass;
+		Release();
 	}
 
-	void WGameWindow::Startup( String^ title, String^ windowClass, WWindowInfo^ info )
+	WGameWindow::!WGameWindow()
+	{
+		Release();
+
+		System::GC::SuppressFinalize( this );
+	}
+
+	void WGameWindow::Release()
+	{
+		SAFE_DELETE( mTitle );
+		SAFE_DELETE( mWindowClass );
+		SAFE_DELETE( mCDPI );
+	}
+
+	/////////////////////////////////
+
+	void WGameWindow::Startup( WRenderer^ renderer, System::String^ title, System::String^ windowClass, WWindowInfo^ info )
 	{
 		_ASSERT( title->Length < MAX_TITLE_LENGTH && windowClass->Length < MAX_CLASS_LENGTH );
 
@@ -33,6 +49,8 @@ namespace Sentinel { namespace Systems
 			mWindowClass[ x ] = windowClass[ x ];
 
 		mWindowInfo = info;
+
+		mRenderer   = renderer;
 	}
 
 	void WGameWindow::Update()
@@ -42,7 +60,7 @@ namespace Sentinel { namespace Systems
 	{
 		SetActive();
 
-		Renderer::Inst()->Shutdown();
+		mRenderer->Shutdown();
 	}
 
 	///////////////////////////
@@ -94,12 +112,12 @@ namespace Sentinel { namespace Systems
 
 	void WGameWindow::SetActive()
 	{
-		WRenderer::SetWindow( mWindowInfo );
+		mRenderer->SetWindow( mWindowInfo );
 	}
 
 	bool WGameWindow::ShareResources( WGameWindow^ window )
 	{
-		return WRenderer::ShareResources( mWindowInfo, window->GetInfo() );
+		return mRenderer->ShareResources( mWindowInfo, window->GetInfo() );
 	}
 
 	WWindowInfo^ WGameWindow::GetInfo()
@@ -116,9 +134,9 @@ namespace Sentinel { namespace Systems
 
 #define RETURN_HANDLE( isHandled )\
 	handled = isHandled;\
-	return IntPtr::Zero;
+	return System::IntPtr::Zero;
 
-	IntPtr WGameWindow::WndProc( IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, bool% handled )
+	System::IntPtr WGameWindow::WndProc( System::IntPtr hWnd, int msg, System::IntPtr wParam, System::IntPtr lParam, bool% handled )
 	{
 		handled = WMouse::ProcessMessages( hWnd, msg, wParam, lParam );
 
@@ -145,39 +163,39 @@ namespace Sentinel { namespace Systems
 
 		// Button Down.
 		//
-		if( WMouse::DidGoDown( static_cast< Sentinel::Systems::MouseButton >(BUTTON_LEFT) ))
+		if( WMouse::DidGoDown( MouseButton::BUTTON_LEFT ))
 			OnLeftMouseDown();
 
-		if( WMouse::DidGoDown( static_cast< Sentinel::Systems::MouseButton >(BUTTON_RIGHT) ))
+		if( WMouse::DidGoDown( MouseButton::BUTTON_RIGHT ))
 			OnRightMouseDown();
 
-		if( WMouse::DidGoDown( static_cast< Sentinel::Systems::MouseButton >(BUTTON_MIDDLE) ))
+		if( WMouse::DidGoDown( MouseButton::BUTTON_MIDDLE ))
 			OnMiddleMouseDown();
 
 		// Button Up.
 		//
-		if( WMouse::DidGoUp( static_cast< Sentinel::Systems::MouseButton >(BUTTON_LEFT) ))
+		if( WMouse::DidGoUp( MouseButton::BUTTON_LEFT ))
 			OnLeftMouseUp();
 
-		if( WMouse::DidGoUp( static_cast< Sentinel::Systems::MouseButton >(BUTTON_RIGHT) ))
+		if( WMouse::DidGoUp( MouseButton::BUTTON_RIGHT ))
 			OnRightMouseUp();
 
-		if( WMouse::DidGoUp( static_cast< Sentinel::Systems::MouseButton >(BUTTON_MIDDLE) ))
+		if( WMouse::DidGoUp( MouseButton::BUTTON_MIDDLE ))
 			OnMiddleMouseUp();
 
 		// Button Double Click.
 		//
-		if( WMouse::DidDoubleClick( static_cast< Sentinel::Systems::MouseButton >(BUTTON_LEFT) ))
+		if( WMouse::DidDoubleClick( MouseButton::BUTTON_LEFT ))
 			OnLeftMouseDoubleClick();
 
-		if( WMouse::DidDoubleClick( static_cast< Sentinel::Systems::MouseButton >(BUTTON_RIGHT) ))
+		if( WMouse::DidDoubleClick( MouseButton::BUTTON_RIGHT ))
 			OnRightMouseDoubleClick();
 
-		if( WMouse::DidDoubleClick( static_cast< Sentinel::Systems::MouseButton >(BUTTON_MIDDLE) ))
+		if( WMouse::DidDoubleClick( MouseButton::BUTTON_MIDDLE ))
 			OnMiddleMouseDoubleClick();
 
 		if( handled )
-			return IntPtr::Zero;
+			return System::IntPtr::Zero;
 
 		RETURN_HANDLE( false );
 	}
@@ -198,8 +216,8 @@ namespace Sentinel { namespace Systems
 
 	void WGameWindow::OnRenderSizeChanged( SizeChangedInfo^ sizeInfo )
 	{
-		Renderer::Inst()->ResizeBuffers( CDPI::Inst()->ScaleX( (int)sizeInfo->NewSize.Width ), CDPI::Inst()->ScaleY( (int)sizeInfo->NewSize.Height ));
-		Renderer::Inst()->SetViewport( 0, 0, mWindowInfo->Width(), mWindowInfo->Height() );
+		mRenderer->ResizeBuffers( mCDPI->ScaleX( (int)sizeInfo->NewSize.Width ), mCDPI->ScaleY( (int)sizeInfo->NewSize.Height ));
+		mRenderer->SetViewport( 0, 0, mWindowInfo->Width(), mWindowInfo->Height() );
 	}
 
 	void WGameWindow::OnRender( DrawingContext^ drawingContext )
@@ -252,17 +270,17 @@ namespace Sentinel { namespace Systems
 			if( !mHWND )
 				TRACE( "Error: CreateWindowEx = " << GetLastError() );
 			
-			mWindowInfo = gcnew WWindowInfo( Renderer::Inst()->Startup( mHWND, mWindowInfo->Fullscreen(), mWindowInfo->Width(), mWindowInfo->Height() ));
+			mWindowInfo = gcnew WWindowInfo( mRenderer->GetRef()->Startup( mHWND, mWindowInfo->Fullscreen(), mWindowInfo->Width(), mWindowInfo->Height() ));
 
 			// Create default settings.
 			//
-			WRenderer::CreateDepthStencil( mWindowInfo->Width(), mWindowInfo->Height() );
-			WRenderer::CreateBackbuffer();
+			mRenderer->CreateDepthStencil( mWindowInfo->Width(), mWindowInfo->Height() );
+			mRenderer->CreateBackbuffer();
 
-			return HandleRef( this, IntPtr( mHWND ));
+			return HandleRef( this, System::IntPtr( mHWND ));
 		}
 
-		return HandleRef( nullptr, IntPtr::Zero );
+		return HandleRef( nullptr, System::IntPtr::Zero );
 	}
 
 	void WGameWindow::DestroyWindowCore( HandleRef hwnd )

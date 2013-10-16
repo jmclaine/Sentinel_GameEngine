@@ -1,4 +1,6 @@
 #include "GameComponent.h"
+#include "GameObject.h"
+#include "Archive.h"
 
 namespace Sentinel
 {

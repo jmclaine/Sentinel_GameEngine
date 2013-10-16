@@ -1,9 +1,12 @@
 #pragma once
 
-#include "PhysicsComponent.h"
+#include "GameComponent.h"
 
 namespace Sentinel
 {
+	class PhysicsComponent;
+	class TransformComponent;
+
 	class SENTINEL_DLL ControllerComponent : public GameComponent
 	{
 	protected:

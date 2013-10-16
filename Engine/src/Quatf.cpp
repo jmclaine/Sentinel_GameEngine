@@ -98,6 +98,11 @@ namespace Sentinel
 		return Quatf( 0, 0, 0, 0 );
 	}
 
+	float Quatf::Dot( const Quatf& q ) const
+	{
+		return x*q.x + y*q.y + z*q.z + w*q.w;
+	}
+
 	Quatf& Quatf::AxisAngle( float _x, float _y, float _z, float _degrees )
 	{
 		float a = (float)DEGREES_TO_RADIANS * _degrees * 0.5f;
@@ -182,5 +187,30 @@ namespace Sentinel
 				v[ i ] = 0;
 		
 		return v;
+	}
+
+	Quatf Quatf::Slerp( const Quatf& q, float t )
+	{
+		float magnitude = sqrt( LengthSquared() * q.LengthSquared() ); 
+
+		float product = Dot( q ) / magnitude;
+		if( fabs( product ) != 1.0f )
+		{
+			float sign = (product < 0.0f) ? -1.0f : 1.0f;
+
+			float theta = acos( sign * product );
+			float s1 = sin( sign * t * theta );   
+			float d = 1.0f / sin( theta );
+			float s0 = sin((1.0f - t) * theta);
+
+			return Quatf((x * s0 + q.x * s1) * d,
+						 (y * s0 + q.y * s1) * d,
+						 (z * s0 + q.z * s1) * d,
+						 (w * s0 + q.w * s1) * d);
+		}
+		else
+		{
+			return *this;
+		}
 	}
 }

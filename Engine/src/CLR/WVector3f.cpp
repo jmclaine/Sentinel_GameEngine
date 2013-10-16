@@ -1,6 +1,6 @@
 #include "WVector3f.h"
 
-namespace Sentinel { namespace Math
+namespace Sentinel { namespace Wrapped
 {
 	DEFINE_REF( Vector3f );
 

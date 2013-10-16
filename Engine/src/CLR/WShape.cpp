@@ -1,6 +1,8 @@
 #include "WShape.h"
+#include "WVector3f.h"
+#include "WBuffer.h"
 
-namespace Sentinel { namespace Math
+namespace Sentinel { namespace Wrapped
 {
 	DEFINE_REF( Ray );
 

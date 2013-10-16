@@ -1,16 +1,24 @@
 #pragma once
 
+#include "Property.h"
 #include "WAssetManager.h"
-#include "WShader.h"
+#include "ShaderManager.h"
 
-namespace Sentinel { namespace Assets
+namespace Sentinel { namespace Wrapped
 {
+	ref class WArchive;
+	ref class WShader;
+	ref class WRenderer;
+
 	public ref class WShaderManager
 	{
-	public:
-
 		DECLARE_ASSET_MANAGER( Shader );
 
-		static bool LoadConfig( System::String^ filename );
+	public:
+
+		void	Save( WArchive^ archive );
+		void	Load( WArchive^ archive, WRenderer^ renderer );
+
+		static WShaderManager^ LoadConfig( System::String^ filename, WRenderer^ renderer, WShaderManager^ shaderManager );
 	};
 }}

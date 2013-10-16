@@ -4,18 +4,25 @@
 
 #include "Mesh.h"
 #include "DrawableComponent.h"
+#include "Material.h"
 
 namespace Sentinel
 {
+	class MeshManager;
+
 	class SENTINEL_DLL MeshComponent : public DrawableComponent
 	{
 		DECLARE_SERIAL();
+
+	protected:
+
+		MeshManager*			mMeshManager;
 
 	public:
 
 		std::shared_ptr< Mesh > mMesh;
 
-		Material				mMaterial;	// sets in update
+		Material				mMaterial;	// assigns to Mesh in Update
 
 		/////////////////////////////
 

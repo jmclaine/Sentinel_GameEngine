@@ -1,24 +1,26 @@
 #pragma once
-/*
-Attached GameObject(s) are automatically shutdown and removed during Shutdown()
-*/
+
 #include <vector>
 #include <map>
-#include <iostream>
-#include <fstream>
 
 #include "Common.h"
-#include "Singleton.h"
-#include "CameraComponent.h"
-#include "LightComponent.h"
-#include "GameObject.h"
 
 namespace Sentinel
 {
-	class SENTINEL_DLL GameWorld : public SingletonSafe< GameWorld >
-	{
-		friend class SingletonSafe< GameWorld >;
+	class GameObject;
+	class CameraComponent;
+	class LightComponent;
+	class Archive;
+	class Renderer;
+	class PhysicsSystem;
+	class Timing;
+	class TextureManager;
+	class ShaderManager;
+	class MeshManager;
+	class ModelManager;
 
+	class SENTINEL_DLL GameWorld
+	{
 	private:
 
 		std::multimap< float, GameObject* >		mAlphaOrder;
@@ -29,36 +31,51 @@ namespace Sentinel
 		std::vector< LightComponent* >			mLight;
 
 		std::vector< GameObject* >				mGameObject;
-		
-	private:
+
+	public:
+
+		Renderer*								mRenderer;
+
+		PhysicsSystem*							mPhysicsSystem;
+
+		Timing*									mTiming;
+
+		TextureManager*							mTextureManager;
+		ShaderManager*							mShaderManager;
+		MeshManager*							mMeshManager;
+		ModelManager*							mModelManager;
+
+		/////////////////////////////////////////////////////
 
 		GameWorld();
 		~GameWorld();
 
 	public:
 
-		// Since CLR will not save the pointer that gets
-		// created by Inst(), this function is required.
+		// Release all GameObjects and GameComponents.
 		//
-		static GameWorld*	Create();
-
 		void				Release();
 
 		void				Save( Archive& archive );
 		void				Load( Archive& archive );
 		
+		// All associated GameObjects and GameComponents also Startup().
+		//
 		void				Startup();
 
-		void				Update();
+		// All associated GameObjects and GameComponents also Update().
+		//
 		void				UpdateController();
 		void				UpdatePhysics();
 		void				UpdateTransform();
 		void				UpdateComponents();
 		void				UpdateDrawable();
 
+		// All associated GameObjects and GameComponents also Shutdown().
+		//
 		void				Shutdown();
 
-		//////////////////////////////
+		/////////////////////////////////////////////////////
 
 		// Returns entity.
 		//
@@ -72,11 +89,13 @@ namespace Sentinel
 		GameObject*			GetGameObject( UINT index );
 		UINT				NumGameObjects();
 
-		//////////////////////////////
-
-		void				SetCamera( CameraComponent* camera );
+		/////////////////////////////////////////////////////
 
 		CameraComponent*	GetCamera( int index = -1 );	// -1 = mCurrentCamera
+		void				SetCamera( CameraComponent* camera );
+		UINT				NumCameras();
+
 		LightComponent*		GetLight( UINT index );
+		UINT				NumLights();
 	};
 }

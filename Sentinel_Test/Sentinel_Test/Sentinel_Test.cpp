@@ -8,11 +8,15 @@
 
 #include "Sentinel_Test.h"
 
-#include "GameWindow.h"
+#include "Renderer.h"
 #include "PhysicsSystem.h"
 #include "ParticleSystem.h"
 #include "NetworkSocket.h"
 #include "AudioSystem.h"
+
+#include "GameWindow.h"
+
+#include "Archive.h"
 
 #include "TextureManager.h"
 #include "ShaderManager.h"
@@ -29,12 +33,17 @@
 #include "GameWorld.h"
 #include "GameObject.h"
 
+#include "TransformComponent.h"
+#include "PhysicsComponent.h"
+#include "LightComponent.h"
 #include "PerspectiveCameraComponent.h"
 #include "OrthographicCameraComponent.h"
 #include "PlayerControllerComponent.h"
 #include "PhysicsComponent.h"
 #include "MeshComponent.h"
 #include "ModelComponent.h"
+
+#include "AudioSource.h"
 
 #include "RandomValue.h"
 
@@ -48,21 +57,42 @@ class MainApp
 	HACCEL					mAccelTable;
 	
 	GameWindow*				mWindow;
+	Renderer*				mRenderer;
 
-	AudioSource*			mSound;
-	
+	Timing*					mTiming;
+	PhysicsSystem*			mPhysics;
+
+	TextureManager*			mTextureManager;
+	ShaderManager*			mShaderManager;
+	MeshManager*			mMeshManager;
+	ModelManager*			mModelManager;
+
+	AudioSystem*			mAudio;
+	AudioSource*			mSound;	// temp
+
+	GameWorld*				mWorld;
+
 public:
 
 	MainApp()
 	{
 		srand( (UINT)time( (time_t*)0 ));
 
-		mWindow = NULL;
-	
-		TextureManager::Create();
-		ShaderManager::Create();
-		MeshManager::Create();
-		ModelManager::Create();
+		mWindow			= NULL;
+		mRenderer		= NULL;
+
+		mTiming			= new Timing();
+		mPhysics		= NULL;
+
+		mTextureManager	= new TextureManager();
+		mShaderManager	= new ShaderManager();
+		mMeshManager	= new MeshManager();
+		mModelManager	= new ModelManager();
+
+		mAudio			= NULL;
+		mSound			= NULL;
+
+		mWorld			= new GameWorld();
 	}
 
 	~MainApp()
@@ -80,57 +110,66 @@ public:
 		// Load config file to setup windows for the renderer.
 		//
 		WindowInfo info;
-		if( !Renderer::Create( "config.xml", info ))
+		mRenderer = Renderer::Create( "config.xml", info );
+		if( !mRenderer )
 		{
 			REPORT_ERROR( "Failed to load 'config.xml'\nDefaulting to OpenGL", "Renderer Setup Failure" );
 
-			if( !Renderer::Inst( BuildRendererGL() ))
-				throw AppException( "Failed to BuildRendererGL" );
+			if( !(mRenderer = BuildRendererGL()) )
+				throw AppException( "Failed to create OpenGL Renderer" );
 		}
 
 		// Prepare main window.
 		//
-		mWindow->Startup( hInstance, nCmdShow, "Sentinel_Test", "SentinelClass0", info );
+		mWindow->Startup( mRenderer, hInstance, nCmdShow, "Sentinel_Test", "SentinelClass0", info );
 
-		Renderer::Inst()->CreateDepthStencil( info.Width(), info.Height() );
-		Renderer::Inst()->CreateBackbuffer();
+		mRenderer->CreateDepthStencil( info.Width(), info.Height() );
+		mRenderer->CreateBackbuffer();
 
 		////////////////////////////////////
 
-		Mouse::Inst()->SetPosition( CenterHandle( mWindow->GetHandle() ));
+		Mouse::Get().SetPosition( CenterHandle( mWindow->GetHandle() ));
 		ShowCursor( FALSE );
 
 		////////////////////////////////////
 
-		PhysicsSystem::Inst()->Startup();
+		mPhysics = BuildPhysicsSystemBT();
+		mPhysics->Startup();
 
 		SetDirectory( "Sounds" );
-		AudioSystem::Inst( AudioSystem::Create() )->Startup();
-		mSound = AudioSystem::Inst()->CreateSound( "rtsoundthrow.wav" );
-		mSound->Play();
+		//mAudio->Startup();
+		//mSound = mAudio->CreateSound( "rtsoundthrow.wav" );
+		//mSound->Play();
 		SetDirectory( ".." );
 
+		
+		Archive archive;
+		archive.Open( "Default.MAP", "rb" );
+
+		mTextureManager->Load( archive, mRenderer );
+		mShaderManager->Load( archive, mRenderer );
+		mMeshManager->Load( archive, mRenderer, mShaderManager, mTextureManager );
+		mModelManager->Load( archive, mRenderer, mShaderManager, mTextureManager );
+		
+		mWorld->mTiming			= mTiming;
+		mWorld->mRenderer		= mRenderer;
+		mWorld->mPhysicsSystem	= mPhysics;
+		mWorld->mTextureManager = mTextureManager;
+		mWorld->mShaderManager	= mShaderManager;
+		mWorld->mMeshManager	= mMeshManager;
+		mWorld->mModelManager	= mModelManager;
+		
+		mWorld->Load( archive );
+
+		archive.Close();
 		/*
 		PrepareShaders();
 		PrepareObjects();
 		PrepareFont();
 		//*/
+
+		mWorld->Startup();
 		
-		Archive archive;
-		archive.Open( "Default.MAP", "rb" );
-
-		TextureManager::Inst()->Load( archive );
-		ShaderManager::Inst()->Load( archive );
-		MeshManager::Inst()->Load( archive );
-		ModelManager::Inst()->Load( archive );
-		GameWorld::Inst()->Load( archive );
-
-		archive.Close();
-
-		GameWorld::Inst()->Startup();
-		//*/
-		ParticleSystem::Inst()->Startup( ShaderManager::Inst()->Get( "Sprite" ), 100 );
-
 		// Enter main game loop.
 		//
 		MSG msg;
@@ -159,50 +198,44 @@ public:
 
 	void Update()
 	{
-		Timing::Inst()->Update();
+		mTiming->Update();
 
-		if( Keyboard::Inst()->DidGoDown( VK_ESCAPE ))
+		if( Keyboard::Get().DidGoDown( VK_ESCAPE ))
 		{
 			PostQuitMessage( 0 );
 		}
 
 		static float color[] = {0.0f, 0.2f, 0.8f, 1.0f};
 
-		Renderer::Inst()->SetDepthStencil( 0 );
-		Renderer::Inst()->SetViewport( 0, 0, mWindow->GetInfo()->Width(), mWindow->GetInfo()->Height() );
-		Renderer::Inst()->SetRenderTarget( 0 );
+		mRenderer->SetDepthStencil( 0 );
+		mRenderer->SetViewport( 0, 0, mWindow->GetInfo()->Width(), mWindow->GetInfo()->Height() );
+		mRenderer->SetRenderTarget( 0 );
 
-		Renderer::Inst()->Clear( color );
+		mRenderer->Clear( color );
 
-		GameWorld::Inst()->Update();
+		mWorld->UpdateController();
 
-		Renderer::Inst()->Present();
+		mPhysics->Update( mTiming->DeltaTime() );
 
-		/////////////////////////////////
-		/*
-		mWindow1->SetActive();
+		mWorld->UpdatePhysics();
+		mWorld->UpdateTransform();
+		mWorld->UpdateComponents();
+		mWorld->UpdateDrawable();
 
-		Renderer::Inst()->SetDepthStencil( 1 );
-		Renderer::Inst()->SetViewport( 0, 0, mWindow1->GetInfo()->Width(), mWindow1->GetInfo()->Height() );
-		Renderer::Inst()->SetRenderTarget( 1 );
+		mRenderer->Present();
 
-		Renderer::Inst()->Clear( color );
+		Mouse::Get().Update();
+		Keyboard::Get().Update();
 
-		Renderer::Inst()->Present();
-		*/
-		/////////////////////////////////
-
-		Mouse::Inst()->Update();
-		Keyboard::Inst()->Update();
-
-		Timing::Inst()->Limit();
+		mTiming->Limit();
 	}
 
 	void PrepareShaders()
 	{
 		SetDirectory( "Shaders" );
 		
-		if( !(ShaderManager::Inst()->LoadConfig( "config.xml" )))
+		mShaderManager = ShaderManager::LoadConfig( "config.xml", mRenderer, mShaderManager );
+		if( !mShaderManager )
 			throw AppException( "Failed to load 'Shaders\\config.xml'" );
 
 		SetDirectory( ".." );
@@ -222,8 +255,6 @@ public:
 
 		//////////////////////////////
 
-		//GameWorld::Inst()->Load( "Default.MAP" );
-		
 		// Create main perspective camera.
 		//
 		info = mWindow->GetInfo();
@@ -234,13 +265,12 @@ public:
 		
 		controller = new PlayerControllerComponent();
 		
-		physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateSphere( transform->mPosition, transform->mOrientation, 1, 1 ));
-		physics->GetRigidBody()->setFlags( BT_DISABLE_WORLD_GRAVITY );
-		physics->GetRigidBody()->setDamping( 0.9f, 0.9f );
-		physics->GetRigidBody()->setRestitution( 1 );
-		physics->GetRigidBody()->setAngularFactor( 0 );
+		physics = new PhysicsComponent( mPhysics->CreateSphere( transform->mPosition, transform->mOrientation, 1, 1 ));
+		physics->GetRigidBody()->SetFlags( DISABLE_GRAVITY );
+		physics->GetRigidBody()->SetDamping( 0.9f, 0.9f );
+		physics->GetRigidBody()->SetAngularFactor( Vector3f() );
 
-		obj = GameWorld::Inst()->AddGameObject( new GameObject(), "MainCamera" );
+		obj = mWorld->AddGameObject( new GameObject(), "MainCamera" );
 		obj->AttachComponent( transform,	"Transform" );
 		obj->AttachComponent( controller,	"Player" );
 		obj->AttachComponent( physics,		"Physics" );
@@ -255,7 +285,7 @@ public:
 		transform = new TransformComponent();
 		transform->mPosition = Vector3f( 0, 0, 0 );
 		
-		obj = GameWorld::Inst()->AddGameObject( new GameObject(), "SpriteCamera" );
+		obj = mWorld->AddGameObject( new GameObject(), "SpriteCamera" );
 		obj->AttachComponent( transform,	"Transform" );
 		obj->AttachComponent( camera,		"Camera" );
 		
@@ -270,7 +300,7 @@ public:
 		light->mAttenuation = Vector4f( 1, 1, 1, 2000 );
 		light->mColor		= ColorRGBA( 1, 1, 1, 1 );
 
-		obj = GameWorld::Inst()->AddGameObject( new GameObject(), "PointLight" );
+		obj = mWorld->AddGameObject( new GameObject(), "PointLight" );
 		obj->AttachComponent( transform,	"Transform" );
 		obj->AttachComponent( light,		"Light" );
 
@@ -280,43 +310,43 @@ public:
 		//
 		MeshBuilder meshBuilder;
 		
-		meshBuilder.mShader = ShaderManager::Inst()->Get( "Texture" );
-		meshBuilder.mTexture[ TEXTURE_DIFFUSE ] = TextureManager::Inst()->Add( "DEFAULT", Renderer::Inst()->CreateTextureFromFile( "default-alpha.png" ));
+		meshBuilder.mShader = mShaderManager->Get( "Texture" );
+		meshBuilder.mTexture[ TEXTURE_DIFFUSE ] = mTextureManager->Add( "DEFAULT", mRenderer->CreateTextureFromFile( "default-alpha.png" ));
 
 		meshBuilder.CreateCube( 1 );
-		MeshManager::Inst()->Add( "Cube", std::shared_ptr< Mesh >( meshBuilder.BuildMesh() ));
+		mMeshManager->Add( "Cube", std::shared_ptr< Mesh >( meshBuilder.BuildMesh( mRenderer )));
 		
 		meshBuilder.ClearGeometry();
 		meshBuilder.CreateCylinder( 1, 1, 10 );
-		MeshManager::Inst()->Add( "Cylinder", std::shared_ptr< Mesh >( meshBuilder.BuildMesh() ));
+		mMeshManager->Add( "Cylinder", std::shared_ptr< Mesh >( meshBuilder.BuildMesh( mRenderer )));
 
 		meshBuilder.ClearGeometry();
 		meshBuilder.CreateOctahedron( 1 );
-		MeshManager::Inst()->Add( "Octahedron", std::shared_ptr< Mesh >( meshBuilder.BuildMesh() ));
+		mMeshManager->Add( "Octahedron", std::shared_ptr< Mesh >( meshBuilder.BuildMesh( mRenderer )));
 
 		meshBuilder.ClearGeometry();
 		meshBuilder.CreateTetrahedron( 1 );
-		MeshManager::Inst()->Add( "Tetrahedron", std::shared_ptr< Mesh >( meshBuilder.BuildMesh() ));
+		mMeshManager->Add( "Tetrahedron", std::shared_ptr< Mesh >( meshBuilder.BuildMesh( mRenderer )));
 
 		meshBuilder.ClearGeometry();
 		meshBuilder.CreateDodecahedron( 1 );
-		MeshManager::Inst()->Add( "Dodecahedron", std::shared_ptr< Mesh >( meshBuilder.BuildMesh() ));
+		mMeshManager->Add( "Dodecahedron", std::shared_ptr< Mesh >( meshBuilder.BuildMesh( mRenderer )));
 
 		meshBuilder.ClearGeometry();
 		meshBuilder.CreateSphere( 1, 10, 10 );
-		MeshManager::Inst()->Add( "Sphere", std::shared_ptr< Mesh >( meshBuilder.BuildMesh() ));
+		mMeshManager->Add( "Sphere", std::shared_ptr< Mesh >( meshBuilder.BuildMesh( mRenderer )));
 
 		meshBuilder.ClearGeometry();
 		meshBuilder.CreateWireSphere( 1, 10, 10 );
-		meshBuilder.mShader = ShaderManager::Inst()->Get( "Color" );
-		MeshManager::Inst()->Add( "Wire Sphere", std::shared_ptr< Mesh >( meshBuilder.BuildMesh() ));
+		meshBuilder.mShader = mShaderManager->Get( "Color" );
+		mMeshManager->Add( "Wire Sphere", std::shared_ptr< Mesh >( meshBuilder.BuildMesh( mRenderer )));
 
-		std::shared_ptr< Model > model = std::shared_ptr< Model >( Model::Load( "Player.M3D" ));
+		std::shared_ptr< Model > model = std::shared_ptr< Model >( Model::Load( "Player.M3D", mRenderer, mShaderManager, mTextureManager ));
 
 		if( !model )
 			throw AppException( "Player.M3D failed to load." );
 
-		ModelManager::Inst()->Add( "Player", model );
+		mModelManager->Add( "Player", model );
 
 		// Create simple box in center of the world.
 		//
@@ -325,12 +355,12 @@ public:
 		transform->mOrientation = Quatf( 0, 0, 1, 15 ).AxisAngle();
 		transform->mScale		= Vector3f( 10, 1, 25 );
 		
-		physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateBox( transform->mPosition, transform->mOrientation, transform->mScale, 0 ));
+		physics = new PhysicsComponent( mPhysics->CreateBox( transform->mPosition, transform->mOrientation, transform->mScale, 0 ));
 
-		obj = GameWorld::Inst()->AddGameObject( new GameObject(), "Origin" );
+		obj = mWorld->AddGameObject( new GameObject(), "Origin" );
 		obj->AttachComponent( transform,	"Transform" );
 		obj->AttachComponent( physics,		"Physics" );
-		obj->AttachComponent( new MeshComponent( MeshManager::Inst()->Get( "Cube" )), "Mesh" );
+		obj->AttachComponent( new MeshComponent( mMeshManager->Get( "Cube" )), "Mesh" );
 
 		////////////////////////////////
 		
@@ -339,12 +369,12 @@ public:
 		transform->mOrientation = Quatf( 0, 0, 1, -15 ).AxisAngle();
 		transform->mScale		= Vector3f( 10, 1, 25 );
 		
-		physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateBox( transform->mPosition, transform->mOrientation, transform->mScale, 0 ));
+		physics = new PhysicsComponent( mPhysics->CreateBox( transform->mPosition, transform->mOrientation, transform->mScale, 0 ));
 
-		obj = GameWorld::Inst()->AddGameObject( new GameObject(), "Origin" );
+		obj = mWorld->AddGameObject( new GameObject(), "Origin" );
 		obj->AttachComponent( transform,	"Transform" );
 		obj->AttachComponent( physics,		"Physics" );
-		obj->AttachComponent( new MeshComponent( MeshManager::Inst()->Get( "Cube" )), "Mesh" );
+		obj->AttachComponent( new MeshComponent( mMeshManager->Get( "Cube" )), "Mesh" );
 		
 		////////////////////////////////
 		
@@ -368,67 +398,67 @@ public:
 				// Cube
 				//
 				case 0:
-					mesh = MeshManager::Inst()->Get( "Cube" );
+					mesh = mMeshManager->Get( "Cube" );
 
-					physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateBox( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mass ));
+					physics = new PhysicsComponent( mPhysics->CreateBox( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mass ));
 
 					break;
 
 				// Cylinder
 				//
 				case 1:
-					mesh = MeshManager::Inst()->Get( "Cylinder" );
+					mesh = mMeshManager->Get( "Cylinder" );
 
 					transform->mScale.z = transform->mScale.x;
 					transform->mScale.y = transform->mScale.y * 5;
-					physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateCylinder( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mass ));
+					physics = new PhysicsComponent( mPhysics->CreateCylinder( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mass ));
 
 					break;
 
 				// Sphere
 				//
 				case 2:
-					mesh = MeshManager::Inst()->Get( "Sphere" );
+					mesh = mMeshManager->Get( "Sphere" );
 
 					transform->mScale = Vector3f( mass, mass, mass );
-					physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateSphere( transform->mPosition, Quatf( 0, 0, 0, 1 ), mass, mass ));
+					physics = new PhysicsComponent( mPhysics->CreateSphere( transform->mPosition, Quatf( 0, 0, 0, 1 ), mass, mass ));
 
 					break;
 
 				// Wire Sphere
 				//
 				case 3:
-					mesh = MeshManager::Inst()->Get( "Wire Sphere" );
+					mesh = mMeshManager->Get( "Wire Sphere" );
 
 					transform->mScale = Vector3f( mass, mass, mass );
-					physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateSphere( transform->mPosition, Quatf( 0, 0, 0, 1 ), mass, mass ));
+					physics = new PhysicsComponent( mPhysics->CreateSphere( transform->mPosition, Quatf( 0, 0, 0, 1 ), mass, mass ));
 
 					break;
 
 				// Tetrahedron
 				//
 				case 4:
-					mesh = MeshManager::Inst()->Get( "Tetrahedron" );
+					mesh = mMeshManager->Get( "Tetrahedron" );
 
-					physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateMesh( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mesh.get(), mass ));
+					physics = new PhysicsComponent( mPhysics->CreateMesh( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mesh.get(), mass ));
 
 					break;
 
 				// Octahedron
 				//
 				case 5:
-					mesh = MeshManager::Inst()->Get( "Octahedron" );
+					mesh = mMeshManager->Get( "Octahedron" );
 
-					physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateMesh( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mesh.get(), mass ));
+					physics = new PhysicsComponent( mPhysics->CreateMesh( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mesh.get(), mass ));
 
 					break;
 
 				// Dodecahedron
 				//
 				case 6:
-					mesh = MeshManager::Inst()->Get( "Dodecahedron" );
+					mesh = mMeshManager->Get( "Dodecahedron" );
 
-					physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateMesh( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mesh.get(), mass ));
+					physics = new PhysicsComponent( mPhysics->CreateMesh( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mesh.get(), mass ));
 
 					break;
 
@@ -437,14 +467,14 @@ public:
 				default:
 					transform->mScale = Vector3f( mass, mass, mass ) * 0.025f;
 
-					physics = new PhysicsComponent( PhysicsSystem::Inst()->CreateSphere( transform->mPosition, Quatf( 0, 0, 0, 1 ), mass * 0.6f, mass ));
+					physics = new PhysicsComponent( mPhysics->CreateSphere( transform->mPosition, Quatf( 0, 0, 0, 1 ), mass * 0.6f, mass ));
 
 					break;
 			}
 
 			sprintf_s( name, "Object %d", x );
 
-			obj = GameWorld::Inst()->AddGameObject( new GameObject(), name );
+			obj = mWorld->AddGameObject( new GameObject(), name );
 			obj->AttachComponent( transform,	"Transform" );
 			obj->AttachComponent( physics,		"Physics" );
 
@@ -453,8 +483,6 @@ public:
 			else
 				obj->AttachComponent( new ModelComponent( model ),	"Model" );
 		}
-
-		GameWorld::Inst()->Startup();
 
 		SetDirectory( ".." );
 	}
@@ -470,30 +498,35 @@ public:
 
 	void Shutdown()
 	{
-		delete mSound;
-
-		Mouse::Destroy();
-		Keyboard::Destroy();
-
-		GameWorld::Inst()->Shutdown();
-		GameWorld::Destroy();
-
-		ModelManager::Destroy();
-		MeshManager::Destroy();
-		ShaderManager::Destroy();
-		TextureManager::Destroy();
-
-		mWindow->Shutdown();
-		delete mWindow;
+		SAFE_DELETE( mSound );
 		
-		AudioSystem::Inst()->Shutdown();
-		AudioSystem::Destroy();
+		if( mWorld )
+		{
+			mWorld->Shutdown();
+			delete mWorld;
+		}
 
-		Timing::Destroy();
-		PhysicsSystem::Destroy();
-		ParticleSystem::Destroy();
+		SAFE_DELETE( mTiming );
+		SAFE_DELETE( mPhysics );
+		
+		SAFE_DELETE( mModelManager );
+		SAFE_DELETE( mMeshManager );
+		SAFE_DELETE( mShaderManager );
+		SAFE_DELETE( mTextureManager );
 
-		Renderer::Destroy();
+		if( mWindow )
+		{
+			mWindow->Shutdown();
+			delete mWindow;
+		}
+		
+		if( mAudio )
+		{
+			mAudio->Shutdown();
+			delete mAudio;
+		}
+
+		SAFE_DELETE( mRenderer );
 	}
 };
 
@@ -509,7 +542,7 @@ int APIENTRY _tWinMain( HINSTANCE hInstance,
 	//
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	_CrtSetReportMode( _CRT_ERROR, _CRTDBG_MODE_DEBUG );
-	//_CrtSetBreakAlloc( 565 );
+	//_CrtSetBreakAlloc( 185 );
 
 	UNREFERENCED_PARAMETER( hPrevInstance );
 	UNREFERENCED_PARAMETER( lpCmdLine );

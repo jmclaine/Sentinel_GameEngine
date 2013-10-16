@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
-using Sentinel.Assets;
+using Sentinel.Wrapped;
 
 namespace Sentinel_Editor
 {

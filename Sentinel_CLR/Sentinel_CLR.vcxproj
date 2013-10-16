@@ -115,7 +115,9 @@ xcopy "$(SolutionDir)$(Configuration)\Sentinel.dll" "$(SolutionDir)\..\Sentinel_
     <ClInclude Include="..\Engine\src\CLR\WMeshManager.h" />
     <ClInclude Include="..\Engine\src\CLR\WModelManager.h" />
     <ClInclude Include="..\Engine\src\CLR\WPhysicsComponent.h" />
+    <ClInclude Include="..\Engine\src\CLR\WPhysicsSystem.h" />
     <ClInclude Include="..\Engine\src\CLR\WPlayerControllerComponent.h" />
+    <ClInclude Include="..\Engine\src\CLR\WRendererTypes.h" />
     <ClInclude Include="..\Engine\src\CLR\WShaderManager.h" />
     <ClInclude Include="..\Engine\src\CLR\WStdVector.h" />
     <ClInclude Include="..\Engine\src\CLR\Property.h" />
@@ -145,6 +147,7 @@ xcopy "$(SolutionDir)$(Configuration)\Sentinel.dll" "$(SolutionDir)\..\Sentinel_
     <ClInclude Include="..\Engine\src\CLR\WShape.h" />
     <ClInclude Include="..\Engine\src\CLR\WTexture.h" />
     <ClInclude Include="..\Engine\src\CLR\WTextureManager.h" />
+    <ClInclude Include="..\Engine\src\CLR\WTiming.h" />
     <ClInclude Include="..\Engine\src\CLR\WTransformComponent.h" />
     <ClInclude Include="..\Engine\src\CLR\WVector2f.h" />
     <ClInclude Include="..\Engine\src\CLR\WVector3f.h" />
@@ -177,6 +180,7 @@ xcopy "$(SolutionDir)$(Configuration)\Sentinel.dll" "$(SolutionDir)\..\Sentinel_
     <ClCompile Include="..\Engine\src\CLR\WModelManager.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WPerspectiveCameraComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WPhysicsComponent.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WPhysicsSystem.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WPlayerControllerComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WQuatf.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WRenderer.cpp" />
@@ -186,6 +190,7 @@ xcopy "$(SolutionDir)$(Configuration)\Sentinel.dll" "$(SolutionDir)\..\Sentinel_
     <ClCompile Include="..\Engine\src\CLR\WShape.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WTexture.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WTextureManager.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WTiming.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WTransformComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WVector2f.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WVector3f.cpp" />

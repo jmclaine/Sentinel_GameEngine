@@ -1,51 +1,72 @@
 #pragma once
 
+#include "Property.h"
 #include "GameWorld.h"
-#include "WGameObject.h"
-#include "WCameraComponent.h"
-#include "WLightComponent.h"
-#include "WArchive.h"
 
-using namespace Sentinel::Utilities;
-
-namespace Sentinel { namespace Components
+namespace Sentinel { namespace Wrapped
 {
+	ref class WRenderer;
+	ref class WPhysicsSystem;
+	ref class WTiming;
+	ref class WTextureManager;
+	ref class WShaderManager;
+	ref class WMeshManager;
+	ref class WModelManager;
+	ref class WArchive;
+	ref class WGameObject;
+	ref class WCameraComponent;
+	ref class WLightComponent;
+
 	public ref class WGameWorld
 	{
+	protected:
+
+		DECLARE_REF_PTR( GameWorld );
+
 	public:
 
-		static void					Create();
-		static void					Release();
+		WGameWorld();
+
+		void				Release();
+
+		DECLARE_OP_PTR( GameWorld );
+
+		DECLARE_PROPERTY( WRenderer^,		XRenderer );
+		DECLARE_PROPERTY( WPhysicsSystem^,	XPhysicsSystem );
+		DECLARE_PROPERTY( WTiming^,			XTiming );
+		DECLARE_PROPERTY( WTextureManager^, XTextureManager );
+		DECLARE_PROPERTY( WShaderManager^,  XShaderManager );
+		DECLARE_PROPERTY( WMeshManager^,    XMeshManager );
+		DECLARE_PROPERTY( WModelManager^,   XModelManager );
 		
-		static void					Save( WArchive^ archive );
-		static void					Load( WArchive^ archive );
+		void				Save( WArchive^ archive );
+		void				Load( WArchive^ archive );
 
-		static void					Startup();
+		void				Startup();
 
-		static void					Update();
-		static void					UpdateController();
-		static void					UpdatePhysics();
-		static void					UpdateTransform();
-		static void					UpdateComponents();
-		static void					UpdateDrawable();
+		void				UpdateController();
+		void				UpdatePhysics();
+		void				UpdateTransform();
+		void				UpdateComponents();
+		void				UpdateDrawable();
 
-		static void					Shutdown();
-
-		//////////////////////////////
-
-		static WGameObject^			AddGameObject( WGameObject^ entity );
-		static WGameObject^			AddGameObject( WGameObject^ entity, System::String^ name );
-
-		static WGameObject^			RemoveGameObject( WGameObject^ entity );
-
-		static WGameObject^			GetGameObject( UINT index );
-		static UINT					NumGameObjects();
+		void				Shutdown();
 
 		//////////////////////////////
 
-		static void					SetCamera( WCameraComponent^ camera );
+		WGameObject^		AddGameObject( WGameObject^ entity );
+		WGameObject^		AddGameObject( WGameObject^ entity, System::String^ name );
 
-		static WCameraComponent^	GetCamera( int index );	// -1 = mCurrentCamera
-		static WLightComponent^		GetLight( UINT index );
+		WGameObject^		RemoveGameObject( WGameObject^ entity );
+
+		WGameObject^		GetGameObject( UINT index );
+		UINT				NumGameObjects();
+
+		//////////////////////////////
+
+		void				SetCamera( WCameraComponent^ camera );
+
+		WCameraComponent^	GetCamera( int index );	// -1 = mCurrentCamera
+		WLightComponent^	GetLight( UINT index );
 	};
 }}

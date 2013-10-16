@@ -1,6 +1,14 @@
 #include "WMesh.h"
+#include "WRenderer.h"
+#include "WGameWorld.h"
+#include "WBuffer.h"
+#include "WShader.h"
+#include "WTexture.h"
+#include "WMaterial.h"
+#include "WMatrix4f.h"
+#include "WVector4f.h"
 
-namespace Sentinel { namespace Assets
+namespace Sentinel { namespace Wrapped
 {
 	DEFINE_REF_SHARED( Mesh );
 
@@ -13,7 +21,7 @@ namespace Sentinel { namespace Assets
 		return mesh0->mRef == mesh1->mRef;
 	}
 
-	DEFINE_PROPERTY_E( Mesh, Systems, PrimitiveType, Primitive );
+	DEFINE_PROPERTY_E( Mesh, PrimitiveType, Primitive );
 	
 	DEFINE_PROPERTY_RP( Mesh, Buffer,		VBO );
 	DEFINE_PROPERTY_RP( Mesh, Buffer,		IBO );
@@ -30,14 +38,14 @@ namespace Sentinel { namespace Assets
 		return gcnew RTexture( mRef->mTexture[ (int)type ] );
 	}
 
-	void WMesh::Draw()
+	void WMesh::Draw( WRenderer^ renderer, WGameWorld^ world )
 	{
-		mRef->Draw();
+		mRef->Draw( renderer, world );
 	}
 
-	void WMesh::Draw( UINT count )
+	void WMesh::Draw( WRenderer^ renderer, WGameWorld^ world, UINT count )
 	{
-		mRef->Draw( count );
+		mRef->Draw( renderer, world, count );
 	}
 
 	////////////////////////////////

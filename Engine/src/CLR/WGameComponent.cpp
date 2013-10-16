@@ -2,9 +2,7 @@
 #include "WGameObject.h"
 #include "WString.h"
 
-using namespace Sentinel::Utilities;
-
-namespace Sentinel { namespace Components
+namespace Sentinel { namespace Wrapped
 {
 	DEFINE_REF_PTR( GameComponent );
 
@@ -57,7 +55,7 @@ namespace Sentinel { namespace Components
 
 	ComponentType WGameComponent::GetType()
 	{
-		return (Sentinel::Components::ComponentType)mRef->GetType();
+		return (Sentinel::Wrapped::ComponentType)mRef->GetType();
 	}
 
 	DEFINE_PROPERTY_STR( GameComponent, Name );

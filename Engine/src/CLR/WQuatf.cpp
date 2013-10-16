@@ -1,6 +1,8 @@
 #include "WQuatf.h"
+#include "Quatf.h"
+#include "WVector3f.h"
 
-namespace Sentinel { namespace Math
+namespace Sentinel { namespace Wrapped
 {
 	DEFINE_REF( Quatf );
 

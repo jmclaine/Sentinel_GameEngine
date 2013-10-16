@@ -3,7 +3,6 @@
 #include <windows.h>
 
 #include "Common.h"
-#include "Singleton.h"
 
 namespace Sentinel
 {
@@ -25,10 +24,8 @@ namespace Sentinel
 		NUM_BUTTONS
 	};
 
-	class SENTINEL_DLL Mouse : public SingletonSafe< Mouse >
+	class SENTINEL_DLL Mouse
 	{
-		friend class SingletonSafe< Mouse >;
-
 	private:
 
 		int		mButtonStates[ NUM_BUTTONS ];
@@ -44,6 +41,8 @@ namespace Sentinel
 		Mouse();
 
 	public:
+
+		static Mouse& Get();
 
 		int		Show( bool visiblity );
 
@@ -71,12 +70,8 @@ namespace Sentinel
 		KEY_DOWN,
 	};
 
-	class SENTINEL_DLL Keyboard : public SingletonSafe< Keyboard >
+	class SENTINEL_DLL Keyboard
 	{
-		friend class SingletonSafe< Keyboard >;
-
-	private:
-
 		static const UINT NUM_KEYS	= 256;
 
 		int		mKeyStates[ NUM_KEYS ];
@@ -87,6 +82,8 @@ namespace Sentinel
 		Keyboard();
 
 	public:
+
+		static Keyboard& Get();
 
 		bool	IsDown( UINT key );
 

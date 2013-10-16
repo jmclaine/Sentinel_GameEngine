@@ -4,7 +4,7 @@
 #include "m_shared_ptr.h"
 #include "Texture.h"
 
-namespace Sentinel { namespace Assets
+namespace Sentinel { namespace Wrapped
 {
 	public ref class WTexture
 	{

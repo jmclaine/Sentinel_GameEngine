@@ -1,6 +1,6 @@
 #include "WControllerComponent.h"
 
-namespace Sentinel { namespace Components
+namespace Sentinel { namespace Wrapped
 {
 	WControllerComponent::WControllerComponent()
 	{

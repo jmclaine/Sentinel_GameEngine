@@ -5,7 +5,7 @@ Shaders are created from WRenderer.CreateShader()
 #include "WTexture.h"
 #include "Shader.h"
 
-namespace Sentinel { namespace Assets
+namespace Sentinel { namespace Wrapped
 {
 	public ref class WShader
 	{

@@ -4,6 +4,7 @@
 #include "Timing.h"
 #include "GameObject.h"
 #include "GameWorld.h"
+#include "Archive.h"
 
 namespace Sentinel
 {
@@ -11,7 +12,7 @@ namespace Sentinel
 
 	GameObject::GameObject() :
 		mTransform( NULL ), mController( NULL ), mPhysics( NULL ), mDrawable( NULL ), 
-		mParent( NULL )
+		mParent( NULL ), mWorld( NULL )
 	{}
 
 	GameObject::~GameObject()
@@ -62,26 +63,44 @@ namespace Sentinel
 			mChild[ x ]->Save( archive );
 	}
 
+#define LOAD_COMPONENT()\
+{	component = (GameComponent*)SerialRegister::Load( archive );\
+	if( component ) {\
+	AttachComponent( component );\
+	component->Load( archive ); }}
+
 	void GameObject::Load( Archive& archive )
 	{
 		archive.Read( &mName );
 
 		int id = 0;
-		AttachComponent( (GameComponent*)SerialRegister::Load( archive ));
-		AttachComponent( (GameComponent*)SerialRegister::Load( archive ));
-		AttachComponent( (GameComponent*)SerialRegister::Load( archive ));
-		AttachComponent( (GameComponent*)SerialRegister::Load( archive ));
+		GameComponent* component;
+
+		LOAD_COMPONENT();
+		LOAD_COMPONENT();
+		LOAD_COMPONENT();
+		LOAD_COMPONENT();
 
 		BYTE size = 0;
 		archive.Read( &size );
 
 		for( BYTE x = 0; x < size; ++x )
-			AttachComponent( (GameComponent*)SerialRegister::Load( archive ));
+			LOAD_COMPONENT();
 
+		// Read children.
+		//
 		archive.Read( &size );
 
+		GameObject* obj;
 		for( BYTE x = 0; x < size; ++x )
-			AddChild( (GameObject*)SerialRegister::Load( archive ));
+		{
+			obj = (GameObject*)SerialRegister::Load( archive );
+			if( obj )
+			{
+				AddChild( obj );
+				obj->Load( archive );
+			}
+		}
 	}
 
 	//////////////////////////////
@@ -191,21 +210,28 @@ namespace Sentinel
 		mChild.push_back( obj );
 		obj->mParent = this;
 
-		// Ensure the GameWorld no longer has
-		// the object as a parent object.
-		//
-		GameWorld::Inst()->RemoveGameObject( obj );
+		if( mWorld )
+		{
+			obj->mWorld  = mWorld;
+
+			// Ensure the GameWorld no longer has
+			// the object as a parent object.
+			//
+			mWorld->RemoveGameObject( obj );
+		}
 	}
 
 	void GameObject::RemoveChild( GameObject* obj )
 	{
 		TRAVERSE_LIST( it, mChild )
+		{
 			if( *it == obj )
 			{
 				obj->mParent = NULL;
 				mChild.erase( it );
 				return;
 			}
+		}
 	}
 
 	GameObject* GameObject::GetChild( UINT index )
@@ -218,6 +244,18 @@ namespace Sentinel
 	UINT GameObject::NumChildren()
 	{
 		return mChild.size();
+	}
+
+	//////////////////////////////
+
+	GameObject* GameObject::Parent()
+	{
+		return mParent;
+	}
+
+	GameWorld* GameObject::World()
+	{
+		return mWorld;
 	}
 
 	//////////////////////////////

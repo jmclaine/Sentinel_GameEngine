@@ -8,7 +8,7 @@ Release() should be called manually for a controlled free memory.
 #include "GameObject.h"
 #include "WGameComponent.h"
 
-namespace Sentinel { namespace Components
+namespace Sentinel { namespace Wrapped
 {
 	public ref class WGameObject
 	{
@@ -27,8 +27,8 @@ namespace Sentinel { namespace Components
 
 		////////////////////////////////
 
-		DECLARE_PROPERTY( System::String^,		Name );
-		DECLARE_PROPERTY( WGameObject^, Parent );
+		DECLARE_PROPERTY(   System::String^,	Name );
+		DECLARE_PROPERTY_G( WGameObject^,		Parent );
 
 		////////////////////////////////
 
@@ -64,6 +64,6 @@ namespace Sentinel { namespace Components
 
 		// Find the first occurrence of a component by type.
 		//
-		WGameComponent^ FindComponent( Sentinel::Components::ComponentType type );
+		WGameComponent^ FindComponent( Sentinel::Wrapped::ComponentType type );
 	};
 }}

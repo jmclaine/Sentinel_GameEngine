@@ -17,9 +17,9 @@ namespace Sentinel
 	{
 		friend class GameWorld;
 
-		DECLARE_SERIAL();
-
 	protected:
+
+		DECLARE_SERIAL();
 
 		GameComponent*						mTransform;
 		GameComponent*						mController;
@@ -30,11 +30,13 @@ namespace Sentinel
 
 		std::vector< GameObject* >			mChild;
 
+		GameObject*							mParent;
+		GameWorld*							mWorld;
+
 	public:
 
 		std::string							mName;
-		GameObject*							mParent;
-
+		
 		//////////////////////////////
 
 		GameObject();
@@ -57,6 +59,12 @@ namespace Sentinel
 		GameObject*		GetChild( UINT index );
 
 		UINT			NumChildren();
+
+		//////////////////////////////
+
+		GameObject*		Parent();
+
+		GameWorld*		World();
 
 		//////////////////////////////
 

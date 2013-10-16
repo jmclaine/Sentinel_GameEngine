@@ -1,14 +1,14 @@
 #pragma once
 
+#include "Property.h"
 #include "Matrix4f.h"
-#include "WVector3f.h"
-#include "WVector4f.h"
-#include "WQuatf.h"
 
-using namespace System;
-
-namespace Sentinel { namespace Math
+namespace Sentinel { namespace Wrapped
 {
+	ref class WVector3f;
+	ref class WVector4f;
+	ref class WQuatf;
+
 	public ref class WMatrix4f
 	{
 		DECLARE_REF( Matrix4f );

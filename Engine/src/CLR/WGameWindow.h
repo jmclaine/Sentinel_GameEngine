@@ -9,10 +9,27 @@ WGameWindow should be inherited to use input.
 public class GameWindow : WGameWindow
 {}
 */
-#include "WRenderer.h"
+#using <System.dll>
+#using <WindowsBase.dll>
+#using <PresentationCore.dll>
+#using <PresentationFramework.dll>
 
-namespace Sentinel { namespace Systems
+#include <Windows.h>
+
+#include "GameWindow.h"
+#include "CDPI.h"
+
+using namespace System::Windows;
+using namespace System::Windows::Interop;
+using namespace System::Windows::Media;
+using namespace System::Windows::Input;
+using namespace System::Runtime::InteropServices;
+
+namespace Sentinel { namespace Wrapped
 {
+	ref class WRenderer;
+	ref class WWindowInfo;
+
 	public ref class WGameWindow : public HwndHost
 	{
 	private:
@@ -25,12 +42,21 @@ namespace Sentinel { namespace Systems
 		
 		WWindowInfo^		mWindowInfo;
 
+		WRenderer^			mRenderer;
+
+		CDPI*				mCDPI;	// fixes aspect ratio within window
+
 	public:
 
 		WGameWindow();
 		~WGameWindow();
+		!WGameWindow();
 
-		virtual void		Startup( String^ title, String^ windowClass, WWindowInfo^ info );
+		virtual void		Release();
+
+		/////////////////////////////////
+
+		virtual void		Startup( WRenderer^ renderer, System::String^ title, System::String^ windowClass, WWindowInfo^ info );
 		
 		virtual void		Update();
 
@@ -65,7 +91,7 @@ namespace Sentinel { namespace Systems
 
 	protected:
 		
-		virtual IntPtr		WndProc( IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, bool% handled ) override;
+		virtual System::IntPtr WndProc( System::IntPtr hwnd, int msg, System::IntPtr wParam, System::IntPtr lParam, bool% handled ) override;
 
 		virtual void		OnRenderSizeChanged( SizeChangedInfo^ sizeInfo ) override;
 

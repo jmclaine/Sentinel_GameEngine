@@ -1,8 +1,6 @@
 #include "WBuffer.h"
 
-using namespace Sentinel;
-
-namespace Sentinel { namespace Assets
+namespace Sentinel { namespace Wrapped
 {
 	DEFINE_REF( Buffer );
 
@@ -30,9 +28,9 @@ namespace Sentinel { namespace Assets
 		mRef->Unlock();
 	}
 
-	Sentinel::Assets::BufferType WBuffer::Type()
+	BufferType WBuffer::Type()
 	{
-		return (Sentinel::Assets::BufferType)mRef->Type();
+		return (BufferType)mRef->Type();
 	}
 
 	UINT WBuffer::Size()

@@ -1,5 +1,6 @@
 #include "GameWindow.h"
 #include "Input.h"
+#include "Renderer.h"
 
 namespace Sentinel
 {
@@ -21,8 +22,10 @@ namespace Sentinel
 	GameWindow::~GameWindow()
 	{}
 
-	void GameWindow::Startup( HINSTANCE hInstance, int nCmdShow, TCHAR* title, TCHAR* windowClass, const WindowInfo& info )
+	void GameWindow::Startup( Renderer* renderer, HINSTANCE hInstance, int nCmdShow, TCHAR* title, TCHAR* windowClass, const WindowInfo& info )
 	{
+		mRenderer = renderer;
+
 		strcpy_s( mTitle, title );
 		strcpy_s( mWindowClass, windowClass );
 		
@@ -41,7 +44,7 @@ namespace Sentinel
 			UpdateWindow( mHWND );
 		}
 
-		mWindowInfo = Renderer::Inst()->Startup( mHWND, info.Fullscreen(), info.Width(), info.Height() );
+		mWindowInfo = mRenderer->Startup( mHWND, info.Fullscreen(), info.Width(), info.Height() );
 
 		if( !mWindowInfo )
 			throw AppException( "Failed Renderer::Startup()" );
@@ -51,7 +54,7 @@ namespace Sentinel
 	{
 		SetActive();
 
-		Renderer::Inst()->Shutdown();
+		mRenderer->Shutdown();
 
 		UnregisterClass( mWindowClass, mINST );
 
@@ -63,12 +66,12 @@ namespace Sentinel
 
 	void GameWindow::SetActive()
 	{
-		Renderer::Inst()->SetWindow( mWindowInfo );
+		mRenderer->SetWindow( mWindowInfo );
 	}
 
 	bool GameWindow::ShareResources( GameWindow* window )
 	{
-		return Renderer::Inst()->ShareResources( mWindowInfo, window->mWindowInfo );
+		return mRenderer->ShareResources( mWindowInfo, window->mWindowInfo );
 	}
 
 	HWND GameWindow::GetHandle()
@@ -85,8 +88,8 @@ namespace Sentinel
 
 	LRESULT CALLBACK GameWindow::WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 	{
-		Mouse::Inst()->ProcessMessages( hWnd, msg, wParam, lParam );
-		Keyboard::Inst()->ProcessMessages();
+		Mouse::Get().ProcessMessages( hWnd, msg, wParam, lParam );
+		Keyboard::Get().ProcessMessages();
 
 		switch( msg )
 		{

@@ -10,9 +10,9 @@ Added Rotation vector for clarity.
 #include "WVector3f.h"
 #include "WQuatf.h"
 
-using namespace Sentinel::Math;
+using namespace Sentinel::Wrapped;
 
-namespace Sentinel { namespace Components
+namespace Sentinel { namespace Wrapped
 {
 	public ref class WTransformComponent : public WGameComponent
 	{

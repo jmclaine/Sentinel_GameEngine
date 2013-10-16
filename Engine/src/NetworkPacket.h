@@ -1,8 +1,9 @@
 #pragma once
 
+#include <unordered_map>
+
 #include "Common.h"
 #include "NetworkSocket.h"
-#include "Timing.h"
 
 namespace Sentinel
 {
@@ -82,25 +83,27 @@ namespace Sentinel
 
 		// UINT = ACK
 		//
-		static std::unordered_map< UINT, GuaranteedMessage* >									 mGuaranteedMessageMap;
+		static std::unordered_map< UINT, GuaranteedMessage* > mGuaranteedMessageMap;
 
 		// Use connections as a basis for what messages should be sent.
 		//
 		static std::unordered_map< NetworkSocket::Connection*, std::vector< GuaranteedSender* >> mGuaranteedSenderMap;
 
-		static UINT	mACK;		// next ACK number
+		static UINT		mACK;		// next ACK number
 
 		////////////////////////////////
 
-		char*	mData;			// starting location of entire packet data
-		char*	mStart;			// starting location of a packet (header)
-		char*	mPosition;		// current memory location within packet
+		char*			mData;			// starting location of entire packet data
+		char*			mStart;			// starting location of a packet (header)
+		char*			mPosition;		// current memory location within packet
 
-		UINT	mSize;			// size of packet
+		UINT			mSize;			// size of packet
+
+		NetworkSocket*	mSocket;
 
 	public:
 
-		NetworkPacket();
+		NetworkPacket( NetworkSocket* networkSocket );
 
 		virtual ~NetworkPacket();
 
@@ -110,9 +113,9 @@ namespace Sentinel
 
 	public:
 
-		static void Update();
+		void		Update( float DT );
 
-		static void Shutdown();
+		void		Shutdown();
 
 		void		Clear( UINT size = PACKET_SIZE );
 	};
@@ -124,21 +127,21 @@ namespace Sentinel
 	//
 	// Example:
 	//
-	// NetworkPacketSender::Inst()->AddHeader( HEADER_PACKET | HEADER_GUARANTEED );
-	// NetworkPacketSender::Inst()->AddValue( (BYTE)0 );
-	// NetworkPacketSender::Inst()->AddEnd();
+	// static NetworkPacketSender sender;
 	//
-	// NetworkPacketSender::Inst()->Send();
+	// sender->AddHeader( HEADER_PACKET | HEADER_GUARANTEED );
+	// sender->AddValue( (BYTE)0 );
+	// sender->AddEnd();
 	//
-	class SENTINEL_DLL NetworkPacketSender : public NetworkPacket, public SingletonSafe< NetworkPacketSender >
+	// sender->Send();
+	//
+	class SENTINEL_DLL NetworkPacketSender : public NetworkPacket
 	{
-		friend class SingletonSafe< NetworkPacketSender >;
-
-	private:
-
-		NetworkPacketSender();
-
 	public:
+
+		NetworkPacketSender( NetworkSocket* networkSocket );
+
+		/////////////////////////////////////////
 
 		void AddHeader( UCHAR header, float advTimer = 0.0f );
 
@@ -162,22 +165,26 @@ namespace Sentinel
 	//
 	// Example:
 	//
-	// if( NetworkPacketReceiver::Inst()->Recv() )
-	// {
-	//     NetworkPacket::Header header = NetworkPacketReceiver::Inst()->GetHeader();
+	// static NetworkPacketReceiver receiver;
 	//
-	//     BYTE value = NetworkPacketReceiver::Inst()->GetValue< BYTE >();
+	// if( receiver.Recv() )
+	// {
+	//     NetworkPacket::Header header = receiver.GetHeader();
+	//
+	//     BYTE value = receiver.GetValue< BYTE >();
 	// }
 	//
-	class SENTINEL_DLL NetworkPacketReceiver : public NetworkPacket, public SingletonSafe< NetworkPacketReceiver >
+	class SENTINEL_DLL NetworkPacketReceiver : public NetworkPacket
 	{
-		friend class SingletonSafe< NetworkPacketReceiver >;
-
 	private:
 
-		NetworkPacketReceiver();
+		NetworkPacketSender*	mSender;
 
 	public:
+
+		NetworkPacketReceiver( NetworkSocket* networkSocket, NetworkPacketSender* sender );
+
+		/////////////////////////////////////////
 
 		const NetworkPacket::Header& GetHeader();
 

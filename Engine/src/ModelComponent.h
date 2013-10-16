@@ -1,10 +1,15 @@
 #pragma once
 
-#include "Model.h"
+#include <vector>
+#include <memory>
+
 #include "DrawableComponent.h"
 
 namespace Sentinel
 {
+	class Material;
+	class Model;
+
 	class SENTINEL_DLL ModelComponent : public DrawableComponent
 	{
 		DECLARE_SERIAL();

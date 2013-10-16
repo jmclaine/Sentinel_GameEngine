@@ -1,12 +1,17 @@
 #pragma once
 
-#include "Texture.h"
 #include "Util.h"
-#include "ParticleSystem.h"
+#include "ColorRGBA.h"
 #include "DrawableComponent.h"
 
 namespace Sentinel
 {
+	class TransformComponent;
+	class ParticleSystem;
+	class Texture;
+	class Material;
+	class ColorRGBA;
+
 	class SENTINEL_DLL SpriteComponent : public DrawableComponent
 	{
 		friend class ParticleSystem;
@@ -16,6 +21,8 @@ namespace Sentinel
 	private:
 
 		TransformComponent*		mTransform;
+
+		ParticleSystem*			mParticle;
 
 		/////////////////////////////////
 		
@@ -32,9 +39,9 @@ namespace Sentinel
 	public:
 
 		SpriteComponent();
-		SpriteComponent( std::shared_ptr< Texture > texture, const POINT& spriteSize );
+		SpriteComponent( ParticleSystem* particle, std::shared_ptr< Texture > texture, const POINT& spriteSize );
 
-		void	Set( std::shared_ptr< Texture > texture, const POINT& spriteSize );
+		void	Set( ParticleSystem* particle, std::shared_ptr< Texture > texture, const POINT& spriteSize );
 
 		void	Startup();
 

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "ColorRGBA.h"
 #include "Property.h"
+#include "ColorRGBA.h"
 
-namespace Sentinel { namespace Assets
+namespace Sentinel { namespace Wrapped
 {
 	public ref class WColorRGBA
 	{

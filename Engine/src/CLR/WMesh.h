@@ -3,26 +3,18 @@
 #include "m_shared_ptr.h"
 #include "Property.h"
 #include "Mesh.h"
-#include "WRenderer.h"
-#include "WMaterial.h"
-#include "WShader.h"
-#include "WTexture.h"
-#include "WBuffer.h"
-#include "WMatrix4f.h"
-#include "WVector4f.h"
+#include "WRendererTypes.h"
 
-using namespace Sentinel::Math;
-
-namespace Sentinel { namespace Assets
+namespace Sentinel { namespace Wrapped
 {
-	public enum class TextureType
-	{
-		DIFFUSE,
-		NORMAL,
-		DEPTH,
-
-		NUM_TEXTURES,
-	};
+	ref class WRenderer;
+	ref class WGameWorld;
+	ref class WBuffer;
+	ref class WShader;
+	ref class RTexture;
+	ref class WMaterial;
+	ref class WMatrix4f;
+	ref class WVector4f;
 
 	public ref class WMesh
 	{
@@ -34,7 +26,7 @@ namespace Sentinel { namespace Assets
 
 		static bool operator == ( WMesh^ mesh0, WMesh^ mesh1 );
 
-		DECLARE_PROPERTY( Sentinel::Systems::PrimitiveType,	Primitive );
+		DECLARE_PROPERTY( Sentinel::Wrapped::PrimitiveType,	Primitive );
 		
 		DECLARE_PROPERTY( WBuffer^,			VBO );
 		DECLARE_PROPERTY( WBuffer^,			IBO );
@@ -48,8 +40,8 @@ namespace Sentinel { namespace Assets
 
 		RTexture^	Texture( TextureType type );
 
-		void		Draw();
-		void		Draw( UINT count );
+		void		Draw( WRenderer^ renderer, WGameWorld^ world );
+		void		Draw( WRenderer^ renderer, WGameWorld^ world, UINT count );
 	};
 
 	DECLARE_CLASS_REF_SHARED( Mesh );

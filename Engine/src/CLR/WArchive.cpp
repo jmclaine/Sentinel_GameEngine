@@ -1,7 +1,7 @@
 #include "WArchive.h"
 #include "WString.h"
 
-namespace Sentinel { namespace Utilities
+namespace Sentinel { namespace Wrapped
 {
 	DEFINE_REF( Archive );
 
@@ -10,7 +10,7 @@ namespace Sentinel { namespace Utilities
 		mRef = new Archive();
 	}
 
-	DEFINE_OP_DEREF( Archive );
+	DEFINE_OP_PTR( Archive );
 
 	void WArchive::Open( System::String^ filename, System::String^ mode )
 	{

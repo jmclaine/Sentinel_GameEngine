@@ -1,7 +1,7 @@
 #include "WTransformComponent.h"
 #include "MathCommon.h"
 
-namespace Sentinel { namespace Components
+namespace Sentinel { namespace Wrapped
 {
 	WTransformComponent::WTransformComponent()
 	{

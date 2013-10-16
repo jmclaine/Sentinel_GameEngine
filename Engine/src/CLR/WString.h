@@ -5,7 +5,7 @@
 
 using namespace System::Runtime::InteropServices;
 
-namespace Sentinel { namespace Utilities
+namespace Sentinel { namespace Wrapped
 {
 	public ref class WString
 	{

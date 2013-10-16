@@ -1,20 +1,11 @@
 #pragma once
 
 #include "Property.h"
+#include "WRendererTypes.h"
 #include "Buffer.h"
 
-using namespace Sentinel;
-
-namespace Sentinel { namespace Assets
+namespace Sentinel { namespace Wrapped
 {
-	public enum class BufferType
-	{
-		VERTEX = 1,
-		INDEX  = 2,
-
-		NUM_BUFFER_TYPES
-	};
-
 	public ref class WBuffer
 	{
 		DECLARE_REF( Buffer );
@@ -34,7 +25,7 @@ namespace Sentinel { namespace Assets
 		System::IntPtr^ Lock();
 		void		Unlock();
 		
-		Sentinel::Assets::BufferType Type();
+		BufferType	Type();
 		UINT		Size();
 		UINT		Stride();
 		UINT		Count();

@@ -8,8 +8,8 @@ namespace Sentinel
 	{
 	protected:
 
-		UINT			mWidth;
-		UINT			mHeight;
+		UINT				mWidth;
+		UINT				mHeight;
 		
 		//////////////////////////////
 

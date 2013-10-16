@@ -1,30 +1,26 @@
 #pragma once
 
-#include "Common.h"
 #include "AssetManager.h"
 #include "Shader.h"
-#include "Singleton.h"
 
 namespace Sentinel
 {
-	class SENTINEL_DLL ShaderManager : public AssetManager< Shader >, public SingletonSafe< ShaderManager >
-	{
-		friend class SingletonSafe< ShaderManager >;
-		friend class AssetManager< Shader >;
+	class Renderer;
+	class Archive;
 
-	private:
+	class SENTINEL_DLL ShaderManager : public AssetManager< Shader >
+	{
+	public:
 
 		ShaderManager();
 		~ShaderManager();
 
-	public:
-
-		static ShaderManager* Create();
+		/////////////////////////////////
 
 		void Save( Archive& archive );
 
-		void Load( Archive& archive );
+		void Load( Archive& archive, Renderer* renderer );
 
-		bool LoadConfig( const char* filename );
+		static ShaderManager* LoadConfig( const char* filename, Renderer* renderer, ShaderManager* shaderManager = NULL );
 	};
 }

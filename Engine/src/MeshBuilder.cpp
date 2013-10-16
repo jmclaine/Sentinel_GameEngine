@@ -1,9 +1,13 @@
 #include <vector>
 #include <memory>
 
+#include "MeshBuilder.h"
 #include "Renderer.h"
 #include "MathCommon.h"
-#include "MeshBuilder.h"
+#include "Mesh.h"
+#include "Shader.h"
+#include "Buffer.h"
+#include "Texture.h"
 
 namespace Sentinel
 {
@@ -22,7 +26,7 @@ namespace Sentinel
 		mShader.reset();
 
 		for( UINT i = 0; i < NUM_TEXTURES; ++i )
-			mTexture[ i ] = Renderer::Inst()->BASE_TEXTURE;
+			mTexture[ i ] = NULL;
 		
 		ClearGeometry();
 
@@ -1449,7 +1453,7 @@ namespace Sentinel
 
 	// Create the VBO and IBO.
 	//
-	void MeshBuilder::CreateBuffers()
+	void MeshBuilder::CreateBuffers( Renderer* renderer )
 	{
 		_ASSERT( mShader );
 		_ASSERT( mVertex.size() > 0 );
@@ -1558,19 +1562,19 @@ namespace Sentinel
 			}
 		}
 
-		mVBO = Renderer::Inst()->CreateBuffer( memBlock, totalSize, mShader->VertexSize(), VERTEX_BUFFER );
-		mIBO = Renderer::Inst()->CreateBuffer( &mIndex.front(), mIndex.size()*sizeof(UINT), sizeof(UINT), INDEX_BUFFER );
+		mVBO = renderer->CreateBuffer( memBlock, totalSize, mShader->VertexSize(), VERTEX_BUFFER );
+		mIBO = renderer->CreateBuffer( &mIndex.front(), mIndex.size()*sizeof(UINT), sizeof(UINT), INDEX_BUFFER );
 
 		free( memBlock );
 	}
 
 	// Returns the mesh created from the buffers; otherwise, NULL.
 	//
-	Mesh* MeshBuilder::BuildMesh()
+	Mesh* MeshBuilder::BuildMesh( Renderer* renderer )
 	{
 		Mesh* mesh = new Mesh();
 		
-		CreateBuffers();
+		CreateBuffers( renderer );
 
 		mesh->mVBO = mVBO;
 		mesh->mIBO = mIBO;

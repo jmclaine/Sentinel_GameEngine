@@ -1,18 +1,18 @@
-#include "GameObject.h"
 #include "LightComponent.h"
+#include "TransformComponent.h"
+#include "GameObject.h"
+#include "Archive.h"
 
 namespace Sentinel
 {
 	DEFINE_SERIAL_REGISTER( LightComponent );
 	DEFINE_SERIAL_CLONE( LightComponent );
 
-	LightComponent::LightComponent()
+	LightComponent::LightComponent() :
+		mTransform( NULL ),
+		mAttenuation( Vector4f( 1, 1, 1, 10000 ))
 	{
 		mType = GameComponent::LIGHT;
-
-		Shutdown();
-
-		mAttenuation = Vector4f( 1, 1, 1, 10000 );
 	}
 
 	const TransformComponent* LightComponent::GetTransform()

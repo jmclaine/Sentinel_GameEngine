@@ -2,17 +2,17 @@
 /*
 The AudioSystem is based on OpenAL, but has been created
 as an abstract class to remove the core OpenAL source from
-the header in order for the Editor to use the audio system.
+the header in order for the Editor to use it.
 */
 #include "Common.h"
-#include "Singleton.h"
-#include "AudioSource.h"
 #include "Vector3f.h"
-#include "Archive.h"
 
 namespace Sentinel
 {
-	class SENTINEL_DLL AudioSystem : public SingletonAbstractSafe< AudioSystem >
+	class Archive;
+	class AudioSource;
+
+	class SENTINEL_DLL AudioSystem
 	{
 	public:
 
@@ -28,8 +28,8 @@ namespace Sentinel
 
 		//////////////////////////////////
 
-		virtual AudioSource*	CreateSound( const char* filename ) = 0;// determines the type and loads automatically
-		virtual AudioSource*	CreateSound( Archive& archive ) = 0;	// loads from file location into a data buffer directly
+		virtual AudioSource*	CreateSound( const char* filename ) = 0; // determines the type and loads automatically
+		virtual AudioSource*	CreateSound( Archive& archive ) = 0;	 // loads from file location into a data buffer directly
 		virtual AudioSource*	CreateSoundWAV( Archive& archive ) = 0;
 		virtual AudioSource*	CreateSoundOGG( Archive& archive ) = 0;
 

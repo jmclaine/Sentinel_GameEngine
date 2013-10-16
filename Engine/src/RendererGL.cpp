@@ -1,6 +1,3 @@
-#include "Renderer.h"
-#include "Archive.h"
-
 #include <GL/glew.h>
 #include <gl/gl.h>
 #include <gl/glu.h>
@@ -11,6 +8,12 @@
 
 #include <fstream>
 #include <vector>
+
+#include "Renderer.h"
+#include "Archive.h"
+#include "Buffer.h"
+#include "Texture.h"
+#include "Shader.h"
 
 #ifdef _DEBUG
 inline void HANDLE_GL_ERRORS()
@@ -61,12 +64,17 @@ namespace Sentinel
 		{
 			if( mType == VERTEX_BUFFER )
 			{
-				Renderer::Inst()->SetVBO( this );
+				glBindBuffer( GL_ARRAY_BUFFER, mID );
+
 				return glMapBuffer( GL_ARRAY_BUFFER, GL_READ_WRITE );
 			}
 			else
 			{
-				Renderer::Inst()->SetIBO( this );
+				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, mID );
+
+				glEnableClientState( GL_INDEX_ARRAY );
+				glIndexPointer( GL_UNSIGNED_INT, sizeof( UINT ), 0 );
+
 				return glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
 			}
 		}

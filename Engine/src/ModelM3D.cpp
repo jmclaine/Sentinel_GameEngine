@@ -2,18 +2,40 @@
 #include <vector>
 
 #include "Model.h"
+#include "Mesh.h"
 #include "Util.h"
 #include "MeshBuilder.h"
 #include "Timing.h"
+#include "AssetArchive.h"
 #include "Archive.h"
-#include "TextureManager.h"
+#include "Renderer.h"
+#include "Shader.h"
 #include "ShaderManager.h"
-#include "MeshManager.h"
+#include "Texture.h"
+#include "TextureManager.h"
+#include "Material.h"
 
 namespace Sentinel
 {
 	class ModelM3D : public Model
 	{
+		// Texture types from 3DStudio Max 2012.
+		//
+		enum AutodeskTextureTypes
+		{
+			AUTODESK_DIFFUSE1 = 1,
+			AUTODESK_DIFFUSE2 = 2,
+			AUTODESK_DIFFUSE3 = 3,
+			AUTODESK_DIFFUSE4 = 4,
+			AUTODESK_DIFFUSE5 = 5,
+			AUTODESK_DIFFUSE6 = 6,
+			AUTODESK_DIFFUSE7 = 7,
+			AUTODESK_BUMP     = 8,
+			AUTODESK_PARALLAX = 9,	// Refraction
+
+			NUM_AUTODESK_TYPES,
+		};
+
 		struct Vertex
 		{
 			Vector3f	mPosition;
@@ -72,23 +94,6 @@ namespace Sentinel
 				SAFE_DELETE_ARRAY( mKeyFrame );
 			}
 		};
-		
-		// Texture types from 3DStudio Max 2012.
-		//
-		enum AutodeskTextureTypes
-		{
-			AUTODESK_DIFFUSE1 = 1,
-			AUTODESK_DIFFUSE2 = 2,
-			AUTODESK_DIFFUSE3 = 3,
-			AUTODESK_DIFFUSE4 = 4,
-			AUTODESK_DIFFUSE5 = 5,
-			AUTODESK_DIFFUSE6 = 6,
-			AUTODESK_DIFFUSE7 = 7,
-			AUTODESK_BUMP     = 8,
-			AUTODESK_PARALLAX = 9,	// Refraction
-
-			NUM_AUTODESK_TYPES,
-		};
 
 		// Materials.
 		//
@@ -146,7 +151,10 @@ namespace Sentinel
 			mNumMaterials = 0;
 		}
 
-		void Save( Archive& archive )
+		void Save( Archive&			archive,
+				   Renderer*		renderer, 
+				   ShaderManager*	shaderManager, 
+				   TextureManager*	textureManager )
 		{
 			// Save the format type.
 			//
@@ -163,7 +171,7 @@ namespace Sentinel
 			archive.Write( &mNumMaterials );
 			
 			for( UINT x = 0; x < mNumMaterials; ++x )
-				WriteMaterial( archive, mMaterials[ x ] );
+				WriteMaterial( archive, mMaterials[ x ], textureManager );
 
 			// Write the objects.
 			//
@@ -176,7 +184,7 @@ namespace Sentinel
 				archive.Write( &mObject[ x ].mNumMeshes );
 
 				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
-					MeshManager::SaveMesh( archive, mObject[ x ].mMesh[ y ] );
+					AssetArchive::SaveMesh( archive, mObject[ x ].mMesh[ y ], renderer, shaderManager, textureManager );
 
 				// Write the keyframes.
 				//
@@ -209,7 +217,10 @@ namespace Sentinel
 			}
 		}
 
-		void Create( Archive& archive )
+		void Create( Archive&			archive,
+					 Renderer*			renderer, 
+					 ShaderManager*		shaderManager, 
+					 TextureManager*	textureManager )
 		{
 			// Read if the model has weighted vertices.
 			//
@@ -223,7 +234,7 @@ namespace Sentinel
 			mMaterials = new MaterialTexture[ mNumMaterials ];
 
 			for( UINT x = 0; x < mNumMaterials; ++x )
-				ReadMaterial( archive, mMaterials[ x ] );
+				ReadMaterial( archive, mMaterials[ x ], renderer, textureManager );
 
 			// Read the objects.
 			//
@@ -238,7 +249,7 @@ namespace Sentinel
 				mObject[ x ].mMesh = new Mesh*[ mObject[ x ].mNumMeshes ];
 
 				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
-					MeshManager::LoadMesh( archive, mObject[ x ].mMesh[ y ] );
+					mObject[ x ].mMesh[ y ] = AssetArchive::LoadMesh( archive, renderer, shaderManager, textureManager );
 
 				// Read the keyframes.
 				//
@@ -263,7 +274,10 @@ namespace Sentinel
 			}
 		}
 
-		bool Create( const char* filename )
+		bool Create( const char*		filename, 
+					 Renderer*			renderer, 
+					 ShaderManager*		shaderManager, 
+					 TextureManager*	textureManager )
 		{
 			Vertex*    vertices  = NULL;
 			Vector3f*  normals   = NULL;
@@ -284,7 +298,7 @@ namespace Sentinel
 				archive.Read( &mNumMaterials );
 				mMaterials = new MaterialTexture[ mNumMaterials ];
 				for( UINT x = 0; x < mNumMaterials; ++x )
-					ReadMaterial( archive, mMaterials[ x ] );
+					ReadMaterial( archive, mMaterials[ x ], renderer, textureManager );
 				
 				// Read whether any data was exported using 32-bit.
 				//
@@ -435,26 +449,26 @@ namespace Sentinel
 
 						if( numTextures == 0 )
 						{
-							builder.mShader = ShaderManager::Inst()->Get( "Color" );
+							builder.mShader = shaderManager->Get( "Color" );
 						}
 						else
 						if( isSkinned )
 						{
-							builder.mShader = ShaderManager::Inst()->Get( "Skinning" );
+							builder.mShader = shaderManager->Get( "Skinning" );
 						}
 						else
 						if( numTextures == 1 )
 						{
-							builder.mShader = ShaderManager::Inst()->Get( "Texture" );;
+							builder.mShader = shaderManager->Get( "Texture" );
 						}
 						else
 						if( numTextures == 2 )
 						{
-							builder.mShader = ShaderManager::Inst()->Get( "Normal Map" );;
+							builder.mShader = shaderManager->Get( "Normal Map" );
 						}
 						else
 						{
-							builder.mShader = ShaderManager::Inst()->Get( "Parallax" );;
+							builder.mShader = shaderManager->Get( "Parallax" );
 						}
 
 						// Read faces.
@@ -494,7 +508,7 @@ namespace Sentinel
 
 						builder.CalculateTangents( false );
 						
-						mObject[ x ].mMesh[ y ] = builder.BuildMesh();
+						mObject[ x ].mMesh[ y ] = builder.BuildMesh( renderer );
 						mObject[ x ].mMesh[ y ]->mMaterial = material;
 
 						builder.ApplyMatrix( mObject[ x ].mKeyFrame[ 0 ].mMatrix );
@@ -527,7 +541,7 @@ namespace Sentinel
 
 	private:
 
-		void WriteMaterial( Archive& archive, MaterialTexture& matTex )
+		void WriteMaterial( Archive& archive, MaterialTexture& matTex, TextureManager* textureManager )
 		{
 			// Write base material.
 			//
@@ -556,14 +570,14 @@ namespace Sentinel
 				{
 					archive.Write( &x );
 
-					std::string name = TextureManager::Inst()->Get( matTex.mTexture[ x ] );
+					std::string name = textureManager->Get( matTex.mTexture[ x ] );
 
 					archive.Write( &name );
 				}
 			}
 		}
 
-		void ReadMaterial( Archive& archive, MaterialTexture& matTex )
+		void ReadMaterial( Archive& archive, MaterialTexture& matTex, Renderer* renderer, TextureManager* textureManager )
 		{
 			// Set the material.
 			//
@@ -615,7 +629,10 @@ namespace Sentinel
 				std::string name;
 				archive.Read( &name );
 				
-				matTex.mTexture[ type ] = TextureManager::Inst()->Add( name, Renderer::Inst()->CreateTextureFromFile( name.c_str() ));
+				if( textureManager )
+					matTex.mTexture[ type ] = textureManager->Add( name, renderer->CreateTextureFromFile( name.c_str() ));
+				else
+					matTex.mTexture[ type ] = renderer->CreateTextureFromFile( name.c_str() );
 			}
 		}
 
@@ -672,10 +689,11 @@ namespace Sentinel
 			return mObject[ objIndex ].mCurrTime;
 		}
 		
-		void Update()
+		void Update( float DT )
 		{
 			// Setup Bone Matrix.
 			//
+			/*
 			if( mIsWeighted )
 			{
 				static Matrix4f matBone;
@@ -693,6 +711,7 @@ namespace Sentinel
 					skin->SetMatrix( skin->Uniform().find( 'B' ), matBone.Ptr(), x, 1 );
 				}
 			}
+			*/
 
 			for( UINT x = 0; x < mNumObjects; ++x )
 			{
@@ -700,7 +719,7 @@ namespace Sentinel
 				//
 				if( mObject[ x ].mNumKeyFrames > 0 )
 				{
-					mObject[ x ].mCurrTime += Timing::Inst()->DeltaTime() * 30.0f;
+					mObject[ x ].mCurrTime += DT * 30.0f;
 
 					if( mObject[ x ].mKeyFrame[ mObject[ x ].mCurrKey ].mFrame <= (int)mObject[ x ].mCurrTime )
 					{
@@ -716,7 +735,7 @@ namespace Sentinel
 			}
 		}
 
-		void Draw()
+		void Draw( Renderer* renderer, GameWorld* world )
 		{
 			// Set up model transforms.
 			//
@@ -736,7 +755,7 @@ namespace Sentinel
 				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
 				{
 					mObject[ x ].mMesh[ y ]->mMatrixWorld = matWorldObject;
-					mObject[ x ].mMesh[ y ]->Draw();
+					mObject[ x ].mMesh[ y ]->Draw( renderer, world );
 				}
 			}
 		}
@@ -744,20 +763,26 @@ namespace Sentinel
 
 	// Create an M3D Model.
 	//
-	Model* LoadModelM3DFromFile( const char* filename )
+	Model* LoadModelM3DFromFile( const char*		filename, 
+								 Renderer*			renderer, 
+								 ShaderManager*		shaderManager, 
+								 TextureManager*	textureManager )
 	{
 		ModelM3D* model = new ModelM3D();
 
-		model->Create( filename );
+		model->Create( filename, renderer, shaderManager, textureManager );
 
 		return model;
 	}
 
-	Model* LoadModelM3DFromArchive( Archive& archive )
+	Model* LoadModelM3DFromArchive( Archive&			archive,
+									Renderer*			renderer, 
+									ShaderManager*		shaderManager, 
+									TextureManager*		textureManager )
 	{
 		ModelM3D* model = new ModelM3D();
 
-		model->Create( archive );
+		model->Create( archive, renderer, shaderManager, textureManager );
 
 		return model;
 	}

@@ -1,14 +1,14 @@
 #include "Util.h"
 #include "GameObject.h"
 #include "CameraComponent.h"
+#include "TransformComponent.h"
 
 namespace Sentinel
 {
-	CameraComponent::CameraComponent()
+	CameraComponent::CameraComponent() :
+		mTransform( NULL )
 	{
 		mType = GameComponent::CAMERA;
-
-		Shutdown();
 
 		mMatrixView.Identity();
 		mMatrixProjection.Identity();

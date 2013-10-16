@@ -35,6 +35,12 @@ namespace Sentinel
 		mDesktopHeight = (float)(rc.top  - rc.bottom);
 	}
 
+	Mouse& Mouse::Get()
+	{
+		static Mouse mouse;
+		return mouse;
+	}
+
 	int Mouse::Show( bool visiblity )
 	{
 		return ShowCursor( visiblity );
@@ -163,6 +169,12 @@ namespace Sentinel
 
 	Keyboard::Keyboard()
 	{}
+
+	Keyboard& Keyboard::Get()
+	{
+		static Keyboard keyboard;
+		return keyboard;
+	}
 
 	bool Keyboard::IsDown( UINT key )
 	{

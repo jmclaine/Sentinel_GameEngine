@@ -1,9 +1,9 @@
 #include "WTexture.h"
 #include "WString.h"
 
-using namespace Sentinel::Utilities;
+using namespace Sentinel::Wrapped;
 
-namespace Sentinel { namespace Assets
+namespace Sentinel { namespace Wrapped
 {
 	DEFINE_REF_SHARED( Texture );
 

@@ -1,7 +1,7 @@
 #pragma once
 
+#include "GameComponent.h"
 #include "Matrix4f.h"
-#include "TransformComponent.h"
 
 #ifndef WIN32
     #define HWND void*
@@ -18,6 +18,8 @@
 
 namespace Sentinel
 {
+	class TransformComponent;
+
 	class SENTINEL_DLL CameraComponent : public GameComponent
 	{
 	protected:

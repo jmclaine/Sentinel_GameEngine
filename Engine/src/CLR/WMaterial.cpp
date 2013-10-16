@@ -1,8 +1,6 @@
 #include "WMaterial.h"
-#include "ColorRGBA.h"
-#include "Util.h"
 
-namespace Sentinel { namespace Assets
+namespace Sentinel { namespace Wrapped
 {
 	DEFINE_REF( Material );
 

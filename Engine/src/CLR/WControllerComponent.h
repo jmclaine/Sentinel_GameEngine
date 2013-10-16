@@ -3,7 +3,7 @@
 #include "WGameComponent.h"
 #include "ControllerComponent.h"
 
-namespace Sentinel { namespace Components
+namespace Sentinel { namespace Wrapped
 {
 	public ref class WControllerComponent : public WGameComponent
 	{

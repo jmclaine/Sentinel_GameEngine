@@ -1,5 +1,7 @@
 #include "TextureManager.h"
+#include "Archive.h"
 #include "Renderer.h"
+#include "Texture.h"
 #include "zlib.h"
 
 namespace Sentinel
@@ -10,12 +12,7 @@ namespace Sentinel
 	TextureManager::~TextureManager()
 	{}
 
-	TextureManager* TextureManager::Create()
-	{
-		return TextureManager::Inst();
-	}
-
-	void TextureManager::Save( Archive& archive )
+	void TextureManager::Save( Archive& archive, Renderer* renderer )
 	{
 		// Store the number of textures.
 		//
@@ -38,7 +35,7 @@ namespace Sentinel
 
 			// Store the texture file in place.
 			//
-			BYTE* pixels = (BYTE*)Renderer::Inst()->GetTexturePixels( texture );
+			BYTE* pixels = (BYTE*)renderer->GetTexturePixels( texture );
 
 			if( !pixels )
 				throw std::exception( "Failed to GetTexturePixels." );
@@ -58,7 +55,7 @@ namespace Sentinel
 		}
 	}
 
-	void TextureManager::Load( Archive& archive )
+	void TextureManager::Load( Archive& archive, Renderer* renderer )
 	{
 		RemoveAll();
 
@@ -95,7 +92,7 @@ namespace Sentinel
 
 			// Create the texture resource.
 			//
-			std::shared_ptr< Texture > texture = Renderer::Inst()->CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA );
+			std::shared_ptr< Texture > texture = renderer->CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA );
 			
 			delete[] comp_pixels;
 			delete[] pixels;

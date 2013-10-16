@@ -43,10 +43,6 @@ namespace Sentinel
 
 	//////////////////////////////////////////
 
-	// This function should create and assign the resulting Renderer*
-	// to the SingletonAbstract instance; however, doing so results
-	// in the pointer being set back to NULL in the CLR wrapper.
-	//
 	Renderer* Renderer::Create( const char* filename, WindowInfo& info )
 	{
 		TiXmlDocument doc;
@@ -58,15 +54,16 @@ namespace Sentinel
 		TiXmlElement* pElem = hDoc.FirstChild( "Renderer" ).Element();
 		const char*   pName = pElem->Attribute( "Type" );
 
-		if( !Renderer::Inst() )
-			if( !Renderer::Inst( (strcmp( "DIRECTX", pName ) == 0) ? BuildRendererDX() : BuildRendererGL() ))
-				return NULL;
+		Renderer* renderer = (strcmp( "DIRECTX", pName ) == 0) ? BuildRendererDX() : BuildRendererGL();
+
+		if( !renderer )
+			return NULL;
 		
 		pElem->QueryBoolAttribute(		"Fullscreen",	&info.mFullscreen );
 		pElem->QueryUnsignedAttribute(	"Width",		&info.mWidth );
 		pElem->QueryUnsignedAttribute(	"Height",		&info.mHeight );
 
-		return Renderer::Inst();
+		return renderer;
 	}
 
 	std::shared_ptr< Texture > Renderer::CreateTexture( UINT width, UINT height, ImageFormatType format, bool createMips )

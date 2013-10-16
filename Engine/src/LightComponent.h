@@ -1,11 +1,13 @@
 #pragma once
 
+#include "GameComponent.h"
 #include "ColorRGBA.h"
 #include "Vector4f.h"
-#include "TransformComponent.h"
 
 namespace Sentinel
 {
+	class TransformComponent;
+
 	class SENTINEL_DLL LightComponent : public GameComponent
 	{
 		DECLARE_SERIAL();

@@ -18,11 +18,7 @@ using System.Collections.ObjectModel;
 
 using System.Runtime.InteropServices;
 
-using Sentinel.Systems;
-using Sentinel.Assets;
-using Sentinel.Math;
-using Sentinel.Utilities;
-using Sentinel.Components;
+using Sentinel.Wrapped;
 
 namespace Sentinel_Editor
 {
@@ -58,6 +54,21 @@ namespace Sentinel_Editor
 
 		private String				mMapName;
 
+		/// 
+		/// Necessary objects to create a Game World.
+		/// 
+		private WRenderer			mRenderer;
+
+		private WPhysicsSystem		mPhysics;
+		private WTiming				mTiming;
+
+		private WTextureManager		mTextureManager;
+		private WShaderManager		mShaderManager;
+		private WMeshManager		mMeshManager;
+		private WModelManager		mModelManager;
+
+		private WGameWorld			mGameWorld;
+
 		
 		///
 		/// Starting Point of Application.
@@ -67,13 +78,6 @@ namespace Sentinel_Editor
 			try
 			{
 				InitializeComponent();
-
-				WTextureManager.Create();
-				WShaderManager.Create();
-				WMeshManager.Create();
-				WModelManager.Create();
-
-				WGameWorld.Create();
 			}
 			catch( Exception e )
 			{
@@ -98,16 +102,23 @@ namespace Sentinel_Editor
 
 			// Initialize Renderer.
 			//
-			WWindowInfo info = WRenderer.Create( "config.xml" );
-			if( info == null )
+			WWindowInfo info = new WWindowInfo();
+			mRenderer = WRenderer.Create( "config.xml", ref info );
+
+			if( mRenderer == null )
 			{
-				MessageBox.Show( "Failed to load config.xml", "Application Failure" );
+				MessageBox.Show( "Failed to load Renderer config.xml", "Application Failure" );
 
 				System.Environment.Exit( 0 );
 			}
 
-			mGameWindow = new GameWindow();
-			mGameWindow.Startup( "World", "WorldClass", info );
+			mGameWorld = new WGameWorld();
+			mTiming    = new WTiming();
+
+			mPhysics = WPhysicsSystem.BuildWPhysicsSystemSE();
+			
+			mGameWindow = new GameWindow( mGameWorld );
+			mGameWindow.Startup( mRenderer, "World", "WorldClass", info );
 			mGameWindow.SetCameraPosition( new WVector3f( 0, 25, 25 ));
 			mGameWindow.SetCameraRotation( new WVector3f( -45, 0, 0 ));
 			
@@ -185,17 +196,21 @@ namespace Sentinel_Editor
 			foreach( ATexture item in mAsset_Texture.Items )
 				item.Data.Dispose();
 
-			WGameWorld.Shutdown();
-			WGameWorld.Release();
+			mGameWorld.Shutdown();
+			mGameWorld.Release();
 
+			mModelManager.Release();
+			mMeshManager.Release();
+			mShaderManager.Release();
+			mTextureManager.Release();
+
+			mTiming.Release();
+			mPhysics.Release();
+			
 			mGameWindow.Shutdown();
 
-			WModelManager.Destroy();
-			WMeshManager.Destroy();
-			WShaderManager.Destroy();
-			WTextureManager.Destroy();
-			
-			WRenderer.Shutdown();
+			mRenderer.Shutdown();
+			mRenderer.Release();
 		}
 		#endregion
 
@@ -204,20 +219,24 @@ namespace Sentinel_Editor
 		{
 			WMouse.Update();
 
-			WRenderer.SetDepthStencil( 0 );
-			WRenderer.SetViewport( 0, 0, mGameWindow.GetInfo().Width(), mGameWindow.GetInfo().Height() );
-			WRenderer.SetRenderTarget( 0 );
+			mTiming.Update();
 
-			WRenderer.Clear( mClearColor );
+			mRenderer.SetDepthStencil( 0 );
+			mRenderer.SetViewport( 0, 0, mGameWindow.GetInfo().Width(), mGameWindow.GetInfo().Height() );
+			mRenderer.SetRenderTarget( 0 );
 
-			WRenderer.SetCull( CullType.CCW );
-			WRenderer.SetDepthStencilState( StencilType.DEFAULT );
+			mRenderer.Clear( mClearColor );
+
+			mRenderer.SetCull( CullType.CCW );
+			mRenderer.SetDepthStencilState( StencilType.DEFAULT );
 
 			mGameWindow.Update();
 
 			DrawSelection();
 
-			WRenderer.Present();
+			mRenderer.Present();
+
+			mTiming.Limit( WTiming.DESIRED_FRAME_RATE );
 		}
 
 		private void DrawSelection()
@@ -226,8 +245,8 @@ namespace Sentinel_Editor
 			//
 			if( mSelectedObject != null )
 			{
-				WRenderer.SetBlend( BlendType.PARTICLE );
-				WRenderer.SetDepthStencilState( StencilType.NO_ZBUFFER );
+				mRenderer.SetBlend( BlendType.PARTICLE );
+				mRenderer.SetDepthStencilState( StencilType.NO_ZBUFFER );
 
 				WTransformComponent selectedObjectTransform = WTransformComponent.Cast( mSelectedObject.FindComponent( ComponentType.TRANSFORM ));
 
@@ -243,7 +262,7 @@ namespace Sentinel_Editor
 						
 						if( component != null )
 						{
-							WRenderer.SetFill( FillType.WIREFRAME );
+							mRenderer.SetFill( FillType.WIREFRAME );
 
 							WMeshComponent meshComp = WMeshComponent.Cast( component );
 							
@@ -254,7 +273,7 @@ namespace Sentinel_Editor
 
 								WMesh   mesh   = meshComp.Mesh;
 								WShader shader = mesh.Shader;
-								WShader color  = WShaderManager.Get( "Color Only" );
+								WShader color  = mShaderManager.Get( "Color Only" );
 
 								mesh.Shader = color;
 
@@ -287,7 +306,7 @@ namespace Sentinel_Editor
 								}
 							}
 
-							WRenderer.SetFill( FillType.SOLID );
+							mRenderer.SetFill( FillType.SOLID );
 						}
 					}
 					else
@@ -307,7 +326,7 @@ namespace Sentinel_Editor
 						float d = distance.Length() * TRANSFORM_OBJECT_SCALE;
 						transform.Scale = new WVector3f( d, d, d );
 
-						WRenderer.SetCull( CullType.NONE );
+						mRenderer.SetCull( CullType.NONE );
 						
 						//WMeshComponent.Cast( mTranslateObject.GetChild( 0 ).FindComponent( ComponentType.DRAWABLE )).Material = mMaterial_Selected;
 						mTranslateObject.UpdateTransform();
@@ -405,7 +424,7 @@ namespace Sentinel_Editor
 										Objects_TreeView.Items.Remove( Objects_DraggedItem );
 									
 									if( Objects_Target == null )
-										WGameWorld.AddGameObject( Objects_DraggedItem.Data );
+										mGameWorld.AddGameObject( Objects_DraggedItem.Data );
 									else
 										Objects_Target.Data.AddChild( Objects_DraggedItem.Data );
 									
@@ -573,9 +592,9 @@ namespace Sentinel_Editor
 
 			if( dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK )
 			{
-				WTexture texture = WRenderer.CreateTextureFromFile( dialog.FileName );
+				WTexture texture = mRenderer.CreateTextureFromFile( dialog.FileName );
 				String name  = Path.GetFileName( dialog.FileName );
-				WTextureManager.Add( name, texture );
+				mTextureManager.Add( name, texture );
 				AddAsset( name, texture );
 			}
 		}
@@ -590,9 +609,9 @@ namespace Sentinel_Editor
 
 			if( dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK )
 			{
-				WModel model = WModel.Load( dialog.FileName );
+				WModel model = WModel.Load( dialog.FileName, mRenderer, mShaderManager, mTextureManager );
 				String name  = Path.GetFileName( dialog.FileName );
-				WModelManager.Add( name, model );
+				mModelManager.Add( name, model );
 				AddAsset( name, model );
 			}
 		}
@@ -611,7 +630,8 @@ namespace Sentinel_Editor
 		{
 			Directory.SetCurrentDirectory( "Assets\\Shaders" );
 
-			if( !WShaderManager.LoadConfig( "config.xml" ))
+			mShaderManager = new WShaderManager();
+			if( WShaderManager.LoadConfig( "config.xml", mRenderer, mShaderManager ) == null )
 			{
 				MessageBox.Show( "Failed to load 'Assets\\Shaders\\config.xml'", "Shader Load Failure" );
 				System.Environment.Exit( -1 );
@@ -620,7 +640,7 @@ namespace Sentinel_Editor
 			List< String >  names   = new List< String >();
 			List< WShader > shaders = new List< WShader >();
 
-			WShaderManager.GetAll( ref names, ref shaders );
+			mShaderManager.GetAll( ref names, ref shaders );
 
 			for( int x = 0; x < names.Count; ++x )
 			{
@@ -640,16 +660,29 @@ namespace Sentinel_Editor
 			WGameObject				obj;
 			WTransformComponent		transform;
 			WPhysicsComponent		physics;
+			WRigidBody				body;
 			WMesh					mesh;
-			
+
+			mTextureManager = new WTextureManager();
+			mMeshManager	= new WMeshManager();
+			mModelManager	= new WModelManager();
+
+			mGameWorld.XRenderer       = mRenderer;
+			mGameWorld.XPhysicsSystem  = mPhysics;
+			mGameWorld.XTiming         = mTiming;
+			mGameWorld.XTextureManager = mTextureManager;
+			mGameWorld.XShaderManager  = mShaderManager;
+			mGameWorld.XMeshManager	   = mMeshManager;
+			mGameWorld.XModelManager   = mModelManager;
+
 			////////////////////////////////////
 
-			WTexture texture = WTextureManager.Add( "default-alpha.png", WRenderer.CreateTextureFromFile( "Assets\\Textures\\default-alpha.png" ));
+			WTexture texture = mTextureManager.Add( "default-alpha.png", mRenderer.CreateTextureFromFile( "Assets\\Textures\\default-alpha.png" ));
 			AddAsset( "default-alpha.png", texture );
 			
 			// Camera.
 			//
-			obj = WGameWorld.AddGameObject( new WGameObject(), "Main_Camera" );
+			obj = mGameWorld.AddGameObject( new WGameObject(), "Main_Camera" );
 
 			transform = (WTransformComponent)obj.AttachComponent( new WTransformComponent(), "Transform" );
 			transform.Position = new WVector3f( 0, 25, 25 );
@@ -658,13 +691,12 @@ namespace Sentinel_Editor
 			obj.AttachComponent( new WPlayerControllerComponent(), "Controller" );
 			
 			physics = (WPhysicsComponent)obj.AttachComponent( new WPhysicsComponent(), "Physics" );
-			physics.ShapeType			= PhysicsShapeType.SPHERE;
-			physics.Flags				= (int)PhysicsFlag.DISABLE_GRAVITY;
-			physics.ShapePosition		= transform.Position;
-			physics.ShapeOrientation	= new WQuatf( transform.Rotation );
-			physics.LinearDamping		= 0.9f;
-			physics.AngularDamping		= 0.9f;
-			physics.Restitution			= 1.0f;
+			physics.SetRigidBody( mPhysics.CreateSphere( transform.Position, new WQuatf( transform.Rotation ), 1.0f, 1.0f ));
+			body = physics.GetRigidBody();
+			body.ShapeType		= PhysicsShapeType.SPHERE;
+			body.Flags			= (int)PhysicsFlag.DISABLE_GRAVITY;
+			body.Restitution	= 1.0f;
+			body.SetDamping( 0.9f, 0.9f );
 			
 			obj.AttachComponent( new WPerspectiveCameraComponent( mGameWindow.GetInfo().Width(), mGameWindow.GetInfo().Height() ), "Camera" );
 
@@ -672,7 +704,7 @@ namespace Sentinel_Editor
 			
 			// Point Light.
 			//
-			obj = WGameWorld.AddGameObject( new WGameObject(), "Point_Light" );
+			obj = mGameWorld.AddGameObject( new WGameObject(), "Point_Light" );
 
 			transform = (WTransformComponent)obj.AttachComponent( new WTransformComponent(), "Transform" );
 			transform.Position = new WVector3f( 0, 10, 0 );
@@ -685,25 +717,23 @@ namespace Sentinel_Editor
 			// Ground object.
 			//
 			meshBuilder.CreateCube( 1.0f );
-			meshBuilder.Shader    = WShaderManager.Get( "Color" );
+			meshBuilder.Shader    = mShaderManager.Get( "Color" );
 			meshBuilder.Primitive = PrimitiveType.TRIANGLE_LIST;
 
-			mesh = WMeshManager.Add( "Ground", meshBuilder.BuildMesh() );
+			mesh = mMeshManager.Add( "Ground", meshBuilder.BuildMesh( mRenderer ));
 			AddAsset( "Ground", mesh );
 
-			obj = WGameWorld.AddGameObject( new WGameObject(), "Ground" );
+			obj = mGameWorld.AddGameObject( new WGameObject(), "Ground" );
 
 			transform = (WTransformComponent)obj.AttachComponent( new WTransformComponent(), "Transform" );
 			transform.Position	 = new WVector3f( 0, 0, 0 );
 			transform.Scale		 = new WVector3f( 100, 1, 100 );
 
 			physics = (WPhysicsComponent)obj.AttachComponent( new WPhysicsComponent(), "Physics" );
-			physics.ShapeType			= PhysicsShapeType.BOX;
-			physics.Flags				= (int)PhysicsFlag.DISABLE_GRAVITY;
-			physics.Mass				= 0;
-			physics.ShapePosition		= transform.Position;
-			physics.ShapeOrientation	= new WQuatf( transform.Rotation );
-			physics.ShapeScale			= transform.Scale;
+			physics.SetRigidBody( mPhysics.CreateBox( transform.Position, new WQuatf( transform.Rotation ), transform.Scale, 0.0f ));
+			body = physics.GetRigidBody();
+			body.ShapeType	= PhysicsShapeType.BOX;
+			body.Flags		= (int)PhysicsFlag.DISABLE_GRAVITY;
 			
 			obj.AttachComponent( new WMeshComponent( mesh ), "Mesh" );
 			
@@ -713,10 +743,10 @@ namespace Sentinel_Editor
 			//
 			meshBuilder.ClearGeometry();
 			meshBuilder.CreateDodecahedron( 1.0f );
-			meshBuilder.Shader = WShaderManager.Get( "Texture" );
-			meshBuilder.Texture( (int)TextureType.DIFFUSE ).Set( WTextureManager.Get( "default-alpha.png" ));
+			meshBuilder.Shader = mShaderManager.Get( "Texture" );
+			meshBuilder.Texture( (int)TextureType.DIFFUSE ).Set( mTextureManager.Get( "default-alpha.png" ));
 
-			mesh = WMeshManager.Add( "Dodecahedron", meshBuilder.BuildMesh() );
+			mesh = mMeshManager.Add( "Dodecahedron", meshBuilder.BuildMesh( mRenderer ));
 			AddAsset( "Dodecahedron", mesh );
 			
 			WGameObject obj2 = new WGameObject();
@@ -734,10 +764,10 @@ namespace Sentinel_Editor
 			meshBuilder.ClearGeometry();
 			meshBuilder.CreateSphere( 1.0f, 10, 10 );
 			
-			mesh = WMeshManager.Add( "Sphere", meshBuilder.BuildMesh() );
+			mesh = mMeshManager.Add( "Sphere", meshBuilder.BuildMesh( mRenderer ));
 			AddAsset( "Sphere", mesh );
 
-			obj = WGameWorld.AddGameObject( new WGameObject(), "Sphere" );
+			obj = mGameWorld.AddGameObject( new WGameObject(), "Sphere" );
 
 			transform = (WTransformComponent)obj.AttachComponent( new WTransformComponent(), "Transform" );
 			transform.Position	= new WVector3f( -10, 4, 0 );
@@ -752,7 +782,7 @@ namespace Sentinel_Editor
 			
 			///////////////////////////////
 			
-			WGameWorld.Startup();
+			mGameWorld.Startup();
 
 			///////////////////////////////
 			// CREATE EDITOR OBJECTS
@@ -769,7 +799,7 @@ namespace Sentinel_Editor
 			mTranslateObject = new WGameObject();
 			const float tileSize = 5;
 
-			WModel model = WModel.Load( "Assets\\Editor\\Translate.M3D" );
+			WModel model = WModel.Load( "Assets\\Editor\\Translate.M3D", mRenderer, mShaderManager, mTextureManager );
 			
 			// Root Translate Object.
 			//
@@ -880,43 +910,43 @@ namespace Sentinel_Editor
 
 				List< String > names = new List< String >();
 
-				WTextureManager.Load( archive );
+				mTextureManager.Load( archive, mRenderer );
 
 				List< WTexture > texture = new List< WTexture >();
-				WTextureManager.GetAll( ref names, ref texture );
+				mTextureManager.GetAll( ref names, ref texture );
 
 				for( int x = 0; x < names.Count; ++x )
 				{
 					AddAsset( names[ x ], texture[ x ] );
 				}
 
-				WShaderManager.Load( archive );
+				mShaderManager.Load( archive, mRenderer );
 
 				names.Clear();
 				List< WShader > shaders = new List< WShader >();
-				WShaderManager.GetAll( ref names, ref shaders );
+				mShaderManager.GetAll( ref names, ref shaders );
 
 				for( int x = 0; x < names.Count; ++x )
 				{
 					AddAsset( names[ x ], shaders[ x ] );
 				}
 
-				WMeshManager.Load( archive );
+				mMeshManager.Load( archive, mRenderer, mShaderManager, mTextureManager );
 
 				names.Clear();
 				List< WMesh > mesh = new List< WMesh >();
-				WMeshManager.GetAll( ref names, ref mesh );
+				mMeshManager.GetAll( ref names, ref mesh );
 
 				for( int x = 0; x < names.Count; ++x )
 				{
 					AddAsset( names[ x ], mesh[ x ] );
 				}
 
-				WModelManager.Load( archive );
+				mModelManager.Load( archive, mRenderer, mShaderManager, mTextureManager );
 
 				names.Clear();
 				List< WModel > model = new List< WModel >();
-				WModelManager.GetAll( ref names, ref model );
+				mModelManager.GetAll( ref names, ref model );
 
 				for( int x = 0; x < names.Count; ++x )
 				{
@@ -925,15 +955,15 @@ namespace Sentinel_Editor
 
 				Objects_TreeView.Items.Clear();
 
-				WGameWorld.Load( archive );
-				WGameWorld.Startup();
+				mGameWorld.Load( archive );
+				mGameWorld.Startup();
 
 				mGameWindow.SetCamera();
 
-				uint count = WGameWorld.NumGameObjects();
+				uint count = mGameWorld.NumGameObjects();
 				for( uint x = 0; x < count; ++x )
 				{
-					AddObject( WGameWorld.GetGameObject( x ));
+					AddObject( mGameWorld.GetGameObject( x ));
 				}
 
 				archive.Close();
@@ -945,12 +975,12 @@ namespace Sentinel_Editor
 			WArchive archive = new WArchive();
 			archive.Open( mMapName, "wb+" );
 
-			WTextureManager.Save( archive );
-			WShaderManager.Save( archive );
-			WMeshManager.Save( archive );
-			WModelManager.Save( archive );
+			mTextureManager.Save( archive, mRenderer );
+			mShaderManager.Save( archive );
+			mMeshManager.Save( archive, mRenderer, mShaderManager, mTextureManager );
+			mModelManager.Save( archive, mRenderer, mShaderManager, mTextureManager );
 
-			WGameWorld.Save( archive );
+			mGameWorld.Save( archive );
 
 			archive.Close();
 		}

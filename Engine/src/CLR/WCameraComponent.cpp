@@ -1,6 +1,6 @@
 #include "WCameraComponent.h"
 
-namespace Sentinel { namespace Components
+namespace Sentinel { namespace Wrapped
 {
 	WCameraComponent::WCameraComponent()
 	{}

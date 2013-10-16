@@ -2,7 +2,7 @@
 
 #include "WPlayerControllerComponent.h"
 
-namespace Sentinel { namespace Components
+namespace Sentinel { namespace Wrapped
 {
 	WPlayerControllerComponent::WPlayerControllerComponent()
 	{

@@ -8,7 +8,7 @@ using System.Windows.Media;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 
-using Sentinel.Components;
+using Sentinel.Wrapped;
 
 namespace Sentinel_Editor
 {

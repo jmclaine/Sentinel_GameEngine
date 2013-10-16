@@ -1,23 +1,24 @@
 #pragma once
 /*
-Contains all the functionality of the C++ version.
+Contains all the functionality of the non-wrapped version.
 */
-#include "MeshBuilder.h"
 #include "Property.h"
-#include "WRenderer.h"
-#include "WMesh.h"
-#include "WMaterial.h"
-#include "WMatrix4f.h"
-#include "WVector4f.h"
-#include "WVector3f.h"
-#include "WVector2f.h"
+#include "MeshBuilder.h"
+#include "WRendererTypes.h"
 #include "WStdVector.h"
 
-using namespace Sentinel::Math;
-using namespace Sentinel::Utilities;
-
-namespace Sentinel { namespace Assets
+namespace Sentinel { namespace Wrapped
 {
+	ref class WRenderer;
+	ref class WMesh;
+	ref class WShader;
+	ref class RTexture;
+	ref class WMaterial;
+	ref class WMatrix4f;
+	ref class WVector4f;
+	ref class WVector3f;
+	ref class WVector2f;
+	ref class WColorRGBA;
 	ref class RStdVector_Vertex;
 	ref class RStdVector_Index;
 
@@ -63,7 +64,7 @@ namespace Sentinel { namespace Assets
 		RStdVector_Index^		Index;
 
 		DECLARE_PROPERTY( WShader^,		Shader );
-		DECLARE_PROPERTY( Sentinel::Systems::PrimitiveType, Primitive );
+		DECLARE_PROPERTY( Sentinel::Wrapped::PrimitiveType, Primitive );
 		DECLARE_PROPERTY( WVector4f^,	TextureScale );
 
 		RTexture^		Texture( TextureType type );
@@ -77,11 +78,11 @@ namespace Sentinel { namespace Assets
 
 		// Index helper functions.
 		//
-		void			AddIndex( int i0 );										// Point
-		void			AddIndex( int i0, int i1 );								// Line
-		void			AddIndex( int i0, int i1, int i2 );						// Triangle
-		void			AddIndex( int i0, int i1, int i2, int i3 );				// Quad
-		void			AddIndex( int i0, int i1, int i2, int i3, int i4 );		// Polygon
+		void			AddIndex( UINT i0 );										// Point
+		void			AddIndex( UINT i0, UINT i1 );								// Line
+		void			AddIndex( UINT i0, UINT i1, UINT i2 );						// Triangle
+		void			AddIndex( UINT i0, UINT i1, UINT i2, UINT i3 );				// Quad
+		void			AddIndex( UINT i0, UINT i1, UINT i2, UINT i3, UINT i4 );	// Polygon
 
 		// Call this function only after all vertices have been added.
 		// Used for normal mapping.
@@ -103,12 +104,12 @@ namespace Sentinel { namespace Assets
 		// Apply a matrix transform to a set a vertices.
 		//
 		void			ApplyMatrix( WMatrix4f^ mat );
-		void			ApplyMatrix( WMatrix4f^ mat, int startVertex, int endVertex );
+		void			ApplyMatrix( WMatrix4f^ mat, UINT startVertex, UINT endVertex );
 
 		// Returns the mesh created from the buffers.
 		// Ensure mShader is set before calling this.
 		//
-		WMesh^			BuildMesh();
+		WMesh^			BuildMesh( WRenderer^ renderer );
 	};
 
 	DECLARE_CLASS_REF( MeshBuilder );

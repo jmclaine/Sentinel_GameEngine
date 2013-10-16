@@ -2,16 +2,12 @@
 
 #using <System.dll>
 #using <WindowsBase.dll>
-#using <PresentationCore.dll>
-#using <PresentationFramework.dll>
 
 #include "Input.h"
 
-using namespace System;
 using namespace System::Windows;
-using namespace System::Windows::Interop;
 
-namespace Sentinel { namespace Systems
+namespace Sentinel { namespace Wrapped
 {
 	public enum class MouseButton
 	{
@@ -22,7 +18,7 @@ namespace Sentinel { namespace Systems
 		NUM_BUTTONS
 	};
 
-	Point^ CenterHandle( HwndHost^ hWnd );
+	Point^ CenterHandle( System::IntPtr hWnd );
 
 	public ref class WMouse
 	{
@@ -31,7 +27,7 @@ namespace Sentinel { namespace Systems
 		static int		Show( bool visiblity );
 
 		static void		SetPosition( Point^ pos );
-		static Point^	GetPosition( IntPtr hWnd );
+		static Point^	GetPosition( System::IntPtr hWnd );
 
 		static bool		IsDown( MouseButton button );
 
@@ -43,6 +39,6 @@ namespace Sentinel { namespace Systems
 
 		static void		Update();
 
-		static bool		ProcessMessages( IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam );
+		static bool		ProcessMessages( System::IntPtr hWnd, int msg, System::IntPtr wParam, System::IntPtr lParam );
 	};
 }}

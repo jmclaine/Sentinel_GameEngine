@@ -2,7 +2,7 @@
 
 #include <vector>
 
-namespace Sentinel { namespace Utilities
+namespace Sentinel { namespace Wrapped
 {
 // Normally this class would be a template,
 // but C# results in error CS1061.

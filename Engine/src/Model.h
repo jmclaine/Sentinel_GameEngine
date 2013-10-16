@@ -15,28 +15,34 @@ following string designations before loading
 a model:
 
 // Color with normal
-ShaderManager::Inst()->Add( shader, "Color" );
+ShaderManager::Add( shader, "Color" );
 
 // Texture with normal
-ShaderManager::Inst()->Add( shader, "Texture" );
+ShaderManager::Add( shader, "Texture" );
 
 // Normal mapping
-ShaderManager::Inst()->Add( shader, "Normal Map" );
+ShaderManager::Add( shader, "Normal Map" );
 
 // Parallax mapping
-ShaderManager::Inst()->Add( shader, "Parallax" );
+ShaderManager::Add( shader, "Parallax" );
 
 // Skinning and bones
-ShaderManager::Inst()->Add( shader, "Skinning" );
+ShaderManager::Add( shader, "Skinning" );
 */
 #include <vector>
 
 #include "Common.h"
-#include "ShaderManager.h"
-#include "Mesh.h"
+#include "Matrix4f.h"
 
 namespace Sentinel
 {
+	class Archive;
+	class Renderer;
+	class ShaderManager;
+	class TextureManager;
+	class GameWorld;
+	class Material;
+
 	class SENTINEL_DLL Model
 	{
 	protected:
@@ -56,13 +62,30 @@ namespace Sentinel
 
 		virtual ~Model();
 		
-		static Model*	Load( const char* filename );
+		// Set the TextureManager to NULL for no management.
+		//
+		// The Renderer is required to load textures.
+		//
+		// The ShaderManager is required for access to shaders
+		// as shown in Model.h header.
+		//
+		static Model*	Load( const char*		filename, 
+							  Renderer*			renderer, 
+							  ShaderManager*	shaderManager, 
+							  TextureManager*	textureManager );
 		
 		// The Archive format is specifically created to make 
 		// the model files easy to save and load for the engine.
 		//
-		virtual void	Save( Archive& archive ) = 0;
-		static Model*	Load( Archive& archive );
+		virtual void	Save( Archive&			archive,
+							  Renderer*			renderer, 
+							  ShaderManager*	shaderManager, 
+							  TextureManager*	textureManager ) = 0;
+
+		static Model*	Load( Archive&			archive,
+							  Renderer*			renderer, 
+							  ShaderManager*	shaderManager, 
+							  TextureManager*	textureManager );
 
 		/////////////////////////////////////
 
@@ -76,13 +99,20 @@ namespace Sentinel
 
 		virtual void	SetTime( float _time, UINT objIndex = 0 ) = 0;
 		virtual float	GetTime( UINT objIndex = 0 ) = 0;
-		virtual void	Update() = 0;
+		virtual void	Update( float DT = 0 ) = 0;
 
-		virtual void	Draw() = 0;
+		virtual void	Draw( Renderer* renderer, GameWorld* world ) = 0;
 	};
 
-	extern Model* LoadModelOBJFromFile( const char* filename );
-	extern Model* LoadModelM3DFromFile( const char* filename );
+	extern Model* LoadModelOBJFromFile( const char*		filename, 
+										Renderer*		renderer, 
+										ShaderManager*	shaderManager,
+										TextureManager* textureManager );
+
+	extern Model* LoadModelM3DFromFile( const char*		filename, 
+										Renderer*		renderer, 
+										ShaderManager*	shaderManager,
+										TextureManager* textureManager );
 
 	// The Archive format is different than the native file format.
 	// It is designed specifically to be read quickly and easily
@@ -92,6 +122,13 @@ namespace Sentinel
 	// format of the following data represents. Use Model::Load()
 	// to create the Model with the correct format.
 	//
-	extern Model* LoadModelOBJFromArchive( Archive& archive );
-	extern Model* LoadModelM3DFromArchive( Archive& archive );
+	extern Model* LoadModelOBJFromArchive( Archive&			archive,
+										   Renderer*		renderer, 
+										   ShaderManager*	shaderManager,
+										   TextureManager*	textureManager );
+
+	extern Model* LoadModelM3DFromArchive( Archive&			archive,
+										   Renderer*		renderer, 
+										   ShaderManager*	shaderManager,
+										   TextureManager*	textureManager );
 }

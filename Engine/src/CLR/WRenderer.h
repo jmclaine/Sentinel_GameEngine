@@ -1,94 +1,24 @@
 #pragma once
 /*
-WRenderer works almost identically to the C++ version.
-All functions are static.
-
 Removed Startup as it is only useful within WGameWindow
 during the BuildWindowCore function.
-
-Adjusted Load to return WWindowInfo instead.
 */
-#using <System.dll>
-#using <WindowsBase.dll>
-#using <PresentationCore.dll>
-#using <PresentationFramework.dll>
-
-#include <Windows.h>
-
 #include "Property.h"
-#include "GameWindow.h"
-#include "WTexture.h"
-#include "WBuffer.h"
-#include "WShader.h"
-#include "WColorRGBA.h"
+#include "WRendererTypes.h"
+#include "Renderer.h"
 
-using namespace System;
-using namespace System::Windows;
-using namespace System::Windows::Interop;
-using namespace System::Windows::Input;
-using namespace System::Windows::Media;
-using namespace System::Windows::Threading;
-using namespace System::Runtime::InteropServices;
-
-using namespace Sentinel::Assets;
-
-namespace Sentinel { namespace Systems
+namespace Sentinel
 {
-	public enum class PrimitiveType
-	{
-		POINT_LIST,
-		LINE_LIST,
-		TRIANGLE_LIST,
+	class Renderer;
+	class GameWindow;
+	class WindowInfo;
 
-		NUM_PRIMITIVES
-	};
-
-	public enum class ImageFormatType
-	{
-		R,
-		RGB,
-		RGBA,
-		HDR,	// R32G32B32F
-
-		NUM_IMAGE_FORMATS
-	};
-
-	public enum class CullType
-	{
-		NONE,
-		CCW,
-		CW,
-
-		NUM_CULL_TYPES
-	};
-
-	public enum class FillType
-	{
-		SOLID,
-		WIREFRAME,
-
-		NUM_FILL_TYPES
-	};
-
-	public enum class BlendType
-	{
-		DEFAULT,
-		ALPHA,
-		PARTICLE,
-
-		NUM_BLEND_TYPES
-	};
-
-	public enum class StencilType
-	{
-		DEFAULT,
-		NO_ZBUFFER,
-		PARTICLE,
-
-		NUM_STENCIL_TYPES
-	};
-
-	////////////////////////////////////////////////////////////
+namespace Wrapped
+{
+	ref class WTexture;
+	ref class WBuffer;
+	ref class WShader;
+	ref class WColorRGBA;
 
 	public ref class WWindowInfo
 	{
@@ -97,11 +27,11 @@ namespace Sentinel { namespace Systems
 	public:
 
 		WWindowInfo();
-		WWindowInfo( const WindowInfo% info );
 		WWindowInfo( WindowInfo* info );
-		WWindowInfo( const WWindowInfo% info );
 		
 		//////////////////////////////
+
+		DECLARE_OP_PTR( WindowInfo );
 
 		bool			Fullscreen();
 
@@ -118,62 +48,70 @@ namespace Sentinel { namespace Systems
 
 	public ref class WRenderer
 	{
+		DECLARE_REF_PTR( Renderer );
+
 	public:
 
-		static WTexture^	NullTexture();
-		static WTexture^	BaseTexture();
+		WRenderer( Renderer* renderer );
+
+		void			Release();
+
+		WTexture^		NullTexture();
+		WTexture^		BaseTexture();
 
 		//////////////////////////////
 
-		static WWindowInfo^	Create( String^ filename );
+		DECLARE_OP_PTR( Renderer );
 
-		static void			Shutdown();
+		static WRenderer^ Create( System::String^ filename, WWindowInfo^% info );
+
+		void			Shutdown();
 
 		// Windows.
 		//
-		static void			SetWindow( WWindowInfo^ info );
-		static WWindowInfo^ GetWindow();
+		void			SetWindow( WWindowInfo^ info );
+		WWindowInfo^	GetWindow();
 
-		static bool			ShareResources( WWindowInfo^ info0, WWindowInfo^ info1 );
+		bool			ShareResources( WWindowInfo^ info0, WWindowInfo^ info1 );
 
 		// Buffers.
 		//
-		static WBuffer^		CreateBuffer( IntPtr data, UINT size, UINT stride, BufferType type );
+		WBuffer^		CreateBuffer( System::IntPtr data, UINT size, UINT stride, BufferType type );
 
-		static void			SetVBO( WBuffer^ buffer );
-		static void			SetIBO( WBuffer^ buffer );
+		void			SetVBO( WBuffer^ buffer );
+		void			SetIBO( WBuffer^ buffer );
 
 		// Textures.
 		//
-		static WTexture^	CreateTexture( UINT width, UINT height, ImageFormatType format, bool createMips );
-		static WTexture^	CreateTextureFromFile( String^ filename );
-		static WTexture^	CreateTextureFromMemory( IntPtr data, UINT width, UINT height, ImageFormatType format, bool createMips );
+		WTexture^		CreateTexture( UINT width, UINT height, ImageFormatType format, bool createMips );
+		WTexture^		CreateTextureFromFile( System::String^ filename );
+		WTexture^		CreateTextureFromMemory( System::IntPtr data, UINT width, UINT height, ImageFormatType format, bool createMips );
 	
 		// Special Rendering.
 		//
-		static UINT			CreateBackbuffer();
-		static UINT			CreateRenderTarget( WTexture^ texture );
-		static UINT			CreateDepthStencil( UINT width, UINT height );
-		static UINT			ResizeBuffers( UINT width, UINT height );
+		UINT			CreateBackbuffer();
+		UINT			CreateRenderTarget( WTexture^ texture );
+		UINT			CreateDepthStencil( UINT width, UINT height );
+		UINT			ResizeBuffers( UINT width, UINT height );
 
-		static void			SetRenderType( PrimitiveType type );
-		static void			SetRenderTarget( UINT target );
-		static void			SetDepthStencil( UINT stencil );
-		static void			SetDepthStencilState( StencilType state );
-		static void			SetViewport( int x, int y, UINT width, UINT height );
-		static UINT			SetCull( CullType type );
-		static UINT			SetFill( FillType type );
-		static void			SetBlend( BlendType type );
+		void			SetRenderType( PrimitiveType type );
+		void			SetRenderTarget( UINT target );
+		void			SetDepthStencil( UINT stencil );
+		void			SetDepthStencilState( StencilType state );
+		void			SetViewport( int x, int y, UINT width, UINT height );
+		UINT			SetCull( CullType type );
+		UINT			SetFill( FillType type );
+		void			SetBlend( BlendType type );
 
 		// Shaders.
 		//
-		static WShader^		CreateShaderFromFile( String^ filename, String^ attrib, String^ uniform );
-		static void			SetShader( WShader^ shader );
+		WShader^		CreateShaderFromFile( System::String^ filename, System::String^ attrib, System::String^ uniform );
+		void			SetShader( WShader^ shader );
 
 		// Rendering.
 		//
-		static void			Clear( WColorRGBA^ color );
-		static void			DrawIndexed( UINT count, UINT startIndex, UINT baseVertex );
-		static void			Present();
+		void			Clear( WColorRGBA^ color );
+		void			DrawIndexed( UINT count, UINT startIndex, UINT baseVertex );
+		void			Present();
 	};
 }}

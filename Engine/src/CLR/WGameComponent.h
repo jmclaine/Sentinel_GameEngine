@@ -3,11 +3,8 @@
 All GameComponent(s) are freed when their associated GameObject is Shutdown()
 Release() should be called manually for a controlled free memory.
 */
-#include "WString.h"
 #include "Property.h"
 #include "GameComponent.h"
-
-using namespace Sentinel::Utilities;
 
 // Create macro to cast the GameComponent to another type.
 // Upcasting a WGameComponent to a derived version does
@@ -30,7 +27,11 @@ using namespace Sentinel::Utilities;
 #define DEFINE_CAST_COMPONENT( refClass )\
 	DEFINE_CAST_COMPONENT_EX( refClass, refClass );
 
-namespace Sentinel { namespace Components
+namespace Sentinel
+{
+	class GameComponent;
+	
+namespace Wrapped
 {
 	ref class WGameObject;
 

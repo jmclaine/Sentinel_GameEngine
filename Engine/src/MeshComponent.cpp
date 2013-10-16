@@ -2,6 +2,10 @@
 
 #include "MeshComponent.h"
 #include "MeshManager.h"
+#include "TransformComponent.h"
+#include "GameObject.h"
+#include "GameWorld.h"
+#include "Archive.h"
 
 namespace Sentinel
 {
@@ -21,6 +25,9 @@ namespace Sentinel
 	void MeshComponent::Startup()
 	{
 		_ASSERT( mMesh );
+		_ASSERT( mOwner );
+		_ASSERT( mOwner->World() );
+		_ASSERT( mOwner->World()->mRenderer );
 
 		DrawableComponent::Startup();
 	}
@@ -35,7 +42,8 @@ namespace Sentinel
 
 			mMesh->mMatrixWorld = mTransform->GetMatrixWorld();
 
-			mMesh->Draw();
+			GameWorld* world = mOwner->World();
+			mMesh->Draw( world->mRenderer, world );
 		}
 	}
 
@@ -48,22 +56,30 @@ namespace Sentinel
 
 	void MeshComponent::Save( Archive& archive )
 	{
+		_ASSERT( mOwner );
+		_ASSERT( mOwner->World() );
+		_ASSERT( mOwner->World()->mMeshManager );
+
 		mSerialRegistry.Save( archive );
 
 		GameComponent::Save( archive );
 
-		archive.Write( &MeshManager::Inst()->Get( mMesh ));
+		archive.Write( &mOwner->World()->mMeshManager->Get( mMesh ));
 		archive.Write( mMaterial.Ptr(), ar_sizeof( mMaterial ));
 	}
 
 	void MeshComponent::Load( Archive& archive )
 	{
+		_ASSERT( mOwner );
+		_ASSERT( mOwner->World() );
+		_ASSERT( mOwner->World()->mMeshManager );
+
 		GameComponent::Load( archive );
 
 		std::string name;
 		archive.Read( &name );
 
-		mMesh = MeshManager::Inst()->Get( name );
+		mMesh = mOwner->World()->mMeshManager->Get( name );
 
 		archive.Read( mMaterial.Ptr(), ar_sizeof( mMaterial ));
 	}

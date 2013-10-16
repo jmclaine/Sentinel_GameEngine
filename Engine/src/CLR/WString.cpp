@@ -1,6 +1,6 @@
 #include "WString.h"
 
-namespace Sentinel { namespace Utilities
+namespace Sentinel { namespace Wrapped
 {
 	WString::WString( const char* str )
 	{

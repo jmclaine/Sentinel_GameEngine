@@ -8,8 +8,9 @@
 
 #pragma comment (lib, "libvorbis_static.lib" )
 
-#include "AudioSystem.h"
 #include "Util.h"
+#include "AudioSystem.h"
+#include "AudioSource.h"
 
 namespace Sentinel
 {

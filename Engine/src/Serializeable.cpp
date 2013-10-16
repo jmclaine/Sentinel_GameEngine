@@ -1,5 +1,6 @@
 #include "Serializeable.h"
 #include "Util.h"
+#include "Archive.h"
 
 namespace Sentinel
 {
@@ -18,10 +19,10 @@ namespace Sentinel
 		return NULL;
 	}
 
-	SerialFactory* SerialFactory::Inst()
+	SerialFactory& SerialFactory::Get()
 	{
 		static SerialFactory mSingle;
-		return &mSingle;
+		return mSingle;
 	}
 
 	void SerialFactory::Register( int value, CloneFunc func )
@@ -44,7 +45,7 @@ namespace Sentinel
 	SerialRegister::SerialRegister( const char* clazz, SerialFactory::CloneFunc func )
 	{
 		mID = StringToID( clazz );
-		SerialFactory::Inst()->Register( mID, func );
+		SerialFactory::Get().Register( mID, func );
 	}
 
 	void SerialRegister::Save( Archive& archive )
@@ -58,11 +59,7 @@ namespace Sentinel
 		archive.Read( &id, 1, true );
 
 		if( id != 0 )
-		{
-			Serializeable* obj = SerialFactory::Inst()->Create( id );
-			obj->Load( archive );
-			return obj;
-		}
+			return SerialFactory::Get().Create( id );
 
 		return NULL;
 	}

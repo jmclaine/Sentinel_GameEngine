@@ -1,7 +1,7 @@
 #include "WModelComponent.h"
 #include "ModelComponent.h"
 
-namespace Sentinel { namespace Components
+namespace Sentinel { namespace Wrapped
 {
 	WModelComponent::WModelComponent( WModel^ model )
 	{

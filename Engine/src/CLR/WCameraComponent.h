@@ -5,9 +5,9 @@
 #include "WTransformComponent.h"
 #include "WMatrix4f.h"
 
-using namespace Sentinel::Math;
+using namespace Sentinel::Wrapped;
 
-namespace Sentinel { namespace Components
+namespace Sentinel { namespace Wrapped
 {
 	public ref class WCameraComponent : public WGameComponent
 	{

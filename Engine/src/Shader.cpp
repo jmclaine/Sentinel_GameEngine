@@ -1,5 +1,6 @@
 #include "Util.h"
 #include "Shader.h"
+#include "Texture.h"
 
 namespace Sentinel
 {
@@ -66,11 +67,11 @@ namespace Sentinel
 					break;
 
 				case 'L':
-					sprintf_s( name, "light_pos%d", lightCount );
+					sprintf_s( name, "light_pos%d",   lightCount );
 					CreateUniform( name );
 					sprintf_s( name, "light_color%d", lightCount );
 					CreateUniform( name );
-					sprintf_s( name, "light_attn%d", lightCount );
+					sprintf_s( name, "light_attn%d",  lightCount );
 					CreateUniform( name );
 					++lightCount;
 					break;

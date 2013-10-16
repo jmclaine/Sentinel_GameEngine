@@ -1,6 +1,6 @@
 #include "WColorRGBA.h"
 
-namespace Sentinel { namespace Assets
+namespace Sentinel { namespace Wrapped
 {
 	DEFINE_REF( ColorRGBA );
 

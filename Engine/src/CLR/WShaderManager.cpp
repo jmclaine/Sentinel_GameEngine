@@ -1,12 +1,28 @@
 #include "WShaderManager.h"
-#include "ShaderManager.h"
+#include "WShader.h"
+#include "WRenderer.h"
+#include "WArchive.h"
+#include "WString.h"
 
-namespace Sentinel { namespace Assets
+namespace Sentinel { namespace Wrapped
 {
 	DEFINE_ASSET_MANAGER( Shader );
 
-	bool WShaderManager::LoadConfig( System::String^ filename )
+	void WShaderManager::Save( WArchive^ archive )
 	{
-		return ShaderManager::Inst()->LoadConfig( WString::Cast( filename ).c_str() );
+		mRef->Save( *archive );
+	}
+
+	void WShaderManager::Load( WArchive^ archive, WRenderer^ renderer )
+	{
+		mRef->Load( *archive, renderer );
+	}
+
+	WShaderManager^ WShaderManager::LoadConfig( System::String^ filename, WRenderer^ renderer, WShaderManager^ shaderManager )
+	{
+		if( !ShaderManager::LoadConfig( WString::Cast( filename ).c_str(), renderer, shaderManager ))
+			return nullptr;
+
+		return shaderManager;
 	}
 }}

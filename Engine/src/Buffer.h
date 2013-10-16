@@ -1,18 +1,11 @@
 #pragma once
 
 #include "Common.h"
-#include "Archive.h"
+#include "RendererTypes.h"
 
 namespace Sentinel
 {
-	enum BufferType
-	{
-		NULL_BUFFER,
-		VERTEX_BUFFER,
-		INDEX_BUFFER,
-
-		NUM_BUFFER_TYPES
-	};
+	class Renderer;
 
 	class SENTINEL_DLL Buffer
 	{
@@ -39,10 +32,5 @@ namespace Sentinel
 		UINT			Size();
 		UINT			Stride();
 		UINT			Count();
-
-		//////////////////////////
-
-		void			Save( Archive& archive );
-		static Buffer*	Load( Archive& archive );
 	};
 }

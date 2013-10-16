@@ -5,26 +5,28 @@
 
 namespace Sentinel
 {
-	class SENTINEL_DLL MeshManager : public AssetManager< Mesh >, public SingletonSafe< MeshManager >
+	class Archive;
+	class Renderer;
+	class ShaderManager;
+	class TextureManager;
+
+	class SENTINEL_DLL MeshManager : public AssetManager< Mesh >
 	{
-		friend class SingletonSafe< MeshManager >;
-		friend class AssetManager< Mesh >;
-		
-	private:
+	public:
 
 		MeshManager();
 		~MeshManager();
 
-	public:
+		/////////////////////////////////
 
-		static MeshManager* Create();
+		void Save( Archive&			archive, 
+				   Renderer*		renderer, 
+				   ShaderManager*	shaderManager, 
+				   TextureManager*	textureManager );
 
-		void Save( Archive& archive );
-
-		void Load( Archive& archive );
-
-		static void SaveMesh( Archive& archive, Mesh* mesh );
-
-		static void LoadMesh( Archive& archive, Mesh* mesh );
+		void Load( Archive&			archive, 
+				   Renderer*		renderer, 
+				   ShaderManager*	shaderManager, 
+				   TextureManager*	textureManager );
 	};
 }

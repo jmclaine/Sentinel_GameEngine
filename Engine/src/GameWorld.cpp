@@ -1,22 +1,32 @@
 #include "GameWorld.h"
-#include "PhysicsSystem.h"
+#include "GameObject.h"
+#include "TransformComponent.h"
+#include "CameraComponent.h"
+#include "LightComponent.h"
+#include "Timing.h"
 #include "Archive.h"
+#include "PhysicsSystem.h"
+#include "TextureManager.h"
+#include "ShaderManager.h"
+#include "MeshManager.h"
+#include "ModelManager.h"
 
 namespace Sentinel
 {
-	GameWorld::GameWorld()
-	{
-		mCurrentCamera = NULL;
-	}
+	GameWorld::GameWorld() :
+		mCurrentCamera( NULL ),
+		mRenderer( NULL ),
+		mPhysicsSystem( NULL ),
+		mTiming( NULL ),
+		mTextureManager( NULL ),
+		mShaderManager( NULL ),
+		mMeshManager( NULL ),
+		mModelManager( NULL )
+	{}
 
 	GameWorld::~GameWorld()
 	{
 		Release();
-	}
-
-	GameWorld* GameWorld::Create()
-	{
-		return GameWorld::Inst();
 	}
 
 	void GameWorld::Release()
@@ -48,8 +58,13 @@ namespace Sentinel
 		UINT size = 0;
 		archive.Read( &size );
 
+		GameObject* obj;
 		for( UINT x = 0; x < size; ++x )
-			AddGameObject( (GameObject*)SerialRegister::Load( archive ));
+		{
+			obj = (GameObject*)SerialRegister::Load( archive );
+			AddGameObject( obj );
+			obj->Load( archive );
+		}
 	}
 
 	void GameWorld::Startup()
@@ -94,15 +109,6 @@ namespace Sentinel
 			mGameObject[ x ]->Startup();
 	}
 
-	void GameWorld::Update()
-	{
-		UpdateController();
-		UpdatePhysics();
-		UpdateTransform();
-		UpdateComponents();
-		UpdateDrawable();
-	}
-
 	void GameWorld::UpdateController()
 	{
 		TRAVERSE_VECTOR( x, mGameObject )
@@ -111,8 +117,6 @@ namespace Sentinel
 
 	void GameWorld::UpdatePhysics()
 	{
-		PhysicsSystem::Inst()->Update();
-
 		TRAVERSE_VECTOR( x, mGameObject )
 			mGameObject[ x ]->UpdatePhysics();
 	}
@@ -185,6 +189,8 @@ namespace Sentinel
 
 			if( entity->mParent )
 				entity->mParent->RemoveChild( entity );
+
+			entity->mWorld = this;
 		
 			mGameObject.push_back( entity );
 		}
@@ -207,11 +213,13 @@ namespace Sentinel
 	GameObject* GameWorld::RemoveGameObject( GameObject* entity )
 	{
 		TRAVERSE_LIST( it, mGameObject )
+		{
 			if( (*it) == entity )
 			{
 				mGameObject.erase( it );
 				return entity;
 			}
+		}
 		
 		return entity;
 	}
@@ -230,13 +238,6 @@ namespace Sentinel
 
 	/////////////////////////////////
 
-	void GameWorld::SetCamera( CameraComponent* camera )
-	{
-		_ASSERT( camera );
-
-		mCurrentCamera = camera;
-	}
-
 	// -1 = mCurrentCamera
 	CameraComponent* GameWorld::GetCamera( int index )
 	{
@@ -245,10 +246,27 @@ namespace Sentinel
 		return (index > -1) ? mCamera[ index ] : mCurrentCamera;
 	}
 
+	void GameWorld::SetCamera( CameraComponent* camera )
+	{
+		_ASSERT( camera );
+
+		mCurrentCamera = camera;
+	}
+
+	UINT GameWorld::NumCameras()
+	{
+		return mCamera.size();
+	}
+
 	LightComponent* GameWorld::GetLight( UINT index )
 	{
 		_ASSERT( index < mLight.size() );
 
 		return mLight[ index ];
+	}
+
+	UINT GameWorld::NumLights()
+	{
+		return mLight.size();
 	}
 }

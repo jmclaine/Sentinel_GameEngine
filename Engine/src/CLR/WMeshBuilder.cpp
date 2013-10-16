@@ -1,7 +1,16 @@
 #include "WMeshBuilder.h"
-#include "Texture.h"
+#include "WRenderer.h"
+#include "WShader.h"
+#include "WMesh.h"
+#include "Mesh.h"
+#include "WMaterial.h"
+#include "WMatrix4f.h"
+#include "WVector4f.h"
+#include "WVector3f.h"
+#include "WVector2f.h"
+#include "WColorRGBA.h"
 
-namespace Sentinel { namespace Assets
+namespace Sentinel { namespace Wrapped
 {
 	DEFINE_REF_EX_BASE( WMeshBuilder, WVertex, MeshBuilder::Vertex );
 
@@ -63,9 +72,9 @@ namespace Sentinel { namespace Assets
 
 	//////////////////////////////////
 
-	DEFINE_PROPERTY_RT( MeshBuilder, Shader,	Shader );
-	DEFINE_PROPERTY_E(  MeshBuilder, Systems,	PrimitiveType, Primitive );
-	DEFINE_PROPERTY_R(  MeshBuilder, Vector4f,	TextureScale );
+	DEFINE_PROPERTY_RT( MeshBuilder, Shader,		Shader );
+	DEFINE_PROPERTY_E(  MeshBuilder, PrimitiveType,	Primitive );
+	DEFINE_PROPERTY_R(  MeshBuilder, Vector4f,		TextureScale );
 
 	RTexture^ WMeshBuilder::Texture( TextureType type )
 	{
@@ -88,29 +97,29 @@ namespace Sentinel { namespace Assets
 
 	// Index helper functions.
 	//
-	void WMeshBuilder::AddIndex( int i0 )
+	void WMeshBuilder::AddIndex( UINT i0 )
 	{
-		mRef->AddIndex( (UINT)i0 );
+		mRef->AddIndex( i0 );
 	}
 
-	void WMeshBuilder::AddIndex( int i0, int i1 )
+	void WMeshBuilder::AddIndex( UINT i0, UINT i1 )
 	{
-		mRef->AddIndex( (UINT)i0, (UINT)i1 );
+		mRef->AddIndex( i0, i1 );
 	}
 
-	void WMeshBuilder::AddIndex( int i0, int i1, int i2 )
+	void WMeshBuilder::AddIndex( UINT i0, UINT i1, UINT i2 )
 	{
-		mRef->AddIndex( (UINT)i0, (UINT)i1, (UINT)i2 );
+		mRef->AddIndex( i0, i1, i2 );
 	}
 
-	void WMeshBuilder::AddIndex( int i0, int i1, int i2, int i3 )
+	void WMeshBuilder::AddIndex( UINT i0, UINT i1, UINT i2, UINT i3 )
 	{
-		mRef->AddIndex( (UINT)i0, (UINT)i1, (UINT)i2, (UINT)i3 );
+		mRef->AddIndex( i0, i1, i2, i3 );
 	}
 
-	void WMeshBuilder::AddIndex( int i0, int i1, int i2, int i3, int i4 )
+	void WMeshBuilder::AddIndex( UINT i0, UINT i1, UINT i2, UINT i3, UINT i4 )
 	{
-		mRef->AddIndex( (UINT)i0, (UINT)i1, (UINT)i2, (UINT)i3, (UINT)i4 );
+		mRef->AddIndex( i0, i1, i2, i3, i4 );
 	}
 
 	// Call this function only after all vertices have been added.
@@ -171,7 +180,7 @@ namespace Sentinel { namespace Assets
 		mRef->ApplyMatrix( *mat->GetRef() );
 	}
 
-	void WMeshBuilder::ApplyMatrix( WMatrix4f^ mat, int startVertex, int endVertex )
+	void WMeshBuilder::ApplyMatrix( WMatrix4f^ mat, UINT startVertex, UINT endVertex )
 	{
 		mRef->ApplyMatrix( *mat->GetRef(), startVertex, endVertex );
 	}
@@ -179,9 +188,9 @@ namespace Sentinel { namespace Assets
 	// Returns the mesh created from the buffers.
 	// Ensure mShader is set before calling this.
 	//
-	WMesh^ WMeshBuilder::BuildMesh()
+	WMesh^ WMeshBuilder::BuildMesh( WRenderer^ renderer )
 	{
-		return gcnew WMesh( std::shared_ptr< Mesh >( mRef->BuildMesh() ));
+		return gcnew WMesh( std::shared_ptr< Mesh >( mRef->BuildMesh( renderer )));
 	}
 
 	//////////////////////////////////

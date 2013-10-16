@@ -1,24 +1,31 @@
+#pragma once
+
 #include "AssetManager.h"
 #include "Model.h"
 
 namespace Sentinel
 {
-	class SENTINEL_DLL ModelManager : public AssetManager< Model >, public SingletonSafe< ModelManager >
-	{
-		friend class SingletonSafe< ModelManager >;
-		friend class AssetManager< Model >;
-		
-	private:
+	class Renderer;
+	class ShaderManager;
+	class TextureManager;
+
+	class SENTINEL_DLL ModelManager : public AssetManager< Model >
+	{	
+	public:
 
 		ModelManager();
 		~ModelManager();
 
-	public:
+		/////////////////////////////////
 
-		static ModelManager* Create();
+		void Save( Archive&			archive, 
+				   Renderer*		renderer, 
+				   ShaderManager*	shaderManager, 
+				   TextureManager*	textureManager );
 
-		void Save( Archive& archive );
-
-		void Load( Archive& archive );
+		void Load( Archive&			archive, 
+				   Renderer*		renderer, 
+				   ShaderManager*	shaderManager, 
+				   TextureManager*	textureManager );
 	};
 }

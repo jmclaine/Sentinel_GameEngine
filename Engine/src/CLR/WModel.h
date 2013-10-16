@@ -3,14 +3,18 @@
 #include "m_shared_ptr.h"
 #include "Property.h"
 #include "Model.h"
-#include "WShader.h"
-#include "WMatrix4f.h"
-#include "WMaterial.h"
 
-using namespace Sentinel::Math;
-
-namespace Sentinel { namespace Assets
+namespace Sentinel { namespace Wrapped
 {
+	ref class WShader;
+	ref class WMatrix4f;
+	ref class WMaterial;
+	ref class WStdVector_Material;
+	ref class WRenderer;
+	ref class WShaderManager;
+	ref class WTextureManager;
+	ref class WGameWorld;
+
 	public ref class WModel
 	{
 		DECLARE_REF_SHARED( Model );
@@ -23,16 +27,19 @@ namespace Sentinel { namespace Assets
 
 		////////////////////////////////
 
-		static WModel^		Load( System::String^ filename );
+		static WModel^	Load( System::String^	filename,
+							  WRenderer^		renderer, 
+							  WShaderManager^	shaderManager, 
+							  WTextureManager^	textureManager );
 
-		void				SetMaterials( WStdVector_Material^ material );
-		void				GetMaterials( WStdVector_Material^ material );
+		void			SetMaterials( WStdVector_Material^ material );
+		void			GetMaterials( WStdVector_Material^ material );
 
-		//void				SetTime( float _time, UINT objIndex = 0 );
-		//float				GetTime( UINT objIndex = 0 );
-		void				Update();
+		//void			SetTime( float _time, UINT objIndex = 0 );
+		//float			GetTime( UINT objIndex = 0 );
+		void			Update( float DT );
 
-		void				Draw();
+		void			Draw( WRenderer^ renderer, WGameWorld^ world );
 	};
 
 	DECLARE_CLASS_REF_SHARED( Model );

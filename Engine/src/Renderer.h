@@ -10,18 +10,18 @@ Create a file called 'config.xml' for easy setup.
 
 // This initializes the Renderer values within the XML file.
 WindowInfo info;
-Renderer::Load( "config.xml", info );
+Renderer* renderer = Renderer::Load( "config.xml", info );
 
 
 // Alternative to creating and loading the XML file.
-Renderer::Inst( BuildRendererGL() );
+Renderer* renderer = BuildRendererGL();
 * OR *
-Renderer::Inst( BuildRendererDX() );
+Renderer* renderer = BuildRendererDX();
 
 
 // Initialize the Renderer.
 // Use appropriate HWND for Windows applications.
-WindowInfo* windowInfo = Renderer::Inst()->Startup( mHWND, info.mFullscreen, info.mWidth, info.mHeight );
+WindowInfo* windowInfo =renderer->Startup( mHWND, info.mFullscreen, info.mWidth, info.mHeight );
 
 
 // Now the Renderer can perform its normal functionality.
@@ -42,46 +42,50 @@ WindowInfo* windowInfo = Renderer::Inst()->Startup( mHWND, info.mFullscreen, inf
 EXAMPLE:
 
 // Only necessary when rendering to multiple windows.
-Renderer::Inst()->SetWindow( windowInfo );
+renderer->SetWindow( windowInfo );
 
 // Clear buffers.
-Renderer::Inst()->Clear( ColorRGBA( 0.0f, 0.2f, 0.8f, 1.0f ).Ptr() );
+renderer->Clear( ColorRGBA( 0.0f, 0.2f, 0.8f, 1.0f ).Ptr() );
 
 // Shaders are required.
-Renderer::Inst()->SetShader( shader );
+renderer->SetShader( shader );
 
 // VBOs and IBOs required.
-Renderer::Inst()->SetVBO( bufferVBO );
-Renderer::Inst()->SetIBO( bufferIBO );
+renderer->SetVBO( bufferVBO );
+renderer->SetIBO( bufferIBO );
 
 // Set shader variables here (see Shader.h).
 
 // Draw stuff.
-Renderer::Inst()->SetRenderType( primitive );
-Renderer::Inst()->DrawIndexed( bufferIBO.mCount, 0, 0 );
+renderer->SetRenderType( primitive );
+renderer->DrawIndexed( bufferIBO.mCount, 0, 0 );
 
-Renderer::Inst()->Present();
+renderer->Present();
 
 
 // When finished with Renderer always call:
-Renderer::Destroy();
+renderer->Shutdown();
+
 
 // If more than one window / handle was created:
-Renderer::Inst()->SetWindow( windowInfo0 );
-Renderer::Inst()->Shutdown();
+renderer->SetWindow( windowInfo0 );
+renderer->Shutdown();
 
-Renderer::Inst()->SetWindow( windowInfo1 );
-Renderer::Inst()->Shutdown();
+renderer->SetWindow( windowInfo1 );
+renderer->Shutdown();
 
-Renderer::Destroy();
+*OR*
+
+If a GameWindow was created:
+
+gameWindow0->Shutdown();
+gameWindow1->Shutdown();
+
 */
 
 #include "Common.h"
-#include "Singleton.h"
 #include "Util.h"
-#include "Shader.h"
-#include "Texture.h"
-#include "Buffer.h"
+#include "RendererTypes.h"
 
 #define STBI_HEADER_FILE_ONLY
 #include "stb_image.c"
@@ -91,59 +95,9 @@ Renderer::Destroy();
 
 namespace Sentinel
 {
-	enum PrimitiveType
-	{
-		POINT_LIST,
-		LINE_LIST,
-		TRIANGLE_LIST,
-
-		NUM_PRIMITIVES
-	};
-
-	enum ImageFormatType
-	{
-		IMAGE_FORMAT_R,
-		IMAGE_FORMAT_RGB,
-		IMAGE_FORMAT_RGBA,
-		IMAGE_FORMAT_HDR,	// R32G32B32F
-
-		NUM_IMAGE_FORMATS
-	};
-
-	enum CullType
-	{
-		CULL_NONE,
-		CULL_CCW,
-		CULL_CW,
-
-		NUM_CULL_TYPES
-	};
-
-	enum FillType
-	{
-		FILL_SOLID,
-		FILL_WIREFRAME,
-
-		NUM_FILL_TYPES
-	};
-
-	enum BlendType
-	{
-		BLEND_DEFAULT,
-		BLEND_ALPHA,
-		BLEND_PARTICLE,
-
-		NUM_BLEND_TYPES
-	};
-
-	enum StencilType
-	{
-		STENCIL_DEFAULT,
-		STENCIL_NO_ZBUFFER,
-		STENCIL_PARTICLE,
-
-		NUM_STENCIL_TYPES
-	};
+	class Shader;
+	class Texture;
+	class Buffer;
 
 	class SENTINEL_DLL WindowInfo
 	{
@@ -172,14 +126,12 @@ namespace Sentinel
 		float	HeightRatio() const;
 	};
 
-	// Renderer is a SingletonAbstract as creating multiple instances
+	// Only one Renderer should be created as multiple instances
 	// of this particular object would unnecessarily complicate the
 	// shared context capability of the video card interface without
-	// any gains.  Due to this class being a Singleton, this also
-	// prevents a user from creating both OpenGL and DirectX at the
-	// same time.
+	// any gains.
 	//
-	class SENTINEL_DLL Renderer : public SingletonAbstractSafe< Renderer >
+	class SENTINEL_DLL Renderer
 	{
 	protected:
 
