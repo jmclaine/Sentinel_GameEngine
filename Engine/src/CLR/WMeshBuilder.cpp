@@ -9,6 +9,7 @@
 #include "WVector3f.h"
 #include "WVector2f.h"
 #include "WColorRGBA.h"
+#include "WTexture.h"
 
 namespace Sentinel { namespace Wrapped
 {

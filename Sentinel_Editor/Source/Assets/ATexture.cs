@@ -16,11 +16,11 @@ namespace Sentinel_Editor
 
 		public WTexture Data { get; private set; }
 
-		public ATexture( String name, WTexture texture )
+		public ATexture( String name, WTexture data )
 		{
 			mType	= EditorAssetType.TEXTURE;
 
-			Data	= texture;
+			Data	= data;
 			Name	= name;
 
 			Header  = EditorAsset.CreateDefaultAssetPanel( name, DefaultImage );

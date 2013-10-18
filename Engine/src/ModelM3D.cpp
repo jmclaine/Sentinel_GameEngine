@@ -6,7 +6,6 @@
 #include "Util.h"
 #include "MeshBuilder.h"
 #include "Timing.h"
-#include "AssetArchive.h"
 #include "Archive.h"
 #include "Renderer.h"
 #include "Shader.h"
@@ -184,7 +183,7 @@ namespace Sentinel
 				archive.Write( &mObject[ x ].mNumMeshes );
 
 				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
-					AssetArchive::SaveMesh( archive, mObject[ x ].mMesh[ y ], renderer, shaderManager, textureManager );
+					Mesh::Save( archive, mObject[ x ].mMesh[ y ], renderer, shaderManager, textureManager );
 
 				// Write the keyframes.
 				//
@@ -249,7 +248,7 @@ namespace Sentinel
 				mObject[ x ].mMesh = new Mesh*[ mObject[ x ].mNumMeshes ];
 
 				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
-					mObject[ x ].mMesh[ y ] = AssetArchive::LoadMesh( archive, renderer, shaderManager, textureManager );
+					mObject[ x ].mMesh[ y ] = Mesh::Load( archive, renderer, shaderManager, textureManager );
 
 				// Read the keyframes.
 				//

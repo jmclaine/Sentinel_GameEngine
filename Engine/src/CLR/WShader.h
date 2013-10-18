@@ -2,11 +2,14 @@
 /*
 Shaders are created from WRenderer.CreateShader()
 */
-#include "WTexture.h"
+#include "Property.h"
 #include "Shader.h"
+#include "m_shared_ptr.h"
 
 namespace Sentinel { namespace Wrapped
 {
+	ref class WTexture;
+
 	public ref class WShader
 	{
 		DECLARE_REF_SHARED( Shader );

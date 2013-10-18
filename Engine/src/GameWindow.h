@@ -12,6 +12,9 @@ namespace Sentinel
 	class Renderer;
 	class WindowInfo;
 
+	// Helper class for quick window creation setup
+	// specifically for the Renderer.
+	//
 	class SENTINEL_DLL GameWindow
 	{
 	private:

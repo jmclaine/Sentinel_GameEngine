@@ -10,7 +10,6 @@
 #include "TextureManager.h"
 #include "ShaderManager.h"
 #include "MeshManager.h"
-#include "AssetArchive.h"
 #include "Archive.h"
 
 namespace Sentinel
@@ -55,7 +54,7 @@ namespace Sentinel
 			archive.Write( &mNumMeshes );
 
 			for( UINT x = 0; x < mNumMeshes; ++x )
-				AssetArchive::SaveMesh( archive, mMesh[ x ], renderer, shaderManager, textureManager );
+				Mesh::Save( archive, mMesh[ x ], renderer, shaderManager, textureManager );
 		}
 
 		void Create( Archive&			archive,
@@ -70,7 +69,7 @@ namespace Sentinel
 			mMesh = new Mesh*[ mNumMeshes ];
 
 			for( UINT x = 0; x < mNumMeshes; ++x )
-				mMesh[ x ] = AssetArchive::LoadMesh( archive, renderer, shaderManager, textureManager );
+				mMesh[ x ] = Mesh::Load( archive, renderer, shaderManager, textureManager );
 		}
 
 		bool Create( const char*		filename, 

@@ -21,6 +21,11 @@ namespace Sentinel
 
 		void Load( Archive& archive, Renderer* renderer );
 
-		static ShaderManager* LoadConfig( const char* filename, Renderer* renderer, ShaderManager* shaderManager = NULL );
+		// See 'config.xml' within the Shaders folder
+		// for the structure of the shader definitions.
+		//
+		// returns true on success.
+		//
+		static bool LoadConfig( const char* filename, Renderer* renderer, ShaderManager* shaderManager );
 	};
 }

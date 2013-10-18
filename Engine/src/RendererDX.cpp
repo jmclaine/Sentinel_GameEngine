@@ -163,7 +163,7 @@ namespace Sentinel
 		UINT CreateFromFile( std::string filename, const std::string& attrib, const std::string& uniform, 
 							 ID3D11Device* device, ID3D11DeviceContext* context )
 		{
-			filename.append( ".fx" );
+			filename.append( ".xsh" );
 
 			if( Archive::ToBuffer( filename.c_str(), mShaderSource ) == 0 )
 			{
@@ -193,7 +193,9 @@ namespace Sentinel
 			ID3D10Blob* fxblob  = NULL;
 			ID3D10Blob* errblob = NULL;
 
-			if( FAILED( D3DX11CompileFromMemory( mShaderSource, strlen( mShaderSource ), 0, NULL, NULL, "", "fx_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &fxblob, &errblob, NULL )))
+			D3D10_SHADER_MACRO macro[2] = {{ "VERSION_DX", 0 }, { 0, 0 }};
+
+			if( FAILED( D3DX11CompileFromMemory( mShaderSource, strlen( mShaderSource ), 0, macro, NULL, "", "fx_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &fxblob, &errblob, NULL )))
 			{
 				if( errblob )
 				{

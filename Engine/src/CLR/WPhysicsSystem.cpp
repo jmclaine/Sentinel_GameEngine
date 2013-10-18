@@ -120,12 +120,12 @@ namespace Sentinel { namespace Wrapped
 	
 	////////////////////////////////////////////////////////////////////
 
-	WPhysicsSystem^ WPhysicsSystem::BuildWPhysicsSystemBT()
+	WPhysicsSystem^ WPhysicsSystem::BuildBT()
 	{
 		return gcnew WPhysicsSystem( BuildPhysicsSystemBT() );
 	}
 
-	WPhysicsSystem^ WPhysicsSystem::BuildWPhysicsSystemSE()
+	WPhysicsSystem^ WPhysicsSystem::BuildSE()
 	{
 		return gcnew WPhysicsSystem( BuildPhysicsSystemSE() );
 	}

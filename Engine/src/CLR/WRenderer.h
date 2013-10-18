@@ -113,5 +113,8 @@ namespace Wrapped
 		void			Clear( WColorRGBA^ color );
 		void			DrawIndexed( UINT count, UINT startIndex, UINT baseVertex );
 		void			Present();
+
+		static WRenderer^ BuildGL();
+		static WRenderer^ BuildDX();
 	};
 }}

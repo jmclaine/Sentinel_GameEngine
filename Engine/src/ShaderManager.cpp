@@ -92,11 +92,14 @@ namespace Sentinel
 		}
 	}
 
-	ShaderManager* ShaderManager::LoadConfig( const char* filename, Renderer* renderer, ShaderManager* shaderManager )
+	bool ShaderManager::LoadConfig( const char* filename, Renderer* renderer, ShaderManager* shaderManager )
 	{
 		TiXmlDocument doc;
 		if( !doc.LoadFile( filename ))
+		{
+			TRACE( "Failed to open '" << filename << "'" );
 			return false;
+		}
 
 		TiXmlHandle	hDoc( &doc );
 
@@ -110,9 +113,6 @@ namespace Sentinel
 
 		// Store each shader.
 		//
-		if( !shaderManager )
-			shaderManager = new ShaderManager();
-		
 		while( pElem != NULL )
 		{
 			const char* pFile = pElem->Attribute( "FileName" );
@@ -123,11 +123,14 @@ namespace Sentinel
 			std::shared_ptr< Shader > shader = shaderManager->Add( pName, renderer->CreateShaderFromFile( pFile, pAttr, pUnif ));
 			
 			if( !shader )
-				throw AppException( "Failed to load shader '" + std::string( pFile ) + "." );
+			{
+				TRACE( "Failed to load shader '" << std::string( pFile ) << "'" );
+				return false;
+			}
 
 			pElem = pElem->NextSiblingElement();
 		}
 
-		return shaderManager;
+		return true;
 	}
 }

@@ -12,6 +12,7 @@ namespace Sentinel { namespace Wrapped
 	ref class WShaderManager;
 	ref class WMeshManager;
 	ref class WModelManager;
+	ref class WAudioSourceManager;
 	ref class WArchive;
 	ref class WGameObject;
 	ref class WCameraComponent;
@@ -31,13 +32,14 @@ namespace Sentinel { namespace Wrapped
 
 		DECLARE_OP_PTR( GameWorld );
 
-		DECLARE_PROPERTY( WRenderer^,		XRenderer );
-		DECLARE_PROPERTY( WPhysicsSystem^,	XPhysicsSystem );
-		DECLARE_PROPERTY( WTiming^,			XTiming );
-		DECLARE_PROPERTY( WTextureManager^, XTextureManager );
-		DECLARE_PROPERTY( WShaderManager^,  XShaderManager );
-		DECLARE_PROPERTY( WMeshManager^,    XMeshManager );
-		DECLARE_PROPERTY( WModelManager^,   XModelManager );
+		DECLARE_PROPERTY( WRenderer^,			XRenderer );
+		DECLARE_PROPERTY( WPhysicsSystem^,		XPhysicsSystem );
+		DECLARE_PROPERTY( WTiming^,				XTiming );
+		DECLARE_PROPERTY( WTextureManager^,		XTextureManager );
+		DECLARE_PROPERTY( WShaderManager^,		XShaderManager );
+		DECLARE_PROPERTY( WMeshManager^,		XMeshManager );
+		DECLARE_PROPERTY( WModelManager^,		XModelManager );
+		DECLARE_PROPERTY( WAudioSourceManager^,	XAudioSourceManager );
 		
 		void				Save( WArchive^ archive );
 		void				Load( WArchive^ archive );

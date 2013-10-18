@@ -223,7 +223,10 @@
                                     <TreeView.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem Header="Add Texture" Click="Assets_AddTexture" />
-                                            <MenuItem Header="Add Model" Click="Assets_AddModel" />
+                                            <MenuItem Header="Add Shader"  Click="Assets_AddShader" />
+                                            <MenuItem Header="Add Mesh"    Click="Assets_AddMesh" />
+                                            <MenuItem Header="Add Model"   Click="Assets_AddModel" />
+                                            <MenuItem Header="Add Sound"   Click="Assets_AddSound" />
                                             <Separator />
                                             <MenuItem Header="Refresh" Click="Assets_Refresh" />
                                         </ContextMenu>

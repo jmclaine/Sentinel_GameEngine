@@ -12,6 +12,14 @@
 
 namespace Sentinel
 {
+	// Sets a maximum frame rate.
+	// Generally, this is 60 Hz as defaulted by DESIRED_FRAME_RATE.
+	//
+	// Call Update() first to QueryCounter() for the starting time.
+	//
+	// Call Limit() to temporarily stop the program from executing
+	// for a set period of time.
+	//
 	class SENTINEL_DLL Timing
 	{
 	public:

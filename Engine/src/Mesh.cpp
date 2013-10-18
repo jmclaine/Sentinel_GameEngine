@@ -11,6 +11,9 @@
 #include "TransformComponent.h"
 #include "CameraComponent.h"
 #include "LightComponent.h"
+#include "Archive.h"
+#include "ShaderManager.h"
+#include "TextureManager.h"
 
 namespace Sentinel
 {
@@ -177,5 +180,84 @@ namespace Sentinel
 			renderer->SetRenderType( mPrimitive );
 			renderer->DrawIndexed( (count == UINT_MAX) ? mIBO->Count() : count, 0, 0 );
 		}
+	}
+
+	//////////////////////////////
+
+	void Mesh::Save( Archive&			archive, 
+					 Mesh*				mesh,
+					 Renderer*			renderer, 
+					 ShaderManager*		shaderManager, 
+					 TextureManager*	textureManager )
+	{
+		BYTE primitive = mesh->mPrimitive;
+		archive.Write( &primitive );
+
+		Buffer::Save( archive, mesh->mVBO );
+		Buffer::Save( archive, mesh->mIBO );
+
+		archive.Write( &shaderManager->Get( mesh->mShader ));
+
+		archive.Write( (BYTE*)mesh->mMaterial.Ptr(), sizeof( Material ));
+
+		for( UINT x = 0; x < NUM_TEXTURES; ++x )
+		{
+			BYTE type;
+			if( mesh->mTexture[ x ].get() == renderer->NULL_TEXTURE.get() )
+				type = 0;
+			else
+			if( mesh->mTexture[ x ].get() == renderer->BASE_TEXTURE.get() )
+				type = 1;
+			else
+				type = 2;
+
+			archive.Write( &type );
+
+			if( type == 2 )
+				archive.Write( &textureManager->Get( mesh->mTexture[ x ] ));
+		}
+	}
+
+	Mesh* Mesh::Load( Archive&			archive, 
+					  Renderer*			renderer, 
+					  ShaderManager*	shaderManager, 
+					  TextureManager*	textureManager )
+	{
+		Mesh* mesh = new Mesh();
+
+		BYTE primitive;
+		archive.Read( &primitive );
+		mesh->mPrimitive = (PrimitiveType)primitive;
+
+		mesh->mVBO = Buffer::Load( archive, renderer );
+		mesh->mIBO = Buffer::Load( archive, renderer );
+
+		std::string shader;
+		archive.Read( &shader );
+		mesh->mShader = shaderManager->Get( shader );
+
+		archive.Read( (BYTE*)mesh->mMaterial.Ptr(), sizeof( Material ));
+		
+		std::string texture;
+		for( UINT x = 0; x < NUM_TEXTURES; ++x )
+		{
+			BYTE type;
+			archive.Read( &type );
+
+			if( type == 0 )
+				mesh->mTexture[ x ] = renderer->NULL_TEXTURE;
+			else
+			if( type == 1 )
+				mesh->mTexture[ x ] = renderer->BASE_TEXTURE;
+			else
+			{
+				std::string texture;
+				archive.Read( &texture );
+
+				mesh->mTexture[ x ] = textureManager->Get( texture );
+			}
+		}
+
+		return mesh;
 	}
 }

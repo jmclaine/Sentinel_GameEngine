@@ -35,6 +35,7 @@ namespace Sentinel_Editor
 		private static TreeViewItem	mAsset_Shader;
 		private static TreeViewItem	mAsset_Mesh;
 		private static TreeViewItem	mAsset_Model;
+		private static TreeViewItem	mAsset_Audio;
 
 		private EditorAsset			mSelectedAsset;
 
@@ -58,14 +59,15 @@ namespace Sentinel_Editor
 		/// Necessary objects to create a Game World.
 		/// 
 		private WRenderer			mRenderer;
-
-		private WPhysicsSystem		mPhysics;
 		private WTiming				mTiming;
+		private WPhysicsSystem		mPhysicsSystem;
+		private WAudioSystem		mAudioSystem;
 
 		private WTextureManager		mTextureManager;
 		private WShaderManager		mShaderManager;
 		private WMeshManager		mMeshManager;
 		private WModelManager		mModelManager;
+		private WAudioSourceManager mAudioSourceManager;
 
 		private WGameWorld			mGameWorld;
 
@@ -99,6 +101,7 @@ namespace Sentinel_Editor
 			AShader.DefaultImage  = new BitmapImage( new Uri( "pack://application:,,,/Resources/Asset_Shader.png" ));
 			AMesh.DefaultImage    = new BitmapImage( new Uri( "pack://application:,,,/Resources/Asset_Mesh.png" ));
 			AModel.DefaultImage   = new BitmapImage( new Uri( "pack://application:,,,/Resources/Asset_Model.png" ));
+			AAudio.DefaultImage   = new BitmapImage( new Uri( "pack://application:,,,/Resources/Asset_Audio.png" ));
 
 			// Initialize Renderer.
 			//
@@ -113,9 +116,10 @@ namespace Sentinel_Editor
 			}
 
 			mGameWorld = new WGameWorld();
-			mTiming    = new WTiming();
-
-			mPhysics = WPhysicsSystem.BuildWPhysicsSystemSE();
+			
+			mTiming        = new WTiming();
+			mPhysicsSystem = WPhysicsSystem.BuildSE();
+			mAudioSystem   = WAudioSystem.BuildAL();
 			
 			mGameWindow = new GameWindow( mGameWorld );
 			mGameWindow.Startup( mRenderer, "World", "WorldClass", info );
@@ -125,7 +129,6 @@ namespace Sentinel_Editor
 			Window_World.Child = mGameWindow;
 			
 			mMapName = "Default.MAP";
-			//WGameWorld.Load( "Default.MAP" );
 			Window_Main.Title = "Sentinel Editor - " + mMapName;
 
 			CompositionTarget.Rendering += Update;
@@ -144,6 +147,7 @@ namespace Sentinel_Editor
 			CreateAssetTree( ref mAsset_Shader,	 "Shader" );
 			CreateAssetTree( ref mAsset_Mesh,	 "Mesh" );
 			CreateAssetTree( ref mAsset_Model,	 "Model" );
+			CreateAssetTree( ref mAsset_Audio,	 "Audio" );
 
 			// Prepare Game World.
 			//
@@ -184,6 +188,9 @@ namespace Sentinel_Editor
 			mScaleObject.Shutdown();
 			mScaleObject.Release();
 
+			foreach( AAudio item in mAsset_Audio.Items )
+				item.Data.Dispose();
+
 			foreach( AModel item in mAsset_Model.Items )
 				item.Data.Dispose();
 
@@ -203,9 +210,11 @@ namespace Sentinel_Editor
 			mMeshManager.Release();
 			mShaderManager.Release();
 			mTextureManager.Release();
+			mAudioSourceManager.Release();
 
 			mTiming.Release();
-			mPhysics.Release();
+			mAudioSystem.Release();
+			mPhysicsSystem.Release();
 			
 			mGameWindow.Shutdown();
 
@@ -218,8 +227,6 @@ namespace Sentinel_Editor
 		private void Update( Object sender, EventArgs e )
 		{
 			WMouse.Update();
-
-			mTiming.Update();
 
 			mRenderer.SetDepthStencil( 0 );
 			mRenderer.SetViewport( 0, 0, mGameWindow.GetInfo().Width(), mGameWindow.GetInfo().Height() );
@@ -235,8 +242,6 @@ namespace Sentinel_Editor
 			DrawSelection();
 
 			mRenderer.Present();
-
-			mTiming.Limit( WTiming.DESIRED_FRAME_RATE );
 		}
 
 		private void DrawSelection()
@@ -565,6 +570,14 @@ namespace Sentinel_Editor
 			mAsset_Model.Items.Add( item );
 		}
 
+		private void AddAsset( String name, WAudioSource source )
+		{
+			AAudio item = new AAudio( name, source );
+			item.Selected += AssetSelected;
+
+			mAsset_Audio.Items.Add( item );
+		}
+
 		///
 		/// Find an Asset by Type.
 		///
@@ -578,7 +591,7 @@ namespace Sentinel_Editor
 		}
 
 		///
-		/// Context Menu
+		/// Context Menu for Assets
 		///
 		private void Assets_AddTexture( Object sender, RoutedEventArgs e )
 		{
@@ -599,6 +612,30 @@ namespace Sentinel_Editor
 			}
 		}
 
+		private void Assets_AddShader( Object sender, RoutedEventArgs e )
+		{
+			/*
+			System.Windows.Forms.OpenFileDialog dialog = new System.Windows.Forms.OpenFileDialog();
+
+			dialog.Title  = "Add Texture to Project";
+			dialog.Filter = "PNG|*.png|All Files|*.*";
+			dialog.FilterIndex = 1;
+
+			//dialog.Multiselect = true;
+
+			if( dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK )
+			{
+				WTexture texture = mRenderer.CreateTextureFromFile( dialog.FileName );
+				String name  = Path.GetFileName( dialog.FileName );
+				mTextureManager.Add( name, texture );
+				AddAsset( name, texture );
+			}
+			*/
+		}
+
+		private void Assets_AddMesh( Object sender, RoutedEventArgs e )
+		{}
+
 		private void Assets_AddModel( Object sender, RoutedEventArgs e )
 		{
 			System.Windows.Forms.OpenFileDialog dialog = new System.Windows.Forms.OpenFileDialog();
@@ -613,6 +650,25 @@ namespace Sentinel_Editor
 				String name  = Path.GetFileName( dialog.FileName );
 				mModelManager.Add( name, model );
 				AddAsset( name, model );
+			}
+		}
+
+		private void Assets_AddSound( Object sender, RoutedEventArgs e )
+		{
+			System.Windows.Forms.OpenFileDialog dialog = new System.Windows.Forms.OpenFileDialog();
+
+			dialog.Title  = "Add Sound to Project";
+			dialog.Filter = "WAV|*.wav|OGG|*.ogg|All Files|*.*";
+			dialog.FilterIndex = 1;
+
+			//dialog.Multiselect = true;
+
+			if( dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK )
+			{
+				WAudioSource source = mAudioSystem.CreateSound( dialog.FileName );
+				String name = Path.GetFileName( dialog.FileName );
+				mAudioSourceManager.Add( name, source );
+				AddAsset( name, source );
 			}
 		}
 
@@ -631,7 +687,7 @@ namespace Sentinel_Editor
 			Directory.SetCurrentDirectory( "Assets\\Shaders" );
 
 			mShaderManager = new WShaderManager();
-			if( WShaderManager.LoadConfig( "config.xml", mRenderer, mShaderManager ) == null )
+			if( !WShaderManager.LoadConfig( "config.xml", mRenderer, mShaderManager ))
 			{
 				MessageBox.Show( "Failed to load 'Assets\\Shaders\\config.xml'", "Shader Load Failure" );
 				System.Environment.Exit( -1 );
@@ -663,17 +719,19 @@ namespace Sentinel_Editor
 			WRigidBody				body;
 			WMesh					mesh;
 
-			mTextureManager = new WTextureManager();
-			mMeshManager	= new WMeshManager();
-			mModelManager	= new WModelManager();
+			mTextureManager		= new WTextureManager();
+			mMeshManager		= new WMeshManager();
+			mModelManager		= new WModelManager();
+			mAudioSourceManager = new WAudioSourceManager();
 
-			mGameWorld.XRenderer       = mRenderer;
-			mGameWorld.XPhysicsSystem  = mPhysics;
-			mGameWorld.XTiming         = mTiming;
-			mGameWorld.XTextureManager = mTextureManager;
-			mGameWorld.XShaderManager  = mShaderManager;
-			mGameWorld.XMeshManager	   = mMeshManager;
-			mGameWorld.XModelManager   = mModelManager;
+			mGameWorld.XRenderer			= mRenderer;
+			mGameWorld.XTiming				= mTiming;
+			mGameWorld.XPhysicsSystem		= mPhysicsSystem;
+			mGameWorld.XTextureManager		= mTextureManager;
+			mGameWorld.XShaderManager		= mShaderManager;
+			mGameWorld.XMeshManager			= mMeshManager;
+			mGameWorld.XModelManager		= mModelManager;
+			mGameWorld.XAudioSourceManager	= mAudioSourceManager;
 
 			////////////////////////////////////
 
@@ -691,7 +749,7 @@ namespace Sentinel_Editor
 			obj.AttachComponent( new WPlayerControllerComponent(), "Controller" );
 			
 			physics = (WPhysicsComponent)obj.AttachComponent( new WPhysicsComponent(), "Physics" );
-			physics.SetRigidBody( mPhysics.CreateSphere( transform.Position, new WQuatf( transform.Rotation ), 1.0f, 1.0f ));
+			physics.SetRigidBody( mPhysicsSystem.CreateSphere( transform.Position, new WQuatf( transform.Rotation ), 1.0f, 1.0f ));
 			body = physics.GetRigidBody();
 			body.ShapeType		= PhysicsShapeType.SPHERE;
 			body.Flags			= (int)PhysicsFlag.DISABLE_GRAVITY;
@@ -730,7 +788,7 @@ namespace Sentinel_Editor
 			transform.Scale		 = new WVector3f( 100, 1, 100 );
 
 			physics = (WPhysicsComponent)obj.AttachComponent( new WPhysicsComponent(), "Physics" );
-			physics.SetRigidBody( mPhysics.CreateBox( transform.Position, new WQuatf( transform.Rotation ), transform.Scale, 0.0f ));
+			physics.SetRigidBody( mPhysicsSystem.CreateBox( transform.Position, new WQuatf( transform.Rotation ), transform.Scale, 0.0f ));
 			body = physics.GetRigidBody();
 			body.ShapeType	= PhysicsShapeType.BOX;
 			body.Flags		= (int)PhysicsFlag.DISABLE_GRAVITY;
@@ -889,6 +947,10 @@ namespace Sentinel_Editor
 				mMapName = dialog.FileName;
 				Window_Main.Title = "Sentinel Editor - " + Path.GetFileName( mMapName );
 				
+				foreach( AAudio item in mAsset_Audio.Items )
+					item.Data.Dispose();
+				mAsset_Audio.Items.Clear();
+
 				foreach( AModel item in mAsset_Model.Items )
 					item.Data.Dispose();
 				mAsset_Model.Items.Clear();
@@ -953,6 +1015,17 @@ namespace Sentinel_Editor
 					AddAsset( names[ x ], model[ x ] );
 				}
 
+				mAudioSourceManager.Load( archive, mAudioSystem );
+
+				names.Clear();
+				List< WAudioSource > source = new List< WAudioSource >();
+				mAudioSourceManager.GetAll( ref names, ref source );
+
+				for( int x = 0; x < names.Count; ++x )
+				{
+					AddAsset( names[ x ], source[ x ] );
+				}
+
 				Objects_TreeView.Items.Clear();
 
 				mGameWorld.Load( archive );
@@ -979,6 +1052,7 @@ namespace Sentinel_Editor
 			mShaderManager.Save( archive );
 			mMeshManager.Save( archive, mRenderer, mShaderManager, mTextureManager );
 			mModelManager.Save( archive, mRenderer, mShaderManager, mTextureManager );
+			mAudioSourceManager.Save( archive );
 
 			mGameWorld.Save( archive );
 

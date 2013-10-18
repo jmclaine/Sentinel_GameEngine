@@ -1,8 +1,8 @@
 #include "MeshManager.h"
-#include "AssetArchive.h"
 #include "Renderer.h"
 #include "ShaderManager.h"
 #include "TextureManager.h"
+#include "Archive.h"
 
 namespace Sentinel
 {
@@ -24,7 +24,7 @@ namespace Sentinel
 		{
 			archive.Write( &it->first );
 
-			AssetArchive::SaveMesh( archive, it->second.get(), renderer, shaderManager, textureManager );
+			Mesh::Save( archive, it->second.get(), renderer, shaderManager, textureManager );
 		}
 	}
 
@@ -43,7 +43,7 @@ namespace Sentinel
 			std::string name;
 			archive.Read( &name );
 
-			std::shared_ptr< Mesh > mesh( AssetArchive::LoadMesh( archive, renderer, shaderManager, textureManager ));
+			std::shared_ptr< Mesh > mesh( Mesh::Load( archive, renderer, shaderManager, textureManager ));
 
 			if( !Add( name, mesh ))
 				throw std::exception( "Failed to load mesh." );

@@ -111,6 +111,9 @@ xcopy "$(SolutionDir)$(Configuration)\Sentinel.dll" "$(SolutionDir)\..\Sentinel_
   <ItemGroup>
     <ClInclude Include="..\Engine\src\CLR\WArchive.h" />
     <ClInclude Include="..\Engine\src\CLR\WAssetManager.h" />
+    <ClInclude Include="..\Engine\src\CLR\WAudioSourceManager.h" />
+    <ClInclude Include="..\Engine\src\CLR\WAudioSource.h" />
+    <ClInclude Include="..\Engine\src\CLR\WAudioSystem.h" />
     <ClInclude Include="..\Engine\src\CLR\WControllerComponent.h" />
     <ClInclude Include="..\Engine\src\CLR\WMeshManager.h" />
     <ClInclude Include="..\Engine\src\CLR\WModelManager.h" />
@@ -158,6 +161,9 @@ xcopy "$(SolutionDir)$(Configuration)\Sentinel.dll" "$(SolutionDir)\..\Sentinel_
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\CLR\WArchive.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WAudioSource.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WAudioSourceManager.cpp" />
+    <ClCompile Include="..\Engine\src\CLR\WAudioSystem.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WBuffer.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WCameraComponent.cpp" />
     <ClCompile Include="..\Engine\src\CLR\WColorRGBA.cpp" />

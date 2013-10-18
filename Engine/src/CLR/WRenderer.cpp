@@ -236,4 +236,14 @@ namespace Sentinel { namespace Wrapped
 	{
 		mRef->Present();
 	}
+
+	WRenderer^ WRenderer::BuildGL()
+	{
+		return gcnew WRenderer( BuildRendererGL() );
+	}
+
+	WRenderer^ WRenderer::BuildDX()
+	{
+		return gcnew WRenderer( BuildRendererDX() );
+	}
 }}

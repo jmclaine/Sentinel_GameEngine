@@ -22,6 +22,7 @@
 #include "ShaderManager.h"
 #include "MeshManager.h"
 #include "ModelManager.h"
+#include "AudioSourceManager.h"
 
 #include "Input.h"
 #include "Timing.h"
@@ -56,21 +57,20 @@ class MainApp
 {
 	HACCEL					mAccelTable;
 	
-	GameWindow*				mWindow;
+	GameWindow*				mGameWindow;
 	Renderer*				mRenderer;
 
 	Timing*					mTiming;
-	PhysicsSystem*			mPhysics;
+	PhysicsSystem*			mPhysicsSystem;
+	AudioSystem*			mAudioSystem;
 
 	TextureManager*			mTextureManager;
 	ShaderManager*			mShaderManager;
 	MeshManager*			mMeshManager;
 	ModelManager*			mModelManager;
-
-	AudioSystem*			mAudio;
-	AudioSource*			mSound;	// temp
-
-	GameWorld*				mWorld;
+	AudioSourceManager*		mAudioSourceManager;
+	
+	GameWorld*				mGameWorld;
 
 public:
 
@@ -78,21 +78,21 @@ public:
 	{
 		srand( (UINT)time( (time_t*)0 ));
 
-		mWindow			= NULL;
+		mGameWindow		= NULL;
 		mRenderer		= NULL;
 
 		mTiming			= new Timing();
-		mPhysics		= NULL;
+		mPhysicsSystem	= NULL;
 
 		mTextureManager	= new TextureManager();
 		mShaderManager	= new ShaderManager();
 		mMeshManager	= new MeshManager();
 		mModelManager	= new ModelManager();
+		mAudioSourceManager = new AudioSourceManager();
 
-		mAudio			= NULL;
-		mSound			= NULL;
-
-		mWorld			= new GameWorld();
+		mAudioSystem	= NULL;
+		
+		mGameWorld		= new GameWorld();
 	}
 
 	~MainApp()
@@ -100,10 +100,10 @@ public:
 
 	int Run( HINSTANCE hInstance, int nCmdShow )
 	{
-		mWindow = new GameWindow( IDI_SENTINEL_TEST, IDI_SMALL, IDC_SENTINEL_TEST );
+		mGameWindow = new GameWindow( IDI_SENTINEL_TEST, IDI_SMALL, IDC_SENTINEL_TEST );
 		
 		//LoadString( hInstance, IDS_APP_TITLE, mTitle, GameWindow::MAX_LOADSTRING );
-		//LoadString( hInstance, IDC_SENTINEL_TEST, mWindowClass, GameWindow::MAX_LOADSTRING );
+		//LoadString( hInstance, IDC_SENTINEL_TEST, mGameWindowClass, GameWindow::MAX_LOADSTRING );
 		
 		mAccelTable = LoadAccelerators( hInstance, MAKEINTRESOURCE( IDC_SENTINEL_TEST ));
 
@@ -121,28 +121,23 @@ public:
 
 		// Prepare main window.
 		//
-		mWindow->Startup( mRenderer, hInstance, nCmdShow, "Sentinel_Test", "SentinelClass0", info );
+		mGameWindow->Startup( mRenderer, hInstance, nCmdShow, "Sentinel_Test", "SentinelClass0", info );
 
 		mRenderer->CreateDepthStencil( info.Width(), info.Height() );
 		mRenderer->CreateBackbuffer();
 
 		////////////////////////////////////
 
-		Mouse::Get().SetPosition( CenterHandle( mWindow->GetHandle() ));
+		Mouse::Get().SetPosition( CenterHandle( mGameWindow->GetHandle() ));
 		ShowCursor( FALSE );
 
 		////////////////////////////////////
 
-		mPhysics = BuildPhysicsSystemBT();
-		mPhysics->Startup();
+		mPhysicsSystem = BuildPhysicsSystemBT();
+		mPhysicsSystem->Startup();
 
-		SetDirectory( "Sounds" );
-		//mAudio->Startup();
-		//mSound = mAudio->CreateSound( "rtsoundthrow.wav" );
-		//mSound->Play();
-		SetDirectory( ".." );
+		mAudioSystem = BuildAudioSystemAL();
 
-		
 		Archive archive;
 		archive.Open( "Default.MAP", "rb" );
 
@@ -150,16 +145,21 @@ public:
 		mShaderManager->Load( archive, mRenderer );
 		mMeshManager->Load( archive, mRenderer, mShaderManager, mTextureManager );
 		mModelManager->Load( archive, mRenderer, mShaderManager, mTextureManager );
+		mAudioSourceManager->Load( archive, mAudioSystem );
 		
-		mWorld->mTiming			= mTiming;
-		mWorld->mRenderer		= mRenderer;
-		mWorld->mPhysicsSystem	= mPhysics;
-		mWorld->mTextureManager = mTextureManager;
-		mWorld->mShaderManager	= mShaderManager;
-		mWorld->mMeshManager	= mMeshManager;
-		mWorld->mModelManager	= mModelManager;
+		mGameWorld->mTiming			= mTiming;
+		mGameWorld->mRenderer		= mRenderer;
+		mGameWorld->mPhysicsSystem	= mPhysicsSystem;
+		mGameWorld->mTextureManager = mTextureManager;
+		mGameWorld->mShaderManager	= mShaderManager;
+		mGameWorld->mMeshManager	= mMeshManager;
+		mGameWorld->mModelManager	= mModelManager;
 		
-		mWorld->Load( archive );
+		mGameWorld->Load( archive );
+
+		std::shared_ptr< AudioSource > source = mAudioSourceManager->Get( "rtsoundthrow.wav" );
+		source->mLoop = true;
+		source->Play();
 
 		archive.Close();
 		/*
@@ -168,7 +168,7 @@ public:
 		PrepareFont();
 		//*/
 
-		mWorld->Startup();
+		mGameWorld->Startup();
 		
 		// Enter main game loop.
 		//
@@ -208,19 +208,19 @@ public:
 		static float color[] = {0.0f, 0.2f, 0.8f, 1.0f};
 
 		mRenderer->SetDepthStencil( 0 );
-		mRenderer->SetViewport( 0, 0, mWindow->GetInfo()->Width(), mWindow->GetInfo()->Height() );
+		mRenderer->SetViewport( 0, 0, mGameWindow->GetInfo()->Width(), mGameWindow->GetInfo()->Height() );
 		mRenderer->SetRenderTarget( 0 );
 
 		mRenderer->Clear( color );
 
-		mWorld->UpdateController();
+		mGameWorld->UpdateController();
 
-		mPhysics->Update( mTiming->DeltaTime() );
+		mPhysicsSystem->Update( mTiming->DeltaTime() );
 
-		mWorld->UpdatePhysics();
-		mWorld->UpdateTransform();
-		mWorld->UpdateComponents();
-		mWorld->UpdateDrawable();
+		mGameWorld->UpdatePhysics();
+		mGameWorld->UpdateTransform();
+		mGameWorld->UpdateComponents();
+		mGameWorld->UpdateDrawable();
 
 		mRenderer->Present();
 
@@ -234,9 +234,7 @@ public:
 	{
 		SetDirectory( "Shaders" );
 		
-		mShaderManager = ShaderManager::LoadConfig( "config.xml", mRenderer, mShaderManager );
-		if( !mShaderManager )
-			throw AppException( "Failed to load 'Shaders\\config.xml'" );
+		ShaderManager::LoadConfig( "config.xml", mRenderer, mShaderManager );
 
 		SetDirectory( ".." );
 	}
@@ -257,7 +255,7 @@ public:
 
 		// Create main perspective camera.
 		//
-		info = mWindow->GetInfo();
+		info = mGameWindow->GetInfo();
 		camera = new PerspectiveCameraComponent( (float)info->Width(), (float)info->Height() );
 		
 		transform = new TransformComponent();
@@ -265,12 +263,12 @@ public:
 		
 		controller = new PlayerControllerComponent();
 		
-		physics = new PhysicsComponent( mPhysics->CreateSphere( transform->mPosition, transform->mOrientation, 1, 1 ));
+		physics = new PhysicsComponent( mPhysicsSystem->CreateSphere( transform->mPosition, transform->mOrientation, 1, 1 ));
 		physics->GetRigidBody()->SetFlags( DISABLE_GRAVITY );
 		physics->GetRigidBody()->SetDamping( 0.9f, 0.9f );
 		physics->GetRigidBody()->SetAngularFactor( Vector3f() );
 
-		obj = mWorld->AddGameObject( new GameObject(), "MainCamera" );
+		obj = mGameWorld->AddGameObject( new GameObject(), "MainCamera" );
 		obj->AttachComponent( transform,	"Transform" );
 		obj->AttachComponent( controller,	"Player" );
 		obj->AttachComponent( physics,		"Physics" );
@@ -285,7 +283,7 @@ public:
 		transform = new TransformComponent();
 		transform->mPosition = Vector3f( 0, 0, 0 );
 		
-		obj = mWorld->AddGameObject( new GameObject(), "SpriteCamera" );
+		obj = mGameWorld->AddGameObject( new GameObject(), "SpriteCamera" );
 		obj->AttachComponent( transform,	"Transform" );
 		obj->AttachComponent( camera,		"Camera" );
 		
@@ -300,7 +298,7 @@ public:
 		light->mAttenuation = Vector4f( 1, 1, 1, 2000 );
 		light->mColor		= ColorRGBA( 1, 1, 1, 1 );
 
-		obj = mWorld->AddGameObject( new GameObject(), "PointLight" );
+		obj = mGameWorld->AddGameObject( new GameObject(), "PointLight" );
 		obj->AttachComponent( transform,	"Transform" );
 		obj->AttachComponent( light,		"Light" );
 
@@ -355,9 +353,9 @@ public:
 		transform->mOrientation = Quatf( 0, 0, 1, 15 ).AxisAngle();
 		transform->mScale		= Vector3f( 10, 1, 25 );
 		
-		physics = new PhysicsComponent( mPhysics->CreateBox( transform->mPosition, transform->mOrientation, transform->mScale, 0 ));
+		physics = new PhysicsComponent( mPhysicsSystem->CreateBox( transform->mPosition, transform->mOrientation, transform->mScale, 0 ));
 
-		obj = mWorld->AddGameObject( new GameObject(), "Origin" );
+		obj = mGameWorld->AddGameObject( new GameObject(), "Origin" );
 		obj->AttachComponent( transform,	"Transform" );
 		obj->AttachComponent( physics,		"Physics" );
 		obj->AttachComponent( new MeshComponent( mMeshManager->Get( "Cube" )), "Mesh" );
@@ -369,9 +367,9 @@ public:
 		transform->mOrientation = Quatf( 0, 0, 1, -15 ).AxisAngle();
 		transform->mScale		= Vector3f( 10, 1, 25 );
 		
-		physics = new PhysicsComponent( mPhysics->CreateBox( transform->mPosition, transform->mOrientation, transform->mScale, 0 ));
+		physics = new PhysicsComponent( mPhysicsSystem->CreateBox( transform->mPosition, transform->mOrientation, transform->mScale, 0 ));
 
-		obj = mWorld->AddGameObject( new GameObject(), "Origin" );
+		obj = mGameWorld->AddGameObject( new GameObject(), "Origin" );
 		obj->AttachComponent( transform,	"Transform" );
 		obj->AttachComponent( physics,		"Physics" );
 		obj->AttachComponent( new MeshComponent( mMeshManager->Get( "Cube" )), "Mesh" );
@@ -400,7 +398,7 @@ public:
 				case 0:
 					mesh = mMeshManager->Get( "Cube" );
 
-					physics = new PhysicsComponent( mPhysics->CreateBox( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mass ));
+					physics = new PhysicsComponent( mPhysicsSystem->CreateBox( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mass ));
 
 					break;
 
@@ -411,7 +409,7 @@ public:
 
 					transform->mScale.z = transform->mScale.x;
 					transform->mScale.y = transform->mScale.y * 5;
-					physics = new PhysicsComponent( mPhysics->CreateCylinder( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mass ));
+					physics = new PhysicsComponent( mPhysicsSystem->CreateCylinder( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mass ));
 
 					break;
 
@@ -421,7 +419,7 @@ public:
 					mesh = mMeshManager->Get( "Sphere" );
 
 					transform->mScale = Vector3f( mass, mass, mass );
-					physics = new PhysicsComponent( mPhysics->CreateSphere( transform->mPosition, Quatf( 0, 0, 0, 1 ), mass, mass ));
+					physics = new PhysicsComponent( mPhysicsSystem->CreateSphere( transform->mPosition, Quatf( 0, 0, 0, 1 ), mass, mass ));
 
 					break;
 
@@ -431,7 +429,7 @@ public:
 					mesh = mMeshManager->Get( "Wire Sphere" );
 
 					transform->mScale = Vector3f( mass, mass, mass );
-					physics = new PhysicsComponent( mPhysics->CreateSphere( transform->mPosition, Quatf( 0, 0, 0, 1 ), mass, mass ));
+					physics = new PhysicsComponent( mPhysicsSystem->CreateSphere( transform->mPosition, Quatf( 0, 0, 0, 1 ), mass, mass ));
 
 					break;
 
@@ -440,7 +438,7 @@ public:
 				case 4:
 					mesh = mMeshManager->Get( "Tetrahedron" );
 
-					physics = new PhysicsComponent( mPhysics->CreateMesh( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mesh.get(), mass ));
+					physics = new PhysicsComponent( mPhysicsSystem->CreateMesh( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mesh.get(), mass ));
 
 					break;
 
@@ -449,7 +447,7 @@ public:
 				case 5:
 					mesh = mMeshManager->Get( "Octahedron" );
 
-					physics = new PhysicsComponent( mPhysics->CreateMesh( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mesh.get(), mass ));
+					physics = new PhysicsComponent( mPhysicsSystem->CreateMesh( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mesh.get(), mass ));
 
 					break;
 
@@ -458,7 +456,7 @@ public:
 				case 6:
 					mesh = mMeshManager->Get( "Dodecahedron" );
 
-					physics = new PhysicsComponent( mPhysics->CreateMesh( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mesh.get(), mass ));
+					physics = new PhysicsComponent( mPhysicsSystem->CreateMesh( transform->mPosition, Quatf( 0, 0, 0, 1 ), transform->mScale, mesh.get(), mass ));
 
 					break;
 
@@ -467,14 +465,14 @@ public:
 				default:
 					transform->mScale = Vector3f( mass, mass, mass ) * 0.025f;
 
-					physics = new PhysicsComponent( mPhysics->CreateSphere( transform->mPosition, Quatf( 0, 0, 0, 1 ), mass * 0.6f, mass ));
+					physics = new PhysicsComponent( mPhysicsSystem->CreateSphere( transform->mPosition, Quatf( 0, 0, 0, 1 ), mass * 0.6f, mass ));
 
 					break;
 			}
 
 			sprintf_s( name, "Object %d", x );
 
-			obj = mWorld->AddGameObject( new GameObject(), name );
+			obj = mGameWorld->AddGameObject( new GameObject(), name );
 			obj->AttachComponent( transform,	"Transform" );
 			obj->AttachComponent( physics,		"Physics" );
 
@@ -498,34 +496,28 @@ public:
 
 	void Shutdown()
 	{
-		SAFE_DELETE( mSound );
-		
-		if( mWorld )
+		if( mGameWorld )
 		{
-			mWorld->Shutdown();
-			delete mWorld;
+			mGameWorld->Shutdown();
+			delete mGameWorld;
 		}
 
 		SAFE_DELETE( mTiming );
-		SAFE_DELETE( mPhysics );
+		SAFE_DELETE( mPhysicsSystem );
+		SAFE_DELETE( mAudioSystem );
 		
+		SAFE_DELETE( mAudioSourceManager );
 		SAFE_DELETE( mModelManager );
 		SAFE_DELETE( mMeshManager );
 		SAFE_DELETE( mShaderManager );
 		SAFE_DELETE( mTextureManager );
 
-		if( mWindow )
+		if( mGameWindow )
 		{
-			mWindow->Shutdown();
-			delete mWindow;
+			mGameWindow->Shutdown();
+			delete mGameWindow;
 		}
 		
-		if( mAudio )
-		{
-			mAudio->Shutdown();
-			delete mAudio;
-		}
-
 		SAFE_DELETE( mRenderer );
 	}
 };

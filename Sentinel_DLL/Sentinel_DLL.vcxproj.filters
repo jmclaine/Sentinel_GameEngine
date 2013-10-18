@@ -132,9 +132,6 @@
     <ClInclude Include="..\Engine\src\FixedPoint.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\Timing.h">
-      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\OrthographicCameraComponent.h">
       <Filter>Source Files\Sentinel_Engine\Components\Core</Filter>
     </ClInclude>
@@ -240,11 +237,14 @@
     <ClInclude Include="..\Engine\src\AudioSource.h">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\AssetArchive.h">
-      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\RendererTypes.h">
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Timing.h">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\AudioSourceManager.h">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -328,9 +328,6 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\ParticleSystem.cpp">
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\Timing.cpp">
-      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\CameraComponent.cpp">
       <Filter>Source Files\Sentinel_Engine\Components\Core</Filter>
@@ -470,9 +467,6 @@
     <ClCompile Include="..\Engine\src\ModelManager.cpp">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\AudioSystem.cpp">
-      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\AudioSource.cpp">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClCompile>
@@ -482,7 +476,13 @@
     <ClCompile Include="..\Engine\src\PhysicsSystemSE.cpp">
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\AssetArchive.cpp">
+    <ClCompile Include="..\Engine\src\Timing.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\AudioSystemAL.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\AudioSourceManager.cpp">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClCompile>
   </ItemGroup>

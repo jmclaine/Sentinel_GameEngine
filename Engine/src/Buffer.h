@@ -5,6 +5,7 @@
 
 namespace Sentinel
 {
+	class Archive;
 	class Renderer;
 
 	class SENTINEL_DLL Buffer
@@ -32,5 +33,11 @@ namespace Sentinel
 		UINT			Size();
 		UINT			Stride();
 		UINT			Count();
+
+		///////////////////////////
+
+		static void		Save( Archive& archive, Buffer* buffer );
+		
+		static Buffer*	Load( Archive& archive, Renderer* renderer );
 	};
 }

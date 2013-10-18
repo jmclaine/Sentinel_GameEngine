@@ -13,6 +13,7 @@ namespace Sentinel_Editor
 		SHADER,
 		MESH,
 		MODEL,
+		AUDIO_SOURCE,
 
 		NUM_ASSETS
 	};

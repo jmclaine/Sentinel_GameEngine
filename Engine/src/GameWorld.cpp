@@ -3,9 +3,10 @@
 #include "TransformComponent.h"
 #include "CameraComponent.h"
 #include "LightComponent.h"
-#include "Timing.h"
 #include "Archive.h"
+#include "Timing.h"
 #include "PhysicsSystem.h"
+#include "AudioSourceManager.h"
 #include "TextureManager.h"
 #include "ShaderManager.h"
 #include "MeshManager.h"
@@ -16,12 +17,13 @@ namespace Sentinel
 	GameWorld::GameWorld() :
 		mCurrentCamera( NULL ),
 		mRenderer( NULL ),
-		mPhysicsSystem( NULL ),
 		mTiming( NULL ),
+		mPhysicsSystem( NULL ),
 		mTextureManager( NULL ),
 		mShaderManager( NULL ),
 		mMeshManager( NULL ),
-		mModelManager( NULL )
+		mModelManager( NULL ),
+		mAudioSourceManager( NULL )
 	{}
 
 	GameWorld::~GameWorld()

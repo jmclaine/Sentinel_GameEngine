@@ -201,7 +201,7 @@ namespace Sentinel
 
 		UINT CreateFromFile( std::string filename, const std::string& attrib, const std::string& uniform )
 		{
-			filename.append( ".gls" );
+			filename.append( ".xsh" );
 
 			if( Archive::ToBuffer( filename.c_str(), mShaderSource ) == 0 )
 			{
@@ -230,18 +230,18 @@ namespace Sentinel
 
 			if( strstr( mShaderSource, "VERTEX_SHADER" ) != NULL )
 			{
-				const char *vshader[2] = { "#define VERTEX_SHADER\n\0", mShaderSource };
+				const char *vshader[2] = { "#define VERSION_GL\n#define VERTEX_SHADER\n\0", mShaderSource };
 				
-				if( !Compile( vshader, mVertexShader, GL_VERTEX_SHADER ))
+				if( !Compile( vshader, mVertexShader, GL_VERTEX_SHADER, 2 ))
 					return S_FALSE;
 			}
 			
 			bool useGS = false;
 			if( strstr( mShaderSource, "GEOMETRY_SHADER" ) != NULL )
 			{
-				const char *gshader[2] = { "#define GEOMETRY_SHADER\n\0", mShaderSource };
+				const char *gshader[2] = { "#define VERSION_GL\n#define GEOMETRY_SHADER\n\0", mShaderSource };
 
-				if( !Compile( gshader, mGeometryShader, GL_GEOMETRY_SHADER ))
+				if( !Compile( gshader, mGeometryShader, GL_GEOMETRY_SHADER, 2 ))
 					return S_FALSE;
 
 				useGS = true;
@@ -255,9 +255,9 @@ namespace Sentinel
 
 			if( strstr( mShaderSource, "FRAGMENT_SHADER" ) != NULL )
 			{
-				const char *fshader[2] = { "#define FRAGMENT_SHADER\n\0", mShaderSource };
+				const char *fshader[2] = { "#define VERSION_GL\n#define FRAGMENT_SHADER\n\0", mShaderSource };
 
-				if( !Compile( fshader, mFragmentShader, GL_FRAGMENT_SHADER ))
+				if( !Compile( fshader, mFragmentShader, GL_FRAGMENT_SHADER, 2 ))
 					return S_FALSE;
 			}
 			
@@ -419,13 +419,13 @@ namespace Sentinel
 
 	private:
 
-		int Compile( const GLchar** source, GLuint& shader, GLenum type )
+		int Compile( const GLchar** source, GLuint& shader, GLenum type, GLsizei count )
 		{
 			_ASSERT( type == GL_VERTEX_SHADER || type == GL_FRAGMENT_SHADER || type == GL_GEOMETRY_SHADER );
 
 			shader = glCreateShader( type );
 
-			glShaderSource( shader, 2, source, NULL );
+			glShaderSource( shader, count, source, NULL );
 			glCompileShader( shader );
 
 			int didCompile = 0;

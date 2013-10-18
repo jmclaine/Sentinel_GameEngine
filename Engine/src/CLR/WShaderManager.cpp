@@ -18,11 +18,8 @@ namespace Sentinel { namespace Wrapped
 		mRef->Load( *archive, renderer );
 	}
 
-	WShaderManager^ WShaderManager::LoadConfig( System::String^ filename, WRenderer^ renderer, WShaderManager^ shaderManager )
+	bool WShaderManager::LoadConfig( System::String^ filename, WRenderer^ renderer, WShaderManager^ shaderManager )
 	{
-		if( !ShaderManager::LoadConfig( WString::Cast( filename ).c_str(), renderer, shaderManager ))
-			return nullptr;
-
-		return shaderManager;
+		return ShaderManager::LoadConfig( WString::Cast( filename ).c_str(), renderer, shaderManager );
 	}
 }}

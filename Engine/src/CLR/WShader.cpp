@@ -1,4 +1,5 @@
 #include "WShader.h"
+#include "WTexture.h"
 
 namespace Sentinel { namespace Wrapped
 {

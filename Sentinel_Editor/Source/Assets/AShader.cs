@@ -16,11 +16,11 @@ namespace Sentinel_Editor
 
 		public WShader Data { get; set; }
 
-		public AShader( String name, WShader shader )
+		public AShader( String name, WShader data )
 		{
 			mType	= EditorAssetType.SHADER;
 
-			Data	= shader;
+			Data	= data;
 			Name	= name;
 
 			Header  = EditorAsset.CreateDefaultAssetPanel( name, DefaultImage );

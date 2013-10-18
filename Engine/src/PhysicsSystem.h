@@ -81,6 +81,11 @@ namespace Sentinel
 
 	////////////////////////////////////////////////////////////////////
 
+	// Abstract class designed for either BulletPhysics or SentinelEditor.
+	//
+	// Call BuildPhysicsSystemBT() or BuildPhysicsSystemSE()
+	// to create the PhysicsSystem.
+	//
 	class PhysicsSystem
 	{
 	public:

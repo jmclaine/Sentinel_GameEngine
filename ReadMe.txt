@@ -27,6 +27,13 @@ This engine has integrated:
 	zlib-1.2.8
 	http://www.zlib.net/
 
+	OpenAL Soft
+	http://kcat.strangesoft.net/openal.html
+
+	OggVorbis
+	http://www.vorbis.com/
+
+
 
 
 //////////////////////////

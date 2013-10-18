@@ -1,12 +1,14 @@
 #include "WGameWorld.h"
 #include "WString.h"
 #include "WRenderer.h"
-#include "WPhysicsSystem.h"
 #include "WTiming.h"
+#include "WPhysicsSystem.h"
+#include "WAudioSystem.h"
 #include "WTextureManager.h"
 #include "WShaderManager.h"
 #include "WMeshManager.h"
 #include "WModelManager.h"
+#include "WAudioSourceManager.h"
 #include "WArchive.h"
 #include "WGameObject.h"
 #include "WCameraComponent.h"
@@ -28,13 +30,14 @@ namespace Sentinel { namespace Wrapped
 
 	DEFINE_OP_PTR( GameWorld );
 
-	DEFINE_PROPERTY_PS_EX( GameWorld, Renderer,			XRenderer,			Renderer );
-	DEFINE_PROPERTY_PS_EX( GameWorld, PhysicsSystem,	XPhysicsSystem,		PhysicsSystem );
-	DEFINE_PROPERTY_PS_EX( GameWorld, Timing,			XTiming,			Timing );
-	DEFINE_PROPERTY_PS_EX( GameWorld, TextureManager,	XTextureManager,	TextureManager );
-	DEFINE_PROPERTY_PS_EX( GameWorld, ShaderManager,	XShaderManager,		ShaderManager );
-	DEFINE_PROPERTY_PS_EX( GameWorld, MeshManager,		XMeshManager,		MeshManager );
-	DEFINE_PROPERTY_PS_EX( GameWorld, ModelManager,		XModelManager,		ModelManager );
+	DEFINE_PROPERTY_PS_EX( GameWorld, Renderer,				XRenderer,				Renderer );
+	DEFINE_PROPERTY_PS_EX( GameWorld, Timing,				XTiming,				Timing );
+	DEFINE_PROPERTY_PS_EX( GameWorld, PhysicsSystem,		XPhysicsSystem,			PhysicsSystem );
+	DEFINE_PROPERTY_PS_EX( GameWorld, TextureManager,		XTextureManager,		TextureManager );
+	DEFINE_PROPERTY_PS_EX( GameWorld, ShaderManager,		XShaderManager,			ShaderManager );
+	DEFINE_PROPERTY_PS_EX( GameWorld, MeshManager,			XMeshManager,			MeshManager );
+	DEFINE_PROPERTY_PS_EX( GameWorld, ModelManager,			XModelManager,			ModelManager );
+	DEFINE_PROPERTY_PS_EX( GameWorld, AudioSourceManager,	XAudioSourceManager,	AudioSourceManager );
 	
 	void WGameWorld::Save( WArchive^ archive )
 	{

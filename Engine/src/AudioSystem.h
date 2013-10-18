@@ -12,24 +12,29 @@ namespace Sentinel
 	class Archive;
 	class AudioSource;
 
+	// Abstract class designed for OpenAL.
+	//
+	// Call BuildAudioSystemAL()
+	// to create the AudioSystem.
+	//
 	class SENTINEL_DLL AudioSystem
 	{
 	public:
 
 		virtual ~AudioSystem() {}
 
-		/////////////////////////////////
-
-		static AudioSystem*		Create();
-
-		virtual void			Startup() = 0;
-
-		virtual void			Shutdown() = 0;
-
 		//////////////////////////////////
 
-		virtual AudioSource*	CreateSound( const char* filename ) = 0; // determines the type and loads automatically
-		virtual AudioSource*	CreateSound( Archive& archive ) = 0;	 // loads from file location into a data buffer directly
+		// Determines the type and loads automatically.
+		//
+		virtual AudioSource*	CreateSound( const char* filename ) = 0;
+
+		// Loads from file location into a data buffer directly.
+		//
+		virtual AudioSource*	CreateSound( Archive& archive ) = 0;
+
+		// Loads sound by file type.
+		//
 		virtual AudioSource*	CreateSoundWAV( Archive& archive ) = 0;
 		virtual AudioSource*	CreateSoundOGG( Archive& archive ) = 0;
 
@@ -37,4 +42,6 @@ namespace Sentinel
 		virtual void			SetListenerVelocity( const Vector3f& velocity ) = 0;
 		virtual void			SetListenerOrientation( const Vector3f& direction, const Vector3f& up = Vector3f( 0, 1, 0 )) = 0;
 	};
+
+	extern SENTINEL_DLL AudioSystem* BuildAudioSystemAL();
 }

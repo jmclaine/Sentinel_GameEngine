@@ -6,7 +6,7 @@ using Sentinel.Wrapped;
 
 namespace Sentinel_Editor
 {
-	public class AModel : EditorAsset
+	public class AAudio : EditorAsset
 	{
 		///
 		/// Initialize this image to get an icon
@@ -14,11 +14,11 @@ namespace Sentinel_Editor
 		///
 		public static BitmapImage DefaultImage { get; set; }
 
-		public WModel Data { get; set; }
+		public WAudioSource Data { get; set; }
 
-		public AModel( String name, WModel data )
+		public AAudio( String name, WAudioSource data )
 		{
-			mType	= EditorAssetType.MODEL;
+			mType	= EditorAssetType.AUDIO_SOURCE;
 
 			Data	= data;
 			Name	= name;

@@ -11,6 +11,8 @@
 #include "Util.h"
 #include "AudioSystem.h"
 #include "AudioSource.h"
+#include "Archive.h"
+#include "zlib.h"
 
 namespace Sentinel
 {
@@ -76,53 +78,12 @@ namespace Sentinel
 
 			CHECK_AUDIO_SOURCE_ERROR( "Failed to stop sound." );
 		}
-
-		///////////////////////////
-
-		void Save( Archive& archive )
-		{
-			archive.Write( &mPitch );
-			archive.Write( &mGain );
-			archive.Write( mPosition.Ptr(), ar_sizeof( mPosition ));
-			archive.Write( mVelocity.Ptr(), ar_sizeof( mVelocity ));
-
-			BYTE loop = (mLoop) ? 1 : 0;
-			archive.Write( &loop );
-			
-			archive.Write( &mFormat );
-			archive.Write( &mSampleRate );
-
-			archive.Write( &mDataSize );
-			
-			archive.Write( mData, mDataSize );
-		}
-
-		void Load( Archive& archive )
-		{
-			archive.Read( &mPitch );
-			archive.Read( &mGain );
-			archive.Read( mPosition.Ptr(), ar_sizeof( mPosition ));
-			archive.Read( mVelocity.Ptr(), ar_sizeof( mVelocity ));
-
-			BYTE loop;
-			archive.Read( &loop );
-			mLoop = (loop) ? true : false;
-			
-			archive.Read( &mFormat );
-			archive.Read( &mSampleRate );
-
-			archive.Read( &mDataSize );
-			
-			mData = (BYTE*)malloc( mDataSize );
-			archive.Read( mData, mDataSize );
-		}
 	};
 
 	/////////////////////////////////////////
 
 	class AudioSystemAL : public AudioSystem
 	{
-		friend class Archive;
 	private:
 
 		ALCdevice*		mDevice;
@@ -131,14 +92,6 @@ namespace Sentinel
 	public:
 
 		AudioSystemAL()
-		{}
-
-		~AudioSystemAL()
-		{}
-
-		//////////////////////////////////
-
-		void Startup()
 		{
 			mDevice = alcOpenDevice( NULL );
 			if( !mDevice )
@@ -156,12 +109,14 @@ namespace Sentinel
 			}
 		}
 
-		void Shutdown()
+		~AudioSystemAL()
 		{
 			alcMakeContextCurrent( NULL );
 			alcDestroyContext( mContext );
 			alcCloseDevice( mDevice );
 		}
+
+		//////////////////////////////////
 
 		AudioSource* CreateSound( const char* filename )
 		{
@@ -201,23 +156,31 @@ namespace Sentinel
 
 		AudioSource* CreateSound( Archive& archive )
 		{
-			AudioSourceAL* audio = new AudioSourceAL();
+			AudioSourceAL* source = new AudioSourceAL();
 
-			audio->Load( archive );
-
+			source->Load( archive );
+			
 			// Create buffer and source.
 			//
-			alGenBuffers( 1, &audio->mBuffer );
-			alGenSources( 1, &audio->mSource );
+			alGenBuffers( 1, &source->mBuffer );
+			alGenSources( 1, &source->mSource );
+
+			// Uncompress sound.
+			//
+			ULONG bound = (ULONG)source->mBoundSize;
+			BYTE* data = (BYTE*)malloc( source->mBoundSize );
+			uncompress( data, &bound, source->mData, source->mDataSize );
 
 			// Create sound buffer.
 			//
-			alBufferData( audio->mBuffer, audio->mFormat, audio->mData, audio->mDataSize, audio->mSampleRate );
-			alSourcei( audio->mSource, AL_BUFFER, audio->mBuffer );
+			alBufferData( source->mBuffer, source->mFormat, data, bound, source->mSampleRate );
+			alSourcei( source->mSource, AL_BUFFER, source->mBuffer );
 
-			CHECK_AUDIO_ERROR( "Error creating sound buffer." );
+			free( data );
+
+			CHECK_AUDIO_SOURCE_ERROR( "Error creating sound buffer." );
 			
-			return audio;
+			return source;
 		}
 
 		AudioSource* CreateSoundWAV( Archive& archive )
@@ -283,9 +246,6 @@ namespace Sentinel
 
 			archive.Read( data, dataSize );
 
-			audio->mData		= data;
-			audio->mDataSize	= dataSize;
-    
 			// Create buffer and source.
 			//
 			alGenBuffers( 1, &audio->mBuffer );
@@ -321,8 +281,19 @@ namespace Sentinel
 
 			// Create sound buffer.
 			//
-			alBufferData( audio->mBuffer, audio->mFormat, audio->mData, audio->mDataSize, audio->mSampleRate );
+			alBufferData( audio->mBuffer, audio->mFormat, data, dataSize, audio->mSampleRate );
 			alSourcei( audio->mSource, AL_BUFFER, audio->mBuffer );
+
+			// Compress sound data and store it.
+			//
+			ULONG bound = compressBound( dataSize );
+			audio->mData = (BYTE*)malloc( bound );
+			compress( audio->mData, &bound, data, dataSize );
+			
+			audio->mDataSize  = (UINT)bound;
+			audio->mBoundSize = dataSize;
+
+			free( data );
 
 			CHECK_AUDIO_ERROR( "Error creating sound buffer." );
 			
@@ -397,7 +368,7 @@ namespace Sentinel
 		}
 	};
 
-	AudioSystem* AudioSystem::Create()
+	AudioSystem* BuildAudioSystemAL()
 	{
 		return new AudioSystemAL();
 	}

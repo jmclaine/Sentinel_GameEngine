@@ -19,6 +19,6 @@ namespace Sentinel { namespace Wrapped
 		void	Save( WArchive^ archive );
 		void	Load( WArchive^ archive, WRenderer^ renderer );
 
-		static WShaderManager^ LoadConfig( System::String^ filename, WRenderer^ renderer, WShaderManager^ shaderManager );
+		static bool LoadConfig( System::String^ filename, WRenderer^ renderer, WShaderManager^ shaderManager );
 	};
 }}

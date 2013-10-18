@@ -101,6 +101,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Source\Assets\AAudio.cs" />
     <Compile Include="Source\Assets\AMesh.cs" />
     <Compile Include="Source\Assets\AModel.cs" />
     <Compile Include="Source\Assets\AShader.cs" />
@@ -138,16 +139,12 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.config" />
-    <None Include="Assets\Shaders\colnorm.fx" />
-    <None Include="Assets\Shaders\colnorm.gls" />
-    <None Include="Assets\Shaders\color.fx" />
-    <None Include="Assets\Shaders\color.gls" />
-    <None Include="Assets\Shaders\normmap.fx" />
-    <None Include="Assets\Shaders\normmap.gls" />
-    <None Include="Assets\Shaders\spriteGO.fx" />
-    <None Include="Assets\Shaders\spriteGO.gls" />
-    <None Include="Assets\Shaders\texture.fx" />
+    <None Include="Assets\Shaders\colnorm.xsh" />
+    <None Include="Assets\Shaders\color.xsh" />
+    <None Include="Assets\Shaders\normmap.xsh" />
+    <None Include="Assets\Shaders\spriteGO.xsh" />
     <None Include="Assets\Shaders\texture.gls" />
+    <None Include="Assets\Shaders\texture.xsh" />
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -177,7 +174,9 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\Asset_Audio.png" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Asset_Image.png" />
     <Resource Include="Resources\Asset_Material.png" />

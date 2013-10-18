@@ -19,6 +19,9 @@ namespace Sentinel
 	class Buffer;
 	class Shader;
 	class Texture;
+	class Archive;
+	class ShaderManager;
+	class TextureManager;
 
 	class SENTINEL_DLL Mesh
 	{
@@ -45,6 +48,19 @@ namespace Sentinel
 		Mesh();
 		~Mesh();
 
-		void Draw( Renderer* renderer, GameWorld* world, UINT count = UINT_MAX );
+		void		 Draw( Renderer* renderer, GameWorld* world, UINT count = UINT_MAX );
+
+		//////////////////////////////
+
+		static void  Save( Archive&			archive, 
+						   Mesh*			mesh,
+						   Renderer*		renderer, 
+						   ShaderManager*	shaderManager, 
+						   TextureManager*	textureManager );
+
+		static Mesh* Load( Archive&			archive, 
+						   Renderer*		renderer, 
+						   ShaderManager*	shaderManager, 
+						   TextureManager*	textureManager );
 	};
 }

@@ -99,9 +99,9 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
   <ItemGroup>
     <ClInclude Include="..\Engine\src\AIControllerComponent.h" />
     <ClInclude Include="..\Engine\src\Archive.h" />
-    <ClInclude Include="..\Engine\src\AssetArchive.h" />
     <ClInclude Include="..\Engine\src\AssetManager.h" />
     <ClInclude Include="..\Engine\src\AudioComponent.h" />
+    <ClInclude Include="..\Engine\src\AudioSourceManager.h" />
     <ClInclude Include="..\Engine\src\AudioSource.h" />
     <ClInclude Include="..\Engine\src\AudioSystem.h" />
     <ClInclude Include="..\Engine\src\Buffer.h" />
@@ -164,9 +164,9 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\Archive.cpp" />
-    <ClCompile Include="..\Engine\src\AssetArchive.cpp" />
+    <ClCompile Include="..\Engine\src\AudioSourceManager.cpp" />
     <ClCompile Include="..\Engine\src\AudioSource.cpp" />
-    <ClCompile Include="..\Engine\src\AudioSystem.cpp" />
+    <ClCompile Include="..\Engine\src\AudioSystemAL.cpp" />
     <ClCompile Include="..\Engine\src\Buffer.cpp" />
     <ClCompile Include="..\Engine\src\CameraComponent.cpp" />
     <ClCompile Include="..\Engine\src\ColorRGBA.cpp" />

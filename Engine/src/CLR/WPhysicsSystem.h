@@ -110,7 +110,7 @@ namespace Sentinel { namespace Wrapped
 
 		//////////////////////////////////
 
-		static WPhysicsSystem^ BuildWPhysicsSystemBT();
-		static WPhysicsSystem^ BuildWPhysicsSystemSE();
+		static WPhysicsSystem^ BuildBT();
+		static WPhysicsSystem^ BuildSE();
 	};
 }}
