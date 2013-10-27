@@ -18,5 +18,25 @@ namespace Sentinel
 		float*	Ptr();
 
 		UINT	ToUINT() const;
+
+		bool		operator == ( const ColorRGBA& color ) const;
+		bool		operator != ( const ColorRGBA& color ) const;
+		bool		Equals( const ColorRGBA& color ) const;
+
+		ColorRGBA&	operator += ( const ColorRGBA& color );
+		ColorRGBA	operator +  ( const ColorRGBA& color ) const;
+		ColorRGBA	Add( const ColorRGBA& color ) const;
+
+		ColorRGBA&	operator -= ( const ColorRGBA& color );
+		ColorRGBA	operator -  ( const ColorRGBA& color ) const;
+		ColorRGBA	Sub( const ColorRGBA& color ) const;
+
+		ColorRGBA&	operator *= ( float scalar );
+		ColorRGBA	operator *  ( float scalar ) const;
+		ColorRGBA	Mul( float scalar ) const;
+
+		ColorRGBA&	operator *= ( const ColorRGBA& color );
+		ColorRGBA	operator *  ( const ColorRGBA& color ) const;
+		ColorRGBA	Mul( const ColorRGBA& color ) const;
 	};
 }

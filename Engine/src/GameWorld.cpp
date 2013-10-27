@@ -6,7 +6,7 @@
 #include "Archive.h"
 #include "Timing.h"
 #include "PhysicsSystem.h"
-#include "AudioSourceManager.h"
+#include "SoundManager.h"
 #include "TextureManager.h"
 #include "ShaderManager.h"
 #include "MeshManager.h"
@@ -23,7 +23,7 @@ namespace Sentinel
 		mShaderManager( NULL ),
 		mMeshManager( NULL ),
 		mModelManager( NULL ),
-		mAudioSourceManager( NULL )
+		mSoundManager( NULL )
 	{}
 
 	GameWorld::~GameWorld()

@@ -67,7 +67,7 @@ namespace Sentinel_Editor
 		private WShaderManager		mShaderManager;
 		private WMeshManager		mMeshManager;
 		private WModelManager		mModelManager;
-		private WAudioSourceManager mAudioSourceManager;
+		private WSoundManager mSoundManager;
 
 		private WGameWorld			mGameWorld;
 
@@ -210,7 +210,7 @@ namespace Sentinel_Editor
 			mMeshManager.Release();
 			mShaderManager.Release();
 			mTextureManager.Release();
-			mAudioSourceManager.Release();
+			mSoundManager.Release();
 
 			mTiming.Release();
 			mAudioSystem.Release();
@@ -570,7 +570,7 @@ namespace Sentinel_Editor
 			mAsset_Model.Items.Add( item );
 		}
 
-		private void AddAsset( String name, WAudioSource source )
+		private void AddAsset( String name, WSound source )
 		{
 			AAudio item = new AAudio( name, source );
 			item.Selected += AssetSelected;
@@ -665,9 +665,9 @@ namespace Sentinel_Editor
 
 			if( dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK )
 			{
-				WAudioSource source = mAudioSystem.CreateSound( dialog.FileName );
+				WSound source = mAudioSystem.CreateSound( dialog.FileName );
 				String name = Path.GetFileName( dialog.FileName );
-				mAudioSourceManager.Add( name, source );
+				mSoundManager.Add( name, source );
 				AddAsset( name, source );
 			}
 		}
@@ -722,7 +722,7 @@ namespace Sentinel_Editor
 			mTextureManager		= new WTextureManager();
 			mMeshManager		= new WMeshManager();
 			mModelManager		= new WModelManager();
-			mAudioSourceManager = new WAudioSourceManager();
+			mSoundManager = new WSoundManager();
 
 			mGameWorld.XRenderer			= mRenderer;
 			mGameWorld.XTiming				= mTiming;
@@ -731,7 +731,7 @@ namespace Sentinel_Editor
 			mGameWorld.XShaderManager		= mShaderManager;
 			mGameWorld.XMeshManager			= mMeshManager;
 			mGameWorld.XModelManager		= mModelManager;
-			mGameWorld.XAudioSourceManager	= mAudioSourceManager;
+			mGameWorld.XSoundManager	= mSoundManager;
 
 			////////////////////////////////////
 
@@ -1015,11 +1015,11 @@ namespace Sentinel_Editor
 					AddAsset( names[ x ], model[ x ] );
 				}
 
-				mAudioSourceManager.Load( archive, mAudioSystem );
+				mSoundManager.Load( archive, mAudioSystem );
 
 				names.Clear();
-				List< WAudioSource > source = new List< WAudioSource >();
-				mAudioSourceManager.GetAll( ref names, ref source );
+				List< WSound > source = new List< WSound >();
+				mSoundManager.GetAll( ref names, ref source );
 
 				for( int x = 0; x < names.Count; ++x )
 				{
@@ -1052,7 +1052,7 @@ namespace Sentinel_Editor
 			mShaderManager.Save( archive );
 			mMeshManager.Save( archive, mRenderer, mShaderManager, mTextureManager );
 			mModelManager.Save( archive, mRenderer, mShaderManager, mTextureManager );
-			mAudioSourceManager.Save( archive );
+			mSoundManager.Save( archive );
 
 			mGameWorld.Save( archive );
 

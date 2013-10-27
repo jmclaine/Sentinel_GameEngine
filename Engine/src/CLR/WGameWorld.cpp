@@ -8,7 +8,7 @@
 #include "WShaderManager.h"
 #include "WMeshManager.h"
 #include "WModelManager.h"
-#include "WAudioSourceManager.h"
+#include "WSoundManager.h"
 #include "WArchive.h"
 #include "WGameObject.h"
 #include "WCameraComponent.h"
@@ -37,7 +37,7 @@ namespace Sentinel { namespace Wrapped
 	DEFINE_PROPERTY_PS_EX( GameWorld, ShaderManager,		XShaderManager,			ShaderManager );
 	DEFINE_PROPERTY_PS_EX( GameWorld, MeshManager,			XMeshManager,			MeshManager );
 	DEFINE_PROPERTY_PS_EX( GameWorld, ModelManager,			XModelManager,			ModelManager );
-	DEFINE_PROPERTY_PS_EX( GameWorld, AudioSourceManager,	XAudioSourceManager,	AudioSourceManager );
+	DEFINE_PROPERTY_PS_EX( GameWorld, SoundManager,	XSoundManager,	SoundManager );
 	
 	void WGameWorld::Save( WArchive^ archive )
 	{

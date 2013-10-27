@@ -1,16 +1,16 @@
-#include "AudioSourceManager.h"
+#include "SoundManager.h"
 #include "AudioSystem.h"
 #include "Archive.h"
 
 namespace Sentinel
 {
-	AudioSourceManager::AudioSourceManager()
+	SoundManager::SoundManager()
 	{}
 
-	AudioSourceManager::~AudioSourceManager()
+	SoundManager::~SoundManager()
 	{}
 
-	void AudioSourceManager::Save( Archive& archive )
+	void SoundManager::Save( Archive& archive )
 	{
 		// Store the number of sounds.
 		//
@@ -19,17 +19,17 @@ namespace Sentinel
 
 		TRAVERSE_LIST( it, mData )
 		{
-			std::shared_ptr< AudioSource > source = it->second;
+			std::shared_ptr< Sound > source = it->second;
 
 			// Store audio info.
 			//
 			archive.Write( &it->first );
 
-			AudioSource::Save( archive, source.get() );
+			Sound::Save( archive, source.get() );
 		}
 	}
 
-	void AudioSourceManager::Load( Archive& archive, AudioSystem* audio )
+	void SoundManager::Load( Archive& archive, AudioSystem* audio )
 	{
 		RemoveAll();
 
@@ -45,7 +45,7 @@ namespace Sentinel
 			std::string name;
 			archive.Read( &name );
 
-			Add( name, std::shared_ptr< AudioSource >( AudioSource::Load( archive, audio )));
+			Add( name, std::shared_ptr< Sound >( Sound::Load( archive, audio )));
 		}
 	}
 }

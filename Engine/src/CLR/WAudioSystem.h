@@ -5,7 +5,7 @@
 
 namespace Sentinel { namespace Wrapped
 {
-	ref class WAudioSource;
+	ref class WSound;
 	ref class WArchive;
 	ref class WVector3f;
 
@@ -25,16 +25,16 @@ namespace Sentinel { namespace Wrapped
 
 		// Determines the type and loads automatically.
 		//
-		WAudioSource^	CreateSound( System::String^ filename );
+		WSound^	CreateSound( System::String^ filename );
 
 		// Loads from file location into a data buffer directly.
 		//
-		WAudioSource^	CreateSound( WArchive^ archive );
+		WSound^	CreateSound( WArchive^ archive );
 
 		// Loads sound by file type.
 		//
-		WAudioSource^	CreateSoundWAV( WArchive^ archive );
-		WAudioSource^	CreateSoundOGG( WArchive^ archive );
+		WSound^	CreateSoundWAV( WArchive^ archive );
+		WSound^	CreateSoundOGG( WArchive^ archive );
 
 		void			SetListenerPosition( WVector3f^ position );
 		void			SetListenerVelocity( WVector3f^ velocity );

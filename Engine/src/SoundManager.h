@@ -1,19 +1,19 @@
 #pragma once
 
 #include "AssetManager.h"
-#include "AudioSource.h"
+#include "Sound.h"
 
 namespace Sentinel
 {
 	class Archive;
 	class AudioSystem;
 
-	class SENTINEL_DLL AudioSourceManager : public AssetManager< AudioSource >
+	class SENTINEL_DLL SoundManager : public AssetManager< Sound >
 	{	
 	public:
 
-		AudioSourceManager();
-		~AudioSourceManager();
+		SoundManager();
+		~SoundManager();
 
 		/////////////////////////////////
 

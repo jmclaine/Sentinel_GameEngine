@@ -2,17 +2,17 @@
 
 #include "Property.h"
 #include "WAssetManager.h"
-#include "AudioSourceManager.h"
+#include "SoundManager.h"
 
 namespace Sentinel { namespace Wrapped
 {
 	ref class WArchive;
-	ref class WAudioSource;
+	ref class WSound;
 	ref class WAudioSystem;
 	
-	public ref class WAudioSourceManager
+	public ref class WSoundManager
 	{
-		DECLARE_ASSET_MANAGER( AudioSource );
+		DECLARE_ASSET_MANAGER( Sound );
 
 	public:
 

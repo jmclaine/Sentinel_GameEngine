@@ -16,9 +16,9 @@ namespace Sentinel
 		// Matrices to calculate the final world matrix
 		// without duplicating matrices for every object.
 		//
-		static Matrix4f		mMatrixTranslation;
-		static Matrix4f		mMatrixScale;
-		static Matrix4f		mMatrixRotation;
+		static Matrix4f		MATRIX_TRANSLATION;
+		static Matrix4f		MATRIX_ROTATION;
+		static Matrix4f		MATRIX_SCALE;
 
 		///////////////////////////////////
 

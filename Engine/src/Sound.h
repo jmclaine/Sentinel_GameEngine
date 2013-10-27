@@ -7,7 +7,7 @@ namespace Sentinel
 	class Archive;
 	class AudioSystem;
 
-	class SENTINEL_DLL AudioSource
+	class SENTINEL_DLL Sound
 	{
 	public:
 
@@ -28,11 +28,11 @@ namespace Sentinel
    
 		///////////////////////////
 
-		AudioSource();
+		Sound();
 
 	public:
 
-		virtual ~AudioSource();
+		virtual ~Sound();
 
 		///////////////////////////
 
@@ -54,9 +54,9 @@ namespace Sentinel
 
 		///////////////////////////
 
-		static void			Save( Archive& archive, AudioSource* source );
+		static void			Save( Archive& archive, Sound* source );
 
-		static AudioSource*	Load( Archive& archive, AudioSystem* audio );
+		static Sound*	Load( Archive& archive, AudioSystem* audio );
 
 	protected:
 

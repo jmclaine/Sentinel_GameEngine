@@ -1,47 +1,76 @@
 #pragma once
 /*
-Creates a global point mesh.
-Generates Sprites through a geometry shader and vertex matrix.
+Creates a particle system based on normal point sprites,
+or physics based geometry.
+
+Must create InitialEffect to have a type of PositionEffect
+in order to spawn outside the origin.
 */
-#include "SpriteComponent.h"
+#include <vector>
+#include <memory>
+
+#include "Particle.h"
+#include "ParticleEffect.h"
+#include "Sprite.h"
+#include "Vector3f.h"
+#include "Quatf.h"
+#include "Matrix4f.h"
+#include "ColorRGBA.h"
 
 namespace Sentinel
 {
-	class Shader;
+	class GameWorld;
+	class Renderer;
 	class Mesh;
 	
 	class SENTINEL_DLL ParticleSystem
 	{
-		friend class SpriteComponent;
+	protected:
 
-	private:
+		static Matrix4f		MATRIX_TRANSLATION;
+		static Matrix4f		MATRIX_ROTATION;
+		static Matrix4f		MATRIX_SCALE;
 
-		Mesh*	mMesh;			// mesh containing only points for sprite generation
+		bool				mIsActive;
+
+		Renderer*			mRenderer;
+		GameWorld*			mWorld;
+
+		UINT				mNumParticles;
+
+		Particle**			mParticle;
+
+		float				mSpawnTime;
 
 	public:
+
+		Mesh*				mMesh;
 		
-		void*	mVertex;		// locked vertices within mMesh after Begin()
-		UINT	mCount;			// number of sprites to render
+		UINT				mMaxParticles;
 
-		/////////////////////////////////
+		float				mMinLifetime;
+		float				mMaxLifetime;
+		
+		std::vector< ParticleEffect* >	mEffect;	// must be in start time order
 
-		ParticleSystem();
-		~ParticleSystem();
+		float				mSpawnRate;
 
-		/////////////////////////////////
+	protected:
 
-		void	Startup( std::shared_ptr< Shader > shader, UINT maxSprites = 1000 );
+		//ParticleSystem();
+		ParticleSystem( Renderer* renderer, GameWorld* world, UINT maxParticles );
 
-		void	Shutdown();
+	public:
 
-		/////////////////////////////////
+		virtual ~ParticleSystem();
 
-		// Prepare for batched Sprite rendering.
-		//
-		void	Begin( SpriteComponent* sprite );
+		virtual void		Startup();
 
-		// Render Sprites within the batch.
-		//
-		void	End();
+		virtual void		Update( float DT );
+
+		virtual void		Shutdown();
 	};
+
+	extern SENTINEL_DLL ParticleSystem* BuildParticleSystemNormal( Renderer* renderer, GameWorld* world, std::shared_ptr< Sprite > sprite, UINT maxParticles = 1000 );
+	// extern SENTINEL_DLL ParticleSystem* BuildParticleSystemPhysics( Renderer* renderer, GameWorld* world, Mesh* mesh, UINT maxParticles = 1000 );
 }

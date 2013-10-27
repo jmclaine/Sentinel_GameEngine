@@ -234,17 +234,32 @@
     <ClInclude Include="..\Engine\src\AudioSystem.h">
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\AudioSource.h">
-      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\RendererTypes.h">
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\Timing.h">
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\AudioSourceManager.h">
+    <ClInclude Include="..\Engine\src\Sound.h">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\SoundManager.h">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\ParticleEmitterComponent.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Sprite.h">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Particle.h">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\ParticleEffect.h">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Point.h">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -467,9 +482,6 @@
     <ClCompile Include="..\Engine\src\ModelManager.cpp">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\AudioSource.cpp">
-      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\PhysicsSystemBT.cpp">
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
     </ClCompile>
@@ -482,7 +494,25 @@
     <ClCompile Include="..\Engine\src\AudioSystemAL.cpp">
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\AudioSourceManager.cpp">
+    <ClCompile Include="..\Engine\src\Sound.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\SoundManager.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\ParticleEmitterComponent.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Sprite.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Particle.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\ParticleSystemNormal.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\ParticleEffect.cpp">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClCompile>
   </ItemGroup>

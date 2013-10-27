@@ -181,7 +181,7 @@ namespace Sentinel
 	template< typename T, typename AlphaT >
 	inline T lerp( const T& start, const T& end, AlphaT alpha )
 	{
-		return start + end.Sub( start ) * alpha;
+		return start + (end - start) * alpha;
 	}
 
 	inline bool IsPowerOfTwo( UINT x )

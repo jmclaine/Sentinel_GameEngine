@@ -1,7 +1,7 @@
 #pragma once
 
 #include "WAudioSystem.h"
-#include "WAudioSource.h"
+#include "WSound.h"
 #include "WArchive.h"
 #include "WString.h"
 #include "WVector3f.h"
@@ -24,24 +24,24 @@ namespace Sentinel { namespace Wrapped
 
 	//////////////////////////////////
 
-	WAudioSource^ WAudioSystem::CreateSound( System::String^ filename )
+	WSound^ WAudioSystem::CreateSound( System::String^ filename )
 	{
-		return gcnew WAudioSource( std::shared_ptr< AudioSource >( mRef->CreateSound( WString::Cast( filename ).c_str() )));
+		return gcnew WSound( std::shared_ptr< Sound >( mRef->CreateSound( WString::Cast( filename ).c_str() )));
 	}
 
-	WAudioSource^ WAudioSystem::CreateSound( WArchive^ archive )
+	WSound^ WAudioSystem::CreateSound( WArchive^ archive )
 	{
-		return gcnew WAudioSource( std::shared_ptr< AudioSource >( mRef->CreateSound( *archive )));
+		return gcnew WSound( std::shared_ptr< Sound >( mRef->CreateSound( *archive )));
 	}
 
-	WAudioSource^ WAudioSystem::CreateSoundWAV( WArchive^ archive )
+	WSound^ WAudioSystem::CreateSoundWAV( WArchive^ archive )
 	{
-		return gcnew WAudioSource( std::shared_ptr< AudioSource >( mRef->CreateSoundWAV( *archive )));
+		return gcnew WSound( std::shared_ptr< Sound >( mRef->CreateSoundWAV( *archive )));
 	}
 
-	WAudioSource^ WAudioSystem::CreateSoundOGG( WArchive^ archive )
+	WSound^ WAudioSystem::CreateSoundOGG( WArchive^ archive )
 	{
-		return gcnew WAudioSource( std::shared_ptr< AudioSource >( mRef->CreateSoundOGG( *archive )));
+		return gcnew WSound( std::shared_ptr< Sound >( mRef->CreateSoundOGG( *archive )));
 	}
 
 	void WAudioSystem::SetListenerPosition( WVector3f^ position )

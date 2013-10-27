@@ -101,8 +101,12 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
     <ClInclude Include="..\Engine\src\Archive.h" />
     <ClInclude Include="..\Engine\src\AssetManager.h" />
     <ClInclude Include="..\Engine\src\AudioComponent.h" />
-    <ClInclude Include="..\Engine\src\AudioSourceManager.h" />
-    <ClInclude Include="..\Engine\src\AudioSource.h" />
+    <ClInclude Include="..\Engine\src\Particle.h" />
+    <ClInclude Include="..\Engine\src\ParticleEmitterComponent.h" />
+    <ClInclude Include="..\Engine\src\ParticleEffect.h" />
+    <ClInclude Include="..\Engine\src\Point.h" />
+    <ClInclude Include="..\Engine\src\SoundManager.h" />
+    <ClInclude Include="..\Engine\src\Sound.h" />
     <ClInclude Include="..\Engine\src\AudioSystem.h" />
     <ClInclude Include="..\Engine\src\Buffer.h" />
     <ClInclude Include="..\Engine\src\CameraComponent.h" />
@@ -149,6 +153,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
     <ClInclude Include="..\Engine\src\ShaderManager.h" />
     <ClInclude Include="..\Engine\src\Shape.h" />
     <ClInclude Include="..\Engine\src\Singleton.h" />
+    <ClInclude Include="..\Engine\src\Sprite.h" />
     <ClInclude Include="..\Engine\src\SpriteComponent.h" />
     <ClInclude Include="..\Engine\src\Texture.h" />
     <ClInclude Include="..\Engine\src\TextureManager.h" />
@@ -164,8 +169,12 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\Archive.cpp" />
-    <ClCompile Include="..\Engine\src\AudioSourceManager.cpp" />
-    <ClCompile Include="..\Engine\src\AudioSource.cpp" />
+    <ClCompile Include="..\Engine\src\Particle.cpp" />
+    <ClCompile Include="..\Engine\src\ParticleEffect.cpp" />
+    <ClCompile Include="..\Engine\src\ParticleEmitterComponent.cpp" />
+    <ClCompile Include="..\Engine\src\ParticleSystemNormal.cpp" />
+    <ClCompile Include="..\Engine\src\SoundManager.cpp" />
+    <ClCompile Include="..\Engine\src\Sound.cpp" />
     <ClCompile Include="..\Engine\src\AudioSystemAL.cpp" />
     <ClCompile Include="..\Engine\src\Buffer.cpp" />
     <ClCompile Include="..\Engine\src\CameraComponent.cpp" />
@@ -212,6 +221,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.lib" "$(SolutionDir)\..\Eng
     <ClCompile Include="..\Engine\src\Shader.cpp" />
     <ClCompile Include="..\Engine\src\ShaderManager.cpp" />
     <ClCompile Include="..\Engine\src\Shape.cpp" />
+    <ClCompile Include="..\Engine\src\Sprite.cpp" />
     <ClCompile Include="..\Engine\src\SpriteComponent.cpp" />
     <ClCompile Include="..\Engine\src\stb_image.c" />
     <ClCompile Include="..\Engine\src\Texture.cpp" />

@@ -1,75 +1,127 @@
 #include "ParticleSystem.h"
+#include "Renderer.h"
+#include "GameWorld.h"
 #include "MeshBuilder.h"
-#include "SpriteComponent.h"
 #include "Mesh.h"
 #include "Shader.h"
 #include "Buffer.h"
 #include "Texture.h"
+#include "Sprite.h"
+#include "RandomValue.h"
+#include "Util.h"
 
 namespace Sentinel
 {
-	ParticleSystem::ParticleSystem() :
-		mMesh( NULL ), mCount( 0 ), mVertex( NULL )
-	{}
+	Matrix4f ParticleSystem::MATRIX_TRANSLATION;
+	Matrix4f ParticleSystem::MATRIX_SCALE;
+	Matrix4f ParticleSystem::MATRIX_ROTATION;
+
+	ParticleSystem::ParticleSystem( Renderer* renderer, GameWorld* world, UINT maxParticles ) :
+		mRenderer( renderer ),
+		mWorld( world ),
+		mNumParticles( 0 ),
+		mMaxParticles( maxParticles ),
+		mMesh( NULL ),
+		mSpawnTime( 0 ),
+		mSpawnRate( 0.01f ),
+		mIsActive( false )
+	{
+		_ASSERT( renderer );
+		_ASSERT( world );
+		_ASSERT( maxParticles > 0 );
+
+		mParticle = new Particle*[ maxParticles ];
+	}
 
 	ParticleSystem::~ParticleSystem()
 	{
+		for( UINT x = 0; x < (UINT)mEffect.size(); ++x )
+			delete mEffect[ x ];
+
+		for( UINT x = 0; x < mMaxParticles; ++x )
+			delete mParticle[ x ];
+
+		delete[] mParticle;
+
+		delete mMesh;
+
 		Shutdown();
 	}
-		
-	// Based on a geometry shader that generates quads from points.
-	//
-	void ParticleSystem::Startup( std::shared_ptr< Shader > shader, UINT maxSprites )
+
+	void ParticleSystem::Startup()
 	{
-		_ASSERT( shader );
-
-		MeshBuilder builder;
-
-		builder.mShader = shader;
-
-		for( UINT x = 0; x < maxSprites; ++x )
+		mIsActive = true;
+	}
+		
+	void ParticleSystem::Update( float DT )
+	{
+		// Generate particles.
+		//
+		if( mNumParticles < mMaxParticles )
 		{
-			builder.mVertex.push_back( MeshBuilder::Vertex( Vector3f( 0.0f, 0.0f, 0.0f )));
-			builder.mIndex.push_back( x );
+			mSpawnTime += DT;
+
+			// Spawn as many particles as spawner will allow.
+			//
+			while( mSpawnTime >= mSpawnRate && mNumParticles < mMaxParticles )
+			{
+				mSpawnTime -= mSpawnRate;
+
+				Particle* particle = mParticle[ mNumParticles ];
+
+				particle->mElapsedTime = 0;
+				particle->mLifetime    = RandomValue( mMinLifetime, mMaxLifetime );
+				particle->mEffectIndex = 0;
+
+				++mNumParticles;
+			}
+
+			// Prevent SpawnTime overrun.
+			//
+			while( mSpawnTime >= mSpawnRate )
+				mSpawnTime -= mSpawnRate;
 		}
 
-		builder.mPrimitive = POINT_LIST;
+		for( int x = 0; x < (int)mNumParticles; ++x )
+		{
+			Particle* particle = mParticle[ x ];
 
-		//mMesh = builder.BuildMesh();
+			// Startup effects in time order.
+			//
+			for( UINT y = particle->mEffectIndex; y < (UINT)mEffect.size(); ++y )
+			{
+				if( particle->mElapsedTime >= mEffect[ y ]->mStartTime )
+				{
+					mEffect[ y ]->Startup( particle );
+
+					++particle->mEffectIndex;
+				}
+			}
+
+			// Update particles with effects.
+			//
+			for( UINT y = 0; y < particle->mEffectIndex; ++y )
+				mEffect[ y ]->Update( particle );
+
+			particle->Update( DT );
+
+			// Replace dead particles.
+			//
+			if( particle->mElapsedTime >= particle->mLifetime )
+			{
+				--mNumParticles;
+
+				*mParticle[ x ] = *mParticle[ mNumParticles ];
+
+				--x;
+			}
+		}
 	}
 
 	void ParticleSystem::Shutdown()
 	{
-		if( mMesh )
-		{
-			delete mMesh;
-			mMesh = NULL;
-		}
-	}
+		mNumParticles = 0;
 
-	// Prepare for batched Sprite rendering.
-	//
-	void ParticleSystem::Begin( SpriteComponent* sprite )
-	{
-		_ASSERT( sprite != NULL );
-		_ASSERT( sprite->mTexture != NULL );
-
-		mCount = 0;
-
-		mMesh->mTexture[ TEXTURE_DIFFUSE ] = sprite->mTexture;
-
-		mMesh->mTextureScale = Vector4f( (float)sprite->mSpriteSize.x / (float)sprite->mTexture->Width(),
-									     (float)sprite->mSpriteSize.y / (float)sprite->mTexture->Height(), 0, 0 );
-
-		mVertex = mMesh->mVBO->Lock();
-	}
-
-	// Render Sprites within the batch.
-	//
-	void ParticleSystem::End()
-	{
-		mMesh->mVBO->Unlock();
-
-		//mMesh->Draw( mCount );
+		mIsActive = false;
 	}
 }

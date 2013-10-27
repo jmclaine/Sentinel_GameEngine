@@ -183,10 +183,10 @@
     <ClInclude Include="..\Engine\src\CLR\WAudioSystem.h">
       <Filter>Sentinel_Engine\Systems</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\WAudioSource.h">
+    <ClInclude Include="..\Engine\src\CLR\WSound.h">
       <Filter>Sentinel_Engine\Assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\CLR\WAudioSourceManager.h">
+    <ClInclude Include="..\Engine\src\CLR\WSoundManager.h">
       <Filter>Sentinel_Engine\Assets</Filter>
     </ClInclude>
   </ItemGroup>
@@ -317,10 +317,10 @@
     <ClCompile Include="..\Engine\src\CLR\WAudioSystem.cpp">
       <Filter>Sentinel_Engine\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\WAudioSource.cpp">
+    <ClCompile Include="..\Engine\src\CLR\WSound.cpp">
       <Filter>Sentinel_Engine\Assets</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\CLR\WAudioSourceManager.cpp">
+    <ClCompile Include="..\Engine\src\CLR\WSoundManager.cpp">
       <Filter>Sentinel_Engine\Assets</Filter>
     </ClCompile>
   </ItemGroup>

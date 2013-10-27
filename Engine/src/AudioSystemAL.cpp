@@ -10,7 +10,7 @@
 
 #include "Util.h"
 #include "AudioSystem.h"
-#include "AudioSource.h"
+#include "Sound.h"
 #include "Archive.h"
 #include "zlib.h"
 
@@ -32,7 +32,7 @@ namespace Sentinel
 
 	/////////////////////////////////////////
 
-	class AudioSourceAL : public AudioSource
+	class SoundAL : public Sound
 	{
 		friend class AudioSystemAL;
 
@@ -41,10 +41,10 @@ namespace Sentinel
 		ALuint	mSource;
 		ALuint	mBuffer;
 
-		AudioSourceAL()
+		SoundAL()
 		{}
 
-		~AudioSourceAL()
+		~SoundAL()
 		{
 			alDeleteSources( 1, &mSource );
 			alDeleteBuffers( 1, &mBuffer );
@@ -118,7 +118,7 @@ namespace Sentinel
 
 		//////////////////////////////////
 
-		AudioSource* CreateSound( const char* filename )
+		Sound* CreateSound( const char* filename )
 		{
 			TRACE( "Loading '" << filename << "'..." );
 
@@ -129,7 +129,7 @@ namespace Sentinel
 				return NULL;
 			}
 
-			AudioSource* audio = NULL;
+			Sound* audio = NULL;
 
 			// Determine what file format to load by checking the last three chars.
 			//
@@ -154,9 +154,9 @@ namespace Sentinel
 			return audio;
 		}
 
-		AudioSource* CreateSound( Archive& archive )
+		Sound* CreateSound( Archive& archive )
 		{
-			AudioSourceAL* source = new AudioSourceAL();
+			SoundAL* source = new SoundAL();
 
 			source->Load( archive );
 			
@@ -183,7 +183,7 @@ namespace Sentinel
 			return source;
 		}
 
-		AudioSource* CreateSoundWAV( Archive& archive )
+		Sound* CreateSoundWAV( Archive& archive )
 		{
 			char  type[4];
 			DWORD size, chunkSize;
@@ -235,7 +235,7 @@ namespace Sentinel
 			
 			// Create audio source.
 			//
-			AudioSourceAL* audio  = new AudioSourceAL();
+			SoundAL* audio  = new SoundAL();
 			ALenum		   format = 0;
 
 			// Read sound data.
@@ -302,7 +302,7 @@ namespace Sentinel
 
 #define BUFFER_SIZE 32767
 
-		AudioSource* CreateSoundOGG( Archive& archive )
+		Sound* CreateSoundOGG( Archive& archive )
 		{
 			/*
 			int				endian = 0;	// 0 for Little-Endian, 1 for Big-Endian

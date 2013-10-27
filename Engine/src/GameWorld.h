@@ -14,11 +14,12 @@ namespace Sentinel
 	class Renderer;
 	class Timing;
 	class PhysicsSystem;
+	class ParticleSystem;
 	class TextureManager;
 	class ShaderManager;
 	class MeshManager;
 	class ModelManager;
-	class AudioSourceManager;
+	class SoundManager;
 
 	class SENTINEL_DLL GameWorld
 	{
@@ -38,12 +39,13 @@ namespace Sentinel
 		Renderer*								mRenderer;
 		Timing*									mTiming;
 		PhysicsSystem*							mPhysicsSystem;
+		ParticleSystem*							mParticleSystem;
 		
 		TextureManager*							mTextureManager;
 		ShaderManager*							mShaderManager;
 		MeshManager*							mMeshManager;
 		ModelManager*							mModelManager;
-		AudioSourceManager*						mAudioSourceManager;
+		SoundManager*						mSoundManager;
 
 		/////////////////////////////////////////////////////
 

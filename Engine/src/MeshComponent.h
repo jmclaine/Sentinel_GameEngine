@@ -2,21 +2,16 @@
 
 #include <memory>
 
-#include "Mesh.h"
 #include "DrawableComponent.h"
 #include "Material.h"
 
 namespace Sentinel
 {
-	class MeshManager;
+	class Mesh;
 
 	class SENTINEL_DLL MeshComponent : public DrawableComponent
 	{
 		DECLARE_SERIAL();
-
-	protected:
-
-		MeshManager*			mMeshManager;
 
 	public:
 

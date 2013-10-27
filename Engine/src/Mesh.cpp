@@ -14,6 +14,7 @@
 #include "Archive.h"
 #include "ShaderManager.h"
 #include "TextureManager.h"
+#include "Timing.h"
 
 namespace Sentinel
 {
@@ -147,7 +148,7 @@ namespace Sentinel
 					// Delta Time.
 					//
 					case 't':
-						//mShader->SetFloat( uniformIndex, world->mTiming->DeltaTime() );
+						mShader->SetFloat( uniformIndex, world->mTiming->DeltaTime() );
 						break;
 
 					// Screen-Space Ambient Occlusion.

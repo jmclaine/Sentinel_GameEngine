@@ -12,7 +12,7 @@ namespace Sentinel { namespace Wrapped
 	ref class WShaderManager;
 	ref class WMeshManager;
 	ref class WModelManager;
-	ref class WAudioSourceManager;
+	ref class WSoundManager;
 	ref class WArchive;
 	ref class WGameObject;
 	ref class WCameraComponent;
@@ -39,7 +39,7 @@ namespace Sentinel { namespace Wrapped
 		DECLARE_PROPERTY( WShaderManager^,		XShaderManager );
 		DECLARE_PROPERTY( WMeshManager^,		XMeshManager );
 		DECLARE_PROPERTY( WModelManager^,		XModelManager );
-		DECLARE_PROPERTY( WAudioSourceManager^,	XAudioSourceManager );
+		DECLARE_PROPERTY( WSoundManager^,	XSoundManager );
 		
 		void				Save( WArchive^ archive );
 		void				Load( WArchive^ archive );

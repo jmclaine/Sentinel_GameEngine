@@ -23,4 +23,83 @@ namespace Sentinel
 			((UINT)(g * 255.0f) << 8)  |
 			((UINT)(r * 255.0f));
 	}
+
+	bool ColorRGBA::operator == ( const ColorRGBA& color ) const
+	{
+		return Equals( color );
+	}
+
+	bool ColorRGBA::operator != ( const ColorRGBA& color ) const
+	{
+		return !Equals( color );
+	}
+
+	bool ColorRGBA::Equals( const ColorRGBA& color ) const
+	{
+		return (r == color.r && g == color.g && b == color.b && a == color.a);
+	}
+
+	ColorRGBA& ColorRGBA::operator += ( const ColorRGBA& color )
+	{
+		*this = Add( color );
+		return *this;
+	}
+
+	ColorRGBA ColorRGBA::operator + ( const ColorRGBA& color ) const
+	{
+		return Add( color );
+	}
+
+	ColorRGBA ColorRGBA::Add( const ColorRGBA& color ) const
+	{
+		return ColorRGBA( r+color.r, g+color.g, b+color.b, a+color.a );
+	}
+
+	ColorRGBA& ColorRGBA::operator -= ( const ColorRGBA& color )
+	{
+		*this = Sub( color );
+		return *this;
+	}
+
+	ColorRGBA ColorRGBA::operator - ( const ColorRGBA& color ) const
+	{
+		return Sub( color );
+	}
+
+	ColorRGBA ColorRGBA::Sub( const ColorRGBA& color ) const
+	{
+		return ColorRGBA( r-color.r, g-color.g, b-color.b, a-color.a );
+	}
+
+	ColorRGBA& ColorRGBA::operator *= ( float scalar )
+	{
+		*this = Mul( scalar );
+		return *this;
+	}
+	
+	ColorRGBA ColorRGBA::operator * ( float scalar ) const
+	{
+		return Mul( scalar );
+	}
+
+	ColorRGBA ColorRGBA::Mul( const float scalar ) const
+	{
+		return ColorRGBA( r*scalar, g*scalar, b*scalar, a*scalar );
+	}
+
+	ColorRGBA& ColorRGBA::operator *= ( const ColorRGBA& color )
+	{
+		*this = Mul( color );
+		return *this;
+	}
+
+	ColorRGBA ColorRGBA::operator * ( const ColorRGBA& color ) const
+	{
+		return Mul( color );
+	}
+
+	ColorRGBA ColorRGBA::Mul( const ColorRGBA& color ) const
+	{
+		return ColorRGBA( r*color.r, g*color.g, b*color.b, a*color.a );
+	}
 }

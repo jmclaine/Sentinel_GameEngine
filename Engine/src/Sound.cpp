@@ -1,15 +1,15 @@
-#include "AudioSource.h"
+#include "Sound.h"
 #include "Archive.h"
 #include "AudioSystem.h"
 
 namespace Sentinel
 {
-	AudioSource::AudioSource() :
+	Sound::Sound() :
 		mPitch( 1.0f ), mGain( 1.0f ), mLoop( false ),
 		mFormat( 0 ), mSampleRate( 0 ), mDataSize( 0 ), mData( NULL )
 	{}
 
-	AudioSource::~AudioSource()
+	Sound::~Sound()
 	{
 		if( mData )
 		{
@@ -20,29 +20,29 @@ namespace Sentinel
 
 	///////////////////////////
 
-	UINT AudioSource::Format()
+	UINT Sound::Format()
 	{
 		return mFormat;
 	}
 
-	DWORD AudioSource::SampleRate()
+	DWORD Sound::SampleRate()
 	{
 		return mSampleRate;
 	}
 
-	UINT AudioSource::DataSize()
+	UINT Sound::DataSize()
 	{
 		return mDataSize;
 	}
 
-	BYTE* AudioSource::Data()
+	BYTE* Sound::Data()
 	{
 		return mData;
 	}
 
 	///////////////////////////
 
-	void AudioSource::Save( Archive& archive, AudioSource* source )
+	void Sound::Save( Archive& archive, Sound* source )
 	{
 		archive.Write( &source->mPitch );
 		archive.Write( &source->mGain );
@@ -62,12 +62,12 @@ namespace Sentinel
 		archive.Write( &source->mBoundSize );
 	}
 
-	AudioSource* AudioSource::Load( Archive& archive, AudioSystem* audio )
+	Sound* Sound::Load( Archive& archive, AudioSystem* audio )
 	{
 		return audio->CreateSound( archive );
 	}
 
-	void AudioSource::Load( Archive& archive )
+	void Sound::Load( Archive& archive )
 	{
 		archive.Read( &mPitch );
 		archive.Read( &mGain );

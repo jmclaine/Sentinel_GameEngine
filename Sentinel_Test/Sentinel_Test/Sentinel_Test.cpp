@@ -22,7 +22,7 @@
 #include "ShaderManager.h"
 #include "MeshManager.h"
 #include "ModelManager.h"
-#include "AudioSourceManager.h"
+#include "SoundManager.h"
 
 #include "Input.h"
 #include "Timing.h"
@@ -44,7 +44,7 @@
 #include "MeshComponent.h"
 #include "ModelComponent.h"
 
-#include "AudioSource.h"
+#include "Sound.h"
 
 #include "RandomValue.h"
 
@@ -63,12 +63,13 @@ class MainApp
 	Timing*					mTiming;
 	PhysicsSystem*			mPhysicsSystem;
 	AudioSystem*			mAudioSystem;
+	ParticleSystem*			mParticleSystem;
 
 	TextureManager*			mTextureManager;
 	ShaderManager*			mShaderManager;
 	MeshManager*			mMeshManager;
 	ModelManager*			mModelManager;
-	AudioSourceManager*		mAudioSourceManager;
+	SoundManager*			mSoundManager;
 	
 	GameWorld*				mGameWorld;
 
@@ -88,7 +89,7 @@ public:
 		mShaderManager	= new ShaderManager();
 		mMeshManager	= new MeshManager();
 		mModelManager	= new ModelManager();
-		mAudioSourceManager = new AudioSourceManager();
+		mSoundManager = new SoundManager();
 
 		mAudioSystem	= NULL;
 		
@@ -145,7 +146,7 @@ public:
 		mShaderManager->Load( archive, mRenderer );
 		mMeshManager->Load( archive, mRenderer, mShaderManager, mTextureManager );
 		mModelManager->Load( archive, mRenderer, mShaderManager, mTextureManager );
-		mAudioSourceManager->Load( archive, mAudioSystem );
+		mSoundManager->Load( archive, mAudioSystem );
 		
 		mGameWorld->mTiming			= mTiming;
 		mGameWorld->mRenderer		= mRenderer;
@@ -157,9 +158,9 @@ public:
 		
 		mGameWorld->Load( archive );
 
-		std::shared_ptr< AudioSource > source = mAudioSourceManager->Get( "rtsoundthrow.wav" );
-		source->mLoop = true;
-		source->Play();
+		//std::shared_ptr< Sound > source = mSoundManager->Get( "rtsoundthrow.wav" );
+		//source->mLoop = true;
+		//source->Play();
 
 		archive.Close();
 		/*
@@ -169,6 +170,28 @@ public:
 		//*/
 
 		mGameWorld->Startup();
+
+		SetDirectory( "Objects" );
+
+		std::shared_ptr< Texture > texture = mTextureManager->Add( "fire.png", mRenderer->CreateTextureFromFile( "fire.png" ));
+		std::shared_ptr< Shader >  shader  = mShaderManager->Add( "sprite", mRenderer->CreateShaderFromFile( "sprite", "XCx", "PXx" ));
+
+		std::shared_ptr< Sprite > sprite( new Sprite( texture, shader, Point2i( 64, 64 )));
+
+		mParticleSystem = BuildParticleSystemNormal( mRenderer, mGameWorld, sprite, 200 );
+		mParticleSystem->mSpawnRate   = 0.025f;
+		mParticleSystem->mMinLifetime = 5.0f;
+		mParticleSystem->mMaxLifetime = 7.0f;
+		mParticleSystem->mEffect.push_back( new AreaPositionEffect( 0, Vector3f( -0.5f, 10, 0 ), Vector3f( 0.5f, 10, 0 )));
+		mParticleSystem->mEffect.push_back( new VelocityEffect( 0, Vector3f( 0, 1.0f, 0 )));
+		mParticleSystem->mEffect.push_back( new ScaleEffect( 0, Vector3f( 0.25f, 0.25f, 0.25f )));
+		mParticleSystem->mEffect.push_back( new RandomColorEffect( 0, ColorRGBA( 0.5f, 0.5f, 0.5f, 1 ), ColorRGBA( 1, 1, 1, 1 )));
+		mParticleSystem->mEffect.push_back( new FadeToColorEffect( 0, 50, ColorRGBA( 1, 1, 1, 0 )));
+		mParticleSystem->mEffect.push_back( new RandomVelocityEffect( 1, Vector3f( -1, 1, 0 ), Vector3f( 1, 1, 0 )));
+
+		mParticleSystem->Startup();
+
+		SetDirectory( ".." );
 		
 		// Enter main game loop.
 		//
@@ -217,6 +240,8 @@ public:
 
 		mPhysicsSystem->Update( mTiming->DeltaTime() );
 
+		mParticleSystem->Update( mTiming->DeltaTime() );
+		
 		mGameWorld->UpdatePhysics();
 		mGameWorld->UpdateTransform();
 		mGameWorld->UpdateComponents();
@@ -504,9 +529,10 @@ public:
 
 		SAFE_DELETE( mTiming );
 		SAFE_DELETE( mPhysicsSystem );
+		SAFE_DELETE( mParticleSystem );
 		SAFE_DELETE( mAudioSystem );
 		
-		SAFE_DELETE( mAudioSourceManager );
+		SAFE_DELETE( mSoundManager );
 		SAFE_DELETE( mModelManager );
 		SAFE_DELETE( mMeshManager );
 		SAFE_DELETE( mShaderManager );

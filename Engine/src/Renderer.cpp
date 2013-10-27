@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "Texture.h"
 #include "tinyxml.h"
 #include <iostream>
 #include <fstream>

@@ -839,8 +839,6 @@ namespace Sentinel
 
 			std::shared_ptr< Texture > texture = CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA );
 
-			TextureDX* texDX = static_cast< TextureDX* >(texture.get());
-			
 			stbi_image_free( pixels );
 
 			return texture;

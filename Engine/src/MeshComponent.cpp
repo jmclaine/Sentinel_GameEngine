@@ -2,6 +2,7 @@
 
 #include "MeshComponent.h"
 #include "MeshManager.h"
+#include "Mesh.h"
 #include "TransformComponent.h"
 #include "GameObject.h"
 #include "GameWorld.h"

@@ -10,7 +10,7 @@ the header in order for the Editor to use it.
 namespace Sentinel
 {
 	class Archive;
-	class AudioSource;
+	class Sound;
 
 	// Abstract class designed for OpenAL.
 	//
@@ -27,16 +27,16 @@ namespace Sentinel
 
 		// Determines the type and loads automatically.
 		//
-		virtual AudioSource*	CreateSound( const char* filename ) = 0;
+		virtual Sound*	CreateSound( const char* filename ) = 0;
 
 		// Loads from file location into a data buffer directly.
 		//
-		virtual AudioSource*	CreateSound( Archive& archive ) = 0;
+		virtual Sound*	CreateSound( Archive& archive ) = 0;
 
 		// Loads sound by file type.
 		//
-		virtual AudioSource*	CreateSoundWAV( Archive& archive ) = 0;
-		virtual AudioSource*	CreateSoundOGG( Archive& archive ) = 0;
+		virtual Sound*	CreateSoundWAV( Archive& archive ) = 0;
+		virtual Sound*	CreateSoundOGG( Archive& archive ) = 0;
 
 		virtual void			SetListenerPosition( const Vector3f& position ) = 0;
 		virtual void			SetListenerVelocity( const Vector3f& velocity ) = 0;

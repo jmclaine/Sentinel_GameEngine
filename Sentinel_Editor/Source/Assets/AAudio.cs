@@ -14,9 +14,9 @@ namespace Sentinel_Editor
 		///
 		public static BitmapImage DefaultImage { get; set; }
 
-		public WAudioSource Data { get; set; }
+		public WSound Data { get; set; }
 
-		public AAudio( String name, WAudioSource data )
+		public AAudio( String name, WSound data )
 		{
 			mType	= EditorAssetType.AUDIO_SOURCE;
 

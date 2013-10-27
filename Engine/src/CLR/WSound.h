@@ -2,17 +2,17 @@
 
 #include "Property.h"
 #include "m_shared_ptr.h"
-#include "AudioSource.h"
+#include "Sound.h"
 
 namespace Sentinel { namespace Wrapped
 {
-	public ref class WAudioSource
+	public ref class WSound
 	{
-		DECLARE_REF_SHARED( AudioSource );
+		DECLARE_REF_SHARED( Sound );
 
 	public:
 
-		DECLARE_OP_SHARED( AudioSource );
+		DECLARE_OP_SHARED( Sound );
 
 		void	Play();
 
@@ -21,5 +21,5 @@ namespace Sentinel { namespace Wrapped
 		void	Stop();
 	};
 
-	DECLARE_CLASS_REF_SHARED( AudioSource );
+	DECLARE_CLASS_REF_SHARED( Sound );
 }}

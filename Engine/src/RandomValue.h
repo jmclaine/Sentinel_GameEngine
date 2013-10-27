@@ -9,16 +9,25 @@ namespace Sentinel
 {
 	inline int RandomValue( int minValue, int maxValue )
 	{
+		if( maxValue > minValue )
+			std::swap( maxValue, minValue );
+
 		return minValue + rand()%(maxValue - minValue);
 	}
 
 	inline float RandomValue( float minValue, float maxValue )
 	{
+		if( maxValue > minValue )
+			std::swap( maxValue, minValue );
+
 		return minValue + (maxValue - minValue) * (rand() / static_cast< float >( RAND_MAX ));
 	}
 
 	inline double RandomValue( double minValue, double maxValue )
 	{
+		if( maxValue > minValue )
+			std::swap( maxValue, minValue );
+
 		return minValue + (maxValue - minValue) * (rand() / static_cast< double >( RAND_MAX ));
 	}
 
