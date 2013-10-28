@@ -3,20 +3,17 @@
 All attached GameComponent(s) are freed on Shutdown()
 */
 #include <set>
-#include <string>
 #include <vector>
 
-#include "Common.h"
 #include "Util.h"
 #include "GameComponent.h"
-#include "Serializeable.h"
 
 namespace Sentinel
 {
+	class GameWorld;
+
 	class SENTINEL_DLL GameObject : public Serializeable
 	{
-		friend class GameWorld;
-
 	protected:
 
 		DECLARE_SERIAL();
@@ -30,12 +27,13 @@ namespace Sentinel
 
 		std::vector< GameObject* >			mChild;
 
-		GameObject*							mParent;
 		GameWorld*							mWorld;
 
 	public:
 
 		std::string							mName;
+
+		GameObject*							mParent;
 		
 		//////////////////////////////
 
@@ -62,9 +60,8 @@ namespace Sentinel
 
 		//////////////////////////////
 
-		GameObject*		Parent();
-
-		GameWorld*		World();
+		GameWorld*		GetWorld();
+		void			SetWorld( GameWorld* world );
 
 		//////////////////////////////
 

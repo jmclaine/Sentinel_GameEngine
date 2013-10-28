@@ -256,6 +256,9 @@ namespace Sentinel
 				archive.Read( &texture );
 
 				mesh->mTexture[ x ] = textureManager->Get( texture );
+
+				if( mesh->mTexture[ x ] == NULL )
+					mesh->mTexture[ x ] = renderer->BASE_TEXTURE;
 			}
 		}
 

@@ -27,8 +27,8 @@ namespace Sentinel
 	{
 		_ASSERT( mMesh );
 		_ASSERT( mOwner );
-		_ASSERT( mOwner->World() );
-		_ASSERT( mOwner->World()->mRenderer );
+		_ASSERT( mOwner->GetWorld() );
+		_ASSERT( mOwner->GetWorld()->mRenderer );
 
 		DrawableComponent::Startup();
 	}
@@ -43,7 +43,7 @@ namespace Sentinel
 
 			mMesh->mMatrixWorld = mTransform->GetMatrixWorld();
 
-			GameWorld* world = mOwner->World();
+			GameWorld* world = mOwner->GetWorld();
 			mMesh->Draw( world->mRenderer, world );
 		}
 	}
@@ -58,29 +58,29 @@ namespace Sentinel
 	void MeshComponent::Save( Archive& archive )
 	{
 		_ASSERT( mOwner );
-		_ASSERT( mOwner->World() );
-		_ASSERT( mOwner->World()->mMeshManager );
+		_ASSERT( mOwner->GetWorld() );
+		_ASSERT( mOwner->GetWorld()->mMeshManager );
 
 		mSerialRegistry.Save( archive );
 
 		GameComponent::Save( archive );
 
-		archive.Write( &mOwner->World()->mMeshManager->Get( mMesh ));
+		archive.Write( &mOwner->GetWorld()->mMeshManager->Get( mMesh ));
 		archive.Write( mMaterial.Ptr(), ar_sizeof( mMaterial ));
 	}
 
 	void MeshComponent::Load( Archive& archive )
 	{
 		_ASSERT( mOwner );
-		_ASSERT( mOwner->World() );
-		_ASSERT( mOwner->World()->mMeshManager );
+		_ASSERT( mOwner->GetWorld() );
+		_ASSERT( mOwner->GetWorld()->mMeshManager );
 
 		GameComponent::Load( archive );
 
 		std::string name;
 		archive.Read( &name );
 
-		mMesh = mOwner->World()->mMeshManager->Get( name );
+		mMesh = mOwner->GetWorld()->mMeshManager->Get( name );
 
 		archive.Read( mMaterial.Ptr(), ar_sizeof( mMaterial ));
 	}

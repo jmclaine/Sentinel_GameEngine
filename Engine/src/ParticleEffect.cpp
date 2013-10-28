@@ -170,6 +170,14 @@ namespace Sentinel
 
 	////////////////////////////////////////////////////////////////////////////
 
+	FadeToScaleEffect::FadeToScaleEffect( float startTime, float endTime, float scale ) :
+		ScaleEffect( startTime, Vector3f( scale, scale, scale )),
+		mEndTime( endTime )
+	{
+		_ASSERT( endTime > 0 );
+		_ASSERT( startTime < endTime );
+	}
+
 	FadeToScaleEffect::FadeToScaleEffect( float startTime, float endTime, const Vector3f& scale ) :
 		ScaleEffect( startTime, scale ),
 		mEndTime( endTime )

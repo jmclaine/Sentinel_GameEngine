@@ -71,8 +71,8 @@ namespace Sentinel
 		{
 			D3D11_MAPPED_SUBRESOURCE mapRes;
 				
-			mContext->Map( mBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapRes );
-
+			mContext->Map( mBuffer, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &mapRes );
+			
 			return mapRes.pData;
 		}
 

@@ -12,6 +12,20 @@
 
 namespace Sentinel
 {
+
+#define BEGIN_PROFILE( timingName )\
+{	static double startCounter = 0;\
+	static double timeCounter = 0;\
+	static UINT counter = 0;\
+	startCounter = timingName->QueryCounter();\
+	++counter;
+
+#define END_PROFILE( timingName, msg )\
+	timeCounter += timingName->QueryCounter() - startCounter;\
+	if( counter >= 60 ) {\
+		TRACE( msg << ": " << timeCounter / (double)counter );\
+		counter = 0; timeCounter = 0; }}\
+	
 	// Sets a maximum frame rate.
 	// Generally, this is 60 Hz as defaulted by DESIRED_FRAME_RATE.
 	//

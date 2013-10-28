@@ -45,7 +45,7 @@ namespace Sentinel
 		ShaderManager*							mShaderManager;
 		MeshManager*							mMeshManager;
 		ModelManager*							mModelManager;
-		SoundManager*						mSoundManager;
+		SoundManager*							mSoundManager;
 
 		/////////////////////////////////////////////////////
 

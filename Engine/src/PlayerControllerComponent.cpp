@@ -106,7 +106,7 @@ namespace Sentinel
 				qFinal = Quatf( rot.y, rot.x, rot.z );
 			}
 
-			Quatf qResult = body->GetOrientation().Slerp( qFinal, clamp( mOwner->World()->mTiming->DeltaTime()*10.0f, 0.0f, 1.0f ));
+			Quatf qResult = body->GetOrientation().Slerp( qFinal, clamp( mOwner->GetWorld()->mTiming->DeltaTime()*10.0f, 0.0f, 1.0f ));
 
 			if( qResult.LengthSquared() > 0 )	// strangely, slerp can end with an invalid rotation
 				body->SetOrientation( qResult );

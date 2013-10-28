@@ -57,25 +57,25 @@ void MyGS(point VSOutput input[1], inout TriangleStream<VSOutput> TriStream)
 	// Bottom left.
 	//
 	v.Position = mul(float4(-1, 1, 0, 1), input[0].Matrix);
-	v.Texture0 = float2(input[0].Texture0.x, input[0].Texture0.y + texScale.y);
+	v.Texture0 = input[0].Texture0;
 	TriStream.Append(v);
 
 	// Bottom right.
 	//
 	v.Position = mul(float4(1, 1, 0, 1), input[0].Matrix);
-	v.Texture0 = input[0].Texture0 + texScale.xy;
+	v.Texture0 = float2(input[0].Texture0.x + texScale.x, input[0].Texture0.y);
 	TriStream.Append(v);
 
 	// Top left.
 	//
 	v.Position = mul(float4(-1, -1, 0, 1), input[0].Matrix);
-	v.Texture0 = input[0].Texture0;
+	v.Texture0 = float2(input[0].Texture0.x, input[0].Texture0.y + texScale.y);
 	TriStream.Append(v);
 
 	// Top right.
 	//
 	v.Position = mul(float4(1, -1, 0, 1), input[0].Matrix);
-	v.Texture0 = float2(input[0].Texture0.x + texScale.x, input[0].Texture0.y);
+	v.Texture0 = input[0].Texture0 + texScale.xy;
 	TriStream.Append(v);
 }
 
@@ -153,25 +153,25 @@ void main()
 	// Bottom left.
 	//
 	gl_Position = gvMatrix[0] * vec4(-1, 1, 0, 1);
-	vTex0 = vec2(gvTex0[0].x, gvTex0[0].y + texScale.y);
+	vTex0 = gvTex0[0];
 	EmitVertex();
 
 	// Bottom right.
 	//
 	gl_Position = gvMatrix[0] * vec4(1, 1, 0, 1);
-	vTex0 = gvTex0[0] + texScale.xy;
+	vTex0 = vec2(gvTex0[0].x + texScale.x, gvTex0[0].y);
 	EmitVertex();
 
 	// Top left.
 	//
 	gl_Position = gvMatrix[0] * vec4(-1, -1, 0, 1);
-	vTex0 = gvTex0[0];
+	vTex0 = vec2(gvTex0[0].x, gvTex0[0].y + texScale.y);
 	EmitVertex();
 
 	// Top right.
 	//
 	gl_Position = gvMatrix[0] * vec4(1, -1, 0, 1);
-	vTex0 = vec2(gvTex0[0].x + texScale.x, gvTex0[0].y);
+	vTex0 = gvTex0[0] + texScale.xy;
 	EmitVertex();
 	
 	EndPrimitive();

@@ -27,15 +27,15 @@ namespace Sentinel_Editor
 	///
 	public partial class MainWindow : Window
 	{
-		private static WColorRGBA   mClearColor = new WColorRGBA( 0.0f, 0.2f, 0.8f, 1.0f );
+		private static WColorRGBA   CLEAR_COLOR = new WColorRGBA( 0.0f, 0.2f, 0.8f, 1.0f );
+
+		private static TreeViewItem	ASSET_TEXTURE;
+		private static TreeViewItem	ASSET_SHADER;
+		private static TreeViewItem	ASSET_MESH;
+		private static TreeViewItem	ASSET_MODEL;
+		private static TreeViewItem	ASSET_AUDIO;
 
 		private GameWindow			mGameWindow;
-		
-		private static TreeViewItem	mAsset_Texture;
-		private static TreeViewItem	mAsset_Shader;
-		private static TreeViewItem	mAsset_Mesh;
-		private static TreeViewItem	mAsset_Model;
-		private static TreeViewItem	mAsset_Audio;
 
 		private EditorAsset			mSelectedAsset;
 
@@ -67,7 +67,7 @@ namespace Sentinel_Editor
 		private WShaderManager		mShaderManager;
 		private WMeshManager		mMeshManager;
 		private WModelManager		mModelManager;
-		private WSoundManager mSoundManager;
+		private WSoundManager		mSoundManager;
 
 		private WGameWorld			mGameWorld;
 
@@ -143,11 +143,11 @@ namespace Sentinel_Editor
 
 			// Create asset trees.
 			//
-			CreateAssetTree( ref mAsset_Texture, "Texture" );
-			CreateAssetTree( ref mAsset_Shader,	 "Shader" );
-			CreateAssetTree( ref mAsset_Mesh,	 "Mesh" );
-			CreateAssetTree( ref mAsset_Model,	 "Model" );
-			CreateAssetTree( ref mAsset_Audio,	 "Audio" );
+			CreateAssetTree( ref ASSET_TEXTURE, "Texture" );
+			CreateAssetTree( ref ASSET_SHADER,	"Shader" );
+			CreateAssetTree( ref ASSET_MESH,	"Mesh" );
+			CreateAssetTree( ref ASSET_MODEL,	"Model" );
+			CreateAssetTree( ref ASSET_AUDIO,	"Audio" );
 
 			// Prepare Game World.
 			//
@@ -188,19 +188,19 @@ namespace Sentinel_Editor
 			mScaleObject.Shutdown();
 			mScaleObject.Release();
 
-			foreach( AAudio item in mAsset_Audio.Items )
+			foreach( AAudio item in ASSET_AUDIO.Items )
 				item.Data.Dispose();
 
-			foreach( AModel item in mAsset_Model.Items )
+			foreach( AModel item in ASSET_MODEL.Items )
 				item.Data.Dispose();
 
-			foreach( AMesh item in mAsset_Mesh.Items )
+			foreach( AMesh item in ASSET_MESH.Items )
 				item.Data.Dispose();
 
-			foreach( AShader item in mAsset_Shader.Items )
+			foreach( AShader item in ASSET_SHADER.Items )
 				item.Data.Dispose();
 
-			foreach( ATexture item in mAsset_Texture.Items )
+			foreach( ATexture item in ASSET_TEXTURE.Items )
 				item.Data.Dispose();
 
 			mGameWorld.Shutdown();
@@ -232,9 +232,10 @@ namespace Sentinel_Editor
 			mRenderer.SetViewport( 0, 0, mGameWindow.GetInfo().Width(), mGameWindow.GetInfo().Height() );
 			mRenderer.SetRenderTarget( 0 );
 
-			mRenderer.Clear( mClearColor );
+			mRenderer.Clear( CLEAR_COLOR );
 
 			mRenderer.SetCull( CullType.CCW );
+			mRenderer.SetBlend( BlendType.ALPHA );
 			mRenderer.SetDepthStencilState( StencilType.DEFAULT );
 
 			mGameWindow.Update();
@@ -401,6 +402,9 @@ namespace Sentinel_Editor
 		{
 			try
 			{
+				// Move objects in Objects Tree using the 
+				// left mouse button to drag and drop items.
+				//
 				if( e.LeftButton == MouseButtonState.Pressed )
 				{
 					Point currentPosition = e.GetPosition( Objects_TreeView );
@@ -456,6 +460,9 @@ namespace Sentinel_Editor
 		{
 			try
 			{
+				// Determine if the object has a new parent after
+				// dragging over an object or the tree.
+				//
 				Point currentPosition = e.GetPosition( Objects_TreeView );
       
 				if( Math.Abs( currentPosition.X - Objects_LastMouseDown.X ) > SystemParameters.MinimumHorizontalDragDistance ||
@@ -498,6 +505,9 @@ namespace Sentinel_Editor
 		{
 			try
 			{
+				// Determines what object is the target of
+				// the drag and drop.
+				//
 				e.Effects = DragDropEffects.None;
 				e.Handled = true;
             
@@ -508,7 +518,9 @@ namespace Sentinel_Editor
 					e.Effects = DragDropEffects.Move;
 				}
 				else
+				{
 					Objects_Target = null;
+				}
 			}
 			catch( Exception )
 			{
@@ -543,7 +555,7 @@ namespace Sentinel_Editor
 			ATexture item = new ATexture( name, texture );
 			item.Selected += AssetSelected;
 			
-			mAsset_Texture.Items.Add( item );
+			ASSET_TEXTURE.Items.Add( item );
 		}
 
 		private void AddAsset( String name, WShader shader )
@@ -551,7 +563,7 @@ namespace Sentinel_Editor
 			AShader item = new AShader( name, shader );
 			item.Selected += AssetSelected;
 			
-			mAsset_Shader.Items.Add( item );
+			ASSET_SHADER.Items.Add( item );
 		}
 
 		private void AddAsset( String name, WMesh mesh )
@@ -559,7 +571,7 @@ namespace Sentinel_Editor
 			AMesh item = new AMesh( name, mesh );
 			item.Selected += AssetSelected;
 			
-			mAsset_Mesh.Items.Add( item );
+			ASSET_MESH.Items.Add( item );
 		}
 
 		private void AddAsset( String name, WModel model )
@@ -567,7 +579,7 @@ namespace Sentinel_Editor
 			AModel item = new AModel( name, model );
 			item.Selected += AssetSelected;
 
-			mAsset_Model.Items.Add( item );
+			ASSET_MODEL.Items.Add( item );
 		}
 
 		private void AddAsset( String name, WSound source )
@@ -575,7 +587,7 @@ namespace Sentinel_Editor
 			AAudio item = new AAudio( name, source );
 			item.Selected += AssetSelected;
 
-			mAsset_Audio.Items.Add( item );
+			ASSET_AUDIO.Items.Add( item );
 		}
 
 		///
@@ -583,7 +595,7 @@ namespace Sentinel_Editor
 		///
 		static public AMesh FindAsset( WMesh mesh )
 		{
-			foreach( AMesh item in mAsset_Mesh.Items )
+			foreach( AMesh item in ASSET_MESH.Items )
 				if( item.Data == mesh )
 					return item;
 			
@@ -722,7 +734,7 @@ namespace Sentinel_Editor
 			mTextureManager		= new WTextureManager();
 			mMeshManager		= new WMeshManager();
 			mModelManager		= new WModelManager();
-			mSoundManager = new WSoundManager();
+			mSoundManager		= new WSoundManager();
 
 			mGameWorld.XRenderer			= mRenderer;
 			mGameWorld.XTiming				= mTiming;
@@ -731,7 +743,7 @@ namespace Sentinel_Editor
 			mGameWorld.XShaderManager		= mShaderManager;
 			mGameWorld.XMeshManager			= mMeshManager;
 			mGameWorld.XModelManager		= mModelManager;
-			mGameWorld.XSoundManager	= mSoundManager;
+			mGameWorld.XSoundManager		= mSoundManager;
 
 			////////////////////////////////////
 
@@ -866,7 +878,7 @@ namespace Sentinel_Editor
 			///////////////////////////////
 
 			WGameObject obj = new WGameObject();
-
+			
 			WTransformComponent transform = new WTransformComponent();
 			transform.Position = new WVector3f( tileSize, 0, 0 );
 			transform.Rotation = new WVector3f( 0, 0, -90 );
@@ -910,18 +922,26 @@ namespace Sentinel_Editor
 
 			///////////////////////////////
 
+			mTranslateObject.SetWorld( mGameWorld );
 			mTranslateObject.Startup();
+
 			model.Dispose();
 		}
 
 		private void CreateRotateMesh()
 		{
 			mRotateObject = new WGameObject();
+
+			mRotateObject.SetWorld( mGameWorld );
+			mRotateObject.Startup();
 		}
 
 		private void CreateScaleMesh()
 		{
 			mScaleObject = new WGameObject();
+
+			mScaleObject.SetWorld( mGameWorld );
+			mScaleObject.Startup();
 		}
 		#endregion
 
@@ -947,26 +967,30 @@ namespace Sentinel_Editor
 				mMapName = dialog.FileName;
 				Window_Main.Title = "Sentinel Editor - " + Path.GetFileName( mMapName );
 				
-				foreach( AAudio item in mAsset_Audio.Items )
+				// Clear current world and asset manager references.
+				//
+				foreach( AAudio item in ASSET_AUDIO.Items )
 					item.Data.Dispose();
-				mAsset_Audio.Items.Clear();
+				ASSET_AUDIO.Items.Clear();
 
-				foreach( AModel item in mAsset_Model.Items )
+				foreach( AModel item in ASSET_MODEL.Items )
 					item.Data.Dispose();
-				mAsset_Model.Items.Clear();
+				ASSET_MODEL.Items.Clear();
 
-				foreach( AMesh item in mAsset_Mesh.Items )
+				foreach( AMesh item in ASSET_MESH.Items )
 					item.Data.Dispose();
-				mAsset_Mesh.Items.Clear();
+				ASSET_MESH.Items.Clear();
 
-				foreach( AShader item in mAsset_Shader.Items )
+				foreach( AShader item in ASSET_SHADER.Items )
 					item.Data.Dispose();
-				mAsset_Shader.Items.Clear();
+				ASSET_SHADER.Items.Clear();
 
-				foreach( ATexture item in mAsset_Texture.Items )
+				foreach( ATexture item in ASSET_TEXTURE.Items )
 					item.Data.Dispose();
-				mAsset_Texture.Items.Clear();
+				ASSET_TEXTURE.Items.Clear();
 
+				// Load each manager.
+				//
 				WArchive archive = new WArchive();
 				archive.Open( mMapName, "rb" );
 
@@ -1028,6 +1052,8 @@ namespace Sentinel_Editor
 
 				Objects_TreeView.Items.Clear();
 
+				// Load the world.
+				//
 				mGameWorld.Load( archive );
 				mGameWorld.Startup();
 

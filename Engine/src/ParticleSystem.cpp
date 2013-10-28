@@ -111,6 +111,7 @@ namespace Sentinel
 			{
 				--mNumParticles;
 
+				//std::swap( mParticle[ x ], mParticle[ mNumParticles ] );
 				*mParticle[ x ] = *mParticle[ mNumParticles ];
 
 				--x;

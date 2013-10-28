@@ -1,5 +1,6 @@
 #include "WGameObject.h"
 #include "WString.h"
+#include "WGameWorld.h"
 
 namespace Sentinel { namespace Wrapped
 {
@@ -30,7 +31,7 @@ namespace Sentinel { namespace Wrapped
 	////////////////////////////////
 
 	DEFINE_PROPERTY_STR( GameObject, Name );
-	DEFINE_PROPERTY_PFG( GameObject, GameObject, Parent );
+	DEFINE_PROPERTY_PS(  GameObject, GameObject, Parent );
 
 	////////////////////////////////
 
@@ -66,6 +67,18 @@ namespace Sentinel { namespace Wrapped
 	UINT WGameObject::NumChildren()
 	{
 		return mRef->NumChildren();
+	}
+
+	////////////////////////////////
+
+	WGameWorld^ WGameObject::GetWorld()
+	{
+		return gcnew WGameWorld( mRef->GetWorld() );
+	}
+
+	void WGameObject::SetWorld( WGameWorld^ world )
+	{
+		mRef->SetWorld( world );
 	}
 
 	////////////////////////////////

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <exception>
-#include <string>
 #include <typeinfo>
 
 #include "Common.h"

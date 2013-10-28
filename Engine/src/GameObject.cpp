@@ -1,5 +1,3 @@
-#include <algorithm>
-
 #include "Util.h"
 #include "Timing.h"
 #include "GameObject.h"
@@ -248,14 +246,19 @@ namespace Sentinel
 
 	//////////////////////////////
 
-	GameObject* GameObject::Parent()
-	{
-		return mParent;
-	}
-
-	GameWorld* GameObject::World()
+	GameWorld* GameObject::GetWorld()
 	{
 		return mWorld;
+	}
+
+	void GameObject::SetWorld( GameWorld* world )
+	{
+		mWorld = world;
+
+		TRAVERSE_VECTOR( x, mChild )
+		{
+			mChild[ x ]->SetWorld( world );
+		}
 	}
 
 	//////////////////////////////

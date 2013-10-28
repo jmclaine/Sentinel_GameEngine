@@ -43,7 +43,7 @@ namespace Sentinel
 
 			mModel->mMatrixWorld = mTransform->GetMatrixWorld();
 
-			GameWorld* world = mOwner->World();
+			GameWorld* world = mOwner->GetWorld();
 			mModel->Draw( world->mRenderer, world );
 		}
 	}
@@ -88,14 +88,14 @@ namespace Sentinel
 	void ModelComponent::Save( Archive& archive )
 	{
 		_ASSERT( mOwner );
-		_ASSERT( mOwner->World() );
-		_ASSERT( mOwner->World()->mModelManager );
+		_ASSERT( mOwner->GetWorld() );
+		_ASSERT( mOwner->GetWorld()->mModelManager );
 
 		mSerialRegistry.Save( archive );
 
 		GameComponent::Save( archive );
 
-		archive.Write( &mOwner->World()->mModelManager->Get( mModel ));
+		archive.Write( &mOwner->GetWorld()->mModelManager->Get( mModel ));
 
 		UINT count = (UINT)mMaterial.size();
 		archive.Write( &count );
@@ -107,15 +107,15 @@ namespace Sentinel
 	void ModelComponent::Load( Archive& archive )
 	{
 		_ASSERT( mOwner );
-		_ASSERT( mOwner->World() );
-		_ASSERT( mOwner->World()->mModelManager );
+		_ASSERT( mOwner->GetWorld() );
+		_ASSERT( mOwner->GetWorld()->mModelManager );
 
 		GameComponent::Load( archive );
 
 		std::string name;
 		archive.Read( &name );
 
-		mModel = mOwner->World()->mModelManager->Get( name );
+		mModel = mOwner->GetWorld()->mModelManager->Get( name );
 
 		UINT count;
 		archive.Read( &count );

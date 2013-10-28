@@ -223,6 +223,7 @@ namespace Sentinel
 
 	public:
 
+		FadeToScaleEffect( float startTime, float endTime, float scale );
 		FadeToScaleEffect( float startTime, float endTime, const Vector3f& scale );
 
 		//////////////////////////////////////

@@ -10,8 +10,10 @@ namespace Sentinel
 	class Archive;
 
 #define DECLARE_SERIAL()\
+	private:\
 		static SerialRegister mSerialRegistry;\
 		static Serializeable* Clone();\
+	public:\
 		void Save( Archive& archive );\
 		void Load( Archive& archive );
 

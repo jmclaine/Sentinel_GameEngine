@@ -10,6 +10,9 @@ Release() should be called manually for a controlled free memory.
 
 namespace Sentinel { namespace Wrapped
 {
+	ref class WGameComponent;
+	ref class WGameWorld;
+
 	public ref class WGameObject
 	{
 		DECLARE_REF_PTR( GameObject );
@@ -27,8 +30,8 @@ namespace Sentinel { namespace Wrapped
 
 		////////////////////////////////
 
-		DECLARE_PROPERTY(   System::String^,	Name );
-		DECLARE_PROPERTY_G( WGameObject^,		Parent );
+		DECLARE_PROPERTY( System::String^,	Name );
+		DECLARE_PROPERTY( WGameObject^,		Parent );
 
 		////////////////////////////////
 
@@ -42,6 +45,11 @@ namespace Sentinel { namespace Wrapped
 		void			RemoveChild( WGameObject^ obj );
 		WGameObject^	GetChild( UINT index );
 		UINT			NumChildren();
+
+		////////////////////////////////
+
+		WGameWorld^		GetWorld();
+		void			SetWorld( WGameWorld^ world );
 
 		////////////////////////////////
 

@@ -142,8 +142,7 @@
     <None Include="Assets\Shaders\colnorm.xsh" />
     <None Include="Assets\Shaders\color.xsh" />
     <None Include="Assets\Shaders\normmap.xsh" />
-    <None Include="Assets\Shaders\spriteGO.xsh" />
-    <None Include="Assets\Shaders\texture.gls" />
+    <None Include="Assets\Shaders\sprite.xsh" />
     <None Include="Assets\Shaders\texture.xsh" />
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">

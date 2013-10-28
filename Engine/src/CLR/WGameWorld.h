@@ -27,6 +27,7 @@ namespace Sentinel { namespace Wrapped
 	public:
 
 		WGameWorld();
+		WGameWorld( GameWorld* world );
 
 		void				Release();
 

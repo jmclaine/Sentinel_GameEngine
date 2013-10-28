@@ -41,8 +41,8 @@ namespace Sentinel
 	void PhysicsComponent::Startup()
 	{
 		_ASSERT( mOwner );
-		_ASSERT( mOwner->World() );
-		_ASSERT( mOwner->World()->mPhysicsSystem );
+		_ASSERT( mOwner->GetWorld() );
+		_ASSERT( mOwner->GetWorld()->mPhysicsSystem );
 
 		mTransform = (TransformComponent*)mOwner->FindComponent( GameComponent::TRANSFORM );
 
@@ -52,7 +52,7 @@ namespace Sentinel
 		if( mRigidBody == NULL )
 			throw AppException( "PhysicsComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain RigidBody" );
 
-		mOwner->World()->mPhysicsSystem->AddRigidBody( mRigidBody );
+		mOwner->GetWorld()->mPhysicsSystem->AddRigidBody( mRigidBody );
 	}
 
 	void PhysicsComponent::Update()
@@ -68,7 +68,7 @@ namespace Sentinel
 	{
 		mTransform = NULL;
 
-		mOwner->World()->mPhysicsSystem->RemoveRigidBody( mRigidBody );
+		mOwner->GetWorld()->mPhysicsSystem->RemoveRigidBody( mRigidBody );
 	}
 
 	/////////////////////////////////
@@ -85,11 +85,11 @@ namespace Sentinel
 		// Remove old rigid body from PhysicsSystem.
 		//
 		if( mRigidBody )
-			mOwner->World()->mPhysicsSystem->RemoveRigidBody( mRigidBody );
+			mOwner->GetWorld()->mPhysicsSystem->RemoveRigidBody( mRigidBody );
 
 		mRigidBody = body;
 
-		mOwner->World()->mPhysicsSystem->AddRigidBody( mRigidBody );
+		mOwner->GetWorld()->mPhysicsSystem->AddRigidBody( mRigidBody );
 	}
 
 	void PhysicsComponent::Save( Archive& archive )
@@ -160,7 +160,7 @@ namespace Sentinel
 		archive.Read( scale.Ptr(),	ar_sizeof( scale ));
 	
 		PhysicsSystem* physics;
-		physics = mOwner->World()->mPhysicsSystem;
+		physics = mOwner->GetWorld()->mPhysicsSystem;
 
 		switch( type )
 		{

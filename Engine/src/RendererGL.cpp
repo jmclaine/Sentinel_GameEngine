@@ -66,7 +66,7 @@ namespace Sentinel
 			{
 				glBindBuffer( GL_ARRAY_BUFFER, mID );
 
-				return glMapBuffer( GL_ARRAY_BUFFER, GL_READ_WRITE );
+				return glMapBuffer( GL_ARRAY_BUFFER, GL_WRITE_ONLY );
 			}
 			else
 			{
@@ -75,7 +75,7 @@ namespace Sentinel
 				glEnableClientState( GL_INDEX_ARRAY );
 				glIndexPointer( GL_UNSIGNED_INT, sizeof( UINT ), 0 );
 
-				return glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
+				return glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY );
 			}
 		}
 
@@ -950,17 +950,16 @@ namespace Sentinel
 			{
 				case STENCIL_DEFAULT:
 					glDepthFunc( GL_LESS );
-					//glDepthMask( GL_TRUE );
+					glDepthMask( GL_TRUE );
 					break;
 
 				case STENCIL_NO_ZBUFFER:
 					glDepthFunc( GL_ALWAYS );
-					//glDepthMask( GL_FALSE );
+					glDepthMask( GL_TRUE );
 					break;
 
 				case STENCIL_PARTICLE:
-					glDepthFunc( GL_LESS );
-					//glDepthMask( GL_TRUE );
+					glDepthMask( GL_FALSE );
 					break;
 			}
 		}
@@ -996,14 +995,21 @@ namespace Sentinel
 
 		void SetBlend( BlendType type )
 		{
-			if( type == BLEND_DEFAULT )
+			switch( type )
 			{
-				glDisable( GL_BLEND );
-			}
-			else
-			{
-				glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-				glEnable( GL_BLEND );
+				case BLEND_ALPHA:
+					glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+					glEnable( GL_BLEND );
+					break;
+
+				case BLEND_PARTICLE:
+					glBlendFunc( GL_SRC_ALPHA, GL_ZERO );
+					glEnable( GL_BLEND );
+					break;
+
+				default:
+					glDisable( GL_BLEND );
+					break;
 			}
 		}
 		

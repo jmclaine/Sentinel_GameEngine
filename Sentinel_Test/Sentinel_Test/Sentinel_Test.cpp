@@ -178,16 +178,23 @@ public:
 
 		std::shared_ptr< Sprite > sprite( new Sprite( texture, shader, Point2i( 64, 64 )));
 
-		mParticleSystem = BuildParticleSystemNormal( mRenderer, mGameWorld, sprite, 200 );
+		mParticleSystem = BuildParticleSystemNormal( mRenderer, mGameWorld, sprite, 300 );
 		mParticleSystem->mSpawnRate   = 0.025f;
-		mParticleSystem->mMinLifetime = 5.0f;
-		mParticleSystem->mMaxLifetime = 7.0f;
-		mParticleSystem->mEffect.push_back( new AreaPositionEffect( 0, Vector3f( -0.5f, 10, 0 ), Vector3f( 0.5f, 10, 0 )));
-		mParticleSystem->mEffect.push_back( new VelocityEffect( 0, Vector3f( 0, 1.0f, 0 )));
-		mParticleSystem->mEffect.push_back( new ScaleEffect( 0, Vector3f( 0.25f, 0.25f, 0.25f )));
-		mParticleSystem->mEffect.push_back( new RandomColorEffect( 0, ColorRGBA( 0.5f, 0.5f, 0.5f, 1 ), ColorRGBA( 1, 1, 1, 1 )));
-		mParticleSystem->mEffect.push_back( new FadeToColorEffect( 0, 50, ColorRGBA( 1, 1, 1, 0 )));
-		mParticleSystem->mEffect.push_back( new RandomVelocityEffect( 1, Vector3f( -1, 1, 0 ), Vector3f( 1, 1, 0 )));
+		mParticleSystem->mMinLifetime = 3.0f;
+		mParticleSystem->mMaxLifetime = 5.0f;
+		mParticleSystem->mEffect.push_back( new TextureEffect( 0, 0 ));
+		mParticleSystem->mEffect.push_back( new AreaPositionEffect( 0, Vector3f( -0.125f, 1, 0 ), Vector3f( 0.125f, 1, 0 )));
+		mParticleSystem->mEffect.push_back( new RandomRotationEffect( 0, Vector3f( 0, 0, -10 ), Vector3f( 0, 0, 10 )));
+		mParticleSystem->mEffect.push_back( new ScaleEffect( 0, Vector3f( 1, 1, 1 )));
+		mParticleSystem->mEffect.push_back( new VelocityEffect( 0, Vector3f( 0, 1.2f, 0 )));
+		mParticleSystem->mEffect.push_back( new RandomColorEffect( 0, ColorRGBA( 0.75f, 0.25f, 0, 0.125 ), ColorRGBA( 0.75f, 0.75f, 0, 0.125 )));
+		mParticleSystem->mEffect.push_back( new FadeToScaleEffect( 0, 0.25f, 0.666f ));
+		mParticleSystem->mEffect.push_back( new FadeToScaleEffect( 0.5f, 1.0f, 0.1f ));
+		mParticleSystem->mEffect.push_back( new TextureEffect( 1.0f, 1 ));
+		mParticleSystem->mEffect.push_back( new FadeToScaleEffect( 1.0f, 2.0f, 1.0f ));
+		mParticleSystem->mEffect.push_back( new RandomColorEffect( 1.0f, ColorRGBA( 1, 1, 1, 0.125 ), ColorRGBA( 0.9f, 0.9f, 0.9f, 0.125 )));
+		mParticleSystem->mEffect.push_back( new FadeToColorEffect( 1.0f, 5.0f, ColorRGBA( 0.9f, 0.9f, 0.9f, 0.025f )));
+		//mParticleSystem->mEffect.push_back( new RandomVelocityEffect( 1, Vector3f( -1, 1, 0 ), Vector3f( 1, 1, 0 )));
 
 		mParticleSystem->Startup();
 
@@ -238,14 +245,16 @@ public:
 
 		mGameWorld->UpdateController();
 
+		BEGIN_PROFILE( mTiming );
 		mPhysicsSystem->Update( mTiming->DeltaTime() );
+		END_PROFILE( mTiming, "Particle" );
 
-		mParticleSystem->Update( mTiming->DeltaTime() );
-		
 		mGameWorld->UpdatePhysics();
 		mGameWorld->UpdateTransform();
 		mGameWorld->UpdateComponents();
 		mGameWorld->UpdateDrawable();
+
+		mParticleSystem->Update( mTiming->DeltaTime() );
 
 		mRenderer->Present();
 

@@ -50,7 +50,9 @@ namespace Sentinel
 		archive.Write( &size );
 
 		TRAVERSE_VECTOR( x, mGameObject )
+		{
 			mGameObject[ x ]->Save( archive );
+		}
 	}
 
 	void GameWorld::Load( Archive& archive )
@@ -192,7 +194,7 @@ namespace Sentinel
 			if( entity->mParent )
 				entity->mParent->RemoveChild( entity );
 
-			entity->mWorld = this;
+			entity->SetWorld( this );
 		
 			mGameObject.push_back( entity );
 		}
@@ -219,6 +221,9 @@ namespace Sentinel
 			if( (*it) == entity )
 			{
 				mGameObject.erase( it );
+
+				entity->SetWorld( NULL );
+
 				return entity;
 			}
 		}

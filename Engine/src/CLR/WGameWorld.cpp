@@ -23,6 +23,11 @@ namespace Sentinel { namespace Wrapped
 		mRef = new GameWorld();
 	}
 
+	WGameWorld::WGameWorld( GameWorld* world )
+	{
+		mRef = world;
+	}
+
 	void WGameWorld::Release()
 	{
 		delete mRef;
