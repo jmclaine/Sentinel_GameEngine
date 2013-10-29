@@ -22,6 +22,8 @@ namespace Sentinel
 
 		std::shared_ptr< Sprite >		mSprite;
 
+		NormalParticle*					mParticle;
+
 	public:
 
 		ParticleSystemNormal( Renderer* renderer, GameWorld* world, std::shared_ptr< Sprite > sprite, UINT maxParticles ) :
@@ -32,8 +34,7 @@ namespace Sentinel
 			_ASSERT( mSprite->GetTexture() );
 			_ASSERT( mSprite->GetShader() );
 			
-			for( UINT x = 0; x < maxParticles; ++x )
-				mParticle[ x ] = new NormalParticle();
+			mParticle = new NormalParticle[ maxParticles ];
 
 			MeshBuilder builder;
 
@@ -58,6 +59,11 @@ namespace Sentinel
 											 1.0f / (float)mSprite->GetDimension().y, 0, 0 );
 		};
 
+		~ParticleSystemNormal()
+		{
+			delete[] mParticle;
+		}
+
 		void Update( float DT )
 		{
 			ParticleSystem::Update( DT );
@@ -68,21 +74,21 @@ namespace Sentinel
 
 			for( UINT x = 0; x < (UINT)mNumParticles; ++x )
 			{
-				NormalParticle* particle = static_cast< NormalParticle* >(mParticle[ x ]);
+				NormalParticle& particle = mParticle[ x ];
 
 				// Prepare particle in buffer.
 				//
-				*(Vector2f*)verts = mSprite->GetFrameCoords( particle->mFrame );
+				*(Vector2f*)verts = mSprite->GetFrameCoords( particle.mFrame );
 				verts += sizeof( Vector2f );
 
-				*(UINT*)verts = particle->mColor.ToUINT();
+				*(UINT*)verts = particle.mColor.ToUINT();
 				verts += sizeof( UINT );
 
-				MATRIX_TRANSLATION.Translate( particle->mPosition );
-				MATRIX_ROTATION.Rotate( particle->mRotation );
-				MATRIX_SCALE.Scale( particle->mScale );
+				MATRIX_TRANSLATION.Translate( particle.mPosition );
+				MATRIX_ROTATION.Rotate( particle.mRotation );
+				MATRIX_SCALE.Scale( particle.mScale );
 
-				mMesh->mMatrixWorld.BillboardWorld( particle->mPosition, mWorld->GetCamera()->GetTransform()->mPosition, Vector3f( 0, 1, 0 ));
+				mMesh->mMatrixWorld.BillboardWorld( particle.mPosition, mWorld->GetCamera()->GetTransform()->mPosition, Vector3f( 0, 1, 0 ));
 				*(Matrix4f*)verts = mMesh->mMatrixWorld * MATRIX_TRANSLATION * MATRIX_ROTATION * MATRIX_SCALE;
 				verts += sizeof( Matrix4f );
 			}
@@ -101,6 +107,13 @@ namespace Sentinel
 			mRenderer->SetCull( CULL_CCW );
 			mRenderer->SetBlend( BLEND_ALPHA );
 			mRenderer->SetDepthStencilState( STENCIL_DEFAULT );
+		}
+
+		Particle& GetParticle( UINT index )
+		{
+			_ASSERT( index < mMaxParticles );
+
+			return mParticle[ index ];
 		}
 	};
 

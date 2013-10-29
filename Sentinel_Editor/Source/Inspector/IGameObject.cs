@@ -49,6 +49,13 @@ namespace Sentinel_Editor
 
 			//////////////////////////////
 
+			WPhysicsComponent physics = WPhysicsComponent.Cast( obj.FindComponent( ComponentType.PHYSICS ));
+
+			if( physics != null )
+				Items.Add( new IPhysicsComponent( physics ));
+
+			//////////////////////////////
+
 			Separator separator = new Separator();
 			separator.Focusable = false;
 			Items.Add( separator );

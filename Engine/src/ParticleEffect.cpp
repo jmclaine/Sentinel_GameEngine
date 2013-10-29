@@ -15,10 +15,10 @@ namespace Sentinel
 		mStartTime( startTime )
 	{}
 
-	void ParticleEffect::Startup( Particle* particle )
+	void ParticleEffect::Startup( Particle& particle )
 	{}
 
-	void ParticleEffect::Update( Particle* particle )
+	void ParticleEffect::Update( Particle& particle )
 	{}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -30,9 +30,21 @@ namespace Sentinel
 		mFrame( frame )
 	{}
 
-	void TextureEffect::Startup( Particle* particle )
+	void TextureEffect::Startup( Particle& particle )
 	{
-		static_cast< NormalParticle* >(particle)->mFrame = mFrame;
+		static_cast< NormalParticle& >(particle).mFrame = mFrame;
+	}
+
+	////////////////////////////////////////////////////////////////////////////
+
+	RandomTextureEffect::RandomTextureEffect( float startTime, UINT minFrame, UINT maxFrame ) :
+		TextureEffect( startTime, minFrame ),
+		mMaxFrame( maxFrame )
+	{}
+
+	void RandomTextureEffect::Startup( Particle& particle )
+	{
+		static_cast< NormalParticle& >(particle).mFrame = RandomValue( mFrame, mMaxFrame );
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -44,9 +56,9 @@ namespace Sentinel
 		mColor( color )
 	{}
 
-	void ColorEffect::Startup( Particle* particle )
+	void ColorEffect::Startup( Particle& particle )
 	{
-		static_cast< NormalParticle* >(particle)->mColor = mColor;
+		static_cast< NormalParticle& >(particle).mColor = mColor;
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -56,9 +68,9 @@ namespace Sentinel
 		mMaxColor( maxColor )
 	{}
 
-	void RandomColorEffect::Startup( Particle* particle )
+	void RandomColorEffect::Startup( Particle& particle )
 	{
-		static_cast< NormalParticle* >(particle)->mColor = RandomValue( mColor, mMaxColor );
+		static_cast< NormalParticle& >(particle).mColor = RandomValue( mColor, mMaxColor );
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -71,13 +83,13 @@ namespace Sentinel
 		_ASSERT( startTime < endTime );
 	}
 
-	void FadeToColorEffect::Startup( Particle* particle )
+	void FadeToColorEffect::Startup( Particle& particle )
 	{}
 
-	void FadeToColorEffect::Update( Particle* particle )
+	void FadeToColorEffect::Update( Particle& particle )
 	{
-		if( particle->mElapsedTime < mEndTime + Timing::DESIRED_FRAME_RATE )
-			static_cast< NormalParticle* >(particle)->mColor = lerp( static_cast< NormalParticle* >(particle)->mColor, mColor, particle->mElapsedTime / mEndTime );
+		if( particle.mElapsedTime < mEndTime + Timing::DESIRED_FRAME_RATE )
+			static_cast< NormalParticle& >(particle).mColor = lerp( static_cast< NormalParticle& >(particle).mColor, mColor, particle.mElapsedTime / mEndTime );
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -88,9 +100,9 @@ namespace Sentinel
 		mPosition( position )
 	{}
 
-	void PositionEffect::Startup( Particle* particle )
+	void PositionEffect::Startup( Particle& particle )
 	{
-		particle->mPosition = mPosition;
+		particle.mPosition = mPosition;
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -100,9 +112,9 @@ namespace Sentinel
 		mMaxPosition( maxPosition )
 	{}
 
-	void AreaPositionEffect::Startup( Particle* particle )
+	void AreaPositionEffect::Startup( Particle& particle )
 	{
-		particle->mPosition = RandomValue( mPosition, mMaxPosition );
+		particle.mPosition = RandomValue( mPosition, mMaxPosition );
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -112,9 +124,9 @@ namespace Sentinel
 		mRadius( radius )
 	{}
 
-	void SpherePositionEffect::Startup( Particle* particle )
+	void SpherePositionEffect::Startup( Particle& particle )
 	{
-		particle->mPosition = mPosition + RandomValue( Vector3f( -mRadius, -mRadius, -mRadius ), Vector3f( mRadius, mRadius, mRadius ));
+		particle.mPosition = mPosition + RandomValue( Vector3f( -mRadius, -mRadius, -mRadius ), Vector3f( mRadius, mRadius, mRadius ));
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -125,9 +137,9 @@ namespace Sentinel
 		mRotation( rotation )
 	{}
 
-	void RotationEffect::Startup( Particle* particle )
+	void RotationEffect::Startup( Particle& particle )
 	{
-		particle->mRotation = mRotation;
+		particle.mRotation = mRotation;
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -138,9 +150,9 @@ namespace Sentinel
 	{}
 
 		
-	void RandomRotationEffect::Startup( Particle* particle )
+	void RandomRotationEffect::Startup( Particle& particle )
 	{
-		particle->mRotation = RandomValue( mRotation, mMaxRotation );
+		particle.mRotation = RandomValue( mRotation, mMaxRotation );
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -151,9 +163,9 @@ namespace Sentinel
 		mScale( scale )
 	{}
 
-	void ScaleEffect::Startup( Particle* particle )
+	void ScaleEffect::Startup( Particle& particle )
 	{
-		particle->mScale = mScale;
+		particle.mScale = mScale;
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -163,9 +175,9 @@ namespace Sentinel
 		mMaxScale( maxScale )
 	{}
 
-	void RandomScaleEffect::Startup( Particle* particle )
+	void RandomScaleEffect::Startup( Particle& particle )
 	{
-		particle->mScale = RandomValue( mScale, mMaxScale );
+		particle.mScale = RandomValue( mScale, mMaxScale );
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -186,13 +198,13 @@ namespace Sentinel
 		_ASSERT( startTime < endTime );
 	}
 
-	void FadeToScaleEffect::Startup( Particle* particle )
+	void FadeToScaleEffect::Startup( Particle& particle )
 	{}
 
-	void FadeToScaleEffect::Update( Particle* particle )
+	void FadeToScaleEffect::Update( Particle& particle )
 	{
-		if( particle->mElapsedTime < mEndTime + Timing::DESIRED_FRAME_RATE )
-			particle->mScale = lerp( particle->mScale, mScale, particle->mElapsedTime / mEndTime );
+		if( particle.mElapsedTime < mEndTime + Timing::DESIRED_FRAME_RATE )
+			particle.mScale = lerp( particle.mScale, mScale, particle.mElapsedTime / mEndTime );
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -203,9 +215,9 @@ namespace Sentinel
 		mVelocity( velocity )
 	{}
 
-	void VelocityEffect::Startup( Particle* particle )
+	void VelocityEffect::Startup( Particle& particle )
 	{
-		particle->mVelocity = mVelocity;
+		particle.mVelocity = mVelocity;
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -215,9 +227,9 @@ namespace Sentinel
 		mMaxVelocity( maxVelocity )
 	{}
 
-	void RandomVelocityEffect::Startup( Particle* particle )
+	void RandomVelocityEffect::Startup( Particle& particle )
 	{
-		particle->mVelocity = RandomValue( mVelocity, mMaxVelocity );
+		particle.mVelocity = RandomValue( mVelocity, mMaxVelocity );
 	}
 	
 	////////////////////////////////////////////////////////////////////////////
@@ -228,9 +240,9 @@ namespace Sentinel
 		mAngularVelocity( angularVelocity )
 	{}
 
-	void AngularVelocityEffect::Startup( Particle* particle )
+	void AngularVelocityEffect::Startup( Particle& particle )
 	{
-		particle->mAngularVelocity = mAngularVelocity;
+		particle.mAngularVelocity = mAngularVelocity;
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -241,9 +253,9 @@ namespace Sentinel
 		mAccel( accel )
 	{}
 
-	void AccelEffect::Startup( Particle* particle )
+	void AccelEffect::Startup( Particle& particle )
 	{
-		particle->mAccel = mAccel;
+		particle.mAccel = mAccel;
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -254,8 +266,8 @@ namespace Sentinel
 		mAngularAccel( angularAccel )
 	{}
 
-	void AngularAccelEffect::Startup( Particle* particle )
+	void AngularAccelEffect::Startup( Particle& particle )
 	{
-		particle->mAngularAccel = mAngularAccel;
+		particle.mAngularAccel = mAngularAccel;
 	}
 }

@@ -38,8 +38,6 @@ namespace Sentinel
 
 		UINT				mNumParticles;
 
-		Particle**			mParticle;
-
 		float				mSpawnTime;
 
 	public:
@@ -69,6 +67,10 @@ namespace Sentinel
 		virtual void		Update( float DT );
 
 		virtual void		Shutdown();
+
+	private:
+
+		virtual Particle&	GetParticle( UINT index ) = 0;
 	};
 
 	extern SENTINEL_DLL ParticleSystem* BuildParticleSystemNormal( Renderer* renderer, GameWorld* world, std::shared_ptr< Sprite > sprite, UINT maxParticles = 1000 );

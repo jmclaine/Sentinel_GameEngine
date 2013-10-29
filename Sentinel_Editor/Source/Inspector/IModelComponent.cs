@@ -15,12 +15,21 @@ namespace Sentinel_Editor
 	{
 		public WModelComponent Data { get; set; }
 
+		private IString mName;
+
 		public IModelComponent( WModelComponent component )
 		{
 			Header	= "Model";
 			Data	= component;
 
-			Items.Add( new Inspector( Inspector.CreateEdit( "Name: ", Data.Name )));
+			mName = new IString( "Name: ", Data.Name );
+			mName.ChangedValue = ChangedName;
+			Items.Add( mName );
+		}
+
+		private void ChangedName()
+		{
+			Data.Name = mName.Data;
 		}
 	}
 }

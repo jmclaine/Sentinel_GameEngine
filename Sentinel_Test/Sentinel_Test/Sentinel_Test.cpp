@@ -178,8 +178,8 @@ public:
 
 		std::shared_ptr< Sprite > sprite( new Sprite( texture, shader, Point2i( 64, 64 )));
 
-		mParticleSystem = BuildParticleSystemNormal( mRenderer, mGameWorld, sprite, 300 );
-		mParticleSystem->mSpawnRate   = 0.025f;
+		mParticleSystem = BuildParticleSystemNormal( mRenderer, mGameWorld, sprite, 3000 );
+		mParticleSystem->mSpawnRate   = 0.0025f;
 		mParticleSystem->mMinLifetime = 3.0f;
 		mParticleSystem->mMaxLifetime = 5.0f;
 		mParticleSystem->mEffect.push_back( new TextureEffect( 0, 0 ));
@@ -230,6 +230,7 @@ public:
 	{
 		mTiming->Update();
 
+		BEGIN_PROFILE( mTiming );
 		if( Keyboard::Get().DidGoDown( VK_ESCAPE ))
 		{
 			PostQuitMessage( 0 );
@@ -243,23 +244,30 @@ public:
 
 		mRenderer->Clear( color );
 
+		BEGIN_PROFILE( mTiming );
 		mGameWorld->UpdateController();
 
-		BEGIN_PROFILE( mTiming );
 		mPhysicsSystem->Update( mTiming->DeltaTime() );
-		END_PROFILE( mTiming, "Particle" );
-
+		
 		mGameWorld->UpdatePhysics();
 		mGameWorld->UpdateTransform();
 		mGameWorld->UpdateComponents();
 		mGameWorld->UpdateDrawable();
+		END_PROFILE( mTiming, "World" );
 
+		BEGIN_PROFILE( mTiming );
 		mParticleSystem->Update( mTiming->DeltaTime() );
+		END_PROFILE( mTiming, "Particle" );
 
+		BEGIN_PROFILE( mTiming );
 		mRenderer->Present();
+		END_PROFILE( mTiming, "Renderer" );
 
 		Mouse::Get().Update();
 		Keyboard::Get().Update();
+		END_PROFILE( mTiming, "Update" );
+
+		SEPARATE_PROFILE( "-----------------------" );
 
 		mTiming->Limit();
 	}

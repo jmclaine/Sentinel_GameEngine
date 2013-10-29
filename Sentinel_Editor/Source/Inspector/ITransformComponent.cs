@@ -16,25 +16,34 @@ namespace Sentinel_Editor
 	{
 		public WTransformComponent Data { get; set; }
 
+		private IString mName;
+
 		public ITransformComponent( WTransformComponent component )
 		{
 			Header	= "Transform";
 			Data	= component;
 
-			Items.Add( new Inspector( Inspector.CreateEdit( "Name: ", Data.Name )));
+			mName = new IString( "Name: ", Data.Name );
+			mName.ChangedValue = ChangedName;
+			Items.Add( mName );
 
-			Items.Add( new IVector3f( Data.Position, "Position" ));
+			Items.Add( new IVector3f( "Position", Data.Position ));
 
-			IVector3f inspector = new IVector3f( Data.Rotation, "Rotation" );
+			IVector3f inspector = new IVector3f( "Rotation", Data.Rotation );
 			inspector.ChangedValue = UpdateRotation;
 			Items.Add( inspector );
 
-			Items.Add( new IVector3f( Data.Scale, "Scale" ));
+			Items.Add( new IVector3f( "Scale", Data.Scale ));
 		}
 
 		private void UpdateRotation()
 		{
 			Data.Update();
+		}
+
+		private void ChangedName()
+		{
+			Data.Name = mName.Data;
 		}
 	}
 }

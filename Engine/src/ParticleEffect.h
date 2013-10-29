@@ -23,9 +23,9 @@ namespace Sentinel
 
 	public:
 
-		virtual void Startup( Particle* particle );
+		virtual void Startup( Particle& particle );
 
-		virtual void Update( Particle* particle );
+		virtual void Update( Particle& particle );
 	};
 
 	////////////////////////////////////////////////////////////////////////////
@@ -34,7 +34,7 @@ namespace Sentinel
 	//
 	class SENTINEL_DLL TextureEffect : public ParticleEffect
 	{
-	private:
+	protected:
 
 		UINT		mFrame;
 		
@@ -44,7 +44,23 @@ namespace Sentinel
 
 		//////////////////////////////////////
 
-		void		Startup( Particle* particle );
+		void		Startup( Particle& particle );
+	};
+
+	class SENTINEL_DLL RandomTextureEffect : public TextureEffect
+	{
+	private:
+
+		// uses mFrame as min
+		UINT		mMaxFrame;
+		
+	public:
+
+		RandomTextureEffect( float startTime, UINT minFrame, UINT maxFrame );
+
+		//////////////////////////////////////
+
+		void		Startup( Particle& particle );
 	};
 
 	////////////////////////////////////////////////////////////////////////////
@@ -63,7 +79,7 @@ namespace Sentinel
 
 		//////////////////////////////////////
 
-		virtual void Startup( Particle* particle );
+		virtual void Startup( Particle& particle );
 	};
 
 	class SENTINEL_DLL RandomColorEffect : public ColorEffect
@@ -79,7 +95,7 @@ namespace Sentinel
 
 		//////////////////////////////////////
 
-		void		Startup( Particle* particle );
+		void		Startup( Particle& particle );
 	};
 
 	class SENTINEL_DLL FadeToColorEffect : public ColorEffect
@@ -94,9 +110,9 @@ namespace Sentinel
 
 		//////////////////////////////////////
 
-		void		Startup( Particle* particle );
+		void		Startup( Particle& particle );
 
-		void		Update( Particle* particle );
+		void		Update( Particle& particle );
 	};
 
 	////////////////////////////////////////////////////////////////////////////
@@ -114,7 +130,7 @@ namespace Sentinel
 
 		//////////////////////////////////////
 
-		virtual void Startup( Particle* particle );
+		virtual void Startup( Particle& particle );
 	};
 
 	class SENTINEL_DLL AreaPositionEffect : public PositionEffect
@@ -130,7 +146,7 @@ namespace Sentinel
 
 		//////////////////////////////////////
 
-		void		Startup( Particle* particle );
+		void		Startup( Particle& particle );
 	};
 
 	class SENTINEL_DLL SpherePositionEffect : public PositionEffect
@@ -145,7 +161,7 @@ namespace Sentinel
 
 		//////////////////////////////////////
 
-		void		Startup( Particle* particle );
+		void		Startup( Particle& particle );
 	};
 
 	////////////////////////////////////////////////////////////////////////////
@@ -163,7 +179,7 @@ namespace Sentinel
 
 		//////////////////////////////////////
 
-		void		Startup( Particle* particle );
+		void		Startup( Particle& particle );
 	};
 
 	class SENTINEL_DLL RandomRotationEffect : public RotationEffect
@@ -179,7 +195,7 @@ namespace Sentinel
 
 		//////////////////////////////////////
 
-		void		Startup( Particle* particle );
+		void		Startup( Particle& particle );
 	};
 
 	////////////////////////////////////////////////////////////////////////////
@@ -197,7 +213,7 @@ namespace Sentinel
 
 		//////////////////////////////////////
 
-		virtual void Startup( Particle* particle );
+		virtual void Startup( Particle& particle );
 	};
 
 	class SENTINEL_DLL RandomScaleEffect : public ScaleEffect
@@ -212,7 +228,7 @@ namespace Sentinel
 
 		//////////////////////////////////////
 
-		virtual void Startup( Particle* particle );
+		virtual void Startup( Particle& particle );
 	};
 
 	class SENTINEL_DLL FadeToScaleEffect : public ScaleEffect
@@ -228,9 +244,9 @@ namespace Sentinel
 
 		//////////////////////////////////////
 
-		void		Startup( Particle* particle );
+		void		Startup( Particle& particle );
 
-		void		Update( Particle* particle );
+		void		Update( Particle& particle );
 	};
 
 	////////////////////////////////////////////////////////////////////////////
@@ -248,7 +264,7 @@ namespace Sentinel
 
 		//////////////////////////////////////
 
-		void		Startup( Particle* particle );
+		void		Startup( Particle& particle );
 	};
 
 	class SENTINEL_DLL RandomVelocityEffect : public VelocityEffect
@@ -264,7 +280,7 @@ namespace Sentinel
 
 		//////////////////////////////////////
 
-		void		Startup( Particle* particle );
+		void		Startup( Particle& particle );
 	};
 
 	////////////////////////////////////////////////////////////////////////////
@@ -282,7 +298,7 @@ namespace Sentinel
 
 		//////////////////////////////////////
 
-		void		Startup( Particle* particle );
+		void		Startup( Particle& particle );
 	};
 
 	////////////////////////////////////////////////////////////////////////////
@@ -300,7 +316,7 @@ namespace Sentinel
 
 		//////////////////////////////////////
 
-		void		Startup( Particle* particle );
+		void		Startup( Particle& particle );
 	};
 
 	////////////////////////////////////////////////////////////////////////////
@@ -318,6 +334,6 @@ namespace Sentinel
 
 		//////////////////////////////////////
 
-		void		Startup( Particle* particle );
+		void		Startup( Particle& particle );
 	};
 }

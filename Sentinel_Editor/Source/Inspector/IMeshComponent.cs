@@ -6,34 +6,30 @@ namespace Sentinel_Editor
 {
 	public class IMeshComponent : Inspector
 	{
-		public WMeshComponent Data { get; set; }
+		public WMeshComponent Data;
+
+		private IString mName;
 
 		public IMeshComponent( WMeshComponent component )
 		{
 			Header	= "Mesh";
 			Data	= component;
 
-			Items.Add( new Inspector( Inspector.CreateEdit( "Name: ", Data.Name )));
+			mName = new IString( "Name: ", Data.Name );
+			mName.ChangedValue = ChangedName;
+			Items.Add( mName );
 
 			WMesh mesh = Data.Mesh;
 			AMesh asset = MainWindow.FindAsset( mesh );
 
-			if( asset != null )
-				Items.Add( Create() );
-			else
-				Items.Add( "null" );
-
+			Items.Add( new IMesh( "Mesh: ", asset ));
+			
 			mesh.Dispose();
 		}
 
-		private Inspector Create()
+		private void ChangedName()
 		{
-			StackPanel panel = new StackPanel();
-			panel.Orientation = Orientation.Horizontal;
-
-			panel.Children.Add( Inspector.CreateLabel( "Mesh: " ));
-
-			return new Inspector( panel );
+			Data.Name = mName.Data;
 		}
 	}
 }

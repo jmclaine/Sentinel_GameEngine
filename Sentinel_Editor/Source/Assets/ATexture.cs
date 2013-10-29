@@ -12,9 +12,9 @@ namespace Sentinel_Editor
 		/// Initialize this image to get an icon
 		/// before the name in the TreeView.
 		///
-		public static BitmapImage DefaultImage { get; set; }
+		public static BitmapImage DefaultImage;
 
-		public WTexture Data { get; private set; }
+		public WTexture Data;
 
 		public ATexture( String name, WTexture data )
 		{

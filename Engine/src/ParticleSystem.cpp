@@ -29,19 +29,12 @@ namespace Sentinel
 		_ASSERT( renderer );
 		_ASSERT( world );
 		_ASSERT( maxParticles > 0 );
-
-		mParticle = new Particle*[ maxParticles ];
 	}
 
 	ParticleSystem::~ParticleSystem()
 	{
 		for( UINT x = 0; x < (UINT)mEffect.size(); ++x )
 			delete mEffect[ x ];
-
-		for( UINT x = 0; x < mMaxParticles; ++x )
-			delete mParticle[ x ];
-
-		delete[] mParticle;
 
 		delete mMesh;
 
@@ -67,11 +60,11 @@ namespace Sentinel
 			{
 				mSpawnTime -= mSpawnRate;
 
-				Particle* particle = mParticle[ mNumParticles ];
+				Particle& particle = GetParticle( mNumParticles );
 
-				particle->mElapsedTime = 0;
-				particle->mLifetime    = RandomValue( mMinLifetime, mMaxLifetime );
-				particle->mEffectIndex = 0;
+				particle.mElapsedTime = 0;
+				particle.mLifetime    = RandomValue( mMinLifetime, mMaxLifetime );
+				particle.mEffectIndex = 0;
 
 				++mNumParticles;
 			}
@@ -84,35 +77,34 @@ namespace Sentinel
 
 		for( int x = 0; x < (int)mNumParticles; ++x )
 		{
-			Particle* particle = mParticle[ x ];
+			Particle& particle = GetParticle( x );
 
 			// Startup effects in time order.
 			//
-			for( UINT y = particle->mEffectIndex; y < (UINT)mEffect.size(); ++y )
+			for( UINT y = particle.mEffectIndex; y < (UINT)mEffect.size(); ++y )
 			{
-				if( particle->mElapsedTime >= mEffect[ y ]->mStartTime )
+				if( particle.mElapsedTime >= mEffect[ y ]->mStartTime )
 				{
 					mEffect[ y ]->Startup( particle );
 
-					++particle->mEffectIndex;
+					++particle.mEffectIndex;
 				}
 			}
 
 			// Update particles with effects.
 			//
-			for( UINT y = 0; y < particle->mEffectIndex; ++y )
+			for( UINT y = 0; y < particle.mEffectIndex; ++y )
 				mEffect[ y ]->Update( particle );
 
-			particle->Update( DT );
+			particle.Update( DT );
 
 			// Replace dead particles.
 			//
-			if( particle->mElapsedTime >= particle->mLifetime )
+			if( particle.mElapsedTime >= particle.mLifetime )
 			{
 				--mNumParticles;
 
-				//std::swap( mParticle[ x ], mParticle[ mNumParticles ] );
-				*mParticle[ x ] = *mParticle[ mNumParticles ];
+				GetParticle( x ) = GetParticle( mNumParticles );
 
 				--x;
 			}

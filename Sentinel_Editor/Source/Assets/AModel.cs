@@ -12,9 +12,9 @@ namespace Sentinel_Editor
 		/// Initialize this image to get an icon
 		/// before the name in the TreeView.
 		///
-		public static BitmapImage DefaultImage { get; set; }
+		public static BitmapImage DefaultImage;
 
-		public WModel Data { get; set; }
+		public WModel Data;
 
 		public AModel( String name, WModel data )
 		{

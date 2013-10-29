@@ -12,9 +12,9 @@ namespace Sentinel_Editor
 		/// Initialize this image to get an icon
 		/// before the name in the TreeView.
 		///
-		public static BitmapImage DefaultImage { get; set; }
+		public static BitmapImage DefaultImage;
 
-		public WMesh Data { get; set; }
+		public WMesh Data;
 
 		public AMesh( String name, WMesh mesh )
 		{
@@ -23,7 +23,12 @@ namespace Sentinel_Editor
 			Data	= mesh;
 			Name	= name;
 
-			Header  = EditorAsset.CreateDefaultAssetPanel( name, DefaultImage );
+			Header  = CreatePanel();
+		}
+
+		public Panel CreatePanel()
+		{
+			return EditorAsset.CreateDefaultAssetPanel( Name, DefaultImage );
 		}
 	}
 }

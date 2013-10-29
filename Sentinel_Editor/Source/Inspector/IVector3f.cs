@@ -13,98 +13,50 @@ namespace Sentinel_Editor
 {
 	class IVector3f : Inspector
 	{
-		public WVector3f Data { get; set; }
+		public WVector3f Data;
 
-		public IVector3f( WVector3f v, String name )
+		private IFloat mX;
+		private IFloat mY;
+		private IFloat mZ;
+
+		public IVector3f( String name, WVector3f data )
 		{
 			Header	= name;
-			Data	= v;
+			Data	= data;
 
 			StackPanel panel  = new StackPanel();
 			panel.Orientation = Orientation.Horizontal;
+			panel.Margin      = new Thickness( -38, 0, 0, 0 );
 			panel.Focusable   = false;
 			
-			Label   label;
-			TextBox box;
-			
-			//////////////////////////////////
+			mX = new IFloat( "X: ", Data.x );
+			mX.ChangedValue = TextChanged_X;
+			panel.Children.Add( mX );
 
-			label = Inspector.CreateLabel( "X: " );
-			label.Focusable = false;
-			panel.Children.Add( label );
+			mY = new IFloat( "Y: ", Data.y );
+			mY.ChangedValue = TextChanged_Y;
+			panel.Children.Add( mY );
 
-			box = Inspector.CreateEdit( v.x );
-			box.TextChanged += TextChanged_X;
-			panel.Children.Add( box );
+			mZ = new IFloat( "Z: ", Data.z );
+			mZ.ChangedValue = TextChanged_Z;
+			panel.Children.Add( mZ );
 
-			//////////////////////////////////
-
-			label = Inspector.CreateLabel( "Y: " );
-			label.Focusable = false;
-			panel.Children.Add( label );
-
-			box = Inspector.CreateEdit( v.y );
-			box.TextChanged += TextChanged_Y;
-			panel.Children.Add( box );
-
-			//////////////////////////////////
-
-			label = Inspector.CreateLabel( "Z: " );
-			label.Focusable = false;
-			panel.Children.Add( label );
-
-			box = Inspector.CreateEdit( v.z );
-			box.TextChanged += TextChanged_Z;
-			panel.Children.Add( box );
-
-			//////////////////////////////////
-
-			Items.Add( new Inspector( panel ));
+			Items.Add( panel );
 		}
 
-		private void TextChanged_X( Object sender, TextChangedEventArgs e )
+		private void TextChanged_X()
 		{
-			TextBox box = sender as TextBox;
-
-			float result;
-
-			if( float.TryParse( box.Text, out result ))
-			{
-				Data.x = result;
-
-				if( ChangedValue != null )
-					ChangedValue();
-			}
+			Data.x = mX.Data;
 		}
 
-		private void TextChanged_Y( Object sender, TextChangedEventArgs e )
+		private void TextChanged_Y()
 		{
-			TextBox box = sender as TextBox;
-
-			float result;
-
-			if( float.TryParse( box.Text, out result ))
-			{
-				Data.y = result;
-				
-				if( ChangedValue != null )
-					ChangedValue();
-			}
+			Data.y = mY.Data;
 		}
 
-		private void TextChanged_Z( Object sender, TextChangedEventArgs e )
+		private void TextChanged_Z()
 		{
-			TextBox box = sender as TextBox;
-
-			float result;
-
-			if( float.TryParse( box.Text, out result ))
-			{
-				Data.z = result;
-				
-				if( ChangedValue != null )
-					ChangedValue();
-			}
+			Data.z = mZ.Data;
 		}
 	}
 }

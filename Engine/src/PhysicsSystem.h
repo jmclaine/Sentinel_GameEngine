@@ -28,8 +28,9 @@ namespace Sentinel
 
 	enum PhysicsFlag
 	{
-		DISABLE_GRAVITY			= 1,
-		ENABLE_GYROSCOPIC_FORCE = 2,
+		PHYSICS_FLAG_NONE,
+		DISABLE_GRAVITY,
+		ENABLE_GYROSCOPIC_FORCE,
 	};
 
 	class RigidBody

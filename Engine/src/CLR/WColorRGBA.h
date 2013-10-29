@@ -31,6 +31,29 @@ namespace Sentinel { namespace Wrapped
 		float*		Ptr();
 
 		UINT		ToUINT();
+
+		////////////////////////////////
+
+		bool		operator == ( WColorRGBA^ v );
+		bool		operator != ( WColorRGBA^ v );
+		bool		Equals( WColorRGBA^ v );
+
+		WColorRGBA^	operator += ( WColorRGBA^ v );
+		static WColorRGBA^ operator + ( WColorRGBA^ v0, WColorRGBA^ v1 );
+		WColorRGBA^	Add( WColorRGBA^ v );
+
+		WColorRGBA^	operator -= ( WColorRGBA^ v );
+		static WColorRGBA^ operator - ( WColorRGBA^ v0, WColorRGBA^ v1 );
+		WColorRGBA^	Sub( WColorRGBA^ v );
+
+		WColorRGBA^	operator *= ( float scalar );
+		static WColorRGBA^ operator * ( WColorRGBA^ v, float scalar );
+		static WColorRGBA^ operator * ( float scalar, WColorRGBA^ v );
+		WColorRGBA^	Mul( float scalar );
+
+		WColorRGBA^	operator *= ( WColorRGBA^ v );
+		static WColorRGBA^ operator * ( WColorRGBA^ v0, WColorRGBA^ v1 );
+		WColorRGBA^	Mul( WColorRGBA^ v );
 	};
 
 	DECLARE_CLASS_REF( ColorRGBA );

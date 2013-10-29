@@ -52,5 +52,91 @@ namespace Sentinel { namespace Wrapped
 
 	////////////////////////////////
 
+	bool WColorRGBA::operator == ( WColorRGBA^ v )
+	{
+		return mRef->Equals( v );
+	}
+
+	bool WColorRGBA::operator != ( WColorRGBA^ v )
+	{
+		return !mRef->Equals( v );
+	}
+
+	bool WColorRGBA::Equals( WColorRGBA^ v )
+	{
+		return mRef->Equals( v );
+	}
+
+	WColorRGBA^ WColorRGBA::operator += ( WColorRGBA^ v )
+	{
+		*mRef += *v->mRef;
+		return this;
+	}
+
+	WColorRGBA^ WColorRGBA::operator + ( WColorRGBA^ v0, WColorRGBA^ v1 )
+	{
+		return v0->Add( v1 );
+	}
+
+	WColorRGBA^ WColorRGBA::Add( WColorRGBA^ v )
+	{
+		return gcnew WColorRGBA( mRef->Add( v ));
+	}
+
+	WColorRGBA^ WColorRGBA::operator -= ( WColorRGBA^ v )
+	{
+		*mRef -= *v->mRef;
+		return this;
+	}
+
+	WColorRGBA^ WColorRGBA::operator - ( WColorRGBA^ v0, WColorRGBA^ v1 )
+	{
+		return v0->Sub( v1 );
+	}
+
+	WColorRGBA^ WColorRGBA::Sub( WColorRGBA^ v )
+	{
+		return gcnew WColorRGBA( mRef->Sub( v ));
+	}
+
+	WColorRGBA^ WColorRGBA::operator *= ( float scalar )
+	{
+		*mRef *= scalar;
+		return this;
+	}
+
+	WColorRGBA^ WColorRGBA::operator * ( WColorRGBA^ v, float scalar )
+	{
+		return v->Mul( scalar );
+	}
+
+	WColorRGBA^ WColorRGBA::operator * ( float scalar, WColorRGBA^ v )
+	{
+		return v->Mul( scalar );
+	}
+
+	WColorRGBA^ WColorRGBA::Mul( float scalar )
+	{
+		return gcnew WColorRGBA( mRef->Mul( scalar ));
+	}
+
+	WColorRGBA^ WColorRGBA::operator *= ( WColorRGBA^ v )
+	{
+		*mRef *= *v->mRef;
+		return this;
+	}
+
+	WColorRGBA^ WColorRGBA::operator * ( WColorRGBA^ v0, WColorRGBA^ v1 )
+	{
+		return v0->Mul( v1 );
+	}
+
+	WColorRGBA^ WColorRGBA::Mul( WColorRGBA^ v )
+	{
+		return gcnew WColorRGBA( mRef->Mul( v ));
+	}
+
+	////////////////////////////////
+
 	DEFINE_CLASS_REF( ColorRGBA );
 }}

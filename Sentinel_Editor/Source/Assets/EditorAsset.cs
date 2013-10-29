@@ -24,7 +24,7 @@ namespace Sentinel_Editor
 		/// Must be initialized before creating a new object.
 		/// Initializes all children to default Style.
 		///
-		public static Style			TreeStyle { get; set; }
+		public static Style			TreeStyle;
 		
 		///
 		/// Since each object possesses a different type of
@@ -38,7 +38,7 @@ namespace Sentinel_Editor
 		protected EditorAssetType	mType;
 		public EditorAssetType		Type { get { return mType; }}
 
-		new public String			Name { get; set; }
+		new public String			Name;
 
 		protected EditorAsset()
 		{
