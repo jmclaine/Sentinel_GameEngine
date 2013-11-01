@@ -28,7 +28,7 @@ namespace Sentinel_Editor
 
 		public Panel CreatePanel()
 		{
-			return EditorAsset.CreateDefaultAssetPanel( Name, DefaultImage );
+			return EditorAsset.CreatePanel( Name, DefaultImage );
 		}
 	}
 }

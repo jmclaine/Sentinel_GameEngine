@@ -210,12 +210,12 @@ namespace Sentinel
 
 		if( mWorld )
 		{
-			obj->mWorld  = mWorld;
-
 			// Ensure the GameWorld no longer has
 			// the object as a parent object.
 			//
 			mWorld->RemoveGameObject( obj );
+
+			obj->SetWorld( mWorld );
 		}
 	}
 

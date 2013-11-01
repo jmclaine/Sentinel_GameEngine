@@ -71,7 +71,6 @@ namespace Sentinel_Editor
 
 		private WGameWorld			mGameWorld;
 
-		
 		///
 		/// Starting Point of Application.
 		///
@@ -394,6 +393,8 @@ namespace Sentinel_Editor
 
 		private void Objects_TreeView_MouseDown( Object sender, MouseButtonEventArgs e )
 		{
+			// Get the last position the mouse was left clicked.
+			//
 			if( e.ChangedButton == System.Windows.Input.MouseButton.Left )
 				Objects_LastMouseDown = e.GetPosition( Objects_TreeView );
 		}

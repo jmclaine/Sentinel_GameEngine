@@ -47,7 +47,7 @@ namespace Sentinel_Editor
 			Focusable	= true;
 		}
 
-		protected static Panel CreateDefaultAssetPanel( String name, BitmapImage bitmap )
+		protected static Panel CreatePanel( String name, BitmapImage bitmap )
 		{
 			StackPanel panel = new StackPanel();
 			panel.Orientation = Orientation.Horizontal;

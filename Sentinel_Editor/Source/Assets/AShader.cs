@@ -23,7 +23,7 @@ namespace Sentinel_Editor
 			Data	= data;
 			Name	= name;
 
-			Header  = EditorAsset.CreateDefaultAssetPanel( name, DefaultImage );
+			Header  = EditorAsset.CreatePanel( name, DefaultImage );
 		}
 	}
 }
