@@ -1,6 +1,11 @@
 #include "ParticleEmitterComponent.h"
+#include "TransformComponent.h"
 #include "ParticleSystem.h"
 #include "Archive.h"
+#include "GameObject.h"
+#include "GameWorld.h"
+#include "Timing.h"
+#include "Mesh.h"
 
 namespace Sentinel
 {
@@ -16,6 +21,11 @@ namespace Sentinel
 		Set( particle );
 	}
 
+	ParticleEmitterComponent::~ParticleEmitterComponent()
+	{
+		delete mParticleSystem;
+	}
+
 	void ParticleEmitterComponent::Set( ParticleSystem* particle )
 	{
 		mParticleSystem = particle;
@@ -24,13 +34,27 @@ namespace Sentinel
 	/////////////////////////////////
 
 	void ParticleEmitterComponent::Startup()
-	{}
+	{
+		DrawableComponent::Startup();
+
+		mParticleSystem->Startup();
+	}
 
 	void ParticleEmitterComponent::Update()
-	{}
+	{
+		DrawableComponent::Update();
+
+		mParticleSystem->mMesh->mMatrixWorld = mTransform->GetMatrixWorld();
+
+		mParticleSystem->Update( mOwner->GetWorld()->mTiming->DeltaTime() );
+	}
 
 	void ParticleEmitterComponent::Shutdown()
-	{}
+	{
+		DrawableComponent::Shutdown();
+
+		mParticleSystem->Shutdown();
+	}
 
 	/////////////////////////////////
 

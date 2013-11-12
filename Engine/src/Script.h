@@ -295,11 +295,11 @@ namespace Sentinel
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Native Function Calls.
 	//
-	typedef Value( *FuncPtr0 )();
-	typedef Value( *FuncPtr1 )( const Value& );
-	typedef Value( *FuncPtr2 )( const Value&, const Value& );
-	typedef Value( *FuncPtr3 )( const Value&, const Value&, const Value& );
-	typedef Value( *FuncPtr4 )( const Value&, const Value&, const Value&, const Value& );
+	typedef Value( *ScriptFuncPtr0 )();
+	typedef Value( *ScriptFuncPtr1 )( const Value& );
+	typedef Value( *ScriptFuncPtr2 )( const Value&, const Value& );
+	typedef Value( *ScriptFuncPtr3 )( const Value&, const Value&, const Value& );
+	typedef Value( *ScriptFuncPtr4 )( const Value&, const Value&, const Value&, const Value& );
 
 	struct NativeFunction
 	{
@@ -308,15 +308,15 @@ namespace Sentinel
 
 		union
 		{
-			FuncPtr0 Func0;
-			FuncPtr1 Func1;
-			FuncPtr2 Func2;
-			FuncPtr3 Func3;
-			FuncPtr4 Func4;
+			ScriptFuncPtr0 Func0;
+			ScriptFuncPtr1 Func1;
+			ScriptFuncPtr2 Func2;
+			ScriptFuncPtr3 Func3;
+			ScriptFuncPtr4 Func4;
 		};
 
 #define NATIVE_FUNC_HELPER( count )\
-	NativeFunction( const std::string& _name, FuncPtr##count _func, const std::string& _args )\
+	NativeFunction( const std::string& _name, ScriptFuncPtr##count _func, const std::string& _args )\
 	{\
 		name  = _name;\
 		Func##count = _func;\
@@ -632,7 +632,7 @@ namespace Sentinel
 		void RegisterVar( const std::string& name, const Value& _value );
 
 #define REGISTER_FUNC_HELPER( count )\
-	void RegisterFunc( const std::string& name, FuncPtr##count func, const std::string& args );
+	void RegisterFunc( const std::string& name, ScriptFuncPtr##count func, const std::string& args );
 
 		REGISTER_FUNC_HELPER( 0 )
 		REGISTER_FUNC_HELPER( 1 )

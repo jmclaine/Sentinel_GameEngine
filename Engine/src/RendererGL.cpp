@@ -325,9 +325,17 @@ namespace Sentinel
 					++texCount;
 					break;
 
-				// Vertex Matrix.
+				// Quad Texture Coordinates.
 				//
 				case 'x':
+					sprintf_s( name, "aTexture%d", texCount );
+					SetOffset( attribIndex, mVertexSize, 16, GL_FLOAT );
+					++texCount;
+					break;
+
+				// Vertex Matrix.
+				//
+				case 'M':
 					sprintf_s( name, "aMatrix" );
 					glBindAttribLocation( mProgramID, attribIndex, name );
 
@@ -582,7 +590,6 @@ namespace Sentinel
 			
 		public:
 
-			HWND		mHWND;
 			HDC			mHDC;
 			HGLRC		mContext;
 
@@ -634,13 +641,13 @@ namespace Sentinel
 		{
 			mCurrWindow = new WindowInfoGL();
 
+			mCurrWindow->mHandle		= hWnd;
 			mCurrWindow->mFullscreen	= fullscreen;
 			mCurrWindow->mWidth			= width;
 			mCurrWindow->mHeight		= height;
 			mCurrWindow->mWidthRatio	= (float)width  / (float)WINDOW_WIDTH_BASE;
 			mCurrWindow->mHeightRatio	= (float)height / (float)WINDOW_HEIGHT_BASE;
-			mCurrWindow->mHWND			= (HWND)hWnd;
-			mCurrWindow->mHDC			= GetDC( mCurrWindow->mHWND );
+			mCurrWindow->mHDC			= GetDC( (HWND)hWnd );
 
 			if( !mCurrWindow->mHDC )
 			{
@@ -651,7 +658,7 @@ namespace Sentinel
 			PIXELFORMATDESCRIPTOR pixelFormatDescriptor = {0};
 			pixelFormatDescriptor.nSize			= sizeof( pixelFormatDescriptor );
 			pixelFormatDescriptor.nVersion		= 1;
-			pixelFormatDescriptor.dwFlags		= PFD_DRAW_TO_BITMAP | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER | PFD_GENERIC_ACCELERATED;
+			pixelFormatDescriptor.dwFlags		= PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER | PFD_GENERIC_ACCELERATED;
 			pixelFormatDescriptor.dwLayerMask	= PFD_MAIN_PLANE;
 			pixelFormatDescriptor.iPixelType	= PFD_TYPE_RGBA;
 			pixelFormatDescriptor.cColorBits	= 32;
@@ -738,7 +745,7 @@ namespace Sentinel
 				wglDeleteContext( mCurrWindow->mContext );
 				mCurrWindow->mContext = 0;
 
-				ReleaseDC( mCurrWindow->mHWND, mCurrWindow->mHDC );
+				ReleaseDC( (HWND)mCurrWindow->mHandle, mCurrWindow->mHDC );
 			}
 		}
 
@@ -882,7 +889,7 @@ namespace Sentinel
 			return mRenderTarget.size()-1;
 		}
 
-		UINT CreateRenderTarget( const std::shared_ptr< Texture >& texture )
+		UINT CreateRenderTarget( std::shared_ptr< Texture > texture )
 		{
 			UINT renderID = mRenderTarget.size();
 

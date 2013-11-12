@@ -7,6 +7,14 @@ Always set mShader to a valid shader before calling BuildMesh()
 Each Vertex contains all the possible variations of vertices
 for ease of creation.  These vertices are then copied over
 into another buffer of the shader specifications.
+
+
+TODO:
+
+Create an FVF style format for the Vertex for memory optimization.
+Would require making mShader private, and creating functions
+to set and get the shader to ensure the Vertex is created with
+the correct amount of memory before adding them to the list.
 */
 #include <memory>
 #include <vector>
@@ -33,24 +41,34 @@ namespace Sentinel
 
 	public:
 
+		// TODO: Create a FVF style Vertex instead of allocating
+		//       the maximum amount of memory each time.
+		//
 		struct Vertex
 		{
-			Vector3f	mPosition;
-			Vector2f	mTextureCoords[ NUM_TEXTURES ];
-			Vector3f	mNormal;
-			UINT		mColor;
+			Vector3f	mPosition;	// P
+
+			// Texture Coordinates are either uv / xy based (X),
+			// or xyzw / quad (x) based depending on the shader
+			// attribute.
+			//
+			Vector2f	mTextureCoords[ NUM_TEXTURES ];	// X
+			Vector4f	mQuadCoords[ NUM_TEXTURES ];	// x
+			
+			Vector3f	mNormal;	// N
+			UINT		mColor;		// C
 
 			// Normal Mapping.
 			//
-			Vector4f	mTangent;
+			Vector4f	mTangent;	// T
 
-			// Bones.
+			// Bones.				// B
 			//
 			float		mWeight[ 4 ];
 			int			mMatrixIndex[ 4 ];
 			int			mNumBones;
 
-			// Vertex Matrix for Sprites.
+			// Vertex Matrix for Sprites. // M
 			//
 			Matrix4f	mMatrixVertex;
 
@@ -98,7 +116,7 @@ namespace Sentinel
 		// Helper function for model loaders.
 		//
 		UINT	FindVertex( const Vector3f& pos, const Vector2f& tex, const Vector3f& normal );
-
+		
 		// Index helper functions.
 		//
 		void	AddIndex( UINT i0 );										// Point

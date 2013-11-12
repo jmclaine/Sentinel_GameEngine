@@ -44,7 +44,14 @@ namespace Sentinel
 	class ShaderDX;
 
 	////////////////////////////////////////////////////////////////////////////////////
-
+	// The DirectX 11 Buffer cannot be read for saving of data.
+	// The reason is that the Buffer must be created as a DYNAMIC resource. The solution
+	// is to store and modify the buffer data using the CPU, and then transfer that
+	// data over to the DYNAMIC buffer.
+	//
+	// The solution is memory consuming, and remains unimplemented due to the only
+	// purpose to use it would be to save modified vertex buffers for DX11 only.
+	//
 	class BufferDX : public Buffer
 	{
 		friend class RendererDX;
@@ -285,9 +292,18 @@ namespace Sentinel
 					mVertexSize += 8;
 					break;
 
-				// Vertex Matrix.
+				// Quad Texture Coordinates.
 				//
 				case 'x':
+					d.SemanticName = "TEXCOORD";
+					d.Format =  DXGI_FORMAT_R32G32B32A32_FLOAT;
+					d.SemanticIndex = semidx++;
+					mVertexSize += 16;
+					break;
+
+				// Vertex Matrix.
+				//
+				case 'M':
 					for( UINT x = 0; x < 4; ++x )
 					{
 						D3D11_INPUT_ELEMENT_DESC &d = decl[ attribIndex++ ];
@@ -516,7 +532,7 @@ namespace Sentinel
 			{
 				{
 					width, height,
-					{ 0, 0 },
+					{ 1, 60 },
 					DXGI_FORMAT_R8G8B8A8_UNORM,
 					DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED,
 					DXGI_MODE_SCALING_UNSPECIFIED
@@ -540,6 +556,7 @@ namespace Sentinel
 	
 			mCurrWindow = new WindowInfoDX();
 
+			mCurrWindow->mHandle		= hWnd;
 			mCurrWindow->mFullscreen	= fullscreen;
 			mCurrWindow->mWidth			= width;
 			mCurrWindow->mHeight		= height;
@@ -1028,7 +1045,7 @@ namespace Sentinel
 			return mRenderTarget.size()-1;
 		}
 
-		UINT CreateRenderTarget( const std::shared_ptr< Texture >& texture )
+		UINT CreateRenderTarget( std::shared_ptr< Texture > texture )
 		{
 			return CreateRenderTarget( static_cast< TextureDX* >(texture.get())->mTexture );
 		}
@@ -1122,12 +1139,15 @@ namespace Sentinel
 		void SetViewport( int x, int y, UINT width, UINT height )
 		{
 			_ASSERT( mCurrWindow );
+
+			RECT rect;
+			GetClientRect( (HWND)mCurrWindow->mHandle, &rect );
 			
 			D3D11_VIEWPORT vp = 
 			{
-				static_cast< float >(x),     static_cast< float >(y),
-				static_cast< float >(width)  / mCurrWindow->mWidthRatio, 
-				static_cast< float >(height) / mCurrWindow->mHeightRatio,
+				static_cast< FLOAT >(x), static_cast< FLOAT >(y),
+				(width != mCurrWindow->mWidth) ? static_cast< FLOAT >(mCurrWindow->mWidth) * (static_cast< FLOAT >(rect.right) / static_cast< FLOAT >(width)) : static_cast< FLOAT >(mCurrWindow->mWidth),
+				(height != mCurrWindow->mHeight) ? static_cast< FLOAT >(mCurrWindow->mHeight) * (static_cast< FLOAT >(rect.bottom) / static_cast< FLOAT >(height)) : static_cast< FLOAT >(mCurrWindow->mHeight),
 				0.0f, 1.0f
 			};
 

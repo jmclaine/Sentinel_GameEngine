@@ -1473,6 +1473,8 @@ namespace Sentinel
 
 		for( UINT j = 0; j < numVerts; ++j )
 		{
+			UINT texCount = 0;
+
 			for( UINT i = 0; i < attrib.size(); ++i )
 			{
 				switch( attrib[ i ] )
@@ -1492,14 +1494,26 @@ namespace Sentinel
 				case 'X':
 					for( UINT k = 0; k < 2; ++k )
 					{
-						*((float*)base) = mVertex[ j ].mTextureCoords[ 0 ][ k ];
+						*((float*)base) = mVertex[ j ].mTextureCoords[ texCount ][ k ];
 						base += sizeof(float);
 					}
+					++texCount;
+					break;
+
+				// Quad Texture Coordinate.
+				//
+				case 'x':
+					for( UINT k = 0; k < 4; ++k )
+					{
+						*((float*)base) = mVertex[ j ].mQuadCoords[ texCount ][ k ];
+						base += sizeof(float);
+					}
+					++texCount;
 					break;
 
 				// Vertex Matrix.
 				//
-				case 'x':
+				case 'M':
 					for( UINT k = 0; k < 16; ++k )
 					{
 						*((float*)base) = mVertex[ j ].mMatrixVertex[ k ];

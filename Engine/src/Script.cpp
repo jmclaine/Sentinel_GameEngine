@@ -190,11 +190,11 @@ namespace Sentinel
 	//
 	int Script::Load( const char* filename )
 	{
-		RegisterFunc( "RandInt",	(FuncPtr2)RandValueInt,		"NN" );
-		RegisterFunc( "RandFloat",	(FuncPtr2)RandValueFloat,	"NN" );
-		RegisterFunc( "sin",		(FuncPtr1)SinValue,			"N" );
-		RegisterFunc( "cos",		(FuncPtr1)CosValue,			"N" );
-		RegisterFunc( "sqrt",		(FuncPtr1)SqrtValue,		"N" );
+		RegisterFunc( "RandInt",	(ScriptFuncPtr2)RandValueInt,	"NN" );
+		RegisterFunc( "RandFloat",	(ScriptFuncPtr2)RandValueFloat,	"NN" );
+		RegisterFunc( "sin",		(ScriptFuncPtr1)SinValue,		"N" );
+		RegisterFunc( "cos",		(ScriptFuncPtr1)CosValue,		"N" );
+		RegisterFunc( "sqrt",		(ScriptFuncPtr1)SqrtValue,		"N" );
 		
 		TRACE( "Loading Script: " << filename );
 
@@ -233,7 +233,7 @@ namespace Sentinel
 	// Allows functions to be replaced.
 	//
 	#define REGISTER_FUNC_HELPER_CPP( count )\
-	void Script::RegisterFunc( const std::string& name, FuncPtr##count func, const std::string& args )\
+	void Script::RegisterFunc( const std::string& name, ScriptFuncPtr##count func, const std::string& args )\
 	{\
 		int index = NativeFunction::Find( comp.parser.nativeFunc, name, (int)args.size() );\
 		if( index == -1 )\

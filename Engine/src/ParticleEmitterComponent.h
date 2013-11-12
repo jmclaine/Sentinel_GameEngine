@@ -6,7 +6,7 @@ namespace Sentinel
 {
 	class ParticleSystem;
 
-	class ParticleEmitterComponent : public DrawableComponent
+	class SENTINEL_DLL ParticleEmitterComponent : public DrawableComponent
 	{
 		DECLARE_SERIAL();
 
@@ -21,6 +21,7 @@ namespace Sentinel
 	public:
 
 		ParticleEmitterComponent( ParticleSystem* particle );
+		~ParticleEmitterComponent();
 
 		void	Set( ParticleSystem* particle );
 

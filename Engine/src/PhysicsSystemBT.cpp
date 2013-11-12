@@ -24,6 +24,8 @@ namespace Sentinel
 {
 	class PhysicsSystemBT;
 
+	// Rigid Body used within the Physics System.
+	//
 	class RigidBodyBT : public RigidBody
 	{
 		friend class PhysicsSystemBT;
@@ -197,6 +199,9 @@ namespace Sentinel
 		}
 	};
 
+	/////////////////////////////////////////////////////////////////////////////
+	// Physics System based on Bullet Physics.
+	//
 	class PhysicsSystemBT : public PhysicsSystem
 	{
 	private:
@@ -272,12 +277,7 @@ namespace Sentinel
 		{
 			if( mIsActive )
 			{
-				while( DT > 0 )
-				{
-					mWorld->stepSimulation( btScalar( DT ));
-
-					DT -= (float)Timing::DESIRED_FRAME_RATE;
-				}
+				mWorld->stepSimulation( btScalar( DT ));
 			}
 		}
 

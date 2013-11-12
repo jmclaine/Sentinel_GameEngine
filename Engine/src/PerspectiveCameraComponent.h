@@ -20,7 +20,8 @@ namespace Sentinel
 	public:
 
 		PerspectiveCameraComponent();
-		PerspectiveCameraComponent( float windowWidth, float windowHeight, float nearZ = 0.1f, float farZ = 10000.0f, float FOV = 45.0f );
+		PerspectiveCameraComponent( float windowWidth, float windowHeight );
+		PerspectiveCameraComponent( float windowWidth, float windowHeight, float nearZ, float farZ, float FOV );
 
 		void			Startup();
 
@@ -30,7 +31,8 @@ namespace Sentinel
 
 		//////////////////////////////
 
-		void			Set( float windowWidth, float windowHeight, float nearZ = 0.1f, float farZ = 10000.0f, float FOV = 45.0f );
+		void			Set( float windowWidth, float windowHeight );
+		void			Set( float windowWidth, float windowHeight, float nearZ, float farZ, float FOV );
 
 		float			NearZ();
 		float			FarZ();

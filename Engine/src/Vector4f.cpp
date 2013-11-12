@@ -43,6 +43,11 @@ namespace Sentinel
 		return &x;
 	}
 
+	Vector4f Vector4f::operator - () const
+	{
+		return Vector4f( -x, -y, -z, -w );
+	}
+
 	bool Vector4f::operator == ( const Vector4f& v ) const
 	{
 		return Equals( v );

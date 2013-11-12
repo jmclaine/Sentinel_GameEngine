@@ -9,8 +9,11 @@ namespace Sentinel
 	DEFINE_SERIAL_REGISTER( GameObject );
 
 	GameObject::GameObject() :
-		mTransform( NULL ), mController( NULL ), mPhysics( NULL ), mDrawable( NULL ), 
-		mParent( NULL ), mWorld( NULL )
+		mTransform( NULL ),
+		mController( NULL ),
+		mPhysics( NULL ),
+		mDrawable( NULL ), 
+		mWorld( NULL )
 	{}
 
 	GameObject::~GameObject()
@@ -23,10 +26,6 @@ namespace Sentinel
 		TRAVERSE_VECTOR( x, mComponent )
 			delete mComponent[ x ];
 		mComponent.clear();
-
-		TRAVERSE_VECTOR( x, mChild )
-			SAFE_DELETE( mChild[ x ] );
-		mChild.clear();
 	}
 
 	//////////////////////////////
@@ -190,24 +189,8 @@ namespace Sentinel
 
 	//////////////////////////////
 
-	void GameObject::AddChild( GameObject* obj )
+	GameObject* GameObject::AddChild( GameObject* obj )
 	{
-		// Check if the object is already a child.
-		//
-		TRAVERSE_VECTOR( x, mChild )
-			if( mChild[ x ] == obj )
-				return;
-
-		// Remove the object from its parent.
-		//
-		if( obj->mParent )
-			obj->mParent->RemoveChild( obj );
-
-		// Add the object as a child.
-		//
-		mChild.push_back( obj );
-		obj->mParent = this;
-
 		if( mWorld )
 		{
 			// Ensure the GameWorld no longer has
@@ -217,31 +200,8 @@ namespace Sentinel
 
 			obj->SetWorld( mWorld );
 		}
-	}
 
-	void GameObject::RemoveChild( GameObject* obj )
-	{
-		TRAVERSE_LIST( it, mChild )
-		{
-			if( *it == obj )
-			{
-				obj->mParent = NULL;
-				mChild.erase( it );
-				return;
-			}
-		}
-	}
-
-	GameObject* GameObject::GetChild( UINT index )
-	{
-		_ASSERT( index < NumChildren() );
-
-		return mChild[ index ];
-	}
-
-	UINT GameObject::NumChildren()
-	{
-		return mChild.size();
+		return ListNode< GameObject >::AddChild( obj );
 	}
 
 	//////////////////////////////
@@ -314,9 +274,10 @@ namespace Sentinel
 	void GameObject::UpdateComponents()
 	{
 		TRAVERSE_VECTOR( x, mComponent )
-			if( mComponent[ x ]->GetType() != GameComponent::CAMERA && 
-				mComponent[ x ]->GetType() != GameComponent::LIGHT )
-				mComponent[ x ]->Update();
+			mComponent[ x ]->Update();
+
+		TRAVERSE_VECTOR( x, mChild )
+			mChild[ x ]->UpdateComponents();
 	}
 
 	void GameObject::UpdateDrawable( bool drawChildren )

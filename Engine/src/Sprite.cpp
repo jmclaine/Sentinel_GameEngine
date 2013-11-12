@@ -1,75 +1,47 @@
 #include "Sprite.h"
 #include "Texture.h"
 #include "Vector2f.h"
+#include "Point.h"
 
 namespace Sentinel
 {
-	Sprite::Sprite( std::shared_ptr< Texture > texture, std::shared_ptr< Shader > shader, const Point2i& spriteSize )
-	{
-		_ASSERT( texture );
-		_ASSERT( shader );
-		_ASSERT( spriteSize.x > 0 && spriteSize.y > 0 );
-
-		mTexture		= texture;
-		mShader			= shader;
-
-		mSize			= spriteSize;
-
-		mDimension.x	= texture->Width()  / mSize.x;
-		mDimension.y	= texture->Height() / mSize.y;
-
-		mNumFrames		= mDimension.x * mDimension.y;
-	}
+	Sprite::Sprite( std::shared_ptr< Shader > shader, std::shared_ptr< Texture > texture ) :
+		mShader( shader ),
+		mTexture( texture )
+	{}
 
 	Sprite::~Sprite()
 	{}
 
-	const Point2i& Sprite::GetSize()
+	//////////////////////////////////////
+
+	void Sprite::AddFrame( const Quad& coords )
 	{
-		return mSize;
+		_ASSERT( mTexture );
+
+		mFrameCoords.push_back( GetTextureCoords( coords ));
 	}
 
-	const Point2i& Sprite::GetDimension()
+	void Sprite::RemoveFrame( UINT index )
 	{
-		return mDimension;
+		mFrameCoords.erase( mFrameCoords.begin() + index );
 	}
 
-	void Sprite::SetFrame( UINT frame )
+	Quad& Sprite::GetFrame( UINT index )
 	{
-		_ASSERT( frame < mNumFrames );
-
-		mFrame = frame;
-	}
-
-	UINT Sprite::GetFrame()
-	{
-		return mFrame;
-	}
-
-	Vector2f Sprite::GetFrameCoords()
-	{
-		return GetFrameCoords( mFrame );
-	}
-
-	Vector2f Sprite::GetFrameCoords( UINT frame )
-	{
-		_ASSERT( frame < mNumFrames );
-
-		return Vector2f( (float)(frame % mDimension.x), (float)(frame / mDimension.x) );
+		return mFrameCoords[ index ];
 	}
 
 	UINT Sprite::NumFrames()
 	{
-		return mNumFrames;
+		return mFrameCoords.size();
 	}
 
-	std::shared_ptr< Texture > Sprite::GetTexture()
+	Quad Sprite::GetTextureCoords( const Quad& coords )
 	{
-		return mTexture;
-	}
-
-	std::shared_ptr< Shader > Sprite::GetShader()
-	{
-		return mShader;
+		return Quad( coords.left   / static_cast< float >(mTexture->Width()),
+					 coords.top    / static_cast< float >(mTexture->Height()),
+					 coords.right  / static_cast< float >(mTexture->Width()), 
+					 coords.bottom / static_cast< float >(mTexture->Height()) );
 	}
 }

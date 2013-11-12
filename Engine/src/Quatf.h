@@ -27,6 +27,7 @@ namespace Sentinel
 		bool		operator != ( const Quatf& v ) const;
 		bool		Equals( const Quatf& v ) const;
 
+		Quatf&		operator *= ( const Quatf& q );
 		Quatf		operator * ( const Quatf& q ) const;
 		Quatf		Mul( const Quatf& q ) const;
 		Quatf		Mul( float scalar ) const;

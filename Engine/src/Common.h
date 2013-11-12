@@ -12,6 +12,7 @@ template class __declspec(dllexport) std::basic_string< char, std::char_traits< 
 	#else
 		#define SENTINEL_DLL	__declspec(dllimport)
 	#endif
+	#pragma comment( lib, "SentinelEngine.lib" )
 #endif
 
 typedef unsigned char	BYTE;

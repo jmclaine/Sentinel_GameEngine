@@ -24,12 +24,9 @@ namespace Sentinel
 	{
 		CameraComponent::Update();
 
-		if( mTransform )
-		{
-			mMatrixView.Translate( mTransform->mPosition );
+		mMatrixView.Translate( mTransform->mPosition );
 		
-			mMatrixFinal = mMatrixProjection * mMatrixView;
-		}
+		mMatrixFinal = mMatrixProjection * mMatrixView;
 	}
 
 	void OrthographicCameraComponent::Shutdown()

@@ -39,6 +39,11 @@ namespace Sentinel
 		return static_cast< float* >(&x);
 	}
 
+	Vector2f Vector2f::operator - () const
+	{
+		return Vector2f( -x, -y );
+	}
+
 	bool Vector2f::operator == ( const Vector2f& v ) const
 	{
 		return Equals( v );

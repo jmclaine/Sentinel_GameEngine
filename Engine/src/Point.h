@@ -27,4 +27,31 @@ namespace Sentinel
 			x( _x ), y( _y ), z( _z )
 		{}
 	};
+
+	struct Point4i
+	{
+		int x, y, z, w;
+
+		Point4i() :
+			x( 0 ), y( 0 ), z( 0 ), w( 0 )
+		{}
+
+		Point4i( int _x, int _y, int _z, int _w ) :
+			x( _x ), y( _y ), z( _z ), w( _w )
+		{}
+	};
+
+	struct Quad
+	{
+		float left, top;
+		float right, bottom;
+
+		Quad() :
+			left( 0 ), top( 0 ), right( 0 ), bottom( 0 )
+		{}
+
+		Quad( float _left, float _top, float _right, float _bottom ) :
+			left( _left ), top( _top ), right( _right ), bottom( _bottom )
+		{}
+	};
 }

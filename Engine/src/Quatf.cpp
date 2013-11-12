@@ -41,6 +41,12 @@ namespace Sentinel
 		return (x == v.x && y == v.y && z == v.z && w == v.w);
 	}
 
+	Quatf& Quatf::operator *= ( const Quatf& q )
+	{
+		*this = Mul( q );
+		return *this;
+	}
+
 	Quatf Quatf::operator * ( const Quatf& q ) const
 	{
 		return Mul( q );
@@ -186,7 +192,7 @@ namespace Sentinel
 			if( v[ i ] > -EPSILON && v[ i ] < EPSILON )
 				v[ i ] = 0;
 		
-		return v;
+		return v * (float)RADIANS_TO_DEGREES;
 	}
 
 	Quatf Quatf::Slerp( const Quatf& q, float t )

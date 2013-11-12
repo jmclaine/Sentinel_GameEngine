@@ -14,7 +14,7 @@ namespace Sentinel
 	class Renderer;
 	class Timing;
 	class PhysicsSystem;
-	class ParticleSystem;
+	class SpriteSystem;
 	class TextureManager;
 	class ShaderManager;
 	class MeshManager;
@@ -39,7 +39,6 @@ namespace Sentinel
 		Renderer*								mRenderer;
 		Timing*									mTiming;
 		PhysicsSystem*							mPhysicsSystem;
-		ParticleSystem*							mParticleSystem;
 		
 		TextureManager*							mTextureManager;
 		ShaderManager*							mShaderManager;

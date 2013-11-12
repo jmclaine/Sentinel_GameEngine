@@ -7,12 +7,13 @@ All attached GameComponent(s) are freed on Shutdown()
 
 #include "Util.h"
 #include "GameComponent.h"
+#include "ListNode.h"
 
 namespace Sentinel
 {
 	class GameWorld;
 
-	class SENTINEL_DLL GameObject : public Serializeable
+	class SENTINEL_DLL GameObject : public Serializeable, public ListNode< GameObject >
 	{
 	protected:
 
@@ -25,15 +26,11 @@ namespace Sentinel
 
 		std::vector< GameComponent* >		mComponent;
 
-		std::vector< GameObject* >			mChild;
-
 		GameWorld*							mWorld;
 
 	public:
 
 		std::string							mName;
-
-		GameObject*							mParent;
 		
 		//////////////////////////////
 
@@ -50,13 +47,7 @@ namespace Sentinel
 
 		//////////////////////////////
 
-		void			AddChild( GameObject* obj );
-
-		void			RemoveChild( GameObject* obj );
-
-		GameObject*		GetChild( UINT index );
-
-		UINT			NumChildren();
+		GameObject*		AddChild( GameObject* obj );	// override
 
 		//////////////////////////////
 

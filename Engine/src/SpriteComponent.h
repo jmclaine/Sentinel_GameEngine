@@ -6,11 +6,12 @@ Render a single quad sprite.
 
 #include "ColorRGBA.h"
 #include "DrawableComponent.h"
+#include "SpriteSystem.h"
 
 namespace Sentinel
 {
 	class TransformComponent;
-	class ParticleSystem;
+	class CameraComponent;
 	class Sprite;
 
 	class SENTINEL_DLL SpriteComponent : public DrawableComponent
@@ -21,11 +22,14 @@ namespace Sentinel
 
 		TransformComponent*		mTransform;
 
-		ParticleSystem*			mParticle;
+		SpriteSystem*			mSpriteSystem;
+
+		CameraComponent*		mCamera;
 
 	public:
-		
-		std::shared_ptr< Sprite > mSprite;
+
+		UINT					mFrame;
+		ColorRGBA				mColor;
 
 	protected:
 
@@ -33,9 +37,10 @@ namespace Sentinel
 
 	public:
 
-		SpriteComponent( ParticleSystem* particle, std::shared_ptr< Sprite > sprite );
+		SpriteComponent( SpriteSystem* spriteSystem, CameraComponent* camera );
+		~SpriteComponent();
 
-		void	Set( ParticleSystem* particle, std::shared_ptr< Sprite > sprite );
+		void	Set( SpriteSystem* spriteSystem, CameraComponent* camera );
 
 		/////////////////////////////////
 

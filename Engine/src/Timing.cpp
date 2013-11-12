@@ -37,18 +37,10 @@ namespace Sentinel
 
 	void Timing::Limit( double frameRate )
 	{
-	    double diff = 0;
-
-		mTimeLater = QueryCounter() + diff;
+	    mTimeLater = QueryCounter();
 		while( (mTimeLater - mTimeNow) < frameRate )
 		{
 			mTimeLater = QueryCounter();
-
-			if( mTimeLater < mTimeNow )
-			{
-			    diff = 1.0 - mTimeNow;
-			    mTimeNow = 0;
-			}
 		}
 
 		mDeltaTime = static_cast< float >(mTimeLater - mTimeNow);

@@ -6,8 +6,6 @@ namespace Sentinel
 {
 	GameWindow::GameWindow( UINT icon, UINT iconSmall, UINT menu, LPCSTR cursor )
 	{
-		mHWND		= NULL;
-		
 		mIcon		= icon;
 		mIconSmall	= iconSmall;
 		mMenu		= menu;
@@ -24,37 +22,49 @@ namespace Sentinel
 
 	void GameWindow::Startup( Renderer* renderer, HINSTANCE hInstance, int nCmdShow, TCHAR* title, TCHAR* windowClass, const WindowInfo& info )
 	{
-		mRenderer = renderer;
-
 		strcpy_s( mTitle, title );
 		strcpy_s( mWindowClass, windowClass );
 		
 		mINST = hInstance;
 
+		HWND hWnd;
+
 		if( RegisterWindowClass() )
 		{
-			mHWND = CreateWindow( mWindowClass, mTitle, (!info.Fullscreen()) ? WS_OVERLAPPEDWINDOW : WS_POPUP,
-								  0, 0, info.Width(), info.Height(),
-								  NULL, NULL, mINST, NULL );
+			RECT rect = { 0, 0, info.Width(), info.Height() };
+			DWORD exStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
+			DWORD dwStyle = (!info.Fullscreen()) ? WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN : WS_POPUP;
+			AdjustWindowRectEx( &rect, dwStyle, FALSE, WS_EX_APPWINDOW | WS_EX_WINDOWEDGE );
 
-			if( !mHWND )
+			hWnd = CreateWindowEx( exStyle, mWindowClass, mTitle, 
+								   dwStyle,
+								   0, 0, rect.right-rect.left, rect.bottom-rect.top,
+								   NULL, NULL, mINST, NULL );
+
+			if( !hWnd )
 				throw AppException( "Failed to initialize window: " + std::string( mTitle ));
 			
-			ShowWindow( mHWND, nCmdShow );
-			UpdateWindow( mHWND );
-		}
+			ShowWindow( hWnd, nCmdShow );
+			UpdateWindow( hWnd );
 
-		mWindowInfo = mRenderer->Startup( mHWND, info.Fullscreen(), info.Width(), info.Height() );
+			mWindowInfo = renderer->Startup( hWnd, info.Fullscreen(), info.Width(), info.Height() );
 
-		if( !mWindowInfo )
+			if( !mWindowInfo )
 			throw AppException( "Failed Renderer::Startup()" );
+
+			GUI::Widget::RENDERER = renderer;
+		}
+		else
+		{
+			throw AppException( "Failed GameWindow::Startup()" );
+		}
 	}
 
 	void GameWindow::Shutdown()
 	{
 		SetActive();
 
-		mRenderer->Shutdown();
+		GUI::Widget::RENDERER->Shutdown();
 
 		UnregisterClass( mWindowClass, mINST );
 
@@ -66,17 +76,12 @@ namespace Sentinel
 
 	void GameWindow::SetActive()
 	{
-		mRenderer->SetWindow( mWindowInfo );
+		GUI::Widget::RENDERER->SetWindow( mWindowInfo );
 	}
 
 	bool GameWindow::ShareResources( GameWindow* window )
 	{
-		return mRenderer->ShareResources( mWindowInfo, window->mWindowInfo );
-	}
-
-	HWND GameWindow::GetHandle()
-	{
-		return mHWND;
+		return GUI::Widget::RENDERER->ShareResources( mWindowInfo, window->mWindowInfo );
 	}
 
 	const WindowInfo* GameWindow::GetInfo() const
@@ -89,24 +94,12 @@ namespace Sentinel
 	LRESULT CALLBACK GameWindow::WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 	{
 		Mouse::Get().ProcessMessages( hWnd, msg, wParam, lParam );
-		Keyboard::Get().ProcessMessages();
-
+		
 		switch( msg )
 		{
-			case WM_COMMAND:
-				return DefWindowProc( hWnd, msg, wParam, lParam );
-			
-			case WM_PAINT:
-				{
-				PAINTSTRUCT ps;
-				BeginPaint( hWnd, &ps );
-				EndPaint( hWnd, &ps );
-				}
-				break;
-
-			case WM_DESTROY:
-				PostQuitMessage( 0 );
-				break;
+		case WM_DESTROY:
+			PostQuitMessage(0);
+			break;
 		}
 
 		return DefWindowProc( hWnd, msg, wParam, lParam );

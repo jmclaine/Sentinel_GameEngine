@@ -21,6 +21,8 @@ namespace Sentinel
 
 		float*		Ptr();
 
+		Vector2f	operator - () const;
+
 		bool		operator == ( const Vector2f& v ) const;
 		bool		operator != ( const Vector2f& v ) const;
 		bool		Equals( const Vector2f& v ) const;

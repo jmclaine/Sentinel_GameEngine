@@ -1,4 +1,5 @@
 #include <crtdbg.h>
+#include <conio.h>
 
 #include "Input.h"
 
@@ -178,11 +179,7 @@ namespace Sentinel
 
 	bool Keyboard::IsDown( UINT key )
 	{
-		bool keyDown = (GetAsyncKeyState( key ) & 0x8000 ) == 0x8000;
-
-		(keyDown) ? mKeyStates[ key ] = KEY_DOWN : mKeyStates[ key ] = KEY_UP;
-
-		return keyDown;
+		return (mKeyStates[ key ] == KEY_DOWN);
 	}
 
 	bool Keyboard::DidGoUp( UINT key ) const

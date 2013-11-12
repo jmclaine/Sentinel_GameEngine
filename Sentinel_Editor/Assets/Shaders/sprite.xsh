@@ -1,8 +1,5 @@
 #ifdef VERSION_DX
 
-uniform float4x4 wvp:WORLDVIEWPROJECTION;
-uniform float4   texScale;
-
 Texture2D tex0;
 SamplerState defss
 {
@@ -16,73 +13,62 @@ SamplerState defss
 //
 struct VSInput
 {
-	float2   Texture0	:TEXCOORD0;
-	float4   Color		:COLOR0;
-
-	row_major float4x4 Matrix	:MATRIX;
-};
-
-struct VSOutput
-{
-	float4 Position		:SV_POSITION;
-	float2 Texture0		:TEXCOORD0;
+	float4 Texture0		:TEXCOORD0;
 	float4 Color		:COLOR0;
 
 	row_major float4x4 Matrix	:MATRIX;
 };
 
-VSOutput MyVS(VSInput input)
+struct GSOutput
 {
-	VSOutput output;
+	float4 Position		:SV_POSITION;
+	float2 Texture0		:TEXCOORD0;
+	float4 Color		:COLOR0;
+};
 
-	output.Position = float4(0, 0, 0, 1);
-	output.Texture0 = input.Texture0 * texScale.xy;
-	output.Color    = input.Color;
-
-	output.Matrix   = mul(input.Matrix, wvp);
-
-	return output;
+VSInput MyVS(VSInput input)
+{
+	return input;
 }
 
 
 // Geometry Shader.
 //
 [maxvertexcount(4)]
-void MyGS(point VSOutput input[1], inout TriangleStream<VSOutput> TriStream)
+void MyGS(point VSInput input[1], inout TriangleStream<GSOutput> TriStream)
 {
-	VSOutput v;
-	v.Color  = input[0].Color;
-	v.Matrix = input[0].Matrix;
-
-	// Bottom left.
-	//
-	v.Position = mul(float4(-1, 1, 0, 1), input[0].Matrix);
-	v.Texture0 = float2(input[0].Texture0.x, input[0].Texture0.y + texScale.y);
-	TriStream.Append(v);
-
-	// Bottom right.
+	GSOutput v;
+	v.Color = input[0].Color;
+	
+	// Top right.
 	//
 	v.Position = mul(float4(1, 1, 0, 1), input[0].Matrix);
-	v.Texture0 = input[0].Texture0 + texScale.xy;
+	v.Texture0 = float2(input[0].Texture0.z, input[0].Texture0.y);
 	TriStream.Append(v);
 
 	// Top left.
 	//
-	v.Position = mul(float4(-1, -1, 0, 1), input[0].Matrix);
-	v.Texture0 = input[0].Texture0;
+	v.Position = mul(float4(-1, 1, 0, 1), input[0].Matrix);
+	v.Texture0 = float2(input[0].Texture0.x, input[0].Texture0.y);
 	TriStream.Append(v);
 
-	// Top right.
+	// Bottom right.
 	//
 	v.Position = mul(float4(1, -1, 0, 1), input[0].Matrix);
-	v.Texture0 = float2(input[0].Texture0.x + texScale.x, input[0].Texture0.y);
+	v.Texture0 = float2(input[0].Texture0.z, input[0].Texture0.w);
+	TriStream.Append(v);
+
+	// Bottom left.
+	//
+	v.Position = mul(float4(-1, -1, 0, 1), input[0].Matrix);
+	v.Texture0 = float2(input[0].Texture0.x, input[0].Texture0.w);
 	TriStream.Append(v);
 }
 
 
 // Fragment Shader.
 //
-float4 MyPS(VSOutput input):SV_Target
+float4 MyPS(GSOutput input):SV_Target
 {
 	return tex0.Sample(defss, input.Texture0) * input.Color;
 }
@@ -105,38 +91,30 @@ technique11 MyTechnique
 
 #ifdef VERTEX_SHADER
 
-uniform mat4 wvp;
-uniform vec4 texScale;
-
-in vec2 aTexture0;
+in vec4 aTexture0;
 in vec4 aColor;
 in mat4 aMatrix;
 
-out vec2 gvTex0;
+out vec4 gvTex0;
 out vec4 gvColor;
 out mat4 gvMatrix;
 
 void main()
 {
-	// Position
-	gl_Position = vec4(0, 0, 0, 1);
-	
 	// Texture color
-	gvTex0 = aTexture0 * texScale.xy;
+	gvTex0 = aTexture0;
 
 	// Vertex color
 	gvColor = aColor;
 
 	// Matrix
-	gvMatrix = wvp * aMatrix;
+	gvMatrix = aMatrix;
 }
 
 #endif
 #ifdef GEOMETRY_SHADER
 
-uniform vec4 texScale;
-
-in vec2 gvTex0[];
+in vec4 gvTex0[];
 in vec4 gvColor[];
 in mat4 gvMatrix[];
 
@@ -150,28 +128,28 @@ void main()
 {
 	vColor = gvColor[0];
 
-	// Bottom left.
-	//
-	gl_Position = gvMatrix[0] * vec4(-1, 1, 0, 1);
-	vTex0 = vec2(gvTex0[0].x, gvTex0[0].y + texScale.y);
-	EmitVertex();
-
-	// Bottom right.
+	// Top right.
 	//
 	gl_Position = gvMatrix[0] * vec4(1, 1, 0, 1);
-	vTex0 = gvTex0[0] + texScale.xy;
+	vTex0 = vec2(gvTex0[0].z, gvTex0[0].y);
 	EmitVertex();
 
 	// Top left.
 	//
-	gl_Position = gvMatrix[0] * vec4(-1, -1, 0, 1);
-	vTex0 = gvTex0[0];
+	gl_Position = gvMatrix[0] * vec4(-1, 1, 0, 1);
+	vTex0 = vec2(gvTex0[0].x, gvTex0[0].y);
 	EmitVertex();
 
-	// Top right.
+	// Bottom right.
 	//
 	gl_Position = gvMatrix[0] * vec4(1, -1, 0, 1);
-	vTex0 = vec2(gvTex0[0].x + texScale.x, gvTex0[0].y);
+	vTex0 = vec2(gvTex0[0].z, gvTex0[0].w);
+	EmitVertex();
+
+	// Bottom left.
+	//
+	gl_Position = gvMatrix[0] * vec4(-1, -1, 0, 1);
+	vTex0 = vec2(gvTex0[0].x, gvTex0[0].w);
 	EmitVertex();
 	
 	EndPrimitive();
@@ -189,7 +167,6 @@ out vec4 vFragColor;
 
 void main()
 {
-	// Final fragment color
 	vFragColor = clamp(texture2D(tex0, vTex0) * vColor, 0.0, 1.0);
 }
 

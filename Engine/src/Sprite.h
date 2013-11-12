@@ -1,51 +1,42 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
-#include "ColorRGBA.h"
+#include "Common.h"
 #include "Point.h"
 
 namespace Sentinel
 {
 	class Texture;
 	class Shader;
-	class Vector2f;
-
+	
 	class SENTINEL_DLL Sprite
 	{
-	private:
+	protected:
 
-		Point2i						mSize;
-		Point2i						mDimension;
+		std::vector< Quad >			mFrameCoords;
 
-		UINT						mFrame;
-		UINT						mNumFrames;
+	public:
 
 		std::shared_ptr< Texture >	mTexture;
 		std::shared_ptr< Shader >	mShader;
 
-	public:
-
-		ColorRGBA					mColor;
-
 		//////////////////////////////////////
 
-		Sprite( std::shared_ptr< Texture > texture, std::shared_ptr< Shader > shader, const Point2i& spriteSize );
+		Sprite( std::shared_ptr< Shader > shader, std::shared_ptr< Texture > texture );
 		~Sprite();
 
 		//////////////////////////////////////
 
-		const Point2i&				GetSize();
-		const Point2i&				GetDimension();
+		// Set frame coordinates as the pixel position within texture,
+		// i.e. AddFrame( Rect( 0, 0, 64, 64 ));
+		//
+		void	AddFrame( const Quad& coords );
+		void	RemoveFrame( UINT index );
+		Quad&	GetFrame( UINT index );
+		UINT	NumFrames();
 
-		void						SetFrame( UINT frame );
-		UINT						GetFrame();
-		Vector2f					GetFrameCoords();
-		Vector2f					GetFrameCoords( UINT frame );
-
-		UINT						NumFrames();
-
-		std::shared_ptr< Texture >	GetTexture();
-		std::shared_ptr< Shader >	GetShader();
+		Quad	GetTextureCoords( const Quad& coords );
 	};
 }

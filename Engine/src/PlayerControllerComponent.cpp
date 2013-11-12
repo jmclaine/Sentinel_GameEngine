@@ -11,6 +11,8 @@
 #include "Matrix4f.h"
 #include "Archive.h"
 #include "PhysicsSystem.h"
+#include "Renderer.h"
+#include "GameWindow.h"
 
 namespace Sentinel
 {
@@ -48,12 +50,12 @@ namespace Sentinel
 			// Backward.
 			//
 			if( keyboard.IsDown( 'S' ))
-				impulse = impulse.Add( matRot.Forward() * -1.0f );
+				impulse = impulse.Add( -matRot.Forward() );
 		
 			// Left.
 			//
 			if( keyboard.IsDown( 'A' ))
-				impulse = impulse.Add( matRot.Right() * -1.0f );
+				impulse = impulse.Add( -matRot.Right() );
 		
 			// Right.
 			//
@@ -68,7 +70,7 @@ namespace Sentinel
 			// Down.
 			//
 			if( keyboard.IsDown( 'C' ))
-				impulse = impulse.Add( matRot.Up() * -1.0f );
+				impulse = impulse.Add( -matRot.Up() );
 
 			// Move in direction.
 			//
@@ -83,8 +85,10 @@ namespace Sentinel
 			POINT  mousePos;
 
 			GetCursorPos( &mousePos );
-			POINT center = CenterHandle();
-			Vector3f diff = Vector3f( (float)(center.x-mousePos.x), (float)(center.y-mousePos.y), 0 ) * mAngularSpeed;
+			POINT center;// = CenterHandle( (HWND)(mOwner->GetWorld()->mRenderer->GetWindow()->Handle()) );
+			center.x = 0;
+			center.y = 0;
+			Vector3f diff;// = Vector3f( (float)(center.y-mousePos.y), (float)(center.x-mousePos.x), 0 ) * mAngularSpeed;
 
 			if( keyboard.IsDown( VK_UP ))
 				diff.z += 1.0f;
@@ -92,7 +96,7 @@ namespace Sentinel
 			if( keyboard.IsDown( VK_DOWN ))
 				diff.z -= 1.0f;
 
-			SetCursorPos( center.x, center.y );
+			//SetCursorPos( center.x, center.y );
 
 			// Rotate in direction with spherical interpolation.
 			//
@@ -100,10 +104,10 @@ namespace Sentinel
 		
 			if( diff.LengthSquared() > 0 )
 			{
-				static Vector3f rot;
+				static Vector3f rot = qFinal.ToEuler();
 				rot += diff;
 	
-				qFinal = Quatf( rot.y, rot.x, rot.z );
+				qFinal = Quatf( rot );
 			}
 
 			Quatf qResult = body->GetOrientation().Slerp( qFinal, clamp( mOwner->GetWorld()->mTiming->DeltaTime()*10.0f, 0.0f, 1.0f ));

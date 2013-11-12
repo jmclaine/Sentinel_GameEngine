@@ -1,6 +1,9 @@
 #include "Renderer.h"
 #include "Texture.h"
 #include "tinyxml.h"
+#include "MeshBuilder.h"
+#include "Mesh.h"
+
 #include <iostream>
 #include <fstream>
 
@@ -42,6 +45,11 @@ namespace Sentinel
 		return mHeightRatio;
 	}
 
+	void* WindowInfo::Handle() const
+	{
+		return mHandle;
+	}
+
 	//////////////////////////////////////////
 
 	Renderer* Renderer::Create( const char* filename, WindowInfo& info )
@@ -64,6 +72,9 @@ namespace Sentinel
 		pElem->QueryUnsignedAttribute(	"Width",		&info.mWidth );
 		pElem->QueryUnsignedAttribute(	"Height",		&info.mHeight );
 
+		info.mWidthRatio  = static_cast< float >(info.mWidth)  / Renderer::WINDOW_WIDTH_BASE;
+		info.mHeightRatio = static_cast< float >(info.mHeight) / Renderer::WINDOW_HEIGHT_BASE;
+
 		return renderer;
 	}
 
@@ -83,5 +94,13 @@ namespace Sentinel
 			return NULL;
 
 		return CreateTextureFromMemory( pixels, (UINT)width, (UINT)height, IMAGE_FORMAT_RGBA );
+	}
+
+	Mesh* Renderer::CreateRenderTargetMesh( std::shared_ptr< Shader > shader )
+	{
+		MeshBuilder builder;
+		builder.mShader = shader;
+		builder.CreateQuad( 1.0f );
+		return builder.BuildMesh( this );
 	}
 }

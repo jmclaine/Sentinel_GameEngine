@@ -13,8 +13,11 @@ namespace Sentinel
 
 	Archive::~Archive()
 	{
-		fclose( mFile );
-		mFile = NULL;
+		if( mFile != NULL )
+		{
+			fclose( mFile );
+			mFile = NULL;
+		}
 	}
 
 	bool Archive::Open( const char* filename, const char* mode )

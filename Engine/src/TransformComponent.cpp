@@ -4,10 +4,6 @@
 
 namespace Sentinel
 {
-	Matrix4f TransformComponent::MATRIX_TRANSLATION;
-	Matrix4f TransformComponent::MATRIX_ROTATION;
-	Matrix4f TransformComponent::MATRIX_SCALE;
-
 	DEFINE_SERIAL_REGISTER( TransformComponent );
 	DEFINE_SERIAL_CLONE( TransformComponent );
 
@@ -20,20 +16,16 @@ namespace Sentinel
 
 	void TransformComponent::Startup()
 	{
-		if( mOwner->mParent )
-			mParentTransform = static_cast< TransformComponent* >(mOwner->mParent->FindComponent( GameComponent::TRANSFORM ));
+		if( mOwner->GetParent() )
+			mParentTransform = static_cast< TransformComponent* >(mOwner->GetParent()->FindComponent( GameComponent::TRANSFORM ));
 		else
 			mParentTransform = NULL;
 	}
 
 	void TransformComponent::Update()
 	{
-		MATRIX_TRANSLATION.Translate( mPosition );
-		MATRIX_ROTATION.Rotate( mOrientation );
-		MATRIX_SCALE.Scale( mScale );
-
-		mMatrixWorld = MATRIX_TRANSLATION * MATRIX_ROTATION * MATRIX_SCALE;
-
+		mMatrixWorld.World( mPosition, mOrientation, mScale );
+		
 		if( mParentTransform )
 			mMatrixWorld = mParentTransform->GetMatrixWorld() * mMatrixWorld;
 	}

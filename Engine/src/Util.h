@@ -25,6 +25,8 @@ namespace Sentinel
 {
 	class InitFailed {};
 
+	typedef void( *FuncPtr0 )();
+
 	#define MAX_VALUE(a,b) (((a) > (b)) ? (a) : (b))
 	#define MIN_VALUE(a,b) (((a) < (b)) ? (a) : (b))
 
@@ -50,14 +52,14 @@ namespace Sentinel
 		MessageBoxA( NULL, str1.str().c_str(), str2.str().c_str(), MB_OK | MB_ICONERROR);\
 	}
 
-	#define TRAVERSE_VECTOR( x, vec ) for( UINT x = 0; x < vec.size(); ++x )
+	#define TRAVERSE_VECTOR( x, vec ) for( unsigned int x = 0; x < vec.size(); ++x )
 
 	#define TRAVERSE_LIST( it, obj ) for( auto it = obj.begin(); it != obj.end(); ++it )
 
 	#define TRAVERSE_LIST_OFFSET( it, obj, offset ) for( auto it = obj.begin()+offset; it != obj.end(); ++it )
 
 	#define COPY_ARRAY( dest, src, size )\
-		for( UINT x = 0; x < size; ++x )\
+		for( unsigned int x = 0; x < size; ++x )\
 			dest[ x ] = src[ x ];
 
 	#define SAFE_DELETE( var )\

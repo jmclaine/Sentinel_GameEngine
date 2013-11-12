@@ -13,6 +13,7 @@
 #include "Sprite.h"
 #include "RandomValue.h"
 #include "Util.h"
+#include "Point.h"
 
 namespace Sentinel
 {
@@ -31,14 +32,14 @@ namespace Sentinel
 			mSprite( sprite )
 		{
 			_ASSERT( mSprite );
-			_ASSERT( mSprite->GetTexture() );
-			_ASSERT( mSprite->GetShader() );
+			_ASSERT( mSprite->mTexture );
+			_ASSERT( mSprite->mShader );
 			
 			mParticle = new NormalParticle[ maxParticles ];
 
 			MeshBuilder builder;
 
-			builder.mShader = mSprite->GetShader();
+			builder.mShader = mSprite->mShader;
 
 			for( UINT x = 0; x < maxParticles; ++x )
 			{
@@ -53,10 +54,10 @@ namespace Sentinel
 			if( !mMesh )
 				throw AppException( "Failed to create Mesh in ParticleSystemNormal::Startup" );
 
-			mMesh->mTexture[ TEXTURE_DIFFUSE ] = mSprite->GetTexture();
+			mMesh->mTexture[ TEXTURE_DIFFUSE ] = mSprite->mTexture;
 
-			mMesh->mTextureScale = Vector4f( 1.0f / (float)mSprite->GetDimension().x,
-											 1.0f / (float)mSprite->GetDimension().y, 0, 0 );
+			mMesh->mTextureScale = Vector4f( 1.0f / (float)mSprite->mTexture->Width(),
+											 1.0f / (float)mSprite->mTexture->Height(), 0, 0 );
 		};
 
 		~ParticleSystemNormal()
@@ -78,8 +79,8 @@ namespace Sentinel
 
 				// Prepare particle in buffer.
 				//
-				*(Vector2f*)verts = mSprite->GetFrameCoords( particle.mFrame );
-				verts += sizeof( Vector2f );
+				*(Quad*)verts = mSprite->GetFrame( particle.mFrame );
+				verts += sizeof( Quad );
 
 				*(UINT*)verts = particle.mColor.ToUINT();
 				verts += sizeof( UINT );
@@ -89,13 +90,13 @@ namespace Sentinel
 				MATRIX_SCALE.Scale( particle.mScale );
 
 				mMesh->mMatrixWorld.BillboardWorld( particle.mPosition, mWorld->GetCamera()->GetTransform()->mPosition, Vector3f( 0, 1, 0 ));
-				*(Matrix4f*)verts = mMesh->mMatrixWorld * MATRIX_TRANSLATION * MATRIX_ROTATION * MATRIX_SCALE;
+				*(Matrix4f*)verts = mWorld->GetCamera()->mMatrixFinal * mMesh->mMatrixWorld * MATRIX_TRANSLATION * MATRIX_ROTATION * MATRIX_SCALE;
 				verts += sizeof( Matrix4f );
 			}
 
 			mMesh->mVBO->Unlock();
 
-			// Render particles...for now.
+			// Render particles.
 			//
 			mRenderer->SetCull( CULL_NONE );
 			mRenderer->SetBlend( BLEND_PARTICLE );

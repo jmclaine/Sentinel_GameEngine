@@ -66,11 +66,13 @@ namespace Sentinel
 		void		ProjectionOrthographic( float windowWidth, float windowHeight );
 		void		ProjectionPerspective( float windowWidth, float windowHeight, float nearZ = 0.1f, float farZ = 10000.0f, float FOV = 45.0f );
 
+		void		World( const Vector3f& position, const Quatf& orientation, const Vector3f& scale );
+
 		Vector3f	Transform( const Vector3f& v ) const;
 		Vector3f	Transform( const Vector4f& v ) const;
 
-		Vector3f	Forward();
-		Vector3f	Up();
-		Vector3f	Right();
+		Vector3f	Forward() const;
+		Vector3f	Up() const;
+		Vector3f	Right() const;
 	};
 }

@@ -28,10 +28,10 @@ namespace Sentinel
 		std::shared_ptr< T > Add( const std::string& name, std::shared_ptr< T > data )
 		{
 			if( !data )
-				return NULL;
+				return data;
 
 			if( mData.find( name ) != mData.end() )
-				return NULL;
+				return data;
 
 			mData.insert( std::pair< std::string, std::shared_ptr< T >>( name, data ));
 

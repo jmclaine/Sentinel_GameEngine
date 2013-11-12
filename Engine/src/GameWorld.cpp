@@ -121,6 +121,9 @@ namespace Sentinel
 
 	void GameWorld::UpdatePhysics()
 	{
+		if( mPhysicsSystem && mTiming )
+			mPhysicsSystem->Update( mTiming->DeltaTime() );
+
 		TRAVERSE_VECTOR( x, mGameObject )
 			mGameObject[ x ]->UpdatePhysics();
 	}
@@ -141,12 +144,6 @@ namespace Sentinel
 	{
 		if( mCurrentCamera )
 		{
-			TRAVERSE_VECTOR( x, mCamera )
-				mCamera[ x ]->Update();
-
-			TRAVERSE_VECTOR( x, mLight )
-				mLight[ x ]->Update();
-
 			// Meshes may contain alpha values.
 			// Put them in order.
 			//
@@ -191,8 +188,8 @@ namespace Sentinel
 					return entity;
 			}
 
-			if( entity->mParent )
-				entity->mParent->RemoveChild( entity );
+			if( entity->GetParent() )
+				entity->GetParent()->RemoveChild( entity );
 
 			entity->SetWorld( this );
 		

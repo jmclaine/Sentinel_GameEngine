@@ -8,13 +8,22 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE( PerspectiveCameraComponent );
 
 	PerspectiveCameraComponent::PerspectiveCameraComponent() :
-		mNearZ( 0.1f ), mFarZ( 10000.0f ), mFOV( 45.0f )
+		mNearZ( 0.1f ),
+		mFarZ( 10000.0f ),
+		mFOV( 45.0f )
 	{
-		Set( 1920.0f, 1080.0f, mNearZ, mFarZ, mFOV );
+		Set( 1920, 1080 );
 	}
 
-	PerspectiveCameraComponent::PerspectiveCameraComponent( float windowWidth, float windowHeight, float nearZ, float farZ, float FOV ) :
-		mNearZ( nearZ ), mFarZ( farZ ), mFOV( FOV )
+	PerspectiveCameraComponent::PerspectiveCameraComponent( float windowWidth, float windowHeight ) :
+		mNearZ( 0.1f ),
+		mFarZ( 10000.0f ),
+		mFOV( 45.0f )
+	{
+		Set( windowWidth, windowHeight );
+	}
+
+	PerspectiveCameraComponent::PerspectiveCameraComponent( float windowWidth, float windowHeight, float nearZ, float farZ, float FOV )
 	{
 		Set( windowWidth, windowHeight, nearZ, farZ, FOV );
 	}
@@ -28,14 +37,11 @@ namespace Sentinel
 	{
 		CameraComponent::Update();
 
-		if( mTransform )
-		{
-			mMatrixView.Rotate( mTransform->mOrientation );
-			mLookAt = mTransform->mPosition + mMatrixView.Forward();
+		mMatrixView.Rotate( mTransform->mOrientation );
+		mLookAt = mTransform->mPosition + mMatrixView.Forward();
 
-			mMatrixView.LookAtView( mTransform->mPosition, mLookAt, mMatrixView.Up() );
-			mMatrixFinal = mMatrixProjection * mMatrixView;
-		}
+		mMatrixView.LookAtView( mTransform->mPosition, mLookAt, mMatrixView.Up() );
+		mMatrixFinal = mMatrixProjection * mMatrixView;
 	}
 
 	void PerspectiveCameraComponent::Shutdown()
@@ -45,8 +51,17 @@ namespace Sentinel
 
 	//////////////////////////////
 
+	void PerspectiveCameraComponent::Set( float windowWidth, float windowHeight )
+	{
+		Set( windowWidth, windowHeight, mNearZ, mFarZ, mFOV );
+	}
+
 	void PerspectiveCameraComponent::Set( float windowWidth, float windowHeight, float nearZ, float farZ, float FOV )
 	{
+		mNearZ = nearZ;
+		mFarZ  = farZ;
+		mFOV   = FOV;
+
 		mMatrixProjection.ProjectionPerspective( windowWidth, windowHeight, nearZ, farZ, FOV );
 	}
 

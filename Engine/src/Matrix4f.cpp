@@ -8,7 +8,7 @@ namespace Sentinel
 {
 	Matrix4f::Matrix4f()
 	{
-		Zero();
+		Identity();
 	}
 
 	Matrix4f::Matrix4f( float* arr )
@@ -312,7 +312,7 @@ namespace Sentinel
 
 		m[12] = -1.0f;
 		m[13] =  1.0f;
-		m[14] =  1.0f;
+		m[14] = -1.0f;
 		m[15] =  1.0f;
 	}
 
@@ -329,6 +329,19 @@ namespace Sentinel
 		m[11] = -1.0f;
 		m[14] = 2.0f * (nearZ * farZ) * depth;
 		m[15] = 1.0f;
+	}
+
+	void Matrix4f::World( const Vector3f& position, const Quatf& orientation, const Vector3f& scale )
+	{
+		static Matrix4f TRANSLATION;
+		static Matrix4f ROTATION;
+		static Matrix4f SCALE;
+
+		TRANSLATION.Translate( position );
+		ROTATION.Rotate( orientation );
+		SCALE.Scale( scale );
+
+		*this = TRANSLATION * ROTATION * SCALE;
 	}
 
 	float Matrix4f::Det()
@@ -455,17 +468,17 @@ namespace Sentinel
 						 v.x*m[2]+v.y*m[6]+v.z*m[10]+v.w*m[14] );
 	}
 
-	Vector3f Matrix4f::Right()
+	Vector3f Matrix4f::Right() const
 	{
 		return Vector3f( m[0], m[1], m[2] );
 	}
 
-	Vector3f Matrix4f::Up()
+	Vector3f Matrix4f::Up() const
 	{
 		return Vector3f( m[4], m[5], m[6] );
 	}
 
-	Vector3f Matrix4f::Forward()
+	Vector3f Matrix4f::Forward() const
 	{
 		return Vector3f( -m[8], -m[9], -m[10] );
 	}

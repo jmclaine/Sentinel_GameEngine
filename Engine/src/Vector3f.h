@@ -22,6 +22,8 @@ namespace Sentinel
 		float&		operator [] ( int i );
 
 		float*		Ptr() const;
+
+		Vector3f	operator - () const;
 		
 		bool		operator == ( const Vector3f& v ) const;
 		bool		operator != ( const Vector3f& v ) const;

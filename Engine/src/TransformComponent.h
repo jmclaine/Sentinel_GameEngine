@@ -13,15 +13,6 @@ namespace Sentinel
 
 	private:
 
-		// Matrices to calculate the final world matrix
-		// without duplicating matrices for every object.
-		//
-		static Matrix4f		MATRIX_TRANSLATION;
-		static Matrix4f		MATRIX_ROTATION;
-		static Matrix4f		MATRIX_SCALE;
-
-		///////////////////////////////////
-
 		TransformComponent*	mParentTransform;
 
 		Matrix4f			mMatrixWorld;

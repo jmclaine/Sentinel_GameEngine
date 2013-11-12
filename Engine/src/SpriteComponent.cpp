@@ -1,12 +1,13 @@
 #include "SpriteComponent.h"
-#include "ParticleSystem.h"
 #include "Vector2f.h"
 #include "Matrix4f.h"
 #include "Material.h"
 #include "Sprite.h"
 #include "GameObject.h"
+#include "GameWorld.h"
 #include "Mesh.h"
 #include "TransformComponent.h"
+#include "CameraComponent.h"
 
 namespace Sentinel
 {
@@ -14,18 +15,26 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE( SpriteComponent );
 
 	SpriteComponent::SpriteComponent() :
-		mParticle( NULL ), mSprite( NULL )
+		mCamera( NULL ),
+		mSpriteSystem( NULL ),
+		mFrame( 0 )
 	{}
 
-	SpriteComponent::SpriteComponent( ParticleSystem* particle, std::shared_ptr< Sprite > sprite )
+	SpriteComponent::SpriteComponent( SpriteSystem* spriteSystem, CameraComponent* camera ) :
+		mFrame( 0 )
 	{
-		Set( particle, sprite );
+		Set( spriteSystem, camera );
 	}
 
-	void SpriteComponent::Set( ParticleSystem* particle, std::shared_ptr< Sprite > sprite )
+	SpriteComponent::~SpriteComponent()
 	{
-		mParticle = particle;
-		mSprite   = sprite;
+		delete mSpriteSystem;
+	}
+
+	void SpriteComponent::Set( SpriteSystem* spriteSystem, CameraComponent* camera )
+	{
+		mSpriteSystem = spriteSystem;
+		mCamera = camera;
 	}
 
 	/////////////////////////////////
@@ -34,22 +43,27 @@ namespace Sentinel
 	{
 		DrawableComponent::Startup();
 
-		if( !mParticle )
-			throw AppException( "SpriteComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain ParticleSystem" );
+		mTransform = (TransformComponent*)mOwner->FindComponent( GameComponent::TRANSFORM );
 
 		if( !mTransform )
 			throw AppException( "SpriteComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain TransformComponent" );
 
-		if( !mSprite )
-			throw AppException( "SpriteComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain Sprite" );
+		if( !mSpriteSystem )
+			throw AppException( "SpriteComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain SpriteSystem" );
+
+		if( !mCamera )
+			throw AppException( "SpriteComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain CameraComponent" );
 	}
 
 	void SpriteComponent::Update()
 	{
 		DrawableComponent::Update();
 
-		if( mTransform )
-		{}
+		mSpriteSystem->Clear();
+
+		mSpriteSystem->Draw( mFrame, mColor, mCamera->mMatrixFinal * mTransform->GetMatrixWorld() );
+
+		mSpriteSystem->Present();
 	}
 
 	void SpriteComponent::Shutdown()

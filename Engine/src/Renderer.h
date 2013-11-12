@@ -2,13 +2,29 @@
 /*
 HOW TO USE:
 
+All objects drawn will scale according to the values set in
+the following variables for their final transformation to
+screen coordinates:
+
+Renderer::WINDOW_WIDTH_BASE  = 1920;
+Renderer::WINDOW_HEIGHT_BASE = 1080;
+
+For example:
+
+Drawing a Sprite scaled at (512, 512) scales it down using
+a ratio calculated within the Renderer on Startup.
+
+(512 * mWindowInfo->WidthRatio(), 512 * mWindowInfo->HeightRatio())
+
+
+
 Create a file called 'config.xml' for easy setup.
 
 <?xml version="1.0" ?>
 <!--DIRECTX or OPENGL-->
 <Renderer Type="OPENGL" Fullscreen="false" Width="1920" Height="1080" />
 
-// This initializes the Renderer values within the XML file.
+// Initialize the Renderer values within the XML file.
 WindowInfo info;
 Renderer* renderer = Renderer::Load( "config.xml", info );
 
@@ -21,7 +37,7 @@ Renderer* renderer = BuildRendererDX();
 
 // Initialize the Renderer.
 // Use appropriate HWND for Windows applications.
-WindowInfo* windowInfo =renderer->Startup( mHWND, info.mFullscreen, info.mWidth, info.mHeight );
+WindowInfo* windowInfo = renderer->Startup( mHWND, info.mFullscreen, info.mWidth, info.mHeight );
 
 
 // Now the Renderer can perform its normal functionality.
@@ -82,7 +98,6 @@ gameWindow0->Shutdown();
 gameWindow1->Shutdown();
 
 */
-
 #include "Common.h"
 #include "Util.h"
 #include "RendererTypes.h"
@@ -98,12 +113,15 @@ namespace Sentinel
 	class Shader;
 	class Texture;
 	class Buffer;
+	class Mesh;
 
 	class SENTINEL_DLL WindowInfo
 	{
 		friend class Renderer;
 
 	protected:
+
+		void*		mHandle;
 
 		bool		mFullscreen;
 
@@ -124,6 +142,8 @@ namespace Sentinel
 
 		float	WidthRatio() const;
 		float	HeightRatio() const;
+
+		void*	Handle() const;
 	};
 
 	// Only one Renderer should be created as multiple instances
@@ -189,8 +209,10 @@ namespace Sentinel
 	
 		// Special Rendering.
 		//
+		Mesh*				CreateRenderTargetMesh( std::shared_ptr< Shader > shader );
+
 		virtual UINT		CreateBackbuffer() = 0;
-		virtual UINT		CreateRenderTarget( const std::shared_ptr< Texture >& texture ) = 0;
+		virtual UINT		CreateRenderTarget( std::shared_ptr< Texture > texture ) = 0;
 		virtual UINT		CreateDepthStencil( UINT width, UINT height ) = 0;
 		virtual UINT		ResizeBuffers( UINT width, UINT height ) = 0;
 

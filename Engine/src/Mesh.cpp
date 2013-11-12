@@ -42,8 +42,11 @@ namespace Sentinel
 
 	void Mesh::Draw( Renderer* renderer, GameWorld* world, UINT count )
 	{
-		_ASSERT( world->GetCamera() != NULL );
-		
+		_ASSERT( renderer );
+		_ASSERT( mShader );
+		_ASSERT( mVBO );
+		_ASSERT( mIBO );
+
 		if( count == 0 )
 			return;
 
@@ -69,6 +72,9 @@ namespace Sentinel
 					// Model-View-Projection Matrix.
 					//
 					case 'P':
+						_ASSERT( world );
+						_ASSERT( world->GetCamera() != NULL );
+
 						mShader->SetMatrix( uniformIndex, (world->GetCamera()->mMatrixFinal * mMatrixWorld).Ptr() );
 						break;
 
@@ -96,6 +102,9 @@ namespace Sentinel
 					// Camera Position.
 					//
 					case 'V':
+						_ASSERT( world );
+						_ASSERT( world->GetCamera() );
+
 						pos = world->GetCamera()->GetTransform()->mPosition;
 						
 						mShader->SetFloat3( uniformIndex, pos.Ptr() );
@@ -104,6 +113,9 @@ namespace Sentinel
 					// Light Position.
 					//
 					case 'L':
+						_ASSERT( world );
+						_ASSERT( world->GetLight( lightCount ));
+
 						mShader->SetFloat3( uniformIndex, world->GetLight( lightCount )->GetTransform()->mPosition.Ptr() );
 						++uniformIndex;
 
@@ -148,6 +160,9 @@ namespace Sentinel
 					// Delta Time.
 					//
 					case 't':
+						_ASSERT( world );
+						_ASSERT( world->mTiming );
+
 						mShader->SetFloat( uniformIndex, world->mTiming->DeltaTime() );
 						break;
 
@@ -155,6 +170,9 @@ namespace Sentinel
 					//
 					case 'A':
 						{
+						_ASSERT( world );
+						_ASSERT( world->GetCamera() );
+
 						const WindowInfo* info = renderer->GetWindow();
 
 						Vector2f pixelSize( 1.0f / info->Width(), 1.0f / info->Height() );
