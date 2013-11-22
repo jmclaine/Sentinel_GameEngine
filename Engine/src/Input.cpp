@@ -2,17 +2,18 @@
 #include <conio.h>
 
 #include "Input.h"
+#include "Renderer.h"
 
 namespace Sentinel
 {
 	POINT CenterHandle( HWND hWnd )
 	{
-		RECT screenRect;
-		GetWindowRect( (!hWnd) ? GetDesktopWindow() : hWnd, &screenRect );
+		RECT rect;
+		GetWindowRect( (!hWnd) ? GetDesktopWindow() : hWnd, &rect );
 
 		POINT p;
-		p.x = screenRect.left + screenRect.right / 2;
-		p.y = screenRect.top + screenRect.bottom / 2;
+		p.x = rect.left + rect.right  / 2;
+		p.y = rect.top  + rect.bottom / 2;
 
 		return p;
 	}
@@ -28,12 +29,6 @@ namespace Sentinel
 		}
 
 		mScrollDistance = 0;
-
-		RECT rc;
-		GetWindowRect( GetDesktopWindow(), &rc );
-
-		mDesktopWidth  = (float)(rc.left - rc.right);
-		mDesktopHeight = (float)(rc.top  - rc.bottom);
 	}
 
 	Mouse& Mouse::Get()
@@ -52,7 +47,7 @@ namespace Sentinel
 		SetCursorPos( pos.x, pos.y );
 	}
 
-	POINT Mouse::GetPosition( HWND hWnd ) const
+	POINT Mouse::GetPosition( HWND hWnd, bool scaleToWindow ) const
 	{
 		POINT mousePos;
 		
@@ -60,12 +55,20 @@ namespace Sentinel
 
 		if( hWnd )
 		{
-			RECT rc;
-			GetClientRect( hWnd, &rc );
+			RECT rect;
+			GetClientRect( hWnd, &rect );
 			ScreenToClient( hWnd, &mousePos );
 
-			mousePos.x = (LONG)((float)(mousePos.x) * mDesktopWidth / (float)(rc.right));
-			mousePos.y = (LONG)((float)(mousePos.y) * mDesktopHeight / (float)(rc.bottom));
+			if( scaleToWindow )
+			{
+				mousePos.x = (LONG)((float)(mousePos.x) * (float)Renderer::WINDOW_WIDTH_BASE  / (float)(rect.right));
+				mousePos.y = (LONG)((float)(mousePos.y) * (float)Renderer::WINDOW_HEIGHT_BASE / (float)(rect.bottom));
+			}
+			else
+			{
+				mousePos.x = (LONG)((float)(mousePos.x));
+				mousePos.y = (LONG)((float)(mousePos.y));
+			}
 		}
 		
 		return mousePos;

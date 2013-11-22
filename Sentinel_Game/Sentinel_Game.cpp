@@ -29,6 +29,7 @@ upon compilation / linking.
 
 #include "TextureManager.h"
 #include "ShaderManager.h"
+#include "SpriteManager.h"
 #include "MeshManager.h"
 #include "ModelManager.h"
 #include "SoundManager.h"
@@ -54,10 +55,12 @@ upon compilation / linking.
 #include "MeshComponent.h"
 #include "ModelComponent.h"
 #include "SpriteComponent.h"
+#include "WidgetComponent.h"
 
 #include "Sound.h"
 #include "Sprite.h"
 
+#include "GUI/Widget.h"
 #include "GUI/Button.h"
 
 #include "RandomValue.h"
@@ -77,19 +80,16 @@ class MainApp
 	Timing*					mTiming;
 	PhysicsSystem*			mPhysicsSystem;
 	AudioSystem*			mAudioSystem;
-	ParticleSystem*			mParticleSystem;
 	SpriteSystem*			mSpriteSystem;
 
 	TextureManager*			mTextureManager;
 	ShaderManager*			mShaderManager;
+	SpriteManager*			mSpriteManager;
 	MeshManager*			mMeshManager;
 	ModelManager*			mModelManager;
 	SoundManager*			mSoundManager;
 	
 	GameWorld*				mGameWorld;
-
-	std::shared_ptr< Texture >  mRTBackbufferTexture;
-	Mesh*						mRTBackbufferMesh;
 
 public:
 
@@ -100,22 +100,19 @@ public:
 		mGameWindow		= NULL;
 		mRenderer		= NULL;
 
-		mTiming			= new Timing();
+		mTiming			= NULL;
 		mPhysicsSystem	= NULL;
-		mParticleSystem = NULL;
 		mSpriteSystem   = NULL;
-		
 		mAudioSystem    = NULL;
 
-		mTextureManager	= new TextureManager();
-		mShaderManager	= new ShaderManager();
-		mMeshManager	= new MeshManager();
-		mModelManager	= new ModelManager();
-		mSoundManager   = new SoundManager();
+		mTextureManager	= NULL;
+		mShaderManager	= NULL;
+		mSpriteManager	= NULL;
+		mMeshManager	= NULL;
+		mModelManager	= NULL;
+		mSoundManager   = NULL;
 
-		mGameWorld		= new GameWorld();
-
-		mRTBackbufferMesh = NULL;
+		mGameWorld		= NULL;
 	}
 
 	~MainApp()
@@ -142,9 +139,8 @@ public:
 		// Prepare main window.
 		//
 		mGameWindow->Startup( mRenderer, hInstance, nCmdShow, "Sentinel Game", "SentinelClass", info );
-		mGameWindow->AddChild( new GUI::Button() );
-
-		mRenderer->CreateDepthStencil( info.Width(), info.Height() );
+		
+		mRenderer->CreateDepthStencil( Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE );
 		mRenderer->CreateBackbuffer();
 
 		////////////////////////////////////
@@ -155,10 +151,33 @@ public:
 		////////////////////////////////////
 		// Prepare and load GameWorld.
 		//
-		mPhysicsSystem = BuildPhysicsSystemBT();
+		mTiming							= new Timing();
+		mPhysicsSystem					= BuildPhysicsSystemBT();
+		mAudioSystem					= BuildAudioSystemAL();
+
+		mTextureManager					= new TextureManager();
+		mShaderManager					= new ShaderManager();
+		mSpriteManager					= new SpriteManager();
+		mMeshManager					= new MeshManager();
+		mModelManager					= new ModelManager();
+		mSoundManager					= new SoundManager();
+
+		////////////////////////////////////
+
 		mPhysicsSystem->Startup();
 
-		mAudioSystem = BuildAudioSystemAL();
+		mGameWorld = new GameWorld();
+
+		mGameWorld->mRenderer			= mRenderer;
+		mGameWorld->mTiming				= mTiming;
+		mGameWorld->mPhysicsSystem		= mPhysicsSystem;
+		
+		mGameWorld->mTextureManager		= mTextureManager;
+		mGameWorld->mShaderManager		= mShaderManager;
+		mGameWorld->mSpriteManager		= mSpriteManager;
+		mGameWorld->mMeshManager		= mMeshManager;
+		mGameWorld->mModelManager		= mModelManager;
+		mGameWorld->mSoundManager		= mSoundManager;
 
 		Archive archive;
 		if( !archive.Open( "Default.MAP", "rb" ))
@@ -166,24 +185,17 @@ public:
 
 		mTextureManager->Load( archive, mRenderer );
 		mShaderManager->Load( archive, mRenderer );
+		mSpriteManager->Load( archive, mShaderManager, mTextureManager );
 		mMeshManager->Load( archive, mRenderer, mShaderManager, mTextureManager );
 		mModelManager->Load( archive, mRenderer, mShaderManager, mTextureManager );
 		mSoundManager->Load( archive, mAudioSystem );
 
-		mGameWorld->mTiming			= mTiming;
-		mGameWorld->mRenderer		= mRenderer;
-		mGameWorld->mPhysicsSystem	= mPhysicsSystem;
-		
-		mGameWorld->mTextureManager = mTextureManager;
-		mGameWorld->mShaderManager	= mShaderManager;
-		mGameWorld->mMeshManager	= mMeshManager;
-		mGameWorld->mModelManager	= mModelManager;
-		
+		mSpriteSystem = new SpriteSystem( mRenderer, mShaderManager->Get( "GUI" ), 256 );
+		mGameWorld->mSpriteSystem		= mSpriteSystem;
+
 		mGameWorld->Load( archive );
 
 		archive.Close();
-
-		mGameWorld->Startup();
 
 		// Testing area.
 		//
@@ -195,25 +207,25 @@ public:
 		std::shared_ptr< Texture > texture = mTextureManager->Add( "fire.png", mRenderer->CreateTextureFromFile( "fire.png" ));
 		
 		std::shared_ptr< Sprite > sprite( new Sprite( mShaderManager->Get( "Sprite" ), texture ));
-		sprite->AddFrame( Quad( 0, 0, 64, 64 ));
-		sprite->AddFrame( Quad( 64, 0, 128, 64 ));
+		sprite->AddFrame( sprite->GetTextureCoords( Quad( 0, 0, 64, 64 )));
+		sprite->AddFrame( sprite->GetTextureCoords( Quad( 64, 0, 128, 64 )));
 
-		mParticleSystem = BuildParticleSystemNormal( mRenderer, mGameWorld, sprite, 100 );
-		mParticleSystem->mSpawnRate   = 0.025f;
-		mParticleSystem->mMinLifetime = 3.0f;
-		mParticleSystem->mMaxLifetime = 5.0f;
-		mParticleSystem->mEffect.push_back( new TextureEffect( 0, 0 ));
-		mParticleSystem->mEffect.push_back( new AreaPositionEffect( 0, Vector3f( -0.125f, 1, 0 ), Vector3f( 0.125f, 1, 0 )));
-		mParticleSystem->mEffect.push_back( new RandomRotationEffect( 0, Vector3f( 0, 0, -10 ), Vector3f( 0, 0, 10 )));
-		mParticleSystem->mEffect.push_back( new ScaleEffect( 0, Vector3f( 1, 1, 1 )));
-		mParticleSystem->mEffect.push_back( new VelocityEffect( 0, Vector3f( 0, 1.2f, 0 )));
-		mParticleSystem->mEffect.push_back( new RandomColorEffect( 0, ColorRGBA( 0.75f, 0.25f, 0, 0.125 ), ColorRGBA( 0.75f, 0.75f, 0, 0.125 )));
-		mParticleSystem->mEffect.push_back( new FadeToScaleEffect( 0, 0.25f, 0.666f ));
-		mParticleSystem->mEffect.push_back( new FadeToScaleEffect( 0.5f, 1.0f, 0.1f ));
-		mParticleSystem->mEffect.push_back( new TextureEffect( 1.0f, 1 ));
-		mParticleSystem->mEffect.push_back( new FadeToScaleEffect( 1.0f, 2.0f, 1.0f ));
-		mParticleSystem->mEffect.push_back( new RandomColorEffect( 1.0f, ColorRGBA( 1, 1, 1, 0.125 ), ColorRGBA( 0.9f, 0.9f, 0.9f, 0.125 )));
-		mParticleSystem->mEffect.push_back( new FadeToColorEffect( 1.0f, 5.0f, ColorRGBA( 0.9f, 0.9f, 0.9f, 0.025f )));
+		ParticleSystem* particleSystem = BuildParticleSystemNormal( mRenderer, mGameWorld, sprite, 300 );
+		particleSystem->mSpawnRate   = 0.025f;
+		particleSystem->mMinLifetime = 3.0f;
+		particleSystem->mMaxLifetime = 5.0f;
+		particleSystem->mEffect.push_back( new TextureEffect( 0, 0 ));
+		particleSystem->mEffect.push_back( new AreaPositionEffect( 0, Vector3f( -0.125f, 1, 0 ), Vector3f( 0.125f, 1, 0 )));
+		particleSystem->mEffect.push_back( new RandomRotationEffect( 0, Vector3f( 0, 0, -10 ), Vector3f( 0, 0, 10 )));
+		particleSystem->mEffect.push_back( new ScaleEffect( 0, Vector3f( 1, 1, 1 )));
+		particleSystem->mEffect.push_back( new VelocityEffect( 0, Vector3f( 0, 1.2f, 0 )));
+		particleSystem->mEffect.push_back( new RandomColorEffect( 0, ColorRGBA( 0.75f, 0.25f, 0, 0.125 ), ColorRGBA( 0.75f, 0.75f, 0, 0.125 )));
+		particleSystem->mEffect.push_back( new FadeToScaleEffect( 0, 0.25f, 0.666f ));
+		particleSystem->mEffect.push_back( new FadeToScaleEffect( 0.5f, 1.0f, 0.1f ));
+		particleSystem->mEffect.push_back( new TextureEffect( 1.0f, 1 ));
+		particleSystem->mEffect.push_back( new FadeToScaleEffect( 1.0f, 2.0f, 1.0f ));
+		particleSystem->mEffect.push_back( new RandomColorEffect( 1.0f, ColorRGBA( 1, 1, 1, 0.125 ), ColorRGBA( 0.9f, 0.9f, 0.9f, 0.125 )));
+		particleSystem->mEffect.push_back( new FadeToColorEffect( 1.0f, 5.0f, ColorRGBA( 0.9f, 0.9f, 0.9f, 0.025f )));
 		//mParticleSystem->mEffect.push_back( new RandomVelocityEffect( 1, Vector3f( -1, 1, 0 ), Vector3f( 1, 1, 0 )));
 
 		obj = mGameWorld->AddGameObject( new GameObject(), "Particle Emitter" );
@@ -221,35 +233,9 @@ public:
 		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
 		transform->mScale = Vector3f( 512, 512, 1 );
 
-		obj->AttachComponent( new ParticleEmitterComponent( mParticleSystem ), "Sprite" );
-		obj->Startup();
-		//*/
+		obj->AttachComponent( new ParticleEmitterComponent( particleSystem ), "Sprite" );
 
-		// Testing sprite system.
-		//
-		std::shared_ptr< Sprite > spriteS( new Sprite( mShaderManager->Get( "GUI" ), mTextureManager->Get( "default-alpha.png" )));
-
-		spriteS->AddFrame( Quad( 0, 0, 512, 512 ));
-
-		mSpriteSystem = new SpriteSystem( mRenderer, spriteS, 1 );
-
-		obj = mGameWorld->AddGameObject( new GameObject(), "GUI Sprite" );
-
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
-		transform->mScale = Vector3f( 512, 512, 1 );
-
-		obj->AttachComponent( new SpriteComponent( mSpriteSystem, mGameWorld->GetCamera( 1 )), "Sprite" );
-		obj->Startup();
-
-		// Create backbuffer for added effects.
-		//
-		mRenderer->CreateDepthStencil( info.Width(), info.Height() );
-
-		mRTBackbufferTexture = mRenderer->CreateTexture( info.Width(), info.Height() );
-		mRenderer->CreateRenderTarget( mRTBackbufferTexture );
-
-		mRTBackbufferMesh = mRenderer->CreateRenderTargetMesh( mShaderManager->Get( "RT_Normal" ));
-		mRTBackbufferMesh->mTexture[ TEXTURE_DIFFUSE ] = mRTBackbufferTexture;
+		mGameWorld->Startup();
 	}
 
 	void Update()
@@ -276,9 +262,9 @@ public:
 			//
 			else
 			{
-				static CameraComponent* camera;
-
 				mTiming->Update();
+
+				mGameWindow->Update();
 
 				Keyboard::Get().ProcessMessages();
 
@@ -293,23 +279,14 @@ public:
 				UINT width  = mGameWindow->GetInfo()->Width();
 				UINT height = mGameWindow->GetInfo()->Height();
 
-				mRenderer->SetViewport( 0, 0, width, height );
-				mRenderer->SetDepthStencil( 1 );
-				mRenderer->SetRenderTarget( 1 );
+				//mRenderer->SetViewport( 0, 0, width, height );
+				mRenderer->SetViewport( ((int)width - (int)Renderer::WINDOW_WIDTH_BASE) >> 1, ((int)height - (int)Renderer::WINDOW_HEIGHT_BASE) >> 1, 
+										Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE );
+				mRenderer->SetDepthStencil( 0 );
+				mRenderer->SetRenderTarget( 0 );
 
 				mRenderer->Clear( color );
 
-				camera = mGameWorld->GetCamera( 0 );
-				((PerspectiveCameraComponent*)camera)->Set( (float)width, (float)height );
-				mGameWorld->SetCamera( camera );
-
-				static RECT rect;
-				GetClientRect( (HWND)mGameWindow->GetInfo()->Handle(), &rect );
-
-				camera = mGameWorld->GetCamera( 1 );
-				//((OrthographicCameraComponent*)camera)->Set( (float)rect.right, (float)rect.bottom );
-				((OrthographicCameraComponent*)camera)->Set( (float)width, (float)height );
-				
 				BEGIN_PROFILE( mTiming );
 				mGameWorld->UpdateController();
 				mGameWorld->UpdatePhysics();
@@ -318,21 +295,6 @@ public:
 				mGameWorld->UpdateDrawable();
 				END_PROFILE( mTiming, "World" );
 
-				mGameWindow->Update();
-
-				//SpriteSystem::Storage& store = mSpriteSystem->GetStorage( 0 );
-				//store.mMatrixWorld = camera->mMatrixFinal;
-
-				////////////////////////////////////
-				
-				mRenderer->SetViewport( 0, 0, rect.right, rect.bottom );
-				mRenderer->SetDepthStencil( 0 );
-				mRenderer->SetRenderTarget( 0 );
-
-				mRenderer->Clear( color );
-
-				mRTBackbufferMesh->Draw( mRenderer, mGameWorld );
-				
 				BEGIN_PROFILE( mTiming );
 				mRenderer->Present();
 				END_PROFILE( mTiming, "Renderer" );
@@ -350,29 +312,21 @@ public:
 
 	void Shutdown()
 	{
-		SAFE_DELETE( mRTBackbufferMesh );
-
-		if( mGameWorld )
-		{
-			mGameWorld->Shutdown();
-			delete mGameWorld;
-		}
-
+		SHUTDOWN_DELETE( mGameWorld );
+		
 		SAFE_DELETE( mTiming );
 		SAFE_DELETE( mPhysicsSystem );
+		SAFE_DELETE( mSpriteSystem );
 		SAFE_DELETE( mAudioSystem );
 		
 		SAFE_DELETE( mSoundManager );
 		SAFE_DELETE( mModelManager );
 		SAFE_DELETE( mMeshManager );
+		SAFE_DELETE( mSpriteManager );
 		SAFE_DELETE( mShaderManager );
 		SAFE_DELETE( mTextureManager );
 
-		if( mGameWindow )
-		{
-			mGameWindow->Shutdown();
-			delete mGameWindow;
-		}
+		SHUTDOWN_DELETE( mGameWindow );
 		
 		SAFE_DELETE( mRenderer );
 	}

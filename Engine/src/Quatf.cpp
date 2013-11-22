@@ -3,6 +3,8 @@
 
 namespace Sentinel
 {
+	const Quatf Quatf::IDENTITY = Quatf( 0, 0, 0, 1 );
+
 	Quatf::Quatf() :
 		x(0), y(0), z(0), w(1)
 	{}

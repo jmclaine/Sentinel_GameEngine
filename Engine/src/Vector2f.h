@@ -8,6 +8,11 @@ namespace Sentinel
 	{
 	public:
 
+		static const Vector2f ZERO;
+		static const Vector2f ONE;
+
+		////////////////////////////////
+
 		float x, y;
 
 		////////////////////////////////

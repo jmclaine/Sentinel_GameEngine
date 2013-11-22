@@ -50,7 +50,22 @@ namespace Sentinel
 		return mHandle;
 	}
 
+	void WindowInfo::Update()
+	{
+		static RECT rect;
+		GetClientRect( (HWND)mHandle, &rect );
+
+		mWidth  = (UINT)rect.right;
+		mHeight = (UINT)rect.bottom;
+
+		mWidthRatio  = (float)mWidth  / (float)Renderer::WINDOW_WIDTH_BASE;
+		mHeightRatio = (float)mHeight / (float)Renderer::WINDOW_HEIGHT_BASE;
+	}
+
 	//////////////////////////////////////////
+
+	UINT Renderer::WINDOW_WIDTH_BASE  = 1920;
+	UINT Renderer::WINDOW_HEIGHT_BASE = 1080;
 
 	Renderer* Renderer::Create( const char* filename, WindowInfo& info )
 	{
@@ -72,8 +87,11 @@ namespace Sentinel
 		pElem->QueryUnsignedAttribute(	"Width",		&info.mWidth );
 		pElem->QueryUnsignedAttribute(	"Height",		&info.mHeight );
 
-		info.mWidthRatio  = static_cast< float >(info.mWidth)  / Renderer::WINDOW_WIDTH_BASE;
-		info.mHeightRatio = static_cast< float >(info.mHeight) / Renderer::WINDOW_HEIGHT_BASE;
+		Renderer::WINDOW_WIDTH_BASE  = info.mWidth;
+		Renderer::WINDOW_HEIGHT_BASE = info.mHeight;
+
+		info.mWidthRatio  = 1;
+		info.mHeightRatio = 1;
 
 		return renderer;
 	}

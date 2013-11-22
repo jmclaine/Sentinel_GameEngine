@@ -19,22 +19,22 @@ namespace Sentinel
 	{
 		_ASSERT( mTexture );
 
-		mFrameCoords.push_back( GetTextureCoords( coords ));
+		mFrame.push_back( coords );
 	}
 
 	void Sprite::RemoveFrame( UINT index )
 	{
-		mFrameCoords.erase( mFrameCoords.begin() + index );
+		mFrame.erase( mFrame.begin() + index );
 	}
 
 	Quad& Sprite::GetFrame( UINT index )
 	{
-		return mFrameCoords[ index ];
+		return mFrame[ index ];
 	}
 
 	UINT Sprite::NumFrames()
 	{
-		return mFrameCoords.size();
+		return mFrame.size();
 	}
 
 	Quad Sprite::GetTextureCoords( const Quad& coords )

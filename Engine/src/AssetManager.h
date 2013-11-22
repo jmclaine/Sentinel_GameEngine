@@ -1,5 +1,13 @@
 #pragma once
-
+/*
+Each managed type saves and loads the string
+designation.  It should use an int to save
+memory and not require the unordered_map.
+A simple function to convert the string
+to a value exists within Util.h called
+StringToID; limited to 16 characters.
+See function for more details.
+*/
 #include <string>
 #include <memory>
 #include <unordered_map>

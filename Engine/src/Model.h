@@ -28,6 +28,11 @@ ShaderManager::Add( shader, "Parallax" );
 
 // Skinning and bones
 ShaderManager::Add( shader, "Skinning" );
+
+The previous shaders are created and loaded
+automatically through the editor using the
+'config.xml' file located within the
+'Assets\Shaders' folder.
 */
 #include <vector>
 

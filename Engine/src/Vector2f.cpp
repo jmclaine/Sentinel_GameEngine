@@ -3,6 +3,9 @@
 
 namespace Sentinel
 {
+	const Vector2f Vector2f::ZERO = Vector2f( 0, 0 );
+	const Vector2f Vector2f::ONE  = Vector2f( 1, 1 );
+
 	Vector2f::Vector2f()
 	{
 		x = y = 0;

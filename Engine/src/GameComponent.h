@@ -4,14 +4,14 @@
 #include <typeinfo>
 
 #include "Common.h"
-#include "Serializeable.h"
+#include "Serializable.h"
 
 namespace Sentinel
 {
 	class GameObject;
 	class Archive;
 
-	class SENTINEL_DLL GameComponent : public Serializeable
+	class SENTINEL_DLL GameComponent : public Serializable
 	{
 	public:
 

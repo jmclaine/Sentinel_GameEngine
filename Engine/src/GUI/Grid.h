@@ -1,29 +1,55 @@
 #pragma once
-
+/*
+CellRatios are UINT values so that the mathematics behind
+the actual floating point values are not required calculations.
+*/
 #include "GUI/Widget.h"
 
 namespace Sentinel { namespace GUI
 {
 	class SENTINEL_DLL Grid : public Widget
 	{
-	protected:
+	public:
 
 		struct CellInfo
 		{
-			UINT    mRatioX;
-			UINT    mRatioY;
+			UINT		mRatioX;
+			UINT		mRatioY;
 
-			Widget* mWidget;
+			Widget*		mWidget;
+
+			CellInfo() :
+				mRatioX( 1 ),
+				mRatioY( 1 ),
+				mWidget( NULL )
+			{}
 		};
 
-		UINT mNumCellX;
-		UINT mNumCellY;
+	protected:
+
+		CellInfo**		mCell;
+
+		UINT			mNumCellX;
+		UINT			mNumCellY;
 
 	public:
 
 		Grid();
 		virtual ~Grid();
 
-		virtual void Update();
+	private:
+
+		void			Release();
+
+	public:
+
+		virtual void	Update();
+
+		void			SetCellSize( UINT sizeX, UINT sizeY );
+
+		UINT			NumCellX();
+		UINT			NumCellY();
+
+		CellInfo&		Get( UINT cellX, UINT cellY );
 	};
 }}

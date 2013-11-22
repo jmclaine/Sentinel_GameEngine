@@ -12,6 +12,10 @@ namespace Sentinel
 		friend class Vector3f;
 		friend class Vector4f;
 
+	public:
+
+		static const Matrix4f IDENTITY;
+
 	private:
 
 		float		m[16];

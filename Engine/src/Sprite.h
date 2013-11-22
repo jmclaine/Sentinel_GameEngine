@@ -15,12 +15,12 @@ namespace Sentinel
 	{
 	protected:
 
-		std::vector< Quad >			mFrameCoords;
+		std::vector< Quad >			mFrame;
 
 	public:
 
-		std::shared_ptr< Texture >	mTexture;
 		std::shared_ptr< Shader >	mShader;
+		std::shared_ptr< Texture >	mTexture;
 
 		//////////////////////////////////////
 
@@ -29,14 +29,16 @@ namespace Sentinel
 
 		//////////////////////////////////////
 
-		// Set frame coordinates as the pixel position within texture,
-		// i.e. AddFrame( Rect( 0, 0, 64, 64 ));
+		// Set frame texture coordinates.
+		// Use GetTextureCoords() for easy conversion.
 		//
 		void	AddFrame( const Quad& coords );
 		void	RemoveFrame( UINT index );
 		Quad&	GetFrame( UINT index );
 		UINT	NumFrames();
-
+		
+		// Convert pixel coordinates to texture coordinates.
+		//
 		Quad	GetTextureCoords( const Quad& coords );
 	};
 }

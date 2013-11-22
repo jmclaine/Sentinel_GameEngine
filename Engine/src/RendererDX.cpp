@@ -1146,8 +1146,8 @@ namespace Sentinel
 			D3D11_VIEWPORT vp = 
 			{
 				static_cast< FLOAT >(x), static_cast< FLOAT >(y),
-				(width != mCurrWindow->mWidth) ? static_cast< FLOAT >(mCurrWindow->mWidth) * (static_cast< FLOAT >(rect.right) / static_cast< FLOAT >(width)) : static_cast< FLOAT >(mCurrWindow->mWidth),
-				(height != mCurrWindow->mHeight) ? static_cast< FLOAT >(mCurrWindow->mHeight) * (static_cast< FLOAT >(rect.bottom) / static_cast< FLOAT >(height)) : static_cast< FLOAT >(mCurrWindow->mHeight),
+				(width != Renderer::WINDOW_WIDTH_BASE) ? static_cast< FLOAT >(Renderer::WINDOW_WIDTH_BASE) * (static_cast< FLOAT >(rect.right) / static_cast< FLOAT >(width)) : static_cast< FLOAT >(Renderer::WINDOW_WIDTH_BASE),
+				(height != Renderer::WINDOW_HEIGHT_BASE) ? static_cast< FLOAT >(Renderer::WINDOW_HEIGHT_BASE) * (static_cast< FLOAT >(rect.bottom) / static_cast< FLOAT >(height)) : static_cast< FLOAT >(Renderer::WINDOW_HEIGHT_BASE),
 				0.0f, 1.0f
 			};
 

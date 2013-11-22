@@ -3,6 +3,9 @@
 
 namespace Sentinel
 {
+	const Vector4f Vector4f::ZERO = Vector4f( 0, 0, 0, 0 );
+	const Vector4f Vector4f::ONE  = Vector4f( 1, 1, 1, 1 );
+
 	Vector4f::Vector4f()
 	{
 		x = y = z = w = 0;

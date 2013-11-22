@@ -146,6 +146,16 @@ namespace Sentinel
 		READ_DATA( data, double, length );
 	}
 
+	void Archive::Read( bool* data, unsigned int length )
+	{
+		for( unsigned int x = 0; x < length; ++x )
+		{
+			BYTE b;
+			READ_DATA( &b, BYTE, 1 );
+			data[ x ] = (b == 1) ? true : false;
+		}
+	}
+
 	void Archive::Read( std::string* data )
 	{
 		data->clear();
@@ -178,12 +188,12 @@ namespace Sentinel
 		WRITE_DATA( data, unsigned char, length );
 	}
 
-	void Archive::Write( short* data, unsigned int length )
+	void Archive::Write( const short* data, unsigned int length )
 	{
 		WRITE_DATA( data, short, length );
 	}
 
-	void Archive::Write( unsigned short* data, unsigned int length )
+	void Archive::Write( const unsigned short* data, unsigned int length )
 	{
 		WRITE_DATA( data, unsigned short, length );
 	}
@@ -271,6 +281,15 @@ namespace Sentinel
 	void Archive::Write( const double* data, unsigned int length )
 	{
 		WRITE_DATA( data, double, length );
+	}
+
+	void Archive::Write( const bool* data, unsigned int length )
+	{
+		for( unsigned int x = 0; x < length; ++x )
+		{
+			BYTE b = (data[ x ]) ? 1 : 0;
+			WRITE_DATA( &b, BYTE, 1 );
+		}
 	}
 
 	void Archive::Write( const std::string* data )

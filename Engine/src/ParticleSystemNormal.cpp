@@ -49,7 +49,7 @@ namespace Sentinel
 
 			builder.mPrimitive = POINT_LIST;
 
-			mMesh = builder.BuildMesh( mRenderer );
+			mMesh = std::shared_ptr< Mesh >(builder.BuildMesh( mRenderer ));
 
 			if( !mMesh )
 				throw AppException( "Failed to create Mesh in ParticleSystemNormal::Startup" );
@@ -85,12 +85,11 @@ namespace Sentinel
 				*(UINT*)verts = particle.mColor.ToUINT();
 				verts += sizeof( UINT );
 
-				MATRIX_TRANSLATION.Translate( particle.mPosition );
-				MATRIX_ROTATION.Rotate( particle.mRotation );
-				MATRIX_SCALE.Scale( particle.mScale );
-
+				static Matrix4f matrixParticle;
+				matrixParticle.World( particle.mPosition, Quatf( particle.mRotation ), particle.mScale );
+				
 				mMesh->mMatrixWorld.BillboardWorld( particle.mPosition, mWorld->GetCamera()->GetTransform()->mPosition, Vector3f( 0, 1, 0 ));
-				*(Matrix4f*)verts = mWorld->GetCamera()->mMatrixFinal * mMesh->mMatrixWorld * MATRIX_TRANSLATION * MATRIX_ROTATION * MATRIX_SCALE;
+				*(Matrix4f*)verts = mWorld->GetCamera()->GetMatrixFinal() * mMesh->mMatrixWorld * matrixParticle;
 				verts += sizeof( Matrix4f );
 			}
 

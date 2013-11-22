@@ -6,11 +6,15 @@ namespace Sentinel { namespace GUI
 {
 	class SENTINEL_DLL Button : public Widget
 	{
+		DECLARE_SERIAL();
+
 	public:
 
 		UINT			mFrameUp;
 		UINT			mFrameOver;
 		UINT			mFrameDown;
+
+	protected:
 
 		enum State
 		{
@@ -19,16 +23,13 @@ namespace Sentinel { namespace GUI
 			DOWN,
 		};
 
-	protected:
-
-		int				mState;
+		State			mState;
 
 	public:
 
-		FuncPtr0		ActionUp;
-		FuncPtr0		ActionOver;
-		FuncPtr0		ActionDown;
-		FuncPtr0		ActionClick;
+		WidgetFunc		mActionUp;
+		WidgetFunc		mActionDown;
+		WidgetFunc		mActionClick;
 
 		//////////////////////////////////
 

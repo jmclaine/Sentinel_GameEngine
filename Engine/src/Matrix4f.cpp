@@ -6,6 +6,8 @@
 
 namespace Sentinel
 {
+	const Matrix4f Matrix4f::IDENTITY = Matrix4f();
+
 	Matrix4f::Matrix4f()
 	{
 		Identity();
@@ -312,7 +314,7 @@ namespace Sentinel
 
 		m[12] = -1.0f;
 		m[13] =  1.0f;
-		m[14] = -1.0f;
+		m[14] =  0.0f;
 		m[15] =  1.0f;
 	}
 

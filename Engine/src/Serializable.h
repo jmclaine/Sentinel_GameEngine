@@ -1,0 +1,157 @@
+#pragma once
+
+#include <map>
+#include <stdio.h>
+#include <functional>
+
+#include "Common.h"
+
+namespace Sentinel
+{
+	class Archive;
+
+#define DECLARE_SERIAL()\
+	private:\
+		static SerialRegister mSerialRegistry;\
+		static Serializable* Clone();\
+	public:\
+		void Save( Archive& archive );\
+		void Load( Archive& archive );
+
+#define DEFINE_SERIAL_REGISTER_EX( refClass, cloneClass )\
+	SerialRegister cloneClass::mSerialRegistry( #refClass, cloneClass::Clone );
+
+#define DEFINE_SERIAL_REGISTER( clazz )\
+	DEFINE_SERIAL_REGISTER_EX( clazz, clazz );
+
+#define DEFINE_SERIAL_CLONE( clazz )\
+	Serializable* clazz::Clone() {\
+		return new clazz(); }
+
+#define DEFINE_SERIAL_SAVE( clazz )\
+	void clazz::Save( Archive& archive ) {\
+		mSerialRegistry.Save( archive );\
+		archive.Write( (const char*)this, sizeof( clazz )); }
+
+#define DEFINE_SERIAL_LOAD( clazz )\
+	void clazz::Load( Archive& archive ) {\
+		archive.Read( (char*)this, sizeof( clazz )); }
+
+#define DEFINE_SERIAL( clazz )\
+	DEFINE_SERIAL_REGISTER( clazz )\
+	DEFINE_SERIAL_CLONE( clazz )\
+	DEFINE_SERIAL_SAVE( clazz )\
+	DEFINE_SERIAL_LOAD( clazz )
+
+
+	// Inherit from this class.
+	//
+	// Clone() recreates the object as a Serializable object.
+	//
+	// Save() allows customization for output to a file
+	// as it is relatively unknown how an object should be
+	// exported. In some cases, pointers need specific
+	// functions in order to be initialized correctly.
+	//
+	// Load() should be the inverse of Save()
+	//
+	class Serializable
+	{
+	public:
+
+		virtual ~Serializable() {}
+
+		virtual void	Save( Archive& archive ) = 0;
+		
+		virtual void	Load( Archive& archive ) = 0;
+	};
+
+	// Stores the Serializable->Clone() function of each object.
+	// Singleton lazy instantiation.
+	//
+	class SENTINEL_DLL SerialFactory
+	{
+	public:
+
+		typedef Serializable* (*CloneFunc)();
+
+	private:
+		
+		static Serializable* NullClone();
+
+		std::map< UINT, CloneFunc > mRegistry;
+
+	protected:
+
+		SerialFactory();
+
+	public:
+
+		~SerialFactory();
+
+		static SerialFactory& Get();
+		
+		///////////////////////////
+
+		bool			Register( UINT value, CloneFunc func );
+
+		Serializable*	Create( UINT value );
+	};
+
+	// Automatically registers the class within the SerialFactory.
+	//
+	class SENTINEL_DLL SerialRegister
+	{
+	private:
+
+		UINT mID;
+
+	public:
+
+		SerialRegister( const char* clazz, SerialFactory::CloneFunc func );
+
+		void					Save( Archive& archive );
+
+		static Serializable*	Load( Archive& archive );
+	};
+
+	///////////////////////////////////////////////////////////////////////////////////
+
+#define REGISTER_SERIAL_FUNCTION( func )\
+	SerialFunctionFactory::Get().Register( HashString( #func ), std::function< void() >( [=]() { func(); } ))
+
+#define CREATE_SERIAL_FUNCTION( func )\
+	SerialFunctionFactory::Get().Create( HashString( #func ))
+
+	class SENTINEL_DLL SerialFunctionFactory
+	{
+	public:
+
+		typedef std::function< void() > Func;
+
+	private:
+
+		static void NullFunc();
+		static std::function< void() > NullFuncPtr;
+		
+		std::map< UINT, Func > mRegistry; 
+
+	protected:
+
+		SerialFunctionFactory();
+
+	public:
+
+		~SerialFunctionFactory();
+
+		static SerialFunctionFactory& Get();
+		
+		///////////////////////////
+
+		bool Register( UINT value, Func func );
+
+		const std::function< void() >& Create( UINT value );
+
+		UINT Find( Func func );
+	};
+}

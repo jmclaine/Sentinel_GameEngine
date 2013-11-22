@@ -45,18 +45,20 @@ namespace Sentinel
 		void	Read(  unsigned long* data, 		unsigned int length = 1, bool is32bit = true );
 		void	Read(  float* data,					unsigned int length = 1, bool is32bit = true );
 		void	Read(  double* data,				unsigned int length = 1 );
+		void	Read(  bool* data,					unsigned int length = 1 );
 		void	Read(  std::string* data );
 		
 		void	Write( const char* data,			unsigned int length = 1 );
 		void	Write( const unsigned char* data,	unsigned int length = 1 );
-		void	Write( short* data,					unsigned int length = 1 );
-		void	Write( unsigned short* data,		unsigned int length = 1 );
+		void	Write( const short* data,			unsigned int length = 1 );
+		void	Write( const unsigned short* data,	unsigned int length = 1 );
 		void	Write( const int* data, 			unsigned int length = 1, bool is32bit = true );
 		void	Write( const unsigned int* data,	unsigned int length = 1, bool is32bit = true );
 		void	Write( const long* data, 			unsigned int length = 1, bool is32bit = true );
 		void	Write( const unsigned long* data, 	unsigned int length = 1, bool is32bit = true );
 		void	Write( const float* data,			unsigned int length = 1, bool is32bit = true );
 		void	Write( const double* data,			unsigned int length = 1 );
+		void	Write( const bool* data,			unsigned int length = 1 );
 		void	Write( const std::string* data );
 
 		////////////////////////

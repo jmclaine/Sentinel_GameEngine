@@ -55,11 +55,11 @@
     <Filter Include="Source Files\Sentinel_Engine\GUI">
       <UniqueIdentifier>{9d095b94-5c58-4d1f-9928-df83977cd1a5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Sentinel_Engine\Assets\Manager">
+      <UniqueIdentifier>{1afb54e4-934e-4d15-8c6b-441dd62e4b25}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Engine\src\Common.h">
-      <Filter>Source Files\Sentinel_Engine</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\Buffer.h">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClInclude>
@@ -198,29 +198,11 @@
     <ClInclude Include="..\Engine\src\Script.h">
       <Filter>Source Files\Sentinel_Engine\Script</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\Serializeable.h">
-      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\Archive.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\AssetManager.h">
-      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\TextureManager.h">
-      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\FloatCompressor.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\ShaderManager.h">
-      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\MeshManager.h">
-      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\ModelManager.h">
-      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\AudioComponent.h">
       <Filter>Source Files\Sentinel_Engine\Components\Audio</Filter>
@@ -235,9 +217,6 @@
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\Sound.h">
-      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\SoundManager.h">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\ParticleEmitterComponent.h">
@@ -255,21 +234,6 @@
     <ClInclude Include="..\Engine\src\TriggerComponent.h">
       <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\GUI\Button.h">
-      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\GUI\Widget.h">
-      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\GameWindow.h">
-      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\GUI\Grid.h">
-      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\GUI\Label.h">
-      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\ListNode.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClInclude>
@@ -281,6 +245,54 @@
     </ClInclude>
     <ClInclude Include="..\Engine\src\Point.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\AssetManager.h">
+      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\MeshManager.h">
+      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\ModelManager.h">
+      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\ShaderManager.h">
+      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\SoundManager.h">
+      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\TextureManager.h">
+      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\SpriteManager.h">
+      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\GameWindow.h">
+      <Filter>Source Files\Sentinel_Engine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\WidgetComponent.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\GUI\Button.h">
+      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\GUI\Grid.h">
+      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\GUI\Label.h">
+      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\GUI\Widget.h">
+      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Serializable.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Common.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\GUI\Drawable.h">
+      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -431,17 +443,8 @@
     <ClCompile Include="..\Engine\src\ScriptParser.cpp">
       <Filter>Source Files\Sentinel_Engine\Script</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\Serializeable.cpp">
-      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\Archive.cpp">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\TextureManager.cpp">
-      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\ShaderManager.cpp">
-      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\zlib-1.2.8\compress.c">
       <Filter>Source Files\Sentinel_Engine\Utilities\zlib</Filter>
@@ -488,12 +491,6 @@
     <ClCompile Include="..\Engine\zlib-1.2.8\zutil.c">
       <Filter>Source Files\Sentinel_Engine\Utilities\zlib</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\MeshManager.cpp">
-      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\ModelManager.cpp">
-      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\PhysicsSystemBT.cpp">
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
     </ClCompile>
@@ -507,9 +504,6 @@
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\Sound.cpp">
-      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\SoundManager.cpp">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\ParticleEmitterComponent.cpp">
@@ -530,20 +524,50 @@
     <ClCompile Include="..\Engine\src\TriggerComponent.cpp">
       <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\GameWindow.cpp">
-      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\Button.cpp">
-      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\Widget.cpp">
-      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\SpriteSystem.cpp">
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\TransformComponent.cpp">
       <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\MeshManager.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\ModelManager.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\ShaderManager.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\SoundManager.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\TextureManager.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\SpriteManager.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\GameWindow.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\WidgetComponent.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\GUI\Button.cpp">
+      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\GUI\Widget.cpp">
+      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Serializable.cpp">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\GUI\Drawable.cpp">
+      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\GUI\Grid.cpp">
+      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

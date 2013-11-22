@@ -17,6 +17,7 @@ namespace Sentinel
 	class SpriteSystem;
 	class TextureManager;
 	class ShaderManager;
+	class SpriteManager;
 	class MeshManager;
 	class ModelManager;
 	class SoundManager;
@@ -39,9 +40,11 @@ namespace Sentinel
 		Renderer*								mRenderer;
 		Timing*									mTiming;
 		PhysicsSystem*							mPhysicsSystem;
+		SpriteSystem*							mSpriteSystem;
 		
 		TextureManager*							mTextureManager;
 		ShaderManager*							mShaderManager;
+		SpriteManager*							mSpriteManager;
 		MeshManager*							mMeshManager;
 		ModelManager*							mModelManager;
 		SoundManager*							mSoundManager;

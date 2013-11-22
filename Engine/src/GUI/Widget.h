@@ -1,46 +1,83 @@
 #pragma once
 /*
-All Widgets have a static Sprite skin that contains 
-the images to use for each type.
+All Widgets use the SpriteSystem to render images by frame.
 */
 #include <vector>
+#include <functional>
+#include <memory>
 
 #include "Common.h"
 #include "ListNode.h"
+#include "Serializable.h"
+#include "Archive.h"
 #include "Input.h"
-#include "Sprite.h"
-#include "Renderer.h"
-#include "Point.h"
+#include "GameWorld.h"
+#include "SpriteSystem.h"
+#include "ColorRGBA.h"
+#include "Vector3f.h"
+#include "Matrix4f.h"
 
 namespace Sentinel { namespace GUI
 {
-	class SENTINEL_DLL Widget : public ListNode< Widget >
+#define WIDGET_BIND( func ) std::bind( [=]() { func(); } );
+
+	typedef std::function< void() > WidgetFunc;
+
+	class SENTINEL_DLL Widget : public ListNode< Widget >, public Serializable
 	{
 	public:
 
-		static Renderer*					RENDERER;
-		static std::shared_ptr< Sprite >	SKIN;
-
-		static void DoNothing();
-
+		static HWND			WINDOW;
+		static GameWorld*	GAME_WORLD;
+		static Matrix4f		MATRIX_WVP;
+		
 	protected:
 
-		Quad			mDimension;
+		Matrix4f		mMatrixWorld;
 
 	public:
+
+		Vector3f		mPosition;
+		Vector3f		mRotation;
+		Vector3f		mScale;
+
+		ColorRGBA		mColor;
+
+		bool			mIsVisible;
+		bool			mPositionToWindow;
+		bool			mScaleToWindow;
+
+		WidgetFunc		mActionOver;
+
+		////////////////////////////////
 
 		Widget();
 		virtual ~Widget();
 
+	protected:
+
+		virtual void	PreUpdate();
+
+	public:
+
 		virtual void	Update();
 
-		// Check if the mouse cursor is over this widget.
-		//
+	protected:
+
+		virtual void	PostUpdate();
+
+	public:
+
 		bool			IsOver();
 
-		// Set position relative to parent.
-		//
-		void			SetPosition( const Point2i& pos );
-		Point2i			GetPosition();
+	protected:
+
+		virtual void	Over();
+
+	public:
+
+		virtual void	Save( Archive& archive );
+
+		virtual void	Load( Archive& archive );
 	};
 }}

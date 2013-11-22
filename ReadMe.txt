@@ -42,8 +42,8 @@ This engine has integrated:
 
 	States that it is LGPL; however documentation contained
 	within the downloaded version indicates it is only GPL.
-	Additionally, Sentinel Game Engine only uses the OpenAL
-	portion of the software downloaded along with DLL.
+	Additionally, Sentinel only uses the OpenAL	portion of 
+	the software downloaded along with DLL.
 
 
 	OggVorbis

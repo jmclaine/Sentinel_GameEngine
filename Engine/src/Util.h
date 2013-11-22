@@ -97,6 +97,12 @@ namespace Sentinel
 			(*it).Release();\
 		(*it).clear();
 
+	#define SHUTDOWN_DELETE( var )\
+		if( var ) {\
+			var->Shutdown();\
+			delete var;\
+			var = NULL; }
+
 	#define SHUTDOWN_ARRAY( count, var )\
 		for( int x = 0; x < count; ++x )\
 		{\
@@ -115,11 +121,11 @@ namespace Sentinel
 
 	#define INTERP( start, end, alpha ) ((start) + ((end) - (start)) * (alpha))
 
-	// Convert a string into an integer value.
-	// Only the first 16 characters will guarantee a unique ID.
+	// djb2 algorithm
+	// Warning: Collisions may be possible
 	//
-	int SENTINEL_DLL StringToID( const char* name );
-
+	UINT SENTINEL_DLL HashString( const char* str );
+	
 	////////////////////////////////////////////////////////////////////
 
 	class AppException : public std::exception

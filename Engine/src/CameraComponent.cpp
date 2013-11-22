@@ -6,7 +6,8 @@
 namespace Sentinel
 {
 	CameraComponent::CameraComponent() :
-		mTransform( NULL )
+		mTransform( NULL ),
+		mScaleToWindow( false )
 	{
 		mType = GameComponent::CAMERA;
 
@@ -34,5 +35,20 @@ namespace Sentinel
 	void CameraComponent::Shutdown()
 	{
 		mTransform = NULL;
+	}
+
+	const Matrix4f& CameraComponent::GetMatrixView()
+	{
+		return mMatrixView;
+	}
+
+	const Matrix4f& CameraComponent::GetMatrixProjection()
+	{
+		return mMatrixProjection;
+	}
+
+	const Matrix4f& CameraComponent::GetMatrixFinal()
+	{
+		return mMatrixFinal;
 	}
 }

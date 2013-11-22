@@ -4,6 +4,8 @@
 
 namespace Sentinel
 {
+	Renderer* gRenderer = NULL;
+
 	GameWindow::GameWindow( UINT icon, UINT iconSmall, UINT menu, LPCSTR cursor )
 	{
 		mIcon		= icon;
@@ -15,6 +17,7 @@ namespace Sentinel
 		memset( mWindowClass, 0, MAX_CLASS_LENGTH );
 
 		mWindowInfo = NULL;
+		mRenderer   = NULL;
 	}
 
 	GameWindow::~GameWindow()
@@ -50,9 +53,10 @@ namespace Sentinel
 			mWindowInfo = renderer->Startup( hWnd, info.Fullscreen(), info.Width(), info.Height() );
 
 			if( !mWindowInfo )
-			throw AppException( "Failed Renderer::Startup()" );
+				throw AppException( "Failed Renderer::Startup()" );
 
-			GUI::Widget::RENDERER = renderer;
+			mRenderer = renderer;
+			gRenderer = renderer;
 		}
 		else
 		{
@@ -60,11 +64,15 @@ namespace Sentinel
 		}
 	}
 
+	void GameWindow::Update()
+	{
+		mWindowInfo->Update();
+	}
+
 	void GameWindow::Shutdown()
 	{
-		SetActive();
-
-		GUI::Widget::RENDERER->Shutdown();
+		mRenderer->SetWindow( mWindowInfo );
+		mRenderer->Shutdown();
 
 		UnregisterClass( mWindowClass, mINST );
 
@@ -73,16 +81,6 @@ namespace Sentinel
 	}
 
 	///////////////////////////
-
-	void GameWindow::SetActive()
-	{
-		GUI::Widget::RENDERER->SetWindow( mWindowInfo );
-	}
-
-	bool GameWindow::ShareResources( GameWindow* window )
-	{
-		return GUI::Widget::RENDERER->ShareResources( mWindowInfo, window->mWindowInfo );
-	}
 
 	const WindowInfo* GameWindow::GetInfo() const
 	{

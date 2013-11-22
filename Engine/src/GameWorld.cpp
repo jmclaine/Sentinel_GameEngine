@@ -6,9 +6,11 @@
 #include "Archive.h"
 #include "Timing.h"
 #include "PhysicsSystem.h"
+#include "SpriteSystem.h"
 #include "SoundManager.h"
 #include "TextureManager.h"
 #include "ShaderManager.h"
+#include "SpriteManager.h"
 #include "MeshManager.h"
 #include "ModelManager.h"
 
@@ -19,8 +21,10 @@ namespace Sentinel
 		mRenderer( NULL ),
 		mTiming( NULL ),
 		mPhysicsSystem( NULL ),
+		mSpriteSystem( NULL ),
 		mTextureManager( NULL ),
 		mShaderManager( NULL ),
+		mSpriteManager( NULL ),
 		mMeshManager( NULL ),
 		mModelManager( NULL ),
 		mSoundManager( NULL )
@@ -152,7 +156,7 @@ namespace Sentinel
 			//
 			// TODO: Raycast from center screen to AABB for more accuracy.
 			//
-			Vector3f camPos = mCurrentCamera->GetTransform()->mPosition;
+			/*Vector3f camPos = mCurrentCamera->GetTransform()->mPosition;
 		
 			mAlphaOrder.clear();
 			TRAVERSE_VECTOR( x, mGameObject )
@@ -161,12 +165,14 @@ namespace Sentinel
 			
 				if( transform )
 					mAlphaOrder.insert( std::pair< float, GameObject* >( -(camPos - transform->mPosition).LengthSquared(), mGameObject[ x ] ));
-			}
+			}*/
 
 			// Update and Render Meshes.
 			//
-			TRAVERSE_LIST( it, mAlphaOrder )
-				(*it).second->UpdateDrawable();
+			//TRAVERSE_LIST( it, mAlphaOrder )
+			//	(*it).second->UpdateDrawable();
+			TRAVERSE_VECTOR( x, mGameObject )
+				mGameObject[ x ]->UpdateDrawable();
 		}
 	}
 
@@ -194,6 +200,44 @@ namespace Sentinel
 			entity->SetWorld( this );
 		
 			mGameObject.push_back( entity );
+
+			////////////////////////////////
+
+			CameraComponent* camera = (CameraComponent*)entity->FindComponent( GameComponent::CAMERA );
+		
+			if( camera )
+			{
+				bool isDup = false;
+				TRAVERSE_VECTOR( x, mCamera )
+				{
+					if( mCamera[ x ] == camera )
+					{
+						isDup = true;
+						break;
+					}
+				}
+
+				if( !isDup )
+					mCamera.push_back( camera );
+			}
+
+			LightComponent* light = (LightComponent*)entity->FindComponent( GameComponent::LIGHT );
+			
+			if( light )
+			{
+				bool isDup = false;
+				TRAVERSE_VECTOR( x, mLight )
+				{
+					if( mLight[ x ] == light )
+					{
+						isDup = true;
+						break;
+					}
+				}
+
+				if( !isDup )
+					mLight.push_back( light );
+			}
 		}
 
 		return entity;

@@ -19,6 +19,7 @@
 namespace Sentinel
 {
 	class TransformComponent;
+	class WindowInfo;
 
 	class SENTINEL_DLL CameraComponent : public GameComponent
 	{
@@ -26,11 +27,15 @@ namespace Sentinel
 
 		TransformComponent* mTransform;
 
+	protected:
+
+		Matrix4f			mMatrixView;
+		Matrix4f			mMatrixProjection;
+		Matrix4f			mMatrixFinal;
+
 	public:
 
-		Matrix4f	mMatrixView;
-		Matrix4f	mMatrixProjection;
-		Matrix4f	mMatrixFinal;
+		bool				mScaleToWindow;
 
 	protected:
 
@@ -40,10 +45,14 @@ namespace Sentinel
 
 		const TransformComponent* GetTransform();
 
-		virtual void Startup();
+		virtual void		Startup();
 
-		virtual void Update();
+		virtual void		Update();
 
-		virtual void Shutdown();
+		virtual void		Shutdown();
+
+		const Matrix4f&		GetMatrixView();
+		const Matrix4f&		GetMatrixProjection();
+		const Matrix4f&		GetMatrixFinal();
 	};
 }

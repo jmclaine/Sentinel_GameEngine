@@ -33,9 +33,6 @@ namespace Sentinel
 
 		int		mScrollDistance;
 
-		float	mDesktopWidth;
-		float	mDesktopHeight;
-
 		///////////////////////////////////
 
 		Mouse();
@@ -47,7 +44,7 @@ namespace Sentinel
 		int		Show( bool visiblity );
 
 		void	SetPosition( const POINT& pos );
-		POINT	GetPosition( HWND hWnd = NULL ) const;
+		POINT	GetPosition( HWND hWnd = NULL, bool scaleToWindow = false ) const;
 
 		bool	IsDown( MouseButton button ) const;
 

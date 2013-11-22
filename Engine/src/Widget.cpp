@@ -3,15 +3,13 @@
 
 namespace Sentinel { namespace GUI
 {
-	Renderer* Widget::RENDERER				= NULL;
-	std::shared_ptr< Sprite > Widget::SKIN	= NULL;
-
-	void Widget::DoNothing()
-	{}
-
+	SpriteSystem* Widget::SPRITE_SYSTEM = NULL;
+	
 	//////////////////////////////////
 
-	Widget::Widget()
+	Widget::Widget() :
+		mZIndex( 0 ),
+		mIsVisible( true )
 	{}
 
 	Widget::~Widget()
@@ -38,8 +36,14 @@ namespace Sentinel { namespace GUI
 
 	void Widget::SetPosition( const Point2i& pos )
 	{
-		mDimension.left = mParent->mDimension.left + static_cast< float >(pos.x);
-		mDimension.top  = mParent->mDimension.top  + static_cast< float >(pos.y);
+		mDimension.left = static_cast< float >(pos.x);
+		mDimension.top  = static_cast< float >(pos.y);
+
+		if( mParent )
+		{
+			mDimension.left += mParent->mDimension.left;
+			mDimension.top  += mParent->mDimension.top;
+		}
 	}
 
 	Point2i Widget::GetPosition()

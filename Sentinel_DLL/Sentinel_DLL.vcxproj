@@ -108,7 +108,9 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
     <ClInclude Include="..\Engine\src\GUI\Button.h" />
     <ClInclude Include="..\Engine\src\GUI\Grid.h" />
     <ClInclude Include="..\Engine\src\GUI\Label.h" />
+    <ClInclude Include="..\Engine\src\GUI\Drawable.h" />
     <ClInclude Include="..\Engine\src\GUI\Widget.h" />
+    <ClInclude Include="..\Engine\src\WidgetComponent.h" />
     <ClInclude Include="..\Engine\src\ListNode.h" />
     <ClInclude Include="..\Engine\src\Particle.h" />
     <ClInclude Include="..\Engine\src\ParticleEmitterComponent.h" />
@@ -157,13 +159,14 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
     <ClInclude Include="..\Engine\src\GameWindow.h" />
     <ClInclude Include="..\Engine\src\RendererTypes.h" />
     <ClInclude Include="..\Engine\src\Script.h" />
-    <ClInclude Include="..\Engine\src\Serializeable.h" />
+    <ClInclude Include="..\Engine\src\Serializable.h" />
     <ClInclude Include="..\Engine\src\Shader.h" />
     <ClInclude Include="..\Engine\src\ShaderManager.h" />
     <ClInclude Include="..\Engine\src\Shape.h" />
     <ClInclude Include="..\Engine\src\Singleton.h" />
     <ClInclude Include="..\Engine\src\Sprite.h" />
     <ClInclude Include="..\Engine\src\SpriteComponent.h" />
+    <ClInclude Include="..\Engine\src\SpriteManager.h" />
     <ClInclude Include="..\Engine\src\SpriteSystem.h" />
     <ClInclude Include="..\Engine\src\Texture.h" />
     <ClInclude Include="..\Engine\src\TextureManager.h" />
@@ -179,7 +182,10 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\Archive.cpp" />
-    <ClCompile Include="..\Engine\src\Button.cpp" />
+    <ClCompile Include="..\Engine\src\GUI\Button.cpp" />
+    <ClCompile Include="..\Engine\src\GUI\Drawable.cpp" />
+    <ClCompile Include="..\Engine\src\GUI\Grid.cpp" />
+    <ClCompile Include="..\Engine\src\GUI\Widget.cpp" />
     <ClCompile Include="..\Engine\src\Particle.cpp" />
     <ClCompile Include="..\Engine\src\ParticleEffect.cpp" />
     <ClCompile Include="..\Engine\src\ParticleEmitterComponent.cpp" />
@@ -228,12 +234,13 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
     <ClCompile Include="..\Engine\src\ScriptLexer.cpp" />
     <ClCompile Include="..\Engine\src\ScriptNode.cpp" />
     <ClCompile Include="..\Engine\src\ScriptParser.cpp" />
-    <ClCompile Include="..\Engine\src\Serializeable.cpp" />
+    <ClCompile Include="..\Engine\src\Serializable.cpp" />
     <ClCompile Include="..\Engine\src\Shader.cpp" />
     <ClCompile Include="..\Engine\src\ShaderManager.cpp" />
     <ClCompile Include="..\Engine\src\Shape.cpp" />
     <ClCompile Include="..\Engine\src\Sprite.cpp" />
     <ClCompile Include="..\Engine\src\SpriteComponent.cpp" />
+    <ClCompile Include="..\Engine\src\SpriteManager.cpp" />
     <ClCompile Include="..\Engine\src\SpriteSystem.cpp" />
     <ClCompile Include="..\Engine\src\stb_image.c" />
     <ClCompile Include="..\Engine\src\Texture.cpp" />
@@ -245,7 +252,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
     <ClCompile Include="..\Engine\src\Vector2f.cpp" />
     <ClCompile Include="..\Engine\src\Vector3f.cpp" />
     <ClCompile Include="..\Engine\src\Vector4f.cpp" />
-    <ClCompile Include="..\Engine\src\Widget.cpp" />
+    <ClCompile Include="..\Engine\src\WidgetComponent.cpp" />
     <ClCompile Include="..\Engine\tinyxml\tinystr.cpp" />
     <ClCompile Include="..\Engine\tinyxml\tinyxml.cpp" />
     <ClCompile Include="..\Engine\tinyxml\tinyxmlerror.cpp" />

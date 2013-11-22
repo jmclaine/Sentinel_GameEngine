@@ -3,7 +3,6 @@
 #include <Windows.h>
 
 #include "Common.h"
-#include "GUI/Widget.h"
 
 namespace Sentinel
 {
@@ -16,7 +15,7 @@ namespace Sentinel
 	// Helper class for quick window creation setup
 	// specifically for the Renderer.
 	//
-	class SENTINEL_DLL GameWindow : public GUI::Widget
+	class SENTINEL_DLL GameWindow
 	{
 	private:
 
@@ -31,6 +30,7 @@ namespace Sentinel
 		char					mWindowClass[ MAX_CLASS_LENGTH ];
 
 		WindowInfo*				mWindowInfo;
+		Renderer*				mRenderer;
 
 	public:
 
@@ -39,13 +39,11 @@ namespace Sentinel
 
 		void	Startup( Renderer* renderer, HINSTANCE hInstance, int nCmdShow, char* title, char* windowClass, const WindowInfo& info );
 
+		void	Update();
+
 		void	Shutdown();
 
 		///////////////////////////
-
-		void	SetActive();
-
-		bool	ShareResources( GameWindow* window );
 
 		const WindowInfo* GetInfo() const;
 

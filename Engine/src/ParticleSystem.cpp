@@ -12,10 +12,6 @@
 
 namespace Sentinel
 {
-	Matrix4f ParticleSystem::MATRIX_TRANSLATION;
-	Matrix4f ParticleSystem::MATRIX_SCALE;
-	Matrix4f ParticleSystem::MATRIX_ROTATION;
-
 	ParticleSystem::ParticleSystem( Renderer* renderer, GameWorld* world, UINT maxParticles ) :
 		mRenderer( renderer ),
 		mWorld( world ),
@@ -35,8 +31,6 @@ namespace Sentinel
 	{
 		for( UINT x = 0; x < (UINT)mEffect.size(); ++x )
 			delete mEffect[ x ];
-
-		delete mMesh;
 
 		Shutdown();
 	}
@@ -116,5 +110,10 @@ namespace Sentinel
 		mNumParticles = 0;
 
 		mIsActive = false;
+	}
+
+	void ParticleSystem::SetMatrixWorld( const Matrix4f& matWorld )
+	{
+		mMesh->mMatrixWorld = matWorld;
 	}
 }

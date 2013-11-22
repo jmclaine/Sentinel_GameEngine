@@ -8,6 +8,11 @@ namespace Sentinel
 	{
 	public:
 
+		static const Vector4f ZERO;
+		static const Vector4f ONE;
+
+		////////////////////////////////
+
 		float x, y, z, w;
 
 		////////////////////////////////

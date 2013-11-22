@@ -44,7 +44,7 @@ namespace Sentinel
 	{
 		DrawableComponent::Update();
 
-		mParticleSystem->mMesh->mMatrixWorld = mTransform->GetMatrixWorld();
+		mParticleSystem->SetMatrixWorld( mTransform->GetMatrixWorld() );
 
 		mParticleSystem->Update( mOwner->GetWorld()->mTiming->DeltaTime() );
 	}

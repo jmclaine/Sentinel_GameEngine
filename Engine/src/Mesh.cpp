@@ -75,7 +75,7 @@ namespace Sentinel
 						_ASSERT( world );
 						_ASSERT( world->GetCamera() != NULL );
 
-						mShader->SetMatrix( uniformIndex, (world->GetCamera()->mMatrixFinal * mMatrixWorld).Ptr() );
+						mShader->SetMatrix( uniformIndex, (world->GetCamera()->GetMatrixFinal() * mMatrixWorld).Ptr() );
 						break;
 
 					// World Matrix.
@@ -177,10 +177,10 @@ namespace Sentinel
 
 						Vector2f pixelSize( 1.0f / info->Width(), 1.0f / info->Height() );
 
-						mShader->SetMatrix( uniformIndex, (world->GetCamera()->mMatrixProjection.Inverse()).Ptr() );
+						mShader->SetMatrix( uniformIndex, (world->GetCamera()->GetMatrixProjection().Inverse()).Ptr() );
 						++uniformIndex;
 
-						mShader->SetMatrix( uniformIndex, world->GetCamera()->mMatrixView.Ptr() );
+						mShader->SetMatrix( uniformIndex, const_cast< Matrix4f& >(world->GetCamera()->GetMatrixView()).Ptr() );
 						++uniformIndex;
 
 						mShader->SetFloat2( uniformIndex, pixelSize.Ptr() );

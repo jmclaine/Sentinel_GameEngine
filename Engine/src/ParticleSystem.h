@@ -27,24 +27,19 @@ namespace Sentinel
 	{
 	protected:
 
-		static Matrix4f		MATRIX_TRANSLATION;
-		static Matrix4f		MATRIX_ROTATION;
-		static Matrix4f		MATRIX_SCALE;
-
 		bool				mIsActive;
 
 		Renderer*			mRenderer;
 		GameWorld*			mWorld;
 
 		UINT				mNumParticles;
+		UINT				mMaxParticles;
 
 		float				mSpawnTime;
 
-	public:
+		std::shared_ptr< Mesh > mMesh;
 
-		Mesh*				mMesh;
-		
-		UINT				mMaxParticles;
+	public:
 
 		float				mMinLifetime;
 		float				mMaxLifetime;
@@ -68,11 +63,15 @@ namespace Sentinel
 
 		virtual void		Shutdown();
 
+		///////////////////////////////////
+
+		void				SetMatrixWorld( const Matrix4f& matWorld );
+
 	private:
 
 		virtual Particle&	GetParticle( UINT index ) = 0;
 	};
 
-	extern SENTINEL_DLL ParticleSystem* BuildParticleSystemNormal( Renderer* renderer, GameWorld* world, std::shared_ptr< Sprite > sprite, UINT maxParticles = 1000 );
-	// extern SENTINEL_DLL ParticleSystem* BuildParticleSystemPhysics( Renderer* renderer, GameWorld* world, Mesh* mesh, UINT maxParticles = 1000 );
+	extern SENTINEL_DLL ParticleSystem* BuildParticleSystemNormal( Renderer* renderer, GameWorld* world, std::shared_ptr< Sprite > sprite, UINT maxParticles );
+	// extern SENTINEL_DLL ParticleSystem* BuildParticleSystemPhysics( Renderer* renderer, GameWorld* world, std::shared_ptr< Mesh > mesh, UINT maxParticles );
 }

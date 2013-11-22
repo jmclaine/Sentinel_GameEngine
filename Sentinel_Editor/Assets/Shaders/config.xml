@@ -6,6 +6,7 @@
   <Definition FileName="normmap"  Attribute="PXNT" Uniform="PpXXVML" Name="Normal Map" />
   <Definition FileName="sprite"   Attribute="xCM"  Uniform="X"       Name="Sprite" />
   <Definition FileName="gui"      Attribute="xCM"  Uniform="X"       Name="GUI" />
+  <Definition FileName="guimesh"  Attribute="PX"   Uniform="pX"      Name="GUI Mesh" />
   <Definition FileName="RTnormal" Attribute="PX"   Uniform="pX"      Name="RT_Normal" />
   
   <!--Definition FileName="colnorm"-->

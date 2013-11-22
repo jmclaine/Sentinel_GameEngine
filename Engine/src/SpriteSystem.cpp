@@ -10,21 +10,20 @@
 
 namespace Sentinel
 {
-	SpriteSystem::SpriteSystem( Renderer* renderer, std::shared_ptr< Sprite > sprite, UINT maxSprites ) :
+	SpriteSystem::SpriteSystem( Renderer* renderer, std::shared_ptr< Shader > shader, UINT maxSprites ) :
 		mRenderer( renderer ),
-		mSprite( sprite ),
 		mMaxSprites( maxSprites ),
 		mNumSprites( 0 )
 	{
 		_ASSERT( renderer );
-		_ASSERT( sprite );
+		_ASSERT( shader );
 		_ASSERT( maxSprites > 0 );
 
 		mStorage = new Storage[ maxSprites ];
 
 		MeshBuilder builder;
 
-		builder.mShader = mSprite->mShader;
+		builder.mShader = shader;
 
 		for( UINT x = 0; x < maxSprites; ++x )
 		{
@@ -38,8 +37,6 @@ namespace Sentinel
 
 		if( !mMesh )
 			throw AppException( "Failed to create Mesh in SpriteSystem" );
-
-		mMesh->mTexture[ TEXTURE_DIFFUSE ] = mSprite->mTexture;
 	}
 
 	SpriteSystem::~SpriteSystem()
@@ -87,11 +84,9 @@ namespace Sentinel
 
 		mMesh->mVBO->Unlock();
 
-		mMesh->mShader  = mSprite->mShader;
+		mMesh->mShader = mSprite->mShader;
 		mMesh->mTexture[ TEXTURE_DIFFUSE ] = mSprite->mTexture;
 
 		mMesh->Draw( mRenderer, NULL, mNumSprites );
-
-		mNumSprites = 0;
 	}
 }

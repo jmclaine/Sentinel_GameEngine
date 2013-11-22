@@ -1,6 +1,9 @@
 #include "OrthographicCameraComponent.h"
 #include "TransformComponent.h"
 #include "Archive.h"
+#include "Renderer.h"
+#include "GameObject.h"
+#include "GameWorld.h"
 
 namespace Sentinel
 {
@@ -23,6 +26,17 @@ namespace Sentinel
 	void OrthographicCameraComponent::Update()
 	{
 		CameraComponent::Update();
+
+		WindowInfo* info = mOwner->GetWorld()->mRenderer->GetWindow();
+
+		if( mScaleToWindow )
+		{
+			Set( (float)info->Width(), (float)info->Height() );
+		}
+		else
+		{
+			Set( (float)Renderer::WINDOW_WIDTH_BASE, (float)Renderer::WINDOW_HEIGHT_BASE );
+		}
 
 		mMatrixView.Translate( mTransform->mPosition );
 		

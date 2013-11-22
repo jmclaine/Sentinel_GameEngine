@@ -12,6 +12,10 @@ namespace Sentinel
 
 	public:
 
+		static const Quatf IDENTITY;
+
+		////////////////////////////////
+
 		float x, y, z, w;
 
 		////////////////////////////////

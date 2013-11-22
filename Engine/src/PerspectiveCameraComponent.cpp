@@ -1,6 +1,9 @@
 #include "PerspectiveCameraComponent.h"
 #include "TransformComponent.h"
 #include "Archive.h"
+#include "Renderer.h"
+#include "GameObject.h"
+#include "GameWorld.h"
 
 namespace Sentinel
 {
@@ -10,7 +13,7 @@ namespace Sentinel
 	PerspectiveCameraComponent::PerspectiveCameraComponent() :
 		mNearZ( 0.1f ),
 		mFarZ( 10000.0f ),
-		mFOV( 45.0f )
+		mFOV( 60.0f )
 	{
 		Set( 1920, 1080 );
 	}
@@ -18,7 +21,7 @@ namespace Sentinel
 	PerspectiveCameraComponent::PerspectiveCameraComponent( float windowWidth, float windowHeight ) :
 		mNearZ( 0.1f ),
 		mFarZ( 10000.0f ),
-		mFOV( 45.0f )
+		mFOV( 60.0f )
 	{
 		Set( windowWidth, windowHeight );
 	}
@@ -36,6 +39,17 @@ namespace Sentinel
 	void PerspectiveCameraComponent::Update()
 	{
 		CameraComponent::Update();
+
+		WindowInfo* info = mOwner->GetWorld()->mRenderer->GetWindow();
+
+		if( mScaleToWindow )
+		{
+			Set( (float)info->Width(), (float)info->Height(), mNearZ, mFarZ, mFOV );
+		}
+		else
+		{
+			Set( (float)Renderer::WINDOW_WIDTH_BASE, (float)Renderer::WINDOW_HEIGHT_BASE, mNearZ, mFarZ, mFOV );
+		}
 
 		mMatrixView.Rotate( mTransform->mOrientation );
 		mLookAt = mTransform->mPosition + mMatrixView.Forward();

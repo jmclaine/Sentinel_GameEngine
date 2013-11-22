@@ -19,29 +19,18 @@ namespace Sentinel
 	#endif
 	}
 
-	int StringToID( const char* name )
+	// Based on code from: http://www.cse.yorku.ca/~oz/hash.html
+	// djb2 algorithm
+	// Warning: Collisions may be possible
+	//
+	UINT HashString( const char* str )
 	{
-		int id = 0;
-		BYTE value = 0;
-		UINT len = strlen( name );
+		UINT hash = 5381;
+		int c;
 
-		for( UINT x = 0; x < len && x < 16; ++x )
-		{
-			if( name[ x ] >= 'A' && name[ x ] <= 'Z' )
-				value = name[ x ] - 'A';
-			else
-			if( name[ x ] >= 'a' && name[ x ] <= 'z' )
-				value = name[ x ] - 'a' + 26;
-			else
-			if( name[ x ] >= '0' && name[ x ] <= '9' )
-				value = name[ x ] - '0' + 52;
-			else
-			if( name[ x ] == '_' )
-				value = 63;
+		while( c = *str++ )
+			hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
 
-			id |= value << (x << 2);
-		}
-
-		return id;
+		return hash;
 	}
 }

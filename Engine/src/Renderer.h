@@ -144,6 +144,8 @@ namespace Sentinel
 		float	HeightRatio() const;
 
 		void*	Handle() const;
+
+		void	Update();
 	};
 
 	// Only one Renderer should be created as multiple instances
@@ -163,8 +165,8 @@ namespace Sentinel
 
 	public:
 
-		static const UINT	WINDOW_WIDTH_BASE  = 1920;
-		static const UINT	WINDOW_HEIGHT_BASE = 1080;
+		static UINT	WINDOW_WIDTH_BASE;
+		static UINT	WINDOW_HEIGHT_BASE;
 
 		std::shared_ptr< Texture >	NULL_TEXTURE;	// black default texture
 		std::shared_ptr< Texture >	BASE_TEXTURE;	// white default texture

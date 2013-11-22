@@ -13,7 +13,7 @@ namespace Sentinel
 {
 	class GameWorld;
 
-	class SENTINEL_DLL GameObject : public Serializeable, public ListNode< GameObject >
+	class SENTINEL_DLL GameObject : public Serializable, public ListNode< GameObject >
 	{
 	protected:
 

@@ -9,6 +9,11 @@ namespace Sentinel
 		friend class Matrix4f;
 
 	public:
+
+		static const Vector3f ZERO;
+		static const Vector3f ONE;
+
+		////////////////////////////////
 		
 		float x, y, z;
 
