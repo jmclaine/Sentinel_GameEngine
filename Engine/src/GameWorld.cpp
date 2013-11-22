@@ -6,6 +6,7 @@
 #include "Archive.h"
 #include "Timing.h"
 #include "PhysicsSystem.h"
+#include "AudioSystem.h"
 #include "SpriteSystem.h"
 #include "SoundManager.h"
 #include "TextureManager.h"
@@ -21,6 +22,7 @@ namespace Sentinel
 		mRenderer( NULL ),
 		mTiming( NULL ),
 		mPhysicsSystem( NULL ),
+		mAudioSystem( NULL ),
 		mSpriteSystem( NULL ),
 		mTextureManager( NULL ),
 		mShaderManager( NULL ),
@@ -33,6 +35,18 @@ namespace Sentinel
 	GameWorld::~GameWorld()
 	{
 		Release();
+
+		SAFE_DELETE( mTiming );
+		SAFE_DELETE( mPhysicsSystem );
+		SAFE_DELETE( mAudioSystem );
+		SAFE_DELETE( mSpriteSystem );
+		
+		SAFE_DELETE( mTextureManager );
+		SAFE_DELETE( mShaderManager );
+		SAFE_DELETE( mSpriteManager );
+		SAFE_DELETE( mMeshManager );
+		SAFE_DELETE( mModelManager );
+		SAFE_DELETE( mSoundManager );
 	}
 
 	void GameWorld::Release()
@@ -148,6 +162,8 @@ namespace Sentinel
 	{
 		if( mCurrentCamera )
 		{
+			mCurrentCamera->Update();
+
 			// Meshes may contain alpha values.
 			// Put them in order.
 			//

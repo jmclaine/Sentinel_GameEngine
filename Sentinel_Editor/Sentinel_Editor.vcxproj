@@ -91,6 +91,7 @@
     <None Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Components\EditorControllerComponent.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Sentinel_Editor.h" />
     <ClInclude Include="stdafx.h" />

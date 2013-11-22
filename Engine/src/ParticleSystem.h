@@ -11,7 +11,7 @@ in order to spawn outside the origin.
 
 #include "Particle.h"
 #include "ParticleEffect.h"
-#include "Sprite.h"
+#include "Serializable.h"
 #include "Vector3f.h"
 #include "Quatf.h"
 #include "Matrix4f.h"
@@ -22,15 +22,25 @@ namespace Sentinel
 	class GameWorld;
 	class Renderer;
 	class Mesh;
+	class Sprite;
+	class Archive;
 	
-	class SENTINEL_DLL ParticleSystem
+	class SENTINEL_DLL ParticleSystem : public Serializable
 	{
+	public:
+
+		enum Type
+		{
+			NORMAL,
+			PHYSICS,
+		};
+
 	protected:
 
 		bool				mIsActive;
 
 		Renderer*			mRenderer;
-		GameWorld*			mWorld;
+		GameWorld*			mGameWorld;
 
 		UINT				mNumParticles;
 		UINT				mMaxParticles;
@@ -50,12 +60,16 @@ namespace Sentinel
 
 	protected:
 
-		//ParticleSystem();
-		ParticleSystem( Renderer* renderer, GameWorld* world, UINT maxParticles );
-
+		ParticleSystem();
+		ParticleSystem( Renderer* renderer, GameWorld* world );
+		
 	public:
 
 		virtual ~ParticleSystem();
+
+		void				Set( Renderer* renderer, GameWorld* world );
+
+		///////////////////////////////////
 
 		virtual void		Startup();
 
@@ -70,8 +84,16 @@ namespace Sentinel
 	private:
 
 		virtual Particle&	GetParticle( UINT index ) = 0;
+
+	public:
+
+		virtual void		Save( Archive& archive );
+
+		virtual void		Load( Archive& archive );
 	};
 
 	extern SENTINEL_DLL ParticleSystem* BuildParticleSystemNormal( Renderer* renderer, GameWorld* world, std::shared_ptr< Sprite > sprite, UINT maxParticles );
+	extern SENTINEL_DLL ParticleSystem* BuildParticleSystemNormal( Renderer* renderer, GameWorld* world );
+
 	// extern SENTINEL_DLL ParticleSystem* BuildParticleSystemPhysics( Renderer* renderer, GameWorld* world, std::shared_ptr< Mesh > mesh, UINT maxParticles );
 }

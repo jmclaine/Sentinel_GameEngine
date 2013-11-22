@@ -71,74 +71,25 @@ class MainApp
 	GameWindow*				mGameWindow;
 	Renderer*				mRenderer;
 
-	Timing*					mTiming;
-	PhysicsSystem*			mPhysicsSystem;
-	AudioSystem*			mAudioSystem;
-	SpriteSystem*			mSpriteSystem;
-
-	TextureManager*			mTextureManager;
-	ShaderManager*			mShaderManager;
-	SpriteManager*			mSpriteManager;
-	MeshManager*			mMeshManager;
-	ModelManager*			mModelManager;
-	SoundManager*			mSoundManager;
-	
 	GameWorld*				mGameWorld;
 	GameWorld*				mEditorWorld;
 
 	Mesh*					mRTBackbufferMesh;
 
-	struct FuncTest
-	{
-		int value;
-
-		void output()
-		{
-			TRACE( "Func: " << value );
-		}
-	};
-	FuncTest test0;
-	FuncTest test1;
-
 public:
 
-	MainApp()
+	MainApp() :
+		mGameWindow( NULL ),
+		mRenderer( NULL ),
+		mGameWorld( NULL ),
+		mEditorWorld( NULL ),
+		mRTBackbufferMesh( NULL )
 	{
 		srand( (UINT)time( (time_t*)0 ));
-
-		mGameWindow		= NULL;
-		mRenderer		= NULL;
-
-		mTiming			= NULL;
-		mPhysicsSystem	= NULL;
-		mSpriteSystem   = NULL;
-		mAudioSystem    = NULL;
-
-		mTextureManager	= NULL;
-		mShaderManager	= NULL;
-		mSpriteManager	= NULL;
-		mMeshManager	= NULL;
-		mModelManager	= NULL;
-		mSoundManager   = NULL;
-
-		mGameWorld		= NULL;
-
-		mRTBackbufferMesh = NULL;
-
-		test0.value = 0;
-		test1.value = 1;
-		
-		REGISTER_SERIAL_FUNCTION( test1.output );
-		REGISTER_SERIAL_FUNCTION( test0.output );
 	}
 
 	~MainApp()
 	{}
-
-	static void Quit()
-	{
-		PostQuitMessage(0);
-	}
 
 	void Startup( HINSTANCE hInstance, int nCmdShow )
 	{
@@ -166,10 +117,11 @@ public:
 		mRenderer->CreateBackbuffer();
 
 		////////////////////////////////////
-		// Prepare GameWorld.
+		// Prepare Editor and World View.
 		//
 		SetDirectory( "Assets" );
 
+		PrepareEditorWorld();
 		PrepareGameWorld();
 		
 		SetDirectory( ".." );
@@ -199,13 +151,16 @@ public:
 			//
 			else
 			{
-				static CameraComponent* camera;
+				static Timing* timing;
 
-				mTiming->Update();
+				timing = mEditorWorld->mTiming;
+
+				timing->Update();
+				mGameWorld->mTiming->Update();
 
 				Keyboard::Get().ProcessMessages();
 
-				BEGIN_PROFILE( mTiming );
+				BEGIN_PROFILE( timing );
 				if( Keyboard::Get().DidGoDown( VK_ESCAPE ))
 				{
 					return;
@@ -229,13 +184,10 @@ public:
 
 				mRenderer->Clear( color );
 
-				BEGIN_PROFILE( mTiming );
-				mGameWorld->UpdateController();
-				mGameWorld->UpdatePhysics();
+				BEGIN_PROFILE( timing );
 				mGameWorld->UpdateTransform();
-				mGameWorld->UpdateComponents();
 				mGameWorld->UpdateDrawable();
-				END_PROFILE( mTiming, "World" );
+				END_PROFILE( timing, "World" );
 
 				////////////////////////////////////
 				
@@ -245,28 +197,29 @@ public:
 
 				mRenderer->Clear( color );
 
-				BEGIN_PROFILE( mTiming );
+				BEGIN_PROFILE( timing );
 				mEditorWorld->UpdateController();
 				mEditorWorld->UpdatePhysics();
 				mEditorWorld->UpdateTransform();
 				mEditorWorld->UpdateComponents();
 				mEditorWorld->UpdateDrawable();
-				END_PROFILE( mTiming, "Editor" );
+				END_PROFILE( timing, "Editor" );
 				
 				//mRTBackbufferMesh->mMatrixWorld.Identity();
 				//mRTBackbufferMesh->Draw( mRenderer, mGameWorld );
 
-				BEGIN_PROFILE( mTiming );
+				BEGIN_PROFILE( timing );
 				mRenderer->Present();
-				END_PROFILE( mTiming, "Renderer" );
+				END_PROFILE( timing, "Renderer" );
 
 				Mouse::Get().Update();
 				Keyboard::Get().Update();
-				END_PROFILE( mTiming, "Update" );
+				END_PROFILE( timing, "Update" );
 
 				SEPARATE_PROFILE( "-----------------------" );
 
-				mTiming->Limit();
+				timing->Limit();
+				mGameWorld->mTiming->Limit(0);
 			}
 		}
 	}
@@ -278,18 +231,6 @@ public:
 		SHUTDOWN_DELETE( mGameWorld );
 		SHUTDOWN_DELETE( mEditorWorld );
 		
-		SAFE_DELETE( mTiming );
-		SAFE_DELETE( mPhysicsSystem );
-		SAFE_DELETE( mSpriteSystem );
-		SAFE_DELETE( mAudioSystem );
-		
-		SAFE_DELETE( mSoundManager );
-		SAFE_DELETE( mModelManager );
-		SAFE_DELETE( mSpriteManager );
-		SAFE_DELETE( mMeshManager );
-		SAFE_DELETE( mShaderManager );
-		SAFE_DELETE( mTextureManager );
-
 		SHUTDOWN_DELETE( mGameWindow );
 		
 		SAFE_DELETE( mRenderer );
@@ -304,19 +245,19 @@ public:
 			return;
 		}
 
-		mTextureManager->Save( archive, mRenderer );
-		mShaderManager->Save( archive );
-		mSpriteManager->Save( archive, mShaderManager, mTextureManager );
-		mMeshManager->Save( archive, mRenderer, mShaderManager, mTextureManager );
-		mModelManager->Save( archive, mRenderer, mShaderManager, mTextureManager );
-		mSoundManager->Save( archive );
+		mGameWorld->mTextureManager->Save( archive, mRenderer );
+		mGameWorld->mShaderManager->Save( archive );
+		mGameWorld->mSpriteManager->Save( archive, mGameWorld->mShaderManager, mGameWorld->mTextureManager );
+		mGameWorld->mMeshManager->Save( archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager );
+		mGameWorld->mModelManager->Save( archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager );
+		mGameWorld->mSoundManager->Save( archive );
 		
 		mGameWorld->Save( archive );
 
 		archive.Close();
 	}
 
-	void PrepareGameWorld()
+	void PrepareEditorWorld()
 	{
 		MeshBuilder						meshBuilder;
 		std::shared_ptr< Mesh >			mesh;
@@ -326,39 +267,24 @@ public:
 		PhysicsComponent*				physics;
 		RigidBody*						body;
 
-		mTiming							= new Timing();
-		mPhysicsSystem					= BuildPhysicsSystemSE();
-		mAudioSystem					= BuildAudioSystemAL();
+		/////////////////////////////////////////////////////////////////////////
 
-		mTextureManager					= new TextureManager();
-		mShaderManager					= new ShaderManager();
-		mSpriteManager					= new SpriteManager();
-		mMeshManager					= new MeshManager();
-		mModelManager					= new ModelManager();
-		mSoundManager					= new SoundManager();
-
-		////////////////////////////////////
-
-		mPhysicsSystem->Startup();
-
-		mGameWorld = new GameWorld();
-
-		mGameWorld->mRenderer			= mRenderer;
-		mGameWorld->mTiming				= mTiming;
-		mGameWorld->mPhysicsSystem		= mPhysicsSystem;
-
-		mGameWorld->mTextureManager		= mTextureManager;
-		mGameWorld->mShaderManager		= mShaderManager;
-		mGameWorld->mSpriteManager		= mSpriteManager;
-		mGameWorld->mMeshManager		= mMeshManager;
-		mGameWorld->mModelManager		= mModelManager;
-		mGameWorld->mSoundManager		= mSoundManager;
-
-		////////////////////////////////////
+		mEditorWorld = new GameWorld();
+		mEditorWorld->mRenderer			= mRenderer;
+		mEditorWorld->mTiming			= new Timing();
+		mEditorWorld->mPhysicsSystem	= BuildPhysicsSystemBT();
+		mEditorWorld->mAudioSystem		= BuildAudioSystemAL();
+		
+		mEditorWorld->mTextureManager	= new TextureManager();
+		mEditorWorld->mShaderManager	= new ShaderManager();
+		mEditorWorld->mSpriteManager	= new SpriteManager();
+		mEditorWorld->mMeshManager		= new MeshManager();
+		mEditorWorld->mModelManager		= new ModelManager();
+		mEditorWorld->mSoundManager		= new SoundManager();
 
 		SetDirectory( "Shaders" );
 
-		if( !mShaderManager->LoadConfig( "config.xml", mRenderer, mShaderManager ))
+		if( !ShaderManager::LoadConfig( "config.xml", mRenderer, mEditorWorld->mShaderManager ))
 		{
 			REPORT_ERROR( "Failed to load 'Assets\\Shaders\\config.xml'", "Shader Load Failure" );
 			throw AppException( "Failed to load 'Assets\\Shaders\\config.xml'" );
@@ -377,24 +303,135 @@ public:
 		*/
 		SetDirectory( ".." );
 
-		mSpriteSystem = new SpriteSystem( mRenderer, mShaderManager->Get( "GUI" ), 256 );
-		mGameWorld->mSpriteSystem		= mSpriteSystem;
+		mEditorWorld->mSpriteSystem = new SpriteSystem( mRenderer, mEditorWorld->mShaderManager->Get( "GUI" ), 256 );
 
 		////////////////////////////////////
 
-		// Create backbuffer for added effects.
+		// Create backbuffer for world view.
 		//
 		mRenderer->CreateDepthStencil( Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE );
-		mRenderer->CreateRenderTarget( mTextureManager->Add( "Backbuffer", mRenderer->CreateTexture( Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE )));
+		mRenderer->CreateRenderTarget( mEditorWorld->mTextureManager->Add( "Backbuffer", mRenderer->CreateTexture( Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE )));
 		
-		mRTBackbufferMesh = mRenderer->CreateRenderTargetMesh( mShaderManager->Get( "RT_Normal" ));
-		mRTBackbufferMesh->mTexture[ TEXTURE_DIFFUSE ] = mTextureManager->Get( "Backbuffer" );
+		mRTBackbufferMesh = mRenderer->CreateRenderTargetMesh( mEditorWorld->mShaderManager->Get( "RT_Normal" ));
+		mRTBackbufferMesh->mTexture[ TEXTURE_DIFFUSE ] = mEditorWorld->mTextureManager->Get( "Backbuffer" );
+
+		// Add GUI texture.
+		//
+		std::shared_ptr< Texture > texture = mEditorWorld->mTextureManager->Add( "default-alpha.png", mRenderer->CreateTextureFromFile( "Textures\\default-alpha.png" ));
+		//AssetTreeItem< Texture >* asset = new AssetTreeItem< Texture >( "default-alpha.png", texture );
+		//mAssetTexture->addChild( asset );
 
 		////////////////////////////////////
 
-		std::shared_ptr< Texture > texture = mTextureManager->Add( "default-alpha.png", mRenderer->CreateTextureFromFile( "Textures\\default-alpha.png" ));
-		//AssetTreeItem< Texture >* asset = new AssetTreeItem< Texture >( "default-alpha.png", texture );
-		//mAssetTexture->addChild( asset );
+		// GUI Camera.
+		//
+		obj = mEditorWorld->AddGameObject( new GameObject(), "GUI Camera" );
+
+		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
+		transform->mPosition = Vector3f( 0, 0, 0 );
+	
+		OrthographicCameraComponent* orthoCamera = (OrthographicCameraComponent*)obj->AttachComponent( new OrthographicCameraComponent( (float)Renderer::WINDOW_WIDTH_BASE, (float)Renderer::WINDOW_HEIGHT_BASE ), "OCamera" );
+		orthoCamera->mScaleToWindow = true;
+
+		//AddObject( obj );
+		
+		// Create game object for widget.
+		//
+		std::shared_ptr< Sprite > sprite( new Sprite( mEditorWorld->mShaderManager->Get( "GUI" ), mEditorWorld->mTextureManager->Get( "default-alpha.png" )));
+
+		sprite->AddFrame( sprite->GetTextureCoords( Quad( 0, 0, 512, 512 )));
+		sprite->AddFrame( sprite->GetTextureCoords( Quad( 0, 0, 64, 64 )));
+
+		mEditorWorld->mSpriteManager->Add( "GUI Sprite", sprite );
+
+		obj = mEditorWorld->AddGameObject( new GameObject(), "GUI Widget" );
+
+		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
+
+		WidgetComponent* widgetComp = (WidgetComponent*)obj->AttachComponent( new WidgetComponent( sprite, 0 ), "Widget" );
+		
+		// Create world drawable.
+		//
+		GUI::Drawable* drawable = (GUI::Drawable*)widgetComp->mRoot.AddChild( new GUI::Drawable() );
+		drawable->mScaleToWindow = true;
+
+		meshBuilder.ClearAll();
+		meshBuilder.CreateQuad( 0.5f, Vector3f( 0, 0, -1 ));
+		Matrix4f matTrans;
+		matTrans.Translate( Vector3f( 0.5f, 0.5f, 0 ));
+		meshBuilder.ApplyMatrix( matTrans );
+		meshBuilder.mShader = mEditorWorld->mShaderManager->Get( "GUI Mesh" );
+		meshBuilder.mTexture[ TEXTURE_DIFFUSE ] = mEditorWorld->mTextureManager->Get( "Backbuffer" );
+
+		drawable->mMesh = mEditorWorld->mMeshManager->Add( "World", std::shared_ptr< Mesh >( meshBuilder.BuildMesh( mRenderer )));
+		drawable->mPosition = Vector3f( 0, 30, 0.2f );
+		drawable->mScale = Vector3f( (float)Renderer::WINDOW_WIDTH_BASE-500, (float)Renderer::WINDOW_HEIGHT_BASE-60, 1 );
+
+		// Create button.
+		//
+		/*GUI::Button* button = (GUI::Button*)widgetComp->mRoot.AddChild( new GUI::Button() );
+		button->mPosition = Vector3f( 200, 30, 0.1f );
+		button->mScale    = Vector3f( 512, 512, 1 );
+		button->mScaleToWindow = false;
+		*/
+		///////////////////////////////
+
+		mEditorWorld->Startup();
+
+		///////////////////////////////
+		// CREATE EDITOR OBJECTS
+
+		CreateTranslateMesh();
+
+		CreateRotateMesh();
+			
+		CreateScaleMesh();
+	}
+
+	void PrepareGameWorld()
+	{
+		MeshBuilder						meshBuilder;
+		std::shared_ptr< Mesh >			mesh;
+
+		GameObject*						obj;
+		TransformComponent*				transform;
+		PhysicsComponent*				physics;
+		RigidBody*						body;
+
+		/////////////////////////////////////////////////////////////////////////
+
+		mGameWorld = new GameWorld();
+
+		mGameWorld->mRenderer			= mRenderer;
+
+		mGameWorld->mTiming				= new Timing();
+		mGameWorld->mPhysicsSystem		= BuildPhysicsSystemSE();
+		mGameWorld->mAudioSystem		= NULL;
+
+		mGameWorld->mTextureManager		= new TextureManager();
+		mGameWorld->mShaderManager		= new ShaderManager();
+		mGameWorld->mSpriteManager		= new SpriteManager();
+		mGameWorld->mMeshManager		= new MeshManager();
+		mGameWorld->mModelManager		= new ModelManager();
+		mGameWorld->mSoundManager		= new SoundManager();
+
+		mGameWorld->mPhysicsSystem->Startup();
+
+		////////////////////////////////////
+
+		mGameWorld->mShaderManager->Add( "GUI", mEditorWorld->mShaderManager->Get( "GUI" ));
+
+		mGameWorld->mSpriteSystem = new SpriteSystem( mRenderer, mGameWorld->mShaderManager->Get( "GUI" ), 256 );
+		
+		////////////////////////////////////
+
+		mGameWorld->mTextureManager->Add( "default-alpha.png", mRenderer->CreateTextureFromFile( "Textures\\default-alpha.png" ));
+
+		mGameWorld->mShaderManager->Add( "Color",   mEditorWorld->mShaderManager->Get( "Color" ));
+		mGameWorld->mShaderManager->Add( "Texture", mEditorWorld->mShaderManager->Get( "Texture" ));
+		mGameWorld->mShaderManager->Add( "Sprite",  mEditorWorld->mShaderManager->Get( "Sprite" ));
+
+		////////////////////////////////////
 
 		// Main Camera.
 		//
@@ -407,7 +444,7 @@ public:
 		obj->AttachComponent( new PlayerControllerComponent(), "Controller" );
 			
 		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
-		physics->SetRigidBody( mPhysicsSystem->CreateSphere( transform->mPosition, transform->mOrientation, 1.0f, 1.0f ));
+		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateSphere( transform->mPosition, transform->mOrientation, 1.0f, 1.0f ));
 		body = physics->GetRigidBody();
 		body->SetShapeType( PHYSICS_SPHERE );
 		body->SetFlags( DISABLE_GRAVITY );
@@ -433,10 +470,10 @@ public:
 		// Ground object.
 		//
 		meshBuilder.CreateCube( 1.0f );
-		meshBuilder.mShader    = mShaderManager->Get( "Color" );
+		meshBuilder.mShader    = mGameWorld->mShaderManager->Get( "Color" );
 		meshBuilder.mPrimitive = TRIANGLE_LIST;
 
-		mesh = mMeshManager->Add( "Ground", std::shared_ptr< Mesh >(meshBuilder.BuildMesh( mRenderer )));
+		mesh = mGameWorld->mMeshManager->Add( "Ground", std::shared_ptr< Mesh >(meshBuilder.BuildMesh( mRenderer )));
 		//mAssetMesh->addChild( new AssetTreeItem< Mesh >( "Ground", mesh ));
 	
 		obj = mGameWorld->AddGameObject( new GameObject(), "Ground" );
@@ -446,7 +483,7 @@ public:
 		transform->mScale    = Vector3f( 100, 1, 100 );
 
 		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
-		physics->SetRigidBody( mPhysicsSystem->CreateBox( transform->mPosition, transform->mOrientation, transform->mScale, 0.0f ));
+		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mPosition, transform->mOrientation, transform->mScale, 0.0f ));
 		body = physics->GetRigidBody();
 		body->SetShapeType( PHYSICS_BOX );
 		body->SetFlags( DISABLE_GRAVITY );
@@ -459,10 +496,10 @@ public:
 		//
 		meshBuilder.ClearGeometry();
 		meshBuilder.CreateDodecahedron( 1.0f );
-		meshBuilder.mShader = mShaderManager->Get( "Texture" );
-		meshBuilder.mTexture[ TEXTURE_DIFFUSE ] = mTextureManager->Get( "default-alpha.png" );
+		meshBuilder.mShader = mGameWorld->mShaderManager->Get( "Texture" );
+		meshBuilder.mTexture[ TEXTURE_DIFFUSE ] = mGameWorld->mTextureManager->Get( "default-alpha.png" );
 
-		mesh = mMeshManager->Add( "Dodecahedron", std::shared_ptr< Mesh >(meshBuilder.BuildMesh( mRenderer )));
+		mesh = mGameWorld->mMeshManager->Add( "Dodecahedron", std::shared_ptr< Mesh >(meshBuilder.BuildMesh( mRenderer )));
 		//AddAsset( "Dodecahedron", mesh );
 			
 		GameObject* obj2 = new GameObject();
@@ -480,7 +517,7 @@ public:
 		meshBuilder.ClearGeometry();
 		meshBuilder.CreateSphere( 1.0f, 10, 10 );
 			
-		mesh = mMeshManager->Add( "Sphere", std::shared_ptr< Mesh >(meshBuilder.BuildMesh( mRenderer )));
+		mesh = mGameWorld->mMeshManager->Add( "Sphere", std::shared_ptr< Mesh >(meshBuilder.BuildMesh( mRenderer )));
 		//AddAsset( "Sphere", mesh );
 
 		obj = mGameWorld->AddGameObject( new GameObject(), "Sphere" );
@@ -498,13 +535,15 @@ public:
 
 		// Testing particle effects.
 		//
-		/*std::shared_ptr< Texture > textureS = mTextureManager->Add( "fire.png", mRenderer->CreateTextureFromFile( "Textures\\fire.png" ));
+		std::shared_ptr< Texture > textureS = mGameWorld->mTextureManager->Add( "fire.png", mRenderer->CreateTextureFromFile( "Textures\\fire.png" ));
+		std::shared_ptr< Sprite >  sprite( new Sprite( mGameWorld->mShaderManager->Get( "Sprite" ), textureS ));
+
+		mGameWorld->mSpriteManager->Add( "Fire", sprite );
 		
-		std::shared_ptr< Sprite > sprite( new Sprite( mShaderManager->Get( "Sprite" ), textureS ));
 		sprite->AddFrame( sprite->GetTextureCoords( Quad( 0, 0, 64, 64 )));
 		sprite->AddFrame( sprite->GetTextureCoords( Quad( 64, 0, 128, 64 )));
 
-		ParticleSystem* particleSystem = BuildParticleSystemNormal( mRenderer, mGameWorld, sprite, 100 );
+		ParticleSystem* particleSystem = BuildParticleSystemNormal( mRenderer, mGameWorld, sprite, 300 );
 		particleSystem->mSpawnRate   = 0.025f;
 		particleSystem->mMinLifetime = 3.0f;
 		particleSystem->mMaxLifetime = 5.0f;
@@ -528,91 +567,10 @@ public:
 		transform->mScale = Vector3f( 512, 512, 1 );
 
 		obj->AttachComponent( new ParticleEmitterComponent( particleSystem ), "Sprite" );
-		*/
 
-		/////////////////////////////////////////////////////////////////////////
-
-		mEditorWorld = new GameWorld();
-		mEditorWorld->mRenderer			= mRenderer;
-		mEditorWorld->mTiming			= mTiming;
-		mEditorWorld->mPhysicsSystem	= mPhysicsSystem;
-
-		mEditorWorld->mTextureManager	= mTextureManager;
-		mEditorWorld->mShaderManager	= mShaderManager;
-		mEditorWorld->mSpriteManager	= mSpriteManager;
-		mEditorWorld->mMeshManager		= mMeshManager;
-		mEditorWorld->mModelManager		= mModelManager;
-		mEditorWorld->mSoundManager		= mSoundManager;
-		mEditorWorld->mSpriteSystem		= mSpriteSystem;
-
-		////////////////////////////////////
-
-		// GUI Camera.
-		//
-		obj = mEditorWorld->AddGameObject( new GameObject(), "GUI Camera" );
-
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
-		transform->mPosition = Vector3f( 0, 0, 0 );
-	
-		OrthographicCameraComponent* orthoCamera = (OrthographicCameraComponent*)obj->AttachComponent( new OrthographicCameraComponent( (float)Renderer::WINDOW_WIDTH_BASE, (float)Renderer::WINDOW_HEIGHT_BASE ), "OCamera" );
-		orthoCamera->mScaleToWindow = true;
-
-		//AddObject( obj );
-		
-		// Create game object for widget.
-		//
-		std::shared_ptr< Sprite > sprite( new Sprite( mShaderManager->Get( "GUI" ), mTextureManager->Get( "default-alpha.png" )));
-
-		sprite->AddFrame( sprite->GetTextureCoords( Quad( 0, 0, 512, 512 )));
-		sprite->AddFrame( sprite->GetTextureCoords( Quad( 0, 0, 64, 64 )));
-
-		mSpriteManager->Add( "GUI Sprite", sprite );
-
-		obj = mEditorWorld->AddGameObject( new GameObject(), "GUI Widget" );
-
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
-
-		WidgetComponent* widgetComp = (WidgetComponent*)obj->AttachComponent( new WidgetComponent( sprite, 0 ), "Widget" );
-		
-		// Create world drawable.
-		//
-		GUI::Drawable* drawable = (GUI::Drawable*)widgetComp->mRoot.AddChild( new GUI::Drawable() );
-		drawable->mScaleToWindow = true;
-
-		meshBuilder.ClearAll();
-		meshBuilder.CreateQuad( 0.5f, Vector3f( 0, 0, -1 ));
-		Matrix4f matTrans;
-		matTrans.Translate( Vector3f( 0.5f, 0.5f, 0 ));
-		meshBuilder.ApplyMatrix( matTrans );
-		meshBuilder.mShader = mShaderManager->Get( "GUI Mesh" );
-		meshBuilder.mTexture[ TEXTURE_DIFFUSE ] = mTextureManager->Get( "Backbuffer" );
-
-		drawable->mMesh = mMeshManager->Add( "World", std::shared_ptr< Mesh >( meshBuilder.BuildMesh( mRenderer )));
-		drawable->mPosition = Vector3f( 0, 30, 0.2f );
-		drawable->mScale = Vector3f( (float)Renderer::WINDOW_WIDTH_BASE-500, (float)Renderer::WINDOW_HEIGHT_BASE-30, 1 );
-
-		// Create button.
-		//
-		GUI::Button* button = (GUI::Button*)widgetComp->mRoot.AddChild( new GUI::Button() );
-		button->mPosition = Vector3f( 200, 30, 0.1f );
-		button->mScale    = Vector3f( 512, 512, 1 );
-		button->mScaleToWindow = false;
-
-		button->mActionClick = CREATE_SERIAL_FUNCTION( test1.output );
-		
 		///////////////////////////////
 
 		mGameWorld->Startup();
-		mEditorWorld->Startup();
-
-		///////////////////////////////
-		// CREATE EDITOR OBJECTS
-
-		CreateTranslateMesh();
-
-		CreateRotateMesh();
-			
-		CreateScaleMesh();
 	}
 		
 	void CreateTranslateMesh()

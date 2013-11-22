@@ -14,7 +14,7 @@ namespace Sentinel
 	{
 	public:
 
-		UINT		mEffectIndex;	// required to determine where in the effects this particle should startup
+		UINT		mEffectIndex;	// determines where in the effects this particle should startup
 
 		float		mLifetime;
 		float		mElapsedTime;

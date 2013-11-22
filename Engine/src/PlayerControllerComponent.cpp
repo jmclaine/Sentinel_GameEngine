@@ -81,14 +81,10 @@ namespace Sentinel
 		
 			///////////////////////////////////
 
-			Mouse& mouse = Mouse::Get();
-			POINT  mousePos;
+			POINT mousePos = Mouse::Get().GetPosition();
 
-			GetCursorPos( &mousePos );
-			POINT center;// = CenterHandle( (HWND)(mOwner->GetWorld()->mRenderer->GetWindow()->Handle()) );
-			center.x = 0;
-			center.y = 0;
-			Vector3f diff;// = Vector3f( (float)(center.y-mousePos.y), (float)(center.x-mousePos.x), 0 ) * mAngularSpeed;
+			POINT center = CenterHandle( (HWND)(mOwner->GetWorld()->mRenderer->GetWindow()->Handle()) );
+			Vector3f diff = Vector3f( (float)(center.y-mousePos.y), (float)(center.x-mousePos.x), 0 ) * mAngularSpeed;
 
 			if( keyboard.IsDown( VK_UP ))
 				diff.z += 1.0f;
@@ -96,7 +92,7 @@ namespace Sentinel
 			if( keyboard.IsDown( VK_DOWN ))
 				diff.z -= 1.0f;
 
-			//SetCursorPos( center.x, center.y );
+			SetCursorPos( center.x, center.y );
 
 			// Rotate in direction with spherical interpolation.
 			//
@@ -112,7 +108,7 @@ namespace Sentinel
 
 			Quatf qResult = body->GetOrientation().Slerp( qFinal, clamp( mOwner->GetWorld()->mTiming->DeltaTime()*10.0f, 0.0f, 1.0f ));
 
-			if( qResult.LengthSquared() > 0 )	// strangely, slerp can end with an invalid rotation
+			if( qResult.LengthSquared() > 0 )	// slerp can end with an invalid rotation
 				body->SetOrientation( qResult );
 		}
 	}

@@ -274,7 +274,10 @@ namespace Sentinel
 	void GameObject::UpdateComponents()
 	{
 		TRAVERSE_VECTOR( x, mComponent )
-			mComponent[ x ]->Update();
+		{
+			if( mComponent[ x ]->GetType() != GameComponent::CAMERA )
+				mComponent[ x ]->Update();
+		}
 
 		TRAVERSE_VECTOR( x, mChild )
 			mChild[ x ]->UpdateComponents();

@@ -1,6 +1,7 @@
 #include "ParticleSystem.h"
 #include "Renderer.h"
 #include "GameWorld.h"
+#include "Archive.h"
 #include "MeshBuilder.h"
 #include "Mesh.h"
 #include "Shader.h"
@@ -12,19 +13,18 @@
 
 namespace Sentinel
 {
-	ParticleSystem::ParticleSystem( Renderer* renderer, GameWorld* world, UINT maxParticles ) :
-		mRenderer( renderer ),
-		mWorld( world ),
+	ParticleSystem::ParticleSystem()
+	{}
+
+	ParticleSystem::ParticleSystem( Renderer* renderer, GameWorld* world ) :
 		mNumParticles( 0 ),
-		mMaxParticles( maxParticles ),
+		mMaxParticles( 0 ),
 		mMesh( NULL ),
 		mSpawnTime( 0 ),
 		mSpawnRate( 0.01f ),
 		mIsActive( false )
 	{
-		_ASSERT( renderer );
-		_ASSERT( world );
-		_ASSERT( maxParticles > 0 );
+		Set( renderer, world );
 	}
 
 	ParticleSystem::~ParticleSystem()
@@ -33,6 +33,15 @@ namespace Sentinel
 			delete mEffect[ x ];
 
 		Shutdown();
+	}
+
+	void ParticleSystem::Set( Renderer* renderer, GameWorld* world )
+	{
+		_ASSERT( renderer );
+		_ASSERT( world );
+
+		mRenderer  = renderer;
+		mGameWorld = world;
 	}
 
 	void ParticleSystem::Startup()
@@ -115,5 +124,54 @@ namespace Sentinel
 	void ParticleSystem::SetMatrixWorld( const Matrix4f& matWorld )
 	{
 		mMesh->mMatrixWorld = matWorld;
+	}
+
+	void ParticleSystem::Save( Archive& archive )
+	{
+		archive.Write( &mIsActive );
+		
+		archive.Write( &mNumParticles );
+		archive.Write( &mMaxParticles );
+
+		archive.Write( &mSpawnTime );
+
+		archive.Write( &mMinLifetime );
+		archive.Write( &mMaxLifetime );
+		
+		UINT size = mEffect.size();
+		archive.Write( &size );
+
+		TRAVERSE_VECTOR( x, mEffect )
+		{
+			mEffect[ x ]->Save( archive );
+		}
+
+		archive.Write( &mSpawnRate );
+	}
+
+	void ParticleSystem::Load( Archive& archive )
+	{
+		archive.Read( &mIsActive );
+		
+		archive.Read( &mNumParticles );
+		archive.Read( &mMaxParticles );
+
+		archive.Read( &mSpawnTime );
+
+		archive.Read( &mMinLifetime );
+		archive.Read( &mMaxLifetime );
+		
+		UINT size = 0;
+		archive.Read( &size );
+
+		ParticleEffect* effect;
+		for( UINT x = 0; x < size; ++x )
+		{
+			effect = (ParticleEffect*)SerialRegister::Load( archive );
+			mEffect.push_back( effect );
+			effect->Load( archive );
+		}
+
+		archive.Read( &mSpawnRate );
 	}
 }

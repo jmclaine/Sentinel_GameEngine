@@ -77,42 +77,16 @@ class MainApp
 	GameWindow*				mGameWindow;
 	Renderer*				mRenderer;
 
-	Timing*					mTiming;
-	PhysicsSystem*			mPhysicsSystem;
-	AudioSystem*			mAudioSystem;
-	SpriteSystem*			mSpriteSystem;
-
-	TextureManager*			mTextureManager;
-	ShaderManager*			mShaderManager;
-	SpriteManager*			mSpriteManager;
-	MeshManager*			mMeshManager;
-	ModelManager*			mModelManager;
-	SoundManager*			mSoundManager;
-	
 	GameWorld*				mGameWorld;
 
 public:
 
-	MainApp()
+	MainApp() :
+		mGameWindow( NULL ),
+		mRenderer( NULL ),
+		mGameWorld( NULL )
 	{
 		srand( (UINT)time( (time_t*)0 ));
-
-		mGameWindow		= NULL;
-		mRenderer		= NULL;
-
-		mTiming			= NULL;
-		mPhysicsSystem	= NULL;
-		mSpriteSystem   = NULL;
-		mAudioSystem    = NULL;
-
-		mTextureManager	= NULL;
-		mShaderManager	= NULL;
-		mSpriteManager	= NULL;
-		mMeshManager	= NULL;
-		mModelManager	= NULL;
-		mSoundManager   = NULL;
-
-		mGameWorld		= NULL;
 	}
 
 	~MainApp()
@@ -149,91 +123,43 @@ public:
 		//ShowCursor( FALSE );
 
 		////////////////////////////////////
-		// Prepare and load GameWorld.
+		// Prepare GameWorld.
 		//
-		mTiming							= new Timing();
-		mPhysicsSystem					= BuildPhysicsSystemBT();
-		mAudioSystem					= BuildAudioSystemAL();
-
-		mTextureManager					= new TextureManager();
-		mShaderManager					= new ShaderManager();
-		mSpriteManager					= new SpriteManager();
-		mMeshManager					= new MeshManager();
-		mModelManager					= new ModelManager();
-		mSoundManager					= new SoundManager();
-
-		////////////////////////////////////
-
-		mPhysicsSystem->Startup();
-
 		mGameWorld = new GameWorld();
 
 		mGameWorld->mRenderer			= mRenderer;
-		mGameWorld->mTiming				= mTiming;
-		mGameWorld->mPhysicsSystem		= mPhysicsSystem;
+		mGameWorld->mTiming				= new Timing();
+		mGameWorld->mPhysicsSystem		= BuildPhysicsSystemBT();
+		mGameWorld->mAudioSystem		= BuildAudioSystemAL();
 		
-		mGameWorld->mTextureManager		= mTextureManager;
-		mGameWorld->mShaderManager		= mShaderManager;
-		mGameWorld->mSpriteManager		= mSpriteManager;
-		mGameWorld->mMeshManager		= mMeshManager;
-		mGameWorld->mModelManager		= mModelManager;
-		mGameWorld->mSoundManager		= mSoundManager;
+		mGameWorld->mTextureManager		= new TextureManager();
+		mGameWorld->mShaderManager		= new ShaderManager();
+		mGameWorld->mSpriteManager		= new SpriteManager();
+		mGameWorld->mMeshManager		= new MeshManager();
+		mGameWorld->mModelManager		= new ModelManager();
+		mGameWorld->mSoundManager		= new SoundManager();
+
+		mGameWorld->mPhysicsSystem->Startup();
 
 		Archive archive;
 		if( !archive.Open( "Default.MAP", "rb" ))
 			throw AppException( "Failed to load Default.MAP" );
 
-		mTextureManager->Load( archive, mRenderer );
-		mShaderManager->Load( archive, mRenderer );
-		mSpriteManager->Load( archive, mShaderManager, mTextureManager );
-		mMeshManager->Load( archive, mRenderer, mShaderManager, mTextureManager );
-		mModelManager->Load( archive, mRenderer, mShaderManager, mTextureManager );
-		mSoundManager->Load( archive, mAudioSystem );
+		mGameWorld->mTextureManager->Load( archive, mRenderer );
+		mGameWorld->mShaderManager->Load( archive, mRenderer );
+		mGameWorld->mSpriteManager->Load( archive, mGameWorld->mShaderManager, mGameWorld->mTextureManager );
+		mGameWorld->mMeshManager->Load( archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager );
+		mGameWorld->mModelManager->Load( archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager );
+		mGameWorld->mSoundManager->Load( archive, mGameWorld->mAudioSystem );
 
-		mSpriteSystem = new SpriteSystem( mRenderer, mShaderManager->Get( "GUI" ), 256 );
-		mGameWorld->mSpriteSystem		= mSpriteSystem;
+		mGameWorld->mSpriteSystem = new SpriteSystem( mRenderer, mGameWorld->mShaderManager->Get( "GUI" ), 256 );
+		mGameWorld->mSpriteSystem = mGameWorld->mSpriteSystem;
 
 		mGameWorld->Load( archive );
 
 		archive.Close();
 
-		// Testing area.
-		//
-		GameObject*			obj;
-		TransformComponent* transform;
-		
-		// Testing particle effects.
-		//
-		std::shared_ptr< Texture > texture = mTextureManager->Add( "fire.png", mRenderer->CreateTextureFromFile( "fire.png" ));
-		
-		std::shared_ptr< Sprite > sprite( new Sprite( mShaderManager->Get( "Sprite" ), texture ));
-		sprite->AddFrame( sprite->GetTextureCoords( Quad( 0, 0, 64, 64 )));
-		sprite->AddFrame( sprite->GetTextureCoords( Quad( 64, 0, 128, 64 )));
-
-		ParticleSystem* particleSystem = BuildParticleSystemNormal( mRenderer, mGameWorld, sprite, 300 );
-		particleSystem->mSpawnRate   = 0.025f;
-		particleSystem->mMinLifetime = 3.0f;
-		particleSystem->mMaxLifetime = 5.0f;
-		particleSystem->mEffect.push_back( new TextureEffect( 0, 0 ));
-		particleSystem->mEffect.push_back( new AreaPositionEffect( 0, Vector3f( -0.125f, 1, 0 ), Vector3f( 0.125f, 1, 0 )));
-		particleSystem->mEffect.push_back( new RandomRotationEffect( 0, Vector3f( 0, 0, -10 ), Vector3f( 0, 0, 10 )));
-		particleSystem->mEffect.push_back( new ScaleEffect( 0, Vector3f( 1, 1, 1 )));
-		particleSystem->mEffect.push_back( new VelocityEffect( 0, Vector3f( 0, 1.2f, 0 )));
-		particleSystem->mEffect.push_back( new RandomColorEffect( 0, ColorRGBA( 0.75f, 0.25f, 0, 0.125 ), ColorRGBA( 0.75f, 0.75f, 0, 0.125 )));
-		particleSystem->mEffect.push_back( new FadeToScaleEffect( 0, 0.25f, 0.666f ));
-		particleSystem->mEffect.push_back( new FadeToScaleEffect( 0.5f, 1.0f, 0.1f ));
-		particleSystem->mEffect.push_back( new TextureEffect( 1.0f, 1 ));
-		particleSystem->mEffect.push_back( new FadeToScaleEffect( 1.0f, 2.0f, 1.0f ));
-		particleSystem->mEffect.push_back( new RandomColorEffect( 1.0f, ColorRGBA( 1, 1, 1, 0.125 ), ColorRGBA( 0.9f, 0.9f, 0.9f, 0.125 )));
-		particleSystem->mEffect.push_back( new FadeToColorEffect( 1.0f, 5.0f, ColorRGBA( 0.9f, 0.9f, 0.9f, 0.025f )));
-		//mParticleSystem->mEffect.push_back( new RandomVelocityEffect( 1, Vector3f( -1, 1, 0 ), Vector3f( 1, 1, 0 )));
-
-		obj = mGameWorld->AddGameObject( new GameObject(), "Particle Emitter" );
-
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
-		transform->mScale = Vector3f( 512, 512, 1 );
-
-		obj->AttachComponent( new ParticleEmitterComponent( particleSystem ), "Sprite" );
+		////////////////////////////////////
 
 		mGameWorld->Startup();
 	}
@@ -262,13 +188,16 @@ public:
 			//
 			else
 			{
-				mTiming->Update();
+				static Timing* timing;
+				timing = mGameWorld->mTiming;
+
+				timing->Update();
 
 				mGameWindow->Update();
 
 				Keyboard::Get().ProcessMessages();
 
-				BEGIN_PROFILE( mTiming );
+				BEGIN_PROFILE( timing );
 				if( Keyboard::Get().DidGoDown( VK_ESCAPE ))
 				{
 					return;
@@ -287,25 +216,25 @@ public:
 
 				mRenderer->Clear( color );
 
-				BEGIN_PROFILE( mTiming );
+				BEGIN_PROFILE( timing );
 				mGameWorld->UpdateController();
 				mGameWorld->UpdatePhysics();
 				mGameWorld->UpdateTransform();
 				mGameWorld->UpdateComponents();
 				mGameWorld->UpdateDrawable();
-				END_PROFILE( mTiming, "World" );
+				END_PROFILE( timing, "World" );
 
-				BEGIN_PROFILE( mTiming );
+				BEGIN_PROFILE( timing );
 				mRenderer->Present();
-				END_PROFILE( mTiming, "Renderer" );
+				END_PROFILE( timing, "Renderer" );
 
 				Mouse::Get().Update();
 				Keyboard::Get().Update();
-				END_PROFILE( mTiming, "Update" );
+				END_PROFILE( timing, "Update" );
 
 				SEPARATE_PROFILE( "-----------------------" );
 
-				mTiming->Limit();
+				timing->Limit();
 			}
 		}
 	}
@@ -313,19 +242,6 @@ public:
 	void Shutdown()
 	{
 		SHUTDOWN_DELETE( mGameWorld );
-		
-		SAFE_DELETE( mTiming );
-		SAFE_DELETE( mPhysicsSystem );
-		SAFE_DELETE( mSpriteSystem );
-		SAFE_DELETE( mAudioSystem );
-		
-		SAFE_DELETE( mSoundManager );
-		SAFE_DELETE( mModelManager );
-		SAFE_DELETE( mMeshManager );
-		SAFE_DELETE( mSpriteManager );
-		SAFE_DELETE( mShaderManager );
-		SAFE_DELETE( mTextureManager );
-
 		SHUTDOWN_DELETE( mGameWindow );
 		
 		SAFE_DELETE( mRenderer );

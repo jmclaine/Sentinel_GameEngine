@@ -63,10 +63,18 @@ namespace Sentinel
 		mSerialRegistry.Save( archive );
 
 		GameComponent::Save( archive );
+
+		mParticleSystem->Save( archive );
 	}
 
 	void ParticleEmitterComponent::Load( Archive& archive )
 	{
 		GameComponent::Load( archive );
+
+		mParticleSystem = (ParticleSystem*)SerialRegister::Load( archive );
+
+		mParticleSystem->Set( mOwner->mWorld->mRenderer, mOwner->mWorld );
+
+		mParticleSystem->Load( archive );
 	}
 }

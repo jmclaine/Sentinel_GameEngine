@@ -14,6 +14,7 @@ namespace Sentinel
 	class Renderer;
 	class Timing;
 	class PhysicsSystem;
+	class AudioSystem;
 	class SpriteSystem;
 	class TextureManager;
 	class ShaderManager;
@@ -37,9 +38,11 @@ namespace Sentinel
 
 	public:
 
-		Renderer*								mRenderer;
+		Renderer*								mRenderer;		// this must be deleted outside this class
+
 		Timing*									mTiming;
 		PhysicsSystem*							mPhysicsSystem;
+		AudioSystem*							mAudioSystem;
 		SpriteSystem*							mSpriteSystem;
 		
 		TextureManager*							mTextureManager;

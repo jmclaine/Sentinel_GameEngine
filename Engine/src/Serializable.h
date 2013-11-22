@@ -10,9 +10,12 @@ namespace Sentinel
 {
 	class Archive;
 
+#define DECLARE_SERIAL_REGISTER()\
+	static SerialRegister mSerialRegistry;
+
 #define DECLARE_SERIAL()\
 	private:\
-		static SerialRegister mSerialRegistry;\
+		DECLARE_SERIAL_REGISTER();\
 		static Serializable* Clone();\
 	public:\
 		void Save( Archive& archive );\
@@ -26,6 +29,10 @@ namespace Sentinel
 
 #define DEFINE_SERIAL_CLONE( clazz )\
 	Serializable* clazz::Clone() {\
+		return new clazz(); }
+
+#define DEFINE_SERIAL_CLONE_INLINE( clazz )\
+	static Serializable* Clone() {\
 		return new clazz(); }
 
 #define DEFINE_SERIAL_SAVE( clazz )\

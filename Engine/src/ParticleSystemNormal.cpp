@@ -14,23 +14,61 @@
 #include "RandomValue.h"
 #include "Util.h"
 #include "Point.h"
+#include "SpriteManager.h"
+#include "Archive.h"
 
 namespace Sentinel
 {
 	class ParticleSystemNormal : public ParticleSystem
 	{
-	private:
-
-		std::shared_ptr< Sprite >		mSprite;
-
-		NormalParticle*					mParticle;
+		DECLARE_SERIAL_REGISTER();
 
 	public:
 
+		DEFINE_SERIAL_CLONE_INLINE( ParticleSystemNormal );
+
+	private:
+
+		std::shared_ptr< Sprite >	mSprite;
+
+		NormalParticle*				mParticle;
+
+	public:
+
+		ParticleSystemNormal()
+		{}
+
+		ParticleSystemNormal( Renderer* renderer, GameWorld* world ) :
+			ParticleSystem( renderer, world )
+		{}
+
 		ParticleSystemNormal( Renderer* renderer, GameWorld* world, std::shared_ptr< Sprite > sprite, UINT maxParticles ) :
-			ParticleSystem( renderer, world, maxParticles ),
-			mSprite( sprite )
+			ParticleSystem( renderer, world )
 		{
+			Build( sprite, maxParticles );
+		};
+
+		~ParticleSystemNormal()
+		{
+			delete[] mParticle;
+		}
+
+		void Build( Renderer* renderer, GameWorld* world, std::shared_ptr< Sprite > sprite, UINT maxParticles )
+		{
+			_ASSERT( renderer );
+			_ASSERT( world );
+
+			mRenderer  = renderer;
+			mGameWorld = world;
+
+			Build( sprite, maxParticles );
+		}
+
+		void Build( std::shared_ptr< Sprite > sprite, UINT maxParticles )
+		{
+			mSprite			= sprite;
+			mMaxParticles	= maxParticles;
+
 			_ASSERT( mSprite );
 			_ASSERT( mSprite->mTexture );
 			_ASSERT( mSprite->mShader );
@@ -58,11 +96,6 @@ namespace Sentinel
 
 			mMesh->mTextureScale = Vector4f( 1.0f / (float)mSprite->mTexture->Width(),
 											 1.0f / (float)mSprite->mTexture->Height(), 0, 0 );
-		};
-
-		~ParticleSystemNormal()
-		{
-			delete[] mParticle;
 		}
 
 		void Update( float DT )
@@ -88,8 +121,8 @@ namespace Sentinel
 				static Matrix4f matrixParticle;
 				matrixParticle.World( particle.mPosition, Quatf( particle.mRotation ), particle.mScale );
 				
-				mMesh->mMatrixWorld.BillboardWorld( particle.mPosition, mWorld->GetCamera()->GetTransform()->mPosition, Vector3f( 0, 1, 0 ));
-				*(Matrix4f*)verts = mWorld->GetCamera()->GetMatrixFinal() * mMesh->mMatrixWorld * matrixParticle;
+				mMesh->mMatrixWorld.BillboardWorld( particle.mPosition, mGameWorld->GetCamera()->GetTransform()->mPosition, Vector3f( 0, 1, 0 ));
+				*(Matrix4f*)verts = mGameWorld->GetCamera()->GetMatrixFinal() * mMesh->mMatrixWorld * matrixParticle;
 				verts += sizeof( Matrix4f );
 			}
 
@@ -102,7 +135,7 @@ namespace Sentinel
 			mRenderer->SetDepthStencilState( STENCIL_PARTICLE );
 
 			mMesh->mMatrixWorld.Identity();
-			mMesh->Draw( mRenderer, mWorld, mNumParticles );
+			mMesh->Draw( mRenderer, mGameWorld, mNumParticles );
 
 			mRenderer->SetCull( CULL_CCW );
 			mRenderer->SetBlend( BLEND_ALPHA );
@@ -115,10 +148,36 @@ namespace Sentinel
 
 			return mParticle[ index ];
 		}
+
+		void Save( Archive& archive )
+		{
+			mSerialRegistry.Save( archive );
+			
+			ParticleSystem::Save( archive );
+
+			archive.Write( &mGameWorld->mSpriteManager->Get( mSprite ));
+		}
+
+		void Load( Archive& archive )
+		{
+			ParticleSystem::Load( archive );
+
+			std::string sprite;
+			archive.Read( &sprite );
+
+			Build( mGameWorld->mSpriteManager->Get( sprite ), mMaxParticles );
+		}
 	};
+
+	DEFINE_SERIAL_REGISTER( ParticleSystemNormal );
 
 	ParticleSystem* BuildParticleSystemNormal( Renderer* renderer, GameWorld* world, std::shared_ptr< Sprite > sprite, UINT maxParticles )
 	{
 		return new ParticleSystemNormal( renderer, world, sprite, maxParticles );
+	}
+
+	ParticleSystem* BuildParticleSystemNormal( Renderer* renderer, GameWorld* world )
+	{
+		return new ParticleSystemNormal( renderer, world );
 	}
 }

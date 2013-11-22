@@ -16,6 +16,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{019a85c5-7bab-4ab8-a10b-57e403b2d883}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{26cdf77d-afff-4d6a-bb04-f6101989a0a1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -66,6 +69,9 @@
     </ClInclude>
     <ClInclude Include="Sentinel_Editor.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\EditorControllerComponent.h">
+      <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
