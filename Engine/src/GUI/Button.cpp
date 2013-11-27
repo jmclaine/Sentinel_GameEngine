@@ -8,7 +8,7 @@ namespace Sentinel { namespace GUI
 	Button::Button() :
 		mFrameUp( 0 ),
 		mFrameOver( 1 ),
-		mFrameDown( 0 ),
+		mFrameDown( 2 ),
 		mActionUp( NULL ),
 		mActionDown( NULL ),
 		mActionClick( NULL ),

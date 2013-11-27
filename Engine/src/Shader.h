@@ -9,9 +9,38 @@ namespace Sentinel
 	#define MAX_LIGHTS				1
 
 	class Texture;
+	
+	enum SamplerMode
+	{
+		MODE_WRAP,
+		MODE_CLAMP,
+
+		NUM_MODES
+	};
+
+	enum SamplerFilter
+	{
+		FILTER_POINT,
+		FILTER_LINEAR,
+		
+		NUM_FILTERS
+	};
 
 	class SENTINEL_DLL Shader
 	{
+	public:
+
+		class Sampler
+		{
+		protected:
+
+			Sampler();
+
+		public:
+
+			virtual ~Sampler();
+		};
+
 	protected:
 
 		char*				mShaderSource;
@@ -20,6 +49,9 @@ namespace Sentinel
 		std::string			mUniform;
 
 		UINT				mVertexSize;
+
+		Sampler**			mSampler;
+		UINT				mNumSamplers;
 
 		////////////////////////////////////
 
@@ -41,11 +73,14 @@ namespace Sentinel
 		virtual void		ApplyLayout() = 0;
 
 		virtual void		SetFloat( UINT uniform, float data ) = 0;
-		virtual void		SetFloat2( UINT uniform, float* data, UINT offset = 0, UINT count = 1 ) = 0;
-		virtual void		SetFloat3( UINT uniform, float* data, UINT offset = 0, UINT count = 1 ) = 0;
-		virtual void		SetFloat4( UINT uniform, float* data, UINT offset = 0, UINT count = 1 ) = 0;
-		virtual void		SetMatrix( UINT uniform, float* matrix, UINT offset = 0, UINT count = 1 ) = 0;
+		virtual void		SetFloat2( UINT uniform, float* data ) = 0;
+		virtual void		SetFloat3( UINT uniform, float* data ) = 0;
+		virtual void		SetFloat4( UINT uniform, float* data ) = 0;
+		virtual void		SetMatrix( UINT uniform, float* data ) = 0;
 		virtual void		SetTexture( UINT uniform, Texture* texture ) = 0;
+
+		virtual void		SetSampler( UINT index, SamplerMode modeU, SamplerMode modeV, 
+										SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter = NUM_FILTERS ) = 0;
 
 	protected:
 

@@ -51,6 +51,8 @@ Edits levels for a game created with the Sentinel Engine.
 #include "MeshComponent.h"
 #include "ModelComponent.h"
 
+#include "EditorControllerComponent.h"
+
 #include "Sound.h"
 #include "Sprite.h"
 
@@ -113,8 +115,8 @@ public:
 		//
 		mGameWindow->Startup( mRenderer, hInstance, nCmdShow, "Sentinel Editor", "SentinelClass", info );
 		
-		mRenderer->CreateDepthStencil( Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE );
 		mRenderer->CreateBackbuffer();
+		mRenderer->CreateDepthStencil( Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE );
 
 		////////////////////////////////////
 		// Prepare Editor and World View.
@@ -123,7 +125,9 @@ public:
 
 		PrepareEditorWorld();
 		PrepareGameWorld();
-		
+
+		mGameWorld->SetCamera( mEditorWorld->GetCamera( 1 ));
+
 		SetDirectory( ".." );
 	}
 
@@ -204,10 +208,10 @@ public:
 				mEditorWorld->UpdateComponents();
 				mEditorWorld->UpdateDrawable();
 				END_PROFILE( timing, "Editor" );
-				
+
 				//mRTBackbufferMesh->mMatrixWorld.Identity();
 				//mRTBackbufferMesh->Draw( mRenderer, mGameWorld );
-
+				
 				BEGIN_PROFILE( timing );
 				mRenderer->Present();
 				END_PROFILE( timing, "Renderer" );
@@ -274,6 +278,8 @@ public:
 		mEditorWorld->mTiming			= new Timing();
 		mEditorWorld->mPhysicsSystem	= BuildPhysicsSystemBT();
 		mEditorWorld->mAudioSystem		= BuildAudioSystemAL();
+
+		mEditorWorld->mPhysicsSystem->Startup();
 		
 		mEditorWorld->mTextureManager	= new TextureManager();
 		mEditorWorld->mShaderManager	= new ShaderManager();
@@ -305,19 +311,23 @@ public:
 
 		mEditorWorld->mSpriteSystem = new SpriteSystem( mRenderer, mEditorWorld->mShaderManager->Get( "GUI" ), 256 );
 
+		mEditorWorld->mShaderManager->Get( "GUI" )->SetSampler( 0, MODE_WRAP, MODE_WRAP, FILTER_POINT, FILTER_POINT );
+		mEditorWorld->mShaderManager->Get( "GUI Mesh" )->SetSampler( 0, MODE_WRAP, MODE_WRAP, FILTER_LINEAR, FILTER_LINEAR );
+		mEditorWorld->mShaderManager->Get( "RT_Normal" )->SetSampler( 0, MODE_WRAP, MODE_WRAP, FILTER_LINEAR, FILTER_LINEAR );
+
 		////////////////////////////////////
 
 		// Create backbuffer for world view.
 		//
-		mRenderer->CreateDepthStencil( Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE );
 		mRenderer->CreateRenderTarget( mEditorWorld->mTextureManager->Add( "Backbuffer", mRenderer->CreateTexture( Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE )));
+		mRenderer->CreateDepthStencil( Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE );
 		
-		mRTBackbufferMesh = mRenderer->CreateRenderTargetMesh( mEditorWorld->mShaderManager->Get( "RT_Normal" ));
+		mRTBackbufferMesh = mRenderer->CreateRenderTargetQuad( mEditorWorld->mShaderManager->Get( "RT_Normal" ));
 		mRTBackbufferMesh->mTexture[ TEXTURE_DIFFUSE ] = mEditorWorld->mTextureManager->Get( "Backbuffer" );
 
 		// Add GUI texture.
 		//
-		std::shared_ptr< Texture > texture = mEditorWorld->mTextureManager->Add( "default-alpha.png", mRenderer->CreateTextureFromFile( "Textures\\default-alpha.png" ));
+		std::shared_ptr< Texture > texture = mEditorWorld->mTextureManager->Add( "GUI.png", mRenderer->CreateTextureFromFile( "Textures\\GUI.png" ));
 		//AssetTreeItem< Texture >* asset = new AssetTreeItem< Texture >( "default-alpha.png", texture );
 		//mAssetTexture->addChild( asset );
 
@@ -334,13 +344,32 @@ public:
 		orthoCamera->mScaleToWindow = true;
 
 		//AddObject( obj );
+
+		// World View Camera.
+		//
+		obj = mEditorWorld->AddGameObject( new GameObject(), "Main Camera" );
+
+		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
+		transform->mPosition    = Vector3f( 0, 25, 25 );
+		transform->mOrientation = Quatf( -45, 0, 0 );
+
+		obj->AttachComponent( new EditorControllerComponent(), "Controller" );
+			
+		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
+		physics->SetRigidBody( mEditorWorld->mPhysicsSystem->CreateSphere( transform->mPosition, transform->mOrientation, 1.0f, 1.0f ));
+		body = physics->GetRigidBody();
+		body->SetFlags( DISABLE_GRAVITY );
+		body->SetRestitution( 1.0f );
+		body->SetDamping( 0.9f, 0.9f );
+
+		obj->AttachComponent( new PerspectiveCameraComponent( (float)Renderer::WINDOW_WIDTH_BASE, (float)Renderer::WINDOW_HEIGHT_BASE ), "PCamera" );
 		
 		// Create game object for widget.
 		//
-		std::shared_ptr< Sprite > sprite( new Sprite( mEditorWorld->mShaderManager->Get( "GUI" ), mEditorWorld->mTextureManager->Get( "default-alpha.png" )));
-
-		sprite->AddFrame( sprite->GetTextureCoords( Quad( 0, 0, 512, 512 )));
-		sprite->AddFrame( sprite->GetTextureCoords( Quad( 0, 0, 64, 64 )));
+		std::shared_ptr< Sprite > sprite( new Sprite( mEditorWorld->mShaderManager->Get( "GUI" ), mEditorWorld->mTextureManager->Get( "GUI.png" )));
+		sprite->AddFrame( sprite->GetTextureCoords( Quad( 0, 0, 1, 1 )));
+		sprite->AddFrame( sprite->GetTextureCoords( Quad( 1, 0, 2, 1 )));
+		sprite->AddFrame( sprite->GetTextureCoords( Quad( 2, 0, 3, 1 )));
 
 		mEditorWorld->mSpriteManager->Add( "GUI Sprite", sprite );
 
@@ -350,30 +379,36 @@ public:
 
 		WidgetComponent* widgetComp = (WidgetComponent*)obj->AttachComponent( new WidgetComponent( sprite, 0 ), "Widget" );
 		
+		GUI::Drawable* drawable;
+
+		// Create menu bar.
+		//
+		drawable = (GUI::Drawable*)widgetComp->mRoot.AddChild( new GUI::Drawable() );
+		drawable->mScaleToWindow = false;
+
+		drawable->mMesh = mEditorWorld->mMeshManager->Add( "World", std::shared_ptr< Mesh >( mRenderer->CreateGUIQuad( mEditorWorld->mShaderManager->Get( "GUI Mesh" ))));
+		drawable->mMesh->mTexture[ TEXTURE_DIFFUSE ] = mRenderer->BASE_TEXTURE;
+		drawable->mPosition = Vector3f( 0, 0, 0.1f );
+		drawable->mScale = Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 30, 1 );
+		drawable->mColor = ColorRGBA( 0.8f, 0.8f, 0.8f, 1 );
+
 		// Create world drawable.
 		//
-		GUI::Drawable* drawable = (GUI::Drawable*)widgetComp->mRoot.AddChild( new GUI::Drawable() );
+		drawable = (GUI::Drawable*)widgetComp->mRoot.AddChild( new GUI::Drawable() );
 		drawable->mScaleToWindow = true;
 
-		meshBuilder.ClearAll();
-		meshBuilder.CreateQuad( 0.5f, Vector3f( 0, 0, -1 ));
-		Matrix4f matTrans;
-		matTrans.Translate( Vector3f( 0.5f, 0.5f, 0 ));
-		meshBuilder.ApplyMatrix( matTrans );
-		meshBuilder.mShader = mEditorWorld->mShaderManager->Get( "GUI Mesh" );
-		meshBuilder.mTexture[ TEXTURE_DIFFUSE ] = mEditorWorld->mTextureManager->Get( "Backbuffer" );
-
-		drawable->mMesh = mEditorWorld->mMeshManager->Add( "World", std::shared_ptr< Mesh >( meshBuilder.BuildMesh( mRenderer )));
+		drawable->mMesh = mEditorWorld->mMeshManager->Add( "World", std::shared_ptr< Mesh >( mRenderer->CreateGUIQuad( mEditorWorld->mShaderManager->Get( "GUI Mesh" ))));
+		drawable->mMesh->mTexture[ TEXTURE_DIFFUSE ] = mEditorWorld->mTextureManager->Get( "Backbuffer" );
 		drawable->mPosition = Vector3f( 0, 30, 0.2f );
 		drawable->mScale = Vector3f( (float)Renderer::WINDOW_WIDTH_BASE-500, (float)Renderer::WINDOW_HEIGHT_BASE-60, 1 );
 
 		// Create button.
 		//
-		/*GUI::Button* button = (GUI::Button*)widgetComp->mRoot.AddChild( new GUI::Button() );
-		button->mPosition = Vector3f( 200, 30, 0.1f );
-		button->mScale    = Vector3f( 512, 512, 1 );
+		GUI::Button* button = (GUI::Button*)widgetComp->mRoot.AddChild( new GUI::Button() );
+		button->mPosition = Vector3f( 200, 30, 0 );
+		button->mScale    = Vector3f( 128, 64, 1 );
 		button->mScaleToWindow = false;
-		*/
+
 		///////////////////////////////
 
 		mEditorWorld->Startup();
@@ -671,7 +706,7 @@ int APIENTRY _tWinMain( HINSTANCE hInstance,
 	//
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	_CrtSetReportMode( _CRT_ERROR, _CRTDBG_MODE_DEBUG );
-	//_CrtSetBreakAlloc( 185 );
+	//_CrtSetBreakAlloc( 669 );
 
 	UNREFERENCED_PARAMETER( hPrevInstance );
 	UNREFERENCED_PARAMETER( lpCmdLine );

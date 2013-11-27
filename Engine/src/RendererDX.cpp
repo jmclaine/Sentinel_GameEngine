@@ -1,7 +1,8 @@
 #include <d3d11.h>
 #include <d3dx11.h>
 #include <D3D11Shader.h>
-#include <D3DX11Effect.h>
+#include <D3DCompiler.h>
+//#include <D3DX11Effect.h>
 
 #ifndef NDEBUG
 	#include <D3DCommon.h>
@@ -17,7 +18,7 @@
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dx11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
-#pragma comment (lib, "effects11.lib")
+//#pragma comment (lib, "effects11.lib")
 
 #include <vector>
 #include <crtdbg.h>
@@ -55,6 +56,7 @@ namespace Sentinel
 	class BufferDX : public Buffer
 	{
 		friend class RendererDX;
+		friend class ShaderDX;
 
 	private:
 
@@ -135,27 +137,159 @@ namespace Sentinel
 	class ShaderDX : public Shader
 	{
 	private:
-		
-		ID3D11Device*			mDevice;
-		ID3D11DeviceContext*	mContext;
 
-		ID3DX11Effect*			mEffect;
-		ID3DX11EffectPass*		mPass;
-		ID3D11InputLayout*		mLayout;
-
-		std::vector< ID3DX11EffectVariable*	> mUniformDX;
+		enum ShaderType
+		{
+			VERTEX_SHADER,
+			GEOMETRY_SHADER,
+			PIXEL_SHADER,
+		};
 
 	public:
 
-		ShaderDX()
+		class SamplerDX : public Sampler
 		{
-			mDevice		= NULL;
-			mContext	= NULL;
+		private:
 
-			mEffect		= NULL;
-			mPass		= NULL;
-			mLayout		= NULL;
+			ID3D11DeviceContext*	mContext;
+			
+		public:
 
+			ID3D11SamplerState*		mSampler;
+
+			UINT					mStartSlot;
+
+		public:
+
+			SamplerDX() :
+				mContext( NULL ),
+				mSampler( NULL )
+			{}
+
+			~SamplerDX()
+			{
+				if( mSampler )
+					mSampler->Release();
+			}
+
+			bool Create( ID3D11Device* device, ID3D11DeviceContext*	context, SamplerMode modeU, SamplerMode modeV, SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter )
+			{
+				mContext = context;
+
+				D3D11_SAMPLER_DESC desc;
+				ZeroMemory( &desc, sizeof( desc ));
+
+				if( minFilter == FILTER_LINEAR )
+				{
+					if( magFilter == FILTER_LINEAR )
+					{
+						if( mipFilter == FILTER_LINEAR )
+						{
+							desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+						}
+						else
+						{
+							desc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+						}
+					}
+					else
+					{
+						if( mipFilter == FILTER_LINEAR )
+						{
+							desc.Filter = D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
+						}
+						else
+						{
+							desc.Filter = D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT;
+						}
+					}
+				}
+				else
+				{
+					if( magFilter == FILTER_LINEAR )
+					{
+						if( mipFilter == FILTER_LINEAR )
+						{
+							desc.Filter = D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR;
+						}
+						else
+						{
+							desc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+						}
+					}
+					else
+					{
+						if( mipFilter == FILTER_LINEAR )
+						{
+							desc.Filter = D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
+						}
+						else
+						{
+							desc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+						}
+					}
+				}
+
+				desc.AddressU		= (modeU == MODE_WRAP) ? D3D11_TEXTURE_ADDRESS_WRAP : D3D11_TEXTURE_ADDRESS_CLAMP;
+				desc.AddressV		= (modeV == MODE_WRAP) ? D3D11_TEXTURE_ADDRESS_WRAP : D3D11_TEXTURE_ADDRESS_CLAMP;
+				desc.AddressW		= D3D11_TEXTURE_ADDRESS_WRAP;
+				desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+				desc.MinLOD			= 0;
+				desc.MaxLOD			= (mipFilter != NUM_FILTERS) ? D3D11_FLOAT32_MAX : 0;
+				desc.MipLODBias		= 0;
+				desc.MaxAnisotropy	= 1;
+				desc.BorderColor[0] = 0;
+				desc.BorderColor[1] = 0;
+				desc.BorderColor[2] = 0;
+				desc.BorderColor[3] = 0;
+				
+				if( device->CreateSamplerState( &desc, &mSampler ) == S_FALSE )
+					return false;
+
+				return true;
+			}
+
+			void Apply()
+			{
+				_ASSERT( mSampler );
+
+				mContext->PSSetSamplers( mStartSlot, 1, &mSampler );
+			}
+		};
+
+	private:
+		
+		ID3D11Device*			mDevice;
+		ID3D11DeviceContext*	mContext;
+		ID3D11ShaderReflectionConstantBuffer* mReflectionBuffer;
+
+		ID3D11VertexShader*		mVertexShader;
+		ID3D11GeometryShader*	mGeometryShader;
+		ID3D11PixelShader*		mPixelShader;
+
+		ID3D11Buffer*			mConstantBuffer;
+		BYTE*					mBufferData;	// locked buffer data
+		
+		ID3D11InputLayout*		mLayout;		// vertex format
+
+		std::vector< UINT >		mUniformDX;		// stores offsets
+
+		UINT					mTextureLevel;
+
+	public:
+
+		ShaderDX( ID3D11Device* device, ID3D11DeviceContext* context ) :
+			mDevice( device ),
+			mContext( context ),
+			mReflectionBuffer( NULL ),
+			mVertexShader( NULL ),
+			mGeometryShader( NULL ),
+			mPixelShader( NULL ),
+			mConstantBuffer( NULL ),
+			mBufferData( NULL ),
+			mLayout( NULL ),
+			mTextureLevel( 0 )
+		{
 			mVertexSize = 0;
 		}
 
@@ -167,8 +301,7 @@ namespace Sentinel
 		// Use the filename without the extension.
 		// DirectX uses .fx files.
 		//
-		UINT CreateFromFile( std::string filename, const std::string& attrib, const std::string& uniform, 
-							 ID3D11Device* device, ID3D11DeviceContext* context )
+		UINT CreateFromFile( std::string filename, const std::string& attrib, const std::string& uniform )
 		{
 			filename.append( ".xsh" );
 
@@ -181,50 +314,53 @@ namespace Sentinel
 
 			TRACE( "Compiling '" << filename << "'..." );
 
-			return CreateFromMemory( mShaderSource, attrib, uniform, device, context );
+			return CreateFromMemory( mShaderSource, attrib, uniform );
 		}
 
-		UINT CreateFromMemory( char* source, const std::string& attrib, const std::string& uniform, 
-							   ID3D11Device* device, ID3D11DeviceContext* context)
+		UINT CreateFromMemory( char* source, const std::string& attrib, const std::string& uniform )
 		{
 			mShaderSource	= source;
 			mAttribute		= attrib;
 			mUniform		= uniform;
 
-			mDevice			= device;
-			mContext		= context;
-
-			// Compile the shader and report errors.
+			// Compile Vertex Shader.
 			//
-			D3DX11_PASS_DESC desc;
-			ID3D10Blob* fxblob  = NULL;
-			ID3D10Blob* errblob = NULL;
+			ID3D10Blob* blobVS = Compile( VERTEX_SHADER );
 
-			D3D10_SHADER_MACRO macro[2] = {{ "VERSION_DX", 0 }, { 0, 0 }};
-
-			if( FAILED( D3DX11CompileFromMemory( mShaderSource, strlen( mShaderSource ), 0, macro, NULL, "", "fx_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &fxblob, &errblob, NULL )))
+			if( blobVS )
+				mDevice->CreateVertexShader( blobVS->GetBufferPointer(), blobVS->GetBufferSize(), 0, &mVertexShader );
+			else
 			{
-				if( errblob )
-				{
-					TRACE( (char*)errblob->GetBufferPointer() );
-				}
-				else
-				{
-					TRACE( "Failed to compile shader." );
-				}
-
-				SAFE_RELEASE_PTR( errblob );
-				SAFE_RELEASE_PTR( fxblob );
-
+				SAFE_RELEASE_PTR( blobVS );
 				return S_FALSE;
 			}
 
-			SAFE_RELEASE_PTR( errblob );
-			HV( D3DX11CreateEffectFromMemory( fxblob->GetBufferPointer(), fxblob->GetBufferSize(), 0, mDevice, &mEffect ));
-			SAFE_RELEASE_PTR( fxblob );
+			// Compile Geometry Shader.
+			//
+			if( strstr( mShaderSource, "GS_Main" ) != NULL )
+			{
+				ID3D10Blob* blobGS = Compile( GEOMETRY_SHADER );
 
-			mPass = mEffect->GetTechniqueByIndex( 0 )->GetPassByIndex( 0 );
-			HV( mPass->GetDesc( &desc ));
+				if( blobGS )
+					mDevice->CreateGeometryShader( blobGS->GetBufferPointer(), blobGS->GetBufferSize(), 0, &mGeometryShader );
+
+				SAFE_RELEASE_PTR( blobGS );
+			}
+
+			// Compile Pixel Shader.
+			//
+			ID3D10Blob* blobPS = Compile( PIXEL_SHADER );
+
+			if( blobPS )
+				mDevice->CreatePixelShader( blobPS->GetBufferPointer(), blobPS->GetBufferSize(), 0, &mPixelShader );
+			else
+			{
+				SAFE_RELEASE_PTR( blobVS );
+				SAFE_RELEASE_PTR( blobPS );
+				return S_FALSE;
+			}
+
+			SAFE_RELEASE_PTR( blobPS );
 
 			TRACE( "Shader Compiled Successfully!" );
 			
@@ -240,7 +376,7 @@ namespace Sentinel
 					break;
 				}
 				else
-				if( attrib[ i ] == 'x' )
+				if( attrib[ i ] == 'M' )
 				{
 					len += 3;
 					break;
@@ -249,7 +385,7 @@ namespace Sentinel
 
 			D3D11_INPUT_ELEMENT_DESC *decl = new D3D11_INPUT_ELEMENT_DESC[ len ];
 			memset( decl, 0, sizeof( D3D11_INPUT_ELEMENT_DESC ) * len );
-			int semidx = 0;
+			UINT texCount = 0;
 
 			UINT attribIndex = 0;
 			for( UINT i = 0; i < (UINT)attrib.size(); ++i )
@@ -288,7 +424,7 @@ namespace Sentinel
 				case 'X':
 					d.SemanticName = "TEXCOORD";
 					d.Format = DXGI_FORMAT_R32G32_FLOAT;
-					d.SemanticIndex = semidx++;
+					d.SemanticIndex = texCount++;
 					mVertexSize += 8;
 					break;
 
@@ -297,7 +433,7 @@ namespace Sentinel
 				case 'x':
 					d.SemanticName = "TEXCOORD";
 					d.Format =  DXGI_FORMAT_R32G32B32A32_FLOAT;
-					d.SemanticIndex = semidx++;
+					d.SemanticIndex = texCount++;
 					mVertexSize += 16;
 					break;
 
@@ -365,14 +501,85 @@ namespace Sentinel
 				++attribIndex;
 			}
 
-			HRESULT hr = mDevice->CreateInputLayout( decl, len, desc.pIAInputSignature, desc.IAInputSignatureSize, &mLayout );
+			HRESULT hr = mDevice->CreateInputLayout( decl, len, blobVS->GetBufferPointer(), blobVS->GetBufferSize(), &mLayout );
 
 			delete[] decl;
 
 			if( hr != S_OK  )
 			{
+				SAFE_RELEASE_PTR( blobVS );
+
 				Release();
 				return S_FALSE;
+			}
+
+			// Create texture samplers.
+			//
+			if( texCount > 0 )
+			{
+				mNumSamplers = texCount;
+
+				mSampler = new Sampler*[ texCount ];
+
+				for( UINT i = 0; i < texCount; ++i )
+				{
+					SamplerDX* sampler = new SamplerDX();
+					
+					sampler->Create( mDevice, mContext, MODE_WRAP, MODE_WRAP, FILTER_LINEAR, FILTER_LINEAR, FILTER_LINEAR );
+					sampler->mStartSlot = i;
+
+					mSampler[ i ] = sampler;
+				}
+			}
+
+			// Create uniforms / constant buffers.
+			//
+			ID3D11ShaderReflection* reflect = NULL;
+			if( D3DReflect( blobVS->GetBufferPointer(), blobVS->GetBufferSize(), IID_ID3D11ShaderReflection, (void**)&reflect ) == S_FALSE )
+			{
+				SAFE_RELEASE_PTR( blobVS );
+				Release();
+
+				return S_FALSE;
+			}
+
+			SAFE_RELEASE_PTR( blobVS );
+
+			D3D11_SHADER_DESC desc;
+			reflect->GetDesc( &desc );
+
+			if( desc.ConstantBuffers > 0 )
+			{
+				mReflectionBuffer = reflect->GetConstantBufferByName( "Uniforms" );
+
+				D3D11_SHADER_BUFFER_DESC shaderDesc;
+				mReflectionBuffer->GetDesc( &shaderDesc );
+			
+				void* bufferData = malloc( shaderDesc.Size );
+				ZeroMemory( bufferData, shaderDesc.Size );
+
+				D3D11_BUFFER_DESC bufferDesc;
+				bufferDesc.Usage				= D3D11_USAGE_DYNAMIC;
+				bufferDesc.ByteWidth			= shaderDesc.Size;
+				bufferDesc.BindFlags			= D3D11_BIND_CONSTANT_BUFFER;
+				bufferDesc.CPUAccessFlags		= D3D11_CPU_ACCESS_WRITE;
+				bufferDesc.MiscFlags			= 0;
+				bufferDesc.StructureByteStride	= 0;
+
+				D3D11_SUBRESOURCE_DATA resourceData;
+				resourceData.pSysMem			= bufferData;
+				resourceData.SysMemPitch		= 0;
+				resourceData.SysMemSlicePitch	= 0;
+
+				if( mDevice->CreateBuffer( &bufferDesc, &resourceData, &mConstantBuffer ) == S_FALSE )
+				{
+					free( bufferData );
+					Release();
+
+					return S_FALSE;
+				}
+
+				free( bufferData );
 			}
 
 			ProcessUniforms();
@@ -382,23 +589,93 @@ namespace Sentinel
 			return S_OK;
 		}
 
-		void ApplyLayout()
+	private:
+
+		ID3D10Blob* Compile( ShaderType type )
 		{
-			mContext->IASetInputLayout( mLayout );
+			ID3D10Blob* shaderBlob = NULL;
+			ID3D10Blob* errorBlob  = NULL;
+
+			D3D10_SHADER_MACRO macro[2] = {{ "VERSION_DX", 0 }, { 0, 0 }};
+
+			if( FAILED( D3DX11CompileFromMemory( mShaderSource, strlen( mShaderSource ), 0, macro, NULL, 
+												 (type == VERTEX_SHADER) ? "VS_Main" : (type == GEOMETRY_SHADER) ? "GS_Main" : (type == PIXEL_SHADER) ? "PS_Main" : 0, 
+												 (type == VERTEX_SHADER) ? "vs_4_0"  : (type == GEOMETRY_SHADER) ? "gs_4_0"  : (type == PIXEL_SHADER) ? "ps_4_0"  : 0, 
+												 D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &shaderBlob, &errorBlob, NULL )))
+			{
+				if( errorBlob )
+					TRACE( (char*)errorBlob->GetBufferPointer() );
+
+				SAFE_RELEASE_PTR( shaderBlob );
+				SAFE_RELEASE_PTR( errorBlob );
+
+				return NULL;
+			}
+			
+			SAFE_RELEASE_PTR( errorBlob );
+
+			return shaderBlob;
 		}
+
+		void CreateUniform( const char* name )
+		{
+			if( strstr( name, "tex" ) == NULL )
+			{
+				ID3D11ShaderReflectionVariable* var = mReflectionBuffer->GetVariableByName( name );
+				D3D11_SHADER_VARIABLE_DESC varDesc;
+				var->GetDesc( &varDesc );
+
+				mUniformDX.push_back( varDesc.StartOffset );
+			}
+			else
+			{
+				mUniformDX.push_back( 0 );
+			}
+		}
+
+	public:
 
 		void ApplyPass()
 		{
-			mPass->Apply( 0, mContext );
+			mTextureLevel = 0;
+
+			if( mConstantBuffer )
+			{
+				D3D11_MAPPED_SUBRESOURCE mapRes;
+				
+				mContext->Map( mConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapRes );
+			
+				mBufferData = (BYTE*)mapRes.pData;
+			}
 		}
 
+		void ApplyLayout()
+		{
+			mContext->IASetInputLayout( mLayout );
+
+			mContext->VSSetShader( mVertexShader, NULL, 0 );
+			mContext->GSSetShader( mGeometryShader, NULL, 0 );
+			mContext->PSSetShader( mPixelShader, NULL, 0 );
+
+			if( mConstantBuffer )
+			{
+				mContext->Unmap( mConstantBuffer, 0 );
+
+				mContext->VSSetConstantBuffers( 0, 1, &mConstantBuffer );
+
+				if( mGeometryShader )
+					mContext->GSSetConstantBuffers( 0, 1, &mConstantBuffer );
+			
+				mContext->PSSetConstantBuffers( 0, 1, &mConstantBuffer );
+			}
+		}
+		
 		void Release()
 		{
 			mDevice		= NULL;
 			mContext	= NULL;
-			mPass		= NULL;
 
-			SAFE_RELEASE_PTR( mEffect );
+			SAFE_RELEASE_PTR( mConstantBuffer );
 			SAFE_RELEASE_PTR( mLayout );
 
 			mUniform.clear();
@@ -406,48 +683,63 @@ namespace Sentinel
 
 		void SetFloat( UINT uniform, float data )
 		{
-			mUniformDX[ uniform ]->AsScalar()->SetFloat( data );
+			memcpy( mBufferData + mUniformDX[ uniform ], &data, sizeof( float ));
 		}
 
-		void SetFloat2( UINT uniform, float* data, UINT offset, UINT count )
+		void SetFloat2( UINT uniform, float* data )
 		{
-			SetVector( uniform, data, offset, count );
+			memcpy( mBufferData + mUniformDX[ uniform ], data, 2 * sizeof( float ));
 		}
 
-		void SetFloat3( UINT uniform, float* data, UINT offset, UINT count )
+		void SetFloat3( UINT uniform, float* data )
 		{
-			SetVector( uniform, data, offset, count );
+			memcpy( mBufferData + mUniformDX[ uniform ], data, 3 * sizeof( float ));
 		}
 
-		void SetFloat4( UINT uniform, float* data, UINT offset, UINT count )
+		void SetFloat4( UINT uniform, float* data )
 		{
-			SetVector( uniform, data, offset, count );
+			memcpy( mBufferData + mUniformDX[ uniform ], data, 4 * sizeof( float ));
 		}
 
-		void SetVector( UINT uniform, float* data, UINT offset, UINT count )
+		void SetMatrix( UINT uniform, float* data )
 		{
-			if( count == 1 )
-				mUniformDX[ uniform ]->AsVector()->SetFloatVector( data );
-			else
-				mUniformDX[ uniform ]->AsVector()->SetFloatVectorArray( data, offset, count );
-		}
-
-		void SetMatrix( UINT uniform, float* matrix, UINT offset, UINT count )
-		{
-			mUniformDX[ uniform ]->AsMatrix()->SetMatrixArray( matrix, offset, count );
+			memcpy( mBufferData + mUniformDX[ uniform ], data, 16 * sizeof( float ));
 		}
 
 		void SetTexture( UINT uniform, Texture* texture )
 		{
 			if( texture )
-				mUniformDX[ uniform ]->AsShaderResource()->SetResource( static_cast< TextureDX* >(texture)->mResource );
+			{
+				mContext->PSSetShaderResources( mTextureLevel, 1, &static_cast< TextureDX* >(texture)->mResource );
+				
+				static_cast< SamplerDX* >(mSampler[ mTextureLevel ])->Apply();
+			}
 			else
-				mUniformDX[ uniform ]->AsShaderResource()->SetResource( NULL );
+			{
+				mContext->PSSetShaderResources( mTextureLevel, 1, NULL );
+			}
+
+			++mTextureLevel;
 		}
 
-		void CreateUniform( const char* name )
+		void SetSampler( UINT index, SamplerMode modeU, SamplerMode modeV, 
+						 SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter )
 		{
-			mUniformDX.push_back( mEffect->GetVariableByName( name ));
+			_ASSERT( index < mNumSamplers );
+
+			SamplerDX* sampler = new SamplerDX();
+
+			if( !sampler->Create( mDevice, mContext, modeU, modeV, minFilter, magFilter, mipFilter ))
+			{
+				delete sampler;
+				return;
+			}
+
+			sampler->mStartSlot = index;
+
+			delete mSampler[ index ];
+
+			mSampler[ index ] = sampler;
 		}
 	};
 
@@ -457,8 +749,13 @@ namespace Sentinel
 	class RendererDX : public Renderer
 	{
 		friend class TextureDX;
+		friend class ShaderDX;
 
 	private:
+
+		static const UINT PRIMITIVE[ NUM_PRIMITIVES ];
+		static const UINT CULL_TYPE[ NUM_CULL_TYPES ];
+		static const UINT FILL_TYPE[ NUM_FILL_TYPES ];
 
 		class WindowInfoDX : public WindowInfo
 		{
@@ -490,17 +787,6 @@ namespace Sentinel
 		
 		RendererDX()
 		{
-			PRIMITIVE[ POINT_LIST ]     = D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
-			PRIMITIVE[ LINE_LIST ]		= D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
-			PRIMITIVE[ TRIANGLE_LIST ]	= D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-
-			CULL_TYPE[ CULL_NONE ]		= D3D11_CULL_NONE;
-			CULL_TYPE[ CULL_CCW  ]		= D3D11_CULL_BACK;
-			CULL_TYPE[ CULL_CW   ]		= D3D11_CULL_FRONT;
-
-			FILL_TYPE[ FILL_SOLID ]		= D3D11_FILL_SOLID;
-			FILL_TYPE[ FILL_WIREFRAME ] = D3D11_FILL_WIREFRAME;
-
 			mSampleDesc.Count   = 1;
 			mSampleDesc.Quality = 0;
 
@@ -765,11 +1051,11 @@ namespace Sentinel
 		{
 			_ASSERT( mCurrWindow );
 			_ASSERT( type == VERTEX_BUFFER || type == INDEX_BUFFER );
-
+			
 			D3D11_BUFFER_DESC bufferDesc;
 			bufferDesc.Usage				= D3D11_USAGE_DYNAMIC;
 			bufferDesc.ByteWidth			= size;
-			bufferDesc.BindFlags			= type;
+			bufferDesc.BindFlags			= (type == VERTEX_BUFFER) ? D3D11_BIND_VERTEX_BUFFER : D3D11_BIND_INDEX_BUFFER;
 			bufferDesc.CPUAccessFlags		= D3D11_CPU_ACCESS_WRITE;
 			bufferDesc.MiscFlags			= 0;
 			bufferDesc.StructureByteStride	= 0;
@@ -813,7 +1099,7 @@ namespace Sentinel
 
 		// Textures.
 		//
-		std::shared_ptr< Texture > CreateTextureFromFile( const char* filename )
+		std::shared_ptr< Texture > CreateTextureFromFile( const char* filename, bool createMips = true )
 		{
 			// TODO: Check for compatible texture size.
 
@@ -854,7 +1140,7 @@ namespace Sentinel
 				return NULL;
 			}
 
-			std::shared_ptr< Texture > texture = CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA );
+			std::shared_ptr< Texture > texture = CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA, createMips );
 
 			stbi_image_free( pixels );
 
@@ -921,7 +1207,7 @@ namespace Sentinel
 			desc.Usage			= D3D11_USAGE_DEFAULT;
 			desc.BindFlags		= D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 			desc.CPUAccessFlags = D3D11_USAGE_DEFAULT;
-			desc.MiscFlags		= D3D11_RESOURCE_MISC_GENERATE_MIPS;
+			desc.MiscFlags		= createMips ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
 
 			ID3D11Texture2D* tex0;
 			HV_PTR( mCurrWindow->mDevice->CreateTexture2D( &desc, NULL, &tex0 ));
@@ -948,9 +1234,9 @@ namespace Sentinel
 
 				desc.MipLevels		= 1;
 				desc.Usage			= D3D11_USAGE_STAGING;
-				desc.BindFlags		= D3D11_USAGE_DEFAULT;
+				desc.BindFlags		= 0;
 				desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-				desc.MiscFlags		= D3D11_USAGE_DEFAULT;
+				desc.MiscFlags		= 0;
 
 				ID3D11Texture2D* tex1;
 				HV_PTR( mCurrWindow->mDevice->CreateTexture2D( &desc, &res, &tex1 ));
@@ -964,7 +1250,7 @@ namespace Sentinel
 				mCurrWindow->mContext->CopySubresourceRegion( tex0, 0, 0, 0, 0, tex1, 0, &box );
 				SAFE_RELEASE_PTR( tex1 );
 			}
-
+			
 			HV_PTR( mCurrWindow->mDevice->CreateShaderResourceView( tex0, &rsv, &texture->mResource ));
 			mCurrWindow->mContext->GenerateMips( texture->mResource );
 			
@@ -1100,9 +1386,9 @@ namespace Sentinel
 		{
 			_ASSERT( type < NUM_PRIMITIVES );
 
-			mCurrShader->ApplyPass();
-			mCurrShader->ApplyLayout();
 			mCurrWindow->mContext->IASetPrimitiveTopology( static_cast< D3D11_PRIMITIVE_TOPOLOGY >( PRIMITIVE[ type ] ));
+
+			mCurrShader->ApplyLayout();
 		}
 
 		void SetRenderTarget( UINT target )
@@ -1201,9 +1487,9 @@ namespace Sentinel
 		//
 		std::shared_ptr< Shader > CreateShaderFromFile( const char* filename, const char* attrib, const char* uniform )
 		{
-			ShaderDX* shader = new ShaderDX();
+			ShaderDX* shader = new ShaderDX( mCurrWindow->mDevice, mCurrWindow->mContext );
 
-			if( shader->CreateFromFile( filename, attrib, uniform, mCurrWindow->mDevice, mCurrWindow->mContext ) != S_OK )
+			if( shader->CreateFromFile( filename, attrib, uniform ) != S_OK )
 			{
 				delete shader;
 				return NULL;
@@ -1214,9 +1500,9 @@ namespace Sentinel
 
 		std::shared_ptr< Shader > CreateShaderFromMemory( const char* source, const char* attrib, const char* uniform )
 		{
-			ShaderDX* shader = new ShaderDX();
+			ShaderDX* shader = new ShaderDX( mCurrWindow->mDevice, mCurrWindow->mContext );
 
-			if( shader->CreateFromMemory( const_cast< char* >(source), attrib, uniform, mCurrWindow->mDevice, mCurrWindow->mContext ) != S_OK )
+			if( shader->CreateFromMemory( const_cast< char* >(source), attrib, uniform ) != S_OK )
 			{
 				delete shader;
 				return NULL;
@@ -1228,6 +1514,8 @@ namespace Sentinel
 		void SetShader( const std::shared_ptr< Shader >& shader )
 		{
 			mCurrShader = shader;
+
+			shader->ApplyPass();
 		}
 
 		// Rendering.
@@ -1262,6 +1550,19 @@ namespace Sentinel
 		}
 	};
 
+	const UINT RendererDX::PRIMITIVE[] = 
+		{ D3D11_PRIMITIVE_TOPOLOGY_POINTLIST,
+		  D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
+		  D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST };
+
+	const UINT RendererDX::CULL_TYPE[] = 
+		{ D3D11_CULL_NONE,
+		  D3D11_CULL_BACK,
+		  D3D11_CULL_FRONT };
+
+	const UINT RendererDX::FILL_TYPE[] = 
+		{ D3D11_FILL_SOLID,
+		  D3D11_FILL_WIREFRAME };
 
 	Renderer* BuildRendererDX()
 	{

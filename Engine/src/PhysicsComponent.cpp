@@ -88,8 +88,6 @@ namespace Sentinel
 			mOwner->GetWorld()->mPhysicsSystem->RemoveRigidBody( mRigidBody );
 
 		mRigidBody = body;
-
-		mOwner->GetWorld()->mPhysicsSystem->AddRigidBody( mRigidBody );
 	}
 
 	void PhysicsComponent::Save( Archive& archive )

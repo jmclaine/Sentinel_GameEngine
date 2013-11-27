@@ -23,8 +23,6 @@ namespace Sentinel
 	{
 		DECLARE_SERIAL_REGISTER();
 
-	public:
-
 		DEFINE_SERIAL_CLONE_INLINE( ParticleSystemNormal );
 
 	private:
@@ -121,7 +119,7 @@ namespace Sentinel
 				static Matrix4f matrixParticle;
 				matrixParticle.World( particle.mPosition, Quatf( particle.mRotation ), particle.mScale );
 				
-				mMesh->mMatrixWorld.BillboardWorld( particle.mPosition, mGameWorld->GetCamera()->GetTransform()->mPosition, Vector3f( 0, 1, 0 ));
+				mMesh->mMatrixWorld.BillboardAxis( particle.mPosition, mGameWorld->GetCamera()->GetTransform()->mPosition, Vector3f( 0, 1, 0 ));
 				*(Matrix4f*)verts = mGameWorld->GetCamera()->GetMatrixFinal() * mMesh->mMatrixWorld * matrixParticle;
 				verts += sizeof( Matrix4f );
 			}

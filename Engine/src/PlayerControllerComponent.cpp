@@ -45,32 +45,32 @@ namespace Sentinel
 			// Forward.
 			//
 			if( keyboard.IsDown( 'W' ))
-				impulse = impulse.Add( matRot.Forward() );
+				impulse += matRot.Forward();
 		
 			// Backward.
 			//
 			if( keyboard.IsDown( 'S' ))
-				impulse = impulse.Add( -matRot.Forward() );
+				impulse -= matRot.Forward();
 		
 			// Left.
 			//
 			if( keyboard.IsDown( 'A' ))
-				impulse = impulse.Add( -matRot.Right() );
+				impulse -= matRot.Right();
 		
 			// Right.
 			//
 			if( keyboard.IsDown( 'D' ))
-				impulse = impulse.Add( matRot.Right() );
+				impulse += matRot.Right();
 		
 			// Up.
 			//
 			if( keyboard.IsDown( VK_SPACE ))
-				impulse = impulse.Add( matRot.Up() );
+				impulse += matRot.Up();
 		
 			// Down.
 			//
 			if( keyboard.IsDown( 'C' ))
-				impulse = impulse.Add( -matRot.Up() );
+				impulse -= matRot.Up();
 
 			// Move in direction.
 			//

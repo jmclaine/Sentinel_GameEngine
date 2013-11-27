@@ -2,15 +2,16 @@
 
 // Uniforms.
 //
-uniform matrix world :WORLD;
-
-Texture2D tex0;
-SamplerState defss
+cbuffer Uniforms
 {
-	Filter = MIN_MAG_MIP_LINEAR;
-	AddressU = Wrap;
-	AddressV = Wrap;
-};
+	matrix world;
+}
+
+
+// Textures.
+//
+Texture2D    tex0		:register(t0);
+SamplerState sampler0	:register(s0);
 
 
 // Vertex Shader.
@@ -27,11 +28,11 @@ struct VSOutput
 	float2 Texture0		:TEXCOORD0;
 };
 
-VSOutput MyVS(VSInput input)
+VSOutput VS_Main(VSInput input)
 {
 	VSOutput output;
 
-	output.Position = mul(input.Position, world);
+	output.Position = mul(world, input.Position);
 	output.Texture0 = input.Texture0;
 
 	return output;
@@ -40,19 +41,9 @@ VSOutput MyVS(VSInput input)
 
 // Fragment Shader.
 //
-float4 MyPS(VSOutput input):SV_Target
+float4 PS_Main(VSOutput input):SV_Target
 {
-	return float4(tex0.Sample(defss, input.Texture0).xyz, 1);
-}
-
-technique11 MyTechnique
-{
-    pass P0
-    {
-		SetVertexShader(CompileShader(vs_4_0, MyVS()));
-		SetGeometryShader(0);
-		SetPixelShader(CompileShader(ps_4_0, MyPS()));
-    }
+	return float4(tex0.Sample(sampler0, input.Texture0).xyz, 1);
 }
 
 #endif

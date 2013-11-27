@@ -1,12 +1,9 @@
 #ifdef VERSION_DX
 
-Texture2D tex0;
-SamplerState defss
-{
-	Filter = MIN_MAG_MIP_LINEAR;
-	AddressU = Wrap;
-	AddressV = Wrap;
-};
+// Textures.
+//
+Texture2D    tex0		:register(t0);
+SamplerState sampler0	:register(s0);
 
 
 // Vertex Shader.
@@ -16,17 +13,10 @@ struct VSInput
 	float4 Texture0		:TEXCOORD0;
 	float4 Color		:COLOR0;
 
-	row_major float4x4 Matrix	:MATRIX;
+	float4x4 Matrix		:MATRIX;
 };
 
-struct GSOutput
-{
-	float4 Position		:SV_POSITION;
-	float2 Texture0		:TEXCOORD0;
-	float4 Color		:COLOR0;
-};
-
-VSInput MyVS(VSInput input)
+VSInput VS_Main(VSInput input)
 {
 	return input;
 }
@@ -34,53 +24,50 @@ VSInput MyVS(VSInput input)
 
 // Geometry Shader.
 //
-[maxvertexcount(4)]
-void MyGS(point VSInput input[1], inout TriangleStream<GSOutput> TriStream)
+struct GSOutput
 {
-	GSOutput v;
-	v.Color = input[0].Color;
+	float4 Position		:SV_POSITION;
+	float2 Texture0		:TEXCOORD0;
+	float4 Color		:COLOR0;
+};
+
+[maxvertexcount(4)]
+void GS_Main(point VSInput input[1], inout TriangleStream<GSOutput> TriStream)
+{
+	GSOutput output;
+	output.Color = input[0].Color;
 	
 	// Top right.
 	//
-	v.Position = mul(float4(1, 1, 0, 1), input[0].Matrix);
-	v.Texture0 = float2(input[0].Texture0.z, input[0].Texture0.y);
-	TriStream.Append(v);
+	output.Position = mul(input[0].Matrix, float4(1, 1, 0, 1));
+	output.Texture0 = float2(input[0].Texture0.z, input[0].Texture0.y);
+	TriStream.Append(output);
 
 	// Top left.
 	//
-	v.Position = mul(float4(-1, 1, 0, 1), input[0].Matrix);
-	v.Texture0 = float2(input[0].Texture0.x, input[0].Texture0.y);
-	TriStream.Append(v);
+	output.Position = mul(input[0].Matrix, float4(-1, 1, 0, 1));
+	output.Texture0 = float2(input[0].Texture0.x, input[0].Texture0.y);
+	TriStream.Append(output);
 
 	// Bottom right.
 	//
-	v.Position = mul(float4(1, -1, 0, 1), input[0].Matrix);
-	v.Texture0 = float2(input[0].Texture0.z, input[0].Texture0.w);
-	TriStream.Append(v);
+	output.Position = mul(input[0].Matrix, float4(1, -1, 0, 1));
+	output.Texture0 = float2(input[0].Texture0.z, input[0].Texture0.w);
+	TriStream.Append(output);
 
 	// Bottom left.
 	//
-	v.Position = mul(float4(-1, -1, 0, 1), input[0].Matrix);
-	v.Texture0 = float2(input[0].Texture0.x, input[0].Texture0.w);
-	TriStream.Append(v);
+	output.Position = mul(input[0].Matrix, float4(-1, -1, 0, 1));
+	output.Texture0 = float2(input[0].Texture0.x, input[0].Texture0.w);
+	TriStream.Append(output);
 }
 
 
-// Fragment Shader.
+// Pixel Shader.
 //
-float4 MyPS(GSOutput input):SV_Target
+float4 PS_Main(GSOutput input):SV_Target
 {
-	return tex0.Sample(defss, input.Texture0) * input.Color;
-}
-
-technique11 MyTechnique
-{
-    pass P0
-    {
-		SetVertexShader(CompileShader(vs_4_0, MyVS()));
-		SetGeometryShader(CompileShader(gs_4_0, MyGS()));
-		SetPixelShader(CompileShader(ps_4_0, MyPS()));
-    }
+	return tex0.Sample(sampler0, input.Texture0) * input.Color;
 }
 
 #endif

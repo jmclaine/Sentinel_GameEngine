@@ -46,7 +46,9 @@ namespace Sentinel
 
 			if( !hWnd )
 				throw AppException( "Failed to initialize window: " + std::string( mTitle ));
-			
+
+			//SetWindowLong(hWnd, GWL_STYLE, 0);	// borderless window
+
 			ShowWindow( hWnd, nCmdShow );
 			UpdateWindow( hWnd );
 

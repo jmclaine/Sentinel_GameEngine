@@ -4,14 +4,30 @@
 
 namespace Sentinel
 {
-	Shader::Shader()
-	{
-		mShaderSource = NULL;
-		mVertexSize   = 0;
-	}
+	Shader::Sampler::Sampler()
+	{}
+	
+	Shader::Sampler::~Sampler()
+	{}
+
+	////////////////////////////////////
+
+	Shader::Shader() :
+		mShaderSource( NULL ),
+		mSampler( NULL ),
+		mVertexSize( 0 )
+	{}
 
 	Shader::~Shader()
 	{
+		if( mSampler )
+		{
+			for( UINT x = 0; x < mNumSamplers; ++x )
+				delete mSampler[ x ];
+
+			delete[] mSampler;
+		}
+
 		free( mShaderSource );
 	}
 

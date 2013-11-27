@@ -33,6 +33,9 @@ namespace Sentinel
 
 		RigidBody*		GetRigidBody();
 
+		// Startup must be called to add the RigidBody
+		// to the PhysicsSystem within GameWorld.
+		//
 		void			SetRigidBody( RigidBody* body );
 	};
 }

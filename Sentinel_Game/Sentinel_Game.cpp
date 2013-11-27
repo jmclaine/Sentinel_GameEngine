@@ -153,8 +153,7 @@ public:
 		mGameWorld->mSoundManager->Load( archive, mGameWorld->mAudioSystem );
 
 		mGameWorld->mSpriteSystem = new SpriteSystem( mRenderer, mGameWorld->mShaderManager->Get( "GUI" ), 256 );
-		mGameWorld->mSpriteSystem = mGameWorld->mSpriteSystem;
-
+		
 		mGameWorld->Load( archive );
 
 		archive.Close();

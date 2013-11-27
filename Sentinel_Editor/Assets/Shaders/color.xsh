@@ -2,7 +2,15 @@
 
 // Uniforms.
 //
-uniform matrix wvp  :WORLDVIEWPROJECTION;
+cbuffer Uniforms
+{
+    matrix wvp;
+
+	float4 ambient;
+	float4 diffuse;
+	float4 specular;
+	float  spec_comp;
+}
 
 
 // Vertex Shader.
@@ -17,36 +25,21 @@ struct VSOutput
 	float4 Position	:SV_POSITION;
 };
 
-VSOutput MyVS( VSInput input )
+VSOutput VS_Main(VSInput input)
 {
 	VSOutput output;
 
-	output.Position = mul(input.Position, wvp);
+	output.Position = mul(wvp, input.Position);
 	
 	return output;
 }
 
 
-// Fragment Uniforms.
+// Pixel Shader.
 //
-uniform float4 ambient;
-uniform float4 diffuse;
-uniform float4 specular;
-uniform float spec_comp;
-
-float4 MyPS(VSOutput input):SV_Target
+float4 PS_Main(VSOutput input):SV_Target
 {	
-	return saturate(ambient + diffuse + specular);
-}
-
-technique11 MyTechnique
-{
-    pass P0
-    {          
-		SetVertexShader(CompileShader(vs_4_0, MyVS()));
-		SetGeometryShader(0);
-		SetPixelShader(CompileShader(ps_4_0, MyPS()));
-    }
+	return saturate(ambient);
 }
 
 #endif
@@ -74,7 +67,7 @@ uniform float spec_comp;
 
 void main()
 {
-   gl_FragColor = clamp(ambient + diffuse + specular, 0.0, 1.0);
+	gl_FragColor = clamp(ambient, 0.0, 1.0);
 }
 
 #endif

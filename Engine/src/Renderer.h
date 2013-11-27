@@ -97,10 +97,28 @@ If a GameWindow was created:
 gameWindow0->Shutdown();
 gameWindow1->Shutdown();
 
+
+
+RENDER TARGET:
+
+If a Render Target is created and it requires a
+Z-Buffer attached to it, OpenGL must have the
+Render Target created before the Depth Stencil.
+
+Example:
+
+renderer->CreateRenderTarget( ... );
+renderer->CreateDepthStencil( ... );
+
+For additional examples of more advanced types:
+
+http://www.opengl.org/wiki/Framebuffer_Object_Examples
+
 */
 #include "Common.h"
 #include "Util.h"
 #include "RendererTypes.h"
+#include "Shader.h"
 
 #define STBI_HEADER_FILE_ONLY
 #include "stb_image.c"
@@ -110,7 +128,6 @@ gameWindow1->Shutdown();
 
 namespace Sentinel
 {
-	class Shader;
 	class Texture;
 	class Buffer;
 	class Mesh;
@@ -157,16 +174,12 @@ namespace Sentinel
 	{
 	protected:
 
-		UINT				PRIMITIVE[ NUM_PRIMITIVES ];
-		UINT				CULL_TYPE[ NUM_CULL_TYPES ];
-		UINT				FILL_TYPE[ NUM_FILL_TYPES ];
-
 		std::shared_ptr< Shader >	mCurrShader;
 
 	public:
 
-		static UINT	WINDOW_WIDTH_BASE;
-		static UINT	WINDOW_HEIGHT_BASE;
+		static UINT					WINDOW_WIDTH_BASE;
+		static UINT					WINDOW_HEIGHT_BASE;
 
 		std::shared_ptr< Texture >	NULL_TEXTURE;	// black default texture
 		std::shared_ptr< Texture >	BASE_TEXTURE;	// white default texture
@@ -204,14 +217,15 @@ namespace Sentinel
 		std::shared_ptr< Texture > CreateTexture( UINT width, UINT height, ImageFormatType format = IMAGE_FORMAT_RGBA, bool createMips = false );
 		std::shared_ptr< Texture > CreateTextureFromResource( void* data, UINT length );
 
-		virtual std::shared_ptr< Texture > CreateTextureFromFile( const char* filename ) = 0;
+		virtual std::shared_ptr< Texture > CreateTextureFromFile( const char* filename, bool createMips = true ) = 0;
 		virtual std::shared_ptr< Texture > CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormatType format, bool createMips = true ) = 0;
 
 		virtual void*		GetTexturePixels( std::shared_ptr< Texture > texture ) = 0;
 	
 		// Special Rendering.
 		//
-		Mesh*				CreateRenderTargetMesh( std::shared_ptr< Shader > shader );
+		Mesh*				CreateRenderTargetQuad( std::shared_ptr< Shader > shader );
+		Mesh*				CreateGUIQuad( std::shared_ptr< Shader > shader );
 
 		virtual UINT		CreateBackbuffer() = 0;
 		virtual UINT		CreateRenderTarget( std::shared_ptr< Texture > texture ) = 0;
@@ -231,7 +245,7 @@ namespace Sentinel
 		//
 		virtual std::shared_ptr< Shader > CreateShaderFromFile( const char* filename, const char* attrib, const char* uniform ) = 0;
 		virtual std::shared_ptr< Shader > CreateShaderFromMemory( const char* filename, const char* attrib, const char* uniform ) = 0;
-
+		
 		virtual void		SetShader( const std::shared_ptr< Shader >& shader ) = 0;
 
 		// Rendering.

@@ -45,11 +45,11 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Engine\openal-soft-1.15.1\include;$(SolutionDir)\Engine\tinyxml;$(SolutionDir)\Engine\bullet-2.81-rev2613\src;$(SolutionDir)\Engine\glew\include;$(SolutionDir)\Engine\src\;$(SolutionDir)\Engine\DirectX11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Components;$(SolutionDir)\Engine\openal-soft-1.15.1\include;$(SolutionDir)\Engine\tinyxml;$(SolutionDir)\Engine\bullet-2.81-rev2613\src;$(SolutionDir)\Engine\glew\include;$(SolutionDir)\Engine\src\;$(SolutionDir)\Engine\DirectX11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -60,12 +60,12 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Engine\openal-soft-1.15.1\include;$(SolutionDir)\Engine\tinyxml;$(SolutionDir)\Engine\bullet-2.81-rev2613\src;$(SolutionDir)\Engine\glew\include;$(SolutionDir)\Engine\src\;$(SolutionDir)\Engine\DirectX11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Components;$(SolutionDir)\Engine\openal-soft-1.15.1\include;$(SolutionDir)\Engine\tinyxml;$(SolutionDir)\Engine\bullet-2.81-rev2613\src;$(SolutionDir)\Engine\glew\include;$(SolutionDir)\Engine\src\;$(SolutionDir)\Engine\DirectX11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -85,7 +85,9 @@
     <None Include="Assets\Shaders\RTnormal.xsh" />
     <None Include="Assets\Shaders\sprite.xsh" />
     <None Include="Assets\Shaders\texture.xsh" />
-    <None Include="config.xml" />
+    <None Include="config.xml">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="ReadMe.txt" />
     <None Include="Sentinel_Editor.ico" />
     <None Include="small.ico" />
@@ -98,6 +100,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Components\EditorControllerComponent.cpp" />
     <ClCompile Include="Sentinel_Editor.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

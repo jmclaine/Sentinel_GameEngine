@@ -37,11 +37,15 @@ namespace Sentinel
 
 		std::string			mName;
 
-		////////////////////////////////
+	protected:
 
 		GameComponent();
 
+	public:
+
 		virtual ~GameComponent();
+
+		////////////////////////////////
 
 		virtual void Startup() = 0;
 

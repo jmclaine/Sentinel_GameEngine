@@ -2,25 +2,29 @@
 
 // Uniforms.
 //
-uniform matrix wvp	 :WORLDVIEWPROJECTION;
-uniform matrix world :WORLD;
+cbuffer Uniforms
+{
+	matrix wvp;
+	matrix world;
+	
+	float3 light_pos0;
+	float3 light_color0;
+	float4 light_attn0;
+	
+	float3 cam_pos;
 
-uniform float3 light_pos0;
-uniform float3 light_color0;
-uniform float4 light_attn0;
-
-uniform float3 cam_pos;
+	float4 ambient;
+	float4 diffuse;
+	float4 specular;
+	float  spec_comp;
+}
 
 
 // Textures.
 //
-Texture2D tex0;
-SamplerState defss
-{
-	Filter = MIN_MAG_MIP_LINEAR;
-	AddressU = Wrap;
-	AddressV = Wrap;
-};
+Texture2D    tex0		:register(t0);
+SamplerState sampler0	:register(s0);
+
 
 // Vertex Shader.
 //
@@ -40,13 +44,13 @@ struct VSOutput
 	float3 LPos0	:NORMAL2;
 };
 
-VSOutput MyVS( VSInput input )
+VSOutput VS_Main( VSInput input )
 {
 	VSOutput output;
 
 	// Position
-	output.Position = mul(input.Position, wvp);
-	float3 worldPos = mul(input.Position, world).xyz;
+	output.Position = mul(wvp,   input.Position);
+	float3 worldPos = mul(world, input.Position).xyz;
 	
 	// Light direction
 	output.LPos0  = light_pos0 - worldPos;
@@ -58,19 +62,14 @@ VSOutput MyVS( VSInput input )
 	output.Texture0 = input.Texture0;
 	
 	// Normal
-	output.Normal = mul(float4(input.Normal, 0), world).xyz;
+	output.Normal = mul(world, float4(input.Normal, 0)).xyz;
 
 	return output;
 }
 
 
-// Fragment Uniforms.
+// Pixel Shader.
 //
-uniform float4 ambient;
-uniform float4 diffuse;
-uniform float4 specular;
-uniform float spec_comp;
-
 float4 GetColor(float3 LPos, float3 camDir, float3 N, float3 color, float4 attn)
 {
 	float dist = max(0.0, length(LPos)-attn.w);
@@ -95,7 +94,7 @@ float4 GetColor(float3 LPos, float3 camDir, float3 N, float3 color, float4 attn)
 	return saturate(float4(ambientFinal.rgb + (diffuseFinal.rgb + specularFinal.rgb) * attnFinal * color, 1));
 }
 
-float4 MyPS(VSOutput input):SV_Target
+float4 PS_Main(VSOutput input):SV_Target
 {	
 	// Camera Direction
 	input.CamDir = normalize(input.CamDir);
@@ -107,17 +106,7 @@ float4 MyPS(VSOutput input):SV_Target
 	float4 color0 = GetColor(input.LPos0, input.CamDir, N, light_color0, light_attn0);
 	
 	// Final fragment color
-	return tex0.Sample(defss, input.Texture0) * color0;
-}
-
-technique11 MyTechnique
-{
-    pass P0
-    {          
-		SetVertexShader(CompileShader(vs_4_0, MyVS()));
-		SetGeometryShader(0);
-		SetPixelShader(CompileShader(ps_4_0, MyPS()));
-    }
+	return tex0.Sample(sampler0, input.Texture0) * color0;
 }
 
 #endif

@@ -130,6 +130,85 @@ namespace Sentinel
 
 	class ShaderGL : public Shader
 	{
+	public:
+
+		class SamplerGL : public Sampler
+		{
+		private:
+
+			GLint	mWrapS;
+			GLint	mWrapT;
+
+			GLint	mMinFilter;
+			GLint	mMagFilter;
+
+		public:
+
+			SamplerGL() :
+				mWrapS( GL_REPEAT ),
+				mWrapT( GL_REPEAT ),
+				mMinFilter( GL_LINEAR ),
+				mMagFilter( GL_LINEAR )
+			{}
+
+			void Create( SamplerMode modeU, SamplerMode modeV, SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter )
+			{
+				mWrapS = (modeU == MODE_WRAP) ? GL_REPEAT : GL_CLAMP;
+				mWrapT = (modeV == MODE_WRAP) ? GL_REPEAT : GL_CLAMP;
+
+				if( minFilter == FILTER_LINEAR )
+				{
+					if( mipFilter == FILTER_LINEAR )
+					{
+						mMinFilter = GL_LINEAR_MIPMAP_LINEAR;
+					}
+					else
+					if( mipFilter == FILTER_POINT )
+					{
+						mMinFilter = GL_LINEAR_MIPMAP_NEAREST;
+					}
+					else
+					{
+						mMinFilter = GL_LINEAR;
+					}
+				}
+				else
+				{
+					if( mipFilter == FILTER_LINEAR )
+					{
+						mMinFilter = GL_NEAREST_MIPMAP_LINEAR;
+					}
+					else
+					if( mipFilter == FILTER_POINT )
+					{
+						mMinFilter = GL_NEAREST_MIPMAP_NEAREST;
+					}
+					else
+					{
+						mMinFilter = GL_NEAREST;
+					}
+				}
+
+				if( magFilter == FILTER_LINEAR )
+				{
+					mMagFilter = GL_LINEAR;
+				}
+				else
+				{
+					mMagFilter = GL_NEAREST;
+				}
+			}
+
+			void Apply()
+			{
+				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mWrapS );
+				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mWrapT );
+
+				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mMinFilter );
+				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mMagFilter );
+			}
+		};
+
 	private:
 		
 		GLuint		mProgramID;
@@ -234,9 +313,10 @@ namespace Sentinel
 				
 				if( !Compile( vshader, mVertexShader, GL_VERTEX_SHADER, 2 ))
 					return S_FALSE;
+
+				glAttachShader( mProgramID, mVertexShader );
 			}
 			
-			bool useGS = false;
 			if( strstr( mShaderSource, "GEOMETRY_SHADER" ) != NULL )
 			{
 				const char *gshader[2] = { "#define VERSION_GL\n#define GEOMETRY_SHADER\n\0", mShaderSource };
@@ -244,13 +324,13 @@ namespace Sentinel
 				if( !Compile( gshader, mGeometryShader, GL_GEOMETRY_SHADER, 2 ))
 					return S_FALSE;
 
-				useGS = true;
-
 				// Figure out a way to allow customization of this:
 				//
 				glProgramParameteriEXT( mProgramID, GL_GEOMETRY_INPUT_TYPE_EXT, GL_POINTS );
 				glProgramParameteriEXT( mProgramID, GL_GEOMETRY_OUTPUT_TYPE_EXT, GL_TRIANGLE_STRIP );
 				glProgramParameteriEXT( mProgramID, GL_GEOMETRY_VERTICES_OUT_EXT, 4 );
+
+				glAttachShader( mProgramID, mGeometryShader );
 			}
 
 			if( strstr( mShaderSource, "FRAGMENT_SHADER" ) != NULL )
@@ -259,6 +339,8 @@ namespace Sentinel
 
 				if( !Compile( fshader, mFragmentShader, GL_FRAGMENT_SHADER, 2 ))
 					return S_FALSE;
+
+				glAttachShader( mProgramID, mFragmentShader );
 			}
 			
 			TRACE( "Shader Compiled Successfully!" );
@@ -379,19 +461,23 @@ namespace Sentinel
 
 				glBindAttribLocation( mProgramID, attribIndex++, name );
 			}
+
+			// Create texture samplers.
+			//
+			if( texCount > 0 )
+			{
+				mNumSamplers = texCount;
+
+				mSampler = new Sampler*[ texCount ];
+
+				for( UINT i = 0; i < texCount; ++i )
+					mSampler[ i ] = new SamplerGL();
+			}
 		
 			// Link the shaders.
 			//
 			int didCompile;
 
-			glAttachShader( mProgramID, mVertexShader );
-
-			if( useGS )
-			{
-				glAttachShader( mProgramID, mGeometryShader );
-			}
-
-			glAttachShader( mProgramID, mFragmentShader );
 			glLinkProgram( mProgramID );
 			glGetProgramiv( mProgramID, GL_LINK_STATUS, &didCompile );
 
@@ -464,6 +550,16 @@ namespace Sentinel
 
 			return 1;
 		}
+
+		void CreateUniform( const char* name )
+		{
+			GLuint id = glGetUniformLocation( mProgramID, name );
+
+			if( id == -1 )
+				TRACE( "Shader Warning: Uniform '" << name << "' does not match within file." );
+			
+			mUniformGL.push_back( id );
+		}
 		
 	public:
 
@@ -495,6 +591,8 @@ namespace Sentinel
 		void ApplyPass()
 		{
 			glUseProgram( mProgramID );
+
+			mTextureLevel = 0;
 		}
 
 		void ApplyLayout()
@@ -507,8 +605,6 @@ namespace Sentinel
 			for( UINT i = 0; i < mAttributeSize; ++i )
 				glVertexAttribPointer( i, mAttributeGL[ i ].mOffsetSize, mAttributeGL[ i ].mType, mAttributeGL[ i ].mNormalize, stride, \
 									   reinterpret_cast< const GLvoid* >( mAttributeGL[ i ].mOffset ));
-			
-			mTextureLevel = 0;
 		}
 
 		void SetFloat( UINT uniform, float data )
@@ -516,24 +612,24 @@ namespace Sentinel
 			glUniform1f( mUniformGL[ uniform ], data );
 		}
 
-		void SetFloat2( UINT uniform, float* data, UINT offset, UINT count )
+		void SetFloat2( UINT uniform, float* data )
 		{
-			glUniform2fv( mUniformGL[ uniform ] + offset, count, data );
+			glUniform2fv( mUniformGL[ uniform ], 1, data );
 		}
 
-		void SetFloat3( UINT uniform, float* data, UINT offset, UINT count )
+		void SetFloat3( UINT uniform, float* data )
 		{
-			glUniform3fv( mUniformGL[ uniform ] + offset, count, data );
+			glUniform3fv( mUniformGL[ uniform ], 1, data );
 		}
 
-		void SetFloat4( UINT uniform, float* data, UINT offset, UINT count )
+		void SetFloat4( UINT uniform, float* data )
 		{
-			glUniform4fv( mUniformGL[ uniform ] + offset, count, data );
+			glUniform4fv( mUniformGL[ uniform ], 1, data );
 		}
 
-		void SetMatrix( UINT uniform, float* matrix, UINT offset, UINT count )
+		void SetMatrix( UINT uniform, float* matrix )
 		{
-			glUniformMatrix4fv( mUniformGL[ uniform ] + offset, count, false, matrix );
+			glUniformMatrix4fv( mUniformGL[ uniform ], 1, false, matrix );
 		}
 
 		void SetTexture( UINT uniform, Texture* texture )
@@ -549,17 +645,17 @@ namespace Sentinel
 
 			glBindTexture( GL_TEXTURE_2D, static_cast< TextureGL* >(texture)->ID() );
 
+			static_cast< SamplerGL* >(mSampler[ mTextureLevel ])->Apply();
+			
 			++mTextureLevel;
 		}
 
-		void CreateUniform( const char* name )
+		void SetSampler( UINT index, SamplerMode modeU, SamplerMode modeV, 
+						 SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter )
 		{
-			GLuint id = glGetUniformLocation( mProgramID, name );
+			_ASSERT( index < mNumSamplers );
 
-			if( id == -1 )
-				TRACE( "Shader Warning: Uniform '" << name << "' does not match within file." );
-			
-			mUniformGL.push_back( id );
+			static_cast< SamplerGL* >(mSampler[ index ])->Create( modeU, modeV, minFilter, magFilter, mipFilter );
 		}
 	};
 
@@ -569,6 +665,10 @@ namespace Sentinel
 	class RendererGL : public Renderer
 	{
 	private:
+
+		static const UINT PRIMITIVE[ NUM_PRIMITIVES ];
+		static const UINT CULL_TYPE[ NUM_CULL_TYPES ];
+		static const UINT FILL_TYPE[ NUM_FILL_TYPES ];
 
 		class RenderTarget
 		{
@@ -601,7 +701,7 @@ namespace Sentinel
 		std::vector< RenderTarget >		mRenderTarget;
 		std::vector< GLuint >			mDepthStencil;
 		
-		UINT IMAGE_FORMAT[ NUM_IMAGE_FORMATS ];
+		static const UINT IMAGE_FORMAT[ NUM_IMAGE_FORMATS ];
 
 		BufferGL*						mCurrVBO;
 
@@ -609,20 +709,6 @@ namespace Sentinel
 		
 		RendererGL()
 		{
-			PRIMITIVE[ POINT_LIST ]				= GL_POINTS;
-			PRIMITIVE[ LINE_LIST ]				= GL_LINES;
-			PRIMITIVE[ TRIANGLE_LIST ]			= GL_TRIANGLES;
-
-			CULL_TYPE[ CULL_NONE ]				= GL_NONE;
-			CULL_TYPE[ CULL_CCW ]				= GL_CCW;
-			CULL_TYPE[ CULL_CW ]				= GL_CW;
-
-			FILL_TYPE[ FILL_SOLID ]				= GL_FILL;
-			FILL_TYPE[ FILL_WIREFRAME ]			= GL_LINE;
-
-			IMAGE_FORMAT[ IMAGE_FORMAT_RGB ]	= GL_RGB;
-			IMAGE_FORMAT[ IMAGE_FORMAT_RGBA ]	= GL_RGBA;
-
 			NULL_TEXTURE = NULL;
 			BASE_TEXTURE = NULL;
 
@@ -811,7 +897,7 @@ namespace Sentinel
 
 		// Textures.
 		//
-		std::shared_ptr< Texture > CreateTextureFromFile( const char* filename )
+		std::shared_ptr< Texture > CreateTextureFromFile( const char* filename, bool createMips = true )
 		{
 			// TODO: Check for compatible texture size.
 
@@ -831,7 +917,7 @@ namespace Sentinel
 				return NULL;
 			}
 
-			std::shared_ptr< Texture > texture = CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA );
+			std::shared_ptr< Texture > texture = CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA, createMips );
 
 			stbi_image_free( pixels );
 
@@ -850,12 +936,12 @@ namespace Sentinel
 			if( createMips )
 			{
 				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 			}
 			else
 			{
-				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );  
 				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 			}
 			
 			// Load the texture object from memory.
@@ -911,7 +997,7 @@ namespace Sentinel
 			glGenRenderbuffers( 1, &id );
 			glBindRenderbuffer( GL_RENDERBUFFER, id );
 			glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height );
-			glFramebufferRenderbuffer( GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, id );
+			glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, id );
 			
 			mDepthStencil.push_back( id );
 			return mDepthStencil.size()-1;
@@ -941,7 +1027,7 @@ namespace Sentinel
 		{
 			_ASSERT( target < mRenderTarget.size() );
 
-			glBindFramebuffer( GL_DRAW_FRAMEBUFFER, mRenderTarget[ target ].mID );
+			glBindFramebuffer( GL_FRAMEBUFFER, mRenderTarget[ target ].mID );
 		}
 
 		void SetDepthStencil( UINT stencil )
@@ -1010,7 +1096,7 @@ namespace Sentinel
 					break;
 
 				case BLEND_PARTICLE:
-					glBlendFunc( GL_SRC_ALPHA, GL_ZERO );
+					//glBlendFunc( GL_SRC_ALPHA, GL_ZERO );
 					glEnable( GL_BLEND );
 					break;
 
@@ -1085,6 +1171,25 @@ namespace Sentinel
 		}
 	};
 
+	const UINT RendererGL::PRIMITIVE[] = 
+		{ GL_POINTS, 
+		  GL_LINES, 
+		  GL_TRIANGLES };
+
+	const UINT RendererGL::CULL_TYPE[] = 
+		{ GL_NONE, 
+		  GL_CCW,
+		  GL_CW };
+
+	const UINT RendererGL::FILL_TYPE[] = 
+		{ GL_FILL,
+		  GL_LINE };
+
+	const UINT RendererGL::IMAGE_FORMAT[] =
+		{ GL_R, 
+		  GL_RGB,
+		  GL_RGBA,
+		  GL_RGBA32F };
 
 	Renderer* BuildRendererGL()
 	{
