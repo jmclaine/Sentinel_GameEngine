@@ -7,6 +7,7 @@
 #include "Archive.h"
 #include "Vector3f.h"
 #include "Quatf.h"
+#include "Util.h"
 
 namespace Sentinel
 {
@@ -115,7 +116,8 @@ namespace Sentinel
 		Vector3f scale = mRigidBody->GetScale();
 		archive.Write( scale.Ptr(), ar_sizeof( scale ));
 			
-		//if( type == RigidBody::MESH )
+		if( type == PHYSICS_MESH )
+			archive.Write( &mOwner->GetWorld()->mMeshManager->Get( mRigidBody->mMesh ));
 
 		int flags = mRigidBody->GetFlags();
 		archive.Write( &flags );
@@ -175,21 +177,21 @@ namespace Sentinel
 				break;
 
 			case PHYSICS_MESH:
-				/*{
+				{
 					std::string name;
 					archive.Read( &name );
 
-					std::shared_ptr< Mesh > mesh = MeshManager::Inst()->Get( name );
+					std::shared_ptr< Mesh > mesh = mOwner->GetWorld()->mMeshManager->Get( name );
 
 					if( mesh )
-						mRigidBody = physics->CreateMesh( pos, rot, scale, mesh.get(), mass );
+						mRigidBody = physics->CreateMesh( pos, rot, scale, mesh, mass );
 					else
-						REPORT_ERROR( "No support for PhysicsComponent shape on " << mOwner->mName, "Load Error" );
+						throw AppException( "No Mesh with PhysicsComponent shape on " + mOwner->mName );
 				}
-				break;*/
+				break;
 
 			default:
-				REPORT_ERROR( "No support for PhysicsComponent shape on " << mOwner->mName, "Load Error" );
+				throw AppException( "No support for PhysicsComponent shape on " + mOwner->mName );
 				break;
 		}
 

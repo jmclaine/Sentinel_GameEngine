@@ -2,9 +2,11 @@
 /*
 Creates a point mesh to generate quads using a geometry shader.
 
-Use 'sprite.xsh' to create a custom shader.  Be aware that the
-vertex attributes must remain the same to ensure the
-SpriteSystem can modify and render the quads correctly.
+Use 'sprite.xsh' as a basis to create a custom shader.  
+Be aware that the vertex attributes must remain the same 
+to ensure the SpriteSystem can modify and render the 
+quads correctly.
+
 Uniforms can be added freely.
 
 Use the current GameWorld camera to render sprites.
@@ -29,7 +31,7 @@ namespace Sentinel
 
 		Renderer*			mRenderer;
 		
-		Mesh*				mMesh;
+		Mesh*				mMesh;			// uses shader to create the mesh points
 
 		UINT				mNumSprites;
 		UINT				mMaxSprites;
@@ -50,6 +52,8 @@ namespace Sentinel
 
 		Storage*			mStorage;
 
+		std::shared_ptr< Shader > mShader;
+
 	public:
 
 		std::shared_ptr< Sprite > mSprite;
@@ -58,6 +62,12 @@ namespace Sentinel
 
 		SpriteSystem( Renderer* renderer, std::shared_ptr< Shader > shader, UINT maxSprites );
 		~SpriteSystem();
+
+		Renderer*	GetRenderer();
+
+		std::shared_ptr< Shader > GetShader();
+
+		/////////////////////////////////////
 
 		void		Clear();
 

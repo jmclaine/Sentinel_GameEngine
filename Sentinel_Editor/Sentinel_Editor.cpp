@@ -16,6 +16,7 @@ Edits levels for a game created with the Sentinel Engine.
 #include "SpriteSystem.h"
 #include "NetworkSocket.h"
 #include "AudioSystem.h"
+#include "FontSystem.h"
 
 #include "GameWindow.h"
 
@@ -57,8 +58,10 @@ Edits levels for a game created with the Sentinel Engine.
 #include "Sprite.h"
 
 #include "GUI/Widget.h"
-#include "GUI/Button.h"
-#include "GUI/Drawable.h"
+#include "GUI/ButtonSprite.h"
+#include "GUI/DrawableMesh.h"
+#include "GUI/DrawableSprite.h"
+#include "GUI/Label.h"
 
 #include "RandomValue.h"
 
@@ -78,6 +81,8 @@ class MainApp
 
 	Mesh*					mRTBackbufferMesh;
 
+	FontSystem*				mFontSystem;
+
 public:
 
 	MainApp() :
@@ -85,7 +90,8 @@ public:
 		mRenderer( NULL ),
 		mGameWorld( NULL ),
 		mEditorWorld( NULL ),
-		mRTBackbufferMesh( NULL )
+		mRTBackbufferMesh( NULL ),
+		mFontSystem( NULL )
 	{
 		srand( (UINT)time( (time_t*)0 ));
 	}
@@ -230,6 +236,9 @@ public:
 
 	void Shutdown()
 	{
+		SAFE_DELETE( mFontSystem->mSpriteSystem );
+		SAFE_DELETE( mFontSystem );
+
 		SAFE_DELETE( mRTBackbufferMesh );
 
 		SHUTDOWN_DELETE( mGameWorld );
@@ -251,7 +260,7 @@ public:
 
 		mGameWorld->mTextureManager->Save( archive, mRenderer );
 		mGameWorld->mShaderManager->Save( archive );
-		mGameWorld->mSpriteManager->Save( archive, mGameWorld->mShaderManager, mGameWorld->mTextureManager );
+		mGameWorld->mSpriteManager->Save( archive, mGameWorld->mTextureManager );
 		mGameWorld->mMeshManager->Save( archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager );
 		mGameWorld->mModelManager->Save( archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager );
 		mGameWorld->mSoundManager->Save( archive );
@@ -308,6 +317,11 @@ public:
 		}
 		*/
 		SetDirectory( ".." );
+
+		mFontSystem = BuildFontSystemFT();
+		mFontSystem->mSpriteSystem = new SpriteSystem( mRenderer, mEditorWorld->mShaderManager->Get( "GUI" ), 256 );
+		mFontSystem->Load( "Font\\courbd.ttf" );
+		mFontSystem->mFont = mFontSystem->Build( 16, 16 );
 
 		mEditorWorld->mSpriteSystem = new SpriteSystem( mRenderer, mEditorWorld->mShaderManager->Get( "GUI" ), 256 );
 
@@ -366,7 +380,7 @@ public:
 		
 		// Create game object for widget.
 		//
-		std::shared_ptr< Sprite > sprite( new Sprite( mEditorWorld->mShaderManager->Get( "GUI" ), mEditorWorld->mTextureManager->Get( "GUI.png" )));
+		std::shared_ptr< Sprite > sprite( new Sprite( mEditorWorld->mTextureManager->Get( "GUI.png" )));
 		sprite->AddFrame( sprite->GetTextureCoords( Quad( 0, 0, 1, 1 )));
 		sprite->AddFrame( sprite->GetTextureCoords( Quad( 1, 0, 2, 1 )));
 		sprite->AddFrame( sprite->GetTextureCoords( Quad( 2, 0, 3, 1 )));
@@ -377,38 +391,84 @@ public:
 
 		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
 
-		WidgetComponent* widgetComp = (WidgetComponent*)obj->AttachComponent( new WidgetComponent( sprite, 0 ), "Widget" );
+		WidgetComponent* widgetComp = (WidgetComponent*)obj->AttachComponent( new WidgetComponent( sprite, mFontSystem, 0 ), "Widget" );
 		
-		GUI::Drawable* drawable;
-
-		// Create menu bar.
+		// Menu Bar.
 		//
-		drawable = (GUI::Drawable*)widgetComp->mRoot.AddChild( new GUI::Drawable() );
-		drawable->mScaleToWindow = false;
+		GUI::DrawableSprite* drawableSprite;
 
-		drawable->mMesh = mEditorWorld->mMeshManager->Add( "World", std::shared_ptr< Mesh >( mRenderer->CreateGUIQuad( mEditorWorld->mShaderManager->Get( "GUI Mesh" ))));
-		drawable->mMesh->mTexture[ TEXTURE_DIFFUSE ] = mRenderer->BASE_TEXTURE;
-		drawable->mPosition = Vector3f( 0, 0, 0.1f );
-		drawable->mScale = Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 30, 1 );
-		drawable->mColor = ColorRGBA( 0.8f, 0.8f, 0.8f, 1 );
+		drawableSprite = (GUI::DrawableSprite*)widgetComp->mRoot.AddChild( new GUI::DrawableSprite() );
+		drawableSprite->mFrame		= 0;
+		drawableSprite->mPosition	= Vector3f( 0, 0, 1 );
+		drawableSprite->mScale		= Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 30, 1 );
+		drawableSprite->mColor		= ColorRGBA( 0.7f, 0.7f, 0.7f, 1 );
+		drawableSprite->mScaleToWindowX = true;
 
-		// Create world drawable.
+		// Menu Labels.
 		//
-		drawable = (GUI::Drawable*)widgetComp->mRoot.AddChild( new GUI::Drawable() );
-		drawable->mScaleToWindow = true;
+		GUI::Label* label;
+		//label = (GUI::Label*)widgetComp->mRoot.AddChild( new GUI::Label( "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ{}[]!@#$%^&*()1234567890" ));
+		label = (GUI::Label*)widgetComp->mRoot.AddChild( new GUI::Label( "File" ));
+		label->mPosition = Vector3f( 10, 20, 0.9f );
+		label->mScale = Vector3f( 16, 16, 1 );
+		label->mColor = ColorRGBA( 0, 0, 0, 1 );
 
-		drawable->mMesh = mEditorWorld->mMeshManager->Add( "World", std::shared_ptr< Mesh >( mRenderer->CreateGUIQuad( mEditorWorld->mShaderManager->Get( "GUI Mesh" ))));
-		drawable->mMesh->mTexture[ TEXTURE_DIFFUSE ] = mEditorWorld->mTextureManager->Get( "Backbuffer" );
-		drawable->mPosition = Vector3f( 0, 30, 0.2f );
-		drawable->mScale = Vector3f( (float)Renderer::WINDOW_WIDTH_BASE-500, (float)Renderer::WINDOW_HEIGHT_BASE-60, 1 );
+		label = (GUI::Label*)widgetComp->mRoot.AddChild( new GUI::Label( "Edit" ));
+		label->mPosition = Vector3f( 110, 20, 0.9f );
+		label->mScale = Vector3f( 16, 16, 1 );
+		label->mColor = ColorRGBA( 0, 0, 0, 1 );
 
-		// Create button.
+		label = (GUI::Label*)widgetComp->mRoot.AddChild( new GUI::Label( "About" ));
+		label->mPosition = Vector3f( 210, 20, 0.9f );
+		label->mScale = Vector3f( 16, 16, 1 );
+		label->mColor = ColorRGBA( 0, 0, 0, 1 );
+
+		// Toolbar.
 		//
-		GUI::Button* button = (GUI::Button*)widgetComp->mRoot.AddChild( new GUI::Button() );
-		button->mPosition = Vector3f( 200, 30, 0 );
+		drawableSprite = (GUI::DrawableSprite*)widgetComp->mRoot.AddChild( new GUI::DrawableSprite() );
+		drawableSprite->mFrame		= 0;
+		drawableSprite->mPosition	= Vector3f( 0, 0, 1 );
+		drawableSprite->mScale		= Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 30, 1 );
+		drawableSprite->mColor		= ColorRGBA( 0.9f, 0.9f, 0.9f, 1 );
+		drawableSprite->mScaleToWindowX = true;
+		drawableSprite->mMargin		= Quad( 0, 30, 0, 0 );
+
+		// Status Bar.
+		//
+		drawableSprite = (GUI::DrawableSprite*)widgetComp->mRoot.AddChild( new GUI::DrawableSprite() );
+		drawableSprite->mFrame		= 0;
+		drawableSprite->mPosition	= Vector3f( 0, (float)Renderer::WINDOW_HEIGHT_BASE, 0.1f );
+		drawableSprite->mScale		= Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 30, 1 );
+		drawableSprite->mColor		= ColorRGBA( 0.7f, 0.7f, 0.7f, 1 );
+		drawableSprite->mScaleToWindowX    = true;
+		drawableSprite->mPositionToWindowY = true;
+		drawableSprite->mMargin		= Quad( 0, -30, 0, 0 );
+
+		// World Drawable.
+		//
+		GUI::DrawableMesh* drawableMesh;
+		drawableMesh = (GUI::DrawableMesh*)widgetComp->mRoot.AddChild( new GUI::DrawableMesh() );
+		drawableMesh->mScaleToWindowX = true;
+		drawableMesh->mScaleToWindowY = true;
+		drawableMesh->mMargin = Quad( 0, 0, 0, -90 );
+
+		drawableMesh->mMesh = mEditorWorld->mMeshManager->Add( "World", std::shared_ptr< Mesh >( mRenderer->CreateGUIQuad( mEditorWorld->mShaderManager->Get( "GUI Mesh" ))));
+		drawableMesh->mMesh->mTexture[ TEXTURE_DIFFUSE ] = mEditorWorld->mTextureManager->Get( "Backbuffer" );
+		drawableMesh->mPosition = Vector3f( 0, 60, 0.8f );
+		drawableMesh->mScale    = Vector3f( (float)Renderer::WINDOW_WIDTH_BASE-500, (float)Renderer::WINDOW_HEIGHT_BASE, 1 );
+
+		// Button.
+		//
+		GUI::ButtonSprite* button = (GUI::ButtonSprite*)widgetComp->mRoot.AddChild( new GUI::ButtonSprite() );
+		button->mPosition = Vector3f( 200, 0, 0.7f );
+		button->mRotation = Vector3f( 0, 0, 45 );
 		button->mScale    = Vector3f( 128, 64, 1 );
-		button->mScaleToWindow = false;
-
+		button->mMargin   = Quad( 0, 30, 0, 0 );
+		button->mPositionToWindowX = true;
+		button->mPositionToWindowY = true;
+		button->mScaleToWindowX = true;
+		button->mScaleToWindowY = true;
+		
 		///////////////////////////////
 
 		mEditorWorld->Startup();
@@ -520,7 +580,6 @@ public:
 		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
 		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mPosition, transform->mOrientation, transform->mScale, 0.0f ));
 		body = physics->GetRigidBody();
-		body->SetShapeType( PHYSICS_BOX );
 		body->SetFlags( DISABLE_GRAVITY );
 			
 		obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
@@ -546,7 +605,12 @@ public:
 		transform->mOrientation	= Quatf( 90, 180, 270 );
 
 		obj2->AttachComponent( new MeshComponent( mesh ), "Mesh" );
-			
+
+		physics = (PhysicsComponent*)obj2->AttachComponent( new PhysicsComponent(), "Physics" );
+		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateMesh( transform->mPosition, transform->mOrientation, transform->mScale, mesh, 1.0f ));
+		body = physics->GetRigidBody();
+		body->SetGravity( Vector3f( 0, -9.81f, 0 ));
+		
 		// Parent test object.
 		//
 		meshBuilder.ClearGeometry();
@@ -564,6 +628,11 @@ public:
 
 		obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
 
+		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
+		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateSphere( transform->mPosition, transform->mOrientation, transform->mScale.x, 1.0f ));
+		body = physics->GetRigidBody();
+		body->SetGravity( Vector3f( 0, -9.81f, 0 ));
+		
 		obj->AddChild( obj2 );
 
 		//AddObject( obj );
@@ -571,14 +640,14 @@ public:
 		// Testing particle effects.
 		//
 		std::shared_ptr< Texture > textureS = mGameWorld->mTextureManager->Add( "fire.png", mRenderer->CreateTextureFromFile( "Textures\\fire.png" ));
-		std::shared_ptr< Sprite >  sprite( new Sprite( mGameWorld->mShaderManager->Get( "Sprite" ), textureS ));
+		std::shared_ptr< Sprite >  sprite( new Sprite( textureS ));
 
 		mGameWorld->mSpriteManager->Add( "Fire", sprite );
 		
 		sprite->AddFrame( sprite->GetTextureCoords( Quad( 0, 0, 64, 64 )));
 		sprite->AddFrame( sprite->GetTextureCoords( Quad( 64, 0, 128, 64 )));
 
-		ParticleSystem* particleSystem = BuildParticleSystemNormal( mRenderer, mGameWorld, sprite, 300 );
+		ParticleSystem* particleSystem = BuildParticleSystemNormal( mRenderer, mGameWorld, mGameWorld->mShaderManager->Get( "Sprite" ), sprite, 300 );
 		particleSystem->mSpawnRate   = 0.025f;
 		particleSystem->mMinLifetime = 3.0f;
 		particleSystem->mMaxLifetime = 5.0f;

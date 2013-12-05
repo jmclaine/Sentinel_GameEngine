@@ -276,9 +276,6 @@
     <ClInclude Include="..\Engine\src\GUI\Button.h">
       <Filter>Source Files\Sentinel_Engine\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\GUI\Grid.h">
-      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\GUI\Label.h">
       <Filter>Source Files\Sentinel_Engine\GUI</Filter>
     </ClInclude>
@@ -291,8 +288,20 @@
     <ClInclude Include="..\Engine\src\Common.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\GUI\Drawable.h">
+    <ClInclude Include="..\Engine\src\GUI\DrawableMesh.h">
       <Filter>Source Files\Sentinel_Engine\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\GUI\DrawableSprite.h">
+      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\GUI\ButtonSprite.h">
+      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\FontSystem.h">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Font.h">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -563,10 +572,19 @@
     <ClCompile Include="..\Engine\src\Serializable.cpp">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\GUI\Drawable.cpp">
+    <ClCompile Include="..\Engine\src\GUI\DrawableMesh.cpp">
       <Filter>Source Files\Sentinel_Engine\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\GUI\Grid.cpp">
+    <ClCompile Include="..\Engine\src\GUI\ButtonSprite.cpp">
+      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\GUI\DrawableSprite.cpp">
+      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\FontSystemFT.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\GUI\Label.cpp">
       <Filter>Source Files\Sentinel_Engine\GUI</Filter>
     </ClCompile>
   </ItemGroup>

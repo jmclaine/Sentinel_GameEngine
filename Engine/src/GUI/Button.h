@@ -6,14 +6,6 @@ namespace Sentinel { namespace GUI
 {
 	class SENTINEL_DLL Button : public Widget
 	{
-		DECLARE_SERIAL();
-
-	public:
-
-		UINT			mFrameUp;
-		UINT			mFrameOver;
-		UINT			mFrameDown;
-
 	protected:
 
 		enum State
@@ -31,18 +23,30 @@ namespace Sentinel { namespace GUI
 		WidgetFunc		mActionDown;
 		WidgetFunc		mActionClick;
 
-		//////////////////////////////////
+	protected:
 
 		Button();
-		virtual ~Button();
 
-		virtual void	Update();
+	public:
+
+		virtual ~Button();
 
 	protected:
 
-		virtual void	Up();
-		virtual void	Over();
-		virtual void	Down();
-		virtual void	Click();
+		virtual void	PreUpdate();
+
+	public:
+
+		virtual void	Update() = 0;
+
+	protected:
+
+		virtual void	PostUpdate();
+
+	public:
+
+		virtual void	Save( Archive& archive );
+
+		virtual void	Load( Archive& archive );
 	};
 }}

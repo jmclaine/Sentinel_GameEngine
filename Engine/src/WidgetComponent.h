@@ -22,12 +22,13 @@ namespace Sentinel
 	protected:
 
 		SpriteSystem*			mSpriteSystem;
+		FontSystem*				mFontSystem;
 
 		UINT					mCamera;
 
 	public:
 
-		GUI::Widget				mRoot;
+		GUI::Root				mRoot;
 
 		std::shared_ptr< Sprite > mSprite;
 
@@ -37,10 +38,10 @@ namespace Sentinel
 
 	public:
 
-		WidgetComponent( std::shared_ptr< Sprite > sprite, UINT camera );
+		WidgetComponent( std::shared_ptr< Sprite > sprite, FontSystem* fontSystem, UINT camera );
 		~WidgetComponent();
 
-		void	Set( std::shared_ptr< Sprite > sprite, UINT camera );
+		void	Set( std::shared_ptr< Sprite > sprite, FontSystem* fontSystem, UINT camera );
 
 		/////////////////////////////////
 

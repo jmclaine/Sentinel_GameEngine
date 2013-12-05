@@ -12,7 +12,7 @@ namespace Sentinel { namespace GUI
 
 		//////////////////////////////////
 
-		Label();
+		Label( const std::string& text );
 		virtual ~Label();
 
 		virtual void Update();

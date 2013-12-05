@@ -2,13 +2,7 @@
 
 namespace Sentinel { namespace GUI
 {
-	DEFINE_SERIAL_REGISTER( Button );
-	DEFINE_SERIAL_CLONE( Button );
-
 	Button::Button() :
-		mFrameUp( 0 ),
-		mFrameOver( 1 ),
-		mFrameDown( 2 ),
 		mActionUp( NULL ),
 		mActionDown( NULL ),
 		mActionClick( NULL ),
@@ -18,101 +12,59 @@ namespace Sentinel { namespace GUI
 	Button::~Button()
 	{}
 
-	void Button::Update()
+	void Button::PreUpdate()
 	{
-		Widget::PreUpdate();
-
-		// Check state of button.
-		//
-		if( IsOver() )
+		if( mIsVisible )
 		{
-			if( mState == UP )
-				Over();
+			Widget::PreUpdate();
+
+			if( mIsOver )
+			{
+				if( mState == UP )
+					mState = OVER;
 			
-			if( Mouse::Get().IsDown( BUTTON_LEFT ))
-				Down();
+				if( Mouse::Get().IsDown( BUTTON_LEFT ))
+				{
+					mState = DOWN;
 
-			if( mState == DOWN && Mouse::Get().DidGoUp( BUTTON_LEFT ))
-				Click();
+					if( mActionDown )
+						mActionDown();
+				}
+
+				if( mState == DOWN && Mouse::Get().DidGoUp( BUTTON_LEFT ))
+				{
+					mState = UP;
+
+					if( mActionClick )
+						mActionClick();
+				}
+			}
+			else
+			if( mState != UP )
+			{
+				mState = UP;
+
+				if( mActionUp )
+					mActionUp();
+			}
 		}
-		else
-		if( mState != UP )
-		{
-			Up();
-		}
-
-		// Draw button.
-		//
-		switch( mState )
-		{
-		case UP:
-			GAME_WORLD->mSpriteSystem->Draw( mFrameUp, mColor, MATRIX_WVP * mMatrixWorld );
-			break;
-
-		case OVER:
-			GAME_WORLD->mSpriteSystem->Draw( mFrameOver, mColor, MATRIX_WVP * mMatrixWorld );
-			break;
-
-		case DOWN:
-			GAME_WORLD->mSpriteSystem->Draw( mFrameDown, mColor, MATRIX_WVP * mMatrixWorld );
-			break;
-		}
-
-		// Update children.
-		//
-		Widget::PostUpdate();
 	}
 
-	void Button::Up()
+	void Button::PostUpdate()
 	{
-		mState = UP;
-
-		if( mActionUp )
-			mActionUp();
-	}
-
-	void Button::Over()
-	{
-		mState = OVER;
-
-		Widget::Over();
-	}
-
-	void Button::Down()
-	{
-		mState = DOWN;
-
-		if( mActionDown )
-			mActionDown();
-	}
-	
-	void Button::Click()
-	{
-		Up();
-
-		if( mActionClick )
-			mActionClick();
+		if( mIsVisible )
+			Widget::PostUpdate();
 	}
 
 	///////////////////////////////////
 
 	void Button::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
-
-		archive.Write( &mFrameUp );
-		archive.Write( &mFrameOver );
-		archive.Write( &mFrameDown );
-
 		Widget::Save( archive );
 	}
 
 	void Button::Load( Archive& archive )
 	{
-		archive.Read( &mFrameUp );
-		archive.Read( &mFrameOver );
-		archive.Read( &mFrameDown );
-
 		Widget::Load( archive );
 	}
 }}

@@ -4,103 +4,39 @@
 
 namespace Sentinel { namespace GUI
 {
-	HWND			Widget::WINDOW		= NULL;
-	GameWorld*		Widget::GAME_WORLD	= NULL;
-	Matrix4f		Widget::MATRIX_WVP	= Matrix4f::IDENTITY;
-	
+	Root::Root() :
+		mIsVisible( true )
+	{}
+
+	Root::~Root()
+	{}
+
+	void Root::Update()
+	{
+		if( mIsVisible )
+		{
+			TRAVERSE_VECTOR( x, mChild )
+			{
+				mChild[ x ]->PreUpdate();
+			}
+
+			TRAVERSE_VECTOR( x, mChild )
+			{
+				mChild[ x ]->Update();
+			}
+
+			TRAVERSE_VECTOR( x, mChild )
+			{
+				mChild[ x ]->PostUpdate();
+			}
+		}
+	}
+
 	//////////////////////////////////
 
-	Widget::Widget() :
-		mScale( Vector3f( 1, 1, 1 )),
-		mIsVisible( true ),
-		mPositionToWindow( false ),
-		mScaleToWindow( false ),
-		mActionOver( NULL )
-	{}
-
-	Widget::~Widget()
-	{}
-
-	void Widget::PreUpdate()
+	void Root::Save( Archive& archive )
 	{
-		Vector3f pos   = mPosition;
-		Vector3f scale = mScale;
-
-		if( mPositionToWindow )
-		{
-			pos.x *= GAME_WORLD->mRenderer->GetWindow()->WidthRatio();
-			pos.y *= GAME_WORLD->mRenderer->GetWindow()->HeightRatio();
-		}
-
-		if( mScaleToWindow )
-		{
-			scale.x *= GAME_WORLD->mRenderer->GetWindow()->WidthRatio();
-			scale.y *= GAME_WORLD->mRenderer->GetWindow()->HeightRatio();
-		}
-
-		mMatrixWorld.World( pos, Quatf( mRotation ), scale );
-	}
-
-	void Widget::Update()
-	{
-		PreUpdate();
-
-		// ...
-
-		PostUpdate();
-	}
-
-	void Widget::PostUpdate()
-	{
-		TRAVERSE_VECTOR( x, mChild )
-		{
-			mChild[ x ]->Update();
-		}
-	}
-
-	bool Widget::IsOver()
-	{
-		POINT mousePos = Mouse::Get().GetPosition( WINDOW );
-
-		Vector3f pos   = mPosition;
-		Vector3f scale = mScale;
-
-		if( mPositionToWindow )
-		{
-			pos.x *= GAME_WORLD->mRenderer->GetWindow()->WidthRatio();
-			pos.y *= GAME_WORLD->mRenderer->GetWindow()->HeightRatio();
-		}
-
-		if( mScaleToWindow )
-		{
-			scale.x *= GAME_WORLD->mRenderer->GetWindow()->WidthRatio();
-			scale.y *= GAME_WORLD->mRenderer->GetWindow()->HeightRatio();
-		}
-		
-		if( mousePos.x >= pos.x && mousePos.y >= pos.y &&
-			mousePos.x <= pos.x + scale.x && mousePos.y <= pos.y + scale.y )
-			return true;
-
-		return false;
-	}
-
-	void Widget::Over()
-	{
-		if( mActionOver )
-			mActionOver();
-	}
-
-	void Widget::Save( Archive& archive )
-	{
-		archive.Write( mPosition.Ptr(), ar_sizeof( mPosition ));
-		archive.Write( mRotation.Ptr(), ar_sizeof( mRotation ));
-		archive.Write( mScale.Ptr(),    ar_sizeof( mScale ));
-
-		archive.Write( mColor.Ptr(),    ar_sizeof( mColor ));
-
 		archive.Write( &mIsVisible );
-		archive.Write( &mPositionToWindow );
-		archive.Write( &mScaleToWindow );
 
 		UINT size = mChild.size();
 		archive.Write( &size );
@@ -111,17 +47,9 @@ namespace Sentinel { namespace GUI
 		}
 	}
 
-	void Widget::Load( Archive& archive )
+	void Root::Load( Archive& archive )
 	{
-		archive.Read( mPosition.Ptr(), ar_sizeof( mPosition ));
-		archive.Read( mRotation.Ptr(), ar_sizeof( mRotation ));
-		archive.Read( mScale.Ptr(),    ar_sizeof( mScale ));
-
-		archive.Read( mColor.Ptr(),    ar_sizeof( mColor ));
-
 		archive.Read( &mIsVisible );
-		archive.Read( &mPositionToWindow );
-		archive.Read( &mScaleToWindow );
 
 		UINT size = 0;
 		archive.Read( &size );
@@ -133,5 +61,135 @@ namespace Sentinel { namespace GUI
 			AddChild( widget );
 			widget->Load( archive );
 		}
+	}
+
+	/////////////////////////////////////////////////////////////////////
+
+	WindowInfo*		Widget::WINDOW_INFO		= NULL;
+	GameWorld*		Widget::GAME_WORLD		= NULL;
+	SpriteSystem*	Widget::SPRITE_SYSTEM	= NULL;
+	FontSystem*		Widget::FONT_SYSTEM		= NULL;
+	Matrix4f		Widget::MATRIX_WVP		= Matrix4f::IDENTITY;
+	
+	//////////////////////////////////
+
+	Widget::Widget() :
+		mScale( Vector3f( 1, 1, 1 )),
+		mPositionToWindowX( false ),
+		mPositionToWindowY( false ),
+		mScaleToWindowX( false ),
+		mScaleToWindowY( false ),
+		mIsOver( false ),
+		mActionOver( NULL )
+	{}
+
+	Widget::~Widget()
+	{}
+
+	void Widget::PreUpdate()
+	{
+		// Position widget.
+		//
+		Vector3f pos   = mPosition;
+		Vector3f scale = mScale;
+
+		if( mPositionToWindowX )
+			pos.x *= WINDOW_INFO->WidthRatio();
+		
+		if( mPositionToWindowY )
+			pos.y *= WINDOW_INFO->HeightRatio();
+
+		if( mScaleToWindowX )
+			scale.x *= WINDOW_INFO->WidthRatio();
+		
+		if( mScaleToWindowY )
+			scale.y *= WINDOW_INFO->HeightRatio();
+
+		pos.x += mMargin.left;
+		pos.y += mMargin.top;
+
+		scale.x += mMargin.right;
+		scale.y += mMargin.bottom;
+
+		mMatrixWorld.World( pos, Quatf( mRotation ), scale );
+
+		// Check for mouse being over the widget.
+		//
+		POINT mousePos = Mouse::Get().GetPosition( (HWND)WINDOW_INFO->Handle() );
+
+		Matrix4f matRot;
+		matRot.Rotate( -mRotation );
+		Vector3f v = matRot.Transform( Vector3f( mousePos.x-pos.x, mousePos.y-pos.y, 0 ));
+
+		if( v.x >= 0 && v.y >= 0 &&
+			v.x <= scale.x && v.y <= scale.y )
+		{
+			if( !mIsOver )
+			{
+				mIsOver = true;
+				
+				if( mActionOver )
+					mActionOver();
+			}
+		}
+		else
+		{
+			mIsOver = false;
+		}
+
+		TRAVERSE_VECTOR( x, mChild )
+		{
+			mChild[ x ]->PreUpdate();
+		}
+	}
+
+	void Widget::Update()
+	{
+		TRAVERSE_VECTOR( x, mChild )
+		{
+			mChild[ x ]->Update();
+		}
+	}
+
+	void Widget::PostUpdate()
+	{
+		TRAVERSE_VECTOR( x, mChild )
+		{
+			mChild[ x ]->PostUpdate();
+		}
+	}
+
+	void Widget::Save( Archive& archive )
+	{
+		archive.Write( mPosition.Ptr(), ar_sizeof( mPosition ));
+		archive.Write( mRotation.Ptr(), ar_sizeof( mRotation ));
+		archive.Write( mScale.Ptr(),    ar_sizeof( mScale ));
+
+		archive.Write( mColor.Ptr(),    ar_sizeof( mColor ));
+
+		archive.Write( &mPositionToWindowX );
+		archive.Write( &mPositionToWindowY );
+
+		archive.Write( &mScaleToWindowX );
+		archive.Write( &mScaleToWindowY );
+
+		Root::Save( archive );
+	}
+
+	void Widget::Load( Archive& archive )
+	{
+		archive.Read( mPosition.Ptr(), ar_sizeof( mPosition ));
+		archive.Read( mRotation.Ptr(), ar_sizeof( mRotation ));
+		archive.Read( mScale.Ptr(),    ar_sizeof( mScale ));
+
+		archive.Read( mColor.Ptr(),    ar_sizeof( mColor ));
+
+		archive.Read( &mPositionToWindowX );
+		archive.Read( &mPositionToWindowY );
+
+		archive.Read( &mScaleToWindowX );
+		archive.Read( &mScaleToWindowY );
+
+		Root::Load( archive );
 	}
 }}

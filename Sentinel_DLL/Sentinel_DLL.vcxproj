@@ -46,7 +46,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Engine\libvorbis-1.3.3\include;$(SolutionDir)\Engine\openal-soft-1.15.1\include;$(SolutionDir)\Engine\bullet-2.81-rev2613\src;$(SolutionDir)\Engine\zlib-1.2.8;$(SolutionDir)\Engine\tinyxml;$(SolutionDir)\Engine\glew\include;$(SolutionDir)\Engine\src\;$(SolutionDir)\Engine\DirectX11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Engine\freetype-2.5.1\include;$(SolutionDir)\Engine\libvorbis-1.3.3\include;$(SolutionDir)\Engine\openal-soft-1.15.1\include;$(SolutionDir)\Engine\bullet-2.81-rev2613\src;$(SolutionDir)\Engine\zlib-1.2.8;$(SolutionDir)\Engine\tinyxml;$(SolutionDir)\Engine\glew\include;$(SolutionDir)\Engine\src\;$(SolutionDir)\Engine\DirectX11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAsManaged>false</CompileAsManaged>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_WINDLL;BUILD_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>
@@ -54,7 +54,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Engine\libvorbis-1.3.3\$(Configuration);$(SolutionDir)\Engine\openal-soft-1.15.1\$(Configuration);$(SolutionDir)\Engine\lib\$(Configuration);$(SolutionDir)\Engine\bullet-2.81-rev2613\lib;$(SolutionDir)\Engine\glew\lib;$(SolutionDir)\Engine\DirectX11\$(Configuration);C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Engine\freetype-2.5.1;$(SolutionDir)\Engine\libvorbis-1.3.3\$(Configuration);$(SolutionDir)\Engine\openal-soft-1.15.1\$(Configuration);$(SolutionDir)\Engine\lib\$(Configuration);$(SolutionDir)\Engine\bullet-2.81-rev2613\lib;$(SolutionDir)\Engine\glew\lib;$(SolutionDir)\Engine\DirectX11\$(Configuration);C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <AdditionalOptions>/NODEFAULTLIB:libc.lib /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib %(AdditionalOptions)</AdditionalOptions>
@@ -75,7 +75,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Engine\libvorbis-1.3.3\include;$(SolutionDir)\Engine\openal-soft-1.15.1\include;$(SolutionDir)\Engine\bullet-2.81-rev2613\src;$(SolutionDir)\Engine\zlib-1.2.8;$(SolutionDir)\Engine\tinyxml;$(SolutionDir)\Engine\glew\include;$(SolutionDir)\Engine\src\;$(SolutionDir)\Engine\DirectX11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Engine\freetype-2.5.1\include;$(SolutionDir)\Engine\libvorbis-1.3.3\include;$(SolutionDir)\Engine\openal-soft-1.15.1\include;$(SolutionDir)\Engine\bullet-2.81-rev2613\src;$(SolutionDir)\Engine\zlib-1.2.8;$(SolutionDir)\Engine\tinyxml;$(SolutionDir)\Engine\glew\include;$(SolutionDir)\Engine\src\;$(SolutionDir)\Engine\DirectX11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAsManaged>false</CompileAsManaged>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_WINDLL;BUILD_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>
@@ -85,7 +85,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Engine\libvorbis-1.3.3\$(Configuration);$(SolutionDir)\Engine\openal-soft-1.15.1\$(Configuration);$(SolutionDir)\Engine\lib\$(Configuration);$(SolutionDir)\Engine\bullet-2.81-rev2613\lib;$(SolutionDir)\Engine\glew\lib;$(SolutionDir)\Engine\DirectX11\$(Configuration);C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Engine\freetype-2.5.1;$(SolutionDir)\Engine\libvorbis-1.3.3\$(Configuration);$(SolutionDir)\Engine\openal-soft-1.15.1\$(Configuration);$(SolutionDir)\Engine\lib\$(Configuration);$(SolutionDir)\Engine\bullet-2.81-rev2613\lib;$(SolutionDir)\Engine\glew\lib;$(SolutionDir)\Engine\DirectX11\$(Configuration);C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <AdditionalOptions>/NODEFAULTLIB:libc.lib /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrtd.lib %(AdditionalOptions)</AdditionalOptions>
@@ -105,10 +105,13 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
     <ClInclude Include="..\Engine\src\Archive.h" />
     <ClInclude Include="..\Engine\src\AssetManager.h" />
     <ClInclude Include="..\Engine\src\AudioComponent.h" />
+    <ClInclude Include="..\Engine\src\Font.h" />
+    <ClInclude Include="..\Engine\src\FontSystem.h" />
     <ClInclude Include="..\Engine\src\GUI\Button.h" />
-    <ClInclude Include="..\Engine\src\GUI\Grid.h" />
+    <ClInclude Include="..\Engine\src\GUI\ButtonSprite.h" />
+    <ClInclude Include="..\Engine\src\GUI\DrawableMesh.h" />
+    <ClInclude Include="..\Engine\src\GUI\DrawableSprite.h" />
     <ClInclude Include="..\Engine\src\GUI\Label.h" />
-    <ClInclude Include="..\Engine\src\GUI\Drawable.h" />
     <ClInclude Include="..\Engine\src\GUI\Widget.h" />
     <ClInclude Include="..\Engine\src\WidgetComponent.h" />
     <ClInclude Include="..\Engine\src\ListNode.h" />
@@ -182,9 +185,12 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\Archive.cpp" />
+    <ClCompile Include="..\Engine\src\FontSystemFT.cpp" />
     <ClCompile Include="..\Engine\src\GUI\Button.cpp" />
-    <ClCompile Include="..\Engine\src\GUI\Drawable.cpp" />
-    <ClCompile Include="..\Engine\src\GUI\Grid.cpp" />
+    <ClCompile Include="..\Engine\src\GUI\ButtonSprite.cpp" />
+    <ClCompile Include="..\Engine\src\GUI\DrawableMesh.cpp" />
+    <ClCompile Include="..\Engine\src\GUI\DrawableSprite.cpp" />
+    <ClCompile Include="..\Engine\src\GUI\Label.cpp" />
     <ClCompile Include="..\Engine\src\GUI\Widget.cpp" />
     <ClCompile Include="..\Engine\src\Particle.cpp" />
     <ClCompile Include="..\Engine\src\ParticleEffect.cpp" />

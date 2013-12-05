@@ -14,6 +14,7 @@
 #include "RandomValue.h"
 #include "Util.h"
 #include "Point.h"
+#include "ShaderManager.h"
 #include "SpriteManager.h"
 #include "Archive.h"
 
@@ -27,6 +28,7 @@ namespace Sentinel
 
 	private:
 
+		std::shared_ptr< Shader >	mShader;
 		std::shared_ptr< Sprite >	mSprite;
 
 		NormalParticle*				mParticle;
@@ -40,10 +42,10 @@ namespace Sentinel
 			ParticleSystem( renderer, world )
 		{}
 
-		ParticleSystemNormal( Renderer* renderer, GameWorld* world, std::shared_ptr< Sprite > sprite, UINT maxParticles ) :
+		ParticleSystemNormal( Renderer* renderer, GameWorld* world, std::shared_ptr< Shader > shader, std::shared_ptr< Sprite > sprite, UINT maxParticles ) :
 			ParticleSystem( renderer, world )
 		{
-			Build( sprite, maxParticles );
+			Build( shader, sprite, maxParticles );
 		};
 
 		~ParticleSystemNormal()
@@ -51,7 +53,7 @@ namespace Sentinel
 			delete[] mParticle;
 		}
 
-		void Build( Renderer* renderer, GameWorld* world, std::shared_ptr< Sprite > sprite, UINT maxParticles )
+		void Build( Renderer* renderer, GameWorld* world, std::shared_ptr< Shader > shader, std::shared_ptr< Sprite > sprite, UINT maxParticles )
 		{
 			_ASSERT( renderer );
 			_ASSERT( world );
@@ -59,23 +61,24 @@ namespace Sentinel
 			mRenderer  = renderer;
 			mGameWorld = world;
 
-			Build( sprite, maxParticles );
+			Build( shader, sprite, maxParticles );
 		}
 
-		void Build( std::shared_ptr< Sprite > sprite, UINT maxParticles )
+		void Build( std::shared_ptr< Shader > shader, std::shared_ptr< Sprite > sprite, UINT maxParticles )
 		{
+			mShader			= shader;
 			mSprite			= sprite;
 			mMaxParticles	= maxParticles;
 
 			_ASSERT( mSprite );
 			_ASSERT( mSprite->mTexture );
-			_ASSERT( mSprite->mShader );
+			_ASSERT( mShader );
 			
 			mParticle = new NormalParticle[ maxParticles ];
 
 			MeshBuilder builder;
 
-			builder.mShader = mSprite->mShader;
+			builder.mShader = mShader;
 
 			for( UINT x = 0; x < maxParticles; ++x )
 			{
@@ -153,6 +156,7 @@ namespace Sentinel
 			
 			ParticleSystem::Save( archive );
 
+			archive.Write( &mGameWorld->mShaderManager->Get( mShader ));
 			archive.Write( &mGameWorld->mSpriteManager->Get( mSprite ));
 		}
 
@@ -160,18 +164,21 @@ namespace Sentinel
 		{
 			ParticleSystem::Load( archive );
 
+			std::string shader;
+			archive.Read( &shader );
+
 			std::string sprite;
 			archive.Read( &sprite );
 
-			Build( mGameWorld->mSpriteManager->Get( sprite ), mMaxParticles );
+			Build( mGameWorld->mShaderManager->Get( shader ), mGameWorld->mSpriteManager->Get( sprite ), mMaxParticles );
 		}
 	};
 
 	DEFINE_SERIAL_REGISTER( ParticleSystemNormal );
 
-	ParticleSystem* BuildParticleSystemNormal( Renderer* renderer, GameWorld* world, std::shared_ptr< Sprite > sprite, UINT maxParticles )
+	ParticleSystem* BuildParticleSystemNormal( Renderer* renderer, GameWorld* world, std::shared_ptr< Shader > shader, std::shared_ptr< Sprite > sprite, UINT maxParticles )
 	{
-		return new ParticleSystemNormal( renderer, world, sprite, maxParticles );
+		return new ParticleSystemNormal( renderer, world, shader, sprite, maxParticles );
 	}
 
 	ParticleSystem* BuildParticleSystemNormal( Renderer* renderer, GameWorld* world )

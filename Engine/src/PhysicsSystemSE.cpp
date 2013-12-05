@@ -32,10 +32,11 @@ namespace Sentinel
 		{
 			mMass			= 1.0f;
 			mFlags			= 0;
-			mLinearDamping	= 0.0f;
-			mAngularDamping = 0.0f;
-			mRestitution	= 0.0f;
-			mFriction		= 0.5f;
+			mLinearDamping	= 0;
+			mAngularDamping = 0;
+			mRestitution	= 0.8f;
+			mFriction		= 0.8f;
+			mAngularFactor	= Vector3f( 0.8f, 0.8f, 0.8f );
 		}
 
 		~RigidBodySE()
@@ -233,10 +234,11 @@ namespace Sentinel
 			return body;
 		}
 
-		RigidBody* CreateMesh( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, Mesh* mesh, float mass )
+		RigidBody* CreateMesh( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, std::shared_ptr< Mesh > mesh, float mass )
 		{
 			RigidBodySE* body = new RigidBodySE();
 
+			body->mMesh = mesh;
 			body->SetShapeType( PHYSICS_MESH );
 			body->SetPosition( position );
 			body->SetOrientation( orientation );

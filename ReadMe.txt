@@ -42,7 +42,7 @@ This engine has integrated:
 
 	States that it is LGPL; however documentation contained
 	within the downloaded version indicates it is only GPL.
-	Additionally, Sentinel only uses the OpenAL	portion of 
+	Additionally, Sentinel only uses the OpenAL portion of 
 	the software downloaded along with DLL.
 
 
@@ -50,6 +50,13 @@ This engine has integrated:
 	http://www.vorbis.com/
 
 	Free software.
+
+
+	FreeType 2
+	http://www.freetype.org/
+
+	Free with mentioning the product uses the FreeType
+	library somewhere in the documentation.
 
 
 

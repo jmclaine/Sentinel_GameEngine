@@ -1042,7 +1042,7 @@ namespace Sentinel
 			switch( state )
 			{
 				case STENCIL_DEFAULT:
-					glDepthFunc( GL_LESS );
+					glDepthFunc( GL_LEQUAL );
 					glDepthMask( GL_TRUE );
 					break;
 

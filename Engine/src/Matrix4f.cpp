@@ -1,5 +1,6 @@
 #include "MathCommon.h"
 #include "Matrix4f.h"
+#include "Vector2f.h"
 #include "Vector3f.h"
 #include "Vector4f.h"
 #include "Quatf.h"
@@ -335,6 +336,8 @@ namespace Sentinel
 
 	void Matrix4f::World( const Vector3f& position, const Quatf& orientation, const Vector3f& scale )
 	{
+		// TODO: Do all matrix math without using matrices.
+		//
 		static Matrix4f TRANSLATION;
 		static Matrix4f ROTATION;
 		static Matrix4f SCALE;
@@ -342,6 +345,21 @@ namespace Sentinel
 		TRANSLATION.Translate( position );
 		ROTATION.Rotate( orientation );
 		SCALE.Scale( scale );
+
+		*this = TRANSLATION * ROTATION * SCALE;
+	}
+
+	void Matrix4f::World( const Vector2f& position, float degrees, const Vector2f& scale )
+	{
+		// TODO: Do all matrix math without using matrices.
+		//
+		static Matrix4f TRANSLATION;
+		static Matrix4f ROTATION;
+		static Matrix4f SCALE;
+
+		TRANSLATION.Translate( Vector3f( position.x, position.y, 0 ));
+		ROTATION.Rotate( Quatf( 0, 0, 1, degrees ).AxisAngle() );
+		SCALE.Scale( Vector3f( scale.x, scale.y, 1 ));
 
 		*this = TRANSLATION * ROTATION * SCALE;
 	}

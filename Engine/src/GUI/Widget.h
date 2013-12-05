@@ -13,23 +13,49 @@ All Widgets use the SpriteSystem to render images by frame.
 #include "Input.h"
 #include "GameWorld.h"
 #include "SpriteSystem.h"
+#include "FontSystem.h"
+#include "Renderer.h"
 #include "ColorRGBA.h"
 #include "Vector3f.h"
 #include "Matrix4f.h"
+#include "Point.h"
 
 namespace Sentinel { namespace GUI
 {
-#define WIDGET_BIND( func ) std::bind( [=]() { func(); } );
-
 	typedef std::function< void() > WidgetFunc;
 
-	class SENTINEL_DLL Widget : public ListNode< Widget >, public Serializable
+	class Widget;
+
+	class SENTINEL_DLL Root : public ListNode< Widget >
 	{
 	public:
 
-		static HWND			WINDOW;
-		static GameWorld*	GAME_WORLD;
-		static Matrix4f		MATRIX_WVP;
+		bool			mIsVisible;
+
+		//////////////////////////////////
+
+		Root();
+		virtual ~Root();
+
+		virtual void	Update();
+
+		//////////////////////////////////
+
+		virtual void	Save( Archive& archive );
+		virtual void	Load( Archive& archive );
+	};
+
+	////////////////////////////////////////////////////////////////////
+
+	class SENTINEL_DLL Widget : public Root, public Serializable
+	{
+	public:
+
+		static WindowInfo*		WINDOW_INFO;
+		static GameWorld*		GAME_WORLD;
+		static SpriteSystem*	SPRITE_SYSTEM;
+		static FontSystem*		FONT_SYSTEM;
+		static Matrix4f			MATRIX_WVP;
 		
 	protected:
 
@@ -43,41 +69,37 @@ namespace Sentinel { namespace GUI
 
 		ColorRGBA		mColor;
 
-		bool			mIsVisible;
-		bool			mPositionToWindow;
-		bool			mScaleToWindow;
+		bool			mPositionToWindowX;
+		bool			mPositionToWindowY;
+
+		bool			mScaleToWindowX;
+		bool			mScaleToWindowY;
+
+		Quad			mMargin;
+
+	protected:
+
+		bool			mIsOver;
+
+	public:
 
 		WidgetFunc		mActionOver;
 
-		////////////////////////////////
+	protected:
 
 		Widget();
+
+	public:
+
 		virtual ~Widget();
 
-	protected:
-
 		virtual void	PreUpdate();
-
-	public:
-
 		virtual void	Update();
-
-	protected:
-
 		virtual void	PostUpdate();
 
-	public:
-
-		bool			IsOver();
-
-	protected:
-
-		virtual void	Over();
-
-	public:
+		//////////////////////////////////
 
 		virtual void	Save( Archive& archive );
-
 		virtual void	Load( Archive& archive );
 	};
 }}

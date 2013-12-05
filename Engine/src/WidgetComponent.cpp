@@ -20,23 +20,25 @@ namespace Sentinel
 
 	WidgetComponent::WidgetComponent() :
 		mSpriteSystem( NULL ),
+		mFontSystem( NULL ),
 		mCamera( -1 )
 	{}
 
-	WidgetComponent::WidgetComponent( std::shared_ptr< Sprite > sprite, UINT camera ) :
+	WidgetComponent::WidgetComponent( std::shared_ptr< Sprite > sprite, FontSystem* fontSystem, UINT camera ) :
 		mSpriteSystem( NULL )
 	{
-		Set( sprite, camera );
+		Set( sprite, fontSystem, camera );
 	}
 
 	WidgetComponent::~WidgetComponent()
 	{}
 
-	void WidgetComponent::Set( std::shared_ptr< Sprite > sprite, UINT camera )
+	void WidgetComponent::Set( std::shared_ptr< Sprite > sprite, FontSystem* fontSystem, UINT camera )
 	{
 		_ASSERT( sprite );
 		
 		mSprite = sprite;
+		mFontSystem = fontSystem;
 		mCamera = camera;
 	}
 
@@ -68,17 +70,31 @@ namespace Sentinel
 
 		if( camera )
 		{
-			mSpriteSystem->mSprite = mSprite;
+			GUI::Widget::WINDOW_INFO	= mOwner->GetWorld()->mRenderer->GetWindow();
+			GUI::Widget::GAME_WORLD		= mOwner->GetWorld();
+			GUI::Widget::MATRIX_WVP		= camera->GetMatrixFinal() * mTransform->GetMatrixWorld();
 
-			mSpriteSystem->Clear();
+			if( mSpriteSystem )
+			{
+				mSpriteSystem->mSprite = mSprite;
 
-			GUI::Widget::WINDOW		= (HWND)mOwner->GetWorld()->mRenderer->GetWindow()->Handle();
-			GUI::Widget::GAME_WORLD	= mOwner->GetWorld();
-			GUI::Widget::MATRIX_WVP	= camera->GetMatrixFinal() * mTransform->GetMatrixWorld();
+				mSpriteSystem->Clear();
+
+				GUI::Widget::SPRITE_SYSTEM = mSpriteSystem;
+			}
+
+			if( mFontSystem )
+			{
+				GUI::Widget::FONT_SYSTEM = mFontSystem;
+
+				mFontSystem->mSpriteSystem->mSprite = mFontSystem->mFont->mSprite;
+				mFontSystem->mSpriteSystem->Clear();
+			}
 			
 			mRoot.Update();
 
 			mSpriteSystem->Present();
+			mFontSystem->mSpriteSystem->Present();
 		}
 	}
 

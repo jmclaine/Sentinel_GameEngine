@@ -147,7 +147,7 @@ public:
 
 		mGameWorld->mTextureManager->Load( archive, mRenderer );
 		mGameWorld->mShaderManager->Load( archive, mRenderer );
-		mGameWorld->mSpriteManager->Load( archive, mGameWorld->mShaderManager, mGameWorld->mTextureManager );
+		mGameWorld->mSpriteManager->Load( archive, mGameWorld->mTextureManager );
 		mGameWorld->mMeshManager->Load( archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager );
 		mGameWorld->mModelManager->Load( archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager );
 		mGameWorld->mSoundManager->Load( archive, mGameWorld->mAudioSystem );

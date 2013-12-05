@@ -12,6 +12,7 @@ namespace Sentinel
 {
 	SpriteSystem::SpriteSystem( Renderer* renderer, std::shared_ptr< Shader > shader, UINT maxSprites ) :
 		mRenderer( renderer ),
+		mShader( shader ),
 		mMaxSprites( maxSprites ),
 		mNumSprites( 0 )
 	{
@@ -23,7 +24,7 @@ namespace Sentinel
 
 		MeshBuilder builder;
 
-		builder.mShader = shader;
+		builder.mShader = mShader;
 
 		for( UINT x = 0; x < maxSprites; ++x )
 		{
@@ -44,6 +45,16 @@ namespace Sentinel
 		delete[] mStorage;
 
 		delete mMesh;
+	}
+
+	Renderer* SpriteSystem::GetRenderer()
+	{
+		return mRenderer;
+	}
+
+	std::shared_ptr< Shader > SpriteSystem::GetShader()
+	{
+		return mShader;
 	}
 
 	void SpriteSystem::Clear()
@@ -84,7 +95,7 @@ namespace Sentinel
 
 		mMesh->mVBO->Unlock();
 
-		mMesh->mShader = mSprite->mShader;
+		mMesh->mShader = mShader;
 		mMesh->mTexture[ TEXTURE_DIFFUSE ] = mSprite->mTexture;
 
 		mMesh->Draw( mRenderer, NULL, mNumSprites );

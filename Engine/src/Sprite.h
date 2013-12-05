@@ -19,12 +19,12 @@ namespace Sentinel
 
 	public:
 
-		std::shared_ptr< Shader >	mShader;
 		std::shared_ptr< Texture >	mTexture;
 
 		//////////////////////////////////////
 
-		Sprite( std::shared_ptr< Shader > shader, std::shared_ptr< Texture > texture );
+		Sprite();
+		Sprite( std::shared_ptr< Texture > texture );
 		~Sprite();
 
 		//////////////////////////////////////

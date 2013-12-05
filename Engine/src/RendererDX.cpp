@@ -793,6 +793,8 @@ namespace Sentinel
 			mCurrWindow  = NULL;
 			mCurrStencil = NULL;
 			mCurrTarget  = NULL;
+
+			mRenderTarget.push_back( NULL );
 		}
 
 		~RendererDX()
@@ -860,7 +862,7 @@ namespace Sentinel
 				HV_PTR( mCurrWindow->mSwapChain->SetFullscreenState( TRUE, NULL ));
 			}
 
-			D3D11_RASTERIZER_DESC rasterizerstate = { D3D11_FILL_SOLID, D3D11_CULL_BACK, true, 0, 0, 0, true, false, true, false };
+			D3D11_RASTERIZER_DESC rasterizerstate = { D3D11_FILL_SOLID, D3D11_CULL_BACK, true, 0, 0, 0, true, false, false, false };
 			HV_PTR( mCurrWindow->mDevice->CreateRasterizerState( &rasterizerstate, &mCurrWindow->mRasterizerState ));
 			mCurrWindow->mContext->RSSetState( mCurrWindow->mRasterizerState );
 
@@ -963,7 +965,7 @@ namespace Sentinel
 				D3D11_DEPTH_STENCIL_DESC stencilDesc;
 				stencilDesc.DepthEnable						= TRUE;
 				stencilDesc.DepthWriteMask					= D3D11_DEPTH_WRITE_MASK_ALL;
-				stencilDesc.DepthFunc						= D3D11_COMPARISON_LESS;
+				stencilDesc.DepthFunc						= D3D11_COMPARISON_LESS_EQUAL;
 
 				stencilDesc.StencilEnable					= FALSE;
 				stencilDesc.StencilReadMask					= 0xFF;
@@ -993,7 +995,7 @@ namespace Sentinel
 				// Create depth STENCIL_NO_ZBUFFER.
 				//
 				stencilDesc.DepthWriteMask					= D3D11_DEPTH_WRITE_MASK_ZERO;
-				stencilDesc.DepthFunc						= D3D11_COMPARISON_LESS;
+				stencilDesc.DepthFunc						= D3D11_COMPARISON_LESS_EQUAL;
 				HV_PTR( mCurrWindow->mDevice->CreateDepthStencilState( &stencilDesc, &stencilState ));
 				mDepthStencilState.push_back( stencilState );
 			}
@@ -1316,7 +1318,14 @@ namespace Sentinel
 
 			HV_PTR( mCurrWindow->mSwapChain->GetBuffer( 0, __uuidof(ID3D11Texture2D), (void**)&tex ));
 
-			return CreateRenderTarget( tex );
+			ID3D11RenderTargetView* rendertarget = NULL;
+			
+			if( mCurrWindow->mDevice->CreateRenderTargetView( tex, NULL, &rendertarget ) != S_OK )
+				return -1;
+
+			mRenderTarget[ 0 ] = rendertarget;
+
+			return 0;
 		}
 
 		UINT CreateRenderTarget( ID3D11Texture2D *backbuffer )
@@ -1375,10 +1384,16 @@ namespace Sentinel
 			mCurrWindow->mWidthRatio	= (float)width  / (float)WINDOW_WIDTH_BASE;
 			mCurrWindow->mHeightRatio	= (float)height / (float)WINDOW_HEIGHT_BASE;
 
-			// Requires releasing all resources, and reloading them.
-			//
-			//mSwapChain->Release();
-			//HV( mSwapChain->ResizeBuffers( 1, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH ));
+			mCurrWindow->mContext->OMSetRenderTargets( 0, 0, 0 );
+
+			mRenderTarget[ 0 ]->Release();
+
+			mCurrWindow->mSwapChain->ResizeBuffers( 1, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH );
+
+			CreateBackbuffer();
+
+			//TRACE( "Resized: (" << width << ", " << height << ")" );
+
 			return 1;
 		}
 

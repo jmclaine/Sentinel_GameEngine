@@ -287,23 +287,23 @@ namespace Sentinel
 		}
 
 	#define CREATE_RIGID_BODY()\
-		return new RigidBodyBT( CreateRigidBody( shape, \
-												 btVector3( position.x, position.y, position.z ), \
-												 btQuaternion( orientation.x, orientation.y, orientation.z, orientation.w ), \
-												 mass ));
+		new RigidBodyBT( CreateRigidBody( shape, \
+										  btVector3( position.x, position.y, position.z ), \
+										  btQuaternion( orientation.x, orientation.y, orientation.z, orientation.w ), \
+										  mass ));
 
 		RigidBody* CreateSphere( const Vector3f& position, const Quatf& orientation, float radius, float mass )
 		{
 			btCollisionShape* shape = new btSphereShape( btScalar( radius ));
 
-			CREATE_RIGID_BODY();
+			return CREATE_RIGID_BODY();
 		}
 
 		RigidBody* CreateBox( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, float mass )
 		{
 			btCollisionShape* shape = new btBoxShape( btVector3( scale.x, scale.y, scale.z ));
 
-			CREATE_RIGID_BODY();
+			return CREATE_RIGID_BODY();
 		}
 
 		RigidBody* CreateCylinder( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, float mass )
@@ -311,10 +311,10 @@ namespace Sentinel
 			// scale.Z() is unused
 			btCollisionShape* shape = new btCylinderShape( btVector3( scale.x, scale.y*0.5f, scale.x ));
 
-			CREATE_RIGID_BODY();
+			return CREATE_RIGID_BODY();
 		}
 
-		RigidBody* CreateMesh( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, Mesh* mesh, float mass )
+		RigidBody* CreateMesh( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, std::shared_ptr< Mesh > mesh, float mass )
 		{
 			Buffer* vbo = mesh->mVBO;
 			Buffer* ibo = mesh->mIBO;
@@ -361,7 +361,11 @@ namespace Sentinel
 
 			btConvexTriangleMeshShape* shape = new btConvexTriangleMeshShape( tiva, true );
 
-			CREATE_RIGID_BODY();
+			RigidBody* body = CREATE_RIGID_BODY();
+
+			body->mMesh = mesh;
+
+			return body;
 		}
 
 		btRigidBody* CreateRigidBody( btCollisionShape* shape, const btVector3& position, const btQuaternion& orientation, btScalar mass )

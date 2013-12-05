@@ -1,0 +1,58 @@
+#pragma once
+/*
+Create and set the SPRITE_SYSTEM before
+creating the texture.  CreateTexture uses
+the Shader
+*/
+#include "Common.h"
+#include "SpriteSystem.h"
+#include "Vector2f.h"
+
+#define NUM_CHARS 256
+
+namespace Sentinel
+{
+	class Renderer;
+
+	class Font
+	{
+	public:
+
+		std::shared_ptr< Sprite > mSprite;
+
+		float mOffsetX[ NUM_CHARS ];	// image offset
+		float mOffsetY[ NUM_CHARS ];
+		float mAdvance[ NUM_CHARS ];	// next character starting position (x-axis)
+
+		/////////////////////
+
+		Font() {}
+		virtual ~Font() {}
+	};
+
+	class SENTINEL_DLL FontSystem
+	{
+	public:
+
+		SpriteSystem*			mSpriteSystem;
+		Matrix4f				mMatrixWVP;
+
+		std::shared_ptr< Font > mFont;
+
+		////////////////////////
+
+		virtual ~FontSystem() {}
+
+		////////////////////////
+
+		virtual void Load( const char* filename ) = 0;
+
+		virtual std::shared_ptr< Font > Build( UINT glyphWidth, UINT glyphHeight ) = 0;
+
+		////////////////////////
+
+		virtual void Draw( char text, const ColorRGBA& color, const Matrix4f& matWorld ) = 0;
+	};
+
+	extern SENTINEL_DLL FontSystem* BuildFontSystemFT();
+}

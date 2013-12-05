@@ -192,7 +192,7 @@ namespace Sentinel
 		return start + (end - start) * alpha;
 	}
 
-	inline bool IsPowerOfTwo( UINT x )
+	inline bool IsPowerOf2( UINT x )
 	{
 		return (x != 0) && ((x & (x-1)) == 0);
 	}
@@ -200,6 +200,19 @@ namespace Sentinel
 	inline int FastMod2( int num )
 	{
 		return num & 1;
+	}
+
+	inline UINT NextPowerOf2( UINT n )
+	{
+		--n;
+
+		n = n | (n >> 1);
+        n = n | (n >> 2);
+        n = n | (n >> 4);
+        n = n | (n >> 8);
+        n = n | (n >> 16);
+
+		return n + 1;
 	}
 
 	template< typename Real >

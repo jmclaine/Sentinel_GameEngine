@@ -68,6 +68,8 @@ namespace Sentinel
 
 	void GameWindow::Update()
 	{
+		gRenderer = mRenderer;
+
 		mWindowInfo->Update();
 	}
 
@@ -99,6 +101,10 @@ namespace Sentinel
 		{
 		case WM_DESTROY:
 			PostQuitMessage(0);
+			break;
+
+		case WM_SIZE:
+			gRenderer->ResizeBuffers( LOWORD( lParam ), HIWORD( lParam ));
 			break;
 		}
 

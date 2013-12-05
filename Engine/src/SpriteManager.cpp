@@ -1,6 +1,5 @@
 #include "SpriteManager.h"
 #include "Renderer.h"
-#include "ShaderManager.h"
 #include "TextureManager.h"
 #include "Archive.h"
 
@@ -13,7 +12,6 @@ namespace Sentinel
 	{}
 
 	void SpriteManager::Save( Archive&			archive, 
-							  ShaderManager*	shaderManager, 
 							  TextureManager*	textureManager )
 	{
 		UINT count = mData.size();
@@ -25,13 +23,7 @@ namespace Sentinel
 
 			std::shared_ptr< Sprite > sprite = it->second;
 
-			std::string str;
-			
-			str = shaderManager->Get( sprite->mShader );
-			archive.Write( &str );
-
-			str = textureManager->Get( sprite->mTexture );
-			archive.Write( &str );
+			archive.Write( &textureManager->Get( sprite->mTexture ));
 
 			UINT size = sprite->NumFrames();
 			archive.Write( &size );
@@ -44,7 +36,6 @@ namespace Sentinel
 	}
 
 	void SpriteManager::Load( Archive&			archive, 
-							  ShaderManager*	shaderManager, 
 							  TextureManager*	textureManager )
 	{
 		RemoveAll();
@@ -57,13 +48,10 @@ namespace Sentinel
 			std::string name;
 			archive.Read( &name );
 
-			std::string shader;
-			archive.Read( &shader );
-
 			std::string texture;
 			archive.Read( &texture );
 
-			std::shared_ptr< Sprite > sprite( new Sprite( shaderManager->Get( shader ), textureManager->Get( texture )));
+			std::shared_ptr< Sprite > sprite( new Sprite( textureManager->Get( texture )));
 
 			UINT size;
 			archive.Read( &size );

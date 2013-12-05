@@ -5,8 +5,10 @@
 
 namespace Sentinel
 {
-	Sprite::Sprite( std::shared_ptr< Shader > shader, std::shared_ptr< Texture > texture ) :
-		mShader( shader ),
+	Sprite::Sprite()
+	{}
+
+	Sprite::Sprite( std::shared_ptr< Texture > texture ) :
 		mTexture( texture )
 	{}
 
@@ -17,8 +19,6 @@ namespace Sentinel
 
 	void Sprite::AddFrame( const Quad& coords )
 	{
-		_ASSERT( mTexture );
-
 		mFrame.push_back( coords );
 	}
 

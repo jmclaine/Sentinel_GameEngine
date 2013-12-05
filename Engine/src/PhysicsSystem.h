@@ -9,6 +9,8 @@ SE stores information for the editor.
 Each should save and load identically to
 ensure a smooth transition between them.
 */
+#include <memory>
+
 #include "Common.h"
 
 namespace Sentinel
@@ -36,6 +38,8 @@ namespace Sentinel
 	class RigidBody
 	{
 	public:
+
+		std::shared_ptr< Mesh > mMesh;
 
 		virtual ~RigidBody() {}
 
@@ -107,7 +111,7 @@ namespace Sentinel
 
 		virtual RigidBody*		CreateCylinder( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, float mass ) = 0;
 
-		virtual RigidBody*		CreateMesh( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, Mesh* mesh, float mass ) = 0;
+		virtual RigidBody*		CreateMesh( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, std::shared_ptr< Mesh > mesh, float mass ) = 0;
 
 		//////////////////////////////////
 
