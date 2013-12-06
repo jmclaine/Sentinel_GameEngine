@@ -396,31 +396,27 @@ namespace Sentinel
 
 		//////////////////////////////////
 
-		PhysicsShape* CreateShape( PhysicsShape::Type type )
+		Serializable* CreateSphere()
 		{
-			switch( type )
-			{
-			case PhysicsShape::SPHERE:
-				return new SpherePhysicsShapeSE();
-
-			case PhysicsShape::BOX:
-				return new BoxPhysicsShapeSE();
-
-			case PhysicsShape::CYLINDER:
-				return new CylinderPhysicsShapeSE();
-
-			case PhysicsShape::MESH:
-				return new MeshPhysicsShapeSE();
-
-			case PhysicsShape::COMPOUND:
-				return new CompoundPhysicsShapeSE();
-
-			default:
-				throw AppException( "Failed to create PhysicsShape." );
-			}
-
-			return NULL;
+			return new SpherePhysicsShapeSE();
 		}
+
+		Serializable* CreateBox()
+		{
+			return new BoxPhysicsShapeSE();
+		}
+
+		Serializable* CreateCylinder()
+		{
+			return new CylinderPhysicsShapeSE();
+		}
+
+		Serializable* CreateMesh()
+		{
+			return new MeshPhysicsShapeSE();
+		}
+
+		//////////////////////////////////
 
 		SpherePhysicsShape* CreateSphere( float radius )
 		{

@@ -2,39 +2,21 @@
 
 #include "Common.h"
 #include "Archive.h"
+#include "Serializable.h"
 #include "Vector3f.h"
 #include "Vector4f.h"
 
 namespace Sentinel
 {
-	class PhysicsShape
+	class PhysicsShape : public Serializable
 	{
-	public:
-
-		enum Type
-		{
-			INVALID,
-
-			SPHERE,
-			BOX,
-			CYLINDER,
-			MESH,
-			COMPOUND,	// multiple shapes in one
-		};
-
-	protected:
-
-		Type	mType;
-
 	public:
 
 		virtual ~PhysicsShape();
 
-		Type GetType();
-
 		virtual void* GetData();
 
-		virtual void Save( Archive& archive );
+		virtual void Save( Archive& archive ) = 0;
 		virtual void Load( Archive& archive ) = 0;
 	};
 

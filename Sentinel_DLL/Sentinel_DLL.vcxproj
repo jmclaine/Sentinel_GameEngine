@@ -201,6 +201,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
     <ClCompile Include="..\Engine\src\ParticleEmitterComponent.cpp" />
     <ClCompile Include="..\Engine\src\ParticleSystemNormal.cpp" />
     <ClCompile Include="..\Engine\src\PhysicsShape.cpp" />
+    <ClCompile Include="..\Engine\src\PhysicsSystem.cpp" />
     <ClCompile Include="..\Engine\src\SoundManager.cpp" />
     <ClCompile Include="..\Engine\src\Sound.cpp" />
     <ClCompile Include="..\Engine\src\AudioSystemAL.cpp" />

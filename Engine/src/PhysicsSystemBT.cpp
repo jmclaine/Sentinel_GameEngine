@@ -37,9 +37,10 @@ namespace Sentinel
 
 	public:
 
-		SpherePhysicsShapeBT() :
-			mShape( NULL )
-		{}
+		SpherePhysicsShapeBT()
+		{
+			Create( 1 );
+		}
 
 		SpherePhysicsShapeBT( float radius )
 		{
@@ -91,9 +92,10 @@ namespace Sentinel
 
 	public:
 
-		BoxPhysicsShapeBT() :
-			mShape( NULL )
-		{}
+		BoxPhysicsShapeBT()
+		{
+			Create( Vector3f( 1, 1, 1 ));
+		}
 
 		BoxPhysicsShapeBT( const Vector3f& scale )
 		{
@@ -149,9 +151,10 @@ namespace Sentinel
 
 	public:
 
-		CylinderPhysicsShapeBT() :
-			mShape( NULL )
-		{}
+		CylinderPhysicsShapeBT()
+		{
+			Create( Vector3f( 1, 1, 1 ));
+		}
 
 		CylinderPhysicsShapeBT( const Vector3f& scale )
 		{
@@ -207,9 +210,10 @@ namespace Sentinel
 
 	public:
 
-		MeshPhysicsShapeBT() :
-			mShape( NULL )
-		{}
+		MeshPhysicsShapeBT()
+		{
+			mShape = new btConvexHullShape();
+		}
 
 		MeshPhysicsShapeBT( Vector3f* verts, UINT count, const Vector3f& scale )
 		{
@@ -235,7 +239,6 @@ namespace Sentinel
 
 		void Create( Vector3f* verts, UINT count, const Vector3f& scale )
 		{
-			mType = MESH;
 			/*
 			mMesh = mesh;
 
@@ -564,31 +567,27 @@ namespace Sentinel
 
 		//////////////////////////////////
 
-		PhysicsShape* CreateShape( PhysicsShape::Type type )
+		Serializable* CreateSphere()
 		{
-			switch( type )
-			{
-			case PhysicsShape::SPHERE:
-				return new SpherePhysicsShapeBT();
-
-			case PhysicsShape::BOX:
-				return new BoxPhysicsShapeBT();
-
-			case PhysicsShape::CYLINDER:
-				return new CylinderPhysicsShapeBT();
-
-			case PhysicsShape::MESH:
-				return new MeshPhysicsShapeBT();
-
-			case PhysicsShape::COMPOUND:
-				return new CompoundPhysicsShapeBT();
-
-			default:
-				throw AppException( "Failed to create PhysicsShape." );
-			}
-
-			return NULL;
+			return new SpherePhysicsShapeBT();
 		}
+
+		Serializable* CreateBox()
+		{
+			return new BoxPhysicsShapeBT();
+		}
+
+		Serializable* CreateCylinder()
+		{
+			return new CylinderPhysicsShapeBT();
+		}
+
+		Serializable* CreateMesh()
+		{
+			return new MeshPhysicsShapeBT();
+		}
+
+		//////////////////////////////////
 
 		SpherePhysicsShape* CreateSphere( float radius )
 		{

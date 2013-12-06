@@ -605,6 +605,9 @@
     <ClCompile Include="..\Engine\src\PhysicsShape.cpp">
       <Filter>Source Files\Sentinel_Engine\Systems\Physics</Filter>
     </ClCompile>
+    <ClCompile Include="..\Engine\src\PhysicsSystem.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems\Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Engine\src\sin16.inl">

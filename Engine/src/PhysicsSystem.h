@@ -36,16 +36,11 @@ namespace Sentinel
 
 		PhysicsShape*		mShape;
 
-		RigidBody() :
-			mShape( NULL )
-		{}
+		RigidBody();
 
 	public:
 
-		virtual ~RigidBody()
-		{
-			delete mShape;
-		}
+		virtual ~RigidBody();
 
 		virtual Vector3f	GetPosition() = 0;
 		virtual void		SetPosition( const Vector3f& position ) = 0;
@@ -97,6 +92,18 @@ namespace Sentinel
 	//
 	class PhysicsSystem
 	{
+		friend class SpherePhysicsShape;
+		friend class BoxPhysicsShape;
+		friend class CylinderPhysicsShape;
+		friend class MeshPhysicsShape;
+		
+	private:
+
+		DECLARE_SERIAL_MEMBER_FUNCTION( PhysicsSystem, CreateSphere );
+		DECLARE_SERIAL_MEMBER_FUNCTION( PhysicsSystem, CreateBox );
+		DECLARE_SERIAL_MEMBER_FUNCTION( PhysicsSystem, CreateCylinder );
+		DECLARE_SERIAL_MEMBER_FUNCTION( PhysicsSystem, CreateMesh );
+
 	public:
 
 		virtual ~PhysicsSystem() {}
@@ -111,7 +118,10 @@ namespace Sentinel
 
 		// Load must be called on shape to Create.
 		//
-		virtual PhysicsShape*			CreateShape( PhysicsShape::Type type ) = 0;
+		virtual Serializable*			CreateSphere() = 0;
+		virtual Serializable*			CreateBox() = 0;
+		virtual Serializable*			CreateCylinder() = 0;
+		virtual Serializable*			CreateMesh() = 0;
 
 		// Shapes are created.
 		//

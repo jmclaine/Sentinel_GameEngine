@@ -139,10 +139,7 @@ namespace Sentinel
 
 		PhysicsSystem* physics = mOwner->GetWorld()->mPhysicsSystem;
 
-		BYTE type;
-		archive.Read( &type );
-
-		PhysicsShape* shape = physics->CreateShape( (PhysicsShape::Type)type );
+		PhysicsShape* shape = (PhysicsShape*)SerialMemberFunctionRegister< PhysicsSystem >::Load( physics, archive );
 		shape->Load( archive );
 		
 		float mass;

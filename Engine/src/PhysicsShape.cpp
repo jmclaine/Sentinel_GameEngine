@@ -1,39 +1,27 @@
 #include "PhysicsShape.h"
+#include "PhysicsSystem.h"
 
 namespace Sentinel
 {
 	PhysicsShape::~PhysicsShape()
 	{}
 
-	PhysicsShape::Type PhysicsShape::GetType()
-	{
-		return mType;
-	}
-
 	void* PhysicsShape::GetData()
 	{
 		return this;
 	}
 
-	void PhysicsShape::Save( Archive& archive )
-	{
-		BYTE type = mType;
-		archive.Write( &type );
-	}
-
 	///////////////////////////////////////////////
 
 	SpherePhysicsShape::SpherePhysicsShape()
-	{
-		mType = SPHERE;
-	}
+	{}
 
 	SpherePhysicsShape::~SpherePhysicsShape()
 	{}
 
 	void SpherePhysicsShape::Save( Archive& archive )
 	{
-		PhysicsShape::Save( archive );
+		PhysicsSystem::mSerialCreateSphere.Save( archive );
 
 		float radius = GetRadius();
 		archive.Write( &radius );
@@ -44,22 +32,20 @@ namespace Sentinel
 		float radius;
 		archive.Read( &radius );
 
-		Create( radius );
+		SetRadius( radius );
 	}
 
 	///////////////////////////////////////////////
 
 	BoxPhysicsShape::BoxPhysicsShape()
-	{
-		mType = BOX;
-	}
+	{}
 
 	BoxPhysicsShape::~BoxPhysicsShape()
 	{}
 
 	void BoxPhysicsShape::Save( Archive& archive )
 	{
-		PhysicsShape::Save( archive );
+		PhysicsSystem::mSerialCreateBox.Save( archive );
 
 		Vector3f scale( GetScale() );
 		archive.Write( scale.Ptr(), ar_sizeof( scale ));
@@ -70,22 +56,20 @@ namespace Sentinel
 		Vector3f scale;
 		archive.Read( scale.Ptr(), ar_sizeof( scale ));
 
-		Create( scale );
+		SetScale( scale );
 	}
 
 	///////////////////////////////////////////////
 
 	CylinderPhysicsShape::CylinderPhysicsShape()
-	{
-		mType = CYLINDER;
-	}
+	{}
 
 	CylinderPhysicsShape::~CylinderPhysicsShape()
 	{}
 
 	void CylinderPhysicsShape::Save( Archive& archive )
 	{
-		PhysicsShape::Save( archive );
+		PhysicsSystem::mSerialCreateCylinder.Save( archive );
 
 		Vector3f scale( GetScale() );
 		archive.Write( scale.Ptr(), ar_sizeof( scale ));
@@ -96,22 +80,20 @@ namespace Sentinel
 		Vector3f scale;
 		archive.Read( scale.Ptr(), ar_sizeof( scale ));
 
-		Create( scale );
+		SetScale( scale );
 	}
 
 	///////////////////////////////////////////////
 
 	MeshPhysicsShape::MeshPhysicsShape()
-	{
-		mType = MESH;
-	}
+	{}
 
 	MeshPhysicsShape::~MeshPhysicsShape()
 	{}
 
 	void MeshPhysicsShape::Save( Archive& archive )
 	{
-		PhysicsShape::Save( archive );
+		PhysicsSystem::mSerialCreateMesh.Save( archive );
 
 		int count = GetNumPoints();
 		archive.Write( &count );
@@ -130,8 +112,6 @@ namespace Sentinel
 
 	void MeshPhysicsShape::Load( Archive& archive )
 	{
-		mType = MESH;
-
 		int count;
 		archive.Read( &count );
 
@@ -149,17 +129,13 @@ namespace Sentinel
 	///////////////////////////////////////////////
 
 	CompoundPhysicsShape::CompoundPhysicsShape()
-	{
-		mType  = COMPOUND;
-	}
+	{}
 
 	CompoundPhysicsShape::~CompoundPhysicsShape()
 	{}
 
 	void CompoundPhysicsShape::Save( Archive& archive )
-	{
-		PhysicsShape::Save( archive );
-	}
+	{}
 
 	void CompoundPhysicsShape::Load( Archive& archive )
 	{}

@@ -5,6 +5,7 @@
 #include <functional>
 
 #include "Common.h"
+#include "Util.h"
 
 namespace Sentinel
 {
@@ -21,11 +22,14 @@ namespace Sentinel
 		void Save( Archive& archive );\
 		void Load( Archive& archive );
 
-#define DEFINE_SERIAL_REGISTER_EX( refClass, cloneClass )\
+#define DEFINE_SERIAL_REGISTER_EX( refClass, func )\
+	SerialRegister refClass::mSerialRegistry( #refClass, func );
+
+#define DEFINE_SERIAL_REGISTER_CLONE( refClass, cloneClass )\
 	SerialRegister cloneClass::mSerialRegistry( #refClass, cloneClass::Clone );
 
 #define DEFINE_SERIAL_REGISTER( clazz )\
-	DEFINE_SERIAL_REGISTER_EX( clazz, clazz );
+	DEFINE_SERIAL_REGISTER_CLONE( clazz, clazz );
 
 #define DEFINE_SERIAL_CLONE( clazz )\
 	Serializable* clazz::Clone() {\
@@ -160,5 +164,113 @@ namespace Sentinel
 		const std::function< void() >& Create( UINT value );
 
 		UINT Find( Func func );
+	};
+
+	///////////////////////////////////////////////////////////////////////////////////
+
+#define DECLARE_SERIAL_MEMBER_FUNCTION( clazz, func )\
+	static SerialMemberFunctionRegister< clazz > mSerial##func;
+
+#define DEFINE_SERIAL_MEMBER_FUNCTION( clazz, func )\
+	SerialMemberFunctionRegister< clazz > clazz::mSerial##func( #func, &clazz::func );
+
+	template< class T >
+	class SerialMemberFunctionFactory
+	{
+	public:
+
+		typedef Serializable* (T::*Func)();
+		
+	private:
+
+		std::map< UINT, Func > mRegistry; 
+
+	protected:
+
+		SerialMemberFunctionFactory()
+		{}
+
+	public:
+
+		~SerialMemberFunctionFactory()
+		{}
+
+		static SerialMemberFunctionFactory& Get()
+		{
+			static SerialMemberFunctionFactory mSingle;
+			return mSingle;
+		}
+		
+		///////////////////////////
+
+		bool Register( UINT value, Func func )
+		{
+			if( mRegistry.find( value ) != mRegistry.end() )
+				return false;
+
+			mRegistry.insert( std::pair< UINT, Func >( value, func ));
+
+			return true;
+		}
+
+		Func Create( UINT value )
+		{
+			auto it = mRegistry.find( value );
+
+			if( it != mRegistry.end() )
+				return it->second;
+
+			return 0;
+		}
+
+		UINT Find( Func func )
+		{
+			TRAVERSE_LIST( it, mRegistry )
+			{
+				if( it->second == func )
+					return it->first;
+			}
+
+			return NULL;
+		}
+	};
+
+	// Automatically registers the class within the SerialMemberFunctionFactory.
+	//
+	template< class T >
+	class SerialMemberFunctionRegister
+	{
+	public:
+
+		typedef Serializable* (T::*Func)();
+
+	private:
+
+		UINT mID;
+
+	public:
+
+		SerialMemberFunctionRegister( const char* name, Func func )
+		{
+			mID = HashString( name );
+			if( !SerialMemberFunctionFactory< T >::Get().Register( mID, func ))
+				throw AppException( "Failed to register serial '" + std::string( name ) + "'" );
+		}
+
+		void Save( Archive& archive )
+		{
+			archive.Write( &mID, 1, true );
+		}
+
+		static Serializable* Load( T* obj, Archive& archive )
+		{
+			UINT id;
+			archive.Read( &id, 1, true );
+
+			if( id != 0 )
+				return (obj->*SerialMemberFunctionFactory< T >::Get().Create( id ))();
+
+			return NULL;
+		}
 	};
 }
