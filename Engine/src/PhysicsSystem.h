@@ -12,21 +12,14 @@ ensure a smooth transition between them.
 #include <memory>
 
 #include "Common.h"
+#include "Archive.h"
+#include "PhysicsShape.h"
 
 namespace Sentinel
 {
 	class Mesh;
 	class Quatf;
 	class Vector3f;
-
-	enum PhysicsShapeType
-	{
-		PHYSICS_INVALID,
-		PHYSICS_SPHERE,
-		PHYSICS_BOX,
-		PHYSICS_CYLINDER,
-		PHYSICS_MESH,
-	};
 
 	enum PhysicsFlag
 	{
@@ -35,13 +28,24 @@ namespace Sentinel
 		ENABLE_GYROSCOPIC_FORCE,
 	};
 
+	////////////////////////////////////////////////////////////////////
+
 	class RigidBody
 	{
+	protected:
+
+		PhysicsShape*		mShape;
+
+		RigidBody() :
+			mShape( NULL )
+		{}
+
 	public:
 
-		std::shared_ptr< Mesh > mMesh;
-
-		virtual ~RigidBody() {}
+		virtual ~RigidBody()
+		{
+			delete mShape;
+		}
 
 		virtual Vector3f	GetPosition() = 0;
 		virtual void		SetPosition( const Vector3f& position ) = 0;
@@ -57,8 +61,8 @@ namespace Sentinel
 		virtual float		GetMass() = 0;
 		virtual void		SetMass( float mass ) = 0;
 
-		virtual PhysicsShapeType GetShapeType() = 0;
-		virtual void		SetShapeType( PhysicsShapeType type ) = 0;
+		virtual PhysicsShape* GetShape() = 0;
+		virtual void		SetShape( PhysicsShape* shape ) = 0;
 		
 		virtual int			GetFlags() = 0;
 		virtual void		SetFlags( int flags ) = 0;
@@ -105,15 +109,20 @@ namespace Sentinel
 
 		//////////////////////////////////
 
-		virtual RigidBody*		CreateSphere( const Vector3f& position, const Quatf& orientation, float radius, float mass ) = 0;
+		// Load must be called on shape to Create.
+		//
+		virtual PhysicsShape*			CreateShape( PhysicsShape::Type type ) = 0;
 
-		virtual RigidBody*		CreateBox( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, float mass ) = 0;
-
-		virtual RigidBody*		CreateCylinder( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, float mass ) = 0;
-
-		virtual RigidBody*		CreateMesh( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, std::shared_ptr< Mesh > mesh, float mass ) = 0;
+		// Shapes are created.
+		//
+		virtual SpherePhysicsShape*		CreateSphere( float radius ) = 0;
+		virtual BoxPhysicsShape*		CreateBox( const Vector3f& scale ) = 0;
+		virtual CylinderPhysicsShape*	CreateCylinder( const Vector3f& scale ) = 0;
+		virtual MeshPhysicsShape*		CreateMesh( Vector3f* verts, UINT count, const Vector3f& scale ) = 0;
 
 		//////////////////////////////////
+
+		virtual RigidBody*		CreateRigidBody( PhysicsShape* shape, const Vector3f& position, const Quatf& orientation, float mass ) = 0;
 
 		virtual void			AddRigidBody( RigidBody* body ) = 0;
 

@@ -58,6 +58,9 @@
     <Filter Include="Source Files\Sentinel_Engine\Assets\Manager">
       <UniqueIdentifier>{1afb54e4-934e-4d15-8c6b-441dd62e4b25}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Sentinel_Engine\Systems\Physics">
+      <UniqueIdentifier>{5da3953f-ae9e-499d-b464-1b830a40034a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Engine\src\Buffer.h">
@@ -158,9 +161,6 @@
     </ClInclude>
     <ClInclude Include="..\Engine\src\SpriteComponent.h">
       <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\PhysicsSystem.h">
-      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\PhysicsComponent.h">
       <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
@@ -302,6 +302,21 @@
     </ClInclude>
     <ClInclude Include="..\Engine\src\Font.h">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\PhysicsConstraintComponent.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\PhysicsShapeComponent.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\PhysicsRigidBodyComponent.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\PhysicsSystem.h">
+      <Filter>Source Files\Sentinel_Engine\Systems\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\PhysicsShape.h">
+      <Filter>Source Files\Sentinel_Engine\Systems\Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -500,12 +515,6 @@
     <ClCompile Include="..\Engine\zlib-1.2.8\zutil.c">
       <Filter>Source Files\Sentinel_Engine\Utilities\zlib</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\PhysicsSystemBT.cpp">
-      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\PhysicsSystemSE.cpp">
-      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\Timing.cpp">
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
     </ClCompile>
@@ -586,6 +595,15 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\GUI\Label.cpp">
       <Filter>Source Files\Sentinel_Engine\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\PhysicsSystemBT.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\PhysicsSystemSE.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\PhysicsShape.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems\Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

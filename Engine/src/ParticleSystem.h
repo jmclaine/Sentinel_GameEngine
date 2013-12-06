@@ -27,15 +27,7 @@ namespace Sentinel
 	class Archive;
 	
 	class SENTINEL_DLL ParticleSystem : public Serializable
-	{
-	public:
-
-		enum Type
-		{
-			NORMAL,
-			PHYSICS,
-		};
-
+	{	
 	protected:
 
 		bool				mIsActive;

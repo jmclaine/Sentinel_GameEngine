@@ -105,6 +105,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
     <ClInclude Include="..\Engine\src\Archive.h" />
     <ClInclude Include="..\Engine\src\AssetManager.h" />
     <ClInclude Include="..\Engine\src\AudioComponent.h" />
+    <ClInclude Include="..\Engine\src\PhysicsConstraintComponent.h" />
     <ClInclude Include="..\Engine\src\Font.h" />
     <ClInclude Include="..\Engine\src\FontSystem.h" />
     <ClInclude Include="..\Engine\src\GUI\Button.h" />
@@ -113,6 +114,9 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
     <ClInclude Include="..\Engine\src\GUI\DrawableSprite.h" />
     <ClInclude Include="..\Engine\src\GUI\Label.h" />
     <ClInclude Include="..\Engine\src\GUI\Widget.h" />
+    <ClInclude Include="..\Engine\src\PhysicsShape.h" />
+    <ClInclude Include="..\Engine\src\PhysicsShapeComponent.h" />
+    <ClInclude Include="..\Engine\src\PhysicsRigidBodyComponent.h" />
     <ClInclude Include="..\Engine\src\WidgetComponent.h" />
     <ClInclude Include="..\Engine\src\ListNode.h" />
     <ClInclude Include="..\Engine\src\Particle.h" />
@@ -196,6 +200,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
     <ClCompile Include="..\Engine\src\ParticleEffect.cpp" />
     <ClCompile Include="..\Engine\src\ParticleEmitterComponent.cpp" />
     <ClCompile Include="..\Engine\src\ParticleSystemNormal.cpp" />
+    <ClCompile Include="..\Engine\src\PhysicsShape.cpp" />
     <ClCompile Include="..\Engine\src\SoundManager.cpp" />
     <ClCompile Include="..\Engine\src\Sound.cpp" />
     <ClCompile Include="..\Engine\src\AudioSystemAL.cpp" />

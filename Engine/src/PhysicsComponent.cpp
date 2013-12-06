@@ -58,7 +58,7 @@ namespace Sentinel
 
 	void PhysicsComponent::Update()
 	{
-		if( mTransform )
+		if( mOwner->GetParent() == NULL )
 		{
 			mTransform->mPosition    = mRigidBody->GetPosition();
 			mTransform->mOrientation = mRigidBody->GetOrientation();
@@ -97,13 +97,8 @@ namespace Sentinel
 
 		GameComponent::Save( archive );
 
-		int type = (int)mRigidBody->GetShapeType();
+		mRigidBody->GetShape()->Save( archive );
 		
-		if( type == PHYSICS_INVALID )
-			REPORT_ERROR( "No support for PhysicsComponent shape on " << mOwner->mName, "Save Error" );
-
-		archive.Write( &type );
-
 		float mass = mRigidBody->GetMass();
 		archive.Write( &mass );
 
@@ -116,9 +111,6 @@ namespace Sentinel
 		Vector3f scale = mRigidBody->GetScale();
 		archive.Write( scale.Ptr(), ar_sizeof( scale ));
 			
-		if( type == PHYSICS_MESH )
-			archive.Write( &mOwner->GetWorld()->mMeshManager->Get( mRigidBody->mMesh ));
-
 		int flags = mRigidBody->GetFlags();
 		archive.Write( &flags );
 
@@ -145,8 +137,13 @@ namespace Sentinel
 	{
 		GameComponent::Load( archive );
 
-		int type;
+		PhysicsSystem* physics = mOwner->GetWorld()->mPhysicsSystem;
+
+		BYTE type;
 		archive.Read( &type );
+
+		PhysicsShape* shape = physics->CreateShape( (PhysicsShape::Type)type );
+		shape->Load( archive );
 		
 		float mass;
 		archive.Read( &mass );
@@ -158,42 +155,8 @@ namespace Sentinel
 		archive.Read( pos.Ptr(),	ar_sizeof( pos ));
 		archive.Read( rot.Ptr(),	ar_sizeof( rot ));
 		archive.Read( scale.Ptr(),	ar_sizeof( scale ));
-	
-		PhysicsSystem* physics;
-		physics = mOwner->GetWorld()->mPhysicsSystem;
 
-		switch( type )
-		{
-			case PHYSICS_SPHERE:
-				mRigidBody = physics->CreateSphere( pos, rot, scale.x, mass );
-				break;
-
-			case PHYSICS_BOX:
-				mRigidBody = physics->CreateBox( pos, rot, scale, mass );
-				break;
-
-			case PHYSICS_CYLINDER:
-				mRigidBody = physics->CreateCylinder( pos, rot, scale, mass );
-				break;
-
-			case PHYSICS_MESH:
-				{
-					std::string name;
-					archive.Read( &name );
-
-					std::shared_ptr< Mesh > mesh = mOwner->GetWorld()->mMeshManager->Get( name );
-
-					if( mesh )
-						mRigidBody = physics->CreateMesh( pos, rot, scale, mesh, mass );
-					else
-						throw AppException( "No Mesh with PhysicsComponent shape on " + mOwner->mName );
-				}
-				break;
-
-			default:
-				throw AppException( "No support for PhysicsComponent shape on " + mOwner->mName );
-				break;
-		}
+		mRigidBody = physics->CreateRigidBody( shape, pos, rot, mass );
 
 		int flags;
 		archive.Read( &flags );

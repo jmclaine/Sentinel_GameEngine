@@ -370,7 +370,7 @@ public:
 		obj->AttachComponent( new EditorControllerComponent(), "Controller" );
 			
 		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
-		physics->SetRigidBody( mEditorWorld->mPhysicsSystem->CreateSphere( transform->mPosition, transform->mOrientation, 1.0f, 1.0f ));
+		physics->SetRigidBody( mEditorWorld->mPhysicsSystem->CreateRigidBody( mEditorWorld->mPhysicsSystem->CreateSphere( 1.0f ), transform->mPosition, transform->mOrientation, 1.0f ));
 		body = physics->GetRigidBody();
 		body->SetFlags( DISABLE_GRAVITY );
 		body->SetRestitution( 1.0f );
@@ -539,9 +539,8 @@ public:
 		obj->AttachComponent( new PlayerControllerComponent(), "Controller" );
 			
 		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
-		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateSphere( transform->mPosition, transform->mOrientation, 1.0f, 1.0f ));
+		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateSphere( 1.0f ), transform->mPosition, transform->mOrientation, 1.0f ));
 		body = physics->GetRigidBody();
-		body->SetShapeType( PHYSICS_SPHERE );
 		body->SetFlags( DISABLE_GRAVITY );
 		body->SetRestitution( 1.0f );
 		body->SetDamping( 0.9f, 0.9f );
@@ -578,7 +577,7 @@ public:
 		transform->mScale    = Vector3f( 100, 1, 100 );
 
 		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
-		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mPosition, transform->mOrientation, transform->mScale, 0.0f ));
+		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
 		body = physics->GetRigidBody();
 		body->SetFlags( DISABLE_GRAVITY );
 			
@@ -601,15 +600,16 @@ public:
 
 		transform = (TransformComponent*)obj2->AttachComponent( new TransformComponent(), "Transform" );
 		transform->mPosition	= Vector3f( 0, 4, 0 );
-		transform->mScale		= Vector3f( 0.5f, 0.5f, 0.5f );
+		transform->mScale		= Vector3f( 1, 1, 1 );
 		transform->mOrientation	= Quatf( 90, 180, 270 );
 
 		obj2->AttachComponent( new MeshComponent( mesh ), "Mesh" );
 
-		physics = (PhysicsComponent*)obj2->AttachComponent( new PhysicsComponent(), "Physics" );
-		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateMesh( transform->mPosition, transform->mOrientation, transform->mScale, mesh, 1.0f ));
-		body = physics->GetRigidBody();
-		body->SetGravity( Vector3f( 0, -9.81f, 0 ));
+		//physics = (PhysicsComponent*)obj2->AttachComponent( new PhysicsComponent(), "Physics" );
+		//physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateMesh( transform->mPosition, transform->mOrientation, transform->mScale, mesh, 1.0f ));
+		//body = physics->GetRigidBody();
+		
+		mGameWorld->AddGameObject( obj2 );
 		
 		// Parent test object.
 		//
@@ -629,11 +629,10 @@ public:
 		obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
 
 		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
-		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateSphere( transform->mPosition, transform->mOrientation, transform->mScale.x, 1.0f ));
+		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateSphere( transform->mScale.x ), transform->mPosition, transform->mOrientation, 1.0f ));
 		body = physics->GetRigidBody();
-		body->SetGravity( Vector3f( 0, -9.81f, 0 ));
 		
-		obj->AddChild( obj2 );
+		//obj->AddChild( obj2 );
 
 		//AddObject( obj );
 

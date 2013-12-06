@@ -1,13 +1,213 @@
+#include <vector>
+
 #include "PhysicsSystem.h"
 #include "Vector3f.h"
 #include "Quatf.h"
+#include "Util.h"
 
 namespace Sentinel
 {
+	class SpherePhysicsShapeSE : public SpherePhysicsShape
+	{
+	private:
+
+		float mRadius;
+
+	public:
+
+		SpherePhysicsShapeSE() :
+			mRadius( 0 )
+		{}
+
+		SpherePhysicsShapeSE( float radius )
+		{
+			Create( radius );
+		}
+
+		~SpherePhysicsShapeSE()
+		{}
+
+	private:
+
+		void Create( float radius )
+		{
+			mRadius = radius;
+		}
+
+	public:
+
+		float GetRadius()
+		{
+			return mRadius;
+		}
+
+		void SetRadius( float radius )
+		{
+			mRadius = radius;
+		}
+	};
+
+	///////////////////////////////////////////////
+
+	class BoxPhysicsShapeSE : public BoxPhysicsShape
+	{
+	private:
+
+		Vector3f mScale;
+
+	public:
+
+		BoxPhysicsShapeSE()
+		{}
+
+		BoxPhysicsShapeSE( const Vector3f& scale )
+		{
+			Create( scale );
+		}
+
+		~BoxPhysicsShapeSE()
+		{}
+
+	private:
+
+		void Create( const Vector3f& scale )
+		{
+			mScale = scale;
+		}
+
+	public:
+
+		Vector3f GetScale()
+		{
+			return mScale;
+		}
+
+		void SetScale( const Vector3f& scale )
+		{
+			mScale = scale;
+		}
+	};
+
+	///////////////////////////////////////////////
+
+	class CylinderPhysicsShapeSE : public CylinderPhysicsShape
+	{
+	private:
+
+		Vector3f mScale;
+
+	public:
+
+		CylinderPhysicsShapeSE()
+		{}
+
+		CylinderPhysicsShapeSE( const Vector3f& scale )
+		{
+			Create( scale );
+		}
+
+		~CylinderPhysicsShapeSE()
+		{}
+
+	private:
+
+		void Create( const Vector3f& scale )
+		{
+			mScale = scale;
+		}
+
+	public:
+
+		Vector3f GetScale()
+		{
+			return mScale;
+		}
+
+		void SetScale( const Vector3f& scale )
+		{
+			mScale = scale;
+		}
+	};
+
+	///////////////////////////////////////////////
+
+	class MeshPhysicsShapeSE : public MeshPhysicsShape
+	{
+	private:
+
+		std::vector< Vector3f > mVert;
+		Vector3f				mScale;
+
+	public:
+
+		MeshPhysicsShapeSE()
+		{}
+
+		MeshPhysicsShapeSE( Vector3f* verts, UINT count, const Vector3f& scale )
+		{
+			Create( verts, count, scale );
+		}
+
+		~MeshPhysicsShapeSE()
+		{}
+
+	private:
+
+		void Create( Vector3f* verts, UINT count, const Vector3f& scale )
+		{
+			for( UINT x = 0; x < count; ++x )
+			{
+				AddPoint( verts[ x ] );
+			}
+
+			SetScale( scale );
+		}
+
+	public:
+
+		int GetNumPoints()
+		{
+			return (int)mVert.size();
+		}
+
+		void AddPoint( const Vector3f& point )
+		{
+			mVert.push_back( point );
+		}
+
+		Vector3f* GetPoints()
+		{
+			return mVert.data();
+		}
+
+		Vector3f GetScale()
+		{
+			return mScale;
+		}
+
+		void SetScale( const Vector3f& scale )
+		{
+			mScale = scale;
+		}
+	};
+
+	///////////////////////////////////////////////
+
+	class CompoundPhysicsShapeSE : public CompoundPhysicsShape
+	{
+	public:
+
+		CompoundPhysicsShapeSE()
+		{}
+
+		~CompoundPhysicsShapeSE()
+		{}
+	};
+
+	/////////////////////////////////////////////////////////////////////////////
+
 	class RigidBodySE : public RigidBody
 	{
-		friend class PhysicsSystemBT;
-
 	private:
 
 		Vector3f			mPosition;
@@ -15,7 +215,6 @@ namespace Sentinel
 		Vector3f			mScale;
 
 		float				mMass;
-		PhysicsShapeType	mShapeType;
 		int					mFlags;
 
 		float				mLinearDamping;
@@ -32,8 +231,8 @@ namespace Sentinel
 		{
 			mMass			= 1.0f;
 			mFlags			= 0;
-			mLinearDamping	= 0;
-			mAngularDamping = 0;
+			mLinearDamping	= 0.2f;
+			mAngularDamping = 0.2f;
 			mRestitution	= 0.8f;
 			mFriction		= 0.8f;
 			mAngularFactor	= Vector3f( 0.8f, 0.8f, 0.8f );
@@ -84,14 +283,14 @@ namespace Sentinel
 			mMass = mass;
 		}
 
-		PhysicsShapeType GetShapeType()
+		PhysicsShape* GetShape()
 		{
-			return mShapeType;
+			return mShape;
 		}
 
-		void SetShapeType( PhysicsShapeType type )
+		void SetShape( PhysicsShape* shape )
 		{
-			mShapeType = type;
+			mShape = shape;
 		}
 
 		int GetFlags()
@@ -195,54 +394,63 @@ namespace Sentinel
 			// unsupported
 		}
 
-		RigidBody* CreateSphere( const Vector3f& position, const Quatf& orientation, float radius, float mass )
+		//////////////////////////////////
+
+		PhysicsShape* CreateShape( PhysicsShape::Type type )
 		{
-			RigidBodySE* body = new RigidBodySE();
+			switch( type )
+			{
+			case PhysicsShape::SPHERE:
+				return new SpherePhysicsShapeSE();
 
-			body->SetShapeType( PHYSICS_SPHERE );
-			body->SetPosition( position );
-			body->SetOrientation( orientation );
-			body->SetScale( Vector3f( radius, radius, radius ));
-			body->SetMass( mass );
+			case PhysicsShape::BOX:
+				return new BoxPhysicsShapeSE();
 
-			return body;
+			case PhysicsShape::CYLINDER:
+				return new CylinderPhysicsShapeSE();
+
+			case PhysicsShape::MESH:
+				return new MeshPhysicsShapeSE();
+
+			case PhysicsShape::COMPOUND:
+				return new CompoundPhysicsShapeSE();
+
+			default:
+				throw AppException( "Failed to create PhysicsShape." );
+			}
+
+			return NULL;
 		}
 
-		RigidBody* CreateBox( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, float mass )
+		SpherePhysicsShape* CreateSphere( float radius )
 		{
-			RigidBodySE* body = new RigidBodySE();
-
-			body->SetShapeType( PHYSICS_BOX );
-			body->SetPosition( position );
-			body->SetOrientation( orientation );
-			body->SetScale( scale );
-			body->SetMass( mass );
-
-			return body;
+			return new SpherePhysicsShapeSE( radius );
 		}
 
-		RigidBody* CreateCylinder( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, float mass )
+		BoxPhysicsShape* CreateBox( const Vector3f& scale )
 		{
-			RigidBodySE* body = new RigidBodySE();
-
-			body->SetShapeType( PHYSICS_CYLINDER );
-			body->SetPosition( position );
-			body->SetOrientation( orientation );
-			body->SetScale( scale );
-			body->SetMass( mass );
-
-			return body;
+			return new BoxPhysicsShapeSE( scale );
 		}
 
-		RigidBody* CreateMesh( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, std::shared_ptr< Mesh > mesh, float mass )
+		CylinderPhysicsShape* CreateCylinder( const Vector3f& scale )
+		{
+			return new CylinderPhysicsShapeSE( scale );
+		}
+
+		MeshPhysicsShape* CreateMesh( Vector3f* verts, UINT count, const Vector3f& scale )
+		{
+			return new MeshPhysicsShapeSE( verts, count, scale );
+		}
+
+		//////////////////////////////////
+
+		RigidBody* CreateRigidBody( PhysicsShape* shape, const Vector3f& position, const Quatf& orientation, float mass )
 		{
 			RigidBodySE* body = new RigidBodySE();
 
-			body->mMesh = mesh;
-			body->SetShapeType( PHYSICS_MESH );
+			body->SetShape( shape );
 			body->SetPosition( position );
 			body->SetOrientation( orientation );
-			body->SetScale( scale );
 			body->SetMass( mass );
 
 			return body;

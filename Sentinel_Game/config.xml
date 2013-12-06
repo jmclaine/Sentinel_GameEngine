@@ -1,3 +1,3 @@
 <?xml version="1.0" ?>
 <!--DIRECTX or OPENGL-->
-<Renderer Type="DIRECTX" Fullscreen="false" Width="1440" Height="900" />
+<Renderer Type="OPENGL" Fullscreen="false" Width="1440" Height="900" />

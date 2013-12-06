@@ -876,7 +876,7 @@ namespace Sentinel
 			
 			glGenBuffers( 1, &buffer->mID );
 			glBindBuffer( bufferType, buffer->mID );
-			glBufferData( bufferType, size,	data, GL_STATIC_DRAW );
+			glBufferData( bufferType, size,	data, GL_DYNAMIC_DRAW );
 
 			return buffer;
 		}

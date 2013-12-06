@@ -1,3 +1,6 @@
+/*
+PhysicsSystem based on BulletPhysics.
+*/
 #include <process.h>
 
 #include "btBulletDynamicsCommon.h"
@@ -24,8 +27,312 @@ namespace Sentinel
 {
 	class PhysicsSystemBT;
 
-	// Rigid Body used within the Physics System.
-	//
+	///////////////////////////////////////////////
+
+	class SpherePhysicsShapeBT : public SpherePhysicsShape
+	{
+	private:
+
+		btSphereShape* mShape;
+
+	public:
+
+		SpherePhysicsShapeBT() :
+			mShape( NULL )
+		{}
+
+		SpherePhysicsShapeBT( float radius )
+		{
+			Create( radius );
+		}
+
+		~SpherePhysicsShapeBT()
+		{
+			delete mShape;
+		}
+
+		operator btSphereShape* ()
+		{
+			return mShape;
+		}
+
+		void* GetData()
+		{
+			return mShape;
+		}
+
+	private:
+
+		void Create( float radius )
+		{
+			mShape = new btSphereShape( btScalar( radius ));
+		}
+
+	public:
+
+		float GetRadius()
+		{
+			return mShape->getRadius();
+		}
+
+		void SetRadius( float radius )
+		{
+			mShape->setUnscaledRadius( radius );
+		}
+	};
+
+	///////////////////////////////////////////////
+
+	class BoxPhysicsShapeBT : public BoxPhysicsShape
+	{
+	private:
+
+		btBoxShape* mShape;
+
+	public:
+
+		BoxPhysicsShapeBT() :
+			mShape( NULL )
+		{}
+
+		BoxPhysicsShapeBT( const Vector3f& scale )
+		{
+			Create( scale );
+		}
+
+		~BoxPhysicsShapeBT()
+		{
+			delete mShape;
+		}
+
+		operator btBoxShape* ()
+		{
+			return mShape;
+		}
+
+		void* GetData()
+		{
+			return mShape;
+		}
+
+	private:
+
+		void Create( const Vector3f& scale )
+		{
+			mShape = new btBoxShape( btVector3( 1, 1, 1 ));
+
+			SetScale( scale );
+		}
+
+	public:
+
+		Vector3f GetScale()
+		{
+			const btVector3& v = mShape->getLocalScaling();
+
+			return Vector3f( v.x(), v.y(), v.z() );
+		}
+
+		void SetScale( const Vector3f& scale )
+		{
+			mShape->setLocalScaling( btVector3( scale.x, scale.y, scale.z ));
+		}
+	};
+
+	///////////////////////////////////////////////
+
+	class CylinderPhysicsShapeBT : public CylinderPhysicsShape
+	{
+	private:
+
+		btCylinderShape* mShape;
+
+	public:
+
+		CylinderPhysicsShapeBT() :
+			mShape( NULL )
+		{}
+
+		CylinderPhysicsShapeBT( const Vector3f& scale )
+		{
+			Create( scale );
+		}
+
+		~CylinderPhysicsShapeBT()
+		{
+			delete mShape;
+		}
+
+		operator btCylinderShape* ()
+		{
+			return mShape;
+		}
+
+		void* GetData()
+		{
+			return mShape;
+		}
+
+	private:
+
+		void Create( const Vector3f& scale )
+		{
+			mShape = new btCylinderShape( btVector3( 1, 0.5f, 1 ));
+
+			SetScale( scale );
+		}
+
+	public:
+
+		Vector3f GetScale()
+		{
+			const btVector3& v = mShape->getLocalScaling();
+
+			return Vector3f( v.x(), v.y(), v.z() );
+		}
+
+		void SetScale( const Vector3f& scale )
+		{
+			mShape->setLocalScaling( btVector3( scale.x, scale.y, scale.z ));
+		}
+	};
+
+	///////////////////////////////////////////////
+
+	class MeshPhysicsShapeBT : public MeshPhysicsShape
+	{
+	private:
+
+		btConvexHullShape* mShape;
+
+	public:
+
+		MeshPhysicsShapeBT() :
+			mShape( NULL )
+		{}
+
+		MeshPhysicsShapeBT( Vector3f* verts, UINT count, const Vector3f& scale )
+		{
+			Create( verts, count, scale );
+		}
+
+		~MeshPhysicsShapeBT()
+		{
+			delete mShape;
+		}
+
+		operator btConvexHullShape* ()
+		{
+			return mShape;
+		}
+
+		void* GetData()
+		{
+			return mShape;
+		}
+
+	private:
+
+		void Create( Vector3f* verts, UINT count, const Vector3f& scale )
+		{
+			mType = MESH;
+			/*
+			mMesh = mesh;
+
+			Buffer* vbo = mesh->mVBO;
+			
+			UINT   count   = vbo->Count();
+			UCHAR* vboData = (UCHAR*)vbo->Lock();
+			
+			btConvexHullShape* shape = new btConvexHullShape();
+			Vector3f v;
+
+			for( UINT x = 0; x < count; ++x )
+			{
+				v = *(Vector3f*)vboData;
+				shape->addPoint( btVector3( v.x, v.y, v.z ));
+				vboData += vbo->Stride();
+			}
+			vbo->Unlock();
+			*/
+
+			mShape = new btConvexHullShape();
+
+			for( UINT x = 0; x < count; ++x )
+			{
+				const Vector3f& v( verts[ x ] );
+
+				mShape->addPoint( btVector3( v.x, v.y, v.z ));
+			}
+
+			mShape->setLocalScaling( btVector3( scale.x, scale.y, scale.z ));
+		}
+
+	public:
+
+		int GetNumPoints()
+		{
+			return mShape->getNumPoints();
+		}
+
+		void AddPoint( const Vector3f& point )
+		{
+			mShape->addPoint( btVector3( point.x, point.y, point.z ));
+		}
+
+		Vector3f* GetPoints()
+		{
+			_ASSERT( 0 );	// ** unscaled points are 4 floats **
+
+			return (Vector3f*)mShape->getUnscaledPoints();
+		}
+
+		Vector3f GetScale()
+		{
+			const btVector3& v = mShape->getLocalScaling();
+
+			return Vector3f( v.x(), v.y(), v.z() );
+		}
+
+		void SetScale( const Vector3f& scale )
+		{
+			mShape->setLocalScaling( btVector3( scale.x, scale.y, scale.z ));
+		}
+	};
+
+	///////////////////////////////////////////////
+
+	class CompoundPhysicsShapeBT : public CompoundPhysicsShape
+	{
+	private:
+
+		btCompoundShape* mShape;
+
+	public:
+
+		CompoundPhysicsShapeBT()
+		{
+			mShape = new btCompoundShape();
+		}
+
+		~CompoundPhysicsShapeBT()
+		{
+			delete mShape;
+		}
+
+		operator btCompoundShape* ()
+		{
+			return mShape;
+		}
+
+		void* GetData()
+		{
+			return mShape;
+		}
+	};
+
+	/////////////////////////////////////////////////////////////////////////////
+	
 	class RigidBodyBT : public RigidBody
 	{
 		friend class PhysicsSystemBT;
@@ -36,8 +343,9 @@ namespace Sentinel
 
 	public:
 
-		RigidBodyBT( btRigidBody* body )
+		RigidBodyBT( PhysicsShape* shape, btRigidBody* body )
 		{
+			mShape     = shape;
 			mRigidBody = body;
 		}
 
@@ -95,28 +403,12 @@ namespace Sentinel
 			mRigidBody->setMassProps( mass, btVector3() );
 		}
 
-		PhysicsShapeType GetShapeType()
+		PhysicsShape* GetShape()
 		{
-			switch( mRigidBody->getCollisionShape()->getShapeType() )
-			{
-				case SPHERE_SHAPE_PROXYTYPE:
-					return PHYSICS_SPHERE;
-
-				case BOX_SHAPE_PROXYTYPE:
-					return PHYSICS_BOX;
-
-				case CYLINDER_SHAPE_PROXYTYPE:
-					return PHYSICS_CYLINDER;
-
-				case CONVEX_TRIANGLEMESH_SHAPE_PROXYTYPE:
-					return PHYSICS_MESH;
-
-				default:
-					return PHYSICS_INVALID;
-			}
+			return mShape;
 		}
 
-		void SetShapeType( PhysicsShapeType type )
+		void SetShape( PhysicsShape* shape )
 		{
 			_ASSERT(0); // unsupported
 		}
@@ -200,20 +492,16 @@ namespace Sentinel
 	};
 
 	/////////////////////////////////////////////////////////////////////////////
-	// Physics System based on Bullet Physics.
-	//
+	
 	class PhysicsSystemBT : public PhysicsSystem
 	{
 	private:
 
-		btDefaultCollisionConfiguration*					mConfig;
-		btCollisionDispatcher*								mDispatcher;
-		btBroadphaseInterface*								mCache;
-		btSequentialImpulseConstraintSolver*				mSolver;
-		btDiscreteDynamicsWorld*							mWorld;
-
-		btAlignedObjectArray< btCollisionShape* >			mShape;
-		btAlignedObjectArray< btTriangleIndexVertexArray* > mShapeData;
+		btDefaultCollisionConfiguration*		mConfig;
+		btCollisionDispatcher*					mDispatcher;
+		btBroadphaseInterface*					mCache;
+		btSequentialImpulseConstraintSolver*	mSolver;
+		btDiscreteDynamicsWorld*				mWorld;
 
 		bool mIsActive;
 
@@ -247,18 +535,6 @@ namespace Sentinel
 				delete obj;
 			}
 
-			TRAVERSE_VECTOR( x, (UINT)mShapeData )
-			{
-				delete mShapeData[ x ]->getIndexedMeshArray()[ 0 ].m_triangleIndexBase;
-				delete mShapeData[ x ]->getIndexedMeshArray()[ 0 ].m_vertexBase;
-				delete mShapeData[ x ];
-			}
-			mShapeData.clear();
-
-			TRAVERSE_VECTOR( x, (UINT)mShape )
-				delete mShape[ x ];
-			mShape.clear();
-
 			SAFE_DELETE( mWorld );
 			SAFE_DELETE( mDispatcher );
 			SAFE_DELETE( mConfig );
@@ -286,108 +562,76 @@ namespace Sentinel
 			mIsActive = false;
 		}
 
-	#define CREATE_RIGID_BODY()\
-		new RigidBodyBT( CreateRigidBody( shape, \
-										  btVector3( position.x, position.y, position.z ), \
-										  btQuaternion( orientation.x, orientation.y, orientation.z, orientation.w ), \
-										  mass ));
+		//////////////////////////////////
 
-		RigidBody* CreateSphere( const Vector3f& position, const Quatf& orientation, float radius, float mass )
+		PhysicsShape* CreateShape( PhysicsShape::Type type )
 		{
-			btCollisionShape* shape = new btSphereShape( btScalar( radius ));
-
-			return CREATE_RIGID_BODY();
-		}
-
-		RigidBody* CreateBox( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, float mass )
-		{
-			btCollisionShape* shape = new btBoxShape( btVector3( scale.x, scale.y, scale.z ));
-
-			return CREATE_RIGID_BODY();
-		}
-
-		RigidBody* CreateCylinder( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, float mass )
-		{
-			// scale.Z() is unused
-			btCollisionShape* shape = new btCylinderShape( btVector3( scale.x, scale.y*0.5f, scale.x ));
-
-			return CREATE_RIGID_BODY();
-		}
-
-		RigidBody* CreateMesh( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, std::shared_ptr< Mesh > mesh, float mass )
-		{
-			Buffer* vbo = mesh->mVBO;
-			Buffer* ibo = mesh->mIBO;
-		
-			// Store only the vertex positions.
-			//
-			UINT   count		= vbo->Count();
-			UCHAR* vboData		= (UCHAR*)vbo->Lock();
-			UCHAR* vboCopy		= new UCHAR[ count * sizeof(Vector3f) ];
-			UCHAR* vboCopyData	= vboCopy;
-
-			for( UINT x = 0; x < count; ++x )
+			switch( type )
 			{
-				// Must be scaled down a little to compensate for bullet shape object numerical error.
-				//
-				*(Vector3f*)vboCopyData = *(Vector3f*)vboData * 0.935f;
+			case PhysicsShape::SPHERE:
+				return new SpherePhysicsShapeBT();
 
-				vboCopyData += sizeof(Vector3f);
-				vboData += vbo->Stride();
+			case PhysicsShape::BOX:
+				return new BoxPhysicsShapeBT();
+
+			case PhysicsShape::CYLINDER:
+				return new CylinderPhysicsShapeBT();
+
+			case PhysicsShape::MESH:
+				return new MeshPhysicsShapeBT();
+
+			case PhysicsShape::COMPOUND:
+				return new CompoundPhysicsShapeBT();
+
+			default:
+				throw AppException( "Failed to create PhysicsShape." );
 			}
-			vbo->Unlock();
 
-			UCHAR* iboCopy = new UCHAR[ ibo->Size() ];
-			memcpy( iboCopy, (UCHAR*)ibo->Lock(), ibo->Size() );
-			ibo->Unlock();
-
-			btIndexedMesh iMesh;
-			iMesh.m_vertexType			= PHY_FLOAT;
-			iMesh.m_numVertices			= vbo->Count();
-			iMesh.m_vertexBase			= vboCopy;
-			iMesh.m_vertexStride		= sizeof(Vector3f);
-
-			iMesh.m_indexType			= PHY_INTEGER;
-			iMesh.m_numTriangles		= ibo->Count();
-			iMesh.m_triangleIndexBase	= iboCopy;
-			iMesh.m_triangleIndexStride = ibo->Stride();
-
-			btTriangleIndexVertexArray* tiva = new btTriangleIndexVertexArray();
-
-			tiva->addIndexedMesh( iMesh, PHY_UCHAR );
-			tiva->setScaling( btVector3( scale.x, scale.y, scale.z ));
-
-			mShapeData.push_back( tiva );
-
-			btConvexTriangleMeshShape* shape = new btConvexTriangleMeshShape( tiva, true );
-
-			RigidBody* body = CREATE_RIGID_BODY();
-
-			body->mMesh = mesh;
-
-			return body;
+			return NULL;
 		}
 
-		btRigidBody* CreateRigidBody( btCollisionShape* shape, const btVector3& position, const btQuaternion& orientation, btScalar mass )
+		SpherePhysicsShape* CreateSphere( float radius )
 		{
-			mShape.push_back( shape );
+			return new SpherePhysicsShapeBT( radius );
+		}
 
+		BoxPhysicsShape* CreateBox( const Vector3f& scale )
+		{
+			return new BoxPhysicsShapeBT( scale );
+		}
+
+		CylinderPhysicsShape* CreateCylinder( const Vector3f& scale )
+		{
+			return new CylinderPhysicsShapeBT( scale );
+		}
+
+		MeshPhysicsShape* CreateMesh( Vector3f* verts, UINT count, const Vector3f& scale )
+		{
+			return new MeshPhysicsShapeBT( verts, count, scale );
+		}
+
+		//////////////////////////////////
+
+		RigidBody* CreateRigidBody( PhysicsShape* shape, const Vector3f& position, const Quatf& orientation, float mass )
+		{
 			btScalar  tMass( mass );
 			btVector3 localInertia( 0, 0, 0 );
 
+			btCollisionShape* btShape = (btCollisionShape*)shape->GetData();
+
 			if( tMass != 0.0f )
-				shape->calculateLocalInertia( tMass, localInertia );
+				btShape->calculateLocalInertia( tMass, localInertia );
 
 			btTransform transform;
 			transform.setIdentity();
-			transform.setOrigin( position );
-			transform.setRotation( orientation );
+			transform.setOrigin( btVector3( position.x, position.y, position.z ));
+			transform.setRotation( btQuaternion( orientation.x, orientation.y, orientation.z, orientation.w ));
 
 			btDefaultMotionState* myMotionState = new btDefaultMotionState( transform );
 
-			btRigidBody::btRigidBodyConstructionInfo rbInfo( tMass, myMotionState, shape, localInertia );
+			btRigidBody::btRigidBodyConstructionInfo rbInfo( tMass, myMotionState, btShape, localInertia );
 
-			return new btRigidBody( rbInfo );
+			return new RigidBodyBT( shape, new btRigidBody( rbInfo ));
 		}
 
 		void AddRigidBody( RigidBody* body )
