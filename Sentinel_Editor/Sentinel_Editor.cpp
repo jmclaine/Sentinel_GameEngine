@@ -58,10 +58,14 @@ Edits levels for a game created with the Sentinel Engine.
 #include "Sprite.h"
 
 #include "GUI/Widget.h"
-#include "GUI/ButtonSprite.h"
-#include "GUI/DrawableMesh.h"
-#include "GUI/DrawableSprite.h"
-#include "GUI/Label.h"
+#include "GUI/WidgetObject.h"
+#include "GUI/WidgetWorld.h"
+#include "GUI/SpriteModelWidget.h"
+#include "GUI/SpriteViewWidget.h"
+#include "GUi/SpriteControllerWidget.h"
+#include "GUI/SpriteButtonWidget.h"
+#include "GUI/LabelWidget.h"
+#include "GUI/MeshViewWidget.h"
 
 #include "RandomValue.h"
 
@@ -393,82 +397,169 @@ public:
 
 		WidgetComponent* widgetComp = (WidgetComponent*)obj->AttachComponent( new WidgetComponent( sprite, mFontSystem, 0 ), "Widget" );
 		
+		GUI::WidgetObject*				widget;
+		GUI::SpriteModelWidget*			model;
+		GUI::SpriteViewWidget*			view;
+		GUI::MeshViewWidget*			drawableMesh;
+		GUI::LabelWidget*				label;
+		GUI::SpriteControllerWidget*	controller;
+		GUI::SpriteButtonWidget*		button;
+
 		// Menu Bar.
 		//
-		GUI::DrawableSprite* drawableSprite;
+		widget = (GUI::WidgetObject*)widgetComp->mWidgetWorld->AddWidgetObject( new GUI::WidgetObject() );
 
-		drawableSprite = (GUI::DrawableSprite*)widgetComp->mRoot.AddChild( new GUI::DrawableSprite() );
-		drawableSprite->mFrame		= 0;
-		drawableSprite->mPosition	= Vector3f( 0, 0, 1 );
-		drawableSprite->mScale		= Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 30, 1 );
-		drawableSprite->mColor		= ColorRGBA( 0.7f, 0.7f, 0.7f, 1 );
-		drawableSprite->mScaleToWindowX = true;
+		model = new GUI::SpriteModelWidget();
+		model->mPosition	= Vector3f( 0, 0, 1 );
+		model->mScale		= Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 30, 1 );
+		model->mScaleToWindowX = true;
+		
+		view = new GUI::SpriteViewWidget();
+		view->mFrame		= 0;
+		view->mColor		= ColorRGBA( 0.7f, 0.7f, 0.7f, 1 );
+
+		controller = new GUI::SpriteControllerWidget();
+
+		widget->SetModel( model );
+		widget->SetView( view );
+		widget->SetController( controller );
 
 		// Menu Labels.
 		//
-		GUI::Label* label;
+		widget = (GUI::WidgetObject*)widgetComp->mWidgetWorld->AddWidgetObject( new GUI::WidgetObject() );
+
+		model = new GUI::SpriteModelWidget();
+		model->mPosition = Vector3f( 10, 20, 0.9f );
+		model->mScale    = Vector3f( 16, 16, 1 );
+
 		//label = (GUI::Label*)widgetComp->mRoot.AddChild( new GUI::Label( "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ{}[]!@#$%^&*()1234567890" ));
-		label = (GUI::Label*)widgetComp->mRoot.AddChild( new GUI::Label( "File" ));
-		label->mPosition = Vector3f( 10, 20, 0.9f );
-		label->mScale = Vector3f( 16, 16, 1 );
+		label = new GUI::LabelWidget( "File" );
 		label->mColor = ColorRGBA( 0, 0, 0, 1 );
 
-		label = (GUI::Label*)widgetComp->mRoot.AddChild( new GUI::Label( "Edit" ));
-		label->mPosition = Vector3f( 110, 20, 0.9f );
-		label->mScale = Vector3f( 16, 16, 1 );
+		controller = new GUI::SpriteControllerWidget();
+
+		widget->SetModel( model );
+		widget->SetView( label );
+		widget->SetController( controller );
+
+		//////////////////////////////////////
+
+		widget = (GUI::WidgetObject*)widgetComp->mWidgetWorld->AddWidgetObject( new GUI::WidgetObject() );
+
+		model = new GUI::SpriteModelWidget();
+		model->mPosition = Vector3f( 110, 20, 0.9f );
+		model->mScale    = Vector3f( 16, 16, 1 );
+
+		label = new GUI::LabelWidget( "Edit" );
 		label->mColor = ColorRGBA( 0, 0, 0, 1 );
 
-		label = (GUI::Label*)widgetComp->mRoot.AddChild( new GUI::Label( "About" ));
-		label->mPosition = Vector3f( 210, 20, 0.9f );
-		label->mScale = Vector3f( 16, 16, 1 );
+		controller = new GUI::SpriteControllerWidget();
+
+		widget->SetModel( model );
+		widget->SetView( label );
+		widget->SetController( controller );
+
+		//////////////////////////////////////
+
+		widget = (GUI::WidgetObject*)widgetComp->mWidgetWorld->AddWidgetObject( new GUI::WidgetObject() );
+
+		model = new GUI::SpriteModelWidget();
+		model->mPosition = Vector3f( 210, 20, 0.9f );
+		model->mScale = Vector3f( 16, 16, 1 );
+
+		label = new GUI::LabelWidget( "Help" );
 		label->mColor = ColorRGBA( 0, 0, 0, 1 );
+
+		controller = new GUI::SpriteControllerWidget();
+
+		widget->SetModel( model );
+		widget->SetView( label );
+		widget->SetController( controller );
 
 		// Toolbar.
 		//
-		drawableSprite = (GUI::DrawableSprite*)widgetComp->mRoot.AddChild( new GUI::DrawableSprite() );
-		drawableSprite->mFrame		= 0;
-		drawableSprite->mPosition	= Vector3f( 0, 0, 1 );
-		drawableSprite->mScale		= Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 30, 1 );
-		drawableSprite->mColor		= ColorRGBA( 0.9f, 0.9f, 0.9f, 1 );
-		drawableSprite->mScaleToWindowX = true;
-		drawableSprite->mMargin		= Quad( 0, 30, 0, 0 );
+		widget = (GUI::WidgetObject*)widgetComp->mWidgetWorld->AddWidgetObject( new GUI::WidgetObject() );
+
+		model = new GUI::SpriteModelWidget();
+		model->mPosition	= Vector3f( 0, 0, 1 );
+		model->mScale		= Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 30, 1 );
+		model->mMargin		= Quad( 0, 30, 0, 0 );
+		model->mScaleToWindowX = true;
+		
+		view = new GUI::SpriteViewWidget();
+		view->mFrame		= 0;
+		view->mColor		= ColorRGBA( 0.9f, 0.9f, 0.9f, 1 );
+
+		controller = new GUI::SpriteControllerWidget();
+
+		widget->SetModel( model );
+		widget->SetView( view );
+		widget->SetController( controller );
 
 		// Status Bar.
 		//
-		drawableSprite = (GUI::DrawableSprite*)widgetComp->mRoot.AddChild( new GUI::DrawableSprite() );
-		drawableSprite->mFrame		= 0;
-		drawableSprite->mPosition	= Vector3f( 0, (float)Renderer::WINDOW_HEIGHT_BASE, 0.1f );
-		drawableSprite->mScale		= Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 30, 1 );
-		drawableSprite->mColor		= ColorRGBA( 0.7f, 0.7f, 0.7f, 1 );
-		drawableSprite->mScaleToWindowX    = true;
-		drawableSprite->mPositionToWindowY = true;
-		drawableSprite->mMargin		= Quad( 0, -30, 0, 0 );
+		widget = (GUI::WidgetObject*)widgetComp->mWidgetWorld->AddWidgetObject( new GUI::WidgetObject() );
+
+		model = new GUI::SpriteModelWidget();
+		model->mPosition	= Vector3f( 0, (float)Renderer::WINDOW_HEIGHT_BASE, 0.1f );
+		model->mScale		= Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 30, 1 );
+		model->mMargin		= Quad( 0, -30, 0, 0 );
+		model->mScaleToWindowX    = true;
+		model->mPositionToWindowY = true;
+		
+		view = new GUI::SpriteViewWidget();
+		view->mFrame		= 0;
+		view->mColor		= ColorRGBA( 0.7f, 0.7f, 0.7f, 1 );
+
+		controller = new GUI::SpriteControllerWidget();
+
+		widget->SetModel( model );
+		widget->SetView( view );
+		widget->SetController( controller );
 
 		// World Drawable.
 		//
-		GUI::DrawableMesh* drawableMesh;
-		drawableMesh = (GUI::DrawableMesh*)widgetComp->mRoot.AddChild( new GUI::DrawableMesh() );
-		drawableMesh->mScaleToWindowX = true;
-		drawableMesh->mScaleToWindowY = true;
-		drawableMesh->mMargin = Quad( 0, 0, 0, -90 );
+		widget = (GUI::WidgetObject*)widgetComp->mWidgetWorld->AddWidgetObject( new GUI::WidgetObject() );
 
+		model = new GUI::SpriteModelWidget();
+		model->mPosition = Vector3f( 0, 60, 0.8f );
+		model->mScale    = Vector3f( (float)Renderer::WINDOW_WIDTH_BASE-500, (float)Renderer::WINDOW_HEIGHT_BASE, 1 );
+		model->mScaleToWindowX = true;
+		model->mScaleToWindowY = true;
+		model->mMargin   = Quad( 0, 0, 0, -90 );
+
+		drawableMesh = new GUI::MeshViewWidget();
 		drawableMesh->mMesh = mEditorWorld->mMeshManager->Add( "World", std::shared_ptr< Mesh >( mRenderer->CreateGUIQuad( mEditorWorld->mShaderManager->Get( "GUI Mesh" ))));
 		drawableMesh->mMesh->mTexture[ TEXTURE_DIFFUSE ] = mEditorWorld->mTextureManager->Get( "Backbuffer" );
-		drawableMesh->mPosition = Vector3f( 0, 60, 0.8f );
-		drawableMesh->mScale    = Vector3f( (float)Renderer::WINDOW_WIDTH_BASE-500, (float)Renderer::WINDOW_HEIGHT_BASE, 1 );
+		
+		controller = new GUI::SpriteControllerWidget();
+
+		widget->SetModel( model );
+		widget->SetView( drawableMesh );
+		widget->SetController( controller );
 
 		// Button.
 		//
-		GUI::ButtonSprite* button = (GUI::ButtonSprite*)widgetComp->mRoot.AddChild( new GUI::ButtonSprite() );
-		button->mPosition = Vector3f( 200, 0, 0.7f );
-		button->mRotation = Vector3f( 0, 0, 45 );
-		button->mScale    = Vector3f( 128, 64, 1 );
-		button->mMargin   = Quad( 0, 30, 0, 0 );
-		button->mPositionToWindowX = true;
-		button->mPositionToWindowY = true;
-		button->mScaleToWindowX = true;
-		button->mScaleToWindowY = true;
+		widget = (GUI::WidgetObject*)widgetComp->mWidgetWorld->AddWidgetObject( new GUI::WidgetObject() );
+
+		model = new GUI::SpriteModelWidget();
+		model->mPosition    = Vector3f( 200, 0, 0.7f );
+		model->mOrientation = Quatf( 0, 0, 45 );
+		model->mScale       = Vector3f( 128, 64, 1 );
+		model->mMargin      = Quad( 0, 30, 0, 0 );
+		model->mPositionToWindowX = true;
+		model->mPositionToWindowY = true;
+		model->mScaleToWindowX = true;
+		model->mScaleToWindowY = true;
 		
+		view = new GUI::SpriteViewWidget();
+		
+		button = new GUI::SpriteButtonWidget();
+
+		widget->SetModel( model );
+		widget->SetView( view );
+		widget->SetController( button );
+
 		///////////////////////////////
 
 		mEditorWorld->Startup();

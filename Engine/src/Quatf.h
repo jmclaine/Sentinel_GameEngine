@@ -27,6 +27,8 @@ namespace Sentinel
 
 		float*		Ptr();
 
+		Quatf		operator - () const;
+
 		bool		operator == ( const Quatf& v ) const;
 		bool		operator != ( const Quatf& v ) const;
 		bool		Equals( const Quatf& v ) const;
@@ -45,12 +47,16 @@ namespace Sentinel
 
 		float		Dot( const Quatf& q ) const;
 
+		Quatf		Inverse() const;
+
 		Quatf&		AxisAngle( float _x, float _y, float _z, float _degrees );
 		Quatf&		AxisAngle();
 
 		Quatf&		Euler( float _pitch, float _yaw, float _roll );
 		Quatf&		Euler();
 		Vector3f	ToEuler();
+
+		Vector3f	Transform( const Vector3f& v );
 
 		Quatf		Slerp( const Quatf& q, float t );
 	};

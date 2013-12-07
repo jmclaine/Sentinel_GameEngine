@@ -57,7 +57,7 @@ namespace Sentinel
 
 	void TextureEffect::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		ParticleEffect::Save( archive );
 
@@ -91,7 +91,7 @@ namespace Sentinel
 
 	void RandomTextureEffect::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		ParticleEffect::Save( archive );
 
@@ -128,7 +128,7 @@ namespace Sentinel
 
 	void ColorEffect::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		ParticleEffect::Save( archive );
 
@@ -162,7 +162,7 @@ namespace Sentinel
 
 	void RandomColorEffect::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		ParticleEffect::Save( archive );
 
@@ -207,7 +207,7 @@ namespace Sentinel
 
 	void FadeToColorEffect::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		ParticleEffect::Save( archive );
 
@@ -243,7 +243,7 @@ namespace Sentinel
 
 	void PositionEffect::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		ParticleEffect::Save( archive );
 
@@ -277,7 +277,7 @@ namespace Sentinel
 
 	void AreaPositionEffect::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		ParticleEffect::Save( archive );
 
@@ -312,7 +312,7 @@ namespace Sentinel
 
 	void SpherePositionEffect::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		ParticleEffect::Save( archive );
 
@@ -348,7 +348,7 @@ namespace Sentinel
 
 	void RotationEffect::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		ParticleEffect::Save( archive );
 
@@ -382,7 +382,7 @@ namespace Sentinel
 
 	void RandomRotationEffect::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		ParticleEffect::Save( archive );
 
@@ -418,7 +418,7 @@ namespace Sentinel
 
 	void ScaleEffect::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		ParticleEffect::Save( archive );
 
@@ -452,7 +452,7 @@ namespace Sentinel
 
 	void RandomScaleEffect::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		ParticleEffect::Save( archive );
 
@@ -505,7 +505,7 @@ namespace Sentinel
 
 	void FadeToScaleEffect::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		ParticleEffect::Save( archive );
 
@@ -541,7 +541,7 @@ namespace Sentinel
 
 	void VelocityEffect::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		ParticleEffect::Save( archive );
 
@@ -575,7 +575,7 @@ namespace Sentinel
 
 	void RandomVelocityEffect::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		ParticleEffect::Save( archive );
 
@@ -611,7 +611,7 @@ namespace Sentinel
 
 	void AngularVelocityEffect::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		ParticleEffect::Save( archive );
 
@@ -645,7 +645,7 @@ namespace Sentinel
 
 	void RandomAngularVelocityEffect::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		ParticleEffect::Save( archive );
 
@@ -681,7 +681,7 @@ namespace Sentinel
 
 	void AccelEffect::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		ParticleEffect::Save( archive );
 
@@ -715,7 +715,7 @@ namespace Sentinel
 
 	void RandomAccelEffect::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		ParticleEffect::Save( archive );
 
@@ -751,7 +751,7 @@ namespace Sentinel
 
 	void AngularAccelEffect::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		ParticleEffect::Save( archive );
 
@@ -785,7 +785,7 @@ namespace Sentinel
 
 	void RandomAngularAccelEffect::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		ParticleEffect::Save( archive );
 

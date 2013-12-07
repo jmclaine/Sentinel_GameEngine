@@ -4,7 +4,7 @@
 
 namespace Sentinel { namespace GUI
 {
-	class SENTINEL_DLL Button : public Widget
+	class SENTINEL_DLL Button
 	{
 	protected:
 
@@ -31,22 +31,13 @@ namespace Sentinel { namespace GUI
 
 		virtual ~Button();
 
-	protected:
+		////////////////////////////////
 
-		virtual void	PreUpdate();
+		virtual void	Update( bool isOver );
 
-	public:
-
-		virtual void	Update() = 0;
-
-	protected:
-
-		virtual void	PostUpdate();
-
-	public:
+		////////////////////////////////
 
 		virtual void	Save( Archive& archive );
-
 		virtual void	Load( Archive& archive );
 	};
 }}

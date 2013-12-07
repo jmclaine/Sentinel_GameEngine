@@ -63,9 +63,6 @@ namespace Sentinel
 		//
 		void				Release();
 
-		void				Save( Archive& archive );
-		void				Load( Archive& archive );
-		
 		// All associated GameObjects and GameComponents also Startup().
 		//
 		void				Startup();
@@ -104,5 +101,10 @@ namespace Sentinel
 
 		LightComponent*		GetLight( UINT index );
 		UINT				NumLights();
+
+		/////////////////////////////////////////////////////
+
+		void				Save( Archive& archive );
+		void				Load( Archive& archive );
 	};
 }

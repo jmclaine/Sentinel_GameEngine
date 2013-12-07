@@ -152,7 +152,7 @@ namespace Sentinel
 
 		void Save( Archive& archive )
 		{
-			mSerialRegistry.Save( archive );
+			SERIAL_REGISTER.Save( archive );
 			
 			ParticleSystem::Save( archive );
 

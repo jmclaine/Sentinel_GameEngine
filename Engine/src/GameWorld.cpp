@@ -52,7 +52,7 @@ namespace Sentinel
 	void GameWorld::Release()
 	{
 		TRAVERSE_VECTOR( x, mGameObject )
-			SAFE_DELETE( mGameObject[ x ] );
+			delete mGameObject[ x ];
 
 		mGameObject.clear();
 		mAlphaOrder.clear();
@@ -60,33 +60,6 @@ namespace Sentinel
 		mLight.clear();
 
 		mCurrentCamera = NULL;
-	}
-
-	void GameWorld::Save( Archive& archive )
-	{
-		UINT size = mGameObject.size();
-		archive.Write( &size );
-
-		TRAVERSE_VECTOR( x, mGameObject )
-		{
-			mGameObject[ x ]->Save( archive );
-		}
-	}
-
-	void GameWorld::Load( Archive& archive )
-	{
-		Release();
-
-		UINT size = 0;
-		archive.Read( &size );
-
-		GameObject* obj;
-		for( UINT x = 0; x < size; ++x )
-		{
-			obj = (GameObject*)SerialRegister::Load( archive );
-			AddGameObject( obj );
-			obj->Load( archive );
-		}
 	}
 
 	void GameWorld::Startup()
@@ -198,7 +171,7 @@ namespace Sentinel
 			mGameObject[ x ]->Shutdown();
 	}
 
-	/////////////////////////////////
+	/////////////////////////////////////////////////////
 
 	GameObject* GameWorld::AddGameObject( GameObject* entity )
 	{
@@ -300,7 +273,7 @@ namespace Sentinel
 		return mGameObject.size();
 	}
 
-	/////////////////////////////////
+	/////////////////////////////////////////////////////
 
 	// -1 = mCurrentCamera
 	CameraComponent* GameWorld::GetCamera( int index )
@@ -332,5 +305,34 @@ namespace Sentinel
 	UINT GameWorld::NumLights()
 	{
 		return mLight.size();
+	}
+
+	/////////////////////////////////////////////////////
+
+	void GameWorld::Save( Archive& archive )
+	{
+		UINT size = mGameObject.size();
+		archive.Write( &size );
+
+		TRAVERSE_VECTOR( x, mGameObject )
+		{
+			mGameObject[ x ]->Save( archive );
+		}
+	}
+
+	void GameWorld::Load( Archive& archive )
+	{
+		Release();
+
+		UINT size = 0;
+		archive.Read( &size );
+
+		GameObject* obj;
+		for( UINT x = 0; x < size; ++x )
+		{
+			obj = (GameObject*)SerialRegister::Load( archive );
+			AddGameObject( obj );
+			obj->Load( archive );
+		}
 	}
 }

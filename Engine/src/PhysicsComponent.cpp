@@ -93,7 +93,7 @@ namespace Sentinel
 
 	void PhysicsComponent::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		GameComponent::Save( archive );
 

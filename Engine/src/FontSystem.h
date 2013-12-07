@@ -1,8 +1,6 @@
 #pragma once
 /*
-Create and set the SPRITE_SYSTEM before
-creating the texture.  CreateTexture uses
-the Shader
+Create and set the SpriteSystem before calling Build()
 */
 #include "Common.h"
 #include "SpriteSystem.h"
@@ -12,8 +10,6 @@ the Shader
 
 namespace Sentinel
 {
-	class Renderer;
-
 	class Font
 	{
 	public:
@@ -29,6 +25,8 @@ namespace Sentinel
 		Font() {}
 		virtual ~Font() {}
 	};
+
+	//////////////////////////////////////////
 
 	class SENTINEL_DLL FontSystem
 	{

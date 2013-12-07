@@ -28,6 +28,11 @@ namespace Sentinel
 		return static_cast< float* >(&x);
 	}
 
+	Quatf Quatf::operator - () const
+	{
+		return Inverse();
+	}
+
 	bool Quatf::operator == ( const Quatf& v ) const
 	{
 		return Equals( v );
@@ -109,6 +114,16 @@ namespace Sentinel
 	float Quatf::Dot( const Quatf& q ) const
 	{
 		return x*q.x + y*q.y + z*q.z + w*q.w;
+	}
+
+	Quatf Quatf::Inverse() const
+	{
+		float len = LengthSquared();
+
+		if( len > 0 )
+			return Quatf( -x, -y, -z, w ).Mul( invsqrt( len ));
+
+		return Quatf( 0, 0, 0, 0 );
 	}
 
 	Quatf& Quatf::AxisAngle( float _x, float _y, float _z, float _degrees )
@@ -195,6 +210,12 @@ namespace Sentinel
 				v[ i ] = 0;
 		
 		return v * (float)RADIANS_TO_DEGREES;
+	}
+
+	Vector3f Quatf::Transform( const Vector3f& v )
+	{
+		Quatf q = ((*this) * Quatf( v.x, v.y, v.z, 0 )) * Quatf( -x, -y, -z, w );
+		return Vector3f( q.x, q.y, q.z );
 	}
 
 	Quatf Quatf::Slerp( const Quatf& q, float t )

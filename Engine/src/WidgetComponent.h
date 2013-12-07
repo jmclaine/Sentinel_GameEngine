@@ -6,11 +6,12 @@ Render a single quad sprite.
 
 #include "ColorRGBA.h"
 #include "DrawableComponent.h"
-#include "GUI/Widget.h"
+#include "GUI/WidgetWorld.h"
 
 namespace Sentinel
 {
 	class SpriteSystem;
+	class FontSystem;
 	class TransformComponent;
 	class CameraComponent;
 	class Sprite;
@@ -28,7 +29,7 @@ namespace Sentinel
 
 	public:
 
-		GUI::Root				mRoot;
+		GUI::WidgetWorld*		mWidgetWorld;
 
 		std::shared_ptr< Sprite > mSprite;
 

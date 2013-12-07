@@ -36,7 +36,7 @@ namespace Sentinel
 
 	void TriggerComponent::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		GameComponent::Save( archive );
 	}

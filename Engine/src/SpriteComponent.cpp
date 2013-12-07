@@ -87,7 +87,7 @@ namespace Sentinel
 		_ASSERT( mOwner->GetWorld() );
 		_ASSERT( mOwner->GetWorld()->mSpriteManager );
 
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		GameComponent::Save( archive );
 

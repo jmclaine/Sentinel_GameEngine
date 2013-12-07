@@ -1,6 +1,7 @@
 #include "WidgetComponent.h"
 #include "SpriteManager.h"
 #include "SpriteSystem.h"
+#include "FontSystem.h"
 #include "Vector2f.h"
 #include "Matrix4f.h"
 #include "Material.h"
@@ -22,16 +23,22 @@ namespace Sentinel
 		mSpriteSystem( NULL ),
 		mFontSystem( NULL ),
 		mCamera( -1 )
-	{}
+	{
+		mWidgetWorld = new GUI::WidgetWorld();
+	}
 
 	WidgetComponent::WidgetComponent( std::shared_ptr< Sprite > sprite, FontSystem* fontSystem, UINT camera ) :
 		mSpriteSystem( NULL )
 	{
+		mWidgetWorld = new GUI::WidgetWorld();
+
 		Set( sprite, fontSystem, camera );
 	}
 
 	WidgetComponent::~WidgetComponent()
-	{}
+	{
+		delete mWidgetWorld;
+	}
 
 	void WidgetComponent::Set( std::shared_ptr< Sprite > sprite, FontSystem* fontSystem, UINT camera )
 	{
@@ -70,28 +77,28 @@ namespace Sentinel
 
 		if( camera )
 		{
-			GUI::Widget::WINDOW_INFO	= mOwner->GetWorld()->mRenderer->GetWindow();
-			GUI::Widget::GAME_WORLD		= mOwner->GetWorld();
-			GUI::Widget::MATRIX_WVP		= camera->GetMatrixFinal() * mTransform->GetMatrixWorld();
-
+			mWidgetWorld->mMatrixWVP	= camera->GetMatrixFinal() * mTransform->GetMatrixWorld();
+			mWidgetWorld->mWindowInfo	= mOwner->GetWorld()->mRenderer->GetWindow();
+			mWidgetWorld->mGameWorld	= mOwner->GetWorld();
+			
 			if( mSpriteSystem )
 			{
 				mSpriteSystem->mSprite = mSprite;
 
 				mSpriteSystem->Clear();
 
-				GUI::Widget::SPRITE_SYSTEM = mSpriteSystem;
+				mWidgetWorld->mSpriteSystem = mSpriteSystem;
 			}
 
 			if( mFontSystem )
 			{
-				GUI::Widget::FONT_SYSTEM = mFontSystem;
+				mWidgetWorld->mFontSystem = mFontSystem;
 
 				mFontSystem->mSpriteSystem->mSprite = mFontSystem->mFont->mSprite;
 				mFontSystem->mSpriteSystem->Clear();
 			}
 			
-			mRoot.Update();
+			mWidgetWorld->Update();
 
 			mSpriteSystem->Present();
 			mFontSystem->mSpriteSystem->Present();
@@ -111,14 +118,14 @@ namespace Sentinel
 		_ASSERT( mOwner->GetWorld() );
 		_ASSERT( mOwner->GetWorld()->mSpriteManager );
 
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		GameComponent::Save( archive );
 
 		archive.Write( &mCamera );
 		archive.Write( &mOwner->GetWorld()->mSpriteManager->Get( mSprite ));
 
-		mRoot.Save( archive );
+		mWidgetWorld->Save( archive );
 	}
 
 	void WidgetComponent::Load( Archive& archive )
@@ -136,6 +143,6 @@ namespace Sentinel
 
 		mSprite = mOwner->GetWorld()->mSpriteManager->Get( name );
 
-		mRoot.Load( archive );
+		mWidgetWorld->Load( archive );
 	}
 }

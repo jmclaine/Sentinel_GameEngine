@@ -40,7 +40,7 @@ namespace Sentinel
 
 	void LightComponent::Save( Archive& archive )
 	{
-		mSerialRegistry.Save( archive );
+		SERIAL_REGISTER.Save( archive );
 
 		GameComponent::Save( archive );
 

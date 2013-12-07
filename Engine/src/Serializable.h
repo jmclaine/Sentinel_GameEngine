@@ -12,7 +12,7 @@ namespace Sentinel
 	class Archive;
 
 #define DECLARE_SERIAL_REGISTER()\
-	static SerialRegister mSerialRegistry;
+	static SerialRegister SERIAL_REGISTER;
 
 #define DECLARE_SERIAL()\
 	private:\
@@ -22,11 +22,17 @@ namespace Sentinel
 		void Save( Archive& archive );\
 		void Load( Archive& archive );
 
+#define DECLARE_SERIAL_REGISTER_SAVE()\
+	void SerialSave( Archive& archive )
+
+#define DEFINE_SERIAL_REGISTER_SAVE( clazz )\
+	void clazz::SerialSave( Archive& archive ) { SERIAL_REGISTER.Save( archive ); Save( archive ); }
+
 #define DEFINE_SERIAL_REGISTER_EX( refClass, func )\
-	SerialRegister refClass::mSerialRegistry( #refClass, func );
+	SerialRegister refClass::SERIAL_REGISTER( #refClass, func );
 
 #define DEFINE_SERIAL_REGISTER_CLONE( refClass, cloneClass )\
-	SerialRegister cloneClass::mSerialRegistry( #refClass, cloneClass::Clone );
+	SerialRegister cloneClass::SERIAL_REGISTER( #refClass, cloneClass::Clone );
 
 #define DEFINE_SERIAL_REGISTER( clazz )\
 	DEFINE_SERIAL_REGISTER_CLONE( clazz, clazz );
@@ -41,7 +47,7 @@ namespace Sentinel
 
 #define DEFINE_SERIAL_SAVE( clazz )\
 	void clazz::Save( Archive& archive ) {\
-		mSerialRegistry.Save( archive );\
+		SERIAL_REGISTER.Save( archive );\
 		archive.Write( (const char*)this, sizeof( clazz )); }
 
 #define DEFINE_SERIAL_LOAD( clazz )\
@@ -169,10 +175,10 @@ namespace Sentinel
 	///////////////////////////////////////////////////////////////////////////////////
 
 #define DECLARE_SERIAL_MEMBER_FUNCTION( clazz, func )\
-	static SerialMemberFunctionRegister< clazz > mSerial##func;
+	static SerialMemberFunctionRegister< clazz > SERIAL_##func;
 
 #define DEFINE_SERIAL_MEMBER_FUNCTION( clazz, func )\
-	SerialMemberFunctionRegister< clazz > clazz::mSerial##func( #func, &clazz::func );
+	SerialMemberFunctionRegister< clazz > clazz::SERIAL_##func( #func, &clazz::func );
 
 	template< class T >
 	class SerialMemberFunctionFactory

@@ -28,79 +28,9 @@ namespace Sentinel
 		mComponent.clear();
 	}
 
-	//////////////////////////////
-
 	DEFINE_SERIAL_CLONE( GameObject );
 
-#define SAVE_COMPONENT( component )\
-	(component) ? component->Save( archive ) : archive.Write( &noValue, 1, true );
-
-	void GameObject::Save( Archive& archive )
-	{
-		mSerialRegistry.Save( archive );
-		
-		archive.Write( &mName );
-		
-		int noValue = 0;
-		SAVE_COMPONENT( mTransform );
-		SAVE_COMPONENT( mController );
-		SAVE_COMPONENT( mPhysics );
-		SAVE_COMPONENT( mDrawable );
-
-		BYTE size = (BYTE)mComponent.size();
-		archive.Write( &size );
-
-		TRAVERSE_VECTOR( x, mComponent )
-			mComponent[ x ]->Save( archive );
-		
-		size = (BYTE)mChild.size();
-		archive.Write( &size );
-
-		TRAVERSE_VECTOR( x, mChild )
-			mChild[ x ]->Save( archive );
-	}
-
-#define LOAD_COMPONENT()\
-{	component = (GameComponent*)SerialRegister::Load( archive );\
-	if( component ) {\
-	AttachComponent( component );\
-	component->Load( archive ); }}
-
-	void GameObject::Load( Archive& archive )
-	{
-		archive.Read( &mName );
-
-		int id = 0;
-		GameComponent* component;
-
-		LOAD_COMPONENT();
-		LOAD_COMPONENT();
-		LOAD_COMPONENT();
-		LOAD_COMPONENT();
-
-		BYTE size = 0;
-		archive.Read( &size );
-
-		for( BYTE x = 0; x < size; ++x )
-			LOAD_COMPONENT();
-
-		// Read children.
-		//
-		archive.Read( &size );
-
-		GameObject* obj;
-		for( BYTE x = 0; x < size; ++x )
-		{
-			obj = (GameObject*)SerialRegister::Load( archive );
-			if( obj )
-			{
-				AddChild( obj );
-				obj->Load( archive );
-			}
-		}
-	}
-
-	//////////////////////////////
+	////////////////////////////////////////////////////////////
 
 	GameComponent* GameObject::AttachComponent( GameComponent* component )
 	{
@@ -187,7 +117,7 @@ namespace Sentinel
 		return component;
 	}
 
-	//////////////////////////////
+	////////////////////////////////////////////////////////////
 
 	GameObject* GameObject::AddChild( GameObject* obj )
 	{
@@ -204,7 +134,7 @@ namespace Sentinel
 		return ListNode< GameObject >::AddChild( obj );
 	}
 
-	//////////////////////////////
+	////////////////////////////////////////////////////////////
 
 	GameWorld* GameObject::GetWorld()
 	{
@@ -221,7 +151,7 @@ namespace Sentinel
 		}
 	}
 
-	//////////////////////////////
+	////////////////////////////////////////////////////////////
 
 	void GameObject::Startup()
 	{
@@ -336,5 +266,75 @@ namespace Sentinel
 		}
 
 		return NULL;
+	}
+
+	////////////////////////////////////////////////////////////
+
+	#define SAVE_COMPONENT( component )\
+	(component) ? component->Save( archive ) : archive.Write( &noValue, 1, true );
+
+	void GameObject::Save( Archive& archive )
+	{
+		SERIAL_REGISTER.Save( archive );
+		
+		archive.Write( &mName );
+		
+		int noValue = 0;
+		SAVE_COMPONENT( mTransform );
+		SAVE_COMPONENT( mController );
+		SAVE_COMPONENT( mPhysics );
+		SAVE_COMPONENT( mDrawable );
+
+		BYTE size = (BYTE)mComponent.size();
+		archive.Write( &size );
+
+		TRAVERSE_VECTOR( x, mComponent )
+			mComponent[ x ]->Save( archive );
+		
+		size = (BYTE)mChild.size();
+		archive.Write( &size );
+
+		TRAVERSE_VECTOR( x, mChild )
+			mChild[ x ]->Save( archive );
+	}
+
+#define LOAD_COMPONENT()\
+{	component = (GameComponent*)SerialRegister::Load( archive );\
+	if( component ) {\
+	AttachComponent( component );\
+	component->Load( archive ); }}
+
+	void GameObject::Load( Archive& archive )
+	{
+		archive.Read( &mName );
+
+		int id = 0;
+		GameComponent* component;
+
+		LOAD_COMPONENT();
+		LOAD_COMPONENT();
+		LOAD_COMPONENT();
+		LOAD_COMPONENT();
+
+		BYTE size = 0;
+		archive.Read( &size );
+
+		for( BYTE x = 0; x < size; ++x )
+			LOAD_COMPONENT();
+
+		// Read children.
+		//
+		archive.Read( &size );
+
+		GameObject* obj;
+		for( BYTE x = 0; x < size; ++x )
+		{
+			obj = (GameObject*)SerialRegister::Load( archive );
+			if( obj )
+			{
+				AddChild( obj );
+				obj->Load( archive );
+			}
+		}
 	}
 }

@@ -62,7 +62,6 @@ namespace Sentinel
 		////////////////////////////////
 
 		virtual void Save( Archive& archive );
-
 		virtual void Load( Archive& archive );
 	};
 }

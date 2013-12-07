@@ -1,4 +1,5 @@
 #include "GUI/Button.h"
+#include "Input.h"
 
 namespace Sentinel { namespace GUI
 {
@@ -12,59 +13,46 @@ namespace Sentinel { namespace GUI
 	Button::~Button()
 	{}
 
-	void Button::PreUpdate()
+	void Button::Update( bool isOver )
 	{
-		if( mIsVisible )
+		if( isOver )
 		{
-			Widget::PreUpdate();
-
-			if( mIsOver )
-			{
-				if( mState == UP )
-					mState = OVER;
+			if( mState == UP )
+				mState = OVER;
 			
-				if( Mouse::Get().IsDown( BUTTON_LEFT ))
-				{
-					mState = DOWN;
+			if( Mouse::Get().IsDown( BUTTON_LEFT ))
+			{
+				mState = DOWN;
 
-					if( mActionDown )
-						mActionDown();
-				}
-
-				if( mState == DOWN && Mouse::Get().DidGoUp( BUTTON_LEFT ))
-				{
-					mState = UP;
-
-					if( mActionClick )
-						mActionClick();
-				}
+				if( mActionDown )
+					mActionDown();
 			}
-			else
-			if( mState != UP )
+
+			if( mState == DOWN && Mouse::Get().DidGoUp( BUTTON_LEFT ))
 			{
 				mState = UP;
 
-				if( mActionUp )
-					mActionUp();
+				if( mActionClick )
+					mActionClick();
 			}
 		}
-	}
+		else
+		if( mState != UP )
+		{
+			mState = UP;
 
-	void Button::PostUpdate()
-	{
-		if( mIsVisible )
-			Widget::PostUpdate();
+			if( mActionUp )
+				mActionUp();
+		}
 	}
 
 	///////////////////////////////////
 
 	void Button::Save( Archive& archive )
 	{
-		Widget::Save( archive );
+		//SerialFunctionFactory::Get().Find( mActionUp );
 	}
 
 	void Button::Load( Archive& archive )
-	{
-		Widget::Load( archive );
-	}
+	{}
 }}

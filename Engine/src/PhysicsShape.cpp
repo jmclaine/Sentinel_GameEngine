@@ -21,7 +21,7 @@ namespace Sentinel
 
 	void SpherePhysicsShape::Save( Archive& archive )
 	{
-		PhysicsSystem::mSerialCreateSphere.Save( archive );
+		PhysicsSystem::SERIAL_CreateSphere.Save( archive );
 
 		float radius = GetRadius();
 		archive.Write( &radius );
@@ -45,7 +45,7 @@ namespace Sentinel
 
 	void BoxPhysicsShape::Save( Archive& archive )
 	{
-		PhysicsSystem::mSerialCreateBox.Save( archive );
+		PhysicsSystem::SERIAL_CreateBox.Save( archive );
 
 		Vector3f scale( GetScale() );
 		archive.Write( scale.Ptr(), ar_sizeof( scale ));
@@ -69,7 +69,7 @@ namespace Sentinel
 
 	void CylinderPhysicsShape::Save( Archive& archive )
 	{
-		PhysicsSystem::mSerialCreateCylinder.Save( archive );
+		PhysicsSystem::SERIAL_CreateCylinder.Save( archive );
 
 		Vector3f scale( GetScale() );
 		archive.Write( scale.Ptr(), ar_sizeof( scale ));
@@ -93,7 +93,7 @@ namespace Sentinel
 
 	void MeshPhysicsShape::Save( Archive& archive )
 	{
-		PhysicsSystem::mSerialCreateMesh.Save( archive );
+		PhysicsSystem::SERIAL_CreateMesh.Save( archive );
 
 		int count = GetNumPoints();
 		archive.Write( &count );
