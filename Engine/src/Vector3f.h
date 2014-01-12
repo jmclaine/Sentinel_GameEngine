@@ -10,11 +10,6 @@ namespace Sentinel
 
 	public:
 
-		static const Vector3f ZERO;
-		static const Vector3f ONE;
-
-		////////////////////////////////
-		
 		float x, y, z;
 
 		////////////////////////////////
@@ -61,5 +56,10 @@ namespace Sentinel
 		Vector3f	Cross( const Vector3f& v ) const;
 
 		float		Angle( const Vector3f& v ) const;
+
+	public:
+
+		static const Vector3f ZERO;
+		static const Vector3f ONE;
 	};
 }

@@ -133,8 +133,10 @@ namespace Sentinel
 		// Create objects.
 		// Based on geometry.h provided with OpenGL.
 		//
+		void	CreateLine( const Vector3f& start, const Vector3f& end );
 		void	CreateQuad( float size, const Vector3f& normal = Vector3f( 0, 0, 1 ));
 		void	CreateCube( float size );
+		void	CreateWireCube( float size );
 		void	CreateCylinder( float radius, float height, int slices, int stacks = 1 );
 		void	CreateTetrahedron( float scale );
 		void	CreateOctahedron( float radius );

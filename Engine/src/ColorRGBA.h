@@ -15,9 +15,9 @@ namespace Sentinel
 		ColorRGBA();
 		ColorRGBA( float red, float green, float blue, float alpha = 1.0f );
 
-		float*	Ptr();
+		float*		Ptr();
 
-		UINT	ToUINT() const;
+		UINT		ToUINT() const;
 
 		bool		operator == ( const ColorRGBA& color ) const;
 		bool		operator != ( const ColorRGBA& color ) const;
@@ -38,5 +38,18 @@ namespace Sentinel
 		ColorRGBA&	operator *= ( const ColorRGBA& color );
 		ColorRGBA	operator *  ( const ColorRGBA& color ) const;
 		ColorRGBA	Mul( const ColorRGBA& color ) const;
+
+	public:
+
+		static const ColorRGBA& WHITE;
+		static const ColorRGBA& LGRAY;
+		static const ColorRGBA& MGRAY;
+		static const ColorRGBA& DGRAY;
+		static const ColorRGBA& BLACK;
+		static const ColorRGBA& RED;
+		static const ColorRGBA& GREEN;
+		static const ColorRGBA& BLUE;
+		static const ColorRGBA& YELLOW;
+		static const ColorRGBA& MAGENTA;
 	};
 }

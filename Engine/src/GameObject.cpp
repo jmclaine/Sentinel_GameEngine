@@ -322,8 +322,6 @@ namespace Sentinel
 		for( BYTE x = 0; x < size; ++x )
 			LOAD_COMPONENT();
 
-		// Read children.
-		//
 		archive.Read( &size );
 
 		GameObject* obj;

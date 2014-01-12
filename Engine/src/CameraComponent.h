@@ -2,6 +2,7 @@
 
 #include "GameComponent.h"
 #include "Matrix4f.h"
+#include "Shape.h"
 
 #ifndef WIN32
     #define HWND void*
@@ -54,5 +55,7 @@ namespace Sentinel
 		const Matrix4f&		GetMatrixView();
 		const Matrix4f&		GetMatrixProjection();
 		const Matrix4f&		GetMatrixFinal();
+
+		virtual Ray			ScreenPointToRay( UINT mouseX, UINT mouseY, UINT screenWidth = 0, UINT screenHeight = 0 ) = 0;
 	};
 }

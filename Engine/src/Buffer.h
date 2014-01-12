@@ -12,6 +12,8 @@ namespace Sentinel
 	{
 	protected:
 
+		BufferAccess	mAccess;
+
 		BufferType		mType;
 		UINT			mSize;
 		UINT			mStride;

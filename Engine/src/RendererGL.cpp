@@ -861,11 +861,12 @@ namespace Sentinel
 
 		// Buffers.
 		//
-		Buffer* CreateBuffer( void* data, UINT size, UINT stride, BufferType type )
+		Buffer* CreateBuffer( void* data, UINT size, UINT stride, BufferType type, BufferAccess access )
 		{
 			_ASSERT( type == VERTEX_BUFFER || type == INDEX_BUFFER );
 
 			BufferGL* buffer = new BufferGL();
+			buffer->mAccess  = access;
 			buffer->mType	 = type;
 			buffer->mSize	 = size;
 			buffer->mStride  = stride;

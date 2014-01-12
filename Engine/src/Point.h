@@ -13,6 +13,11 @@ namespace Sentinel
 		Point2i( int _x, int _y ) :
 			x( _x ), y( _y )
 		{}
+
+		int* Ptr()
+		{
+			return &x;
+		}
 	};
 
 	struct Point3i
@@ -26,6 +31,11 @@ namespace Sentinel
 		Point3i( int _x, int _y, int _z ) :
 			x( _x ), y( _y ), z( _z )
 		{}
+
+		int* Ptr()
+		{
+			return &x;
+		}
 	};
 
 	struct Point4i
@@ -39,6 +49,11 @@ namespace Sentinel
 		Point4i( int _x, int _y, int _z, int _w ) :
 			x( _x ), y( _y ), z( _z ), w( _w )
 		{}
+
+		int* Ptr()
+		{
+			return &x;
+		}
 	};
 
 	struct Quad
@@ -53,5 +68,10 @@ namespace Sentinel
 		Quad( float _left, float _top, float _right, float _bottom ) :
 			left( _left ), top( _top ), right( _right ), bottom( _bottom )
 		{}
+
+		float* Ptr()
+		{
+			return &left;
+		}
 	};
 }

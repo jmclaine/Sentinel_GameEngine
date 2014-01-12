@@ -65,6 +65,14 @@ namespace Sentinel
 		NUM_BUFFER_TYPES
 	};
 
+	enum BufferAccess
+	{
+		BUFFER_READ_WRITE,
+		BUFFER_WRITE,
+
+		NUM_BUFFER_ACCESS
+	};
+
 	enum TextureType
 	{
 		TEXTURE_DIFFUSE,

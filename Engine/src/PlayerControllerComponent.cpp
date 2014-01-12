@@ -38,39 +38,35 @@ namespace Sentinel
 
 			Vector3f impulse( 0, 0, 0 );
 
-			//mPhysics->GetRigidBody()->activate( true );
-
-			Matrix4f matRot( mTransform->mOrientation );
-		
 			// Forward.
 			//
 			if( keyboard.IsDown( 'W' ))
-				impulse += matRot.Forward();
+				impulse += mTransform->mOrientation.Forward();
 		
 			// Backward.
 			//
 			if( keyboard.IsDown( 'S' ))
-				impulse -= matRot.Forward();
+				impulse -= mTransform->mOrientation.Forward();
 		
 			// Left.
 			//
 			if( keyboard.IsDown( 'A' ))
-				impulse -= matRot.Right();
+				impulse -= mTransform->mOrientation.Right();
 		
 			// Right.
 			//
 			if( keyboard.IsDown( 'D' ))
-				impulse += matRot.Right();
+				impulse += mTransform->mOrientation.Right();
 		
 			// Up.
 			//
 			if( keyboard.IsDown( VK_SPACE ))
-				impulse += matRot.Up();
+				impulse += mTransform->mOrientation.Up();
 		
 			// Down.
 			//
 			if( keyboard.IsDown( 'C' ))
-				impulse -= matRot.Up();
+				impulse -= mTransform->mOrientation.Up();
 
 			// Move in direction.
 			//

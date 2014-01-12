@@ -212,25 +212,25 @@ namespace Sentinel
 		return v * (float)RADIANS_TO_DEGREES;
 	}
 
-	Vector3f Quatf::Transform( const Vector3f& v )
+	Vector3f Quatf::Transform( const Vector3f& v ) const
 	{
 		Quatf q = ((*this) * Quatf( v.x, v.y, v.z, 0 )) * Quatf( -x, -y, -z, w );
+
 		return Vector3f( q.x, q.y, q.z );
 	}
 
 	Quatf Quatf::Slerp( const Quatf& q, float t )
 	{
-		float magnitude = sqrt( LengthSquared() * q.LengthSquared() ); 
+		float product = Dot( q ) * invsqrt( LengthSquared() * q.LengthSquared() );
 
-		float product = Dot( q ) / magnitude;
 		if( fabs( product ) != 1.0f )
 		{
 			float sign = (product < 0.0f) ? -1.0f : 1.0f;
 
 			float theta = acos( sign * product );
-			float s1 = sin( sign * t * theta );   
-			float d = 1.0f / sin( theta );
 			float s0 = sin((1.0f - t) * theta);
+			float s1 = sin( sign * t * theta );   
+			float d  = 1.0f / sin( theta );
 
 			return Quatf((x * s0 + q.x * s1) * d,
 						 (y * s0 + q.y * s1) * d,
@@ -241,5 +241,29 @@ namespace Sentinel
 		{
 			return *this;
 		}
+	}
+
+	// Based on code by Nic @
+	// http://nic-gamedev.blogspot.com/2011/11/quaternion-math-getting-local-axis.html
+	//
+	Vector3f Quatf::Forward() const
+	{
+		return Vector3f( -2 * (x * z + w * y), 
+						 -2 * (y * z - w * x),
+						 -1 + 2 * (x * x + y * y)).NormalizeFast();
+	}
+
+	Vector3f Quatf::Up() const
+	{
+		return Vector3f( 2 * (x * y - w * z), 
+						 1 - 2 * (x * x + z * z),
+						 2 * (y * z + w * x)).NormalizeFast();
+	}
+
+	Vector3f Quatf::Right() const
+	{
+		return Vector3f( 1 - 2 * (y * y + z * z),
+						 2 * (x * y + w * z),
+						 2 * (x * z - w * y)).NormalizeFast();
 	}
 }

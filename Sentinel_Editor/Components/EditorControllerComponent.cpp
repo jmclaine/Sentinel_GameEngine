@@ -47,19 +47,17 @@ namespace Sentinel
 
 			Vector3f impulse( 0, 0, 0 );
 
-			Matrix4f matRot( mTransform->mOrientation );
-
 			int scroll = mouse.ScrollDistance();
 
 			// Forward.
 			//
 			if( scroll > 0 )
-				impulse += matRot.Forward();
+				impulse += mTransform->GetMatrixWorld().Forward();
 		
 			// Backward.
 			//
 			if( scroll < 0 )
-				impulse -= matRot.Forward();
+				impulse -= mTransform->GetMatrixWorld().Forward();
 
 			// Move in direction.
 			//
@@ -75,8 +73,8 @@ namespace Sentinel
 				float x = (float)(mLastMousePos.x-mousePos.x);
 				float y = (float)(mLastMousePos.y-mousePos.y);
 
-				impulse -= matRot.Right() * x;
-				impulse += matRot.Up() * y;
+				impulse -= mTransform->GetMatrixWorld().Right() * x;
+				impulse += mTransform->GetMatrixWorld().Up() * y;
 
 				// Move in direction.
 				//

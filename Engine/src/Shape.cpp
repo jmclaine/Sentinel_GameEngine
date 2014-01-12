@@ -2,6 +2,7 @@
 
 #include "MathCommon.h"
 #include "Shape.h"
+#include "Vector4f.h"
 
 namespace Sentinel
 {
@@ -537,54 +538,79 @@ namespace Sentinel
 
 	/////////////////////////////////////////////////////////////////////////////////////
 
+	BoundingBox::BoundingBox()
+	{}
+
 	BoundingBox::BoundingBox( const Vector3f& minBounds, const Vector3f& maxBounds )
 	{
 		Set( minBounds, maxBounds );
 	}
 
-	BoundingBox::BoundingBox( char* verts, UINT count, UINT stride )
+	BoundingBox::BoundingBox( const BYTE* verts, UINT count, UINT stride )
 	{
-		Vector3f minBounds( FLT_MAX, FLT_MAX, FLT_MAX );
-		Vector3f maxBounds( FLT_MIN, FLT_MIN, FLT_MIN );
-		
-		for( UINT x = 0; x < count; ++x )
-		{
-			Vector3f pos = *(Vector3f*)(verts + count * stride);
-
-			for( int y = 0; y < 3; ++y )
-			{
-				if( pos[ y ] < minBounds[ y ] )
-					minBounds[ y ] = pos[ y ];
-
-				if( pos[ y ] > maxBounds[ y ] )
-					maxBounds[ y ] = pos[ y ];
-			}
-		}
-
-		Set( minBounds, maxBounds );
+		Set( verts, count, stride );
 	}
 
-	void BoundingBox::Set( const Vector3f& minBounds, const Vector3f& maxBounds )
+	void BoundingBox::Set( const Vector3f& minBounds, const Vector3f& maxBounds, const Matrix4f& matWorld )
 	{
+		// AABB
+		//
+		Vector3f center( (maxBounds - minBounds) * 0.5f );
+		Vector3f extent( maxBounds - center );
+
+		Vector3f newCenter = matWorld.Transform( center );
+		Vector3f newExtent = matWorld.Transform( Vector4f( extent.x, extent.y, extent.z, 0 ));
+
+		Vector3f minPos( newCenter - newExtent );
+		Vector3f maxPos( newCenter + newExtent );
+
+		for( UINT x = 0; x < 3; ++x )
+		{
+			if( minPos[ x ] > maxPos[ x ] )
+				std::swap( minPos[ x ], maxPos[ x ] );
+		}
+
 		// min
-		mPlane[ 0 ].mPosition = minBounds;
+		mPlane[ 0 ].mPosition = minPos;
 		mPlane[ 0 ].mNormal   = Vector3f( 1, 0, 0 );
 
-		mPlane[ 1 ].mPosition = minBounds;
+		mPlane[ 1 ].mPosition = minPos;
 		mPlane[ 1 ].mNormal   = Vector3f( 0, 1, 0 );
 
-		mPlane[ 2 ].mPosition = minBounds;
+		mPlane[ 2 ].mPosition = minPos;
 		mPlane[ 2 ].mNormal   = Vector3f( 0, 0, 1 );
 
 		// max
-		mPlane[ 3 ].mPosition = maxBounds;
+		mPlane[ 3 ].mPosition = maxPos;
 		mPlane[ 3 ].mNormal   = Vector3f( -1, 0, 0 );
 
-		mPlane[ 4 ].mPosition = maxBounds;
+		mPlane[ 4 ].mPosition = maxPos;
 		mPlane[ 4 ].mNormal   = Vector3f( 0, -1, 0 );
 
-		mPlane[ 5 ].mPosition = maxBounds;
+		mPlane[ 5 ].mPosition = maxPos;
 		mPlane[ 5 ].mNormal   = Vector3f( 0, 0, -1 );
+	}
+
+	void BoundingBox::Set( const BYTE* verts, UINT count, UINT stride )
+	{
+		Vector3f minPos( FLT_MAX, FLT_MAX, FLT_MAX );
+		Vector3f maxPos( -FLT_MAX, -FLT_MAX, -FLT_MAX );
+
+		for( UINT x = 0; x < count; ++x )
+		{
+			minPos.x = std::min( ((Vector3f*)verts)->x, minPos.x );
+			maxPos.x = std::max( ((Vector3f*)verts)->x, maxPos.x );
+			
+			minPos.y = std::min( ((Vector3f*)verts)->y, minPos.y );
+			maxPos.y = std::max( ((Vector3f*)verts)->y, maxPos.y );
+
+			minPos.z = std::min( ((Vector3f*)verts)->z, minPos.z );
+			maxPos.z = std::max( ((Vector3f*)verts)->z, maxPos.z );
+
+			verts += stride;
+		}
+
+		Set( minPos, maxPos );
 	}
 
 	const Vector3f& BoundingBox::GetMinBounds() const
@@ -597,7 +623,7 @@ namespace Sentinel
 		return mPlane[ 3 ].mPosition;
 	}
 
-	bool BoundingBox::Intersects( const Vector3f& point )
+	bool BoundingBox::Intersects( const Vector3f& point ) const
 	{
 		for( UINT x = 0; x < 3; ++x )
 			if( point[ x ] < GetMinBounds()[ x ] || point[ x ] > GetMaxBounds()[ x ] )
@@ -608,31 +634,39 @@ namespace Sentinel
 
 	// Check for a Ray being within a Box.
 	//
-	// Based on Dan Sunday's algorithm.
-	// softsurfer.com/Archive/algorithm_0105/algorithm_0105.htm
+	// Based on code by tavianator
+	// http://tavianator.com/2011/05/fast-branchless-raybounding-box-intersections/
 	//
-	bool BoundingBox::Intersects( const Ray& ray )
+	bool BoundingBox::Intersects( const Ray& ray, Vector3f* intersection ) const
 	{
-		for( int axis = 0; axis < 6; ++axis )
-		{
-			Vector3f w0 = ray.mPosition - mPlane[ axis ].mPosition;
-			float a = -mPlane[ axis ].mNormal.Dot( w0 );
-			float b = mPlane[ axis ].mNormal.Dot( ray.mDirection );
+		const Vector3f& minBounds = GetMinBounds();
+		const Vector3f& maxBounds = GetMaxBounds();
 
-			if (fabs(b) < 0.001f)	// ray is parallel to the plane
-				return false;
+		float dx = 1.0f / ray.mDirection.x;
+		float dy = 1.0f / ray.mDirection.y;
+		float dz = 1.0f / ray.mDirection.z;
 
-			float r = a / b;
-			if (r < 0.0f)			// ray goes away from plane
-				return false;
+		float tx1 = (minBounds.x - ray.mPosition.x)*dx;
+		float tx2 = (maxBounds.x - ray.mPosition.x)*dx;
 
-			// add a little to ensure the point has a chance to be within the box
-			Vector3f point = ray.mPosition + ray.mDirection * r + mPlane[ axis ].mNormal * 0.001f;
+		float tmin = std::min(tx1, tx2);
+		float tmax = std::max(tx1, tx2);
 
-			if( Intersects( point ))
-				return true;
-		}
+		float ty1 = (minBounds.y - ray.mPosition.y)*dy;
+		float ty2 = (maxBounds.y - ray.mPosition.y)*dy;
 
-		return false;
+		tmin = std::max(tmin, std::min(ty1, ty2));
+		tmax = std::min(tmax, std::max(ty1, ty2));
+
+		float tz1 = (minBounds.z - ray.mPosition.z)*dz;
+		float tz2 = (maxBounds.z - ray.mPosition.z)*dz;
+
+		tmin = std::max(tmin, std::min(tz1, tz2));
+		tmax = std::min(tmax, std::max(tz1, tz2));
+
+		if( intersection != NULL )
+			(*intersection) = ray.mPosition + ray.mDirection * tmin;
+
+		return tmax >= std::max(0.0f, tmin);// && tmin < tmax;
 	}
 }

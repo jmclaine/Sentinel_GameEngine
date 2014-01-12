@@ -7,6 +7,7 @@
 #include "GameObject.h"
 #include "GameWorld.h"
 #include "Archive.h"
+#include "Buffer.h"
 
 namespace Sentinel
 {
@@ -37,15 +38,16 @@ namespace Sentinel
 	{
 		DrawableComponent::Update();
 
-		if( mTransform )
-		{
-			mMesh->mMaterial = mMaterial;
+		const BoundingBox& bounds = mMesh->mBounds;
+		const Matrix4f& matWorld  = mTransform->GetMatrixWorld();
 
-			mMesh->mMatrixWorld = mTransform->GetMatrixWorld();
+		mBounds.Set( bounds.GetMinBounds(), bounds.GetMaxBounds(), matWorld );
 
-			GameWorld* world = mOwner->GetWorld();
-			mMesh->Draw( world->mRenderer, world );
-		}
+		mMesh->mMaterial    = mMaterial;
+		mMesh->mMatrixWorld = matWorld;
+
+		GameWorld* world = mOwner->GetWorld();
+		mMesh->Draw( world->mRenderer, world );
 	}
 
 	void MeshComponent::Shutdown()

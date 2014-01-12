@@ -178,6 +178,25 @@ namespace Sentinel
 
 	//////////////////////////////////////////////////////////////////
 	
+	// Create a simple line from start to end.
+	//
+	void MeshBuilder::CreateLine( const Vector3f& start, const Vector3f& end )
+	{
+		UINT startVert = mVertex.size();
+
+		Vertex vertex;
+
+		vertex.mPosition = start;
+
+		mVertex.push_back( vertex );
+
+		vertex.mPosition = end;
+
+		mVertex.push_back( vertex );
+
+		AddIndex( startVert, startVert+1 );
+	}
+
 	// Create a quad based on a normal and size.
 	//
 	void MeshBuilder::CreateQuad( float size, const Vector3f& normal )
@@ -254,6 +273,83 @@ namespace Sentinel
 
 		// Top
 		CUBE_SIDE( Vector3f( 0, 1, 0 ));
+	}
+
+	void MeshBuilder::CreateWireCube( float size )
+	{
+		UINT startVert = mVertex.size();
+
+		Vertex vertex;
+
+		// Left Bottom Back (0)
+		vertex.mPosition = Vector3f( -size, -size, -size );
+		mVertex.push_back( vertex );
+
+		// Right Bottom Back (1)
+		vertex.mPosition = Vector3f( size, -size, -size );
+		mVertex.push_back( vertex );
+
+		// Left Top Back (2)
+		vertex.mPosition = Vector3f( -size, size, -size );
+		mVertex.push_back( vertex );
+
+		// Right Top Back (3)
+		vertex.mPosition = Vector3f( size, size, -size );
+		mVertex.push_back( vertex );
+
+		// Left Bottom Front (4)
+		vertex.mPosition = Vector3f( -size, -size, size );
+		mVertex.push_back( vertex );
+
+		// Right Bottom Front (5)
+		vertex.mPosition = Vector3f( size, -size, size );
+		mVertex.push_back( vertex );
+
+		// Left Top Front (6)
+		vertex.mPosition = Vector3f( -size, size, size );
+		mVertex.push_back( vertex );
+
+		// Right Top Front (7)
+		vertex.mPosition = Vector3f( size, size, size );
+		mVertex.push_back( vertex );
+
+		// Back
+		AddIndex( startVert, startVert+1 );
+		AddIndex( startVert, startVert+2 );
+		AddIndex( startVert+1, startVert+3 );
+		AddIndex( startVert+2, startVert+3 );
+
+		// Top
+		//AddIndex( startVert+2, startVert+3 );
+		AddIndex( startVert+2, startVert+6 );
+		AddIndex( startVert+3, startVert+7 );
+		AddIndex( startVert+6, startVert+7 );
+
+		// Left
+		//AddIndex( startVert, startVert+2 );
+		AddIndex( startVert, startVert+4 );
+		//AddIndex( startVert+2, startVert+6 );
+		AddIndex( startVert+4, startVert+6 );
+
+		// Front
+		AddIndex( startVert+4, startVert+5 );
+		//AddIndex( startVert+6, startVert+7 );
+		//AddIndex( startVert+4, startVert+6 );
+		AddIndex( startVert+5, startVert+7 );
+
+		// Bottom
+		//AddIndex( startVert, startVert+1 );
+		//AddIndex( startVert+4, startVert+5 );
+		AddIndex( startVert+1, startVert+5 );
+		//AddIndex( startVert, startVert+4 );
+
+		// Right
+		//AddIndex( startVert+1, startVert+3 );
+		//AddIndex( startVert+5, startVert+7 );
+		//AddIndex( startVert+1, startVert+5 );
+		//AddIndex( startVert+3, startVert+7 );
+
+		mPrimitive = LINE_LIST;
 	}
 
 	// Shape code base from geometry.h of OpenGL.
@@ -1599,6 +1695,8 @@ namespace Sentinel
 		mesh->mShader		= mShader;
 		mesh->mPrimitive	= mPrimitive;
 		mesh->mTextureScale = mTextureScale;
+
+		mesh->mBounds.Set( (BYTE*)mVertex.data(), mVertex.size(), sizeof( Vertex ));
 
 		return mesh;
 	}

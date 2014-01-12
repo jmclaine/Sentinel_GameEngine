@@ -11,7 +11,7 @@ namespace Sentinel
 	{
 		DECLARE_SERIAL();
 
-	private:
+	protected:
 
 		TransformComponent*	mParentTransform;
 
@@ -27,14 +27,14 @@ namespace Sentinel
 
 		TransformComponent();
 
-		void				Startup();
+		virtual void		Startup();
 
-		void				Update();
+		virtual void		Update();
 
-		void				Shutdown();
+		virtual void		Shutdown();
 
 		///////////////////////////////////
 
-		const Matrix4f&		GetMatrixWorld();
+		const Matrix4f&		GetMatrixWorld() const;
 	};
 }

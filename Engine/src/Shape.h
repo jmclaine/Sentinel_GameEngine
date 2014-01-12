@@ -2,6 +2,7 @@
 
 #include "Common.h"
 #include "Vector3f.h"
+#include "Matrix4f.h"
 
 namespace Sentinel
 {
@@ -79,15 +80,17 @@ namespace Sentinel
 
 	public:
 
+		BoundingBox();
 		BoundingBox( const Vector3f& minBounds, const Vector3f& maxBounds );
-		BoundingBox( char* verts, UINT count, UINT stride = sizeof( Vector3f ));	// Takes in a pointer to 3 float points.
+		BoundingBox( const BYTE* verts, UINT count, UINT stride = sizeof( Vector3f ));
 
-		void		Set( const Vector3f& minBounds, const Vector3f& maxBounds );
+		void		Set( const Vector3f& minBounds, const Vector3f& maxBounds, const Matrix4f& matWorld = Matrix4f::IDENTITY );
+		void		Set( const BYTE* verts, UINT count, UINT stride = sizeof( Vector3f ));
 
 		const Vector3f& GetMinBounds() const;
 		const Vector3f& GetMaxBounds() const;
 
-		bool		Intersects( const Vector3f& point );
-		bool		Intersects( const Ray& ray );
+		bool		Intersects( const Vector3f& point ) const;
+		bool		Intersects( const Ray& ray, Vector3f* intersection = NULL ) const;
 	};
 }

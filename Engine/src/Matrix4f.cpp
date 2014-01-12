@@ -323,7 +323,7 @@ namespace Sentinel
 	{
 		Zero();
 
-		float size  = 1.0f / tan( (float)DEGREES_TO_RADIANS * FOV / 2.0f );
+		float size  = 1.0f / tan( (float)DEGREES_TO_RADIANS * FOV * 0.5f );
 		float depth = 1.0f / (nearZ - farZ);
 
 		m[0]  = size / (windowWidth / windowHeight);
@@ -331,7 +331,7 @@ namespace Sentinel
 		m[10] = (farZ + nearZ) * depth;
 		m[11] = -1.0f;
 		m[14] = 2.0f * (nearZ * farZ) * depth;
-		m[15] = 1.0f;
+		m[15] = 0.0f;
 	}
 
 	void Matrix4f::World( const Vector3f& position, const Quatf& orientation, const Vector3f& scale )
@@ -490,16 +490,16 @@ namespace Sentinel
 
 	Vector3f Matrix4f::Right() const
 	{
-		return Vector3f( m[0], m[1], m[2] );
+		return Vector3f( m[0], m[1], m[2] ).Normalize();
 	}
 
 	Vector3f Matrix4f::Up() const
 	{
-		return Vector3f( m[4], m[5], m[6] );
+		return Vector3f( m[4], m[5], m[6] ).Normalize();
 	}
 
 	Vector3f Matrix4f::Forward() const
 	{
-		return Vector3f( -m[8], -m[9], -m[10] );
+		return Vector3f( -m[8], -m[9], -m[10] ).Normalize();
 	}
 }

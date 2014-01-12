@@ -20,7 +20,6 @@ Use the current GameWorld camera to render sprites.
 namespace Sentinel
 {
 	class Renderer;
-	class GameWorld;
 	class Mesh;
 	class Sprite;
 	class Shader;
@@ -30,8 +29,10 @@ namespace Sentinel
 	private:
 
 		Renderer*			mRenderer;
+
+		std::shared_ptr< Shader > mShader;
 		
-		Mesh*				mMesh;			// uses shader to create the mesh points
+		Mesh*				mMesh;
 
 		UINT				mNumSprites;
 		UINT				mMaxSprites;
@@ -51,8 +52,6 @@ namespace Sentinel
 	private:
 
 		Storage*			mStorage;
-
-		std::shared_ptr< Shader > mShader;
 
 	public:
 

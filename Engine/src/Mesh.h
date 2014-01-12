@@ -11,6 +11,7 @@ Mesh creation helpers are in MeshBuilder.h or Model.h
 #include "Matrix4f.h"
 #include "Vector4f.h"
 #include "Material.h"
+#include "Shape.h"
 
 namespace Sentinel
 {
@@ -43,12 +44,18 @@ namespace Sentinel
 		Material			mMaterial;
 		std::shared_ptr< Texture >	mTexture[ NUM_TEXTURES ];
 
+		BoundingBox			mBounds;
+
 		//////////////////////////////
 
 		Mesh();
 		~Mesh();
 
 		void		 Draw( Renderer* renderer, GameWorld* world, UINT count = UINT_MAX );
+
+		// Helper function to calculate the bounding box using the VBO.
+		//
+		void		 CalculateBounds();
 
 		//////////////////////////////
 

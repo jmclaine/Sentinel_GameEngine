@@ -65,8 +65,19 @@ namespace Sentinel
 		if( !mSpriteSystem )
 			throw AppException( "WidgetComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain SpriteSystem" );
 
-		if( !mOwner->GetWorld()->GetCamera( mCamera ))
+		CameraComponent* camera = mOwner->GetWorld()->GetCamera( mCamera );
+
+		if( !camera )
 			throw AppException( "WidgetComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain CameraComponent" );
+
+		if( camera )
+		{
+			mWidgetWorld->mMatrixWVP	= camera->GetMatrixFinal() * mTransform->GetMatrixWorld();
+			mWidgetWorld->mWindowInfo	= mOwner->GetWorld()->mRenderer->GetWindow();
+			mWidgetWorld->mGameWorld	= mOwner->GetWorld();
+		}
+
+		mWidgetWorld->Startup();
 	}
 
 	void WidgetComponent::Update()
@@ -77,9 +88,7 @@ namespace Sentinel
 
 		if( camera )
 		{
-			mWidgetWorld->mMatrixWVP	= camera->GetMatrixFinal() * mTransform->GetMatrixWorld();
-			mWidgetWorld->mWindowInfo	= mOwner->GetWorld()->mRenderer->GetWindow();
-			mWidgetWorld->mGameWorld	= mOwner->GetWorld();
+			mWidgetWorld->mMatrixWVP = camera->GetMatrixFinal() * mTransform->GetMatrixWorld();
 			
 			if( mSpriteSystem )
 			{
@@ -108,6 +117,8 @@ namespace Sentinel
 	void WidgetComponent::Shutdown()
 	{
 		DrawableComponent::Shutdown();
+
+		mWidgetWorld->Shutdown();
 	}
 
 	/////////////////////////////////

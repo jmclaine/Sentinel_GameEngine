@@ -13,10 +13,6 @@ namespace Sentinel
 		friend class Vector3f;
 		friend class Vector4f;
 
-	public:
-
-		static const Matrix4f IDENTITY;
-
 	private:
 
 		float		m[16];
@@ -80,5 +76,9 @@ namespace Sentinel
 		Vector3f	Forward() const;
 		Vector3f	Up() const;
 		Vector3f	Right() const;
+
+	public:
+
+		static const Matrix4f IDENTITY;
 	};
 }

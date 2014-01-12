@@ -48,9 +48,6 @@ namespace Sentinel
 	// is to store and modify the buffer data using the CPU, and then transfer that
 	// data over to the DYNAMIC buffer.
 	//
-	// The solution is memory consuming, and remains unimplemented due to the only
-	// purpose to use it would be to save modified vertex buffers for DX11 only.
-	//
 	class BufferDX : public Buffer
 	{
 		friend class RendererDX;
@@ -58,11 +55,14 @@ namespace Sentinel
 
 	private:
 
+		void*					mData;
+
 		ID3D11DeviceContext*	mContext;
 		ID3D11Buffer*			mBuffer;
 
 		BufferDX()
 		{
+			mData   = NULL;
 			mBuffer = NULL;
 			mStride = 0;
 		}
@@ -76,20 +76,38 @@ namespace Sentinel
 
 		void* Lock()
 		{
-			D3D11_MAPPED_SUBRESOURCE mapRes;
+			if( mAccess == BUFFER_READ_WRITE )
+			{
+				return mData;
+			}
+			else
+			//if( mAccess == Buffer::WRITE )
+			{
+				D3D11_MAPPED_SUBRESOURCE mapRes;
 				
-			mContext->Map( mBuffer, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &mapRes );
+				mContext->Map( mBuffer, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &mapRes );
 			
-			return mapRes.pData;
+				return mapRes.pData;
+			}
 		}
 
 		void Unlock()
 		{
+			if( mAccess == BUFFER_READ_WRITE )
+			{
+				D3D11_MAPPED_SUBRESOURCE mapRes;
+				
+				mContext->Map( mBuffer, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &mapRes );
+
+				memcpy( mapRes.pData, mData, mSize );
+			}
+			
 			mContext->Unmap( mBuffer, 0 );
 		}
 
 		void Release()
 		{
+			free( mData );
 			SAFE_RELEASE_PTR( mBuffer );
 			mStride = 0;
 		}
@@ -1047,7 +1065,7 @@ namespace Sentinel
 
 		// Buffers.
 		//
-		Buffer* CreateBuffer( void* data, UINT size, UINT stride, BufferType type )
+		Buffer* CreateBuffer( void* data, UINT size, UINT stride, BufferType type, BufferAccess access )
 		{
 			_ASSERT( mCurrWindow );
 			_ASSERT( type == VERTEX_BUFFER || type == INDEX_BUFFER );
@@ -1060,17 +1078,30 @@ namespace Sentinel
 			bufferDesc.MiscFlags			= 0;
 			bufferDesc.StructureByteStride	= 0;
 
-			D3D11_SUBRESOURCE_DATA resourceData;
-			resourceData.pSysMem			= data;
-			resourceData.SysMemPitch		= 0;
-			resourceData.SysMemSlicePitch	= 0;
-
 			BufferDX* buffer = new BufferDX();
+			buffer->mAccess  = access;
 			buffer->mContext = mCurrWindow->mContext;
 			buffer->mType	 = type;
 			buffer->mSize	 = size;
 			buffer->mStride  = stride;
 			buffer->mCount	 = size / stride;
+
+			D3D11_SUBRESOURCE_DATA resourceData;
+
+			if( access == BUFFER_READ_WRITE )
+			{
+				buffer->mData    = malloc( size );
+				memcpy( buffer->mData, data, size );
+
+				resourceData.pSysMem = buffer->mData;
+			}
+			else
+			{
+				resourceData.pSysMem = data;
+			}
+
+			resourceData.SysMemPitch		= 0;
+			resourceData.SysMemSlicePitch	= 0;
 			
 			if( mCurrWindow->mDevice->CreateBuffer( &bufferDesc, &resourceData, &buffer->mBuffer ) == S_FALSE )
 			{

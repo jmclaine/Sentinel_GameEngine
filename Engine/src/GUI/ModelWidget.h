@@ -9,9 +9,11 @@ namespace Sentinel { namespace GUI
 {
 	class SENTINEL_DLL ModelWidget : public Widget
 	{
+		DECLARE_SERIAL();
+
 	public:
 
-		virtual DECLARE_SERIAL_REGISTER_SAVE() = 0;
+		DECLARE_SERIAL_REGISTER_SAVE();
 
 	protected:
 
@@ -25,12 +27,9 @@ namespace Sentinel { namespace GUI
 		Quatf				mOrientation;
 		Vector3f			mScale;
 
-	protected:
+		///////////////////////////////////
 
 		ModelWidget();
-
-	public:
-
 		virtual ~ModelWidget();
 
 		///////////////////////////////////
@@ -44,10 +43,5 @@ namespace Sentinel { namespace GUI
 		///////////////////////////////////
 
 		const Matrix4f&		GetMatrixWorld();
-
-		///////////////////////////////////
-
-		void				Save( Archive& archive );
-		void				Load( Archive& archive );
 	};
 }}

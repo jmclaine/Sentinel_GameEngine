@@ -24,4 +24,11 @@ namespace Sentinel
 	{
 		mTransform = NULL;
 	}
+
+	///////////////////////////////////
+
+	const BoundingBox& DrawableComponent::GetBounds()
+	{
+		return mBounds;
+	}
 }

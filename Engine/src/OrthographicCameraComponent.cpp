@@ -55,6 +55,11 @@ namespace Sentinel
 		mMatrixProjection.ProjectionOrthographic( windowWidth, windowHeight );
 	}
 
+	Ray OrthographicCameraComponent::ScreenPointToRay( UINT mouseX, UINT mouseY, UINT screenWidth, UINT screenHeight )
+	{
+		return Ray( Vector3f( (float)mouseX, (float)mouseY, 0 ), Vector3f( 0, 0, -1 ));
+	}
+
 	//////////////////////////////
 
 	void OrthographicCameraComponent::Save( Archive& archive )

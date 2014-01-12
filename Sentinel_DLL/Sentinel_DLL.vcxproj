@@ -105,9 +105,10 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
     <ClInclude Include="..\Engine\src\Archive.h" />
     <ClInclude Include="..\Engine\src\AssetManager.h" />
     <ClInclude Include="..\Engine\src\AudioComponent.h" />
+    <ClInclude Include="..\Engine\src\Debug.h" />
     <ClInclude Include="..\Engine\src\GUI\ControllerWidget.h" />
+    <ClInclude Include="..\Engine\src\GUI\ModelWidget.h" />
     <ClInclude Include="..\Engine\src\GUI\SpriteControllerWidget.h" />
-    <ClInclude Include="..\Engine\src\GUI\SpriteModelWidget.h" />
     <ClInclude Include="..\Engine\src\GUI\SpriteViewWidget.h" />
     <ClInclude Include="..\Engine\src\GUI\ViewWidget.h" />
     <ClInclude Include="..\Engine\src\GUI\WidgetObject.h" />
@@ -194,6 +195,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\Archive.cpp" />
+    <ClCompile Include="..\Engine\src\Debug.cpp" />
     <ClCompile Include="..\Engine\src\FontSystemFT.cpp" />
     <ClCompile Include="..\Engine\src\GUI\Button.cpp" />
     <ClCompile Include="..\Engine\src\GUI\SpriteButtonWidget.cpp" />
@@ -201,7 +203,6 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
     <ClCompile Include="..\Engine\src\GUI\MeshViewWidget.cpp" />
     <ClCompile Include="..\Engine\src\GUI\LabelWidget.cpp" />
     <ClCompile Include="..\Engine\src\GUI\SpriteControllerWidget.cpp" />
-    <ClCompile Include="..\Engine\src\GUI\SpriteModelWidget.cpp" />
     <ClCompile Include="..\Engine\src\GUI\SpriteViewWidget.cpp" />
     <ClCompile Include="..\Engine\src\GUI\ModelWidget.cpp" />
     <ClCompile Include="..\Engine\src\GUI\ViewWidget.cpp" />

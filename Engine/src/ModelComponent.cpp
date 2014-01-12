@@ -37,15 +37,12 @@ namespace Sentinel
 	{
 		DrawableComponent::Update();
 
-		if( mTransform )
-		{
-			mModel->SetMaterials( mMaterial );
+		mModel->SetMaterials( mMaterial );
 
-			mModel->mMatrixWorld = mTransform->GetMatrixWorld();
+		mModel->mMatrixWorld = mTransform->GetMatrixWorld();
 
-			GameWorld* world = mOwner->GetWorld();
-			mModel->Draw( world->mRenderer, world );
-		}
+		GameWorld* world = mOwner->GetWorld();
+		mModel->Draw( world->mRenderer, world );
 	}
 
 	void ModelComponent::Shutdown()

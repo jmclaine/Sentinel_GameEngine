@@ -22,5 +22,7 @@ namespace Sentinel
 		//////////////////////////////
 
 		void Set( float windowWidth, float windowHeight );
+
+		Ray	 ScreenPointToRay( UINT mouseX, UINT mouseY, UINT screenWidth = 0, UINT screenHeight = 0 );
 	};
 }

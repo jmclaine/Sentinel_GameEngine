@@ -2,6 +2,17 @@
 
 namespace Sentinel
 {
+	const ColorRGBA& ColorRGBA::WHITE   = ColorRGBA( 1.0f, 1.0f, 1.0f, 1.0f );
+	const ColorRGBA& ColorRGBA::LGRAY   = ColorRGBA( 0.8f, 0.8f, 0.8f, 1.0f );
+	const ColorRGBA& ColorRGBA::MGRAY   = ColorRGBA( 0.5f, 0.5f, 0.5f, 1.0f );
+	const ColorRGBA& ColorRGBA::DGRAY   = ColorRGBA( 0.2f, 0.2f, 0.2f, 1.0f );
+	const ColorRGBA& ColorRGBA::BLACK   = ColorRGBA( 0.0f, 0.0f, 0.0f, 1.0f );
+	const ColorRGBA& ColorRGBA::RED     = ColorRGBA( 1.0f, 0.0f, 0.0f, 1.0f );
+	const ColorRGBA& ColorRGBA::GREEN   = ColorRGBA( 0.0f, 1.0f, 0.0f, 1.0f );
+	const ColorRGBA& ColorRGBA::BLUE    = ColorRGBA( 0.0f, 0.0f, 1.0f, 1.0f );
+	const ColorRGBA& ColorRGBA::YELLOW  = ColorRGBA( 1.0f, 1.0f, 0.0f, 1.0f );
+	const ColorRGBA& ColorRGBA::MAGENTA = ColorRGBA( 1.0f, 0.0f, 1.0f, 1.0f );
+
 	ColorRGBA::ColorRGBA() :
 		r( 1 ), g( 1 ), b( 1 ), a( 1 )
 	{}

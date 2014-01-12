@@ -3,9 +3,6 @@
 
 namespace Sentinel
 {
-	const Vector3f Vector3f::ZERO = Vector3f( 0, 0, 0 );
-	const Vector3f Vector3f::ONE  = Vector3f( 1, 1, 1 );
-
 	Vector3f::Vector3f()
 	{
 		x = y = z = 0;
@@ -205,4 +202,7 @@ namespace Sentinel
 
 		return a;
 	}
+
+	const Vector3f Vector3f::ZERO = Vector3f( 0, 0, 0 );
+	const Vector3f Vector3f::ONE  = Vector3f( 1, 1, 1 );
 }

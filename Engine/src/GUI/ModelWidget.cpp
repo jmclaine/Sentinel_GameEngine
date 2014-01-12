@@ -3,6 +3,11 @@
 
 namespace Sentinel { namespace GUI
 {
+	DEFINE_SERIAL_REGISTER( ModelWidget );
+	DEFINE_SERIAL_CLONE( ModelWidget );
+
+	DEFINE_SERIAL_REGISTER_SAVE( ModelWidget );
+
 	ModelWidget::ModelWidget() :
 		mParentModel( NULL ),
 		mScale( 1, 1, 1 )

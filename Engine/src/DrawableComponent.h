@@ -2,6 +2,7 @@
 
 #include "Common.h"
 #include "GameComponent.h"
+#include "Shape.h"
 
 namespace Sentinel
 {
@@ -12,6 +13,8 @@ namespace Sentinel
 	protected:
 
 		TransformComponent*		mTransform;
+
+		BoundingBox				mBounds;
 
 		/////////////////////////////
 
@@ -24,5 +27,9 @@ namespace Sentinel
 		virtual void	Update();
 
 		virtual void	Shutdown();
+
+		/////////////////////////////
+
+		const BoundingBox& GetBounds();
 	};
 }

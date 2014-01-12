@@ -12,10 +12,6 @@ namespace Sentinel
 
 	public:
 
-		static const Quatf IDENTITY;
-
-		////////////////////////////////
-
 		float x, y, z, w;
 
 		////////////////////////////////
@@ -56,8 +52,16 @@ namespace Sentinel
 		Quatf&		Euler();
 		Vector3f	ToEuler();
 
-		Vector3f	Transform( const Vector3f& v );
+		Vector3f	Transform( const Vector3f& v ) const;
 
 		Quatf		Slerp( const Quatf& q, float t );
+
+		Vector3f	Forward() const;
+		Vector3f	Up() const;
+		Vector3f	Right() const;
+
+	public:
+
+		static const Quatf IDENTITY;
 	};
 }

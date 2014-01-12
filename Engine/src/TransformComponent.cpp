@@ -37,7 +37,7 @@ namespace Sentinel
 
 	///////////////////////////////////
 
-	const Matrix4f& TransformComponent::GetMatrixWorld()
+	const Matrix4f& TransformComponent::GetMatrixWorld() const
 	{
 		return mMatrixWorld;
 	}

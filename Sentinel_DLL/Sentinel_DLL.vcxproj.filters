@@ -99,9 +99,6 @@
     <ClInclude Include="..\Engine\src\Quatf.h">
       <Filter>Source Files\Sentinel_Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\Shape.h">
-      <Filter>Source Files\Sentinel_Engine\Math</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\Vector2f.h">
       <Filter>Source Files\Sentinel_Engine\Math</Filter>
     </ClInclude>
@@ -345,14 +342,17 @@
     <ClInclude Include="..\Engine\src\GUI\MeshViewWidget.h">
       <Filter>Source Files\Sentinel_Engine\GUI\View</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\src\GameComponent.h">
+      <Filter>Source Files\Sentinel_Engine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Shape.h">
+      <Filter>Source Files\Sentinel_Engine\Misc</Filter>
+    </ClInclude>
     <ClInclude Include="..\Engine\src\GUI\ModelWidget.h">
       <Filter>Source Files\Sentinel_Engine\GUI\Model</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\GUI\SpriteModelWidget.h">
-      <Filter>Source Files\Sentinel_Engine\GUI\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\GameComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components</Filter>
+    <ClInclude Include="..\Engine\src\Debug.h">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -369,9 +369,6 @@
       <Filter>Source Files\Sentinel_Engine\Math</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\Quatf.cpp">
-      <Filter>Source Files\Sentinel_Engine\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\Shape.cpp">
       <Filter>Source Files\Sentinel_Engine\Math</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\Vector2f.cpp">
@@ -656,14 +653,17 @@
     <ClCompile Include="..\Engine\src\GUI\ModelWidget.cpp">
       <Filter>Source Files\Sentinel_Engine\GUI\Model</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\GUI\SpriteModelWidget.cpp">
-      <Filter>Source Files\Sentinel_Engine\GUI\Model</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\GUI\WidgetWorld.cpp">
       <Filter>Source Files\Sentinel_Engine\GUI</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\GameComponent.cpp">
       <Filter>Source Files\Sentinel_Engine\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Shape.cpp">
+      <Filter>Source Files\Sentinel_Engine\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Debug.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

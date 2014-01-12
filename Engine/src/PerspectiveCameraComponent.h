@@ -2,6 +2,7 @@
 
 #include "CameraComponent.h"
 #include "Vector3f.h"
+#include "Vector2f.h"
 
 namespace Sentinel
 {
@@ -14,6 +15,7 @@ namespace Sentinel
 		float			mNearZ;
 		float			mFarZ;
 		float			mFOV;
+		float			mAspectRatio;
 
 		Vector3f		mLookAt;
 
@@ -37,6 +39,13 @@ namespace Sentinel
 		float			NearZ();
 		float			FarZ();
 		float			FOV();
+		float			AspectRatio();
+
 		const Vector3f& LookAt();
+
+		void			GetFrustumSize( Vector3f& nearCenter, Vector3f& farCenter,
+										Vector2f& nearSize,   Vector2f& farSize );
+
+		Ray				ScreenPointToRay( UINT mouseX, UINT mouseY, UINT screenWidth = 0, UINT screenHeight = 0 );
 	};
 }

@@ -207,7 +207,7 @@ namespace Sentinel
 
 		// Buffers.
 		//
-		virtual Buffer*		CreateBuffer( void* data, UINT size, UINT stride, BufferType type ) = 0;
+		virtual Buffer*		CreateBuffer( void* data, UINT size, UINT stride, BufferType type, BufferAccess access = BUFFER_READ_WRITE ) = 0;
 
 		virtual void		SetVBO( Buffer* buffer ) = 0;
 		virtual void		SetIBO( Buffer* buffer ) = 0;

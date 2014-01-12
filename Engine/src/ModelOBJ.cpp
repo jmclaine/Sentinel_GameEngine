@@ -88,7 +88,7 @@ namespace Sentinel
 			// Initialize the minimum and maximum vertex positions for the bounding sphere.
 			//
 			Vector3f minPosition( FLT_MAX, FLT_MAX, FLT_MAX ),
-					 maxPosition( FLT_MIN, FLT_MIN, FLT_MIN );
+					 maxPosition( -FLT_MAX, -FLT_MAX, -FLT_MAX );
 
 			// Create a default material.
 			//

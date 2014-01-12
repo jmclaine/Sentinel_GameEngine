@@ -19,7 +19,7 @@ namespace Sentinel
 
 		Material				mMaterial;	// assigns to Mesh in Update
 
-		/////////////////////////////
+		///////////////////////////////////
 
 		MeshComponent();
 		MeshComponent( std::shared_ptr< Mesh > mesh );

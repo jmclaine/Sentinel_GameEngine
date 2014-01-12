@@ -8,11 +8,6 @@ namespace Sentinel
 	{
 	public:
 
-		static const Vector2f ZERO;
-		static const Vector2f ONE;
-
-		////////////////////////////////
-
 		float x, y;
 
 		////////////////////////////////
@@ -59,5 +54,10 @@ namespace Sentinel
 		Vector2f	Cross() const;
 
 		float		Angle( const Vector2f& v ) const;
+
+	public:
+
+		static const Vector2f ZERO;
+		static const Vector2f ONE;
 	};
 }

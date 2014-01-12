@@ -201,6 +201,13 @@ namespace Sentinel
 		}
 	}
 
+	void Mesh::CalculateBounds()
+	{
+		mBounds.Set( (BYTE*)mVBO->Lock(), mVBO->Count(), mVBO->Stride() );
+
+		mVBO->Unlock();
+	}
+
 	//////////////////////////////
 
 	void Mesh::Save( Archive&			archive, 
