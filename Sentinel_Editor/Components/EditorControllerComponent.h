@@ -11,6 +11,9 @@ namespace Sentinel
 
 		POINT	mLastMousePos;
 
+		UINT	mLastWindowWidth;
+		UINT	mLastWindowHeight;
+
 	public:
 
 		float	mForwardSpeed;

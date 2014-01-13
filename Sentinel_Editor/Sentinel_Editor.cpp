@@ -230,6 +230,8 @@ public:
 				mGameWorld->UpdateTransform();
 				mGameWorld->UpdateDrawable();
 
+				// Cast a ray into the world to select objects.
+				//
 				POINT mousePos = Mouse::Get().GetPosition( (HWND)mGameWindow->GetInfo()->Handle() );
 
 				GUI::ModelWidget* model = (GUI::ModelWidget*)mGameWorldWidget->GetModel();
@@ -237,7 +239,6 @@ public:
 				const Vector3f& worldScale = model->mScale;
 
 				mMouseToWorldRay = mGameWorld->GetCamera()->ScreenPointToRay( mousePos.x - (UINT)worldPos.x, mousePos.y - (UINT)worldPos.y, (UINT)worldScale.x, (UINT)worldScale.y );
-				//mMouseToWorldRay = mGameWorld->GetCamera()->ScreenPointToRay( mousePos.x, mousePos.y );
 				
 				Vector3f nearCenter, farCenter;
 				Vector2f nearSize, farSize;
@@ -246,51 +247,6 @@ public:
 
 				camera->GetFrustumSize( nearCenter, farCenter, nearSize, farSize );
 				const Matrix4f& cameraMatrix = camera->GetTransform()->GetMatrixWorld();
-
-				/*sprintf( drawnText, "%f, %f, %f", camera->GetTransform()->mPosition.x, camera->GetTransform()->mPosition.y,camera->GetTransform()->mPosition.z );
-
-				static bool updateLine = true;
-
-				if( Keyboard::Get().DidGoDown( 'P' ))
-					updateLine = !updateLine;
-
-				if( updateLine )
-				{
-					mDebug->Clear();
-
-					mDebug->DrawLine( mMouseToWorldRay.mPosition, mMouseToWorldRay.mPosition + mMouseToWorldRay.mDirection * 1000.0f );
-					
-					// Draw the frustum.
-					//
-					Vector3f ntl = nearCenter - cameraMatrix.Right() * nearSize.x + cameraMatrix.Up() * nearSize.y;
-					Vector3f nbl = nearCenter - cameraMatrix.Right() * nearSize.x - cameraMatrix.Up() * nearSize.y;
-					Vector3f ntr = nearCenter + cameraMatrix.Right() * nearSize.x + cameraMatrix.Up() * nearSize.y;
-					Vector3f nbr = nearCenter + cameraMatrix.Right() * nearSize.x - cameraMatrix.Up() * nearSize.y;
-
-					Vector3f ftl = farCenter - cameraMatrix.Right() * farSize.x + cameraMatrix.Up() * farSize.y;
-					Vector3f fbl = farCenter - cameraMatrix.Right() * farSize.x - cameraMatrix.Up() * farSize.y;
-					Vector3f ftr = farCenter + cameraMatrix.Right() * farSize.x + cameraMatrix.Up() * farSize.y;
-					Vector3f fbr = farCenter + cameraMatrix.Right() * farSize.x - cameraMatrix.Up() * farSize.y;
-
-					mDebug->DrawLine( ntl, ntr );
-					mDebug->DrawLine( ntr, nbr );
-					mDebug->DrawLine( nbr, nbl );
-					mDebug->DrawLine( nbl, ntl );
-
-					mDebug->DrawLine( ftl, ftr );
-					mDebug->DrawLine( ftr, fbr );
-					mDebug->DrawLine( fbr, fbl );
-					mDebug->DrawLine( fbl, ftl );
-
-					mDebug->DrawLine( ntl, ftl );
-					mDebug->DrawLine( nbl, fbl );
-					mDebug->DrawLine( ntr, ftr );
-					mDebug->DrawLine( nbr, fbr );
-				}
-
-				mDebug->Present();
-				*/
-				//sprintf( drawnText, "%f, %f, %f", ratioX, ratioY, nearPos.z );
 
 				UINT count = mGameWorld->NumGameObjects();
 
@@ -320,10 +276,6 @@ public:
 
 				mRenderer->Clear( colorEditor );
 
-				//POINT mousePos = Mouse::Get().GetPosition( (HWND)mGameWindow->GetInfo()->Handle() );
-				//sprintf( drawnText, "%d, %d", mousePos.x, mousePos.y );
-				//sprintf( drawnText, "%f, %f, %f", mMouseToWorldRay.mPosition.x, mMouseToWorldRay.mPosition.y, mMouseToWorldRay.mPosition.z );
-				//sprintf( drawnText, "%f, %f, %f", mMouseToWorldRay.mDirection.x, mMouseToWorldRay.mDirection.y, mMouseToWorldRay.mDirection.z );
 				mDebugText->mText = drawnText;
 
 				BEGIN_PROFILE( timing );
@@ -477,8 +429,7 @@ public:
 		transform->mPosition = Vector3f( 0, 0, 0 );
 	
 		OrthographicCameraComponent* orthoCamera = (OrthographicCameraComponent*)obj->AttachComponent( new OrthographicCameraComponent( (float)Renderer::WINDOW_WIDTH_BASE, (float)Renderer::WINDOW_HEIGHT_BASE ), "OCamera" );
-		orthoCamera->mScaleToWindow = true;
-
+		
 		//AddObject( obj );
 
 		// World View Camera.
@@ -529,15 +480,16 @@ public:
 
 		model = new GUI::ModelWidget();
 		model->mPosition	= Vector3f( 0, 0, 1 );
-		model->mScale		= Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 30, 1 );
+		model->mScale		= Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 0, 1 );
 		
 		view = new GUI::SpriteViewWidget();
 		view->mFrame		= 0;
 		view->mColor		= ColorRGBA( 0.7f, 0.7f, 0.7f, 1 );
 
 		controller = new GUI::SpriteControllerWidget();
+		controller->mMargin.bottom = 30;
 		controller->mScaleToWindowX = true;
-
+		
 		widget->SetModel( model );
 		widget->SetView( view );
 		widget->SetController( controller );
@@ -555,7 +507,7 @@ public:
 		label->mColor = ColorRGBA( 0, 0, 0, 1 );
 
 		controller = new GUI::SpriteControllerWidget();
-
+		
 		widget->SetModel( model );
 		widget->SetView( label );
 		widget->SetController( controller );
@@ -572,7 +524,7 @@ public:
 		label->mColor = ColorRGBA( 0, 0, 0, 1 );
 
 		controller = new GUI::SpriteControllerWidget();
-
+		
 		widget->SetModel( model );
 		widget->SetView( label );
 		widget->SetController( controller );
@@ -589,7 +541,7 @@ public:
 		label->mColor = ColorRGBA( 0, 0, 0, 1 );
 
 		controller = new GUI::SpriteControllerWidget();
-
+		
 		widget->SetModel( model );
 		widget->SetView( label );
 		widget->SetController( controller );
@@ -617,14 +569,14 @@ public:
 
 		model = new GUI::ModelWidget();
 		model->mPosition	= Vector3f( 0, 0, 1 );
-		model->mScale		= Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 30, 1 );
+		model->mScale		= Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 0, 1 );
 		
 		view = new GUI::SpriteViewWidget();
 		view->mFrame		= 0;
 		view->mColor		= ColorRGBA( 0.9f, 0.9f, 0.9f, 1 );
 
 		controller = new GUI::SpriteControllerWidget();
-		controller->mMargin = Quad( 0, 30, 0, 0 );
+		controller->mMargin = Quad( 0, 30, 0, 30 );
 		controller->mScaleToWindowX = true;
 
 		widget->SetModel( model );
@@ -637,14 +589,14 @@ public:
 
 		model = new GUI::ModelWidget();
 		model->mPosition	= Vector3f( 0, (float)Renderer::WINDOW_HEIGHT_BASE, 0.1f );
-		model->mScale		= Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 30, 1 );
+		model->mScale		= Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 0, 1 );
 		
 		view = new GUI::SpriteViewWidget();
 		view->mFrame		= 0;
 		view->mColor		= ColorRGBA( 0.7f, 0.7f, 0.7f, 1 );
 
 		controller = new GUI::SpriteControllerWidget();
-		controller->mMargin				= Quad( 0, -30, 0, 0 );
+		controller->mMargin				= Quad( 0, -30, 0, 30 );
 		controller->mScaleToWindowX		= true;
 		controller->mPositionToWindowY	= true;
 
@@ -657,7 +609,7 @@ public:
 		mGameWorldWidget = (GUI::WidgetObject*)widgetComp->mWidgetWorld->AddWidgetObject( new GUI::WidgetObject() );
 
 		model = new GUI::ModelWidget();
-		model->mPosition = Vector3f( 0, 60, 0.8f );
+		model->mPosition = Vector3f( 0, 0, 0.8f );
 		model->mScale    = Vector3f( (float)Renderer::WINDOW_WIDTH_BASE-500, (float)Renderer::WINDOW_HEIGHT_BASE, 1 );
 		
 		drawableMesh = new GUI::MeshViewWidget();
@@ -667,7 +619,7 @@ public:
 		controller = new GUI::SpriteControllerWidget();
 		controller->mScaleToWindowX = true;
 		controller->mScaleToWindowY = true;
-		controller->mMargin = Quad( 0, 0, 0, -90 );
+		controller->mMargin = Quad( 0, 60, 0, -90 );
 
 		mGameWorldWidget->SetModel( model );
 		mGameWorldWidget->SetView( drawableMesh );

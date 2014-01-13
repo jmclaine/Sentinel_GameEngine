@@ -12,7 +12,11 @@ namespace Sentinel { namespace GUI
 	DEFINE_SERIAL_REGISTER( SpriteControllerWidget );
 	DEFINE_SERIAL_CLONE( SpriteControllerWidget );
 
-	SpriteControllerWidget::SpriteControllerWidget()
+	SpriteControllerWidget::SpriteControllerWidget() :
+		mPositionToWindowX( false ),
+		mPositionToWindowY( false ),
+		mScaleToWindowX( false ),
+		mScaleToWindowY( false )
 	{}
 
 	SpriteControllerWidget::~SpriteControllerWidget()

@@ -70,12 +70,9 @@ namespace Sentinel
 		if( !camera )
 			throw AppException( "WidgetComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain CameraComponent" );
 
-		if( camera )
-		{
-			mWidgetWorld->mMatrixWVP	= camera->GetMatrixFinal() * mTransform->GetMatrixWorld();
-			mWidgetWorld->mWindowInfo	= mOwner->GetWorld()->mRenderer->GetWindow();
-			mWidgetWorld->mGameWorld	= mOwner->GetWorld();
-		}
+		mWidgetWorld->mMatrixWVP	= camera->GetMatrixFinal() * mTransform->GetMatrixWorld();
+		mWidgetWorld->mWindowInfo	= mOwner->GetWorld()->mRenderer->GetWindow();
+		mWidgetWorld->mGameWorld	= mOwner->GetWorld();
 
 		mWidgetWorld->Startup();
 	}

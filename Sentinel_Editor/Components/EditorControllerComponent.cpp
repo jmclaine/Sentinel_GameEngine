@@ -12,6 +12,8 @@
 #include "PhysicsSystem.h"
 #include "Renderer.h"
 #include "GameWindow.h"
+#include "PerspectiveCameraComponent.h"
+#include "OrthographicCameraComponent.h"
 
 namespace Sentinel
 {
@@ -29,6 +31,29 @@ namespace Sentinel
 
 	void EditorControllerComponent::Update()
 	{
+		// Adjust the camera sizes if necessary.
+		//
+		WindowInfo* info = mOwner->GetWorld()->mRenderer->GetWindow();
+
+		if( mLastWindowWidth != info->Width() || mLastWindowHeight != info->Height() )
+		{
+			// Magically ensure the FOV looks correct.
+			// Divide by 32 from the width produces the intended result.
+			//
+			PerspectiveCameraComponent* cameraP = (PerspectiveCameraComponent*)mOwner->GetWorld()->GetCamera( 1 );
+
+			cameraP->Set( (float)info->Width(), (float)info->Height(), cameraP->NearZ(), cameraP->FarZ(), (float)(info->Width() >> 5) );
+		
+			////////////////////
+
+			OrthographicCameraComponent* cameraO = (OrthographicCameraComponent*)mOwner->GetWorld()->GetCamera( 0 );
+
+			cameraO->Set( (float)info->Width(), (float)info->Height() );
+
+			mLastWindowWidth = info->Width();
+			mLastWindowHeight = info->Height();
+		}
+
 		if( mPhysics )
 		{
 			RigidBody* body		= mPhysics->GetRigidBody();

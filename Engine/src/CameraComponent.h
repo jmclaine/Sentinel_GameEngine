@@ -34,10 +34,6 @@ namespace Sentinel
 		Matrix4f			mMatrixProjection;
 		Matrix4f			mMatrixFinal;
 
-	public:
-
-		bool				mScaleToWindow;
-
 	protected:
 
 		CameraComponent();

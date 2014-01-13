@@ -41,17 +41,6 @@ namespace Sentinel
 	{
 		CameraComponent::Update();
 
-		WindowInfo* info = mOwner->GetWorld()->mRenderer->GetWindow();
-
-		if( mScaleToWindow )
-		{
-			Set( (float)info->Width(), (float)info->Height(), mNearZ, mFarZ, mFOV );
-		}
-		else
-		{
-			Set( (float)Renderer::WINDOW_WIDTH_BASE, (float)Renderer::WINDOW_HEIGHT_BASE, mNearZ, mFarZ, mFOV );
-		}
-
 		mMatrixView.Rotate( mTransform->mOrientation );
 		mLookAt = mTransform->mPosition + mMatrixView.Forward();
 
@@ -75,9 +64,12 @@ namespace Sentinel
 	{
 		mNearZ = nearZ;
 		mFarZ  = farZ;
-		mFOV   = FOV;
+		
+		mFOV = FOV;
 
-		mAspectRatio = windowWidth / windowHeight;
+		mAspectRatio  = windowWidth / windowHeight;
+
+		mAngle = tan( (float)DEGREES_TO_RADIANS * mFOV * 0.5f );
 
 		mMatrixProjection.ProjectionPerspective( windowWidth, windowHeight, nearZ, farZ, FOV );
 	}
@@ -102,6 +94,11 @@ namespace Sentinel
 		return mAspectRatio;
 	}
 
+	float PerspectiveCameraComponent::Angle()
+	{
+		return mAngle;
+	}
+
 	const Vector3f& PerspectiveCameraComponent::LookAt()
 	{
 		return mLookAt;
@@ -121,10 +118,8 @@ namespace Sentinel
 		nearCenter = pos + dir * NearZ();
 		farCenter  = pos + dir * FarZ();
 
-		float angle = tan( (float)DEGREES_TO_RADIANS * FOV() * 0.5f );
-
-		float nearHeight = NearZ() * angle;
-		float farHeight  = FarZ()  * angle;
+		float nearHeight = NearZ() * Angle();
+		float farHeight  = FarZ()  * Angle();
 
 		nearSize = Vector2f( nearHeight * AspectRatio(), nearHeight );
 		farSize  = Vector2f( farHeight * AspectRatio(), farHeight );
@@ -149,10 +144,8 @@ namespace Sentinel
 		float ratioY = 2.0f * (0.5f - (mouseY / static_cast< float >(screenHeight)));
 
 		Vector3f nearPos( nearCenter + cameraMatrix.Right() * ratioX * nearSize.x + cameraMatrix.Up() * ratioY * nearSize.y );
-		Vector3f farPos( farCenter + cameraMatrix.Right() * ratioX * farSize.x + cameraMatrix.Up() * ratioY * farSize.y );
-
-		//return Ray( nearPos, (nearPos - mTransform->mPosition).Normalize() );
-		return Ray( nearPos, (farPos - nearPos).Normalize() );
+		
+		return Ray( nearPos, nearPos - GetTransform()->mPosition );
 	}
 
 	//////////////////////////////

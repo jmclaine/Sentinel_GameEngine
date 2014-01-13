@@ -6,8 +6,7 @@
 namespace Sentinel
 {
 	CameraComponent::CameraComponent() :
-		mTransform( NULL ),
-		mScaleToWindow( false )
+		mTransform( NULL )
 	{
 		mType = GameComponent::CAMERA;
 

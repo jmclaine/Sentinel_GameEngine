@@ -17,6 +17,8 @@ namespace Sentinel
 		float			mFOV;
 		float			mAspectRatio;
 
+		float			mAngle;
+
 		Vector3f		mLookAt;
 
 	public:
@@ -40,6 +42,8 @@ namespace Sentinel
 		float			FarZ();
 		float			FOV();
 		float			AspectRatio();
+
+		float			Angle();
 
 		const Vector3f& LookAt();
 

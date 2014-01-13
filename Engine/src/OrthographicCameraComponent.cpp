@@ -27,17 +27,6 @@ namespace Sentinel
 	{
 		CameraComponent::Update();
 
-		WindowInfo* info = mOwner->GetWorld()->mRenderer->GetWindow();
-
-		if( mScaleToWindow )
-		{
-			Set( (float)info->Width(), (float)info->Height() );
-		}
-		else
-		{
-			Set( (float)Renderer::WINDOW_WIDTH_BASE, (float)Renderer::WINDOW_HEIGHT_BASE );
-		}
-
 		mMatrixView.Translate( mTransform->mPosition );
 		
 		mMatrixFinal = mMatrixProjection * mMatrixView;

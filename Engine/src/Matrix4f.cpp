@@ -490,16 +490,16 @@ namespace Sentinel
 
 	Vector3f Matrix4f::Right() const
 	{
-		return Vector3f( m[0], m[1], m[2] ).Normalize();
+		return Vector3f( m[0], m[1], m[2] );
 	}
 
 	Vector3f Matrix4f::Up() const
 	{
-		return Vector3f( m[4], m[5], m[6] ).Normalize();
+		return Vector3f( m[4], m[5], m[6] );
 	}
 
 	Vector3f Matrix4f::Forward() const
 	{
-		return Vector3f( -m[8], -m[9], -m[10] ).Normalize();
+		return Vector3f( -m[8], -m[9], -m[10] );
 	}
 }
