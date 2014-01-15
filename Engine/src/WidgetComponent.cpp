@@ -101,6 +101,7 @@ namespace Sentinel
 				mWidgetWorld->mFontSystem = mFontSystem;
 
 				mFontSystem->mSpriteSystem->mSprite = mFontSystem->mFont->mSprite;
+
 				mFontSystem->mSpriteSystem->Clear();
 			}
 			

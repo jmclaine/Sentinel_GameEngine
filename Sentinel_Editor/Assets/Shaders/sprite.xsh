@@ -101,15 +101,15 @@ void main()
 #endif
 #ifdef GEOMETRY_SHADER
 
+layout (points) in;
+layout (triangle_strip, max_vertices=4) out;
+
 in vec4 gvTex0[];
 in vec4 gvColor[];
 in mat4 gvMatrix[];
 
 out vec2 vTex0;
 out vec4 vColor;
-
-//layout (points) in;
-//layout (triangle_strip, max_vertices=4) out;
 
 void main()
 {

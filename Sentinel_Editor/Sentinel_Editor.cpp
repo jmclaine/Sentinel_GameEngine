@@ -157,8 +157,14 @@ public:
 		PrepareGameWorld();
 
 		MeshBuilder builder;
+		static Matrix4f matTrans, matScale;
+
+		// Create wire cube from solid cubes.
+		// Adjust spaces using scale of object.
+		//
 		builder.mShader = mEditorWorld->mShaderManager->Get( "Color Only" );
 		builder.CreateWireCube( 1 );
+		
 		mBoundsMesh = builder.BuildMesh( mRenderer );
 
 		mGameWorld->SetCamera( mEditorWorld->GetCamera( 1 ));
@@ -217,9 +223,6 @@ public:
 
 				mGameWindow->Update();
 
-				UINT width  = mGameWindow->GetInfo()->Width();
-				UINT height = mGameWindow->GetInfo()->Height();
-
 				mRenderer->SetViewport( 0, 0, Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE );
 				mRenderer->SetDepthStencil( 1 );
 				mRenderer->SetRenderTarget( 1 );
@@ -230,39 +233,7 @@ public:
 				mGameWorld->UpdateTransform();
 				mGameWorld->UpdateDrawable();
 
-				// Cast a ray into the world to select objects.
-				//
-				POINT mousePos = Mouse::Get().GetPosition( (HWND)mGameWindow->GetInfo()->Handle() );
-
-				GUI::ModelWidget* model = (GUI::ModelWidget*)mGameWorldWidget->GetModel();
-				const Vector3f& worldPos   = model->mPosition;
-				const Vector3f& worldScale = model->mScale;
-
-				mMouseToWorldRay = mGameWorld->GetCamera()->ScreenPointToRay( mousePos.x - (UINT)worldPos.x, mousePos.y - (UINT)worldPos.y, (UINT)worldScale.x, (UINT)worldScale.y );
-				
-				Vector3f nearCenter, farCenter;
-				Vector2f nearSize, farSize;
-
-				PerspectiveCameraComponent* camera = (PerspectiveCameraComponent*)(mGameWorld->GetCamera());
-
-				camera->GetFrustumSize( nearCenter, farCenter, nearSize, farSize );
-				const Matrix4f& cameraMatrix = camera->GetTransform()->GetMatrixWorld();
-
-				UINT count = mGameWorld->NumGameObjects();
-
-				mSelectedObject = NULL;
-				mHoverObject = NULL;
-				mHoverDist = FLT_MAX;
-
-				for( UINT x = 0; x < count; ++x )
-				{
-					CheckBounds( mGameWorld->GetGameObject( x ));
-				}
-
-				for( UINT x = 0; x < count; ++x )
-				{
-					DrawBounds( mGameWorld->GetGameObject( x ));
-				}
+				SelectGameObject();
 
 				END_PROFILE( timing, "World" );
 
@@ -270,7 +241,9 @@ public:
 				
 				static float colorEditor[] = {0.2f, 0.2f, 0.2f, 1.0f};
 
-				mRenderer->SetViewport( 0, 0, width, height );
+				const WindowInfo* info = mGameWindow->GetInfo();
+
+				mRenderer->SetViewport( 0, 0, info->Width(), info->Height() );
 				mRenderer->SetDepthStencil( 0 );
 				mRenderer->SetRenderTarget( 0 );
 
@@ -286,6 +259,8 @@ public:
 				mEditorWorld->UpdateDrawable();
 				END_PROFILE( timing, "Editor" );
 
+				// Draw GameWorld over Backbuffer.
+				//
 				//mRTBackbufferMesh->mMatrixWorld.Identity();
 				//mRTBackbufferMesh->Draw( mRenderer, mGameWorld );
 				
@@ -307,7 +282,9 @@ public:
 
 	void Shutdown()
 	{
-		SAFE_DELETE( mFontSystem->mSpriteSystem );
+		if( mFontSystem )
+			SAFE_DELETE( mFontSystem->mSpriteSystem );
+
 		SAFE_DELETE( mFontSystem );
 
 		SAFE_DELETE( mBoundsMesh );
@@ -984,12 +961,20 @@ public:
 			Vector3f scale  = (box.GetMaxBounds() - center);
 
 			if( obj != mHoverObject )
+			{
 				mBoundsMesh->mMaterial.mAmbient = ColorRGBA::WHITE;
+
+				if( obj == mSelectedObject )
+					mBoundsMesh->mMaterial.mAmbient = ColorRGBA::RED;
+			}
+			else
+			if( obj == mSelectedObject )
+				mBoundsMesh->mMaterial.mAmbient = ColorRGBA::YELLOW;
 			else
 				mBoundsMesh->mMaterial.mAmbient = ColorRGBA::GREEN;
 
 			mBoundsMesh->mMatrixWorld.World( center, Quatf::IDENTITY, scale );
-
+			
 			mBoundsMesh->Draw( mRenderer, mGameWorld );
 		}
 
@@ -998,6 +983,39 @@ public:
 		for( UINT x = 0; x < count; ++x )
 		{
 			DrawBounds( obj->GetChild( x ));
+		}
+	}
+
+	void SelectGameObject()
+	{
+		// Cast a ray into the world to select objects.
+		//
+		POINT mousePos = Mouse::Get().GetPosition( (HWND)mGameWindow->GetInfo()->Handle() );
+
+		GUI::ModelWidget* model = (GUI::ModelWidget*)mGameWorldWidget->GetModel();
+		const Vector3f& worldPos   = model->mPosition;
+		const Vector3f& worldScale = model->mScale;
+
+		mMouseToWorldRay = mGameWorld->GetCamera()->ScreenPointToRay( mousePos.x - (UINT)worldPos.x, mousePos.y - (UINT)worldPos.y, (UINT)worldScale.x, (UINT)worldScale.y );
+				
+		UINT count = mGameWorld->NumGameObjects();
+
+		mHoverObject = NULL;
+		mHoverDist = FLT_MAX;
+
+		for( UINT x = 0; x < count; ++x )
+		{
+			CheckBounds( mGameWorld->GetGameObject( x ));
+		}
+
+		if( Mouse::Get().DidGoDown( BUTTON_LEFT ))
+		{
+			mSelectedObject = mHoverObject;
+		}
+
+		for( UINT x = 0; x < count; ++x )
+		{
+			DrawBounds( mGameWorld->GetGameObject( x ));
 		}
 	}
 };

@@ -56,6 +56,9 @@
     <None Include="Assets\Shaders\guimesh.xsh">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Assets\Shaders\line.xsh">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">

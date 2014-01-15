@@ -81,6 +81,7 @@
     <None Include="Assets\Shaders\config.xml" />
     <None Include="Assets\Shaders\gui.xsh" />
     <None Include="Assets\Shaders\guimesh.xsh" />
+    <None Include="Assets\Shaders\line.xsh" />
     <None Include="Assets\Shaders\normmap.xsh" />
     <None Include="Assets\Shaders\RTnormal.xsh" />
     <None Include="Assets\Shaders\sprite.xsh" />

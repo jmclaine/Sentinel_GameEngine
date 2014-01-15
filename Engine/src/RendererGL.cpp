@@ -1,6 +1,6 @@
 #include <GL/glew.h>
-#include <gl/gl.h>
-#include <gl/glu.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 
 #pragma comment (lib, "opengl32.lib")
 #pragma comment (lib, "glu32.lib")
@@ -324,11 +324,12 @@ namespace Sentinel
 				if( !Compile( gshader, mGeometryShader, GL_GEOMETRY_SHADER, 2 ))
 					return S_FALSE;
 
-				// Figure out a way to allow customization of this:
-				//
-				glProgramParameteriEXT( mProgramID, GL_GEOMETRY_INPUT_TYPE_EXT, GL_POINTS );
-				glProgramParameteriEXT( mProgramID, GL_GEOMETRY_OUTPUT_TYPE_EXT, GL_TRIANGLE_STRIP );
-				glProgramParameteriEXT( mProgramID, GL_GEOMETRY_VERTICES_OUT_EXT, 4 );
+				//layout (points) in;
+				//layout (triangle_strip, max_vertices=4) out;
+
+				//glProgramParameteriEXT( mProgramID, GL_GEOMETRY_INPUT_TYPE_EXT, GL_POINTS );
+				//glProgramParameteriEXT( mProgramID, GL_GEOMETRY_OUTPUT_TYPE_EXT, GL_TRIANGLE_STRIP );
+				//glProgramParameteriEXT( mProgramID, GL_GEOMETRY_VERTICES_OUT_EXT, 4 );
 
 				glAttachShader( mProgramID, mGeometryShader );
 			}
@@ -781,6 +782,8 @@ namespace Sentinel
 			}
 
 			glewInit();
+
+			TRACE( "OpenGL Version " << glGetString( GL_VERSION ));
 
 			glEnable( GL_DEPTH_TEST );
 
