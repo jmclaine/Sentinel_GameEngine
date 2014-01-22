@@ -27,9 +27,10 @@ namespace Sentinel
 
 		virtual ~Buffer();
 
+		virtual void	Release() = 0;
+
 		virtual void*	Lock() = 0;
 		virtual void	Unlock() = 0;
-		virtual void	Release() = 0;
 
 		BufferType		Type();
 		UINT			Size();

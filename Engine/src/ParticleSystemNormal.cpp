@@ -78,7 +78,7 @@ namespace Sentinel
 
 			MeshBuilder builder;
 
-			builder.mShader = mShader;
+			builder.mLayout = shader->Layout();
 
 			for( UINT x = 0; x < maxParticles; ++x )
 			{
@@ -93,10 +93,8 @@ namespace Sentinel
 			if( !mMesh )
 				throw AppException( "Failed to create Mesh in ParticleSystemNormal::Startup" );
 
+			mMesh->mShader = shader;
 			mMesh->mTexture[ TEXTURE_DIFFUSE ] = mSprite->mTexture;
-
-			mMesh->mTextureScale = Vector4f( 1.0f / (float)mSprite->mTexture->Width(),
-											 1.0f / (float)mSprite->mTexture->Height(), 0, 0 );
 		}
 
 		void Update( float DT )

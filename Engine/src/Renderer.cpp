@@ -117,21 +117,30 @@ namespace Sentinel
 	Mesh* Renderer::CreateRenderTargetQuad( std::shared_ptr< Shader > shader )
 	{
 		MeshBuilder builder;
-		builder.mShader = shader;
+
+		builder.mLayout = CreateVertexLayout( shader->Attribute() );
 		builder.CreateQuad( 1.0f );
-		return builder.BuildMesh( this );
+
+		Mesh* mesh = builder.BuildMesh( this );
+		mesh->mShader = shader;
+
+		return mesh;
 	}
 
 	Mesh* Renderer::CreateGUIQuad( std::shared_ptr< Shader > shader )
 	{
 		MeshBuilder builder;
-		builder.mShader = shader;
+
+		builder.mLayout = CreateVertexLayout( shader->Attribute() );
 		builder.CreateQuad( 0.5f, Vector3f( 0, 0, -1 ));
 
 		Matrix4f matTrans;
 		matTrans.Translate( Vector3f( 0.5f, 0.5f, 0 ));
 		builder.ApplyMatrix( matTrans );
 
-		return builder.BuildMesh( this );
+		Mesh* mesh = builder.BuildMesh( this );
+		mesh->mShader = shader;
+
+		return mesh;
 	}
 }

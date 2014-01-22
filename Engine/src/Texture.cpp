@@ -2,9 +2,6 @@
 
 namespace Sentinel
 {
-	Texture::Texture()
-	{}
-
 	Texture::Texture( UINT width, UINT height ) :
 		mWidth( width ),
 		mHeight( height )

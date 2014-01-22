@@ -96,9 +96,10 @@ namespace Sentinel
 			const std::string defaultMaterial = "~*Default*~";
 			builder.insert( MeshBuilderPair( defaultMaterial, new MeshBuilder() ));
 
-			MeshBuilder* meshBuilder = builder.begin()->second;
-			meshBuilder->mShader = shaderManager->Get( "Color" );
+			bool useColorShader = true;
 
+			MeshBuilder* meshBuilder = builder.begin()->second;
+			
 			// Read the file.
 			//
 			std::string line;
@@ -191,7 +192,8 @@ namespace Sentinel
 									builder.insert( MeshBuilderPair( mtlName, new MeshBuilder() ));
 
 									MeshBuilder* meshBuilder = builder[ mtlName ];
-									meshBuilder->mShader = shaderManager->Get( "Color" );
+
+									useColorShader = true;
 								}
 								// Load a texture.
 								//
@@ -204,7 +206,8 @@ namespace Sentinel
 									{
 										mtlParsehelper >> mtlToken;
 										MeshBuilder* meshBuilder = mtl_iter->second;
-										meshBuilder->mShader = shaderManager->Get( "Texture" );
+
+										useColorShader = false;
 
 										meshBuilder->mTexture[ TEXTURE_DIFFUSE ] = textureManager->Add( mtlToken, renderer->CreateTextureFromFile( mtlToken.c_str() ));
 									}
@@ -290,9 +293,9 @@ namespace Sentinel
 								//
 								currVertex = meshBuilder->mVertex.size();
 
-								meshVertex.mPosition			= positions[ vIndex[ 0 ]];
-								meshVertex.mTextureCoords[ 0 ]	= texCoords[ vIndex[ 1 ]];
-								meshVertex.mNormal				= normals[ vIndex[ 2 ]];
+								meshVertex.mPosition		= positions[ vIndex[ 0 ]];
+								meshVertex.mTexCoord[ 0 ]	= texCoords[ vIndex[ 1 ]];
+								meshVertex.mNormal			= normals[ vIndex[ 2 ]];
 								meshBuilder->mVertex.push_back( meshVertex );
 							}
 
@@ -318,6 +321,8 @@ namespace Sentinel
 				// All the information for the model has been retrieved.
 				// Now make the VBOs and IBOs for each material.
 				//
+				std::shared_ptr< VertexLayout > layout = (useColorShader) ? shaderManager->Get( "Color" )->Layout() : shaderManager->Get( "Texture" )->Layout();
+
 				UINT i = 0;
 				mMesh = new Mesh*[ builder.size() ];
 
@@ -325,6 +330,8 @@ namespace Sentinel
 				{
 					if( it->second->mVertex.size() > 0 )
 					{
+						it->second->mLayout = layout;
+
 						mMesh[ i ] = it->second->BuildMesh( renderer );
 						++i;
 					}

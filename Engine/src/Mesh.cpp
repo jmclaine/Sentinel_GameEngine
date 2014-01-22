@@ -15,6 +15,7 @@
 #include "ShaderManager.h"
 #include "TextureManager.h"
 #include "Timing.h"
+#include "VertexLayout.h"
 
 namespace Sentinel
 {
@@ -28,10 +29,10 @@ namespace Sentinel
 		mVBO = NULL;
 		mIBO = NULL;
 
+		mLayout = NULL;
+
 		mMatrixWorld.Identity();
 		mMatrixShadow.Identity();
-		
-		mTextureScale = Vector4f( 0, 0, 1, 1 );
 	}
 
 	Mesh::~Mesh()
@@ -42,19 +43,21 @@ namespace Sentinel
 
 	void Mesh::Draw( Renderer* renderer, GameWorld* world, UINT count )
 	{
-		_ASSERT( renderer );
-		_ASSERT( mShader );
-		_ASSERT( mVBO );
-		_ASSERT( mIBO );
-
 		if( count == 0 )
 			return;
 
 		if( mVBO != NULL && mIBO != NULL )
 		{
+			_ASSERT( renderer );
+			_ASSERT( mShader );
+			_ASSERT( mVBO );
+			_ASSERT( mIBO );
+			_ASSERT( mLayout );
+
 			renderer->SetShader( mShader );
 			renderer->SetVBO( mVBO );
 			renderer->SetIBO( mIBO );
+			renderer->SetVertexLayout( mLayout );
 
 			// Set Uniforms.
 			//
@@ -63,134 +66,117 @@ namespace Sentinel
 			UINT uniformIndex = 0;
 			Vector3f pos;
 
-			const std::string& uniform = mShader->Uniform();
+			const std::vector< UniformType >& uniform = mShader->Uniform();
 			
 			for( UINT i = 0; i < uniform.size(); ++i )
 			{
 				switch( uniform[ i ] )
 				{
-					// Model-View-Projection Matrix.
-					//
-					case 'P':
-						_ASSERT( world );
-						_ASSERT( world->GetCamera() != NULL );
+				case UNIFORM_WVP:
+					_ASSERT( world );
+					_ASSERT( world->GetCamera() != NULL );
 
-						mShader->SetMatrix( uniformIndex, (world->GetCamera()->GetMatrixFinal() * mMatrixWorld).Ptr() );
-						break;
+					mShader->SetMatrix( uniformIndex, (world->GetCamera()->GetMatrixFinal() * mMatrixWorld).Ptr() );
+					break;
 
-					// World Matrix.
-					//
-					case 'p':
-						mShader->SetMatrix( uniformIndex, mMatrixWorld.Ptr() );
-						break;
+				case UNIFORM_WORLD:
+					mShader->SetMatrix( uniformIndex, mMatrixWorld.Ptr() );
+					break;
 
-					// Textures.
-					//
-					case 'X':
-						_ASSERT( mTexture[ texCount ] );	// no texture loaded
+				case UNIFORM_TEXTURE:
+					_ASSERT( mTexture[ texCount ] );	// no texture loaded
 
-						mShader->SetTexture( uniformIndex, mTexture[ texCount ].get() );
-						++texCount;
-						break;
+					mShader->SetTexture( uniformIndex, mTexture[ texCount ].get() );
+					++texCount;
+					break;
 
-					// Texture Scale.
-					//
-					case 'x':
-						mShader->SetFloat4( uniformIndex, mTextureScale.Ptr() );
-						break;
+				case UNIFORM_CAMERA_POS:
+					_ASSERT( world );
+					_ASSERT( world->GetCamera() );
 
-					// Camera Position.
-					//
-					case 'V':
-						_ASSERT( world );
-						_ASSERT( world->GetCamera() );
-
-						pos = world->GetCamera()->GetTransform()->mPosition;
+					pos = world->GetCamera()->GetTransform()->mPosition;
 						
-						mShader->SetFloat3( uniformIndex, pos.Ptr() );
-						break;
+					mShader->SetFloat3( uniformIndex, pos.Ptr() );
+					break;
 
-					// Light Position.
-					//
-					case 'L':
-						_ASSERT( world );
-						_ASSERT( world->GetLight( lightCount ));
+				case UNIFORM_LIGHT_POS:
+					_ASSERT( world );
+					_ASSERT( world->GetLight( lightCount ));
 
-						mShader->SetFloat3( uniformIndex, world->GetLight( lightCount )->GetTransform()->mPosition.Ptr() );
-						++uniformIndex;
+					mShader->SetFloat3( uniformIndex, world->GetLight( lightCount )->GetTransform()->mPosition.Ptr() );
+					break;
 
-						mShader->SetFloat3( uniformIndex, world->GetLight( lightCount )->mColor.Ptr() );
-						++uniformIndex;
+				case UNIFORM_LIGHT_COLOR:
+					_ASSERT( world );
+					_ASSERT( world->GetLight( lightCount ));
 
-						mShader->SetFloat4( uniformIndex, world->GetLight( lightCount )->mAttenuation.Ptr() );
-						++lightCount;
+					mShader->SetFloat3( uniformIndex, world->GetLight( lightCount )->mColor.Ptr() );
+					break;
 
-						break;
+				case UNIFORM_LIGHT_ATTN:
+					_ASSERT( world );
+					_ASSERT( world->GetLight( lightCount ));
 
-					// Material.
-					//
-					case 'M':
-						mShader->SetFloat4( uniformIndex, mMaterial.mAmbient.Ptr() );
-						++uniformIndex;
+					mShader->SetFloat4( uniformIndex, world->GetLight( lightCount )->mAttenuation.Ptr() );
+					break;
 
-						mShader->SetFloat4( uniformIndex, mMaterial.mDiffuse.Ptr() );
-						++uniformIndex;
+				case UNIFORM_AMBIENT:
+					mShader->SetFloat4( uniformIndex, mMaterial.mAmbient.Ptr() );
+					break;
 
-						mShader->SetFloat4( uniformIndex, mMaterial.mSpecular.Ptr() );
-						++uniformIndex;
+				case UNIFORM_DIFFUSE:
+					mShader->SetFloat4( uniformIndex, mMaterial.mDiffuse.Ptr() );
+					break;
 
-						mShader->SetFloat(  uniformIndex, mMaterial.mSpecularComponent );
-						break;
+				case UNIFORM_SPECULAR:
+					mShader->SetFloat4( uniformIndex, mMaterial.mSpecular.Ptr() );
+					break;
 
-					// Shadows.
-					//
-					case 'S':
-						mShader->SetMatrix( uniformIndex, (mMatrixShadow * mMatrixWorld).Ptr() );
-						++uniformIndex;
+				case UNIFORM_SPEC_COMP:
+					mShader->SetFloat(  uniformIndex, mMaterial.mSpecularComponent );
+					break;
 
-						mShader->SetFloat( uniformIndex, 0.0f );
-						break;
+				// Shadows.
+				//
+				/*case 'S':
+					mShader->SetMatrix( uniformIndex, (mMatrixShadow * mMatrixWorld).Ptr() );
+					++uniformIndex;
 
-					// Render Target Scale.
-					//
-					case 's':
-						mShader->SetFloat4( uniformIndex, mTextureScale.Ptr() );
-						break;
+					mShader->SetFloat( uniformIndex, 0.0f );
+					break;*/
 
-					// Delta Time.
-					//
-					case 't':
-						_ASSERT( world );
-						_ASSERT( world->mTiming );
+				case UNIFORM_DELTA_TIME:
+					_ASSERT( world );
+					_ASSERT( world->mTiming );
 
-						mShader->SetFloat( uniformIndex, world->mTiming->DeltaTime() );
-						break;
+					mShader->SetFloat( uniformIndex, world->mTiming->DeltaTime() );
+					break;
 
-					// Screen-Space Ambient Occlusion.
-					//
-					case 'A':
-						{
-						_ASSERT( world );
-						_ASSERT( world->GetCamera() );
+				// Screen-Space Ambient Occlusion.
+				//
+					/*
+				case 'A':
+					{
+					_ASSERT( world );
+					_ASSERT( world->GetCamera() );
 
-						const WindowInfo* info = renderer->GetWindow();
+					const WindowInfo* info = renderer->GetWindow();
 
-						Vector2f pixelSize( 1.0f / info->Width(), 1.0f / info->Height() );
+					Vector2f pixelSize( 1.0f / info->Width(), 1.0f / info->Height() );
 
-						mShader->SetMatrix( uniformIndex, (world->GetCamera()->GetMatrixProjection().Inverse()).Ptr() );
-						++uniformIndex;
+					mShader->SetMatrix( uniformIndex, (world->GetCamera()->GetMatrixProjection().Inverse()).Ptr() );
+					++uniformIndex;
 
-						mShader->SetMatrix( uniformIndex, const_cast< Matrix4f& >(world->GetCamera()->GetMatrixView()).Ptr() );
-						++uniformIndex;
+					mShader->SetMatrix( uniformIndex, const_cast< Matrix4f& >(world->GetCamera()->GetMatrixView()).Ptr() );
+					++uniformIndex;
 
-						mShader->SetFloat2( uniformIndex, pixelSize.Ptr() );
-						}
-						break;
+					mShader->SetFloat2( uniformIndex, pixelSize.Ptr() );
+					}
+					break;*/
 
-					// Unknown.
-					//
-					default:
-						break;
+				default:
+					REPORT_ERROR( "Mesh attempted to Draw with invalid Uniform!", "Mesh Draw Error" );
+					break;
 				}
 
 				++uniformIndex;

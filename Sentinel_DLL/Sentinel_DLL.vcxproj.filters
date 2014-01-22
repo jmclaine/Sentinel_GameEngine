@@ -79,6 +79,12 @@
     <Filter Include="Source Files\Sentinel_Engine\Components\View">
       <UniqueIdentifier>{5e1aada5-4b20-46c4-8201-7cd3403d93bb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Sentinel_Engine\Systems\Renderer\GL">
+      <UniqueIdentifier>{9ee354e0-8238-410b-828f-d127760e3d84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Sentinel_Engine\Systems\Renderer\DX">
+      <UniqueIdentifier>{0a3b4c92-7da0-4063-9807-b09ac32eaab0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Engine\src\Texture.h">
@@ -297,9 +303,6 @@
     <ClInclude Include="..\Engine\src\Material.h">
       <Filter>Source Files\Sentinel_Engine\Misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\Buffer.h">
-      <Filter>Source Files\Sentinel_Engine\Misc</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\Point.h">
       <Filter>Source Files\Sentinel_Engine\Misc</Filter>
     </ClInclude>
@@ -353,6 +356,45 @@
     </ClInclude>
     <ClInclude Include="..\Engine\src\Debug.h">
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Tokenizer.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\VertexLayout.h">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Buffer.h">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\GL\BufferGL.h">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\GL\CommonGL.h">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\GL\ShaderGL.h">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\GL\TextureGL.h">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\GL\VertexLayoutGL.h">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\DX\BufferDX.h">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer\DX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\DX\CommonDX.h">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer\DX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\DX\TextureDX.h">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer\DX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\DX\ShaderDX.h">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer\DX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\DX\VertexLayoutDX.h">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer\DX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -611,15 +653,6 @@
     <ClCompile Include="..\Engine\src\Material.cpp">
       <Filter>Source Files\Sentinel_Engine\Misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\Buffer.cpp">
-      <Filter>Source Files\Sentinel_Engine\Misc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\RendererGL.cpp">
-      <Filter>Source Files\Sentinel_Engine\Systems\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\RendererDX.cpp">
-      <Filter>Source Files\Sentinel_Engine\Systems\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\Renderer.cpp">
       <Filter>Source Files\Sentinel_Engine\Systems\Renderer</Filter>
     </ClCompile>
@@ -664,6 +697,45 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\Debug.cpp">
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Tokenizer.cpp">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\VertexLayout.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Buffer.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\GL\BufferGL.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\GL\RendererGL.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\GL\ShaderGL.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\GL\TextureGL.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\GL\VertexLayoutGL.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\DX\BufferDX.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer\DX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\DX\RendererDX.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer\DX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\DX\TextureDX.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer\DX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\DX\ShaderDX.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer\DX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\DX\VertexLayoutDX.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer\DX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

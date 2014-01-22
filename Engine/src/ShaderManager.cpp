@@ -28,8 +28,8 @@ namespace Sentinel
 			//
 			archive.Write( &it->first );
 
-			archive.Write( &shader->Attribute() );
-			archive.Write( &shader->Uniform() );
+			//archive.Write( &shader->Attribute() );
+			//archive.Write( &shader->Uniform() );
 
 			// Store the compressed shader source.
 			//
@@ -63,11 +63,11 @@ namespace Sentinel
 			std::string name;
 			archive.Read( &name );
 
-			std::string attrib;
-			archive.Read( &attrib );
+			//std::string attrib;
+			//archive.Read( &attrib );
 
-			std::string uniform;
-			archive.Read( &uniform );
+			//std::string uniform;
+			//archive.Read( &uniform );
 
 			ULONG size;
 			archive.Read( &size, 1, true );
@@ -85,8 +85,8 @@ namespace Sentinel
 
 			TRACE( "Compiling '" << name << "'..." );
 
-			if( !Add( name, renderer->CreateShaderFromMemory( source, attrib.c_str(), uniform.c_str() )))
-				throw std::exception( "Failed to read shader." );
+			//if( !Add( name, renderer->CreateShaderFromMemory( source, attrib, uniform )))
+			//	throw std::exception( "Failed to read shader." );
 
 			free( comp_source );
 		}
@@ -109,26 +109,24 @@ namespace Sentinel
 
 		// Read <Definition>
 		//
-		TiXmlElement* pElem = pMain->FirstChild( "Definition" )->ToElement();
+		TiXmlElement* pDef = pMain->FirstChild( "Definition" )->ToElement();
 
 		// Store each shader.
 		//
-		while( pElem != NULL )
+		while( pDef != NULL )
 		{
-			const char* pFile = pElem->Attribute( "FileName" );
-			const char* pAttr = pElem->Attribute( "Attribute" );
-			const char* pUnif = pElem->Attribute( "Uniform" );
-			const char* pName = pElem->Attribute( "Name" );
+			const char* pFile = pDef->Attribute( "FileName" );
+			const char* pName = pDef->Attribute( "Name" );
 
-			std::shared_ptr< Shader > shader = shaderManager->Add( pName, renderer->CreateShaderFromFile( pFile, pAttr, pUnif ));
-			
+			std::shared_ptr< Shader > shader = shaderManager->Add( pName, renderer->CreateShaderFromFile( pFile ));
+
 			if( !shader )
 			{
 				TRACE( "Failed to load shader '" << std::string( pFile ) << "'" );
 				return false;
 			}
 
-			pElem = pElem->NextSiblingElement();
+			pDef = pDef->NextSiblingElement();
 		}
 
 		return true;

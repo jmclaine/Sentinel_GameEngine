@@ -23,6 +23,7 @@ namespace Sentinel
 	class Archive;
 	class ShaderManager;
 	class TextureManager;
+	class VertexLayout;
 
 	class SENTINEL_DLL Mesh
 	{
@@ -35,10 +36,11 @@ namespace Sentinel
 		Buffer*				mVBO;
 		Buffer*				mIBO;
 
+		std::shared_ptr< VertexLayout > mLayout;
+
 		Matrix4f			mMatrixWorld;
 		Matrix4f			mMatrixShadow;		// camera matrix
-		Vector4f			mTextureScale;
-
+		
 		std::shared_ptr< Shader >	mShader;
 		
 		Material			mMaterial;

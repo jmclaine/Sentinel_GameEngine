@@ -162,14 +162,17 @@ public:
 		// Create wire cube from solid cubes.
 		// Adjust spaces using scale of object.
 		//
-		builder.mShader = mEditorWorld->mShaderManager->Get( "Color Only" );
+		std::shared_ptr< Shader > shaderColor = mEditorWorld->mShaderManager->Get( "Color Only" );
+
+		builder.mLayout = shaderColor->Layout();
 		builder.CreateWireCube( 1 );
 		
 		mBoundsMesh = builder.BuildMesh( mRenderer );
+		mBoundsMesh->mShader = shaderColor;
 
 		mGameWorld->SetCamera( mEditorWorld->GetCamera( 1 ));
 
-		mDebug = new Debug( mRenderer, mGameWorld, mEditorWorld->mShaderManager->Get( "Color Only" ));
+		mDebug = new Debug( mRenderer, mGameWorld, shaderColor );
 
 		SetDirectory( ".." );
 	}
@@ -352,7 +355,6 @@ public:
 
 		if( !ShaderManager::LoadConfig( "config.xml", mRenderer, mEditorWorld->mShaderManager ))
 		{
-			REPORT_ERROR( "Failed to load 'Assets\\Shaders\\config.xml'", "Shader Load Failure" );
 			throw AppException( "Failed to load 'Assets\\Shaders\\config.xml'" );
 		}
 
@@ -444,7 +446,7 @@ public:
 		WidgetComponent* widgetComp = (WidgetComponent*)obj->AttachComponent( new WidgetComponent( sprite, mFontSystem, 0 ), "Widget" );
 		
 		GUI::WidgetObject*				widget;
-		GUI::ModelWidget*			model;
+		GUI::ModelWidget*				model;
 		GUI::SpriteViewWidget*			view;
 		GUI::MeshViewWidget*			drawableMesh;
 		GUI::LabelWidget*				label;
@@ -718,11 +720,14 @@ public:
 			
 		// Ground object.
 		//
+		std::shared_ptr< Shader > shaderColor = mGameWorld->mShaderManager->Get( "Color" );
+
 		meshBuilder.CreateCube( 1.0f );
-		meshBuilder.mShader    = mGameWorld->mShaderManager->Get( "Color" );
+		meshBuilder.mLayout    = shaderColor->Layout();
 		meshBuilder.mPrimitive = TRIANGLE_LIST;
 
 		mesh = mGameWorld->mMeshManager->Add( "Ground", std::shared_ptr< Mesh >(meshBuilder.BuildMesh( mRenderer )));
+		mesh->mShader = shaderColor;
 		//mAssetMesh->addChild( new AssetTreeItem< Mesh >( "Ground", mesh ));
 	
 		obj = mGameWorld->AddGameObject( new GameObject(), "Ground" );
@@ -743,12 +748,15 @@ public:
 			
 		// Test object.
 		//
+		std::shared_ptr< Shader > shaderTexture = mGameWorld->mShaderManager->Get( "Texture" );
+
 		meshBuilder.ClearGeometry();
 		meshBuilder.CreateDodecahedron( 1.0f );
-		meshBuilder.mShader = mGameWorld->mShaderManager->Get( "Texture" );
+		meshBuilder.mLayout = shaderTexture->Layout();
 		meshBuilder.mTexture[ TEXTURE_DIFFUSE ] = mGameWorld->mTextureManager->Get( "default-alpha.png" );
 
 		mesh = mGameWorld->mMeshManager->Add( "Dodecahedron", std::shared_ptr< Mesh >(meshBuilder.BuildMesh( mRenderer )));
+		mesh->mShader = shaderColor;	// intentionally set wrong shader to demonstrate vertex layout compatibility
 		//AddAsset( "Dodecahedron", mesh );
 			
 		GameObject* obj2 = new GameObject();
@@ -773,6 +781,7 @@ public:
 		meshBuilder.CreateSphere( 1.0f, 10, 10 );
 			
 		mesh = mGameWorld->mMeshManager->Add( "Sphere", std::shared_ptr< Mesh >(meshBuilder.BuildMesh( mRenderer )));
+		mesh->mShader = shaderTexture;
 		//AddAsset( "Sphere", mesh );
 
 		obj = mGameWorld->AddGameObject( new GameObject(), "Sphere" );
@@ -1032,7 +1041,7 @@ int APIENTRY _tWinMain( HINSTANCE hInstance,
 	//
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	_CrtSetReportMode( _CRT_ERROR, _CRTDBG_MODE_DEBUG );
-	//_CrtSetBreakAlloc( 669 );
+	//_CrtSetBreakAlloc( 1260 );
 
 	UNREFERENCED_PARAMETER( hPrevInstance );
 	UNREFERENCED_PARAMETER( lpCmdLine );

@@ -2,18 +2,17 @@
 
 // Textures.
 //
-Texture2D    tex0		:register(t0);
-SamplerState sampler0	:register(s0);
+Texture2D    _Texture0	:register(t0);
+SamplerState _Sampler0	:register(s0);
 
 
 // Vertex Shader.
 //
 struct VSInput
 {
-	float4 Texture0		:TEXCOORD0;
-	float4 Color		:COLOR0;
-
-	float4x4 Matrix		:MATRIX;
+	float4 QuadCoord0	:QUADCOORD0;
+	float4 Color		:COLOR;
+	matrix Matrix		:MATRIX;
 };
 
 VSInput VS_Main(VSInput input)
@@ -27,7 +26,7 @@ VSInput VS_Main(VSInput input)
 struct GSOutput
 {
 	float4 Position		:SV_POSITION;
-	float2 Texture0		:TEXCOORD0;
+	float2 TexCoord0	:TEXCOORD0;
 	float4 Color		:COLOR0;
 };
 
@@ -40,25 +39,25 @@ void GS_Main(point VSInput input[1], inout TriangleStream<GSOutput> TriStream)
 	// Top right.
 	//
 	output.Position = mul(input[0].Matrix, float4(1, 1, 0, 1));
-	output.Texture0 = float2(input[0].Texture0.z, input[0].Texture0.y);
+	output.TexCoord0 = float2(input[0].QuadCoord0.z, input[0].QuadCoord0.y);
 	TriStream.Append(output);
 
 	// Top left.
 	//
 	output.Position = mul(input[0].Matrix, float4(-1, 1, 0, 1));
-	output.Texture0 = float2(input[0].Texture0.x, input[0].Texture0.y);
+	output.TexCoord0 = float2(input[0].QuadCoord0.x, input[0].QuadCoord0.y);
 	TriStream.Append(output);
 
 	// Bottom right.
 	//
 	output.Position = mul(input[0].Matrix, float4(1, -1, 0, 1));
-	output.Texture0 = float2(input[0].Texture0.z, input[0].Texture0.w);
+	output.TexCoord0 = float2(input[0].QuadCoord0.z, input[0].QuadCoord0.w);
 	TriStream.Append(output);
 
 	// Bottom left.
 	//
 	output.Position = mul(input[0].Matrix, float4(-1, -1, 0, 1));
-	output.Texture0 = float2(input[0].Texture0.x, input[0].Texture0.w);
+	output.TexCoord0 = float2(input[0].QuadCoord0.x, input[0].QuadCoord0.w);
 	TriStream.Append(output);
 }
 
@@ -67,7 +66,7 @@ void GS_Main(point VSInput input[1], inout TriangleStream<GSOutput> TriStream)
 //
 float4 PS_Main(GSOutput input):SV_Target
 {
-	return tex0.Sample(sampler0, input.Texture0) * input.Color;
+	return _Texture0.Sample(_Sampler0, input.TexCoord0) * input.Color;
 }
 
 #endif
@@ -78,24 +77,24 @@ float4 PS_Main(GSOutput input):SV_Target
 
 #ifdef VERTEX_SHADER
 
-in vec4 aTexture0;
-in vec4 aColor;
-in mat4 aMatrix;
+in vec4 QuadCoord0;
+in vec4 Color;
+in mat4 Matrix;
 
-out vec4 gvTex0;
+out vec4 gvQuadCoord0;
 out vec4 gvColor;
 out mat4 gvMatrix;
 
 void main()
 {
 	// Texture color
-	gvTex0 = aTexture0;
+	gvQuadCoord0 = QuadCoord0;
 
 	// Vertex color
-	gvColor = aColor;
+	gvColor = Color;
 
 	// Matrix
-	gvMatrix = aMatrix;
+	gvMatrix = Matrix;
 }
 
 #endif
@@ -104,11 +103,11 @@ void main()
 layout (points) in;
 layout (triangle_strip, max_vertices=4) out;
 
-in vec4 gvTex0[];
+in vec4 gvQuadCoord0[];
 in vec4 gvColor[];
 in mat4 gvMatrix[];
 
-out vec2 vTex0;
+out vec2 vTexCoord0;
 out vec4 vColor;
 
 void main()
@@ -118,25 +117,28 @@ void main()
 	// Top right.
 	//
 	gl_Position = gvMatrix[0] * vec4(1, 1, 0, 1);
-	vTex0 = vec2(gvTex0[0].z, gvTex0[0].y);
+	vTexCoord0 = vec2(gvQuadCoord0[0].z, gvQuadCoord0[0].y);
 	EmitVertex();
 
 	// Top left.
 	//
+	vColor = gvColor[0];
 	gl_Position = gvMatrix[0] * vec4(-1, 1, 0, 1);
-	vTex0 = vec2(gvTex0[0].x, gvTex0[0].y);
+	vTexCoord0 = vec2(gvQuadCoord0[0].x, gvQuadCoord0[0].y);
 	EmitVertex();
 
 	// Bottom right.
 	//
+	vColor = gvColor[0];
 	gl_Position = gvMatrix[0] * vec4(1, -1, 0, 1);
-	vTex0 = vec2(gvTex0[0].z, gvTex0[0].w);
+	vTexCoord0 = vec2(gvQuadCoord0[0].z, gvQuadCoord0[0].w);
 	EmitVertex();
 
 	// Bottom left.
 	//
+	vColor = gvColor[0];
 	gl_Position = gvMatrix[0] * vec4(-1, -1, 0, 1);
-	vTex0 = vec2(gvTex0[0].x, gvTex0[0].w);
+	vTexCoord0 = vec2(gvQuadCoord0[0].x, gvQuadCoord0[0].w);
 	EmitVertex();
 	
 	EndPrimitive();
@@ -145,16 +147,16 @@ void main()
 #endif
 #ifdef FRAGMENT_SHADER
 
-uniform sampler2D tex0;
+uniform sampler2D _Texture0;
 
-in vec2 vTex0;
+in vec2 vTexCoord0;
 in vec4 vColor;
 
 out vec4 vFragColor;
 
 void main()
 {
-	vFragColor = clamp(texture2D(tex0, vTex0) * vColor, 0.0, 1.0);
+	vFragColor = clamp(texture2D(_Texture0, vTexCoord0) * vColor, 0.0, 1.0);
 }
 
 #endif

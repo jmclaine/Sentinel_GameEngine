@@ -13,9 +13,8 @@ namespace Sentinel
 	////////////////////////////////////
 
 	Shader::Shader() :
-		mShaderSource( NULL ),
-		mSampler( NULL ),
-		mVertexSize( 0 )
+		mSource( NULL ),
+		mSampler( NULL )
 	{}
 
 	Shader::~Shader()
@@ -28,98 +27,26 @@ namespace Sentinel
 			delete[] mSampler;
 		}
 
-		free( mShaderSource );
+		free( mSource );
 	}
 
 	const char* Shader::Source()
 	{
-		return mShaderSource;
+		return mSource;
 	}
 
-	const std::string& Shader::Attribute()
+	const std::vector< AttributeType >& Shader::Attribute()
 	{
 		return mAttribute;
 	}
 
-	const std::string& Shader::Uniform()
+	const std::vector< UniformType >& Shader::Uniform()
 	{
 		return mUniform;
 	}
 
-	UINT Shader::VertexSize()
+	const std::shared_ptr< VertexLayout > Shader::Layout()
 	{
-		return mVertexSize;
-	}
-
-	void Shader::ProcessUniforms()
-	{
-		char name[ 32 ];
-		UINT lightCount = 0;
-		UINT texCount = 0;
-		for( UINT i = 0; i < mUniform.size(); ++i )
-		{
-			switch( mUniform[ i ] )
-			{
-				case 'P':
-					CreateUniform( "wvp" );
-					break;
-
-				case 'p':
-					CreateUniform( "world" );
-					break;
-
-				case 'X':
-					sprintf_s( name, "tex%d", texCount );
-					CreateUniform( name );
-					++texCount;
-					break;
-
-				case 'x':
-					CreateUniform( "texScale" );
-					break;
-
-				case 'V':
-					CreateUniform( "cam_pos" );
-					break;
-
-				case 'L':
-					sprintf_s( name, "light_pos%d",   lightCount );
-					CreateUniform( name );
-					sprintf_s( name, "light_color%d", lightCount );
-					CreateUniform( name );
-					sprintf_s( name, "light_attn%d",  lightCount );
-					CreateUniform( name );
-					++lightCount;
-					break;
-
-				case 'M':
-					CreateUniform( "ambient" );
-					CreateUniform( "diffuse" );
-					CreateUniform( "specular" );
-					CreateUniform( "spec_comp" );
-					break;
-
-				case 'S':
-					CreateUniform( "mlvlp" );
-					CreateUniform( "shadow_epsilon" );
-					break;
-
-				case 's':
-					CreateUniform( "rtScale" );
-					break;
-
-				case 'B':
-					CreateUniform( "bone" );
-					break;
-
-				case 't':
-					CreateUniform( "deltaTime" );
-					break;
-
-				default:
-					TRACE( mUniform[ i ] << " = UNIFORM UNKNOWN" );
-					break;
-			}
-		}
+		return mLayout;
 	}
 }

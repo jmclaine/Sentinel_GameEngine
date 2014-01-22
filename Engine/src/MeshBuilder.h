@@ -34,6 +34,7 @@ namespace Sentinel
 	class Texture;
 	class Shader;
 	class Renderer;
+	class VertexLayout;
 
 	class SENTINEL_DLL MeshBuilder
 	{
@@ -46,37 +47,37 @@ namespace Sentinel
 		//
 		struct Vertex
 		{
-			Vector3f	mPosition;	// P
+			Vector3f	mPosition;
 
-			// Texture Coordinates are either uv / xy based (X),
-			// or xyzw / quad (x) based depending on the shader
+			// Texture Coordinates are either uv / xy based,
+			// or xyzw / quad based depending on the shader
 			// attribute.
 			//
-			Vector2f	mTextureCoords[ NUM_TEXTURES ];	// X
-			Vector4f	mQuadCoords[ NUM_TEXTURES ];	// x
+			Vector2f	mTexCoord[ NUM_TEXTURES ];
+			Vector4f	mQuadCoord[ NUM_TEXTURES ];
 			
-			Vector3f	mNormal;	// N
-			UINT		mColor;		// C
+			Vector3f	mNormal;
+			UINT		mColor;
 
 			// Normal Mapping.
 			//
-			Vector4f	mTangent;	// T
+			Vector4f	mTangent;
 
-			// Bones.				// B
+			// Bones.
 			//
-			float		mWeight[ 4 ];
-			int			mMatrixIndex[ 4 ];
-			int			mNumBones;
+			int			mBoneCount;
+			int			mBoneIndex[ 4 ];
+			float		mBoneWeight[ 4 ];
 
-			// Vertex Matrix for Sprites. // M
+			// Vertex Matrix for Sprites
 			//
-			Matrix4f	mMatrixVertex;
+			Matrix4f	mMatrix;
 
 			Vertex() :
 				mPosition( Vector3f( 0, 0, 0 )),
 				mColor( 0xFFFFFFFF )
 			{
-				mMatrixVertex.Identity();
+				mMatrix.Identity();
 			}
 
 			Vertex( const Vector3f& pos, const ColorRGBA& color = ColorRGBA( 1, 1, 1, 1 )) :
@@ -84,7 +85,7 @@ namespace Sentinel
 			{
 				mColor = color.ToUINT();
 
-				mMatrixVertex.Identity();
+				mMatrix.Identity();
 			}
 		};
 
@@ -95,12 +96,12 @@ namespace Sentinel
 
 	public:
 
-		std::shared_ptr< Shader >	mShader;
+		std::shared_ptr< VertexLayout > mLayout;
+
 		PrimitiveType				mPrimitive;
 
 		std::shared_ptr< Texture >	mTexture[ NUM_TEXTURES ];	// uses TextureType
-		Vector4f					mTextureScale;
-
+		
 		std::vector< Vertex >		mVertex;
 		std::vector< UINT >			mIndex;
 

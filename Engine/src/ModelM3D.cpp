@@ -41,11 +41,11 @@ namespace Sentinel
 
 			// Bones.
 			//
-			float		mWeight[ 4 ];
-			int			mMatrixIndex[ 4 ];
-			int			mNumBones;
+			int			mBoneCount;
+			int			mBoneIndex[ 4 ];
+			float		mBoneWeight[ 4 ];
 
-			Vertex() : mNumBones( 0 ) {}
+			Vertex() : mBoneCount( 0 ) {}
 		};
 
 		struct KeyFrame
@@ -329,12 +329,12 @@ namespace Sentinel
 
 					if( mIsWeighted )
 					{
-						archive.Read( &vertices[ x ].mNumBones );
+						archive.Read( &vertices[ x ].mBoneCount );
 
-						for( int y = 0; y < vertices[ x ].mNumBones; ++y )
+						for( int y = 0; y < vertices[ x ].mBoneCount; ++y )
 						{
-							archive.Read( &vertices[ x ].mMatrixIndex[ y ] );
-							archive.Read( &vertices[ x ].mWeight[ y ] );
+							archive.Read( &vertices[ x ].mBoneIndex[ y ] );
+							archive.Read( &vertices[ x ].mBoneWeight[ y ] );
 						}
 					}
 				}
@@ -446,29 +446,33 @@ namespace Sentinel
 							material = Material();
 						}
 
+						std::shared_ptr< Shader > shader;
+
 						if( numTextures == 0 )
 						{
-							builder.mShader = shaderManager->Get( "Color" );
+							shader = shaderManager->Get( "Color" );
 						}
 						else
 						if( isSkinned )
 						{
-							builder.mShader = shaderManager->Get( "Skinning" );
+							shader = shaderManager->Get( "Skinning" );
 						}
 						else
 						if( numTextures == 1 )
 						{
-							builder.mShader = shaderManager->Get( "Texture" );
+							shader = shaderManager->Get( "Texture" );
 						}
 						else
 						if( numTextures == 2 )
 						{
-							builder.mShader = shaderManager->Get( "Normal Map" );
+							shader = shaderManager->Get( "Normal Map" );
 						}
 						else
 						{
-							builder.mShader = shaderManager->Get( "Parallax" );
+							shader = shaderManager->Get( "Parallax" );
 						}
+
+						builder.mLayout = renderer->CreateVertexLayout( shader->Attribute() );
 
 						// Read faces.
 						//
@@ -492,13 +496,13 @@ namespace Sentinel
 
 							if( isSkinned )
 							{
-								COPY_ARRAY( meshVertex.mWeight, vertices[ vertex ].mWeight, 4 );
-								COPY_ARRAY( meshVertex.mMatrixIndex, vertices[ vertex ].mMatrixIndex, 4 );
-								meshVertex.mNumBones = vertices[ vertex ].mNumBones;
+								COPY_ARRAY( meshVertex.mBoneWeight, vertices[ vertex ].mBoneWeight, 4 );
+								COPY_ARRAY( meshVertex.mBoneIndex, vertices[ vertex ].mBoneIndex, 4 );
+								meshVertex.mBoneCount = vertices[ vertex ].mBoneCount;
 							}
 
 							meshVertex.mNormal = normals[ normal ];
-							meshVertex.mTextureCoords[ 0 ] = Vector2f( texCoords[ texCoord ].x, texCoords[ texCoord ].y );
+							meshVertex.mTexCoord[ 0 ] = Vector2f( texCoords[ texCoord ].x, texCoords[ texCoord ].y );
 
 							builder.mVertex.push_back( meshVertex );
 
@@ -508,6 +512,7 @@ namespace Sentinel
 						builder.CalculateTangents( false );
 						
 						mObject[ x ].mMesh[ y ] = builder.BuildMesh( renderer );
+						mObject[ x ].mMesh[ y ]->mShader   = shader;
 						mObject[ x ].mMesh[ y ]->mMaterial = material;
 
 						builder.ApplyMatrix( mObject[ x ].mKeyFrame[ 0 ].mMatrix );

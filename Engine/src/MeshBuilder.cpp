@@ -8,6 +8,7 @@
 #include "Shader.h"
 #include "Buffer.h"
 #include "Texture.h"
+#include "VertexLayout.h"
 
 namespace Sentinel
 {
@@ -23,14 +24,12 @@ namespace Sentinel
 	{
 		mPrimitive = TRIANGLE_LIST;
 
-		mShader.reset();
+		mLayout = NULL;
 
 		for( UINT i = 0; i < NUM_TEXTURES; ++i )
 			mTexture[ i ] = NULL;
 		
 		ClearGeometry();
-
-		mTextureScale = Vector4f( 0, 0, 1, 1 );
 	}
 
 	void MeshBuilder::ClearGeometry()
@@ -48,7 +47,7 @@ namespace Sentinel
 	{
 		for( UINT i = 0; i < mVertex.size(); ++i )
 		{
-			if( mVertex[ i ].mPosition == pos && mVertex[ i ].mTextureCoords[ 0 ] == tex && mVertex[ i ].mNormal == normal )
+			if( mVertex[ i ].mPosition == pos && mVertex[ i ].mTexCoord[ 0 ] == tex && mVertex[ i ].mNormal == normal )
 				return i;
 		}
 
@@ -123,11 +122,11 @@ namespace Sentinel
 
 			// Calculate the tangents.
 			//
-			float s1 = mVertex[ j[1] ].mTextureCoords[0].x - mVertex[ j[0] ].mTextureCoords[0].x;
-			float t1 = mVertex[ j[1] ].mTextureCoords[0].y - mVertex[ j[0] ].mTextureCoords[0].y;
+			float s1 = mVertex[ j[1] ].mTexCoord[0].x - mVertex[ j[0] ].mTexCoord[0].x;
+			float t1 = mVertex[ j[1] ].mTexCoord[0].y - mVertex[ j[0] ].mTexCoord[0].y;
 
-			float s2 = mVertex[ j[2] ].mTextureCoords[0].x - mVertex[ j[0] ].mTextureCoords[0].x;
-			float t2 = mVertex[ j[2] ].mTextureCoords[0].y - mVertex[ j[0] ].mTextureCoords[0].y;
+			float s2 = mVertex[ j[2] ].mTexCoord[0].x - mVertex[ j[0] ].mTexCoord[0].x;
+			float t2 = mVertex[ j[2] ].mTexCoord[0].y - mVertex[ j[0] ].mTexCoord[0].y;
 
 			float det = 1.0f / (s1*t2 - s2*t1);
 
@@ -211,29 +210,29 @@ namespace Sentinel
 
 		Vertex vertex;
 		vertex.mPosition			= cornerUL * -size;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0, 1 );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0, 1 );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0, 1 );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0, 1 );
 		vertex.mNormal				= normal;
 
 		mVertex.push_back( vertex );
 		
 		vertex.mPosition			= cornerUR * -size;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1, 1 );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1, 1 );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1, 1 );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1, 1 );
 		vertex.mNormal				= normal;
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= cornerUL * size;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1, 0 );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1, 0 );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1, 0 );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1, 0 );
 		vertex.mNormal				= normal;
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= cornerUR * size;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0, 0 );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0, 0 );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0, 0 );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0, 0 );
 		vertex.mNormal				= normal;
 
 		mVertex.push_back( vertex );
@@ -416,8 +415,8 @@ namespace Sentinel
 
 		Vertex vertex;
 		vertex.mPosition			= Vector3f( 0.0f, -zHeight, 0.0f );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.5f, 0.5f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.5f, 0.5f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.5f, 0.5f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.5f, 0.5f );
 		vertex.mNormal				= Vector3f( 0.0f, -1.0f, 0.0f );
 
 		mVertex.push_back( vertex );
@@ -425,8 +424,8 @@ namespace Sentinel
 		for( j = 0; j <= slices; j++ )
 		{
 			vertex.mPosition			= Vector3f( cost[ j ]*radius, -zHeight, sint[ j ]*radius );
-			vertex.mTextureCoords[ 0 ]	= Vector2f( 0.5f + cost[ j ]*0.5f, 0.5f + sint[ j ]*0.5f );
-			vertex.mTextureCoords[ 1 ]	= Vector2f( 0.5f + cost[ j ]*0.5f, 0.5f + sint[ j ]*0.5f );
+			vertex.mTexCoord[ 0 ]	= Vector2f( 0.5f + cost[ j ]*0.5f, 0.5f + sint[ j ]*0.5f );
+			vertex.mTexCoord[ 1 ]	= Vector2f( 0.5f + cost[ j ]*0.5f, 0.5f + sint[ j ]*0.5f );
 
 			mVertex.push_back( vertex );
 		}
@@ -441,8 +440,8 @@ namespace Sentinel
 		vertCount = (int)mVertex.size();
 
 		vertex.mPosition			= Vector3f( 0.0f, zHeight, 0.0f );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.5f, 0.5f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.5f, 0.5f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.5f, 0.5f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.5f, 0.5f );
 		vertex.mNormal				= Vector3f( 0.0f, 1.0f, 0.0f );
 
 		mVertex.push_back( vertex );
@@ -450,8 +449,8 @@ namespace Sentinel
 		for( j = slices; j >= 0; j-- )
 		{
 			vertex.mPosition			= Vector3f( cost[ j ]*radius, zHeight, sint[ j ]*radius );
-			vertex.mTextureCoords[ 0 ]	= Vector2f( 0.5f + cost[ j ]*0.5f, 0.5f + sint[ j ]*0.5f );
-			vertex.mTextureCoords[ 1 ]	= Vector2f( 0.5f + cost[ j ]*0.5f, 0.5f + sint[ j ]*0.5f );
+			vertex.mTexCoord[ 0 ]	= Vector2f( 0.5f + cost[ j ]*0.5f, 0.5f + sint[ j ]*0.5f );
+			vertex.mTexCoord[ 1 ]	= Vector2f( 0.5f + cost[ j ]*0.5f, 0.5f + sint[ j ]*0.5f );
 
 			mVertex.push_back( vertex );
 		}
@@ -480,15 +479,15 @@ namespace Sentinel
 				float u = ((float)j / (float)slices * 2.0f);
 				
 				vertex.mPosition			= Vector3f( cost[ j ]*radius, z0, sint[ j ]*radius );
-				vertex.mTextureCoords[ 0 ]	= Vector2f( u, 0.0f );
-				vertex.mTextureCoords[ 1 ]	= Vector2f( u, 0.0f );
+				vertex.mTexCoord[ 0 ]	= Vector2f( u, 0.0f );
+				vertex.mTexCoord[ 1 ]	= Vector2f( u, 0.0f );
 				vertex.mNormal				= Vector3f( cost[ j ], 0.0f, sint[ j ] );
 
 				mVertex.push_back( vertex );
 
 				vertex.mPosition			= Vector3f( cost[ j ]*radius, z1, sint[ j ]*radius );
-				vertex.mTextureCoords[ 0 ]	= Vector2f( u, 1.0f );
-				vertex.mTextureCoords[ 1 ]	= Vector2f( u, 1.0f );
+				vertex.mTexCoord[ 0 ]	= Vector2f( u, 1.0f );
+				vertex.mTexCoord[ 1 ]	= Vector2f( u, 1.0f );
 				vertex.mNormal				= Vector3f( cost[ j ], 0.0f, sint[ j ] );
 
 				mVertex.push_back( vertex );
@@ -540,22 +539,22 @@ namespace Sentinel
 
 		Vertex vertex;
 		vertex.mPosition			= r1;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.5f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.5f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.5f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.5f, 1.0f );
 		vertex.mNormal				= Vector3f( -1.0f, 0.0f, 0.0f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= r3;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.0f );
 		vertex.mNormal				= Vector3f( -1.0f, 0.0f, 0.0f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= r2;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.0f );
 		vertex.mNormal				= Vector3f( -1.0f, 0.0f, 0.0f );
 
 		mVertex.push_back( vertex );
@@ -563,68 +562,68 @@ namespace Sentinel
 		////////////////////////////////////////
 
 		vertex.mPosition			= r0;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.5f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.5f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.5f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.5f, 1.0f );
 		vertex.mNormal				= Vector3f( 0.333333333333f, -0.942809041582f, 0.0f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= r2;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.0f );
 		vertex.mNormal				= Vector3f( 0.333333333333f, -0.942809041582f, 0.0f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= r3;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.0f );
 		vertex.mNormal				= Vector3f( 0.333333333333f, -0.942809041582f, 0.0f );
-
-		mVertex.push_back( vertex );
-
-		////////////////////////////////////////
-		
-		vertex.mPosition			= r0;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.5f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.5f, 1.0f );
-		vertex.mNormal				= Vector3f( 0.333333333333f,  0.471404520791f, -0.816496580928f );
-
-		mVertex.push_back( vertex );
-
-		vertex.mPosition			= r3;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.0f );
-		vertex.mNormal				= Vector3f( 0.333333333333f,  0.471404520791f, -0.816496580928f );
-
-		mVertex.push_back( vertex );
-
-		vertex.mPosition			= r1;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.0f );
-		vertex.mNormal				= Vector3f( 0.333333333333f,  0.471404520791f, -0.816496580928f );
 
 		mVertex.push_back( vertex );
 
 		////////////////////////////////////////
 		
 		vertex.mPosition			= r0;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.5f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.5f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.5f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.5f, 1.0f );
+		vertex.mNormal				= Vector3f( 0.333333333333f,  0.471404520791f, -0.816496580928f );
+
+		mVertex.push_back( vertex );
+
+		vertex.mPosition			= r3;
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mNormal				= Vector3f( 0.333333333333f,  0.471404520791f, -0.816496580928f );
+
+		mVertex.push_back( vertex );
+
+		vertex.mPosition			= r1;
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mNormal				= Vector3f( 0.333333333333f,  0.471404520791f, -0.816496580928f );
+
+		mVertex.push_back( vertex );
+
+		////////////////////////////////////////
+		
+		vertex.mPosition			= r0;
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.5f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.5f, 1.0f );
 		vertex.mNormal				= Vector3f( 0.333333333333f,  0.471404520791f,  0.816496580928f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= r1;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.0f );
 		vertex.mNormal				= Vector3f( 0.333333333333f,  0.471404520791f,  0.816496580928f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= r2;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.0f );
 		vertex.mNormal				= Vector3f( 0.333333333333f,  0.471404520791f,  0.816496580928f );
 
 		mVertex.push_back( vertex );
@@ -647,22 +646,22 @@ namespace Sentinel
 
 		Vertex vertex;
 		vertex.mPosition			= Vector3f( radius, 0.0f, 0.0f );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.0f );
 		vertex.mNormal				= Vector3f( 0.577350269189f, 0.577350269189f, 0.577350269189f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, radius, 0.0f );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 1.0f );
 		vertex.mNormal				= Vector3f( 0.577350269189f, 0.577350269189f, 0.577350269189f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, 0.0f, radius );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.0f );
 		vertex.mNormal				= Vector3f( 0.577350269189f, 0.577350269189f, 0.577350269189f );
 
 		mVertex.push_back( vertex );
@@ -670,22 +669,22 @@ namespace Sentinel
 		////////////////////////////////////////
 
 		vertex.mPosition			= Vector3f( radius, 0.0f, 0.0f );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.0f );
 		vertex.mNormal				= Vector3f( 0.577350269189f, 0.577350269189f, -0.577350269189f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, 0.0f, -radius );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 1.0f );
 		vertex.mNormal				= Vector3f( 0.577350269189f, 0.577350269189f, -0.577350269189f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, radius, 0.0f );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.0f );
 		vertex.mNormal				= Vector3f( 0.577350269189f, 0.577350269189f, -0.577350269189f );
 
 		mVertex.push_back( vertex );
@@ -693,22 +692,22 @@ namespace Sentinel
 		//////////////////////////////////////////
 
 		vertex.mPosition			= Vector3f( radius, 0.0f, 0.0f );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.0f );
 		vertex.mNormal				= Vector3f( 0.577350269189f, -0.577350269189f, 0.577350269189f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, 0.0f, radius );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 1.0f );
 		vertex.mNormal				= Vector3f( 0.577350269189f, -0.577350269189f, 0.577350269189f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, -radius, 0.0f );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.0f );
 		vertex.mNormal				= Vector3f( 0.577350269189f, -0.577350269189f, 0.577350269189f );
 
 		mVertex.push_back( vertex );
@@ -716,22 +715,22 @@ namespace Sentinel
 		//////////////////////////////////////////
 
 		vertex.mPosition			= Vector3f( radius, 0.0f, 0.0f );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.0f );
 		vertex.mNormal				= Vector3f( 0.577350269189f, -0.577350269189f, -0.577350269189f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, -radius, 0.0f );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 1.0f );
 		vertex.mNormal				= Vector3f( 0.577350269189f, -0.577350269189f, -0.577350269189f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, 0.0f, -radius );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.0f );
 		vertex.mNormal				= Vector3f( 0.577350269189f, -0.577350269189f, -0.577350269189f );
 
 		mVertex.push_back( vertex );
@@ -739,22 +738,22 @@ namespace Sentinel
 		//////////////////////////////////////////
 
 		vertex.mPosition			= Vector3f( -radius, 0.0f, 0.0f );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.0f );
 		vertex.mNormal				= Vector3f( -0.577350269189f, 0.577350269189f, 0.577350269189f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, 0.0f, radius );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 1.0f );
 		vertex.mNormal				= Vector3f( -0.577350269189f, 0.577350269189f, 0.577350269189f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, radius, 0.0f );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.0f );
 		vertex.mNormal				= Vector3f( -0.577350269189f, 0.577350269189f, 0.577350269189f );
 
 		mVertex.push_back( vertex );
@@ -762,22 +761,22 @@ namespace Sentinel
 		//////////////////////////////////////////
 
 		vertex.mPosition			= Vector3f( -radius, 0.0f, 0.0f );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.0f );
 		vertex.mNormal				= Vector3f( -0.577350269189f, 0.577350269189f, -0.577350269189f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, radius, 0.0f );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 1.0f );
 		vertex.mNormal				= Vector3f( -0.577350269189f, 0.577350269189f, -0.577350269189f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, 0.0f, -radius );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.0f );
 		vertex.mNormal				= Vector3f( -0.577350269189f, 0.577350269189f, -0.577350269189f );
 
 		mVertex.push_back( vertex );
@@ -785,22 +784,22 @@ namespace Sentinel
 		//////////////////////////////////////////
 
 		vertex.mPosition			= Vector3f( -radius, 0.0f, 0.0f );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.0f );
 		vertex.mNormal				= Vector3f( -0.577350269189f, -0.577350269189f, 0.577350269189f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f,-radius, 0.0f );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 1.0f );
 		vertex.mNormal				= Vector3f( -0.577350269189f, -0.577350269189f, 0.577350269189f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, 0.0f, radius );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.0f );
 		vertex.mNormal				= Vector3f( -0.577350269189f, -0.577350269189f, 0.577350269189f );
 
 		mVertex.push_back( vertex );
@@ -808,22 +807,22 @@ namespace Sentinel
 		//////////////////////////////////////////
 
 		vertex.mPosition			= Vector3f( -radius, 0.0f, 0.0f );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.0f );
 		vertex.mNormal				= Vector3f( -0.577350269189f, -0.577350269189f, -0.577350269189f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, 0.0f, -radius );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 1.0f );
 		vertex.mNormal				= Vector3f( -0.577350269189f, -0.577350269189f, -0.577350269189f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, -radius, 0.0f );
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.0f );
 		vertex.mNormal				= Vector3f( -0.577350269189f, -0.577350269189f, -0.577350269189f );
 
 		mVertex.push_back( vertex );
@@ -846,36 +845,36 @@ namespace Sentinel
 
 		Vertex vertex;
 		vertex.mPosition			= Vector3f( 0.0f, 1.61803398875f, 0.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.5f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.5f, 0.0f );
 		vertex.mNormal				= Vector3f( 0.0f, 0.525731112119f, 0.850650808354f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( -1.0f, 1.0f, 1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.31f );
 		vertex.mNormal				= Vector3f( 0.0f, 0.525731112119f, 0.850650808354f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( -0.61803398875f, 0.0f, 1.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.31f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.31f, 1.0f );
 		vertex.mNormal				= Vector3f( 0.0f, 0.525731112119f, 0.850650808354f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.61803398875f, 0.0f, 1.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.69f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.69f, 1.0f );
 		vertex.mNormal				= Vector3f( 0.0f, 0.525731112119f, 0.850650808354f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 1.0f, 1.0f, 1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.31f );
 		vertex.mNormal				= Vector3f( 0.0f, 0.525731112119f, 0.850650808354f );
 
 		mVertex.push_back( vertex );
@@ -883,36 +882,36 @@ namespace Sentinel
 		/////////////////////////////////////////////////////////////////
 
 		vertex.mPosition			= Vector3f( 0.0f, 1.61803398875f, -0.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.5f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.5f, 0.0f );
 		vertex.mNormal				= Vector3f( 0.0f, 0.525731112119f, -0.850650808354f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 1.0f, 1.0f, -1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.31f );
 		vertex.mNormal				= Vector3f( 0.0f, 0.525731112119f, -0.850650808354f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.61803398875f, 0.0f, -1.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.31f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.31f, 1.0f );
 		vertex.mNormal				= Vector3f( 0.0f, 0.525731112119f, -0.850650808354f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( -0.61803398875f, 0.0f, -1.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.69f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.69f, 1.0f );
 		vertex.mNormal				= Vector3f( 0.0f, 0.525731112119f, -0.850650808354f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( -1.0f, 1.0f, -1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.31f );
 		vertex.mNormal				= Vector3f( 0.0f, 0.525731112119f, -0.850650808354f );
 
 		mVertex.push_back( vertex );
@@ -920,36 +919,36 @@ namespace Sentinel
 		/////////////////////////////////////////////////////////////////
 
 		vertex.mPosition			= Vector3f( 0.0f, -1.61803398875f, 0.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.5f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.5f, 0.0f );
 		vertex.mNormal				= Vector3f( 0.0f, -0.525731112119f, 0.850650808354f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 1.0f, -1.0f, 1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.31f );
 		vertex.mNormal				= Vector3f( 0.0f, -0.525731112119f, 0.850650808354f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.61803398875f, 0.0f, 1.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.31f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.31f, 1.0f );
 		vertex.mNormal				= Vector3f( 0.0f, -0.525731112119f, 0.850650808354f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( -0.61803398875f, 0.0f, 1.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.69f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.69f, 1.0f );
 		vertex.mNormal				= Vector3f( 0.0f, -0.525731112119f, 0.850650808354f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( -1.0f, -1.0f, 1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.31f );
 		vertex.mNormal				= Vector3f( 0.0f, -0.525731112119f, 0.850650808354f );
 
 		mVertex.push_back( vertex );
@@ -957,36 +956,36 @@ namespace Sentinel
 		/////////////////////////////////////////////////////////////////
 
 		vertex.mPosition			= Vector3f( 0.0f, -1.61803398875f, -0.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.5f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.5f, 0.0f );
 		vertex.mNormal				= Vector3f( 0.0f, -0.525731112119f, -0.850650808354f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( -1.0f, -1.0f, -1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.31f );
 		vertex.mNormal				= Vector3f( 0.0f, -0.525731112119f, -0.850650808354f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( -0.61803398875f, 0.0f, -1.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.31f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.31f, 1.0f );
 		vertex.mNormal				= Vector3f( 0.0f, -0.525731112119f, -0.850650808354f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.61803398875f, 0.0f, -1.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.69f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.69f, 1.0f );
 		vertex.mNormal				= Vector3f( 0.0f, -0.525731112119f, -0.850650808354f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 1.0f, -1.0f, -1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.31f );
 		vertex.mNormal				= Vector3f( 0.0f, -0.525731112119f, -0.850650808354f );
 
 		mVertex.push_back( vertex );
@@ -995,36 +994,36 @@ namespace Sentinel
 		/////////////////////////////////////////////////////////////////
 
 		vertex.mPosition			= Vector3f( 0.61803398875f, 0.0f, 1.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.5f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.5f, 0.0f );
 		vertex.mNormal				= Vector3f( 0.850650808354f, 0.0f, 0.525731112119f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 1.0f, -1.0f, 1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.31f );
 		vertex.mNormal				= Vector3f( 0.850650808354f, 0.0f, 0.525731112119f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 1.61803398875f, -0.61803398875f, 0.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.31f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.31f, 1.0f );
 		vertex.mNormal				= Vector3f( 0.850650808354f, 0.0f, 0.525731112119f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 1.61803398875f, 0.61803398875f, 0.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.69f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.69f, 1.0f );
 		vertex.mNormal				= Vector3f( 0.850650808354f, 0.0f, 0.525731112119f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 1.0f, 1.0f, 1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.31f );
 		vertex.mNormal				= Vector3f( 0.850650808354f, 0.0f, 0.525731112119f );
 
 		mVertex.push_back( vertex );
@@ -1032,36 +1031,36 @@ namespace Sentinel
 		/////////////////////////////////////////////////////////////////
 
 		vertex.mPosition			= Vector3f( -0.61803398875f, 0.0f, 1.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.5f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.5f, 0.0f );
 		vertex.mNormal				= Vector3f( -0.850650808354f, 0.0f, 0.525731112119f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( -1.0f, 1.0f, 1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.31f );
 		vertex.mNormal				= Vector3f( -0.850650808354f, 0.0f, 0.525731112119f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( -1.61803398875f, 0.61803398875f, 0.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.31f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.31f, 1.0f );
 		vertex.mNormal				= Vector3f( -0.850650808354f, 0.0f, 0.525731112119f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( -1.61803398875f, -0.61803398875f, 0.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.69f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.69f, 1.0f );
 		vertex.mNormal				= Vector3f( -0.850650808354f, 0.0f, 0.525731112119f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( -1.0f, -1.0f, 1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.31f );
 		vertex.mNormal				= Vector3f( -0.850650808354f, 0.0f, 0.525731112119f );
 
 		mVertex.push_back( vertex );
@@ -1069,36 +1068,36 @@ namespace Sentinel
 		/////////////////////////////////////////////////////////////////
 
 		vertex.mPosition			= Vector3f( 0.61803398875f, 0.0f, -1.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.5f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.5f, 0.0f );
 		vertex.mNormal				= Vector3f( 0.850650808354f, 0.0f, -0.525731112119f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 1.0f, 1.0f, -1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.31f );
 		vertex.mNormal				= Vector3f( 0.850650808354f, 0.0f, -0.525731112119f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 1.61803398875f, 0.61803398875f, 0.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.31f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.31f, 1.0f );
 		vertex.mNormal				= Vector3f( 0.850650808354f, 0.0f, -0.525731112119f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 1.61803398875f, -0.61803398875f, 0.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.69f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.69f, 1.0f );
 		vertex.mNormal				= Vector3f( 0.850650808354f, 0.0f, -0.525731112119f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 1.0f, -1.0f, -1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.31f );
 		vertex.mNormal				= Vector3f( 0.850650808354f, 0.0f, -0.525731112119f );
 
 		mVertex.push_back( vertex );
@@ -1106,36 +1105,36 @@ namespace Sentinel
 		/////////////////////////////////////////////////////////////////
 
 		vertex.mPosition			= Vector3f( -0.61803398875f, 0.0f, -1.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.5f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.5f, 0.0f );
 		vertex.mNormal				= Vector3f( -0.850650808354f, 0.0f, -0.525731112119f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( -1.0f, -1.0f, -1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.31f );
 		vertex.mNormal				= Vector3f( -0.850650808354f, 0.0f, -0.525731112119f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( -1.61803398875f, -0.61803398875f, 0.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.31f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.31f, 1.0f );
 		vertex.mNormal				= Vector3f( -0.850650808354f, 0.0f, -0.525731112119f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( -1.61803398875f, 0.61803398875f, 0.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.69f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.69f, 1.0f );
 		vertex.mNormal				= Vector3f( -0.850650808354f, 0.0f, -0.525731112119f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( -1.0f, 1.0f, -1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.31f );
 		vertex.mNormal				= Vector3f( -0.850650808354f, 0.0f, -0.525731112119f );
 
 		mVertex.push_back( vertex );
@@ -1144,36 +1143,36 @@ namespace Sentinel
 		/////////////////////////////////////////////////////////////////
 
 		vertex.mPosition			= Vector3f( 1.61803398875f, 0.61803398875f, 0.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.5f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.5f, 0.0f );
 		vertex.mNormal				= Vector3f( 0.525731112119f, 0.850650808354f, 0.0f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 1.0f, 1.0f, -1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.31f );
 		vertex.mNormal				= Vector3f( 0.525731112119f, 0.850650808354f, 0.0f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, 1.61803398875f, -0.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.31f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.31f, 1.0f );
 		vertex.mNormal				= Vector3f( 0.525731112119f, 0.850650808354f, 0.0f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, 1.61803398875f, 0.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.69f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.69f, 1.0f );
 		vertex.mNormal				= Vector3f( 0.525731112119f, 0.850650808354f, 0.0f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 1.0f, 1.0f, 1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.31f );
 		vertex.mNormal				= Vector3f( 0.525731112119f, 0.850650808354f, 0.0f );
 
 		mVertex.push_back( vertex );
@@ -1181,36 +1180,36 @@ namespace Sentinel
 		/////////////////////////////////////////////////////////////////
 
 		vertex.mPosition			= Vector3f( 1.61803398875f, -0.61803398875f, 0.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.5f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.5f, 0.0f );
 		vertex.mNormal				= Vector3f( 0.525731112119f, -0.850650808354f, 0.0f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 1.0f, -1.0f, 1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.31f );
 		vertex.mNormal				= Vector3f( 0.525731112119f, -0.850650808354f, 0.0f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, -1.61803398875f, 0.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.31f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.31f, 1.0f );
 		vertex.mNormal				= Vector3f( 0.525731112119f, -0.850650808354f, 0.0f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, -1.61803398875f, -0.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.69f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.69f, 1.0f );
 		vertex.mNormal				= Vector3f( 0.525731112119f, -0.850650808354f, 0.0f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 1.0f, -1.0f, -1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.31f );
 		vertex.mNormal				= Vector3f( 0.525731112119f, -0.850650808354f, 0.0f );
 
 		mVertex.push_back( vertex );
@@ -1218,36 +1217,36 @@ namespace Sentinel
 		/////////////////////////////////////////////////////////////////
 
 		vertex.mPosition			= Vector3f( -1.61803398875f, 0.61803398875f, 0.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.5f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.5f, 0.0f );
 		vertex.mNormal				= Vector3f( -0.525731112119f, 0.850650808354f, 0.0f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( -1.0f, 1.0f, 1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.31f );
 		vertex.mNormal				= Vector3f( -0.525731112119f, 0.850650808354f, 0.0f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, 1.61803398875f, 0.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.31f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.31f, 1.0f );
 		vertex.mNormal				= Vector3f( -0.525731112119f, 0.850650808354f, 0.0f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, 1.61803398875f, -0.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.69f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.69f, 1.0f );
 		vertex.mNormal				= Vector3f( -0.525731112119f, 0.850650808354f, 0.0f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( -1.0f, 1.0f, -1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.31f );
 		vertex.mNormal				= Vector3f( -0.525731112119f, 0.850650808354f, 0.0f );
 
 		mVertex.push_back( vertex );
@@ -1255,36 +1254,36 @@ namespace Sentinel
 		/////////////////////////////////////////////////////////////////
 
 		vertex.mPosition			= Vector3f( -1.61803398875f, -0.61803398875f, 0.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.5f, 0.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.5f, 0.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.5f, 0.0f );
 		vertex.mNormal				= Vector3f( -0.525731112119f, -0.850650808354f, 0.0f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( -1.0f, -1.0f, -1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.0f, 0.31f );
 		vertex.mNormal				= Vector3f( -0.525731112119f, -0.850650808354f, 0.0f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, -1.61803398875f, -0.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.31f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.31f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.31f, 1.0f );
 		vertex.mNormal				= Vector3f( -0.525731112119f, -0.850650808354f, 0.0f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( 0.0f, -1.61803398875f, 0.61803398875f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 0.69f, 1.0f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 0.69f, 1.0f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 0.69f, 1.0f );
 		vertex.mNormal				= Vector3f( -0.525731112119f, -0.850650808354f, 0.0f );
 
 		mVertex.push_back( vertex );
 
 		vertex.mPosition			= Vector3f( -1.0f, -1.0f, 1.0f ) * scale;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( 1.0f, 0.31f );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 0 ]	= Vector2f( 1.0f, 0.31f );
+		vertex.mTexCoord[ 1 ]	= Vector2f( 1.0f, 0.31f );
 		vertex.mNormal				= Vector3f( -0.525731112119f, -0.850650808354f, 0.0f );
 
 		mVertex.push_back( vertex );
@@ -1413,8 +1412,8 @@ namespace Sentinel
 
 		tx1 = 0.0f; //(atan2(0.0f, 1.0f) / (2.0f * (float)PI) + 0.5f) * texWrap;
 		ty1 = 0.0f; //(acos(0.0f) / (float)PI + 0.5f) * texWrap;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( tx1, ty1 );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( tx1, ty1 );
+		vertex.mTexCoord[ 0 ]	= Vector2f( tx1, ty1 );
+		vertex.mTexCoord[ 1 ]	= Vector2f( tx1, ty1 );
 
 		mVertex.push_back( vertex );
 		
@@ -1427,8 +1426,8 @@ namespace Sentinel
 
 			tx1 = u * texWrap; //(atan2(u, z1) / (2.0f * (float)PI) + 0.5f) * texWrap;
 			ty1 = v * texWrap; //(acos(v) / (float)PI + 0.5f) * texWrap;
-			vertex.mTextureCoords[ 0 ]	= Vector2f( tx1, ty1 );
-			vertex.mTextureCoords[ 1 ]	= Vector2f( tx1, ty1 );
+			vertex.mTexCoord[ 0 ]	= Vector2f( tx1, ty1 );
+			vertex.mTexCoord[ 1 ]	= Vector2f( tx1, ty1 );
 
 			mVertex.push_back( vertex );
 		}
@@ -1459,8 +1458,8 @@ namespace Sentinel
 				ty = v * texWrap; //(acos(v) / (float)PI + 0.5f) * texWrap;
 				//clamp( tx, -2.0f*(float)PI, 2.0f*(float)PI );
 				//clamp( ty, -2.0f*(float)PI, 2.0f*(float)PI );
-				vertex.mTextureCoords[ 0 ]	= Vector2f( tx, ty );
-				vertex.mTextureCoords[ 1 ]	= Vector2f( tx, ty );
+				vertex.mTexCoord[ 0 ]	= Vector2f( tx, ty );
+				vertex.mTexCoord[ 1 ]	= Vector2f( tx, ty );
 
 				mVertex.push_back( vertex );
 				
@@ -1475,8 +1474,8 @@ namespace Sentinel
 				ty = v * texWrap; //(acos(v) / (float)PI + 0.5f) * texWrap;
 				//clamp( tx, -2.0f*(float)PI, 2.0f*(float)PI );
 				//clamp( ty, -2.0f*(float)PI, 2.0f*(float)PI );
-				vertex.mTextureCoords[ 0 ]	= Vector2f( tx, ty );
-				vertex.mTextureCoords[ 1 ]	= Vector2f( tx, ty );
+				vertex.mTexCoord[ 0 ]	= Vector2f( tx, ty );
+				vertex.mTexCoord[ 1 ]	= Vector2f( tx, ty );
 
 				mVertex.push_back( vertex );
 			}
@@ -1499,8 +1498,8 @@ namespace Sentinel
 
 		tx1 = 0.0f; //(atan2(0.0f, -1.0f) / (2.0f * (float)PI) + 0.5f) * texWrap;
 		ty1 = 0.0f; //(acos(0.0f) / (float)PI + 0.5f) * texWrap;
-		vertex.mTextureCoords[ 0 ]	= Vector2f( tx1, ty1 );
-		vertex.mTextureCoords[ 1 ]	= Vector2f( tx1, ty1 );
+		vertex.mTexCoord[ 0 ]	= Vector2f( tx1, ty1 );
+		vertex.mTexCoord[ 1 ]	= Vector2f( tx1, ty1 );
 
 		mVertex.push_back( vertex );
 
@@ -1513,8 +1512,8 @@ namespace Sentinel
 			
 			tx1 = u * texWrap; //(atan2(u, z1) / (2.0f * (float)PI) + 0.5f) * texWrap;
 			ty1 = v * texWrap; //(acos(v) / (float)PI + 0.5f) * texWrap;
-			vertex.mTextureCoords[ 0 ]	= Vector2f( tx1, ty1 );
-			vertex.mTextureCoords[ 1 ]	= Vector2f( tx1, ty1 );
+			vertex.mTexCoord[ 0 ]	= Vector2f( tx1, ty1 );
+			vertex.mTexCoord[ 1 ]	= Vector2f( tx1, ty1 );
 
 			mVertex.push_back( vertex );
 		}
@@ -1551,17 +1550,17 @@ namespace Sentinel
 	//
 	void MeshBuilder::CreateBuffers( Renderer* renderer )
 	{
-		_ASSERT( mShader );
+		_ASSERT( mLayout );
 		_ASSERT( mVertex.size() > 0 );
 		_ASSERT( mIndex.size() > 0 );
 
-		const std::string& attrib = mShader->Attribute();
+		std::vector< AttributeType > layout = mLayout->Layout();
 
-		UINT vertexSize	= mShader->VertexSize();
+		UINT vertexSize	= mLayout->VertexSize();
 		UINT numVerts	= mVertex.size();
 		UINT totalSize	= vertexSize * numVerts;
 
-		// Copy the generic vertex into a custom vertex using memory management.
+		// Copy the generic vertex into a custom vertex.
 		//
 		void* memBlock;
 		memBlock = malloc( totalSize );
@@ -1571,13 +1570,11 @@ namespace Sentinel
 		{
 			UINT texCount = 0;
 
-			for( UINT i = 0; i < attrib.size(); ++i )
+			for( UINT i = 0; i < (UINT)layout.size(); ++i )
 			{
-				switch( attrib[ i ] )
+				switch( layout[ i ] )
 				{
-				// Position.
-				//
-				case 'P':
+				case ATTRIB_POSITION:
 					for( UINT k = 0; k < 3; ++k )
 					{
 						*((float*)base) = mVertex[ j ].mPosition[ k ];
@@ -1585,41 +1582,34 @@ namespace Sentinel
 					}
 					break;
 
-				// Texture Coordinate.
-				//
-				case 'X':
+				case ATTRIB_TEXCOORD0:
+				case ATTRIB_TEXCOORD1:
+				case ATTRIB_TEXCOORD2:
 					for( UINT k = 0; k < 2; ++k )
 					{
-						*((float*)base) = mVertex[ j ].mTextureCoords[ texCount ][ k ];
+						*((float*)base) = mVertex[ j ].mTexCoord[ texCount ][ k ];
 						base += sizeof(float);
 					}
 					++texCount;
 					break;
 
-				// Quad Texture Coordinate.
-				//
-				case 'x':
+				case ATTRIB_QUADCOORD0:
+				case ATTRIB_QUADCOORD1:
+				case ATTRIB_QUADCOORD2:
 					for( UINT k = 0; k < 4; ++k )
 					{
-						*((float*)base) = mVertex[ j ].mQuadCoords[ texCount ][ k ];
+						*((float*)base) = mVertex[ j ].mQuadCoord[ texCount ][ k ];
 						base += sizeof(float);
 					}
 					++texCount;
 					break;
 
-				// Vertex Matrix.
-				//
-				case 'M':
-					for( UINT k = 0; k < 16; ++k )
-					{
-						*((float*)base) = mVertex[ j ].mMatrixVertex[ k ];
-						base += sizeof(float);
-					}
+				case ATTRIB_COLOR:
+					*((UINT*)base) = mVertex[ j ].mColor;
+					base += sizeof(UINT);
 					break;
 
-				// Normal.
-				//
-				case 'N':
+				case ATTRIB_NORMAL:
 					for( UINT k = 0; k < 3; ++k )
 					{
 						*((float*)base) = mVertex[ j ].mNormal[ k ];
@@ -1627,16 +1617,7 @@ namespace Sentinel
 					}
 					break;
 
-				// Color.
-				//
-				case 'C':
-					*((UINT*)base) = mVertex[ j ].mColor;
-					base += sizeof(UINT);
-					break;
-
-				// Tangent.
-				//
-				case 'T':
+				case ATTRIB_TANGENT:
 					for( UINT k = 0; k < 4; ++k )
 					{
 						*((float*)base) = mVertex[ j ].mTangent[ k ];
@@ -1644,27 +1625,31 @@ namespace Sentinel
 					}
 					break;
 
-				// Bones.
-				//
-				case 'B':
-					// Number of bones.
-					//
-					*((int*)base) = mVertex[ j ].mNumBones;
+				case ATTRIB_BONE_COUNT:
+					*((int*)base) = mVertex[ j ].mBoneCount;
 					base += sizeof(int);
+					break;
 
-					// Bone index.
-					//
+				case ATTRIB_BONE_INDEX:
 					for( UINT k = 0; k < 4; ++k )
 					{
-						*((int*)base) = mVertex[ j ].mMatrixIndex[ k ];
+						*((int*)base) = mVertex[ j ].mBoneIndex[ k ];
 						base += sizeof(int);
 					}
+					break;
 
-					// Weights.
-					//
+				case ATTRIB_BONE_WEIGHT:
 					for( UINT k = 0; k < 4; ++k )
 					{
-						*((float*)base) = mVertex[ j ].mWeight[ k ];
+						*((float*)base) = mVertex[ j ].mBoneWeight[ k ];
+						base += sizeof(float);
+					}
+					break;
+
+				case ATTRIB_MATRIX:
+					for( UINT k = 0; k < 16; ++k )
+					{
+						*((float*)base) = mVertex[ j ].mMatrix[ k ];
 						base += sizeof(float);
 					}
 					break;
@@ -1672,7 +1657,7 @@ namespace Sentinel
 			}
 		}
 
-		mVBO = renderer->CreateBuffer( memBlock, totalSize, mShader->VertexSize(), VERTEX_BUFFER );
+		mVBO = renderer->CreateBuffer( memBlock, totalSize, vertexSize, VERTEX_BUFFER );
 		mIBO = renderer->CreateBuffer( &mIndex.front(), mIndex.size()*sizeof(UINT), sizeof(UINT), INDEX_BUFFER );
 
 		free( memBlock );
@@ -1692,10 +1677,9 @@ namespace Sentinel
 		for( UINT x = 0; x < NUM_TEXTURES; ++x )
 			mesh->mTexture[ x ] = mTexture[ x ];
 		
-		mesh->mShader		= mShader;
+		mesh->mLayout		= mLayout;
 		mesh->mPrimitive	= mPrimitive;
-		mesh->mTextureScale = mTextureScale;
-
+		
 		mesh->mBounds.Set( (BYTE*)mVertex.data(), mVertex.size(), sizeof( Vertex ));
 
 		return mesh;

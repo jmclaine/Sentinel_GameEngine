@@ -4,14 +4,14 @@
 //
 cbuffer Uniforms
 {
-	matrix world;
+	matrix _World;
 }
 
 
 // Textures.
 //
-Texture2D    tex0		:register(t0);
-SamplerState sampler0	:register(s0);
+Texture2D    _Texture0	:register(t0);
+SamplerState _Sampler0	:register(s0);
 
 
 // Vertex Shader.
@@ -32,7 +32,7 @@ VSOutput VS_Main(VSInput input)
 {
 	VSOutput output;
 
-	output.Position = mul(world, input.Position);
+	output.Position = mul(_World, input.Position);
 	output.Texture0 = input.Texture0;
 
 	return output;
@@ -43,7 +43,7 @@ VSOutput VS_Main(VSInput input)
 //
 float4 PS_Main(VSOutput input):SV_Target
 {
-	return float4(tex0.Sample(sampler0, input.Texture0).xyz, 1);
+	return float4(_Texture0.Sample(_Sampler0, input.Texture0).xyz, 1);
 }
 
 #endif
@@ -54,33 +54,33 @@ float4 PS_Main(VSOutput input):SV_Target
 
 #ifdef VERTEX_SHADER
 
-uniform mat4 world;
+uniform mat4 _World;
 
-in vec4 aPosition;
-in vec2 aTexture0;
+in vec4 Position;
+in vec2 TexCoord0;
 
-out vec2 gvTex0;
+out vec2 gvTexCoord0;
 
 void main()
 {
-	gl_Position = world * aPosition;
+	gl_Position = _World * Position;
 
 	// Texture color
-	gvTex0 = vec2(aTexture0.x, 1.0-aTexture0.y);
+	gvTexCoord0 = vec2(TexCoord0.x, 1.0-TexCoord0.y);
 }
 
 #endif
 #ifdef FRAGMENT_SHADER
 
-uniform sampler2D tex0;
+uniform sampler2D _Texture0;
 
-in vec2 gvTex0;
+in vec2 gvTexCoord0;
 
 out vec4 vFragColor;
 
 void main()
 {
-	vFragColor = vec4(texture2D(tex0, gvTex0).xyz, 1);
+	vFragColor = vec4(texture2D(_Texture0, gvTexCoord0).xyz, 1);
 }
 
 #endif

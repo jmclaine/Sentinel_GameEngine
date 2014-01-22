@@ -10,10 +10,9 @@ namespace Sentinel
 
 		UINT				mWidth;
 		UINT				mHeight;
-		
+
 		//////////////////////////////
 
-		Texture();
 		Texture( UINT width, UINT height );
 
 	public:

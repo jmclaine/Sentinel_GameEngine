@@ -119,6 +119,7 @@ http://www.opengl.org/wiki/Framebuffer_Object_Examples
 #include "Util.h"
 #include "RendererTypes.h"
 #include "Shader.h"
+#include "VertexLayout.h"
 
 #define STBI_HEADER_FILE_ONLY
 #include "stb_image.c"
@@ -243,10 +244,16 @@ namespace Sentinel
 
 		// Shaders.
 		//
-		virtual std::shared_ptr< Shader > CreateShaderFromFile( const char* filename, const char* attrib, const char* uniform ) = 0;
-		virtual std::shared_ptr< Shader > CreateShaderFromMemory( const char* filename, const char* attrib, const char* uniform ) = 0;
-		
+		virtual std::shared_ptr< Shader > CreateShaderFromFile( const char* filename ) = 0;
+		virtual std::shared_ptr< Shader > CreateShaderFromMemory( const char* source ) = 0;
+
 		virtual void		SetShader( const std::shared_ptr< Shader >& shader ) = 0;
+
+		// Vertex Layout.
+		//
+		virtual std::shared_ptr< VertexLayout > CreateVertexLayout( const std::vector< AttributeType >& attrib ) = 0;
+
+		virtual void		SetVertexLayout( std::shared_ptr< VertexLayout > vertexLayout ) = 0;
 
 		// Rendering.
 		//

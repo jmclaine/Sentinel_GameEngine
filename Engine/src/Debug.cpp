@@ -20,7 +20,7 @@ namespace Sentinel
 
 		MeshBuilder builder;
 
-		builder.mShader = mShader;
+		builder.mLayout = renderer->CreateVertexLayout( shader->Attribute() );
 
 		for( UINT x = 0; x < maxLines; ++x )
 		{
@@ -39,6 +39,8 @@ namespace Sentinel
 
 		if( !mMesh )
 			throw AppException( "Failed to create Mesh in Debug" );
+
+		mMesh->mShader = shader;
 	}
 
 	Debug::~Debug()

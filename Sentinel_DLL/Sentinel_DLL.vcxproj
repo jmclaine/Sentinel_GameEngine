@@ -106,6 +106,16 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
     <ClInclude Include="..\Engine\src\AssetManager.h" />
     <ClInclude Include="..\Engine\src\AudioComponent.h" />
     <ClInclude Include="..\Engine\src\Debug.h" />
+    <ClInclude Include="..\Engine\src\DX\BufferDX.h" />
+    <ClInclude Include="..\Engine\src\DX\CommonDX.h" />
+    <ClInclude Include="..\Engine\src\DX\ShaderDX.h" />
+    <ClInclude Include="..\Engine\src\DX\TextureDX.h" />
+    <ClInclude Include="..\Engine\src\DX\VertexLayoutDX.h" />
+    <ClInclude Include="..\Engine\src\GL\BufferGL.h" />
+    <ClInclude Include="..\Engine\src\GL\CommonGL.h" />
+    <ClInclude Include="..\Engine\src\GL\ShaderGL.h" />
+    <ClInclude Include="..\Engine\src\GL\TextureGL.h" />
+    <ClInclude Include="..\Engine\src\GL\VertexLayoutGL.h" />
     <ClInclude Include="..\Engine\src\GUI\ControllerWidget.h" />
     <ClInclude Include="..\Engine\src\GUI\ModelWidget.h" />
     <ClInclude Include="..\Engine\src\GUI\SpriteControllerWidget.h" />
@@ -123,6 +133,8 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
     <ClInclude Include="..\Engine\src\PhysicsShape.h" />
     <ClInclude Include="..\Engine\src\PhysicsShapeComponent.h" />
     <ClInclude Include="..\Engine\src\PhysicsRigidBodyComponent.h" />
+    <ClInclude Include="..\Engine\src\Tokenizer.h" />
+    <ClInclude Include="..\Engine\src\VertexLayout.h" />
     <ClInclude Include="..\Engine\src\WidgetComponent.h" />
     <ClInclude Include="..\Engine\src\ListNode.h" />
     <ClInclude Include="..\Engine\src\Particle.h" />
@@ -196,7 +208,17 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
   <ItemGroup>
     <ClCompile Include="..\Engine\src\Archive.cpp" />
     <ClCompile Include="..\Engine\src\Debug.cpp" />
+    <ClCompile Include="..\Engine\src\DX\BufferDX.cpp" />
+    <ClCompile Include="..\Engine\src\DX\RendererDX.cpp" />
+    <ClCompile Include="..\Engine\src\DX\ShaderDX.cpp" />
+    <ClCompile Include="..\Engine\src\DX\TextureDX.cpp" />
+    <ClCompile Include="..\Engine\src\DX\VertexLayoutDX.cpp" />
     <ClCompile Include="..\Engine\src\FontSystemFT.cpp" />
+    <ClCompile Include="..\Engine\src\GL\BufferGL.cpp" />
+    <ClCompile Include="..\Engine\src\GL\RendererGL.cpp" />
+    <ClCompile Include="..\Engine\src\GL\ShaderGL.cpp" />
+    <ClCompile Include="..\Engine\src\GL\TextureGL.cpp" />
+    <ClCompile Include="..\Engine\src\GL\VertexLayoutGL.cpp" />
     <ClCompile Include="..\Engine\src\GUI\Button.cpp" />
     <ClCompile Include="..\Engine\src\GUI\SpriteButtonWidget.cpp" />
     <ClCompile Include="..\Engine\src\GUI\ControllerWidget.cpp" />
@@ -251,8 +273,6 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
     <ClCompile Include="..\Engine\src\PlayerControllerComponent.cpp" />
     <ClCompile Include="..\Engine\src\Quatf.cpp" />
     <ClCompile Include="..\Engine\src\Renderer.cpp" />
-    <ClCompile Include="..\Engine\src\RendererDX.cpp" />
-    <ClCompile Include="..\Engine\src\RendererGL.cpp" />
     <ClCompile Include="..\Engine\src\GameWindow.cpp" />
     <ClCompile Include="..\Engine\src\Script.cpp" />
     <ClCompile Include="..\Engine\src\ScriptCompiler.cpp" />
@@ -271,12 +291,14 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
     <ClCompile Include="..\Engine\src\Texture.cpp" />
     <ClCompile Include="..\Engine\src\TextureManager.cpp" />
     <ClCompile Include="..\Engine\src\Timing.cpp" />
+    <ClCompile Include="..\Engine\src\Tokenizer.cpp" />
     <ClCompile Include="..\Engine\src\TransformComponent.cpp" />
     <ClCompile Include="..\Engine\src\TriggerComponent.cpp" />
     <ClCompile Include="..\Engine\src\Util.cpp" />
     <ClCompile Include="..\Engine\src\Vector2f.cpp" />
     <ClCompile Include="..\Engine\src\Vector3f.cpp" />
     <ClCompile Include="..\Engine\src\Vector4f.cpp" />
+    <ClCompile Include="..\Engine\src\VertexLayout.cpp" />
     <ClCompile Include="..\Engine\src\WidgetComponent.cpp" />
     <ClCompile Include="..\Engine\tinyxml\tinystr.cpp" />
     <ClCompile Include="..\Engine\tinyxml\tinyxml.cpp" />

@@ -24,7 +24,7 @@ namespace Sentinel
 
 		MeshBuilder builder;
 
-		builder.mShader = mShader;
+		builder.mLayout = shader->Layout();
 
 		for( UINT x = 0; x < maxSprites; ++x )
 		{
@@ -38,6 +38,8 @@ namespace Sentinel
 
 		if( !mMesh )
 			throw AppException( "Failed to create Mesh in SpriteSystem" );
+
+		mMesh->mShader = shader;
 	}
 
 	SpriteSystem::~SpriteSystem()

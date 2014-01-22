@@ -4,12 +4,9 @@
 //
 cbuffer Uniforms
 {
-    matrix wvp;
+    matrix _WVP;
 
-	float4 ambient;
-	float4 diffuse;
-	float4 specular;
-	float  spec_comp;
+	float4 _Ambient;
 }
 
 
@@ -29,7 +26,7 @@ VSOutput VS_Main(VSInput input)
 {
 	VSOutput output;
 
-	output.Position = mul(wvp, input.Position);
+	output.Position = mul(_WVP, input.Position);
 	
 	return output;
 }
@@ -39,7 +36,7 @@ VSOutput VS_Main(VSInput input)
 //
 float4 PS_Main(VSOutput input):SV_Target
 {	
-	return saturate(ambient);
+	return saturate(_Ambient);
 }
 
 #endif
@@ -48,26 +45,23 @@ float4 PS_Main(VSOutput input):SV_Target
 
 #ifdef VERTEX_SHADER
 
-uniform mat4 wvp;
+uniform mat4 _WVP;
 
-attribute vec4 aPosition;
+attribute vec4 Position;
 
 void main()
 {
-	gl_Position = wvp * aPosition;
+	gl_Position = _WVP * Position;
 }
 
 #endif
 #ifdef FRAGMENT_SHADER
 
-uniform vec4 ambient;
-uniform vec4 diffuse;
-uniform vec4 specular;
-uniform float spec_comp;
+uniform vec4 _Ambient;
 
 void main()
 {
-	gl_FragColor = clamp(ambient, 0.0, 1.0);
+	gl_FragColor = clamp(_Ambient, 0.0, 1.0);
 }
 
 #endif

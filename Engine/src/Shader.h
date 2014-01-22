@@ -1,6 +1,8 @@
 #pragma once
 
-#include "Common.h"
+#include <vector>
+
+#include "VertexLayout.h"
 
 namespace Sentinel
 {
@@ -26,6 +28,28 @@ namespace Sentinel
 		NUM_FILTERS
 	};
 
+	enum UniformType
+	{
+		UNIFORM_WVP,
+		UNIFORM_WORLD,
+		UNIFORM_INV_WORLD,
+		UNIFORM_VIEW,
+		UNIFORM_INV_VIEW,
+		UNIFORM_PROJ,
+		UNIFORM_INV_PROJ,
+		UNIFORM_TEXTURE,
+		UNIFORM_AMBIENT,
+		UNIFORM_DIFFUSE,
+		UNIFORM_SPECULAR,
+		UNIFORM_SPEC_COMP,
+		UNIFORM_LIGHT_POS,
+		UNIFORM_LIGHT_COLOR,
+		UNIFORM_LIGHT_ATTN,
+		UNIFORM_CAMERA_POS,
+		UNIFORM_BONES,
+		UNIFORM_DELTA_TIME,
+	};
+
 	class SENTINEL_DLL Shader
 	{
 	public:
@@ -43,15 +67,17 @@ namespace Sentinel
 
 	protected:
 
-		char*				mShaderSource;
+		char*			mSource;
 		
-		std::string			mAttribute;
-		std::string			mUniform;
+		std::vector< AttributeType > mAttribute;
+		std::vector< UniformType >   mUniform;
 
-		UINT				mVertexSize;
+		std::shared_ptr< VertexLayout > mLayout;
 
-		Sampler**			mSampler;
-		UINT				mNumSamplers;
+		UINT			mVertexSize;
+
+		Sampler**		mSampler;
+		UINT			mNumSamplers;
 
 		////////////////////////////////////
 
@@ -61,31 +87,28 @@ namespace Sentinel
 
 		virtual ~Shader();
 
-		const char*			Source();
-		const std::string&	Attribute();
-		const std::string&	Uniform();
+		const char*		Source();
+		const std::vector< AttributeType >&   Attribute();
+		const std::vector< UniformType >&     Uniform();
+		const std::shared_ptr< VertexLayout > Layout();
 
-		UINT  				VertexSize();
+		virtual void	Release() = 0;
 
-		virtual void		Release() = 0;
+		////////////////////////////////////
+		
+		virtual void	SetFloat( UINT uniform, float data ) = 0;
+		virtual void	SetFloat2( UINT uniform, float* data ) = 0;
+		virtual void	SetFloat3( UINT uniform, float* data ) = 0;
+		virtual void	SetFloat4( UINT uniform, float* data ) = 0;
+		virtual void	SetMatrix( UINT uniform, float* data ) = 0;
+		virtual void	SetTexture( UINT uniform, Texture* texture ) = 0;
 
-		virtual void		ApplyPass() = 0;
-		virtual void		ApplyLayout() = 0;
+		virtual void	SetSampler( UINT index, SamplerMode modeU, SamplerMode modeV, 
+									SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter = NUM_FILTERS ) = 0;
 
-		virtual void		SetFloat( UINT uniform, float data ) = 0;
-		virtual void		SetFloat2( UINT uniform, float* data ) = 0;
-		virtual void		SetFloat3( UINT uniform, float* data ) = 0;
-		virtual void		SetFloat4( UINT uniform, float* data ) = 0;
-		virtual void		SetMatrix( UINT uniform, float* data ) = 0;
-		virtual void		SetTexture( UINT uniform, Texture* texture ) = 0;
+		////////////////////////////////////
 
-		virtual void		SetSampler( UINT index, SamplerMode modeU, SamplerMode modeV, 
-										SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter = NUM_FILTERS ) = 0;
-
-	protected:
-
-		virtual void		CreateUniform( const char* name ) = 0;
-
-		void  				ProcessUniforms();
+		virtual void	Enable() = 0;
+		virtual void	Disable() = 0;
 	};
 }
