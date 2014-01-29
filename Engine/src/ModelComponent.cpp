@@ -24,8 +24,6 @@ namespace Sentinel
 	void ModelComponent::Set( std::shared_ptr< Model > model )
 	{
 		mModel = model;
-
-		mModel->GetMaterials( &mMaterial );
 	}
 
 	void ModelComponent::Startup()
@@ -37,47 +35,16 @@ namespace Sentinel
 	{
 		DrawableComponent::Update();
 
-		mModel->SetMaterials( mMaterial );
-
 		mModel->mMatrixWorld = mTransform->GetMatrixWorld();
 
 		GameWorld* world = mOwner->GetWorld();
+
 		mModel->Draw( world->mRenderer, world );
 	}
 
 	void ModelComponent::Shutdown()
 	{
 		DrawableComponent::Shutdown();
-	}
-
-	///////////////////////////////////
-
-	void ModelComponent::SetMaterial( const Material& material )
-	{
-		for( UINT x = 0; x < mMaterial.size(); ++x )
-			mMaterial[ x ] = material;
-	}
-
-	void ModelComponent::SetMaterial( UINT index, const Material& material )
-	{
-		_ASSERT( index < mMaterial.size() );
-
-		mMaterial[ index ] = material;
-	}
-
-	void ModelComponent::SetMaterial( const std::vector< Material >& material )
-	{
-		mMaterial = material;
-	}
-
-	const std::vector< Material >& ModelComponent::GetMaterial()
-	{
-		return mMaterial;
-	}
-
-	UINT ModelComponent::GetMaterialSize()
-	{
-		return mMaterial.size();
 	}
 
 	///////////////////////////////////
@@ -92,13 +59,9 @@ namespace Sentinel
 
 		GameComponent::Save( archive );
 
-		archive.Write( &mOwner->GetWorld()->mModelManager->Get( mModel ));
+		GameWorld* world = mOwner->GetWorld();
 
-		UINT count = (UINT)mMaterial.size();
-		archive.Write( &count );
-
-		for( UINT x = 0; x < count; ++x )
-			archive.Write( mMaterial[ x ].Ptr(), ar_sizeof( mMaterial[ x ] ));
+		archive.Write( &world->mModelManager->Get( mModel ));
 	}
 
 	void ModelComponent::Load( Archive& archive )
@@ -109,17 +72,11 @@ namespace Sentinel
 
 		GameComponent::Load( archive );
 
+		GameWorld* world = mOwner->GetWorld();
+
 		std::string name;
 		archive.Read( &name );
 
-		mModel = mOwner->GetWorld()->mModelManager->Get( name );
-
-		UINT count;
-		archive.Read( &count );
-
-		mMaterial.resize( count );
-
-		for( UINT x = 0; x < count; ++x )
-			archive.Read( mMaterial[ x ].Ptr(), ar_sizeof( mMaterial[ x ] ));
+		mModel = world->mModelManager->Get( name );
 	}
 }

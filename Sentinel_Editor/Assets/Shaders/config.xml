@@ -21,6 +21,7 @@ vec4 _LightAttn;    float4 _LightAttn;
 -->
 <Shaders>
 
+  <Definition FileName="line"     Name="Line" />
   <Definition FileName="texture"  Name="Texture" />
   <Definition FileName="RTnormal" Name="RT_Normal" />
   <Definition FileName="sprite"   Name="Sprite" />

@@ -123,6 +123,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
     <ClInclude Include="..\Engine\src\GUI\ViewWidget.h" />
     <ClInclude Include="..\Engine\src\GUI\WidgetObject.h" />
     <ClInclude Include="..\Engine\src\GUI\WidgetWorld.h" />
+    <ClInclude Include="..\Engine\src\MaterialManager.h" />
     <ClInclude Include="..\Engine\src\PhysicsConstraintComponent.h" />
     <ClInclude Include="..\Engine\src\FontSystem.h" />
     <ClInclude Include="..\Engine\src\GUI\Button.h" />
@@ -231,6 +232,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
     <ClCompile Include="..\Engine\src\GUI\Widget.cpp" />
     <ClCompile Include="..\Engine\src\GUI\WidgetObject.cpp" />
     <ClCompile Include="..\Engine\src\GUI\WidgetWorld.cpp" />
+    <ClCompile Include="..\Engine\src\MaterialManager.cpp" />
     <ClCompile Include="..\Engine\src\Particle.cpp" />
     <ClCompile Include="..\Engine\src\ParticleEffect.cpp" />
     <ClCompile Include="..\Engine\src\ParticleEmitterComponent.cpp" />

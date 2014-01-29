@@ -20,20 +20,6 @@ namespace Sentinel
 		static const UINT CULL_TYPE[ NUM_CULL_TYPES ];
 		static const UINT FILL_TYPE[ NUM_FILL_TYPES ];
 
-		class RenderTarget
-		{
-		public:
-
-			std::shared_ptr< Texture >	mTexture;
-			GLuint		mID;
-			
-			RenderTarget( const std::shared_ptr< Texture >& texture, GLuint id )
-			{
-				mTexture = texture;
-				mID		 = id;
-			}
-		};
-
 		class WindowInfoGL : public WindowInfo
 		{
 			friend class RendererGL;
@@ -46,12 +32,132 @@ namespace Sentinel
 			GLenum		mRenderMode;
 		};
 
+		class RenderTargetGL
+		{
+		public:
+
+			std::shared_ptr< Texture >	mTexture;
+			GLuint		mID;
+			
+			RenderTargetGL( const std::shared_ptr< Texture >& texture, GLuint id )
+			{
+				mTexture = texture;
+				mID		 = id;
+			}
+		};
+
+		class BlendStateGL : public BlendState
+		{
+		public:
+
+			bool		mEnable;
+
+			GLenum		mSrcBlendColor;
+			GLenum		mDstBlendColor;
+
+			GLenum		mSrcBlendAlpha;
+			GLenum		mDstBlendAlpha;
+
+			GLenum		mBlendFuncColor;
+			GLenum		mBlendFuncAlpha;
+
+			BlendStateGL( bool enable,
+						  BlendType srcBlendColor, BlendType dstBlendColor,
+						  BlendType srcBlendAlpha, BlendType dstBlendAlpha,
+						  BlendFuncType blendFuncColor, BlendFuncType blendFuncAlpha ) :
+				mEnable( enable ),
+				mSrcBlendColor( BLENDtoENUM( srcBlendColor )), mDstBlendColor( BLENDtoENUM( dstBlendColor )),
+				mSrcBlendAlpha( BLENDtoENUM( srcBlendAlpha )), mDstBlendAlpha( BLENDtoENUM( dstBlendAlpha )),
+				mBlendFuncColor( FUNCtoENUM( blendFuncColor )), mBlendFuncAlpha( FUNCtoENUM( blendFuncAlpha ))
+			{}
+
+			~BlendStateGL()
+			{}
+
+			void Apply()
+			{
+				if( mEnable )
+				{
+					glEnable( GL_BLEND );
+					glBlendFuncSeparate( mSrcBlendColor, mDstBlendColor, mSrcBlendAlpha, mDstBlendAlpha );
+					glBlendEquationSeparate( mBlendFuncColor, mBlendFuncAlpha );
+				}
+				else
+				{
+					glDisable( GL_BLEND );
+				}
+			}
+
+		private:
+
+			static GLenum BLENDtoENUM( BlendType type )
+			{
+				switch( type )
+				{
+				case BLEND_ZERO:
+					return GL_ZERO;
+
+				case BLEND_ONE:
+					return GL_ONE;
+
+				case BLEND_SRC_COLOR:
+					return GL_SRC_COLOR;
+
+				case BLEND_ONE_MINUS_SRC_COLOR:
+					return GL_ONE_MINUS_SRC_COLOR;
+
+				case BLEND_SRC_ALPHA:
+					return GL_SRC_ALPHA;
+
+				case BLEND_ONE_MINUS_SRC_ALPHA:
+					return GL_ONE_MINUS_SRC_ALPHA;
+
+				case BLEND_DST_COLOR:
+					return GL_DST_COLOR;
+
+				case BLEND_ONE_MINUS_DST_COLOR:
+					return GL_ONE_MINUS_DST_COLOR;
+
+				case BLEND_DST_ALPHA:
+					return GL_DST_ALPHA;
+
+				case BLEND_ONE_MINUS_DST_ALPHA:
+					return GL_ONE_MINUS_DST_ALPHA;
+
+				default:
+					return GL_INVALID_ENUM;
+				}
+			}
+
+			static GLenum FUNCtoENUM( BlendFuncType type )
+			{
+				switch( type )
+				{
+				case BLEND_FUNC_ADD:
+					return GL_FUNC_ADD;
+
+				case BLEND_FUNC_SUBTRACT:
+					return GL_FUNC_SUBTRACT;
+
+				case BLEND_FUNC_REVERSE_SUBTRACT:
+					return GL_FUNC_REVERSE_SUBTRACT;
+
+				case BLEND_FUNC_MIN:
+					return GL_MIN;
+
+				case BLEND_FUNC_MAX:
+					return GL_MAX;
+
+				default:
+					return GL_INVALID_ENUM;
+				}
+			}
+		};
+
 		WindowInfoGL*					mCurrWindow;
 
-		std::vector< RenderTarget >		mRenderTarget;
+		std::vector< RenderTargetGL >	mRenderTarget;
 		std::vector< GLuint >			mDepthStencil;
-		
-		static const UINT IMAGE_FORMAT[ NUM_IMAGE_FORMATS ];
 
 	public:
 		
@@ -93,7 +199,7 @@ namespace Sentinel
 			pixelFormatDescriptor.dwLayerMask	= PFD_MAIN_PLANE;
 			pixelFormatDescriptor.iPixelType	= PFD_TYPE_RGBA;
 			pixelFormatDescriptor.cColorBits	= 32;
-			pixelFormatDescriptor.cDepthBits	= 16;
+			pixelFormatDescriptor.cDepthBits	= 24;
 			
 			int pixelFormat = ChoosePixelFormat( mCurrWindow->mHDC, &pixelFormatDescriptor );
 			if( !pixelFormat )
@@ -127,7 +233,7 @@ namespace Sentinel
 
 			glewInit();
 
-			TRACE( "Created OpenGL " << glGetString( GL_VERSION ) << " Renderer");
+			TRACE( "Created OpenGL " << glGetString( GL_VERSION ) << " Renderer" );
 
 			glEnable( GL_DEPTH_TEST );
 
@@ -136,12 +242,12 @@ namespace Sentinel
 
 			// Create NULL_TEXTURE.
 			//
-			if( !NULL_TEXTURE )
+			if( !NULL_TEXTURE.get() )
 				NULL_TEXTURE = std::shared_ptr< Texture >( new TextureGL( 0, 0, 0 ));
 
 			// Create initial white texture as BASE_TEXTURE.
 			//
-			if( !BASE_TEXTURE )
+			if( !BASE_TEXTURE.get() )
 			{
 				UCHAR* newTex = new UCHAR[ 4 ];
 
@@ -160,6 +266,18 @@ namespace Sentinel
 
 				delete newTex;
 			}
+
+			// Create non-blending state.
+			//
+			if( !BLEND_OFF.get() )
+				BLEND_OFF = std::shared_ptr< BlendState >(new BlendStateGL( false, BLEND_ZERO, BLEND_ZERO, BLEND_ZERO, BLEND_ZERO, BLEND_FUNC_ADD, BLEND_FUNC_ADD ));
+
+			// Create default alpha-blending state.
+			//
+			if( !BLEND_ALPHA.get() )
+				BLEND_ALPHA = std::shared_ptr< BlendState >(CreateBlendState());
+
+			SetBlendState( BLEND_ALPHA );
 
 			return mCurrWindow;
 		}
@@ -209,7 +327,7 @@ namespace Sentinel
 
 		// Buffers.
 		//
-		Buffer* CreateBuffer( void* data, UINT size, UINT stride, BufferType type, BufferAccess access )
+		Buffer* CreateBuffer( void* data, UINT size, UINT stride, BufferType type, BufferAccessType access )
 		{
 			return new BufferGL( data, size, stride, type, access );
 		}
@@ -260,8 +378,6 @@ namespace Sentinel
 			UINT texID;
 			glGenTextures( 1, &texID );
 
-			// Configure the texture object.
-			//
 			glBindTexture( GL_TEXTURE_2D, texID );
 
 			if( createMips )
@@ -275,10 +391,30 @@ namespace Sentinel
 				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 			}
 			
-			// Load the texture object from memory.
-			//
 			glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-			glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, IMAGE_FORMAT[ format ], GL_UNSIGNED_BYTE, data );
+
+			switch( format )
+			{
+			case IMAGE_FORMAT_R:
+				glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_R, GL_UNSIGNED_BYTE, data );
+				break;
+
+			case IMAGE_FORMAT_RGB:
+				glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data );
+				break;
+
+			case IMAGE_FORMAT_RGBA:
+				glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
+				break;
+
+			case IMAGE_FORMAT_HDR:
+				glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA32F, GL_UNSIGNED_BYTE, data );
+				break;
+
+			default:
+				_ASSERT(0); // invalid image type
+				return NULL;
+			}
 
 			if( createMips )
 				glGenerateMipmap( GL_TEXTURE_2D );
@@ -300,7 +436,7 @@ namespace Sentinel
 		//
 		UINT CreateBackbuffer()
 		{
-			mRenderTarget.push_back( RenderTarget( NULL_TEXTURE, 0 ));
+			mRenderTarget.push_back( RenderTargetGL( NULL_TEXTURE, 0 ));
 			return mRenderTarget.size()-1;
 		}
 
@@ -308,7 +444,7 @@ namespace Sentinel
 		{
 			UINT renderID = mRenderTarget.size();
 
-			mRenderTarget.push_back( RenderTarget( texture, 0 ));
+			mRenderTarget.push_back( RenderTargetGL( texture, 0 ));
 			
 			glGenFramebuffers( 1, &mRenderTarget.back().mID );
 			glBindFramebuffer( GL_DRAW_FRAMEBUFFER, mRenderTarget.back().mID );
@@ -332,6 +468,16 @@ namespace Sentinel
 			return mDepthStencil.size()-1;
 		}
 
+		BlendState* CreateBlendState( BlendType srcBlendColor = BLEND_SRC_ALPHA, BlendType dstBlendColor = BLEND_ONE_MINUS_SRC_ALPHA, 
+									  BlendType srcBlendAlpha = BLEND_SRC_ALPHA, BlendType dstBlendAlpha = BLEND_ONE_MINUS_SRC_ALPHA,
+									  BlendFuncType blendFuncColor = BLEND_FUNC_ADD, BlendFuncType blendFuncAlpha = BLEND_FUNC_ADD )
+		{
+			return new BlendStateGL( true, 
+									 srcBlendColor, dstBlendColor, 
+									 srcBlendAlpha, dstBlendAlpha,
+									 blendFuncColor, blendFuncAlpha );
+		}
+
 		UINT ResizeBuffers( UINT width, UINT height )
 		{
 			mCurrWindow->mWidth			= width;
@@ -343,7 +489,7 @@ namespace Sentinel
 			return 1;
 		}
 
-		void SetRenderType( PrimitiveType type )
+		void SetRenderType( RenderType type )
 		{
 			_ASSERT( mCurrWindow );
 
@@ -364,24 +510,44 @@ namespace Sentinel
 			glBindRenderbuffer( GL_RENDERBUFFER, mDepthStencil[ stencil ] );
 		}
 
-		void SetDepthStencilState( StencilType state )
+		void SetDepthStencilType( DepthType state )
 		{
 			switch( state )
 			{
-				case STENCIL_DEFAULT:
-					glDepthFunc( GL_LEQUAL );
-					glDepthMask( GL_TRUE );
-					break;
+			case DEPTH_LESS:
+				glDepthFunc( GL_LESS );
+				break;
 
-				case STENCIL_NO_ZBUFFER:
-					glDepthFunc( GL_ALWAYS );
-					glDepthMask( GL_TRUE );
-					break;
+			case DEPTH_EQUAL:
+				glDepthFunc( GL_EQUAL );
+				break;
 
-				case STENCIL_PARTICLE:
-					glDepthMask( GL_FALSE );
-					break;
+			case DEPTH_GREATER:
+				glDepthFunc( GL_GREATER );
+				break;
+
+			case DEPTH_NOTEQUAL:
+				glDepthFunc( GL_NOTEQUAL );
+				break;
+
+			case DEPTH_GEQUAL:
+				glDepthFunc( GL_GEQUAL );
+				break;
+				
+			case DEPTH_LEQUAL:
+				glDepthFunc( GL_LEQUAL );
+				break;
+
+			case DEPTH_ALWAYS:
+				glDepthFunc( GL_ALWAYS );
+				break;
+
+			case DEPTH_OFF:
+				glDepthMask( GL_FALSE );
+				return;
 			}
+
+			glDepthMask( GL_TRUE );
 		}
 
 		void SetViewport( int x, int y, UINT width, UINT height )
@@ -413,24 +579,11 @@ namespace Sentinel
 			return S_OK;
 		}
 
-		void SetBlend( BlendType type )
+		void SetBlendState( std::shared_ptr< BlendState > blend )
 		{
-			switch( type )
-			{
-				case BLEND_ALPHA:
-					glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-					glEnable( GL_BLEND );
-					break;
+			_ASSERT( blend );
 
-				case BLEND_PARTICLE:
-					glBlendFunc( GL_SRC_ALPHA, GL_ONE );
-					glEnable( GL_BLEND );
-					break;
-
-				default:
-					glDisable( GL_BLEND );
-					break;
-			}
+			static_cast< BlendStateGL* >(blend.get())->Apply();
 		}
 		
 		// Shaders.
@@ -560,12 +713,6 @@ namespace Sentinel
 	const UINT RendererGL::FILL_TYPE[] = 
 		{ GL_FILL,
 		  GL_LINE };
-
-	const UINT RendererGL::IMAGE_FORMAT[] =
-		{ GL_R, 
-		  GL_RGB,
-		  GL_RGBA,
-		  GL_RGBA32F };
 
 	Renderer* BuildRendererGL()
 	{

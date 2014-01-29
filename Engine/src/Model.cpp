@@ -9,10 +9,10 @@ namespace Sentinel
 	Model::~Model()
 	{}
 
-	Model* Model::Load( const char*		filename, 
-						Renderer*		renderer, 
-						ShaderManager*	shaderManager, 
-						TextureManager*	textureManager )
+	Model* Model::Load( const char*			filename, 
+						Renderer*			renderer, 
+						ShaderManager*		shaderManager, 
+						TextureManager*		textureManager )
 	{
 		// Determine the extension of the object,
 		// and load it according to its type.
@@ -31,10 +31,10 @@ namespace Sentinel
 		return NULL;
 	}
 
-	Model* Model::Load( Archive&		archive,
-						Renderer*		renderer, 
-						ShaderManager*	shaderManager, 
-						TextureManager*	textureManager )
+	Model* Model::Load( Archive&			archive,
+						Renderer*			renderer, 
+						ShaderManager*		shaderManager, 
+						TextureManager*		textureManager )
 	{
 		BYTE format;
 		archive.Read( &format );

@@ -114,33 +114,31 @@ namespace Sentinel
 		return CreateTextureFromMemory( pixels, (UINT)width, (UINT)height, IMAGE_FORMAT_RGBA );
 	}
 
-	Mesh* Renderer::CreateRenderTargetQuad( std::shared_ptr< Shader > shader )
+	Mesh* Renderer::CreateRenderTargetQuad( std::shared_ptr< VertexLayout > layout )
 	{
 		MeshBuilder builder;
 
-		builder.mLayout = CreateVertexLayout( shader->Attribute() );
 		builder.CreateQuad( 1.0f );
+		builder.mLayout = layout;
 
 		Mesh* mesh = builder.BuildMesh( this );
-		mesh->mShader = shader;
-
+		
 		return mesh;
 	}
 
-	Mesh* Renderer::CreateGUIQuad( std::shared_ptr< Shader > shader )
+	Mesh* Renderer::CreateGUIQuad( std::shared_ptr< VertexLayout > layout )
 	{
 		MeshBuilder builder;
 
-		builder.mLayout = CreateVertexLayout( shader->Attribute() );
 		builder.CreateQuad( 0.5f, Vector3f( 0, 0, -1 ));
+		builder.mLayout = layout;
 
 		Matrix4f matTrans;
 		matTrans.Translate( Vector3f( 0.5f, 0.5f, 0 ));
 		builder.ApplyMatrix( matTrans );
 
 		Mesh* mesh = builder.BuildMesh( this );
-		mesh->mShader = shader;
-
+		
 		return mesh;
 	}
 }

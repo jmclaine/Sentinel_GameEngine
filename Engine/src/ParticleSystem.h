@@ -22,7 +22,7 @@ namespace Sentinel
 	class GameWorld;
 	class Renderer;
 	class Mesh;
-	class Shader;
+	class Material;
 	class Sprite;
 	class Archive;
 	
@@ -85,8 +85,12 @@ namespace Sentinel
 		virtual void		Load( Archive& archive );
 	};
 
-	extern SENTINEL_DLL ParticleSystem* BuildParticleSystemNormal( Renderer* renderer, GameWorld* world, std::shared_ptr< Shader > shader, std::shared_ptr< Sprite > sprite, UINT maxParticles );
+	extern SENTINEL_DLL ParticleSystem* BuildParticleSystemNormal( Renderer* renderer, GameWorld* world, 
+																   std::shared_ptr< Material > material, 
+																   std::shared_ptr< Sprite > sprite, 
+																   UINT maxParticles );
+
 	extern SENTINEL_DLL ParticleSystem* BuildParticleSystemNormal( Renderer* renderer, GameWorld* world );
 
-	// extern SENTINEL_DLL ParticleSystem* BuildParticleSystemPhysics( Renderer* renderer, GameWorld* world, std::shared_ptr< Mesh > mesh, UINT maxParticles );
+	//extern SENTINEL_DLL ParticleSystem* BuildParticleSystemPhysics( Renderer* renderer, GameWorld* world, std::shared_ptr< Mesh > mesh, UINT maxParticles );
 }

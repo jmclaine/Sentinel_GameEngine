@@ -355,7 +355,21 @@ namespace Sentinel
  
 			glGetShaderInfoLog( shader, length, &length, compileLog );
 
-			TRACE( "\nShader Compile Log" );
+			switch( type )
+			{
+			case GL_VERTEX_SHADER:
+				TRACE( "\nVertex Shader Compile Log" );
+				break;
+
+			case GL_GEOMETRY_SHADER:
+				TRACE( "\nGeometry Shader Compile Log" );
+				break;
+
+			case GL_FRAGMENT_SHADER:
+				TRACE( "\nFragment Shader Compile Log" );
+				break;
+			}
+
 			TRACE( compileLog );
 
 			free( compileLog );

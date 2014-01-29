@@ -12,12 +12,12 @@ namespace Sentinel
 	{
 	protected:
 
-		BufferAccess	mAccess;
+		BufferAccessType	mAccess;
 
-		BufferType		mType;
-		UINT			mSize;
-		UINT			mStride;
-		UINT			mCount;
+		BufferType			mType;
+		UINT				mSize;
+		UINT				mStride;
+		UINT				mCount;
 
 		//////////////////////////
 
@@ -27,20 +27,20 @@ namespace Sentinel
 
 		virtual ~Buffer();
 
-		virtual void	Release() = 0;
+		virtual void		Release() = 0;
 
-		virtual void*	Lock() = 0;
-		virtual void	Unlock() = 0;
+		virtual void*		Lock() = 0;
+		virtual void		Unlock() = 0;
 
-		BufferType		Type();
-		UINT			Size();
-		UINT			Stride();
-		UINT			Count();
+		BufferType			Type();
+		UINT				Size();
+		UINT				Stride();
+		UINT				Count();
 
 		///////////////////////////
 
-		static void		Save( Archive& archive, Buffer* buffer );
+		static void			Save( Archive& archive, Buffer* buffer );
 		
-		static Buffer*	Load( Archive& archive, Renderer* renderer );
+		static Buffer*		Load( Archive& archive, Renderer* renderer );
 	};
 }

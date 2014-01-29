@@ -15,10 +15,8 @@ namespace Sentinel
 
 	public:
 
-		std::shared_ptr< Mesh > mMesh;
-
-		Material				mMaterial;	// assigns to Mesh in Update
-
+		std::shared_ptr< Mesh >		mMesh;
+		
 		///////////////////////////////////
 
 		MeshComponent();

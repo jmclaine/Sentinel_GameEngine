@@ -18,7 +18,7 @@ SamplerState _Sampler0	:register(s0);
 //
 struct VSInput
 {
-	float4 Position		:POSITION;
+	float3 Position		:POSITION;
 	float2 Texture0		:TEXCOORD0;
 };
 
@@ -32,7 +32,7 @@ VSOutput VS_Main(VSInput input)
 {
 	VSOutput output;
 
-	output.Position = mul(_World, input.Position);
+	output.Position = mul(_World, float4(input.Position, 1));
 	output.Texture0 = input.Texture0;
 
 	return output;

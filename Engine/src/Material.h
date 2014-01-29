@@ -1,26 +1,53 @@
 #pragma once
 
+#include <memory>
+
 #include "Common.h"
 #include "ColorRGBA.h"
+#include "RendererTypes.h"
 
 namespace Sentinel
 {
+	class Shader;
+	class Texture;
+	class BlendState;
+	class Archive;
+	class ShaderManager;
+	class TextureManager;
+	class Renderer;
+
 	class SENTINEL_DLL Material
 	{
 	public:
 
-		ColorRGBA			mAmbient;
-		ColorRGBA			mDiffuse;
-		ColorRGBA			mSpecular;
-		float				mSpecularComponent;
+		ColorRGBA						mAmbient;
+		ColorRGBA						mDiffuse;
+		ColorRGBA						mSpecular;
+		float							mSpecularComponent;
 
-		//////////////////////////////////
+		std::shared_ptr< Shader >		mShader;
+		std::shared_ptr< Texture >		mTexture[ NUM_TEXTURES ];
+		std::shared_ptr< BlendState >	mBlendState;
 
-		Material( const ColorRGBA& ambient  = ColorRGBA( 0.2f, 0.2f, 0.2f, 1.0f ),
-				  const ColorRGBA& diffuse  = ColorRGBA( 0.6f, 0.6f, 0.6f, 1.0f ),
-				  const ColorRGBA& specular = ColorRGBA( 0.2f, 0.2f, 0.2f, 1.0f ),
-				  float spec_comp = 32.0f );
+		CullType						mCullMode;
+		DepthType						mDepthMode;
 
-		float* Ptr();
+		//////////////////////////////////////////////
+
+		Material();
+		~Material();
+
+		void				Apply( Renderer* renderer );
+
+		//////////////////////////////////////////////
+
+		static void			Save( Archive&			archive, 
+								  Material*			material,
+								  ShaderManager*	shaderManager,
+								  TextureManager*	textureManager );
+
+		static Material*	Load( Archive&			archive,
+								  ShaderManager*	shaderManager,
+								  TextureManager*	textureManager );
 	};
 }

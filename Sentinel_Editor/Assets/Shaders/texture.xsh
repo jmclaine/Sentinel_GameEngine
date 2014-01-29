@@ -30,18 +30,18 @@ SamplerState _Sampler0	:register(s0);
 //
 struct VSInput
 {
-	float3 Position		:POSITION;
+	float4 Position		:POSITION;
 	float2 TexCoord0	:TEXCOORD0;
-	float3 Normal		:NORMAL0;
+	float3 Normal		:NORMAL;
 };
 
 struct VSOutput
 {
 	float4 Position		:SV_POSITION;
 	float2 TexCoord0	:TEXCOORD0;
-	float3 Normal		:NORMAL0;
-	float3 CamDir		:NORMAL1;
-	float3 LPos0		:NORMAL2;
+	float3 Normal		:NORMAL;
+	float3 CameraDir	:CAMERA_DIR;
+	float3 LightPos		:LIGHT_POS;
 };
 
 VSOutput VS_Main( VSInput input )
@@ -49,14 +49,14 @@ VSOutput VS_Main( VSInput input )
 	VSOutput output;
 
 	// Position
-	output.Position = mul(_WVP,   float4(input.Position, 1));
-	float3 worldPos = mul(_World, float4(input.Position, 1)).xyz;
+	output.Position = mul(_WVP,   input.Position);
+	float3 worldPos = mul(_World, input.Position).xyz;
 	
 	// Light direction
-	output.LPos0  = _LightPos - worldPos;
+	output.LightPos  = _LightPos - worldPos;
 	
 	// Camera direction
-	output.CamDir = _CameraPos - worldPos;
+	output.CameraDir = _CameraPos - worldPos;
 
 	// Texture
 	output.TexCoord0 = input.TexCoord0;
@@ -97,13 +97,13 @@ float4 GetColor(float3 LPos, float3 camDir, float3 N, float3 color, float4 attn)
 float4 PS_Main(VSOutput input):SV_Target
 {	
 	// Camera Direction
-	input.CamDir = normalize(input.CamDir);
+	input.CameraDir = normalize(input.CameraDir);
 
 	// Normal
 	float3 N = normalize(input.Normal);
 
 	// Attenuation
-	float4 color0 = GetColor(input.LPos0, input.CamDir, N, _LightColor, _LightAttn);
+	float4 color0 = GetColor(input.LightPos, input.CameraDir, N, _LightColor, _LightAttn);
 	
 	// Final fragment color
 	return _Texture0.Sample(_Sampler0, input.TexCoord0) * color0;
@@ -180,7 +180,9 @@ vec4 GetColor( vec3 LPos, vec3 camDir, vec3 N, vec3 color, vec4 attn )
 	vec4 diffuseFinal = _Diffuse * intensity;
 
 	// Specular
-	vec4 specularFinal = max(_Specular * pow(clamp(dot(N, H), 0.0, 1.0), _SpecComp), 0.0);
+	vec4 specularFinal;
+	if(dot(-LPos, N) < 0)
+		specularFinal = max(_Specular * pow(clamp(dot(N, H), 0.0, 1.0), _SpecComp), 0.0);
 
 	return clamp(vec4(ambientFinal.rgb + (diffuseFinal.rgb + specularFinal.rgb) * attnFinal * color, 1.0), 0.0, 1.0);
 }

@@ -133,6 +133,8 @@ namespace Sentinel
 	class Buffer;
 	class Mesh;
 
+	//////////////////////////////////
+
 	class SENTINEL_DLL WindowInfo
 	{
 		friend class Renderer;
@@ -166,6 +168,17 @@ namespace Sentinel
 		void	Update();
 	};
 
+	//////////////////////////////////
+
+	class SENTINEL_DLL BlendState
+	{
+	public:
+
+		virtual ~BlendState() {}
+	};
+
+	//////////////////////////////////
+
 	// Only one Renderer should be created as multiple instances
 	// of this particular object would unnecessarily complicate the
 	// shared context capability of the video card interface without
@@ -179,15 +192,18 @@ namespace Sentinel
 
 	public:
 
-		static UINT					WINDOW_WIDTH_BASE;
-		static UINT					WINDOW_HEIGHT_BASE;
+		static UINT						WINDOW_WIDTH_BASE;
+		static UINT						WINDOW_HEIGHT_BASE;
 
-		std::shared_ptr< Texture >	NULL_TEXTURE;	// black default texture
-		std::shared_ptr< Texture >	BASE_TEXTURE;	// white default texture
+		std::shared_ptr< Texture >		NULL_TEXTURE;	// black default texture
+		std::shared_ptr< Texture >		BASE_TEXTURE;	// white default texture
+
+		std::shared_ptr< BlendState >	BLEND_OFF;
+		std::shared_ptr< BlendState >	BLEND_ALPHA;
 
 	public:
 
-		virtual ~Renderer() {};
+		virtual ~Renderer() {}
 
 		/////////////////////////////////
 
@@ -208,7 +224,7 @@ namespace Sentinel
 
 		// Buffers.
 		//
-		virtual Buffer*		CreateBuffer( void* data, UINT size, UINT stride, BufferType type, BufferAccess access = BUFFER_READ_WRITE ) = 0;
+		virtual Buffer*		CreateBuffer( void* data, UINT size, UINT stride, BufferType type, BufferAccessType access = BUFFER_READ_WRITE ) = 0;
 
 		virtual void		SetVBO( Buffer* buffer ) = 0;
 		virtual void		SetIBO( Buffer* buffer ) = 0;
@@ -225,22 +241,27 @@ namespace Sentinel
 	
 		// Special Rendering.
 		//
-		Mesh*				CreateRenderTargetQuad( std::shared_ptr< Shader > shader );
-		Mesh*				CreateGUIQuad( std::shared_ptr< Shader > shader );
+		Mesh*				CreateRenderTargetQuad( std::shared_ptr< VertexLayout > layout );
+		Mesh*				CreateGUIQuad( std::shared_ptr< VertexLayout > layout );
 
 		virtual UINT		CreateBackbuffer() = 0;
 		virtual UINT		CreateRenderTarget( std::shared_ptr< Texture > texture ) = 0;
 		virtual UINT		CreateDepthStencil( UINT width, UINT height ) = 0;
+		virtual BlendState* CreateBlendState( BlendType srcBlendColor = BLEND_SRC_ALPHA, BlendType dstBlendColor = BLEND_ONE_MINUS_SRC_ALPHA, 
+											  BlendType srcBlendAlpha = BLEND_SRC_ALPHA, BlendType dstBlendAlpha = BLEND_ONE_MINUS_SRC_ALPHA,
+											  BlendFuncType blendFuncColor = BLEND_FUNC_ADD, BlendFuncType blendFuncAlpha = BLEND_FUNC_ADD ) = 0;
+
 		virtual UINT		ResizeBuffers( UINT width, UINT height ) = 0;
 
-		virtual void		SetRenderType( PrimitiveType type ) = 0;
+		virtual void		SetRenderType( RenderType type ) = 0;
 		virtual void		SetRenderTarget( UINT target ) = 0;
 		virtual void		SetDepthStencil( UINT stencil ) = 0;
-		virtual void		SetDepthStencilState( StencilType state ) = 0;
+		virtual void		SetBlendState( std::shared_ptr< BlendState > blend ) = 0;
+
+		virtual void		SetDepthStencilType( DepthType state ) = 0;
 		virtual void		SetViewport( int x, int y, UINT width, UINT height ) = 0;
 		virtual UINT		SetCull( CullType type ) = 0;
 		virtual UINT		SetFill( FillType type ) = 0;
-		virtual void		SetBlend( BlendType type ) = 0;
 
 		// Shaders.
 		//

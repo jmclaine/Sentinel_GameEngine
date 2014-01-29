@@ -8,9 +8,7 @@
 #include "Timing.h"
 #include "Archive.h"
 #include "Renderer.h"
-#include "Shader.h"
 #include "ShaderManager.h"
-#include "Texture.h"
 #include "TextureManager.h"
 #include "Material.h"
 
@@ -20,7 +18,7 @@ namespace Sentinel
 	{
 		// Texture types from 3DStudio Max 2012.
 		//
-		enum AutodeskTextureTypes
+		enum AutodeskTextureType
 		{
 			AUTODESK_DIFFUSE1 = 1,
 			AUTODESK_DIFFUSE2 = 2,
@@ -94,18 +92,10 @@ namespace Sentinel
 			}
 		};
 
-		// Materials.
-		//
-		struct MaterialTexture
-		{
-			Material	mMaterial;
-			std::shared_ptr< Texture > mTexture[ NUM_AUTODESK_TYPES ];
-		};
-
 		Object*				mObject;
 		UINT				mNumObjects;
 
-		MaterialTexture*	mMaterials;
+		std::shared_ptr< Material >* mMaterials;
 		UINT				mNumMaterials;
 
 		bool				mIsWeighted;		// Are the vertices weighted?
@@ -150,10 +140,10 @@ namespace Sentinel
 			mNumMaterials = 0;
 		}
 
-		void Save( Archive&			archive,
-				   Renderer*		renderer, 
-				   ShaderManager*	shaderManager, 
-				   TextureManager*	textureManager )
+		void Save( Archive&				archive,
+				   Renderer*			renderer, 
+				   ShaderManager*		shaderManager, 
+				   TextureManager*		textureManager )
 		{
 			// Save the format type.
 			//
@@ -216,10 +206,10 @@ namespace Sentinel
 			}
 		}
 
-		void Create( Archive&			archive,
-					 Renderer*			renderer, 
-					 ShaderManager*		shaderManager, 
-					 TextureManager*	textureManager )
+		void CreateFromArchive( Archive&			archive,
+								Renderer*			renderer, 
+								ShaderManager*		shaderManager, 
+								TextureManager*		textureManager )
 		{
 			// Read if the model has weighted vertices.
 			//
@@ -230,7 +220,7 @@ namespace Sentinel
 			// Read the materials.
 			//
 			archive.Read( &mNumMaterials );
-			mMaterials = new MaterialTexture[ mNumMaterials ];
+			mMaterials = new std::shared_ptr< Material >[ mNumMaterials ];
 
 			for( UINT x = 0; x < mNumMaterials; ++x )
 				ReadMaterial( archive, mMaterials[ x ], renderer, textureManager );
@@ -273,10 +263,10 @@ namespace Sentinel
 			}
 		}
 
-		bool Create( const char*		filename, 
-					 Renderer*			renderer, 
-					 ShaderManager*		shaderManager, 
-					 TextureManager*	textureManager )
+		bool CreateFromFile( const char*		filename, 
+							 Renderer*			renderer, 
+							 ShaderManager*		shaderManager, 
+							 TextureManager*	textureManager )
 		{
 			Vertex*    vertices  = NULL;
 			Vector3f*  normals   = NULL;
@@ -295,9 +285,14 @@ namespace Sentinel
 				// Read the materials and create meshes.
 				//
 				archive.Read( &mNumMaterials );
-				mMaterials = new MaterialTexture[ mNumMaterials ];
+				mMaterials = new std::shared_ptr< Material >[ mNumMaterials ];
+
 				for( UINT x = 0; x < mNumMaterials; ++x )
+				{
+					mMaterials[ x ] = std::shared_ptr< Material >(new Material());
+
 					ReadMaterial( archive, mMaterials[ x ], renderer, textureManager );
+				}
 				
 				// Read whether any data was exported using 32-bit.
 				//
@@ -348,7 +343,6 @@ namespace Sentinel
 				for( int x = 0; x < numNormals; ++x )
 					archive.Read( normals[ x ].Ptr(), 3 );
 
-				
 				// Read texture coordinates.
 				//
 				int numTexCoords;
@@ -416,8 +410,7 @@ namespace Sentinel
 						mObject[ x ].mMesh[ y ] = NULL;
 
 					MeshBuilder builder;
-					Material	material;
-
+					
 					for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
 					{
 						builder.ClearAll();
@@ -428,22 +421,22 @@ namespace Sentinel
 
 						// Read the material ID for this object.
 						//
+						std::shared_ptr< Material > material;
+
 						int matID;
 						archive.Read( &matID );
 
 						if( matID != -1 )
 						{
-							MaterialTexture& mtex = mMaterials[ matID ];
-							material = mtex.mMaterial;
-
-							for( UINT z = 0; z < NUM_AUTODESK_TYPES; ++z )
-								if( mtex.mTexture[ z ] != NULL )
-									if( builder.mTexture[ numTextures ] = mtex.mTexture[ z ] )
-										++numTextures;
+							material = mMaterials[ matID ];
+							
+							for( UINT z = 0; z < NUM_TEXTURES; ++z )
+								if( material->mTexture[ z ].get() != NULL )
+									++numTextures;
 						}
 						else
 						{
-							material = Material();
+							material = std::shared_ptr< Material >(new Material());
 						}
 
 						std::shared_ptr< Shader > shader;
@@ -472,7 +465,9 @@ namespace Sentinel
 							shader = shaderManager->Get( "Parallax" );
 						}
 
-						builder.mLayout = renderer->CreateVertexLayout( shader->Attribute() );
+						material->mShader = shader;
+
+						builder.mLayout = shader->Layout();
 
 						// Read faces.
 						//
@@ -512,7 +507,6 @@ namespace Sentinel
 						builder.CalculateTangents( false );
 						
 						mObject[ x ].mMesh[ y ] = builder.BuildMesh( renderer );
-						mObject[ x ].mMesh[ y ]->mShader   = shader;
 						mObject[ x ].mMesh[ y ]->mMaterial = material;
 
 						builder.ApplyMatrix( mObject[ x ].mKeyFrame[ 0 ].mMatrix );
@@ -545,43 +539,48 @@ namespace Sentinel
 
 	private:
 
-		void WriteMaterial( Archive& archive, MaterialTexture& matTex, TextureManager* textureManager )
+		void WriteMaterial( Archive& archive, 
+							std::shared_ptr< Material > material, 
+							TextureManager* textureManager )
 		{
 			// Write base material.
 			//
-			archive.Write( matTex.mMaterial.mAmbient.Ptr(),  3 );
-			archive.Write( matTex.mMaterial.mDiffuse.Ptr(),  3 );
-			archive.Write( matTex.mMaterial.mSpecular.Ptr(), 3 );
+			archive.Write( material->mAmbient.Ptr(),  3 );
+			archive.Write( material->mDiffuse.Ptr(),  3 );
+			archive.Write( material->mSpecular.Ptr(), 3 );
 
-			float spec_comp = matTex.mMaterial.mSpecularComponent / 100.0f;
+			float spec_comp = material->mSpecularComponent / 100.0f;
 			archive.Write( &spec_comp );
 
-			float alpha = matTex.mMaterial.mAmbient.a + matTex.mMaterial.mDiffuse.a + matTex.mMaterial.mSpecular.a;
+			float alpha = material->mAmbient.a + material->mDiffuse.a + material->mSpecular.a;
 			archive.Write( &alpha );
 
 			// Write filenames of each texture.
 			//
 			UINT numTextures = 0;
 			for( UINT x = 0; x < NUM_AUTODESK_TYPES; ++x )
-				if( matTex.mTexture[ x ] != NULL )
+				if( material->mTexture[ x ] != NULL )
 					++numTextures;
 
 			archive.Write( &numTextures, 1, false );
 
 			for( BYTE x = 0; x < NUM_AUTODESK_TYPES; ++x )
 			{
-				if( matTex.mTexture[ x ] != NULL )
+				if(material->mTexture[ x ] != NULL )
 				{
 					archive.Write( &x );
 
-					std::string name = textureManager->Get( matTex.mTexture[ x ] );
+					std::string name = textureManager->Get( material->mTexture[ x ] );
 
 					archive.Write( &name );
 				}
 			}
 		}
 
-		void ReadMaterial( Archive& archive, MaterialTexture& matTex, Renderer* renderer, TextureManager* textureManager )
+		void ReadMaterial( Archive&				archive, 
+						   std::shared_ptr< Material > material, 
+						   Renderer*			renderer, 
+						   TextureManager*		textureManager )
 		{
 			// Set the material.
 			//
@@ -601,11 +600,16 @@ namespace Sentinel
 			float alpha;
 			archive.Read( &alpha );
 			
-			matTex.mMaterial = Material( ColorRGBA( ambient.x,  ambient.y,  ambient.z,  alpha ),\
-										 ColorRGBA( diffuse.x,  diffuse.y,  diffuse.z,  0 ),\
-										 ColorRGBA( specular.x, specular.y, specular.z, 0 ),\
-										 spec_comp );
+			material->mAmbient  = ColorRGBA( ambient.x,  ambient.y,  ambient.z,  alpha );
+			material->mDiffuse  = ColorRGBA( diffuse.x,  diffuse.y,  diffuse.z,  0 );
+			material->mSpecular = ColorRGBA( specular.x, specular.y, specular.z, 0 );
+			material->mSpecularComponent = spec_comp;
 
+			if( alpha < 0.98f )	// close enough
+				material->mBlendState = renderer->BLEND_ALPHA;
+			else
+				material->mBlendState = renderer->BLEND_OFF;
+			
 			// Read filenames of each texture.
 			//
 			UINT numTextures;
@@ -616,33 +620,31 @@ namespace Sentinel
 				BYTE type;
 				archive.Read( &type );
 
-				if( type == AUTODESK_BUMP )
+				switch( type )
 				{
+				case AUTODESK_BUMP:
 					type = TEXTURE_NORMAL;
-				}
-				else
-				if( type == AUTODESK_PARALLAX )
-				{
+					break;
+
+				case AUTODESK_PARALLAX:
 					type = TEXTURE_DEPTH;
-				}
-				else
-				{
+					break;
+				
+				default:
 					type = TEXTURE_DIFFUSE;
+					break;
 				}
 
 				std::string name;
 				archive.Read( &name );
 				
-				if( textureManager )
-					matTex.mTexture[ type ] = textureManager->Add( name, renderer->CreateTextureFromFile( name.c_str() ));
-				else
-					matTex.mTexture[ type ] = renderer->CreateTextureFromFile( name.c_str() );
+				material->mTexture[ type ] = textureManager->Add( name, renderer->CreateTextureFromFile( name.c_str() ));
 			}
 		}
 
 	public:
 
-		void SetMaterials( const std::vector< Material >& material )
+		void SetMaterials( const std::vector< std::shared_ptr< Material >>& material )
 		{
 			auto it = material.begin();
 
@@ -654,7 +656,7 @@ namespace Sentinel
 				}
 		}
 
-		void GetMaterials( std::vector< Material >* material )
+		void GetMaterials( std::vector< std::shared_ptr< Material >>* material )
 		{
 			material->clear();
 
@@ -662,14 +664,7 @@ namespace Sentinel
 				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
 					material->push_back( mObject[ x ].mMesh[ y ]->mMaterial );
 		}
-		/*
-		void SetShader( Shader* shader )
-		{
-			for( UINT x = 0; x < mNumObjects; ++x )
-				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
-					mObject[ x ].mMesh[ y ]->mShader = shader;
-		}
-		*/
+
 		void SetTime( float _time, UINT objIndex = 0 )
 		{
 			_ASSERT( objIndex < mNumObjects );
@@ -774,7 +769,7 @@ namespace Sentinel
 	{
 		ModelM3D* model = new ModelM3D();
 
-		model->Create( filename, renderer, shaderManager, textureManager );
+		model->CreateFromFile( filename, renderer, shaderManager, textureManager );
 
 		return model;
 	}
@@ -786,7 +781,7 @@ namespace Sentinel
 	{
 		ModelM3D* model = new ModelM3D();
 
-		model->Create( archive, renderer, shaderManager, textureManager );
+		model->CreateFromArchive( archive, renderer, shaderManager, textureManager );
 
 		return model;
 	}

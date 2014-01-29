@@ -22,14 +22,15 @@ namespace Sentinel
 		desc.Format				= format;
 		desc.SemanticIndex		= index;
 		desc.AlignedByteOffset	= mVertexSize;
+		desc.InputSlot			= 0;
+		desc.InputSlotClass		= D3D11_INPUT_PER_VERTEX_DATA;
+		desc.InstanceDataStepRate = 0;
 
 		mVertexSize += size;
 	}
 
 	void VertexLayoutDX::AddAttribute( AttributeType type )
 	{
-		mLayout.push_back( type );
-
 		switch( type )
 		{
 		case ATTRIB_POSITION:
@@ -93,8 +94,10 @@ namespace Sentinel
 
 		default:
 			TRACE( "Attempted to add unknown Attribute: " << type );
-			break;
+			return;
 		}
+
+		mLayout.push_back( type );
 	}
 
 	HRESULT VertexLayoutDX::Create( ID3D11Device* device )
@@ -113,14 +116,6 @@ namespace Sentinel
 			{
 			case ATTRIB_POSITION:
 				source += "float4 Position:POSITION;\n";
-				break;
-
-			case ATTRIB_NORMAL:
-				source += "float3 Normal:NORMAL;\n";
-				break;
-
-			case ATTRIB_COLOR:
-				source += "float4 Color:COLOR;\n";
 				break;
 
 			case ATTRIB_TEXCOORD0:
@@ -145,6 +140,14 @@ namespace Sentinel
 
 			case ATTRIB_QUADCOORD2:
 				source += "float4 QuadCoord2:QUADCOORD2;\n";
+				break;
+
+			case ATTRIB_NORMAL:
+				source += "float3 Normal:NORMAL;\n";
+				break;
+
+			case ATTRIB_COLOR:
+				source += "float4 Color:COLOR;\n";
 				break;
 
 			case ATTRIB_TANGENT:
@@ -178,30 +181,22 @@ namespace Sentinel
 									 "VS_Main", "vs_4_0", 
 									 D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &shaderBlob, NULL, NULL ) == S_FALSE )
 		{
-			return S_FALSE;
-		}
-			
-		if( device->CreateInputLayout( mInputDesc.data(), mInputDesc.size(), 
-									   shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), 
-									   &mInputLayout ) == S_FALSE )
-		{
 			SAFE_RELEASE_PTR( shaderBlob );
 
 			return S_FALSE;
 		}
+			
+		HRESULT result = Create( device, shaderBlob );
 
 		SAFE_RELEASE_PTR( shaderBlob );
 
-		return S_OK;
+		return result;
 	}
 
 	HRESULT VertexLayoutDX::Create( ID3D11Device* device, ID3D10Blob* shaderBlob )
 	{
-		if( device->CreateInputLayout( mInputDesc.data(), mInputDesc.size(), 
-									   shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), 
-									   &mInputLayout ) == S_FALSE )
-		{
-			return S_FALSE;
-		}
+		return device->CreateInputLayout( mInputDesc.data(), mInputDesc.size(), 
+										  shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), 
+										  &mInputLayout );
 	}
 }

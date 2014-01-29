@@ -18,10 +18,8 @@ namespace Sentinel
 
 		/////////////////////////////////
 
-		void Save( Archive&			archive, 
-				   TextureManager*	textureManager );
+		void Save( Archive&			archive );
 
-		void Load( Archive&			archive, 
-				   TextureManager*	textureManager );
+		void Load( Archive&			archive );
 	};
 }

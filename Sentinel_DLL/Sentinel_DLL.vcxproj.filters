@@ -300,9 +300,6 @@
     <ClInclude Include="..\Engine\src\ColorRGBA.h">
       <Filter>Source Files\Sentinel_Engine\Misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\Material.h">
-      <Filter>Source Files\Sentinel_Engine\Misc</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\Point.h">
       <Filter>Source Files\Sentinel_Engine\Misc</Filter>
     </ClInclude>
@@ -395,6 +392,12 @@
     </ClInclude>
     <ClInclude Include="..\Engine\src\DX\VertexLayoutDX.h">
       <Filter>Source Files\Sentinel_Engine\Systems\Renderer\DX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\MaterialManager.h">
+      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Material.h">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -650,9 +653,6 @@
     <ClCompile Include="..\Engine\src\ColorRGBA.cpp">
       <Filter>Source Files\Sentinel_Engine\Misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\Material.cpp">
-      <Filter>Source Files\Sentinel_Engine\Misc</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\Renderer.cpp">
       <Filter>Source Files\Sentinel_Engine\Systems\Renderer</Filter>
     </ClCompile>
@@ -736,6 +736,12 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\DX\VertexLayoutDX.cpp">
       <Filter>Source Files\Sentinel_Engine\Systems\Renderer\DX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Material.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\MaterialManager.cpp">
+      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

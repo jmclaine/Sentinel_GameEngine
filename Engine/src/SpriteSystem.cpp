@@ -2,29 +2,31 @@
 #include "MeshBuilder.h"
 #include "Mesh.h"
 #include "Buffer.h"
+#include "Material.h"
 #include "Sprite.h"
 #include "Renderer.h"
 #include "GameWorld.h"
 #include "CameraComponent.h"
 #include "TransformComponent.h"
+#include "VertexLayout.h"
+#include "Material.h"
 
 namespace Sentinel
 {
-	SpriteSystem::SpriteSystem( Renderer* renderer, std::shared_ptr< Shader > shader, UINT maxSprites ) :
+	SpriteSystem::SpriteSystem( Renderer* renderer, std::shared_ptr< VertexLayout > layout, UINT maxSprites ) :
 		mRenderer( renderer ),
-		mShader( shader ),
 		mMaxSprites( maxSprites ),
 		mNumSprites( 0 )
 	{
 		_ASSERT( renderer );
-		_ASSERT( shader );
+		_ASSERT( layout.get() );
 		_ASSERT( maxSprites > 0 );
 
 		mStorage = new Storage[ maxSprites ];
 
 		MeshBuilder builder;
 
-		builder.mLayout = shader->Layout();
+		builder.mLayout = layout;
 
 		for( UINT x = 0; x < maxSprites; ++x )
 		{
@@ -38,8 +40,6 @@ namespace Sentinel
 
 		if( !mMesh )
 			throw AppException( "Failed to create Mesh in SpriteSystem" );
-
-		mMesh->mShader = shader;
 	}
 
 	SpriteSystem::~SpriteSystem()
@@ -54,10 +54,7 @@ namespace Sentinel
 		return mRenderer;
 	}
 
-	std::shared_ptr< Shader > SpriteSystem::GetShader()
-	{
-		return mShader;
-	}
+	/////////////////////////////////////
 
 	void SpriteSystem::Clear()
 	{
@@ -97,9 +94,8 @@ namespace Sentinel
 
 		mMesh->mVBO->Unlock();
 
-		mMesh->mShader = mShader;
-		mMesh->mTexture[ TEXTURE_DIFFUSE ] = mSprite->mTexture;
-
+		mMesh->mMaterial = mMaterial;
+		
 		mMesh->Draw( mRenderer, NULL, mNumSprites );
 	}
 }

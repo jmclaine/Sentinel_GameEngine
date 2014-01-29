@@ -14,7 +14,7 @@ cbuffer Uniforms
 //
 struct VSInput
 {
-	float4 Position	:POSITION;
+	float3 Position	:POSITION;
 };
 
 struct VSOutput
@@ -26,7 +26,7 @@ VSOutput VS_Main(VSInput input)
 {
 	VSOutput output;
 
-	output.Position = mul(_WVP, input.Position);
+	output.Position = mul(_WVP, float4(input.Position, 1));
 	
 	return output;
 }

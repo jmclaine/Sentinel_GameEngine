@@ -16,6 +16,7 @@ http://www.freetype.org/
 #include "Renderer.h"
 #include "Sprite.h"
 #include "Texture.h"
+#include "Material.h"
 #include "Util.h"
 
 namespace Sentinel
@@ -172,18 +173,29 @@ namespace Sentinel
 				FT_Done_Glyph( glyph );
 			}
 
-			// Create texture from memory.
-			//
-			sprite->mTexture = mSpriteSystem->GetRenderer()->CreateTextureFromMemory( pixels, textureWidth, textureHeight, IMAGE_FORMAT_RGBA );
+			std::shared_ptr< Texture > texture = mSpriteSystem->GetRenderer()->CreateTextureFromMemory( pixels, textureWidth, textureHeight, IMAGE_FORMAT_RGBA );
 
 			free( pixels );
+
+			if( texture.get() == NULL )
+			{
+				REPORT_ERROR( "Failed to create texture for font.", "Texture Creation Error" );
+
+				return NULL;
+			}
+
+			std::shared_ptr< Material > material( new Material() );
+			material->mTexture[ TEXTURE_DIFFUSE ] = texture;
+
+			font->mMaterial = material;
 
 			return font;
 		}
 
 		void Draw( char text, const ColorRGBA& color, const Matrix4f& matWorld )
 		{
-			mSpriteSystem->mSprite = mFont->mSprite;
+			mSpriteSystem->mSprite   = mFont->mSprite;
+			mSpriteSystem->mMaterial = mFont->mMaterial;
 
 			mSpriteSystem->Draw( text, color, matWorld );
 		}

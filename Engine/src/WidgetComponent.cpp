@@ -4,8 +4,8 @@
 #include "FontSystem.h"
 #include "Vector2f.h"
 #include "Matrix4f.h"
-#include "Material.h"
 #include "Sprite.h"
+#include "Material.h"
 #include "GameObject.h"
 #include "GameWorld.h"
 #include "Mesh.h"
@@ -21,18 +21,19 @@ namespace Sentinel
 
 	WidgetComponent::WidgetComponent() :
 		mSpriteSystem( NULL ),
+		mMaterial( NULL ),
 		mFontSystem( NULL ),
 		mCamera( -1 )
 	{
 		mWidgetWorld = new GUI::WidgetWorld();
 	}
 
-	WidgetComponent::WidgetComponent( std::shared_ptr< Sprite > sprite, FontSystem* fontSystem, UINT camera ) :
+	WidgetComponent::WidgetComponent( std::shared_ptr< Sprite > sprite, std::shared_ptr< Material > material, FontSystem* fontSystem, UINT camera ) :
 		mSpriteSystem( NULL )
 	{
 		mWidgetWorld = new GUI::WidgetWorld();
 
-		Set( sprite, fontSystem, camera );
+		Set( sprite, material, fontSystem, camera );
 	}
 
 	WidgetComponent::~WidgetComponent()
@@ -40,13 +41,14 @@ namespace Sentinel
 		delete mWidgetWorld;
 	}
 
-	void WidgetComponent::Set( std::shared_ptr< Sprite > sprite, FontSystem* fontSystem, UINT camera )
+	void WidgetComponent::Set( std::shared_ptr< Sprite > sprite, std::shared_ptr< Material > material, FontSystem* fontSystem, UINT camera )
 	{
 		_ASSERT( sprite );
 		
-		mSprite = sprite;
-		mFontSystem = fontSystem;
-		mCamera = camera;
+		mSprite			= sprite;
+		mMaterial		= material;
+		mFontSystem		= fontSystem;
+		mCamera			= camera;
 	}
 
 	/////////////////////////////////
@@ -89,7 +91,8 @@ namespace Sentinel
 			
 			if( mSpriteSystem )
 			{
-				mSpriteSystem->mSprite = mSprite;
+				mSpriteSystem->mSprite   = mSprite;
+				mSpriteSystem->mMaterial = mMaterial;
 
 				mSpriteSystem->Clear();
 
@@ -100,7 +103,8 @@ namespace Sentinel
 			{
 				mWidgetWorld->mFontSystem = mFontSystem;
 
-				mFontSystem->mSpriteSystem->mSprite = mFontSystem->mFont->mSprite;
+				mFontSystem->mSpriteSystem->mSprite   = mFontSystem->mFont->mSprite;
+				mFontSystem->mSpriteSystem->mMaterial = mFontSystem->mFont->mMaterial;
 
 				mFontSystem->mSpriteSystem->Clear();
 			}

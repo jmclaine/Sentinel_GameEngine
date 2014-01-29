@@ -14,7 +14,8 @@ namespace Sentinel
 	{
 	public:
 
-		std::shared_ptr< Sprite > mSprite;
+		std::shared_ptr< Sprite >   mSprite;
+		std::shared_ptr< Material > mMaterial;
 
 		float mOffsetX[ NUM_CHARS ];	// image offset
 		float mOffsetY[ NUM_CHARS ];

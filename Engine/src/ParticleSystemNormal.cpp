@@ -7,7 +7,6 @@
 #include "TransformComponent.h"
 #include "CameraComponent.h"
 #include "Mesh.h"
-#include "Shader.h"
 #include "Buffer.h"
 #include "Texture.h"
 #include "Sprite.h"
@@ -16,6 +15,7 @@
 #include "Point.h"
 #include "ShaderManager.h"
 #include "SpriteManager.h"
+#include "MaterialManager.h"
 #include "Archive.h"
 
 namespace Sentinel
@@ -28,7 +28,7 @@ namespace Sentinel
 
 	private:
 
-		std::shared_ptr< Shader >	mShader;
+		std::shared_ptr< Material >	mMaterial;
 		std::shared_ptr< Sprite >	mSprite;
 
 		NormalParticle*				mParticle;
@@ -42,10 +42,10 @@ namespace Sentinel
 			ParticleSystem( renderer, world )
 		{}
 
-		ParticleSystemNormal( Renderer* renderer, GameWorld* world, std::shared_ptr< Shader > shader, std::shared_ptr< Sprite > sprite, UINT maxParticles ) :
+		ParticleSystemNormal( Renderer* renderer, GameWorld* world, std::shared_ptr< Material > material, std::shared_ptr< Sprite > sprite, UINT maxParticles ) :
 			ParticleSystem( renderer, world )
 		{
-			Build( shader, sprite, maxParticles );
+			Build( material, sprite, maxParticles );
 		};
 
 		~ParticleSystemNormal()
@@ -53,7 +53,7 @@ namespace Sentinel
 			delete[] mParticle;
 		}
 
-		void Build( Renderer* renderer, GameWorld* world, std::shared_ptr< Shader > shader, std::shared_ptr< Sprite > sprite, UINT maxParticles )
+		void Build( Renderer* renderer, GameWorld* world, std::shared_ptr< Material > material, std::shared_ptr< Sprite > sprite, UINT maxParticles )
 		{
 			_ASSERT( renderer );
 			_ASSERT( world );
@@ -61,24 +61,24 @@ namespace Sentinel
 			mRenderer  = renderer;
 			mGameWorld = world;
 
-			Build( shader, sprite, maxParticles );
+			Build( material, sprite, maxParticles );
 		}
 
-		void Build( std::shared_ptr< Shader > shader, std::shared_ptr< Sprite > sprite, UINT maxParticles )
+		void Build( std::shared_ptr< Material > material, std::shared_ptr< Sprite > sprite, UINT maxParticles )
 		{
-			mShader			= shader;
+			mMaterial		= material;
 			mSprite			= sprite;
 			mMaxParticles	= maxParticles;
 
-			_ASSERT( mSprite );
-			_ASSERT( mSprite->mTexture );
-			_ASSERT( mShader );
+			_ASSERT( mMaterial.get() );
+			_ASSERT( mSprite.get() );
+			_ASSERT( mMaxParticles > 0 );
 			
 			mParticle = new NormalParticle[ maxParticles ];
 
 			MeshBuilder builder;
 
-			builder.mLayout = shader->Layout();
+			builder.mLayout = material->mShader->Layout();
 
 			for( UINT x = 0; x < maxParticles; ++x )
 			{
@@ -93,24 +93,21 @@ namespace Sentinel
 			if( !mMesh )
 				throw AppException( "Failed to create Mesh in ParticleSystemNormal::Startup" );
 
-			mMesh->mShader = shader;
-			mMesh->mTexture[ TEXTURE_DIFFUSE ] = mSprite->mTexture;
+			mMesh->mMaterial = material;
+
+			mMesh->mMatrixWorld.Identity();
 		}
 
 		void Update( float DT )
 		{
 			ParticleSystem::Update( DT );
 
-			// Prepare to render particles.
-			//
 			BYTE* verts = (BYTE*)mMesh->mVBO->Lock();
 
 			for( UINT x = 0; x < (UINT)mNumParticles; ++x )
 			{
 				NormalParticle& particle = mParticle[ x ];
 
-				// Prepare particle in buffer.
-				//
 				*(Quad*)verts = mSprite->GetFrame( particle.mFrame );
 				verts += sizeof( Quad );
 
@@ -127,18 +124,7 @@ namespace Sentinel
 
 			mMesh->mVBO->Unlock();
 
-			// Render particles.
-			//
-			mRenderer->SetCull( CULL_NONE );
-			mRenderer->SetBlend( BLEND_PARTICLE );
-			mRenderer->SetDepthStencilState( STENCIL_PARTICLE );
-
-			mMesh->mMatrixWorld.Identity();
 			mMesh->Draw( mRenderer, mGameWorld, mNumParticles );
-
-			mRenderer->SetCull( CULL_CCW );
-			mRenderer->SetBlend( BLEND_ALPHA );
-			mRenderer->SetDepthStencilState( STENCIL_DEFAULT );
 		}
 
 		Particle& GetParticle( UINT index )
@@ -154,7 +140,7 @@ namespace Sentinel
 			
 			ParticleSystem::Save( archive );
 
-			archive.Write( &mGameWorld->mShaderManager->Get( mShader ));
+			archive.Write( &mGameWorld->mMaterialManager->Get( mMaterial ));
 			archive.Write( &mGameWorld->mSpriteManager->Get( mSprite ));
 		}
 
@@ -162,21 +148,24 @@ namespace Sentinel
 		{
 			ParticleSystem::Load( archive );
 
-			std::string shader;
-			archive.Read( &shader );
+			std::string material;
+			archive.Read( &material );
 
 			std::string sprite;
 			archive.Read( &sprite );
 
-			Build( mGameWorld->mShaderManager->Get( shader ), mGameWorld->mSpriteManager->Get( sprite ), mMaxParticles );
+			Build( mGameWorld->mMaterialManager->Get( material ), mGameWorld->mSpriteManager->Get( sprite ), mMaxParticles );
 		}
 	};
 
 	DEFINE_SERIAL_REGISTER( ParticleSystemNormal );
 
-	ParticleSystem* BuildParticleSystemNormal( Renderer* renderer, GameWorld* world, std::shared_ptr< Shader > shader, std::shared_ptr< Sprite > sprite, UINT maxParticles )
+	ParticleSystem* BuildParticleSystemNormal( Renderer* renderer, GameWorld* world, 
+											   std::shared_ptr< Material > material, 
+											   std::shared_ptr< Sprite > sprite, 
+											   UINT maxParticles )
 	{
-		return new ParticleSystemNormal( renderer, world, shader, sprite, maxParticles );
+		return new ParticleSystemNormal( renderer, world, material, sprite, maxParticles );
 	}
 
 	ParticleSystem* BuildParticleSystemNormal( Renderer* renderer, GameWorld* world )

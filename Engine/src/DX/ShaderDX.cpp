@@ -550,8 +550,11 @@ namespace Sentinel
 		++mTextureLevel;
 	}
 
-	void ShaderDX::SetSampler( UINT index, SamplerMode modeU, SamplerMode modeV, 
-						SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter )
+	void ShaderDX::SetSampler( UINT index, 
+							   SamplerMode modeU, SamplerMode modeV, 
+							   SamplerFilter minFilter, 
+							   SamplerFilter magFilter, 
+							   SamplerFilter mipFilter )
 	{
 		_ASSERT( index < mNumSamplers );
 
@@ -591,19 +594,11 @@ namespace Sentinel
 			mContext->Unmap( mConstantBuffer, 0 );
 
 			mContext->VSSetConstantBuffers( 0, 1, &mConstantBuffer );
-
-			if( mGeometryShader )
-				mContext->GSSetConstantBuffers( 0, 1, &mConstantBuffer );
-			
+			mContext->GSSetConstantBuffers( 0, 1, &mConstantBuffer );
 			mContext->PSSetConstantBuffers( 0, 1, &mConstantBuffer );
 		}
 	}
 
 	void ShaderDX::Disable()
-	{
-		mContext->OMSetRenderTargets( 0, 0, 0 );
-
-		ID3D11ShaderResourceView* nullViews[ 8 ] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-		mContext->PSSetShaderResources( 0, 8, nullViews );
-	}
+	{}
 }

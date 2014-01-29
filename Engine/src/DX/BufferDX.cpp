@@ -3,7 +3,7 @@
 
 namespace Sentinel
 {
-	BufferDX::BufferDX( ID3D11Device* device, ID3D11DeviceContext* context, void* data, UINT size, UINT stride, BufferType type, BufferAccess access )
+	BufferDX::BufferDX( ID3D11Device* device, ID3D11DeviceContext* context, void* data, UINT size, UINT stride, BufferType type, BufferAccessType access )
 	{
 		_ASSERT( device );
 		_ASSERT( context );

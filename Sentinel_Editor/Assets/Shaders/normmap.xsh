@@ -204,7 +204,9 @@ vec4 GetColor( vec3 LPos, vec3 LDist, vec3 camDir, vec3 N, vec3 color, vec4 attn
 	vec4 diffuseFinal = _Diffuse * intensity;
 
 	// Specular
-	vec4 specularFinal = max(_Specular * pow(clamp(dot(N, H), 0.0, 1.0), _SpecComp), 0.0);
+	vec4 specularFinal;
+	if(dot(-LPos, N) < 0)
+		specularFinal = max(_Specular * pow(clamp(dot(N, H), 0.0, 1.0), _SpecComp), 0.0);
 
 	return clamp(vec4(ambientFinal.rgb + (diffuseFinal.rgb + specularFinal.rgb) * attnFinal * color, 1.0), 0.0, 1.0);
 }

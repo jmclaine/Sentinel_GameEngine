@@ -22,7 +22,8 @@ namespace Sentinel
 	class Renderer;
 	class Mesh;
 	class Sprite;
-	class Shader;
+	class Material;
+	class VertexLayout;
 
 	class SENTINEL_DLL SpriteSystem
 	{
@@ -30,8 +31,6 @@ namespace Sentinel
 
 		Renderer*			mRenderer;
 
-		std::shared_ptr< Shader > mShader;
-		
 		Mesh*				mMesh;
 
 		UINT				mNumSprites;
@@ -45,7 +44,6 @@ namespace Sentinel
 
 			UINT			mFrame;
 			ColorRGBA		mColor;
-
 			Matrix4f		mMatrixWorld;
 		};
 
@@ -55,16 +53,15 @@ namespace Sentinel
 
 	public:
 
-		std::shared_ptr< Sprite > mSprite;
+		std::shared_ptr< Sprite >   mSprite;
+		std::shared_ptr< Material > mMaterial;
 
 		/////////////////////////////////////
 
-		SpriteSystem( Renderer* renderer, std::shared_ptr< Shader > shader, UINT maxSprites );
+		SpriteSystem( Renderer* renderer, std::shared_ptr< VertexLayout > layout, UINT maxSprites );
 		~SpriteSystem();
 
 		Renderer*	GetRenderer();
-
-		std::shared_ptr< Shader > GetShader();
 
 		/////////////////////////////////////
 

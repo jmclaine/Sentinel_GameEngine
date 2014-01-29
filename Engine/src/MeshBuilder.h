@@ -98,10 +98,8 @@ namespace Sentinel
 
 		std::shared_ptr< VertexLayout > mLayout;
 
-		PrimitiveType				mPrimitive;
+		RenderType					mPrimitive;
 
-		std::shared_ptr< Texture >	mTexture[ NUM_TEXTURES ];	// uses TextureType
-		
 		std::vector< Vertex >		mVertex;
 		std::vector< UINT >			mIndex;
 

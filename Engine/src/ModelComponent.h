@@ -14,13 +14,9 @@ namespace Sentinel
 	{
 		DECLARE_SERIAL();
 
-	protected:
-
-		std::vector< Material >		mMaterial;
-
 	public:
 
-		std::shared_ptr< Model >	mModel;
+		std::shared_ptr< Model > mModel;
 
 		///////////////////////////////////
 
@@ -34,13 +30,5 @@ namespace Sentinel
 		void	Update();
 
 		void	Shutdown();
-
-		///////////////////////////////////
-
-		void	SetMaterial( const Material& material );
-		void	SetMaterial( UINT index, const Material& material );
-		void	SetMaterial( const std::vector< Material >& material );
-		const std::vector< Material >& GetMaterial();
-		UINT	GetMaterialSize();
 	};
 }

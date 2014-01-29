@@ -5,22 +5,25 @@
 #include "Renderer.h"
 #include "GameWorld.h"
 #include "Shader.h"
+#include "VertexLayout.h"
+#include "Material.h"
 
 namespace Sentinel
 {
-	Debug::Debug( Renderer* renderer, GameWorld* world, std::shared_ptr< Shader > shader, UINT maxLines ) :
+	Debug::Debug( Renderer* renderer, GameWorld* world, std::shared_ptr< Material > material, UINT maxLines ) :
 		mRenderer( renderer ),
 		mWorld( world ),
-		mShader( shader ),
+		mMaterial( material ),
 		mMaxLines( maxLines )
 	{
 		_ASSERT( renderer );
-		_ASSERT( shader );
+		_ASSERT( material.get() );
+		_ASSERT( material->mShader.get() );
 		_ASSERT( maxLines > 0 );
 
 		MeshBuilder builder;
 
-		builder.mLayout = renderer->CreateVertexLayout( shader->Attribute() );
+		builder.mLayout = material->mShader->Layout();
 
 		for( UINT x = 0; x < maxLines; ++x )
 		{
@@ -39,8 +42,6 @@ namespace Sentinel
 
 		if( !mMesh )
 			throw AppException( "Failed to create Mesh in Debug" );
-
-		mMesh->mShader = shader;
 	}
 
 	Debug::~Debug()
@@ -53,9 +54,9 @@ namespace Sentinel
 		return mRenderer;
 	}
 
-	std::shared_ptr< Shader > Debug::GetShader()
+	GameWorld* Debug::GetWorld()
 	{
-		return mShader;
+		return mWorld;
 	}
 
 	/////////////////////////////////////
@@ -79,6 +80,8 @@ namespace Sentinel
 
 	void Debug::Present()
 	{
+		mMesh->mMaterial = mMaterial;
+
 		mMesh->Draw( mRenderer, mWorld, mNumLines << 1 );
 	}
 }

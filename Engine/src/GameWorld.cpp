@@ -11,6 +11,7 @@
 #include "SoundManager.h"
 #include "TextureManager.h"
 #include "ShaderManager.h"
+#include "MaterialManager.h"
 #include "SpriteManager.h"
 #include "MeshManager.h"
 #include "ModelManager.h"
@@ -43,6 +44,7 @@ namespace Sentinel
 		
 		SAFE_DELETE( mTextureManager );
 		SAFE_DELETE( mShaderManager );
+		SAFE_DELETE( mMaterialManager );
 		SAFE_DELETE( mSpriteManager );
 		SAFE_DELETE( mMeshManager );
 		SAFE_DELETE( mModelManager );

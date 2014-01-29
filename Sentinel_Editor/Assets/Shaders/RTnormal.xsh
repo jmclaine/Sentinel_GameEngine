@@ -18,14 +18,14 @@ SamplerState _Sampler0	:register(s0);
 //
 struct VSInput
 {
-	float4 Position	:POSITION;
-	float2 Texture0	:TEXCOORD0;
+	float4 Position		:POSITION;
+	float2 Texture0		:TEXCOORD0;
 };
 
 struct VSOutput
 {
-	float4 Position	:SV_POSITION;
-	float2 Texture0	:TEXCOORD0;
+	float4 Position		:SV_POSITION;
+	float2 Texture0		:TEXCOORD0;
 };
 
 VSOutput VS_Main(VSInput input)

@@ -4,6 +4,7 @@
 #include "Archive.h"
 #include "GameObject.h"
 #include "GameWorld.h"
+#include "Renderer.h"
 #include "Timing.h"
 #include "Mesh.h"
 
@@ -45,6 +46,8 @@ namespace Sentinel
 		DrawableComponent::Update();
 
 		mParticleSystem->SetMatrixWorld( mTransform->GetMatrixWorld() );
+
+		Renderer* renderer = mOwner->GetWorld()->mRenderer;
 
 		mParticleSystem->Update( mOwner->GetWorld()->mTiming->DeltaTime() );
 	}

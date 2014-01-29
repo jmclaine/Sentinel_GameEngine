@@ -16,20 +16,19 @@
 #include "TextureManager.h"
 #include "Timing.h"
 #include "VertexLayout.h"
+#include "Material.h"
 
 namespace Sentinel
 {
 	Mesh::Mesh()
 	{
-		mPrimitive = TRIANGLE_LIST;
+		mPrimitive	= TRIANGLE_LIST;
 
-		for( UINT i = 0; i < NUM_TEXTURES; ++i )
-			mTexture[ i ] = NULL;
-		
-		mVBO = NULL;
-		mIBO = NULL;
+		mVBO		= NULL;
+		mIBO		= NULL;
 
-		mLayout = NULL;
+		mLayout		= NULL;
+		mMaterial	= NULL;
 
 		mMatrixWorld.Identity();
 		mMatrixShadow.Identity();
@@ -49,15 +48,20 @@ namespace Sentinel
 		if( mVBO != NULL && mIBO != NULL )
 		{
 			_ASSERT( renderer );
-			_ASSERT( mShader );
 			_ASSERT( mVBO );
 			_ASSERT( mIBO );
 			_ASSERT( mLayout );
+			_ASSERT( mMaterial );
+			_ASSERT( mMaterial->mShader );
+			
+			mMaterial->Apply( renderer );
 
-			renderer->SetShader( mShader );
 			renderer->SetVBO( mVBO );
 			renderer->SetIBO( mIBO );
+
 			renderer->SetVertexLayout( mLayout );
+
+			std::shared_ptr< Shader > shader = mMaterial->mShader;
 
 			// Set Uniforms.
 			//
@@ -66,7 +70,7 @@ namespace Sentinel
 			UINT uniformIndex = 0;
 			Vector3f pos;
 
-			const std::vector< UniformType >& uniform = mShader->Uniform();
+			const std::vector< UniformType >& uniform = shader->Uniform();
 			
 			for( UINT i = 0; i < uniform.size(); ++i )
 			{
@@ -76,17 +80,18 @@ namespace Sentinel
 					_ASSERT( world );
 					_ASSERT( world->GetCamera() != NULL );
 
-					mShader->SetMatrix( uniformIndex, (world->GetCamera()->GetMatrixFinal() * mMatrixWorld).Ptr() );
+					shader->SetMatrix( uniformIndex, (world->GetCamera()->GetMatrixFinal() * mMatrixWorld).Ptr() );
 					break;
 
 				case UNIFORM_WORLD:
-					mShader->SetMatrix( uniformIndex, mMatrixWorld.Ptr() );
+					shader->SetMatrix( uniformIndex, mMatrixWorld.Ptr() );
 					break;
 
 				case UNIFORM_TEXTURE:
-					_ASSERT( mTexture[ texCount ] );	// no texture loaded
+					_ASSERT( mMaterial.get() );
+					_ASSERT( mMaterial->mTexture[ texCount ].get() );	// no texture loaded
 
-					mShader->SetTexture( uniformIndex, mTexture[ texCount ].get() );
+					shader->SetTexture( uniformIndex, mMaterial->mTexture[ texCount ].get() );
 					++texCount;
 					break;
 
@@ -96,44 +101,44 @@ namespace Sentinel
 
 					pos = world->GetCamera()->GetTransform()->mPosition;
 						
-					mShader->SetFloat3( uniformIndex, pos.Ptr() );
+					shader->SetFloat3( uniformIndex, pos.Ptr() );
 					break;
 
 				case UNIFORM_LIGHT_POS:
 					_ASSERT( world );
 					_ASSERT( world->GetLight( lightCount ));
 
-					mShader->SetFloat3( uniformIndex, world->GetLight( lightCount )->GetTransform()->mPosition.Ptr() );
+					shader->SetFloat3( uniformIndex, world->GetLight( lightCount )->GetTransform()->mPosition.Ptr() );
 					break;
 
 				case UNIFORM_LIGHT_COLOR:
 					_ASSERT( world );
 					_ASSERT( world->GetLight( lightCount ));
 
-					mShader->SetFloat3( uniformIndex, world->GetLight( lightCount )->mColor.Ptr() );
+					shader->SetFloat3( uniformIndex, world->GetLight( lightCount )->mColor.Ptr() );
 					break;
 
 				case UNIFORM_LIGHT_ATTN:
 					_ASSERT( world );
 					_ASSERT( world->GetLight( lightCount ));
 
-					mShader->SetFloat4( uniformIndex, world->GetLight( lightCount )->mAttenuation.Ptr() );
+					shader->SetFloat4( uniformIndex, world->GetLight( lightCount )->mAttenuation.Ptr() );
 					break;
 
 				case UNIFORM_AMBIENT:
-					mShader->SetFloat4( uniformIndex, mMaterial.mAmbient.Ptr() );
+					shader->SetFloat4( uniformIndex, mMaterial->mAmbient.Ptr() );
 					break;
 
 				case UNIFORM_DIFFUSE:
-					mShader->SetFloat4( uniformIndex, mMaterial.mDiffuse.Ptr() );
+					shader->SetFloat4( uniformIndex, mMaterial->mDiffuse.Ptr() );
 					break;
 
 				case UNIFORM_SPECULAR:
-					mShader->SetFloat4( uniformIndex, mMaterial.mSpecular.Ptr() );
+					shader->SetFloat4( uniformIndex, mMaterial->mSpecular.Ptr() );
 					break;
 
 				case UNIFORM_SPEC_COMP:
-					mShader->SetFloat(  uniformIndex, mMaterial.mSpecularComponent );
+					shader->SetFloat(  uniformIndex, mMaterial->mSpecularComponent );
 					break;
 
 				// Shadows.
@@ -149,7 +154,7 @@ namespace Sentinel
 					_ASSERT( world );
 					_ASSERT( world->mTiming );
 
-					mShader->SetFloat( uniformIndex, world->mTiming->DeltaTime() );
+					shader->SetFloat( uniformIndex, world->mTiming->DeltaTime() );
 					break;
 
 				// Screen-Space Ambient Occlusion.
@@ -202,6 +207,7 @@ namespace Sentinel
 					 ShaderManager*		shaderManager, 
 					 TextureManager*	textureManager )
 	{
+		/*
 		BYTE primitive = mesh->mPrimitive;
 		archive.Write( &primitive );
 
@@ -228,6 +234,7 @@ namespace Sentinel
 			if( type == 2 )
 				archive.Write( &textureManager->Get( mesh->mTexture[ x ] ));
 		}
+		*/
 	}
 
 	Mesh* Mesh::Load( Archive&			archive, 
@@ -235,11 +242,12 @@ namespace Sentinel
 					  ShaderManager*	shaderManager, 
 					  TextureManager*	textureManager )
 	{
+		/*
 		Mesh* mesh = new Mesh();
 
 		BYTE primitive;
 		archive.Read( &primitive );
-		mesh->mPrimitive = (PrimitiveType)primitive;
+		mesh->mPrimitive = (RenderType)primitive;
 
 		mesh->mVBO = Buffer::Load( archive, renderer );
 		mesh->mIBO = Buffer::Load( archive, renderer );
@@ -274,5 +282,7 @@ namespace Sentinel
 		}
 
 		return mesh;
+		*/
+		return NULL;
 	}
 }

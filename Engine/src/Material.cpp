@@ -1,16 +1,45 @@
 #include "Material.h"
+#include "Renderer.h"
+#include "Archive.h"
+#include "ShaderManager.h"
+#include "TextureManager.h"
 
 namespace Sentinel
 {
-	Material::Material( const ColorRGBA& ambient,
-						const ColorRGBA& diffuse,
-						const ColorRGBA& specular,
-						float spec_comp ) :
-		mAmbient( ambient ), mDiffuse( diffuse ), mSpecular( specular ), mSpecularComponent( spec_comp )
+	Material::Material() :
+		mAmbient( 0.2f, 0.2f, 0.2f, 1.0f ),
+		mDiffuse( 0.8f, 0.8f, 0.8f, 1.0f ),
+		mSpecular( 0.2f, 0.2f, 0.2f, 1.0f ),
+		mSpecularComponent( 8.0f ),
+		mShader( NULL ),
+		mBlendState( NULL ),
+		mCullMode( CULL_CCW ),
+		mDepthMode( DEPTH_LEQUAL )
 	{}
 
-	float* Material::Ptr()
+	Material::~Material()
+	{}
+
+	void Material::Apply( Renderer* renderer )
 	{
-		return mAmbient.Ptr();
+		renderer->SetCull( mCullMode );
+		renderer->SetDepthStencilType( mDepthMode );
+		renderer->SetShader( mShader );
+		renderer->SetBlendState( mBlendState );
+	}
+
+	//////////////////////////////////////////////
+
+	void Material::Save( Archive&			archive, 
+						 Material*			material,
+						 ShaderManager*		shaderManager,
+						 TextureManager*	textureManager )
+	{}
+
+	Material* Material::Load( Archive&			archive,
+							  ShaderManager*	shaderManager,
+							  TextureManager*	textureManager )
+	{
+		return NULL;
 	}
 }

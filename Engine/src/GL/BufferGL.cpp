@@ -2,7 +2,7 @@
 
 namespace Sentinel
 {
-	BufferGL::BufferGL( void* data, UINT size, UINT stride, BufferType type, BufferAccess access )
+	BufferGL::BufferGL( void* data, UINT size, UINT stride, BufferType type, BufferAccessType access )
 	{
 		_ASSERT( type == VERTEX_BUFFER || type == INDEX_BUFFER );
 

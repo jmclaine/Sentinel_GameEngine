@@ -26,9 +26,6 @@ namespace Sentinel
 
 		mLayout = NULL;
 
-		for( UINT i = 0; i < NUM_TEXTURES; ++i )
-			mTexture[ i ] = NULL;
-		
 		ClearGeometry();
 	}
 
@@ -1671,14 +1668,10 @@ namespace Sentinel
 		
 		CreateBuffers( renderer );
 
-		mesh->mVBO = mVBO;
-		mesh->mIBO = mIBO;
-
-		for( UINT x = 0; x < NUM_TEXTURES; ++x )
-			mesh->mTexture[ x ] = mTexture[ x ];
-		
-		mesh->mLayout		= mLayout;
 		mesh->mPrimitive	= mPrimitive;
+		mesh->mVBO			= mVBO;
+		mesh->mIBO			= mIBO;
+		mesh->mLayout		= mLayout;
 		
 		mesh->mBounds.Set( (BYTE*)mVertex.data(), mVertex.size(), sizeof( Vertex ));
 

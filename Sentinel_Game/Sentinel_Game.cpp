@@ -147,12 +147,12 @@ public:
 
 		mGameWorld->mTextureManager->Load( archive, mRenderer );
 		mGameWorld->mShaderManager->Load( archive, mRenderer );
-		mGameWorld->mSpriteManager->Load( archive, mGameWorld->mTextureManager );
+		mGameWorld->mSpriteManager->Load( archive );
 		mGameWorld->mMeshManager->Load( archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager );
 		mGameWorld->mModelManager->Load( archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager );
 		mGameWorld->mSoundManager->Load( archive, mGameWorld->mAudioSystem );
 
-		mGameWorld->mSpriteSystem = new SpriteSystem( mRenderer, mGameWorld->mShaderManager->Get( "GUI" ), 256 );
+		mGameWorld->mSpriteSystem = new SpriteSystem( mRenderer, mGameWorld->mShaderManager->Get( "GUI" )->Layout(), 256 );
 		
 		mGameWorld->Load( archive );
 

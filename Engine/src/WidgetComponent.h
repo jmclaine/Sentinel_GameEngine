@@ -15,6 +15,7 @@ namespace Sentinel
 	class TransformComponent;
 	class CameraComponent;
 	class Sprite;
+	class Material;
 
 	class SENTINEL_DLL WidgetComponent : public DrawableComponent
 	{
@@ -31,7 +32,8 @@ namespace Sentinel
 
 		GUI::WidgetWorld*		mWidgetWorld;
 
-		std::shared_ptr< Sprite > mSprite;
+		std::shared_ptr< Sprite >   mSprite;
+		std::shared_ptr< Material > mMaterial;
 
 	protected:
 
@@ -39,10 +41,10 @@ namespace Sentinel
 
 	public:
 
-		WidgetComponent( std::shared_ptr< Sprite > sprite, FontSystem* fontSystem, UINT camera );
+		WidgetComponent( std::shared_ptr< Sprite > sprite, std::shared_ptr< Material > material, FontSystem* fontSystem, UINT camera );
 		~WidgetComponent();
 
-		void	Set( std::shared_ptr< Sprite > sprite, FontSystem* fontSystem, UINT camera );
+		void	Set( std::shared_ptr< Sprite > sprite, std::shared_ptr< Material > material, FontSystem* fontSystem, UINT camera );
 
 		/////////////////////////////////
 

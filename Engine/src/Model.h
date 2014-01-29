@@ -33,10 +33,11 @@ The previous shaders are created and loaded
 automatically through the editor using the
 'config.xml' file located within the
 'Assets\Shaders' folder.
+
+Each Model has self contained Materials.
 */
 #include <vector>
 
-#include "Common.h"
 #include "Matrix4f.h"
 
 namespace Sentinel
@@ -45,8 +46,10 @@ namespace Sentinel
 	class Renderer;
 	class ShaderManager;
 	class TextureManager;
-	class GameWorld;
+	class MaterialManager;
+	class Shader;
 	class Material;
+	class GameWorld;
 
 	class SENTINEL_DLL Model
 	{
@@ -67,13 +70,6 @@ namespace Sentinel
 
 		virtual ~Model();
 		
-		// Set the TextureManager to NULL for no management.
-		//
-		// The Renderer is required to load textures.
-		//
-		// The ShaderManager is required for access to shaders
-		// as shown in Model.h header.
-		//
 		static Model*	Load( const char*		filename, 
 							  Renderer*			renderer, 
 							  ShaderManager*	shaderManager, 
@@ -99,8 +95,8 @@ namespace Sentinel
 		// There is no way to tell which materials pertain to what portion of the model.
 		// A name label for each material in conjuction with a std::map would solve this problem.
 		//
-		virtual void	SetMaterials( const std::vector< Material >& material ) = 0;
-		virtual void	GetMaterials( std::vector< Material >* material ) = 0;
+		virtual void	SetMaterials( const std::vector< std::shared_ptr< Material >>& material ) = 0;
+		virtual void	GetMaterials( std::vector< std::shared_ptr< Material >>* material ) = 0;
 
 		virtual void	SetTime( float _time, UINT objIndex = 0 ) = 0;
 		virtual float	GetTime( UINT objIndex = 0 ) = 0;
@@ -109,31 +105,35 @@ namespace Sentinel
 		virtual void	Draw( Renderer* renderer, GameWorld* world ) = 0;
 	};
 
-	extern Model* LoadModelOBJFromFile( const char*		filename, 
-										Renderer*		renderer, 
-										ShaderManager*	shaderManager,
-										TextureManager* textureManager );
+	extern SENTINEL_DLL Model* LoadModelOBJFromFile( 
+										const char*			filename, 
+										Renderer*			renderer, 
+										ShaderManager*		shaderManager,
+										TextureManager*		textureManager );
 
-	extern Model* LoadModelM3DFromFile( const char*		filename, 
-										Renderer*		renderer, 
-										ShaderManager*	shaderManager,
-										TextureManager* textureManager );
+	extern SENTINEL_DLL Model* LoadModelM3DFromFile( 
+										const char*			filename, 
+										Renderer*			renderer, 
+										ShaderManager*		shaderManager,
+										TextureManager*		textureManager );
 
 	// The Archive format is different than the native file format.
 	// It is designed specifically to be read quickly and easily
-	// by the engine, and is the inverse of Save().
+	// by the engine.
 	//
 	// Save() creates a single BYTE header designating what the
 	// format of the following data represents. Use Model::Load()
 	// to create the Model with the correct format.
 	//
-	extern Model* LoadModelOBJFromArchive( Archive&			archive,
-										   Renderer*		renderer, 
-										   ShaderManager*	shaderManager,
-										   TextureManager*	textureManager );
+	extern SENTINEL_DLL Model* LoadModelOBJFromArchive( 
+										Archive&			archive,
+										Renderer*			renderer, 
+										ShaderManager*		shaderManager,
+										TextureManager*		textureManager );
 
-	extern Model* LoadModelM3DFromArchive( Archive&			archive,
-										   Renderer*		renderer, 
-										   ShaderManager*	shaderManager,
-										   TextureManager*	textureManager );
+	extern SENTINEL_DLL Model* LoadModelM3DFromArchive( 
+										Archive&			archive,
+										Renderer*			renderer, 
+										ShaderManager*		shaderManager,
+										TextureManager*		textureManager );
 }

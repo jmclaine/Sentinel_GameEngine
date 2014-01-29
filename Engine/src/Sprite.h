@@ -1,5 +1,11 @@
 #pragma once
+/*
+All frames should be in texture coordinates, i.e. 0.0f - 1.0f
 
+Example:
+
+sprite->AddFrame( Sprite::QUADtoTEXCOORD( Quad( 0, 0, 64, 64 ), texture->Width(), texture->Height() ));
+*/
 #include <memory>
 #include <vector>
 
@@ -15,16 +21,11 @@ namespace Sentinel
 	{
 	protected:
 
-		std::vector< Quad >			mFrame;
+		std::vector< Quad > mFrame;
 
 	public:
 
-		std::shared_ptr< Texture >	mTexture;
-
-		//////////////////////////////////////
-
 		Sprite();
-		Sprite( std::shared_ptr< Texture > texture );
 		~Sprite();
 
 		//////////////////////////////////////
@@ -37,8 +38,10 @@ namespace Sentinel
 		Quad&	GetFrame( UINT index );
 		UINT	NumFrames();
 		
+		//////////////////////////////////////
+
 		// Convert pixel coordinates to texture coordinates.
 		//
-		Quad	GetTextureCoords( const Quad& coords );
+		static Quad QUADtoTEXCOORD( const Quad& coords, UINT textureWidth, UINT textureHeight );
 	};
 }

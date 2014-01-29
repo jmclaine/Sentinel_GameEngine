@@ -8,10 +8,6 @@ namespace Sentinel
 	Sprite::Sprite()
 	{}
 
-	Sprite::Sprite( std::shared_ptr< Texture > texture ) :
-		mTexture( texture )
-	{}
-
 	Sprite::~Sprite()
 	{}
 
@@ -37,11 +33,13 @@ namespace Sentinel
 		return mFrame.size();
 	}
 
-	Quad Sprite::GetTextureCoords( const Quad& coords )
+	//////////////////////////////////////
+
+	Quad Sprite::QUADtoTEXCOORD( const Quad& coords, UINT textureWidth, UINT textureHeight )
 	{
-		return Quad( coords.left   / static_cast< float >(mTexture->Width()),
-					 coords.top    / static_cast< float >(mTexture->Height()),
-					 coords.right  / static_cast< float >(mTexture->Width()), 
-					 coords.bottom / static_cast< float >(mTexture->Height()) );
+		return Quad( coords.left   / static_cast< float >(textureWidth),
+					 coords.top    / static_cast< float >(textureHeight),
+					 coords.right  / static_cast< float >(textureWidth), 
+					 coords.bottom / static_cast< float >(textureHeight) );
 	}
 }

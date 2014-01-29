@@ -9,6 +9,7 @@
 #include "Renderer.h"
 #include "TextureManager.h"
 #include "ShaderManager.h"
+#include "MaterialManager.h"
 #include "MeshManager.h"
 #include "Archive.h"
 
@@ -87,16 +88,20 @@ namespace Sentinel
 
 			// Initialize the minimum and maximum vertex positions for the bounding sphere.
 			//
-			Vector3f minPosition( FLT_MAX, FLT_MAX, FLT_MAX ),
-					 maxPosition( -FLT_MAX, -FLT_MAX, -FLT_MAX );
+			Vector3f minPosition( FLT_MAX, FLT_MAX, FLT_MAX );
+			Vector3f maxPosition( -FLT_MAX, -FLT_MAX, -FLT_MAX );
 
 			// Create a default material.
 			//
 			MeshBuilderMap builder;
-			const std::string defaultMaterial = "~*Default*~";
-			builder.insert( MeshBuilderPair( defaultMaterial, new MeshBuilder() ));
+			const std::string defaultMaterialName = "~*Default*~";
+			builder.insert( MeshBuilderPair( defaultMaterialName, new MeshBuilder() ));
 
-			bool useColorShader = true;
+			std::shared_ptr< Shader > shaderColor   = shaderManager->Get( "Color" );
+			std::shared_ptr< Shader > shaderTexture = shaderManager->Get( "Texture" );
+
+			if( shaderColor.get() == NULL || shaderTexture.get() == NULL )
+				return false;
 
 			MeshBuilder* meshBuilder = builder.begin()->second;
 			
@@ -167,8 +172,8 @@ namespace Sentinel
 
 						// Begin parsing through this material file.
 						//
-						std::string mtlLine,
-									mtlName;
+						std::string mtlLine;
+						std::string mtlName;
 						std::ifstream mtlFile( token.c_str() );
 
 						if( mtlFile.is_open() )
@@ -193,23 +198,29 @@ namespace Sentinel
 
 									MeshBuilder* meshBuilder = builder[ mtlName ];
 
-									useColorShader = true;
+									meshBuilder->mLayout = shaderColor->Layout();
 								}
 								// Load a texture.
 								//
 								else
 								if( mtlToken == "map_Kd" )
 								{
-									const MeshBuilderMap::iterator& mtl_iter = builder.find( mtlName );
+									const MeshBuilderMap::iterator& mtlIter = builder.find( mtlName );
 
-									if( mtl_iter != builder.end() )
+									if( mtlIter != builder.end() )
 									{
 										mtlParsehelper >> mtlToken;
-										MeshBuilder* meshBuilder = mtl_iter->second;
 
-										useColorShader = false;
+										std::shared_ptr< Texture > texture = textureManager->Add( mtlName, renderer->CreateTextureFromFile( mtlToken.c_str() ));
+										if( texture.get() == NULL )
+										{
+											REPORT_ERROR( "Failed to load image '" << mtlToken << "'", "Load Model Error" );
+											return false;
+										}
 
-										meshBuilder->mTexture[ TEXTURE_DIFFUSE ] = textureManager->Add( mtlToken, renderer->CreateTextureFromFile( mtlToken.c_str() ));
+										MeshBuilder* meshBuilder = mtlIter->second;
+
+										meshBuilder->mLayout = shaderTexture->Layout();
 									}
 								}
 							}
@@ -230,7 +241,7 @@ namespace Sentinel
 						// If the material was not found, reference the default material.
 						//
 						if( mtl_iter == builder.end() )
-							meshBuilder = builder[ defaultMaterial ];
+							meshBuilder = builder[ defaultMaterialName ];
 						else
                             meshBuilder = mtl_iter->second;
 					}
@@ -318,11 +329,11 @@ namespace Sentinel
 
 				file.close();
 
+				_ASSERT(0);	// this requires a Material be created
+
 				// All the information for the model has been retrieved.
 				// Now make the VBOs and IBOs for each material.
 				//
-				std::shared_ptr< VertexLayout > layout = (useColorShader) ? shaderManager->Get( "Color" )->Layout() : shaderManager->Get( "Texture" )->Layout();
-
 				UINT i = 0;
 				mMesh = new Mesh*[ builder.size() ];
 
@@ -330,8 +341,6 @@ namespace Sentinel
 				{
 					if( it->second->mVertex.size() > 0 )
 					{
-						it->second->mLayout = layout;
-
 						mMesh[ i ] = it->second->BuildMesh( renderer );
 						++i;
 					}
@@ -360,7 +369,7 @@ namespace Sentinel
 
 		//////////////////////////////////////////////////////////////////////////
 
-		void SetMaterials( const std::vector< Material >& material )
+		void SetMaterials( const std::vector< std::shared_ptr< Material >>& material )
 		{
 			auto it = material.begin();
 
@@ -371,18 +380,12 @@ namespace Sentinel
 			}
 		}
 
-		void GetMaterials( std::vector< Material >* material )
+		void GetMaterials( std::vector< std::shared_ptr< Material >>* material )
 		{
 			for( UINT x = 0; x < mNumMeshes; ++x )
 				material->push_back( mMesh[ x ]->mMaterial );
 		}
-		/*
-		void SetShader( Shader* shader )
-		{
-			for( UINT x = 0; x < mNumMeshes; ++x )
-				mMesh[ x ]->mShader = shader;
-		}
-		*/
+
 		// OBJ files do not support animation.
 		//
 		void SetTime( float _time, UINT objIndex = 0 )

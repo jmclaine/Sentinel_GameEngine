@@ -20,8 +20,6 @@ namespace Sentinel
 	MeshComponent::MeshComponent( std::shared_ptr< Mesh > mesh )
 	{
 		mMesh = mesh;
-
-		mMaterial = mMesh->mMaterial;
 	}
 
 	void MeshComponent::Startup()
@@ -43,10 +41,10 @@ namespace Sentinel
 
 		mBounds.Set( bounds.GetMinBounds(), bounds.GetMaxBounds(), matWorld );
 
-		mMesh->mMaterial    = mMaterial;
 		mMesh->mMatrixWorld = matWorld;
 
 		GameWorld* world = mOwner->GetWorld();
+
 		mMesh->Draw( world->mRenderer, world );
 	}
 
@@ -67,8 +65,9 @@ namespace Sentinel
 
 		GameComponent::Save( archive );
 
-		archive.Write( &mOwner->GetWorld()->mMeshManager->Get( mMesh ));
-		archive.Write( mMaterial.Ptr(), ar_sizeof( mMaterial ));
+		GameWorld* world = mOwner->GetWorld();
+
+		archive.Write( &world->mMeshManager->Get( mMesh ));
 	}
 
 	void MeshComponent::Load( Archive& archive )
@@ -79,11 +78,11 @@ namespace Sentinel
 
 		GameComponent::Load( archive );
 
+		GameWorld* world = mOwner->GetWorld();
+
 		std::string name;
 		archive.Read( &name );
 
-		mMesh = mOwner->GetWorld()->mMeshManager->Get( name );
-
-		archive.Read( mMaterial.Ptr(), ar_sizeof( mMaterial ));
+		mMesh = world->mMeshManager->Get( name );
 	}
 }

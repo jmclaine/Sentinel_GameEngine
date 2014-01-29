@@ -10,7 +10,6 @@ Mesh creation helpers are in MeshBuilder.h or Model.h
 #include "RendererTypes.h"
 #include "Matrix4f.h"
 #include "Vector4f.h"
-#include "Material.h"
 #include "Shape.h"
 
 namespace Sentinel
@@ -24,6 +23,7 @@ namespace Sentinel
 	class ShaderManager;
 	class TextureManager;
 	class VertexLayout;
+	class Material;
 
 	class SENTINEL_DLL Mesh
 	{
@@ -31,20 +31,16 @@ namespace Sentinel
 
 	public:
 
-		PrimitiveType		mPrimitive;
+		RenderType			mPrimitive;
 		
 		Buffer*				mVBO;
 		Buffer*				mIBO;
 
-		std::shared_ptr< VertexLayout > mLayout;
+		std::shared_ptr< VertexLayout >		mLayout;
+		std::shared_ptr< Material >			mMaterial;
 
 		Matrix4f			mMatrixWorld;
 		Matrix4f			mMatrixShadow;		// camera matrix
-		
-		std::shared_ptr< Shader >	mShader;
-		
-		Material			mMaterial;
-		std::shared_ptr< Texture >	mTexture[ NUM_TEXTURES ];
 
 		BoundingBox			mBounds;
 

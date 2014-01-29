@@ -25,7 +25,7 @@ namespace Sentinel
 
 		///////////////////////////////////
 
-		BufferDX( ID3D11Device* device, ID3D11DeviceContext* context, void* data, UINT size, UINT stride, BufferType type, BufferAccess access );
+		BufferDX( ID3D11Device* device, ID3D11DeviceContext* context, void* data, UINT size, UINT stride, BufferType type, BufferAccessType access );
 		~BufferDX();
 
 		void	Release();

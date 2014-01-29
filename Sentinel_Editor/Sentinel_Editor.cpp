@@ -11,7 +11,6 @@ Edits levels for a game created with the Sentinel Engine.
 
 #include "Renderer.h"
 #include "PhysicsSystem.h"
-#include "SpriteSystem.h"
 #include "ParticleSystem.h"
 #include "SpriteSystem.h"
 #include "NetworkSocket.h"
@@ -24,6 +23,7 @@ Edits levels for a game created with the Sentinel Engine.
 
 #include "TextureManager.h"
 #include "ShaderManager.h"
+#include "MaterialManager.h"
 #include "SpriteManager.h"
 #include "MeshManager.h"
 #include "ModelManager.h"
@@ -93,6 +93,13 @@ class MainApp
 	GameObject*				mHoverObject;
 	float					mHoverDist;
 
+	GameObject*				mTranslateObject;
+
+	ColorRGBA				mSelectedColorX;
+	ColorRGBA				mSelectedColorY;
+	ColorRGBA				mSelectedColorZ;
+	ColorRGBA				mSelectedColorAxis;
+
 	FontSystem*				mFontSystem;
 	GUI::LabelWidget*		mDebugText;
 	GUI::WidgetObject*		mGameWorldWidget;
@@ -113,6 +120,11 @@ public:
 		mSelectedObject( NULL ),
 		mHoverObject( NULL ),
 		mHoverDist( 0 ),
+		mTranslateObject( NULL ),
+		mSelectedColorX( 1, 0, 0, 0.5f ),
+		mSelectedColorY( 0, 1, 0, 0.5f ),
+		mSelectedColorZ( 0, 0, 1, 0.5f ),
+		mSelectedColorAxis( 1, 1, 0, 0.5f ),
 		mFontSystem( NULL ),
 		mDebug( NULL ),
 		mMouseToWorldRay( Vector3f(), Vector3f() )
@@ -162,17 +174,24 @@ public:
 		// Create wire cube from solid cubes.
 		// Adjust spaces using scale of object.
 		//
-		std::shared_ptr< Shader > shaderColor = mEditorWorld->mShaderManager->Get( "Color Only" );
+		std::shared_ptr< Shader > shaderLine = mEditorWorld->mShaderManager->Get( "Color Only" );
 
-		builder.mLayout = shaderColor->Layout();
+		builder.mLayout = shaderLine->Layout();
 		builder.CreateWireCube( 1 );
 		
 		mBoundsMesh = builder.BuildMesh( mRenderer );
-		mBoundsMesh->mShader = shaderColor;
+
+		std::shared_ptr< Material > material = mEditorWorld->mMaterialManager->Add( "Bounds", std::shared_ptr< Material >(new Material()));
+		material->mShader = shaderLine;
+		material->mBlendState = mRenderer->BLEND_OFF;
+		material->mDepthMode = DEPTH_LESS;
+		material->mCullMode = CULL_CCW;
+
+		mBoundsMesh->mMaterial = material;
 
 		mGameWorld->SetCamera( mEditorWorld->GetCamera( 1 ));
 
-		mDebug = new Debug( mRenderer, mGameWorld, shaderColor );
+		mDebug = new Debug( mRenderer, mGameWorld, material );
 
 		SetDirectory( ".." );
 	}
@@ -229,7 +248,6 @@ public:
 				mRenderer->SetViewport( 0, 0, Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE );
 				mRenderer->SetDepthStencil( 1 );
 				mRenderer->SetRenderTarget( 1 );
-
 				mRenderer->Clear( colorWorld );
 
 				BEGIN_PROFILE( timing );
@@ -237,6 +255,7 @@ public:
 				mGameWorld->UpdateDrawable();
 
 				SelectGameObject();
+				DrawTranslateObject();
 
 				END_PROFILE( timing, "World" );
 
@@ -249,10 +268,9 @@ public:
 				mRenderer->SetViewport( 0, 0, info->Width(), info->Height() );
 				mRenderer->SetDepthStencil( 0 );
 				mRenderer->SetRenderTarget( 0 );
-
 				mRenderer->Clear( colorEditor );
 
-				mDebugText->mText = drawnText;
+				//mDebugText->mText = drawnText;
 
 				BEGIN_PROFILE( timing );
 				mEditorWorld->UpdateController();
@@ -293,6 +311,8 @@ public:
 		SAFE_DELETE( mBoundsMesh );
 		SAFE_DELETE( mRTBackbufferMesh );
 
+		SAFE_DELETE( mTranslateObject );
+
 		SAFE_DELETE( mDebug );
 
 		SHUTDOWN_DELETE( mGameWorld );
@@ -314,7 +334,8 @@ public:
 
 		mGameWorld->mTextureManager->Save( archive, mRenderer );
 		mGameWorld->mShaderManager->Save( archive );
-		mGameWorld->mSpriteManager->Save( archive, mGameWorld->mTextureManager );
+		mGameWorld->mMaterialManager->Save( archive, mGameWorld->mShaderManager, mGameWorld->mTextureManager );
+		mGameWorld->mSpriteManager->Save( archive );
 		mGameWorld->mMeshManager->Save( archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager );
 		mGameWorld->mModelManager->Save( archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager );
 		mGameWorld->mSoundManager->Save( archive );
@@ -328,6 +349,12 @@ public:
 	{
 		MeshBuilder						meshBuilder;
 		std::shared_ptr< Mesh >			mesh;
+
+		std::shared_ptr< Material >		material;
+		std::shared_ptr< Texture >		texture;
+		std::shared_ptr< Shader >		shader;
+
+		std::shared_ptr< Sprite >		sprite;
 
 		GameObject*						obj;
 		TransformComponent*				transform;
@@ -346,6 +373,7 @@ public:
 		
 		mEditorWorld->mTextureManager	= new TextureManager();
 		mEditorWorld->mShaderManager	= new ShaderManager();
+		mEditorWorld->mMaterialManager	= new MaterialManager();
 		mEditorWorld->mSpriteManager	= new SpriteManager();
 		mEditorWorld->mMeshManager		= new MeshManager();
 		mEditorWorld->mModelManager		= new ModelManager();
@@ -371,12 +399,22 @@ public:
 		*/
 		SetDirectory( ".." );
 
+		shader = mEditorWorld->mShaderManager->Get( "GUI" );
+
 		mFontSystem = BuildFontSystemFT();
-		mFontSystem->mSpriteSystem = new SpriteSystem( mRenderer, mEditorWorld->mShaderManager->Get( "GUI" ), 256 );
+		mFontSystem->mSpriteSystem = new SpriteSystem( mRenderer, shader->Layout(), 256 );
 		mFontSystem->Load( "Font\\courbd.ttf" );
 		mFontSystem->mFont = mFontSystem->Build( 16, 16 );
+		mFontSystem->mFont->mMaterial->mShader = shader;
+		mFontSystem->mFont->mMaterial->mBlendState = mRenderer->BLEND_ALPHA;
 
-		mEditorWorld->mSpriteSystem = new SpriteSystem( mRenderer, mEditorWorld->mShaderManager->Get( "GUI" ), 256 );
+		mEditorWorld->mSpriteSystem = new SpriteSystem( mRenderer, shader->Layout(), 256 );
+
+		material = std::shared_ptr< Material >(new Material());
+		material->mShader = shader;
+		material->mBlendState = mRenderer->BLEND_ALPHA;
+
+		mEditorWorld->mSpriteSystem->mMaterial = material;
 
 		mEditorWorld->mShaderManager->Get( "GUI" )->SetSampler( 0, MODE_WRAP, MODE_WRAP, FILTER_POINT, FILTER_POINT );
 		mEditorWorld->mShaderManager->Get( "GUI Mesh" )->SetSampler( 0, MODE_WRAP, MODE_WRAP, FILTER_LINEAR, FILTER_LINEAR );
@@ -389,12 +427,17 @@ public:
 		mRenderer->CreateRenderTarget( mEditorWorld->mTextureManager->Add( "Backbuffer", mRenderer->CreateTexture( Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE )));
 		mRenderer->CreateDepthStencil( Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE );
 		
-		mRTBackbufferMesh = mRenderer->CreateRenderTargetQuad( mEditorWorld->mShaderManager->Get( "RT_Normal" ));
-		mRTBackbufferMesh->mTexture[ TEXTURE_DIFFUSE ] = mEditorWorld->mTextureManager->Get( "Backbuffer" );
+		material = mEditorWorld->mMaterialManager->Add( "Backbuffer", std::shared_ptr< Material >( new Material() ));
+		material->mShader = mEditorWorld->mShaderManager->Get( "RT_Normal" );
+		material->mBlendState = mRenderer->BLEND_OFF;
+		material->mTexture[ TEXTURE_DIFFUSE ] = mEditorWorld->mTextureManager->Get( "Backbuffer" );
+
+		mRTBackbufferMesh = mRenderer->CreateRenderTargetQuad( material->mShader->Layout() );
+		mRTBackbufferMesh->mMaterial = material;
 
 		// Add GUI texture.
 		//
-		std::shared_ptr< Texture > texture = mEditorWorld->mTextureManager->Add( "GUI.png", mRenderer->CreateTextureFromFile( "Textures\\GUI.png" ));
+		texture = mEditorWorld->mTextureManager->Add( "GUI.png", mRenderer->CreateTextureFromFile( "Textures\\GUI.png" ));
 		//AssetTreeItem< Texture >* asset = new AssetTreeItem< Texture >( "default-alpha.png", texture );
 		//mAssetTexture->addChild( asset );
 
@@ -432,18 +475,23 @@ public:
 		
 		// Create game object for widget.
 		//
-		std::shared_ptr< Sprite > sprite( new Sprite( mEditorWorld->mTextureManager->Get( "GUI.png" )));
-		sprite->AddFrame( sprite->GetTextureCoords( Quad( 0, 0, 1, 1 )));
-		sprite->AddFrame( sprite->GetTextureCoords( Quad( 1, 0, 2, 1 )));
-		sprite->AddFrame( sprite->GetTextureCoords( Quad( 2, 0, 3, 1 )));
+		texture = mEditorWorld->mTextureManager->Get( "GUI.png" );
 
-		mEditorWorld->mSpriteManager->Add( "GUI Sprite", sprite );
+		material = mEditorWorld->mMaterialManager->Add( "GUI", std::shared_ptr< Material >( new Material() ));
+		material->mShader = mEditorWorld->mShaderManager->Get( "GUI" );
+		material->mBlendState = mRenderer->BLEND_ALPHA;
+		material->mTexture[ TEXTURE_DIFFUSE ] = texture;
+
+		sprite = mEditorWorld->mSpriteManager->Add( "GUI", std::shared_ptr< Sprite >( new Sprite() ));
+		sprite->AddFrame( Sprite::QUADtoTEXCOORD( Quad( 0, 0, 1, 1 ), texture->Width(), texture->Height() ));
+		sprite->AddFrame( Sprite::QUADtoTEXCOORD( Quad( 1, 0, 2, 1 ), texture->Width(), texture->Height() ));
+		sprite->AddFrame( Sprite::QUADtoTEXCOORD( Quad( 2, 0, 3, 1 ), texture->Width(), texture->Height() ));
 
 		obj = mEditorWorld->AddGameObject( new GameObject(), "GUI Widget" );
 
 		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
 
-		WidgetComponent* widgetComp = (WidgetComponent*)obj->AttachComponent( new WidgetComponent( sprite, mFontSystem, 0 ), "Widget" );
+		WidgetComponent* widgetComp = (WidgetComponent*)obj->AttachComponent( new WidgetComponent( sprite, material, mFontSystem, 0 ), "Widget" );
 		
 		GUI::WidgetObject*				widget;
 		GUI::ModelWidget*				model;
@@ -583,27 +631,6 @@ public:
 		widget->SetView( view );
 		widget->SetController( controller );
 
-		// World Drawable.
-		//
-		mGameWorldWidget = (GUI::WidgetObject*)widgetComp->mWidgetWorld->AddWidgetObject( new GUI::WidgetObject() );
-
-		model = new GUI::ModelWidget();
-		model->mPosition = Vector3f( 0, 0, 0.8f );
-		model->mScale    = Vector3f( (float)Renderer::WINDOW_WIDTH_BASE-500, (float)Renderer::WINDOW_HEIGHT_BASE, 1 );
-		
-		drawableMesh = new GUI::MeshViewWidget();
-		drawableMesh->mMesh = mEditorWorld->mMeshManager->Add( "World", std::shared_ptr< Mesh >( mRenderer->CreateGUIQuad( mEditorWorld->mShaderManager->Get( "GUI Mesh" ))));
-		drawableMesh->mMesh->mTexture[ TEXTURE_DIFFUSE ] = mEditorWorld->mTextureManager->Get( "Backbuffer" );
-		
-		controller = new GUI::SpriteControllerWidget();
-		controller->mScaleToWindowX = true;
-		controller->mScaleToWindowY = true;
-		controller->mMargin = Quad( 0, 60, 0, -90 );
-
-		mGameWorldWidget->SetModel( model );
-		mGameWorldWidget->SetView( drawableMesh );
-		mGameWorldWidget->SetController( controller );
-
 		// Button.
 		//
 		widget = (GUI::WidgetObject*)widgetComp->mWidgetWorld->AddWidgetObject( new GUI::WidgetObject() );
@@ -626,24 +653,43 @@ public:
 		widget->SetView( view );
 		widget->SetController( button );
 
+		// World Drawable.
+		//
+		mGameWorldWidget = (GUI::WidgetObject*)widgetComp->mWidgetWorld->AddWidgetObject( new GUI::WidgetObject() );
+
+		model = new GUI::ModelWidget();
+		model->mPosition = Vector3f( 0, 0, 0.8f );
+		model->mScale    = Vector3f( (float)Renderer::WINDOW_WIDTH_BASE-500, (float)Renderer::WINDOW_HEIGHT_BASE, 1 );
+		
+		material = mEditorWorld->mMaterialManager->Add( "World", std::shared_ptr< Material >( new Material() ));
+		material->mShader = mEditorWorld->mShaderManager->Get( "GUI Mesh" );
+		material->mBlendState = mRenderer->BLEND_OFF;
+		material->mTexture[ TEXTURE_DIFFUSE ] = mEditorWorld->mTextureManager->Get( "Backbuffer" );
+
+		drawableMesh = new GUI::MeshViewWidget();
+		drawableMesh->mMesh = mEditorWorld->mMeshManager->Add( "World", std::shared_ptr< Mesh >( mRenderer->CreateGUIQuad( material->mShader->Layout() )));
+		drawableMesh->mMesh->mMaterial = material;
+		
+		controller = new GUI::SpriteControllerWidget();
+		controller->mScaleToWindowX = true;
+		controller->mScaleToWindowY = true;
+		controller->mMargin = Quad( 0, 60, 0, -90 );
+
+		mGameWorldWidget->SetModel( model );
+		mGameWorldWidget->SetView( drawableMesh );
+		mGameWorldWidget->SetController( controller );
+
 		///////////////////////////////
 
 		mEditorWorld->Startup();
-
-		///////////////////////////////
-		// CREATE EDITOR OBJECTS
-
-		CreateTranslateMesh();
-
-		CreateRotateMesh();
-			
-		CreateScaleMesh();
 	}
 
 	void PrepareGameWorld()
 	{
 		MeshBuilder						meshBuilder;
 		std::shared_ptr< Mesh >			mesh;
+
+		std::shared_ptr< Material >		material;
 
 		GameObject*						obj;
 		TransformComponent*				transform;
@@ -662,6 +708,7 @@ public:
 
 		mGameWorld->mTextureManager		= new TextureManager();
 		mGameWorld->mShaderManager		= new ShaderManager();
+		mGameWorld->mMaterialManager	= new MaterialManager();
 		mGameWorld->mSpriteManager		= new SpriteManager();
 		mGameWorld->mMeshManager		= new MeshManager();
 		mGameWorld->mModelManager		= new ModelManager();
@@ -671,10 +718,10 @@ public:
 
 		////////////////////////////////////
 
-		mGameWorld->mShaderManager->Add( "GUI", mEditorWorld->mShaderManager->Get( "GUI" ));
+		std::shared_ptr< Shader > shaderGUI = mGameWorld->mShaderManager->Add( "GUI", mEditorWorld->mShaderManager->Get( "GUI" ));
 
-		mGameWorld->mSpriteSystem = new SpriteSystem( mRenderer, mGameWorld->mShaderManager->Get( "GUI" ), 256 );
-		
+		mGameWorld->mSpriteSystem = new SpriteSystem( mRenderer, shaderGUI->Layout(), 256 );
+
 		////////////////////////////////////
 
 		mGameWorld->mTextureManager->Add( "default-alpha.png", mRenderer->CreateTextureFromFile( "Textures\\default-alpha.png" ));
@@ -682,6 +729,9 @@ public:
 		mGameWorld->mShaderManager->Add( "Color",   mEditorWorld->mShaderManager->Get( "Color" ));
 		mGameWorld->mShaderManager->Add( "Texture", mEditorWorld->mShaderManager->Get( "Texture" ));
 		mGameWorld->mShaderManager->Add( "Sprite",  mEditorWorld->mShaderManager->Get( "Sprite" ));
+
+		std::shared_ptr< Shader > shaderColor = mGameWorld->mShaderManager->Get( "Color" );
+		std::shared_ptr< Shader > shaderTexture = mGameWorld->mShaderManager->Get( "Texture" );
 
 		////////////////////////////////////
 
@@ -717,17 +767,19 @@ public:
 		light->mAttenuation  = Vector4f( 1, 1, 1, 25 );
 
 		//AddObject( obj );
-			
+		
 		// Ground object.
 		//
-		std::shared_ptr< Shader > shaderColor = mGameWorld->mShaderManager->Get( "Color" );
-
 		meshBuilder.CreateCube( 1.0f );
 		meshBuilder.mLayout    = shaderColor->Layout();
 		meshBuilder.mPrimitive = TRIANGLE_LIST;
 
+		material = mGameWorld->mMaterialManager->Add( "Ground", std::shared_ptr< Material >(new Material()));
+		material->mShader = shaderColor;
+		material->mBlendState = mRenderer->BLEND_OFF;
+
 		mesh = mGameWorld->mMeshManager->Add( "Ground", std::shared_ptr< Mesh >(meshBuilder.BuildMesh( mRenderer )));
-		mesh->mShader = shaderColor;
+		mesh->mMaterial = material;
 		//mAssetMesh->addChild( new AssetTreeItem< Mesh >( "Ground", mesh ));
 	
 		obj = mGameWorld->AddGameObject( new GameObject(), "Ground" );
@@ -743,22 +795,64 @@ public:
 		body->SetFlags( DISABLE_GRAVITY );
 			
 		obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
-			
+		//*/
 		//AddObject( obj );
-			
+		
+		// Testing particle effects.
+		//
+		std::shared_ptr< Texture > texture = mGameWorld->mTextureManager->Add( "fire.png", mRenderer->CreateTextureFromFile( "Textures\\fire.png" ));
+		
+		material = mGameWorld->mMaterialManager->Add( "Fire", std::shared_ptr< Material >(new Material()));
+		material->mShader = mGameWorld->mShaderManager->Get( "Sprite" );
+		material->mBlendState = std::shared_ptr< BlendState >(mRenderer->CreateBlendState( BLEND_SRC_ALPHA, BLEND_ONE, BLEND_SRC_ALPHA, BLEND_ONE ));
+		material->mTexture[ TEXTURE_DIFFUSE ] = texture;
+		material->mCullMode  = CULL_NONE;
+		material->mDepthMode = DEPTH_OFF;
+
+		std::shared_ptr< Sprite > sprite = mGameWorld->mSpriteManager->Add( "Fire", std::shared_ptr< Sprite >(new Sprite()));
+		sprite->AddFrame( Sprite::QUADtoTEXCOORD( Quad( 0, 0, 64, 64 ), texture->Width(), texture->Height() ));
+		sprite->AddFrame( Sprite::QUADtoTEXCOORD( Quad( 64, 0, 128, 64 ), texture->Width(), texture->Height() ));
+
+		ParticleSystem* particleSystem = BuildParticleSystemNormal( mRenderer, mGameWorld, material, sprite, 300 );
+		particleSystem->mSpawnRate   = 0.025f;
+		particleSystem->mMinLifetime = 3.0f;
+		particleSystem->mMaxLifetime = 5.0f;
+		particleSystem->mEffect.push_back( new TextureEffect( 0, 0 ));
+		particleSystem->mEffect.push_back( new AreaPositionEffect( 0, Vector3f( -0.125f, 1, 0 ), Vector3f( 0.125f, 1, 0 )));
+		particleSystem->mEffect.push_back( new RandomRotationEffect( 0, Vector3f( 0, 0, -10 ), Vector3f( 0, 0, 10 )));
+		particleSystem->mEffect.push_back( new ScaleEffect( 0, Vector3f( 1, 1, 1 )));
+		particleSystem->mEffect.push_back( new VelocityEffect( 0, Vector3f( 0, 1.2f, 0 )));
+		particleSystem->mEffect.push_back( new RandomColorEffect( 0, ColorRGBA( 0.75f, 0.25f, 0, 0.125f ), ColorRGBA( 0.75f, 0.75f, 0, 0.125f )));
+		particleSystem->mEffect.push_back( new FadeToScaleEffect( 0, 0.25f, 0.666f ));
+		particleSystem->mEffect.push_back( new FadeToScaleEffect( 0.5f, 1.0f, 0.1f ));
+		particleSystem->mEffect.push_back( new TextureEffect( 1.0f, 1 ));
+		particleSystem->mEffect.push_back( new FadeToScaleEffect( 1.0f, 2.0f, 1.0f ));
+		particleSystem->mEffect.push_back( new RandomColorEffect( 1.0f, ColorRGBA( 1, 1, 1, 0.125f ), ColorRGBA( 0.9f, 0.9f, 0.9f, 0.125f )));
+		particleSystem->mEffect.push_back( new FadeToColorEffect( 1.0f, 5.0f, ColorRGBA( 0.9f, 0.9f, 0.9f, 0.025f )));
+		//particleSystem->mEffect.push_back( new RandomVelocityEffect( 1, Vector3f( -1, 1, 0 ), Vector3f( 1, 1, 0 )));
+
+		obj = mGameWorld->AddGameObject( new GameObject(), "Particle Emitter" );
+
+		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
+		transform->mScale = Vector3f( 512, 512, 1 );
+
+		obj->AttachComponent( new ParticleEmitterComponent( particleSystem ), "Sprite" );
+
 		// Test object.
 		//
-		std::shared_ptr< Shader > shaderTexture = mGameWorld->mShaderManager->Get( "Texture" );
-
 		meshBuilder.ClearGeometry();
 		meshBuilder.CreateDodecahedron( 1.0f );
 		meshBuilder.mLayout = shaderTexture->Layout();
-		meshBuilder.mTexture[ TEXTURE_DIFFUSE ] = mGameWorld->mTextureManager->Get( "default-alpha.png" );
+
+		material = mGameWorld->mMaterialManager->Add( "Dodecahedron", std::shared_ptr< Material >(new Material()));
+		material->mShader = shaderColor; // intentionally set wrong shader to demonstrate vertex layout compatibility
+		material->mBlendState = mRenderer->BLEND_ALPHA;
+		material->mTexture[ TEXTURE_DIFFUSE ] = mGameWorld->mTextureManager->Get( "default-alpha.png" );
 
 		mesh = mGameWorld->mMeshManager->Add( "Dodecahedron", std::shared_ptr< Mesh >(meshBuilder.BuildMesh( mRenderer )));
-		mesh->mShader = shaderColor;	// intentionally set wrong shader to demonstrate vertex layout compatibility
+		mesh->mMaterial = material;	
 		//AddAsset( "Dodecahedron", mesh );
-			
+
 		GameObject* obj2 = new GameObject();
 		obj2->mName = "Dodecahedron";
 
@@ -779,9 +873,16 @@ public:
 		//
 		meshBuilder.ClearGeometry();
 		meshBuilder.CreateSphere( 1.0f, 10, 10 );
-			
+		mesh->mLayout = shaderTexture->Layout();
+
+		material = mGameWorld->mMaterialManager->Add( "Sphere", std::shared_ptr< Material >(new Material()));
+		material->mShader = shaderTexture;
+		material->mBlendState = mRenderer->BLEND_ALPHA;
+		//material->mDepthMode = DEPTH_ALWAYS;
+		material->mTexture[ TEXTURE_DIFFUSE ] = mGameWorld->mTextureManager->Get( "default-alpha.png" );
+
 		mesh = mGameWorld->mMeshManager->Add( "Sphere", std::shared_ptr< Mesh >(meshBuilder.BuildMesh( mRenderer )));
-		mesh->mShader = shaderTexture;
+		mesh->mMaterial = material;
 		//AddAsset( "Sphere", mesh );
 
 		obj = mGameWorld->AddGameObject( new GameObject(), "Sphere" );
@@ -797,113 +898,109 @@ public:
 		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateSphere( transform->mScale.x ), transform->mPosition, transform->mOrientation, 1.0f ));
 		body = physics->GetRigidBody();
 		
-		//obj->AddChild( obj2 );
+		obj->AddChild( obj2 );
 
 		//AddObject( obj );
-
-		// Testing particle effects.
-		//
-		std::shared_ptr< Texture > textureS = mGameWorld->mTextureManager->Add( "fire.png", mRenderer->CreateTextureFromFile( "Textures\\fire.png" ));
-		std::shared_ptr< Sprite >  sprite( new Sprite( textureS ));
-
-		mGameWorld->mSpriteManager->Add( "Fire", sprite );
-		
-		sprite->AddFrame( sprite->GetTextureCoords( Quad( 0, 0, 64, 64 )));
-		sprite->AddFrame( sprite->GetTextureCoords( Quad( 64, 0, 128, 64 )));
-
-		ParticleSystem* particleSystem = BuildParticleSystemNormal( mRenderer, mGameWorld, mGameWorld->mShaderManager->Get( "Sprite" ), sprite, 300 );
-		particleSystem->mSpawnRate   = 0.025f;
-		particleSystem->mMinLifetime = 3.0f;
-		particleSystem->mMaxLifetime = 5.0f;
-		particleSystem->mEffect.push_back( new TextureEffect( 0, 0 ));
-		particleSystem->mEffect.push_back( new AreaPositionEffect( 0, Vector3f( -0.125f, 1, 0 ), Vector3f( 0.125f, 1, 0 )));
-		particleSystem->mEffect.push_back( new RandomRotationEffect( 0, Vector3f( 0, 0, -10 ), Vector3f( 0, 0, 10 )));
-		particleSystem->mEffect.push_back( new ScaleEffect( 0, Vector3f( 1, 1, 1 )));
-		particleSystem->mEffect.push_back( new VelocityEffect( 0, Vector3f( 0, 1.2f, 0 )));
-		particleSystem->mEffect.push_back( new RandomColorEffect( 0, ColorRGBA( 0.75f, 0.25f, 0, 0.125 ), ColorRGBA( 0.75f, 0.75f, 0, 0.125 )));
-		particleSystem->mEffect.push_back( new FadeToScaleEffect( 0, 0.25f, 0.666f ));
-		particleSystem->mEffect.push_back( new FadeToScaleEffect( 0.5f, 1.0f, 0.1f ));
-		particleSystem->mEffect.push_back( new TextureEffect( 1.0f, 1 ));
-		particleSystem->mEffect.push_back( new FadeToScaleEffect( 1.0f, 2.0f, 1.0f ));
-		particleSystem->mEffect.push_back( new RandomColorEffect( 1.0f, ColorRGBA( 1, 1, 1, 0.125 ), ColorRGBA( 0.9f, 0.9f, 0.9f, 0.125 )));
-		particleSystem->mEffect.push_back( new FadeToColorEffect( 1.0f, 5.0f, ColorRGBA( 0.9f, 0.9f, 0.9f, 0.025f )));
-		//particleSystem->mEffect.push_back( new RandomVelocityEffect( 1, Vector3f( -1, 1, 0 ), Vector3f( 1, 1, 0 )));
-
-		obj = mGameWorld->AddGameObject( new GameObject(), "Particle Emitter" );
-
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
-		transform->mScale = Vector3f( 512, 512, 1 );
-
-		obj->AttachComponent( new ParticleEmitterComponent( particleSystem ), "Sprite" );
 
 		///////////////////////////////
 
 		mGameWorld->Startup();
+
+		///////////////////////////////
+		// CREATE EDITOR OBJECTS
+		//
+		CreateTranslateObject();
+
+		CreateRotateMesh();
+			
+		CreateScaleMesh();
 	}
 		
-	void CreateTranslateMesh()
+	void CreateTranslateObject()
 	{
-		/*mTranslateObject = new WGameObject();
+		mTranslateObject = new GameObject();
 		const float tileSize = 5;
 
-		WModel model = WModel.Load( "Assets\\Editor\\Translate.M3D", mRenderer, mShaderManager, mTextureManager );
-			
+		std::shared_ptr< Model > model = std::shared_ptr< Model >(LoadModelM3DFromFile( "Editor\\Translate.M3D", mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager ));
+		
+		std::vector< std::shared_ptr< Material >> material;
+		model->GetMaterials( &material );
+
+		material[ 0 ]->mShader = mEditorWorld->mShaderManager->Get( "Color Only" );
+		material[ 0 ]->mCullMode = CULL_NONE;
+		material[ 0 ]->mBlendState = std::shared_ptr< BlendState >(mRenderer->CreateBlendState( BLEND_SRC_ALPHA, BLEND_ONE, BLEND_SRC_ALPHA, BLEND_ONE ));
+		material[ 0 ]->mDepthMode = DEPTH_ALWAYS;
+
+		model->SetMaterials( material );
+
 		// Root Translate Object.
 		//
-		mTranslateObject.AttachComponent( new WTransformComponent(), "Transform" );
+		mTranslateObject->AttachComponent( new TransformComponent(), "Transform" );
 			
 		///////////////////////////////
 
-		WGameObject obj = new WGameObject();
+		GameObject* obj = new GameObject();
 			
-		WTransformComponent transform = new WTransformComponent();
-		transform.Position = new WVector3f( tileSize, 0, 0 );
-		transform.Rotation = new WVector3f( 0, 0, -90 );
-		obj.AttachComponent( transform, "Tile_X" );
+		TransformComponent* transform = new TransformComponent();
+		transform->mPosition    = Vector3f( tileSize, 0, 0 );
+		transform->mOrientation = Quatf( Vector3f( 0, 0, -90 ));
+		obj->AttachComponent( transform, "Tile_X" );
 
-		WModelComponent modelComp = new WModelComponent( model );
-		modelComp.SetMaterial( mMaterial_X_Axis );
-		obj.AttachComponent( modelComp, "Model_X" );
+		ModelComponent* modelComp = new ModelComponent( model );
+		//modelComp->SetMaterial( mSelectedMaterialX );
+		obj->AttachComponent( modelComp, "Model_X" );
 
-		mTranslateObject.AddChild( obj );
+		mTranslateObject->AddChild( obj );
 
 		///////////////////////////////
 			
-		obj = new WGameObject();
+		obj = new GameObject();
 
-		transform = new WTransformComponent();
-		transform.Position = new WVector3f( 0, tileSize, 0 );
-		transform.Rotation = new WVector3f( 0, 0, 0 );
-		obj.AttachComponent( transform, "Tile_Y" );
+		transform = new TransformComponent();
+		transform->mPosition    = Vector3f( 0, tileSize, 0 );
+		transform->mOrientation = Quatf( Vector3f( 0, 0, 0 ));
+		obj->AttachComponent( transform, "Tile_Y" );
 
-		modelComp = new WModelComponent( model );
-		modelComp.SetMaterial( mMaterial_Y_Axis );
-		obj.AttachComponent( modelComp, "Model_Y" );
+		modelComp = new ModelComponent( model );
+		//modelComp->SetMaterial( mSelectedMaterialY );
+		obj->AttachComponent( modelComp, "Model_Y" );
 
-		mTranslateObject.AddChild( obj );
-
-		///////////////////////////////
-
-		obj = new WGameObject();
-
-		transform = new WTransformComponent();
-		transform.Position = new WVector3f( 0, 0, tileSize );
-		transform.Rotation = new WVector3f( 90, 0, 0 );
-		obj.AttachComponent( transform, "Tile_Z" );
-
-		modelComp = new WModelComponent( model );
-		modelComp.SetMaterial( mMaterial_Z_Axis );
-		obj.AttachComponent( modelComp, "Model_Z" );
-
-		mTranslateObject.AddChild( obj );
+		mTranslateObject->AddChild( obj );
 
 		///////////////////////////////
 
-		mTranslateObject.SetWorld( mGameWorld );
-		mTranslateObject.Startup();
+		obj = new GameObject();
 
-		model.Dispose();
-		*/
+		transform = new TransformComponent();
+		transform->mPosition    = Vector3f( 0, 0, tileSize );
+		transform->mOrientation = Quatf( Vector3f( 90, 0, 0 ));
+		obj->AttachComponent( transform, "Tile_Z" );
+
+		modelComp = new ModelComponent( model );
+		//modelComp->SetMaterial( mSelectedMaterialZ );
+		obj->AttachComponent( modelComp, "Model_Z" );
+
+		mTranslateObject->AddChild( obj );
+
+		///////////////////////////////
+
+		mTranslateObject->SetWorld( mGameWorld );
+		mTranslateObject->Startup();
+	}
+
+	void DrawTranslateObject()
+	{
+		if( mSelectedObject )
+		{
+			TransformComponent* transformObject = (TransformComponent*)mTranslateObject->FindComponent( GameComponent::TRANSFORM );
+			TransformComponent* transformSelect = (TransformComponent*)mSelectedObject->FindComponent( GameComponent::TRANSFORM );
+
+			transformObject->mPosition = transformSelect->mPosition;
+			transformObject->mScale    = Vector3f::ONE * (mGameWorld->GetCamera()->GetTransform()->mPosition - transformSelect->mPosition).Length() * 0.005f;
+			
+			mTranslateObject->UpdateTransform();
+			mTranslateObject->UpdateDrawable();
+		}
 	}
 
 	void CreateRotateMesh()
@@ -971,16 +1068,16 @@ public:
 
 			if( obj != mHoverObject )
 			{
-				mBoundsMesh->mMaterial.mAmbient = ColorRGBA::WHITE;
+				mBoundsMesh->mMaterial->mAmbient = ColorRGBA::WHITE;
 
 				if( obj == mSelectedObject )
-					mBoundsMesh->mMaterial.mAmbient = ColorRGBA::RED;
+					mBoundsMesh->mMaterial->mAmbient = ColorRGBA::RED;
 			}
 			else
 			if( obj == mSelectedObject )
-				mBoundsMesh->mMaterial.mAmbient = ColorRGBA::YELLOW;
+				mBoundsMesh->mMaterial->mAmbient = ColorRGBA::YELLOW;
 			else
-				mBoundsMesh->mMaterial.mAmbient = ColorRGBA::GREEN;
+				mBoundsMesh->mMaterial->mAmbient = ColorRGBA::GREEN;
 
 			mBoundsMesh->mMatrixWorld.World( center, Quatf::IDENTITY, scale );
 			

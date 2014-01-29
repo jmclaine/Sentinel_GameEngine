@@ -10,15 +10,14 @@ namespace Sentinel
 	class GameWorld;
 	class Shader;
 	class Mesh;
-
+	class Material;
+	
 	class SENTINEL_DLL Debug
 	{
 	private:
 
 		Renderer*	mRenderer;
 		GameWorld*	mWorld;
-
-		std::shared_ptr< Shader > mShader;
 
 		Mesh*		mMesh;
 
@@ -27,14 +26,13 @@ namespace Sentinel
 
 	public:
 
-		Debug( Renderer* renderer, GameWorld* world, std::shared_ptr< Shader > shader, UINT maxLines = 1000 );
+		std::shared_ptr< Material > mMaterial;
+
+		Debug( Renderer* renderer, GameWorld* world, std::shared_ptr< Material > material, UINT maxLines = 1000 );
 		~Debug();
 
 		Renderer*	GetRenderer();
-
 		GameWorld*	GetWorld();
-
-		std::shared_ptr< Shader > GetShader();
 
 		/////////////////////////////////////
 

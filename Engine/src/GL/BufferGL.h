@@ -11,7 +11,7 @@ namespace Sentinel
 
 	public:
 
-		BufferGL( void* data, UINT size, UINT stride, BufferType type, BufferAccess access );
+		BufferGL( void* data, UINT size, UINT stride, BufferType type, BufferAccessType access );
 		~BufferGL();
 
 		void	Release();
