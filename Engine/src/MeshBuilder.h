@@ -157,5 +157,11 @@ namespace Sentinel
 		// Ensure mShader is set before calling this.
 		//
 		Mesh*	BuildMesh( Renderer* renderer );
+
+		// Helper functions to build quads for both
+		// RenderTextures and GUIs.
+		//
+		static Mesh* BuildRenderTextureMesh( Renderer* renderer, std::shared_ptr< VertexLayout > layout );
+		static Mesh* BuildGUIMesh( Renderer* renderer, std::shared_ptr< VertexLayout > layout );
 	};
 }

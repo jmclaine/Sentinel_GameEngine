@@ -21,14 +21,17 @@ vec4 _LightAttn;    float4 _LightAttn;
 -->
 <Shaders>
 
-  <Definition FileName="line"     Name="Line" />
-  <Definition FileName="texture"  Name="Texture" />
-  <Definition FileName="RTnormal" Name="RT_Normal" />
-  <Definition FileName="sprite"   Name="Sprite" />
-  <Definition FileName="normmap"  Name="Normal Map" />
-  <Definition FileName="gui"      Name="GUI" />
-  <Definition FileName="guimesh"  Name="GUI Mesh" />
-  <Definition FileName="color"    Name="Color Only" />
-  <Definition FileName="colnorm"  Name="Color" />
+  <Definition FileName="Line"             Name="Line" />
+  <Definition FileName="Texture_Lit"      Name="Texture" />
+  <Definition FileName="Texture_Lit_Shadow"      Name="Texture_Lit_Shadow" />
+  <Definition FileName="RT_Color"         Name="RT_Normal" />
+  <Definition FileName="RT_Cube_Depth"    Name="RT_Cube_Depth" />
+  <Definition FileName="Sprite"           Name="Sprite" />
+  <Definition FileName="Normal_Map"       Name="Normal Map" />
+  <Definition FileName="GUI"              Name="GUI" />
+  <Definition FileName="GUI_Mesh"         Name="GUI Mesh" />
+  <Definition FileName="Color_Only"       Name="Color Only" />
+  <Definition FileName="Color_Lit"        Name="Color" />
+  <Definition FileName="Color_Lit_Shadow" Name="Color_Lit_Shadow" />
   
 </Shaders>

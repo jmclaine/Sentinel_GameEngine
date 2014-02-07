@@ -39,7 +39,7 @@ namespace Sentinel
 
 	public:
 
-		Renderer*								mRenderer;		// this must be deleted outside this class
+		Renderer*								mRenderer;		// must be deleted outside this class
 
 		Timing*									mTiming;
 		PhysicsSystem*							mPhysicsSystem;
@@ -75,6 +75,7 @@ namespace Sentinel
 		void				UpdatePhysics();
 		void				UpdateTransform();
 		void				UpdateComponents();
+		void				UpdateLight();
 		void				UpdateDrawable();
 
 		// All associated GameObjects and GameComponents also Shutdown().

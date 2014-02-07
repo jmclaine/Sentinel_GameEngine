@@ -36,6 +36,11 @@ namespace Sentinel
 		mTransform = NULL;
 	}
 
+	const Matrix4f& CameraComponent::GetMatrixWorld()
+	{
+		return mTransform->GetMatrixWorld();
+	}
+
 	const Matrix4f& CameraComponent::GetMatrixView()
 	{
 		return mMatrixView;

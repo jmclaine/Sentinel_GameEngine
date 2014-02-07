@@ -48,6 +48,7 @@ namespace Sentinel
 
 		virtual void		Shutdown();
 
+		const Matrix4f&		GetMatrixWorld();
 		const Matrix4f&		GetMatrixView();
 		const Matrix4f&		GetMatrixProjection();
 		const Matrix4f&		GetMatrixFinal();

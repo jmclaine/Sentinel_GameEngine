@@ -20,6 +20,8 @@ namespace Sentinel
 		static const UINT CULL_TYPE[ NUM_CULL_TYPES ];
 		static const UINT FILL_TYPE[ NUM_FILL_TYPES ];
 
+		//////////////////////////////////
+
 		class WindowInfoGL : public WindowInfo
 		{
 			friend class RendererGL;
@@ -32,19 +34,40 @@ namespace Sentinel
 			GLenum		mRenderMode;
 		};
 
-		class RenderTargetGL
+		//////////////////////////////////
+
+		class RenderTextureGL : public RenderTexture
 		{
 		public:
 
-			std::shared_ptr< Texture >	mTexture;
+			Texture*	mTexture;
 			GLuint		mID;
 			
-			RenderTargetGL( const std::shared_ptr< Texture >& texture, GLuint id )
+			RenderTextureGL( Texture* texture, GLuint id ) :
+				mTexture( texture ),
+				mID( id )
+			{}
+
+			~RenderTextureGL()
 			{
-				mTexture = texture;
-				mID		 = id;
+				glDeleteFramebuffers( 1, &mID );
 			}
 		};
+
+		//////////////////////////////////
+
+		class DepthStencilGL : public DepthStencil
+		{
+		public:
+
+			GLuint		mID;
+
+			DepthStencilGL( GLuint id ) :
+				mID( id )
+			{}
+		};
+
+		//////////////////////////////////
 
 		class BlendStateGL : public BlendState
 		{
@@ -154,10 +177,9 @@ namespace Sentinel
 			}
 		};
 
-		WindowInfoGL*					mCurrWindow;
+		//////////////////////////////////
 
-		std::vector< RenderTargetGL >	mRenderTarget;
-		std::vector< GLuint >			mDepthStencil;
+		WindowInfoGL* mCurrWindow;
 
 	public:
 		
@@ -166,9 +188,8 @@ namespace Sentinel
 			NULL_TEXTURE = NULL;
 			BASE_TEXTURE = NULL;
 
-			mDepthStencil.push_back( 0 );
-
-			mCurrWindow = NULL;
+			mCurrWindow  = NULL;
+			mCurrShader  = NULL;
 		}
 
 		RendererGL::~RendererGL()
@@ -243,7 +264,7 @@ namespace Sentinel
 			// Create NULL_TEXTURE.
 			//
 			if( !NULL_TEXTURE.get() )
-				NULL_TEXTURE = std::shared_ptr< Texture >( new TextureGL( 0, 0, 0 ));
+				NULL_TEXTURE = std::shared_ptr< Texture >( new TextureGL( 0, 0, IMAGE_FORMAT_RGBA, 0 ));
 
 			// Create initial white texture as BASE_TEXTURE.
 			//
@@ -256,7 +277,7 @@ namespace Sentinel
 				newTex[ 2 ] = 255;
 				newTex[ 3 ] = 255;
 
-				BASE_TEXTURE = CreateTextureFromMemory( newTex, 1, 1, IMAGE_FORMAT_RGBA, false );
+				BASE_TEXTURE = std::shared_ptr< Texture >(CreateTextureFromMemory( newTex, 1, 1, IMAGE_FORMAT_RGBA, false ));
 
 				if( !BASE_TEXTURE )
 				{
@@ -277,7 +298,7 @@ namespace Sentinel
 			if( !BLEND_ALPHA.get() )
 				BLEND_ALPHA = std::shared_ptr< BlendState >(CreateBlendState());
 
-			SetBlendState( BLEND_ALPHA );
+			SetBlendState( BLEND_ALPHA.get() );
 
 			return mCurrWindow;
 		}
@@ -285,11 +306,6 @@ namespace Sentinel
 		void Shutdown()
 		{
 			mCurrShader = NULL;
-
-			for( UINT i = 0; i < mRenderTarget.size(); ++i )
-				glDeleteFramebuffers( 1, &mRenderTarget[ i ].mID );
-
-			mRenderTarget.clear();
 
 			if( mCurrWindow )
 			{
@@ -346,7 +362,7 @@ namespace Sentinel
 
 		// Textures.
 		//
-		std::shared_ptr< Texture > CreateTextureFromFile( const char* filename, bool createMips = true )
+		Texture* CreateTextureFromFile( const char* filename, bool createMips = true )
 		{
 			// TODO: Check for compatible texture size.
 
@@ -366,18 +382,17 @@ namespace Sentinel
 				return NULL;
 			}
 
-			std::shared_ptr< Texture > texture = CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA, createMips );
+			Texture* texture = CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA, createMips );
 
 			stbi_image_free( pixels );
 
 			return texture;
 		}
 
-		std::shared_ptr< Texture > CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormatType format, bool createMips = true )
+		Texture* CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormatType format, bool createMips = true )
 		{
-			UINT texID;
+			GLuint texID;
 			glGenTextures( 1, &texID );
-
 			glBindTexture( GL_TEXTURE_2D, texID );
 
 			if( createMips )
@@ -411,6 +426,10 @@ namespace Sentinel
 				glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA32F, GL_UNSIGNED_BYTE, data );
 				break;
 
+			case IMAGE_FORMAT_DEPTH:
+				glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, data );
+				break;
+
 			default:
 				_ASSERT(0); // invalid image type
 				return NULL;
@@ -419,14 +438,62 @@ namespace Sentinel
 			if( createMips )
 				glGenerateMipmap( GL_TEXTURE_2D );
 			
-			return std::shared_ptr< Texture >( new TextureGL( width, height, texID ));
+			return new TextureGL( width, height, format, texID );
 		}
 
-		void* GetTexturePixels( std::shared_ptr< Texture > texture )
+		Texture* CreateTextureCube( UINT width, UINT height, ImageFormatType format )
+		{
+			GLuint texID;
+			glGenTextures( 1, &texID );
+			glBindTexture( GL_TEXTURE_CUBE_MAP, texID );
+			
+			glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+			glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+			glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
+
+			glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+			glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+
+			switch( format )
+			{
+			case IMAGE_FORMAT_R:
+				for( UINT x = 0; x < 6; ++x )
+					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGBA, width, height, 0, GL_R, GL_UNSIGNED_BYTE, NULL );
+				break;
+
+			case IMAGE_FORMAT_RGB:
+				for( UINT x = 0; x < 6; ++x )
+					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGBA, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL );
+				break;
+
+			case IMAGE_FORMAT_RGBA:
+				for( UINT x = 0; x < 6; ++x )
+					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
+				break;
+
+			case IMAGE_FORMAT_HDR:
+				for( UINT x = 0; x < 6; ++x )
+					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGBA, width, height, 0, GL_RGBA32F, GL_UNSIGNED_BYTE, NULL );
+				break;
+
+			case IMAGE_FORMAT_DEPTH:
+				for( UINT x = 0; x < 6; ++x )
+					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL );
+				break;
+
+			default:
+				_ASSERT(0); // invalid image type
+				return NULL;
+			}
+
+			return new TextureGL( width, height, format, texID );
+		}
+
+		void* GetTexturePixels( Texture* texture )
 		{
 			BYTE* pixels = new BYTE[ (texture->Width() << 2) * texture->Height() ];
 
-			glBindTexture( GL_TEXTURE_2D, ((TextureGL*)texture.get())->mID );
+			glBindTexture( GL_TEXTURE_2D, static_cast< TextureGL* >(texture)->ID() );
 			glGetTexImage( GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
 
 			return pixels;
@@ -434,29 +501,39 @@ namespace Sentinel
 
 		// Special Rendering.
 		//
-		UINT CreateBackbuffer()
+		RenderTexture* CreateBackbuffer()
 		{
-			mRenderTarget.push_back( RenderTargetGL( NULL_TEXTURE, 0 ));
-			return mRenderTarget.size()-1;
+			return new RenderTextureGL( NULL_TEXTURE.get(), 0 );
 		}
 
-		UINT CreateRenderTarget( std::shared_ptr< Texture > texture )
+		RenderTexture* CreateRenderTexture( Texture* texture )
 		{
-			UINT renderID = mRenderTarget.size();
+			GLuint id;
+			glGenFramebuffers( 1, &id );
+			glBindFramebuffer( GL_DRAW_FRAMEBUFFER, id );
 
-			mRenderTarget.push_back( RenderTargetGL( texture, 0 ));
-			
-			glGenFramebuffers( 1, &mRenderTarget.back().mID );
-			glBindFramebuffer( GL_DRAW_FRAMEBUFFER, mRenderTarget.back().mID );
-			glFramebufferTexture( GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, ((TextureGL*)texture.get())->mID, 0 );
+			switch( texture->Format() )
+			{
+			case IMAGE_FORMAT_DEPTH:
+				glFramebufferTexture( GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, static_cast< TextureGL* >(texture)->ID(), 0 );
+				break;
+
+			default:
+				glFramebufferTexture( GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, static_cast< TextureGL* >(texture)->ID(), 0 );
+				break;
+			}
 			
 			if( glCheckFramebufferStatus( GL_FRAMEBUFFER ) != GL_FRAMEBUFFER_COMPLETE )
-				REPORT_ERROR( "Failed to create Render Target #" << renderID, "OpenGL Render Target" );
+			{
+				REPORT_ERROR( "Failed to create Render Target", "OpenGL Render Target" );
+
+				return NULL;
+			}
 			
-			return renderID;
+			return new RenderTextureGL( texture, id );
 		}
 
-		UINT CreateDepthStencil( UINT width, UINT height )
+		DepthStencil* CreateDepthStencil( UINT width, UINT height )
 		{
 			GLuint id;
 			glGenRenderbuffers( 1, &id );
@@ -464,8 +541,7 @@ namespace Sentinel
 			glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height );
 			glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, id );
 			
-			mDepthStencil.push_back( id );
-			return mDepthStencil.size()-1;
+			return new DepthStencilGL( id );
 		}
 
 		BlendState* CreateBlendState( BlendType srcBlendColor = BLEND_SRC_ALPHA, BlendType dstBlendColor = BLEND_ONE_MINUS_SRC_ALPHA, 
@@ -496,18 +572,26 @@ namespace Sentinel
 			mCurrWindow->mRenderMode = type;
 		}
 
-		void SetRenderTarget( UINT target )
+		void SetRenderTexture( RenderTexture* target )
 		{
-			_ASSERT( target < mRenderTarget.size() );
+			_ASSERT( target );
 
-			glBindFramebuffer( GL_FRAMEBUFFER, mRenderTarget[ target ].mID );
+			RenderTextureGL* targetGL = static_cast< RenderTextureGL* >(target);
+
+			glBindFramebuffer( GL_FRAMEBUFFER, targetGL->mID );
+
+			if( targetGL->mTexture->Format() == IMAGE_FORMAT_DEPTH )
+			{
+				glDrawBuffer( GL_NONE );
+				glReadBuffer( GL_NONE );
+			}
 		}
 
-		void SetDepthStencil( UINT stencil )
+		void SetDepthStencil( DepthStencil* stencil )
 		{
-			_ASSERT( stencil < mDepthStencil.size() );
+			_ASSERT( stencil );
 
-			glBindRenderbuffer( GL_RENDERBUFFER, mDepthStencil[ stencil ] );
+			glBindRenderbuffer( GL_RENDERBUFFER, static_cast< DepthStencilGL* >(stencil)->mID );
 		}
 
 		void SetDepthStencilType( DepthType state )
@@ -579,16 +663,16 @@ namespace Sentinel
 			return S_OK;
 		}
 
-		void SetBlendState( std::shared_ptr< BlendState > blend )
+		void SetBlendState( BlendState* blend )
 		{
 			_ASSERT( blend );
 
-			static_cast< BlendStateGL* >(blend.get())->Apply();
+			static_cast< BlendStateGL* >(blend)->Apply();
 		}
 		
 		// Shaders.
 		//
-		std::shared_ptr< Shader > CreateShaderFromFile( const char* filename )
+		Shader* CreateShaderFromFile( const char* filename )
 		{
 			ShaderGL* shader = new ShaderGL();
 
@@ -598,10 +682,10 @@ namespace Sentinel
 				return NULL;
 			}
 
-			return std::shared_ptr< Shader >( shader );
+			return shader;
 		}
 
-		std::shared_ptr< Shader > CreateShaderFromMemory( const char* source )
+		Shader* CreateShaderFromMemory( const char* source )
 		{
 			ShaderGL* shader = new ShaderGL();
 
@@ -611,19 +695,12 @@ namespace Sentinel
 				return NULL;
 			}
 
-			return std::shared_ptr< Shader >( shader );
-		}
-
-		void SetShader( const std::shared_ptr< Shader >& shader )
-		{
-			mCurrShader = shader;
-
-			mCurrShader->Enable();
+			return shader;
 		}
 
 		// Vertex Layout.
 		//
-		std::shared_ptr< VertexLayout > CreateVertexLayout( const std::vector< AttributeType >& attrib )
+		VertexLayout* CreateVertexLayout( const std::vector< AttributeType >& attrib )
 		{
 			VertexLayoutGL* layout = new VertexLayoutGL();
 
@@ -633,14 +710,14 @@ namespace Sentinel
 				layout->AddAttribute( attrib[ x ] );
 			}
 
-			return std::shared_ptr< VertexLayout >(layout);
+			return layout;
 		}
 
-		void SetVertexLayout( std::shared_ptr< VertexLayout > vertexLayout )
+		void SetVertexLayout( VertexLayout* vertexLayout )
 		{
-			const VertexLayoutGL* vertexLayoutGL = static_cast< const VertexLayoutGL* >(vertexLayout.get());
+			const VertexLayoutGL* vertexLayoutGL = static_cast< const VertexLayoutGL* >(vertexLayout);
 
-			ShaderGL* shaderGL = static_cast< ShaderGL* >(mCurrShader.get());
+			ShaderGL* shaderGL = static_cast< ShaderGL* >(mCurrShader);
 
 			const std::vector< AttributeType >& layout = vertexLayout->Layout();
 			UINT size = (UINT)layout.size();
@@ -690,8 +767,6 @@ namespace Sentinel
 		{
 			glDrawRangeElementsBaseVertex( PRIMITIVE[ mCurrWindow->mRenderMode ], startIndex, startIndex + count, count, GL_UNSIGNED_INT, \
 										   reinterpret_cast< void* >( startIndex * sizeof( UINT )), baseVertex );
-			
-			mCurrShader->Disable();
 		}
 
 		void Present()

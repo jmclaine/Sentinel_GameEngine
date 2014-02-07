@@ -14,7 +14,8 @@ namespace Sentinel
 
 	Shader::Shader() :
 		mSource( NULL ),
-		mSampler( NULL )
+		mSampler( NULL ),
+		mNumSamplers( 0 )
 	{}
 
 	Shader::~Shader()

@@ -12,10 +12,11 @@ namespace Sentinel
 	ModelManager::~ModelManager()
 	{}
 
-	void ModelManager::Save( Archive& archive, 
-							 Renderer* renderer, 
-							 ShaderManager* shaderManager, 
-							 TextureManager* textureManager )
+	void ModelManager::Save( Archive&			archive, 
+							 Renderer*			renderer, 
+							 ShaderManager*		shaderManager, 
+							 TextureManager*	textureManager,
+							 MaterialManager*	materialManager )
 	{
 		UINT count = mData.size();
 		archive.Write( &count );
@@ -24,14 +25,15 @@ namespace Sentinel
 		{
 			archive.Write( &it->first );
 
-			it->second->Save( archive, renderer, shaderManager, textureManager );
+			it->second->Save( archive, renderer, shaderManager, textureManager, materialManager );
 		}
 	}
 
-	void ModelManager::Load( Archive& archive, 
-							 Renderer* renderer, 
-							 ShaderManager* shaderManager, 
-							 TextureManager* textureManager )
+	void ModelManager::Load( Archive&			archive, 
+							 Renderer*			renderer, 
+							 ShaderManager*		shaderManager, 
+							 TextureManager*	textureManager,
+							 MaterialManager*	materialManager )
 	{
 		RemoveAll();
 
@@ -43,7 +45,7 @@ namespace Sentinel
 			std::string name;
 			archive.Read( &name );
 
-			if( !Add( name, std::shared_ptr< Model >( Model::Load( archive, renderer, shaderManager, textureManager ))))
+			if( !Add( name, std::shared_ptr< Model >( Model::Load( archive, renderer, shaderManager, textureManager, materialManager ))))
 				throw std::exception( "Failed to load mesh." );
 		}
 	}

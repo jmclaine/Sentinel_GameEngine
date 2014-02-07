@@ -10,10 +10,11 @@
 #include "Shader.h"
 #include "TransformComponent.h"
 #include "CameraComponent.h"
-#include "LightComponent.h"
+#include "PointLightComponent.h"
 #include "Archive.h"
 #include "ShaderManager.h"
 #include "TextureManager.h"
+#include "MaterialManager.h"
 #include "Timing.h"
 #include "VertexLayout.h"
 #include "Material.h"
@@ -56,12 +57,12 @@ namespace Sentinel
 			
 			mMaterial->Apply( renderer );
 
+			Shader* shader = renderer->GetShader();
+
 			renderer->SetVBO( mVBO );
 			renderer->SetIBO( mIBO );
 
-			renderer->SetVertexLayout( mLayout );
-
-			std::shared_ptr< Shader > shader = mMaterial->mShader;
+			renderer->SetVertexLayout( mLayout.get() );
 
 			// Set Uniforms.
 			//
@@ -111,6 +112,13 @@ namespace Sentinel
 					shader->SetFloat3( uniformIndex, world->GetLight( lightCount )->GetTransform()->mPosition.Ptr() );
 					break;
 
+				case UNIFORM_LIGHT_DIR:
+					_ASSERT( world );
+					_ASSERT( world->GetLight( lightCount ));
+
+					shader->SetFloat3( uniformIndex, world->GetLight( lightCount )->GetTransform()->mOrientation.ToEuler().Ptr() );
+					break;
+
 				case UNIFORM_LIGHT_COLOR:
 					_ASSERT( world );
 					_ASSERT( world->GetLight( lightCount ));
@@ -123,6 +131,25 @@ namespace Sentinel
 					_ASSERT( world->GetLight( lightCount ));
 
 					shader->SetFloat4( uniformIndex, world->GetLight( lightCount )->mAttenuation.Ptr() );
+					break;
+
+				case UNIFORM_LIGHT_MATRIX:
+					_ASSERT( world );
+					_ASSERT( world->GetLight( lightCount ));
+					break;
+
+				case UNIFORM_LIGHT_CUBE_MATRIX:
+					_ASSERT( world );
+					_ASSERT( world->GetLight( lightCount ));
+
+					shader->SetMatrix( uniformIndex, static_cast< PointLightComponent* >(world->GetLight( lightCount ))->PtrMatrixFinal(), 6 );
+					break;
+
+				case UNIFORM_LIGHT_TEXTURE_CUBE:
+					_ASSERT( world );
+					_ASSERT( world->GetLight( lightCount ));
+
+					shader->SetTextureCube( uniformIndex, static_cast< PointLightComponent* >(world->GetLight( lightCount ))->GetTexture() );
 					break;
 
 				case UNIFORM_AMBIENT:
@@ -138,7 +165,7 @@ namespace Sentinel
 					break;
 
 				case UNIFORM_SPEC_COMP:
-					shader->SetFloat(  uniformIndex, mMaterial->mSpecularComponent );
+					shader->SetFloat(  uniformIndex, &mMaterial->mSpecularComponent );
 					break;
 
 				// Shadows.
@@ -151,10 +178,13 @@ namespace Sentinel
 					break;*/
 
 				case UNIFORM_DELTA_TIME:
+					{
 					_ASSERT( world );
 					_ASSERT( world->mTiming );
 
-					shader->SetFloat( uniformIndex, world->mTiming->DeltaTime() );
+					float DT = world->mTiming->DeltaTime();
+					shader->SetFloat( uniformIndex, &DT );
+					}
 					break;
 
 				// Screen-Space Ambient Occlusion.
@@ -205,44 +235,25 @@ namespace Sentinel
 					 Mesh*				mesh,
 					 Renderer*			renderer, 
 					 ShaderManager*		shaderManager, 
-					 TextureManager*	textureManager )
+					 TextureManager*	textureManager,
+					 MaterialManager*	materialManager )
 	{
-		/*
 		BYTE primitive = mesh->mPrimitive;
 		archive.Write( &primitive );
 
 		Buffer::Save( archive, mesh->mVBO );
 		Buffer::Save( archive, mesh->mIBO );
 
-		archive.Write( &shaderManager->Get( mesh->mShader ));
-
-		archive.Write( (BYTE*)mesh->mMaterial.Ptr(), sizeof( Material ));
-
-		for( UINT x = 0; x < NUM_TEXTURES; ++x )
-		{
-			BYTE type;
-			if( mesh->mTexture[ x ].get() == renderer->NULL_TEXTURE.get() )
-				type = 0;
-			else
-			if( mesh->mTexture[ x ].get() == renderer->BASE_TEXTURE.get() )
-				type = 1;
-			else
-				type = 2;
-
-			archive.Write( &type );
-
-			if( type == 2 )
-				archive.Write( &textureManager->Get( mesh->mTexture[ x ] ));
-		}
-		*/
+		std::string material = materialManager->Get( mesh->mMaterial );
+		archive.Write( &material );
 	}
 
 	Mesh* Mesh::Load( Archive&			archive, 
 					  Renderer*			renderer, 
 					  ShaderManager*	shaderManager, 
-					  TextureManager*	textureManager )
+					  TextureManager*	textureManager,
+					  MaterialManager*	materialManager )
 	{
-		/*
 		Mesh* mesh = new Mesh();
 
 		BYTE primitive;
@@ -252,37 +263,10 @@ namespace Sentinel
 		mesh->mVBO = Buffer::Load( archive, renderer );
 		mesh->mIBO = Buffer::Load( archive, renderer );
 
-		std::string shader;
-		archive.Read( &shader );
-		mesh->mShader = shaderManager->Get( shader );
-
-		archive.Read( (BYTE*)mesh->mMaterial.Ptr(), sizeof( Material ));
-		
-		std::string texture;
-		for( UINT x = 0; x < NUM_TEXTURES; ++x )
-		{
-			BYTE type;
-			archive.Read( &type );
-
-			if( type == 0 )
-				mesh->mTexture[ x ] = renderer->NULL_TEXTURE;
-			else
-			if( type == 1 )
-				mesh->mTexture[ x ] = renderer->BASE_TEXTURE;
-			else
-			{
-				std::string texture;
-				archive.Read( &texture );
-
-				mesh->mTexture[ x ] = textureManager->Get( texture );
-
-				if( mesh->mTexture[ x ] == NULL )
-					mesh->mTexture[ x ] = renderer->BASE_TEXTURE;
-			}
-		}
+		std::string material;
+		archive.Read( &material );
+		mesh->mMaterial = materialManager->Get( material );
 
 		return mesh;
-		*/
-		return NULL;
 	}
 }

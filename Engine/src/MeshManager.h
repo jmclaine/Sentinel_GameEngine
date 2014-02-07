@@ -19,14 +19,16 @@ namespace Sentinel
 
 		/////////////////////////////////
 
-		void Save( Archive&			archive, 
-				   Renderer*		renderer, 
-				   ShaderManager*	shaderManager, 
-				   TextureManager*	textureManager );
+		void Save( Archive&				archive, 
+				   Renderer*			renderer, 
+				   ShaderManager*		shaderManager, 
+				   TextureManager*		textureManager,
+				   MaterialManager*		materialManager );
 
-		void Load( Archive&			archive, 
-				   Renderer*		renderer, 
-				   ShaderManager*	shaderManager, 
-				   TextureManager*	textureManager );
+		void Load( Archive&				archive, 
+				   Renderer*			renderer, 
+				   ShaderManager*		shaderManager, 
+				   TextureManager*		textureManager,
+				   MaterialManager*		materialManager );
 	};
 }

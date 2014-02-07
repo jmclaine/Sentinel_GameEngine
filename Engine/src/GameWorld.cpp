@@ -2,7 +2,7 @@
 #include "GameObject.h"
 #include "TransformComponent.h"
 #include "CameraComponent.h"
-#include "LightComponent.h"
+#include "PointLightComponent.h"
 #include "Archive.h"
 #include "Timing.h"
 #include "PhysicsSystem.h"
@@ -84,24 +84,6 @@ namespace Sentinel
 		if( !mCurrentCamera )
 			mCurrentCamera = (!mCamera.empty()) ? mCamera[ 0 ] : NULL;
 
-		// Create a default light if none exist.
-		//
-		if( mLight.empty() && mCurrentCamera )
-		{
-			LightComponent* light = new LightComponent();
-			light->mAttenuation = Vector4f( 1, 1, 1, 2000 );
-			light->mColor		= ColorRGBA( 1, 1, 1, 1 );
-
-			TransformComponent* transform = new TransformComponent();
-			transform->mPosition = Vector3f( 0, 250, 0 );
-
-			GameObject* obj = AddGameObject( new GameObject(), "Default_Light" );
-			obj->AttachComponent( transform, "Transform" );
-			obj->AttachComponent( light, "Light" );
-
-			mLight.push_back( light );
-		}
-
 		TRAVERSE_VECTOR( x, mGameObject )
 			mGameObject[ x ]->Startup();
 	}
@@ -133,6 +115,12 @@ namespace Sentinel
 			mGameObject[ x ]->UpdateComponents();
 	}
 
+	void GameWorld::UpdateLight()
+	{
+		TRAVERSE_VECTOR( x, mLight )
+			mLight[ x ]->Update();
+	}
+
 	void GameWorld::UpdateDrawable()
 	{
 		if( mCurrentCamera )
@@ -147,7 +135,8 @@ namespace Sentinel
 			//
 			// TODO: Raycast from center screen to AABB for more accuracy.
 			//
-			/*Vector3f camPos = mCurrentCamera->GetTransform()->mPosition;
+			/*
+			Vector3f camPos = mCurrentCamera->GetTransform()->mPosition;
 		
 			mAlphaOrder.clear();
 			TRAVERSE_VECTOR( x, mGameObject )
@@ -156,12 +145,14 @@ namespace Sentinel
 			
 				if( transform )
 					mAlphaOrder.insert( std::pair< float, GameObject* >( -(camPos - transform->mPosition).LengthSquared(), mGameObject[ x ] ));
-			}*/
+			}
 
 			// Update and Render Meshes.
 			//
-			//TRAVERSE_LIST( it, mAlphaOrder )
-			//	(*it).second->UpdateDrawable();
+			TRAVERSE_LIST( it, mAlphaOrder )
+				(*it).second->UpdateDrawable();
+			//*/
+
 			TRAVERSE_VECTOR( x, mGameObject )
 				mGameObject[ x ]->UpdateDrawable();
 		}

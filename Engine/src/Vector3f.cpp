@@ -124,6 +124,16 @@ namespace Sentinel
 		return Vector3f( x*v.x, y*v.y, z*v.z );
 	}
 
+	Vector3f Vector3f::Min( const Vector3f& v ) const
+	{
+		return Vector3f( std::min( x, v.x ), std::min( y, v.y ), std::min( z, v.z ));
+	}
+
+	Vector3f Vector3f::Max( const Vector3f& v ) const
+	{
+		return Vector3f( std::max( x, v.x ), std::max( y, v.y ), std::max( z, v.z ));
+	}
+
 	float Vector3f::Length() const
 	{
 		return sqrt( LengthSquared() );

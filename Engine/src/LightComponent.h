@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "GameComponent.h"
 #include "ColorRGBA.h"
 #include "Vector4f.h"
@@ -7,28 +9,49 @@
 namespace Sentinel
 {
 	class TransformComponent;
+	class DrawableComponent;
+	class Texture;
+	class RenderTexture;
 
 	class SENTINEL_DLL LightComponent : public GameComponent
 	{
-		DECLARE_SERIAL();
+	protected:
 
-		TransformComponent* mTransform;		// light must possess a position / direction
+		virtual DECLARE_SERIAL_SAVE();
+		virtual DECLARE_SERIAL_LOAD();
+
+		TransformComponent*		mTransform;
+
+		std::vector< DrawableComponent* > mDynamic;
+
+		Texture*				mTexture;
+		RenderTexture*			mRenderTexture;
+		
 
 	public:
 
-		ColorRGBA	mColor;
-		Vector4f	mAttenuation;			// radius = w
-
-		//////////////////////////////
+		ColorRGBA				mColor;
+		Vector4f				mAttenuation;	// radius = w
+		
+	protected:
 
 		LightComponent();
 
-		const TransformComponent* GetTransform();
+	public:
 
-		void		Startup();
+		virtual ~LightComponent();
 
-		void		Update();
+		virtual void		Startup();
 
-		void		Shutdown();
+		virtual void		Update();
+
+		virtual void		Shutdown();
+
+		///////////////////////////////////////
+
+		TransformComponent* GetTransform();
+
+		Texture*			GetTexture();
+		RenderTexture*		GetRenderTexture();
 	};
 }

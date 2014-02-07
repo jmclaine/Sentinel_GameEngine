@@ -107,7 +107,7 @@ Render Target created before the Depth Stencil.
 
 Example:
 
-renderer->CreateRenderTarget( ... );
+renderer->CreateRenderTexture( ... );
 renderer->CreateDepthStencil( ... );
 
 For additional examples of more advanced types:
@@ -118,7 +118,6 @@ http://www.opengl.org/wiki/Framebuffer_Object_Examples
 #include "Common.h"
 #include "Util.h"
 #include "RendererTypes.h"
-#include "Shader.h"
 #include "VertexLayout.h"
 
 #define STBI_HEADER_FILE_ONLY
@@ -130,6 +129,8 @@ http://www.opengl.org/wiki/Framebuffer_Object_Examples
 namespace Sentinel
 {
 	class Texture;
+	class TextureCube;
+	class Shader;
 	class Buffer;
 	class Mesh;
 
@@ -170,7 +171,25 @@ namespace Sentinel
 
 	//////////////////////////////////
 
-	class SENTINEL_DLL BlendState
+	class RenderTexture
+	{
+	public:
+
+		virtual ~RenderTexture() {}
+	};
+
+	//////////////////////////////////
+
+	class DepthStencil
+	{
+	public:
+
+		virtual ~DepthStencil() {}
+	};
+
+	//////////////////////////////////
+
+	class BlendState
 	{
 	public:
 
@@ -188,7 +207,8 @@ namespace Sentinel
 	{
 	protected:
 
-		std::shared_ptr< Shader >	mCurrShader;
+		Shader*							mCurrShader;
+		bool							mIsShaderLocked;
 
 	public:
 
@@ -201,86 +221,91 @@ namespace Sentinel
 		std::shared_ptr< BlendState >	BLEND_OFF;
 		std::shared_ptr< BlendState >	BLEND_ALPHA;
 
+	protected:
+
+		Renderer();
+
 	public:
 
-		virtual ~Renderer() {}
+		virtual ~Renderer();
 
 		/////////////////////////////////
 
 		// Initializes the Renderer as either DirectX11 or OpenGL from an XML file.
 		//
-		static Renderer*	Create( const char* filename, WindowInfo& info );
+		static Renderer*		Create( const char* filename, WindowInfo& info );
 
-		virtual WindowInfo*	Startup( void* hWnd, bool fullscreen, UINT width, UINT height ) = 0;
+		virtual WindowInfo*		Startup( void* hWnd, bool fullscreen, UINT width, UINT height ) = 0;
 
-		virtual void		Shutdown() = 0;
+		virtual void			Shutdown() = 0;
 
 		// Windows.
 		//
-		virtual void		SetWindow( WindowInfo* info ) = 0;
-		virtual WindowInfo* GetWindow() = 0;
+		virtual void			SetWindow( WindowInfo* info ) = 0;
+		virtual WindowInfo*		GetWindow() = 0;
 
-		virtual bool		ShareResources( WindowInfo* info0, WindowInfo* info1 ) = 0;
+		virtual bool			ShareResources( WindowInfo* info0, WindowInfo* info1 ) = 0;
 
 		// Buffers.
 		//
-		virtual Buffer*		CreateBuffer( void* data, UINT size, UINT stride, BufferType type, BufferAccessType access = BUFFER_READ_WRITE ) = 0;
+		virtual Buffer*			CreateBuffer( void* data, UINT size, UINT stride, BufferType type, BufferAccessType access = BUFFER_READ_WRITE ) = 0;
 
-		virtual void		SetVBO( Buffer* buffer ) = 0;
-		virtual void		SetIBO( Buffer* buffer ) = 0;
+		virtual void			SetVBO( Buffer* buffer ) = 0;
+		virtual void			SetIBO( Buffer* buffer ) = 0;
 
 		// Textures.
 		//
-		std::shared_ptr< Texture > CreateTexture( UINT width, UINT height, ImageFormatType format = IMAGE_FORMAT_RGBA, bool createMips = false );
-		std::shared_ptr< Texture > CreateTextureFromResource( void* data, UINT length );
+		Texture*				CreateTexture( UINT width, UINT height, ImageFormatType format = IMAGE_FORMAT_RGBA, bool createMips = false );
+		Texture*				CreateTextureFromResource( void* data, UINT length );
 
-		virtual std::shared_ptr< Texture > CreateTextureFromFile( const char* filename, bool createMips = true ) = 0;
-		virtual std::shared_ptr< Texture > CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormatType format, bool createMips = true ) = 0;
+		virtual Texture*		CreateTextureFromFile( const char* filename, bool createMips = true ) = 0;
+		virtual Texture*		CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormatType format, bool createMips = true ) = 0;
+		virtual Texture*		CreateTextureCube( UINT width, UINT height, ImageFormatType format ) = 0;
 
-		virtual void*		GetTexturePixels( std::shared_ptr< Texture > texture ) = 0;
+		virtual void*			GetTexturePixels( Texture* texture ) = 0;
 	
 		// Special Rendering.
 		//
-		Mesh*				CreateRenderTargetQuad( std::shared_ptr< VertexLayout > layout );
-		Mesh*				CreateGUIQuad( std::shared_ptr< VertexLayout > layout );
+		virtual RenderTexture*	CreateBackbuffer() = 0;
+		virtual RenderTexture*	CreateRenderTexture( Texture* texture ) = 0;
+		virtual DepthStencil*	CreateDepthStencil( UINT width, UINT height ) = 0;
+		virtual BlendState*		CreateBlendState( BlendType srcBlendColor = BLEND_SRC_ALPHA, BlendType dstBlendColor = BLEND_ONE_MINUS_SRC_ALPHA, 
+											      BlendType srcBlendAlpha = BLEND_SRC_ALPHA, BlendType dstBlendAlpha = BLEND_ONE_MINUS_SRC_ALPHA,
+											      BlendFuncType blendFuncColor = BLEND_FUNC_ADD, BlendFuncType blendFuncAlpha = BLEND_FUNC_ADD ) = 0;
 
-		virtual UINT		CreateBackbuffer() = 0;
-		virtual UINT		CreateRenderTarget( std::shared_ptr< Texture > texture ) = 0;
-		virtual UINT		CreateDepthStencil( UINT width, UINT height ) = 0;
-		virtual BlendState* CreateBlendState( BlendType srcBlendColor = BLEND_SRC_ALPHA, BlendType dstBlendColor = BLEND_ONE_MINUS_SRC_ALPHA, 
-											  BlendType srcBlendAlpha = BLEND_SRC_ALPHA, BlendType dstBlendAlpha = BLEND_ONE_MINUS_SRC_ALPHA,
-											  BlendFuncType blendFuncColor = BLEND_FUNC_ADD, BlendFuncType blendFuncAlpha = BLEND_FUNC_ADD ) = 0;
+		virtual UINT			ResizeBuffers( UINT width, UINT height ) = 0;
 
-		virtual UINT		ResizeBuffers( UINT width, UINT height ) = 0;
+		virtual void			SetRenderType( RenderType type ) = 0;
+		virtual void			SetRenderTexture( RenderTexture* target ) = 0;
+		virtual void			SetDepthStencil( DepthStencil* stencil ) = 0;
+		virtual void			SetBlendState( BlendState* blend ) = 0;
 
-		virtual void		SetRenderType( RenderType type ) = 0;
-		virtual void		SetRenderTarget( UINT target ) = 0;
-		virtual void		SetDepthStencil( UINT stencil ) = 0;
-		virtual void		SetBlendState( std::shared_ptr< BlendState > blend ) = 0;
-
-		virtual void		SetDepthStencilType( DepthType state ) = 0;
-		virtual void		SetViewport( int x, int y, UINT width, UINT height ) = 0;
-		virtual UINT		SetCull( CullType type ) = 0;
-		virtual UINT		SetFill( FillType type ) = 0;
+		virtual void			SetDepthStencilType( DepthType state ) = 0;
+		virtual void			SetViewport( int x, int y, UINT width, UINT height ) = 0;
+		virtual UINT			SetCull( CullType type ) = 0;
+		virtual UINT			SetFill( FillType type ) = 0;
 
 		// Shaders.
 		//
-		virtual std::shared_ptr< Shader > CreateShaderFromFile( const char* filename ) = 0;
-		virtual std::shared_ptr< Shader > CreateShaderFromMemory( const char* source ) = 0;
+		virtual Shader*			CreateShaderFromFile( const char* filename ) = 0;
+		virtual Shader*			CreateShaderFromMemory( const char* source ) = 0;
 
-		virtual void		SetShader( const std::shared_ptr< Shader >& shader ) = 0;
+		void					SetShader( Shader* shader );
+		Shader*					GetShader();
+		void					LockShader();
+		void					UnlockShader();
 
 		// Vertex Layout.
 		//
-		virtual std::shared_ptr< VertexLayout > CreateVertexLayout( const std::vector< AttributeType >& attrib ) = 0;
+		virtual VertexLayout*	CreateVertexLayout( const std::vector< AttributeType >& attrib ) = 0;
 
-		virtual void		SetVertexLayout( std::shared_ptr< VertexLayout > vertexLayout ) = 0;
+		virtual void			SetVertexLayout( VertexLayout* vertexLayout ) = 0;
 
 		// Rendering.
 		//
-		virtual void		Clear( float* color ) = 0;
-		virtual void		DrawIndexed( UINT count, UINT startIndex, UINT baseVertex ) = 0;
-		virtual void		Present() = 0;
+		virtual void			Clear( float* color ) = 0;
+		virtual void			DrawIndexed( UINT count, UINT startIndex, UINT baseVertex ) = 0;
+		virtual void			Present() = 0;
 	};
 
 	////////////////////////////////////////////////////////////////////

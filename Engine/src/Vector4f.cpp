@@ -130,6 +130,16 @@ namespace Sentinel
 		return Vector4f( x*v.x, y*v.y, z*v.z, w*v.w );
 	}
 
+	Vector4f Vector4f::Min( const Vector4f& v ) const
+	{
+		return Vector4f( std::min( x, v.x ), std::min( y, v.y ), std::min( z, v.z ), std::min( w, v.w ));
+	}
+
+	Vector4f Vector4f::Max( const Vector4f& v ) const
+	{
+		return Vector4f( std::max( x, v.x ), std::max( y, v.y ), std::max( z, v.z ), std::max( w, v.w ));
+	}
+
 	float Vector4f::Length() const
 	{
 		return sqrt( LengthSquared() );

@@ -143,7 +143,8 @@ namespace Sentinel
 		void Save( Archive&				archive,
 				   Renderer*			renderer, 
 				   ShaderManager*		shaderManager, 
-				   TextureManager*		textureManager )
+				   TextureManager*		textureManager,
+				   MaterialManager*		materialManager )
 		{
 			// Save the format type.
 			//
@@ -173,7 +174,7 @@ namespace Sentinel
 				archive.Write( &mObject[ x ].mNumMeshes );
 
 				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
-					Mesh::Save( archive, mObject[ x ].mMesh[ y ], renderer, shaderManager, textureManager );
+					Mesh::Save( archive, mObject[ x ].mMesh[ y ], renderer, shaderManager, textureManager, materialManager );
 
 				// Write the keyframes.
 				//
@@ -209,7 +210,8 @@ namespace Sentinel
 		void CreateFromArchive( Archive&			archive,
 								Renderer*			renderer, 
 								ShaderManager*		shaderManager, 
-								TextureManager*		textureManager )
+								TextureManager*		textureManager,
+								MaterialManager*	materialManager )
 		{
 			// Read if the model has weighted vertices.
 			//
@@ -238,7 +240,7 @@ namespace Sentinel
 				mObject[ x ].mMesh = new Mesh*[ mObject[ x ].mNumMeshes ];
 
 				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
-					mObject[ x ].mMesh[ y ] = Mesh::Load( archive, renderer, shaderManager, textureManager );
+					mObject[ x ].mMesh[ y ] = Mesh::Load( archive, renderer, shaderManager, textureManager, materialManager );
 
 				// Read the keyframes.
 				//
@@ -266,7 +268,8 @@ namespace Sentinel
 		bool CreateFromFile( const char*		filename, 
 							 Renderer*			renderer, 
 							 ShaderManager*		shaderManager, 
-							 TextureManager*	textureManager )
+							 TextureManager*	textureManager,
+							 MaterialManager*	materialManager )
 		{
 			Vertex*    vertices  = NULL;
 			Vector3f*  normals   = NULL;
@@ -638,7 +641,7 @@ namespace Sentinel
 				std::string name;
 				archive.Read( &name );
 				
-				material->mTexture[ type ] = textureManager->Add( name, renderer->CreateTextureFromFile( name.c_str() ));
+				material->mTexture[ type ] = textureManager->Add( name, std::shared_ptr< Texture >(renderer->CreateTextureFromFile( name.c_str() )));
 			}
 		}
 
@@ -765,11 +768,12 @@ namespace Sentinel
 	Model* LoadModelM3DFromFile( const char*		filename, 
 								 Renderer*			renderer, 
 								 ShaderManager*		shaderManager, 
-								 TextureManager*	textureManager )
+								 TextureManager*	textureManager,
+								 MaterialManager*	materialManager )
 	{
 		ModelM3D* model = new ModelM3D();
 
-		model->CreateFromFile( filename, renderer, shaderManager, textureManager );
+		model->CreateFromFile( filename, renderer, shaderManager, textureManager, materialManager );
 
 		return model;
 	}
@@ -777,11 +781,12 @@ namespace Sentinel
 	Model* LoadModelM3DFromArchive( Archive&			archive,
 									Renderer*			renderer, 
 									ShaderManager*		shaderManager, 
-									TextureManager*		textureManager )
+									TextureManager*		textureManager,
+									MaterialManager*	materialManager )
 	{
 		ModelM3D* model = new ModelM3D();
 
-		model->CreateFromArchive( archive, renderer, shaderManager, textureManager );
+		model->CreateFromArchive( archive, renderer, shaderManager, textureManager, materialManager );
 
 		return model;
 	}

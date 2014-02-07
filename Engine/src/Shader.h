@@ -43,8 +43,12 @@ namespace Sentinel
 		UNIFORM_SPECULAR,
 		UNIFORM_SPEC_COMP,
 		UNIFORM_LIGHT_POS,
+		UNIFORM_LIGHT_DIR,
 		UNIFORM_LIGHT_COLOR,
 		UNIFORM_LIGHT_ATTN,
+		UNIFORM_LIGHT_MATRIX,
+		UNIFORM_LIGHT_CUBE_MATRIX,
+		UNIFORM_LIGHT_TEXTURE_CUBE,
 		UNIFORM_CAMERA_POS,
 		UNIFORM_BONES,
 		UNIFORM_DELTA_TIME,
@@ -74,8 +78,6 @@ namespace Sentinel
 
 		std::shared_ptr< VertexLayout > mLayout;
 
-		UINT			mVertexSize;
-
 		Sampler**		mSampler;
 		UINT			mNumSamplers;
 
@@ -96,12 +98,13 @@ namespace Sentinel
 
 		////////////////////////////////////
 		
-		virtual void	SetFloat( UINT uniform, float data ) = 0;
-		virtual void	SetFloat2( UINT uniform, float* data ) = 0;
-		virtual void	SetFloat3( UINT uniform, float* data ) = 0;
-		virtual void	SetFloat4( UINT uniform, float* data ) = 0;
-		virtual void	SetMatrix( UINT uniform, float* data ) = 0;
+		virtual void	SetFloat( UINT uniform, float* data, UINT count = 1 ) = 0;
+		virtual void	SetFloat2( UINT uniform, float* data, UINT count = 1 ) = 0;
+		virtual void	SetFloat3( UINT uniform, float* data, UINT count = 1 ) = 0;
+		virtual void	SetFloat4( UINT uniform, float* data, UINT count = 1 ) = 0;
+		virtual void	SetMatrix( UINT uniform, float* data, UINT count = 1 ) = 0;
 		virtual void	SetTexture( UINT uniform, Texture* texture ) = 0;
+		virtual void	SetTextureCube( UINT uniform, Texture* texture ) = 0;
 
 		virtual void	SetSampler( UINT index, SamplerMode modeU, SamplerMode modeV, 
 									SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter = NUM_FILTERS ) = 0;

@@ -1677,4 +1677,35 @@ namespace Sentinel
 
 		return mesh;
 	}
+
+	// Helper functions to build quads for both
+	// RenderTextures and GUIs.
+	//
+	Mesh* MeshBuilder::BuildRenderTextureMesh( Renderer* renderer, std::shared_ptr< VertexLayout > layout )
+	{
+		MeshBuilder builder;
+
+		builder.CreateQuad( 1.0f );
+		builder.mLayout = layout;
+
+		Mesh* mesh = builder.BuildMesh( renderer );
+		
+		return mesh;
+	}
+
+	Mesh* MeshBuilder::BuildGUIMesh( Renderer* renderer, std::shared_ptr< VertexLayout > layout )
+	{
+		MeshBuilder builder;
+
+		builder.CreateQuad( 0.5f, Vector3f( 0, 0, -1 ));
+		builder.mLayout = layout;
+
+		Matrix4f matTrans;
+		matTrans.Translate( Vector3f( 0.5f, 0.5f, 0 ));
+		builder.ApplyMatrix( matTrans );
+
+		Mesh* mesh = builder.BuildMesh( renderer );
+		
+		return mesh;
+	}
 }

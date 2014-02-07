@@ -22,6 +22,7 @@ namespace Sentinel
 	class Archive;
 	class ShaderManager;
 	class TextureManager;
+	class MaterialManager;
 	class VertexLayout;
 	class Material;
 
@@ -57,15 +58,17 @@ namespace Sentinel
 
 		//////////////////////////////
 
-		static void  Save( Archive&			archive, 
-						   Mesh*			mesh,
-						   Renderer*		renderer, 
-						   ShaderManager*	shaderManager, 
-						   TextureManager*	textureManager );
+		static void  Save( Archive&				archive, 
+						   Mesh*				mesh,
+						   Renderer*			renderer, 
+						   ShaderManager*		shaderManager, 
+						   TextureManager*		textureManager,
+						   MaterialManager*		materialManager );
 
-		static Mesh* Load( Archive&			archive, 
-						   Renderer*		renderer, 
-						   ShaderManager*	shaderManager, 
-						   TextureManager*	textureManager );
+		static Mesh* Load( Archive&				archive, 
+						   Renderer*			renderer, 
+						   ShaderManager*		shaderManager, 
+						   TextureManager*		textureManager,
+						   MaterialManager*		materialManager );
 	};
 }

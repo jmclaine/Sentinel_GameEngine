@@ -118,7 +118,7 @@ namespace Sentinel
 			const char* pFile = pDef->Attribute( "FileName" );
 			const char* pName = pDef->Attribute( "Name" );
 
-			std::shared_ptr< Shader > shader = shaderManager->Add( pName, renderer->CreateShaderFromFile( pFile ));
+			std::shared_ptr< Shader > shader( shaderManager->Add( pName, std::shared_ptr< Shader >(renderer->CreateShaderFromFile( pFile ))));
 
 			if( !shader )
 			{

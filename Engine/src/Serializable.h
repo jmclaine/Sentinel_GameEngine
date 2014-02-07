@@ -14,13 +14,25 @@ namespace Sentinel
 #define DECLARE_SERIAL_REGISTER()\
 	static SerialRegister SERIAL_REGISTER;
 
+#define DECLARE_SERIAL_CLONE()\
+	static Serializable* Clone();
+
+#define DECLARE_SERIAL_SAVE()\
+	void Save( Archive& archive );
+
+#define DECLARE_SERIAL_LOAD()\
+	void Load( Archive& archive );
+
+#define DECLARE_SERIAL_ARCHIVE()\
+	DECLARE_SERIAL_SAVE();\
+	DECLARE_SERIAL_LOAD();
+
 #define DECLARE_SERIAL()\
 	private:\
 		DECLARE_SERIAL_REGISTER();\
-		static Serializable* Clone();\
+		DECLARE_SERIAL_CLONE();\
 	public:\
-		void Save( Archive& archive );\
-		void Load( Archive& archive );
+		DECLARE_SERIAL_ARCHIVE();
 
 #define DECLARE_SERIAL_REGISTER_SAVE()\
 	void SerialSave( Archive& archive )
@@ -70,7 +82,8 @@ namespace Sentinel
 	// exported. In some cases, pointers need specific
 	// functions in order to be initialized correctly.
 	//
-	// Load() should be the inverse of Save()
+	// Load() reads the data required for the object's
+	// initialization.
 	//
 	class Serializable
 	{

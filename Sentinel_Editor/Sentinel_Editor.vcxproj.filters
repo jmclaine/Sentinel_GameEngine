@@ -29,34 +29,43 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="config.xml" />
-    <None Include="Assets\Shaders\colnorm.xsh">
+    <None Include="Assets\Shaders\Color_Lit.xsh">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Assets\Shaders\color.xsh">
+    <None Include="Assets\Shaders\Color_Only.xsh">
       <Filter>Shaders</Filter>
     </None>
     <None Include="Assets\Shaders\config.xml">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Assets\Shaders\gui.xsh">
+    <None Include="Assets\Shaders\GUI.xsh">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Assets\Shaders\normmap.xsh">
+    <None Include="Assets\Shaders\GUI_Mesh.xsh">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Assets\Shaders\RTnormal.xsh">
+    <None Include="Assets\Shaders\Line.xsh">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Assets\Shaders\sprite.xsh">
+    <None Include="Assets\Shaders\Normal_Map.xsh">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Assets\Shaders\texture.xsh">
+    <None Include="Assets\Shaders\Sprite.xsh">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Assets\Shaders\guimesh.xsh">
+    <None Include="Assets\Shaders\Texture_Lit.xsh">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Assets\Shaders\line.xsh">
+    <None Include="Assets\Shaders\RT_Cube_Depth.xsh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\RT_Color.xsh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\Color_Lit_Shadow.xsh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\Texture_Lit_Shadow.xsh">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

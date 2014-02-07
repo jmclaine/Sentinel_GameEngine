@@ -523,17 +523,26 @@ namespace Sentinel
 		}
 	}
 
-	bool BoundingSphere::Intersects( const Vector3f& point )
+	bool BoundingSphere::Intersects( const Vector3f& point ) const
 	{
 		return (point - mCenter).LengthSquared() < (mRadius * mRadius);
 	}
 
-	bool BoundingSphere::Intersects( const BoundingSphere& sphere )
+	bool BoundingSphere::Intersects( const BoundingSphere& sphere ) const
 	{
 		float d = (mCenter - sphere.mCenter).LengthSquared();
 		float r = (mRadius + sphere.mRadius);
 
 		return (d < r*r);
+	}
+
+	bool BoundingSphere::Intersects( const BoundingBox& box ) const
+	{
+		Vector3f closestPointInAabb = mCenter.Max( box.GetMinBounds() ).Min( box.GetMaxBounds() );
+
+		float distanceSquared = (closestPointInAabb - mCenter).LengthSquared();
+
+		return distanceSquared < (mRadius * mRadius);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -668,5 +677,10 @@ namespace Sentinel
 			(*intersection) = ray.mPosition + ray.mDirection * tmin;
 
 		return tmax >= std::max(0.0f, tmin);// && tmin < tmax;
+	}
+
+	bool BoundingBox::Intersects( const BoundingSphere& sphere ) const
+	{
+		return sphere.Intersects( *this );
 	}
 }

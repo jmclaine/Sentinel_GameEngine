@@ -43,10 +43,12 @@ namespace Sentinel
 
 		static void			Save( Archive&			archive, 
 								  Material*			material,
+								  Renderer*			renderer,
 								  ShaderManager*	shaderManager,
 								  TextureManager*	textureManager );
 
 		static Material*	Load( Archive&			archive,
+								  Renderer*			renderer,
 								  ShaderManager*	shaderManager,
 								  TextureManager*	textureManager );
 	};

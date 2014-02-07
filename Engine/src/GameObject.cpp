@@ -205,7 +205,8 @@ namespace Sentinel
 	{
 		TRAVERSE_VECTOR( x, mComponent )
 		{
-			if( mComponent[ x ]->GetType() != GameComponent::CAMERA )
+			if( mComponent[ x ]->GetType() != GameComponent::CAMERA &&
+				mComponent[ x ]->GetType() != GameComponent::LIGHT )
 				mComponent[ x ]->Update();
 		}
 

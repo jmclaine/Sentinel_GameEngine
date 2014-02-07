@@ -73,7 +73,8 @@ namespace Sentinel
 		static Model*	Load( const char*		filename, 
 							  Renderer*			renderer, 
 							  ShaderManager*	shaderManager, 
-							  TextureManager*	textureManager );
+							  TextureManager*	textureManager,
+							  MaterialManager*	materialManager );
 		
 		// The Archive format is specifically created to make 
 		// the model files easy to save and load for the engine.
@@ -81,12 +82,14 @@ namespace Sentinel
 		virtual void	Save( Archive&			archive,
 							  Renderer*			renderer, 
 							  ShaderManager*	shaderManager, 
-							  TextureManager*	textureManager ) = 0;
+							  TextureManager*	textureManager,
+							  MaterialManager*	materialManager ) = 0;
 
 		static Model*	Load( Archive&			archive,
 							  Renderer*			renderer, 
 							  ShaderManager*	shaderManager, 
-							  TextureManager*	textureManager );
+							  TextureManager*	textureManager,
+							  MaterialManager*	materialManager );
 
 		/////////////////////////////////////
 
@@ -109,13 +112,15 @@ namespace Sentinel
 										const char*			filename, 
 										Renderer*			renderer, 
 										ShaderManager*		shaderManager,
-										TextureManager*		textureManager );
+										TextureManager*		textureManager,
+										MaterialManager*	materialManager );
 
 	extern SENTINEL_DLL Model* LoadModelM3DFromFile( 
 										const char*			filename, 
 										Renderer*			renderer, 
 										ShaderManager*		shaderManager,
-										TextureManager*		textureManager );
+										TextureManager*		textureManager,
+										MaterialManager*	materialManager );
 
 	// The Archive format is different than the native file format.
 	// It is designed specifically to be read quickly and easily
@@ -129,11 +134,13 @@ namespace Sentinel
 										Archive&			archive,
 										Renderer*			renderer, 
 										ShaderManager*		shaderManager,
-										TextureManager*		textureManager );
+										TextureManager*		textureManager,
+										MaterialManager*	materialManager );
 
 	extern SENTINEL_DLL Model* LoadModelM3DFromArchive( 
 										Archive&			archive,
 										Renderer*			renderer, 
 										ShaderManager*		shaderManager,
-										TextureManager*		textureManager );
+										TextureManager*		textureManager,
+										MaterialManager*	materialManager );
 }

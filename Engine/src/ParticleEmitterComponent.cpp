@@ -76,7 +76,9 @@ namespace Sentinel
 
 		mParticleSystem = (ParticleSystem*)SerialRegister::Load( archive );
 
-		mParticleSystem->Set( mOwner->mWorld->mRenderer, mOwner->mWorld );
+		GameWorld* world = mOwner->GetWorld();
+
+		mParticleSystem->Set( world->mRenderer, world );
 
 		mParticleSystem->Load( archive );
 	}

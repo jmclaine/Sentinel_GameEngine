@@ -12,11 +12,15 @@ namespace Sentinel
 	{
 	protected:
 
-		TransformComponent*		mTransform;
+		TransformComponent* mTransform;
 
-		BoundingBox				mBounds;
+		BoundingBox		mBounds;
 
-		/////////////////////////////
+	public:
+
+		bool			mIsDynamic;
+
+	protected:
 
 		DrawableComponent();
 

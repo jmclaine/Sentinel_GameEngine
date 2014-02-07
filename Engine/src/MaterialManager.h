@@ -6,6 +6,7 @@
 namespace Sentinel
 {
 	class Archive;
+	class Renderer;
 	class ShaderManager;
 	class TextureManager;
 
@@ -18,11 +19,13 @@ namespace Sentinel
 
 		/////////////////////////////////
 
-		void Save( Archive&			archive, 
+		void Save( Archive&			archive,
+				   Renderer*		renderer,
 				   ShaderManager*	shaderManager, 
 				   TextureManager*	textureManager );
 
-		void Load( Archive&			archive, 
+		void Load( Archive&			archive,
+				   Renderer*		renderer,
 				   ShaderManager*	shaderManager, 
 				   TextureManager*	textureManager );
 	};

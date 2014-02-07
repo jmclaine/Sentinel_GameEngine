@@ -65,7 +65,7 @@ namespace Sentinel
 		Matrix4f	Inverse() const;
 
 		void		ProjectionOrthographic( float windowWidth, float windowHeight );
-		void		ProjectionPerspective( float windowWidth, float windowHeight, float nearZ = 0.1f, float farZ = 10000.0f, float FOV = 45.0f );
+		void		ProjectionPerspective( float windowWidth, float windowHeight, float nearZ = 0.3f, float farZ = 1000.0f, float FOV = 60.0f );
 
 		void		World( const Vector3f& position, const Quatf& orientation, const Vector3f& scale );
 		void		World( const Vector2f& position, float degrees, const Vector2f& scale );

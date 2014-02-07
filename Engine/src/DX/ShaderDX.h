@@ -85,22 +85,23 @@ namespace Sentinel
 
 	public:
 
-		void SetFloat( UINT uniform, float data );
-		void SetFloat2( UINT uniform, float* data );
-		void SetFloat3( UINT uniform, float* data );
-		void SetFloat4( UINT uniform, float* data );
-		void SetMatrix( UINT uniform, float* data );
-		void SetTexture( UINT uniform, Texture* texture );
+		void		SetFloat( UINT uniform, float* data, UINT count = 1 );
+		void		SetFloat2( UINT uniform, float* data, UINT count = 1 );
+		void		SetFloat3( UINT uniform, float* data, UINT count = 1 );
+		void		SetFloat4( UINT uniform, float* data, UINT count = 1 );
+		void		SetMatrix( UINT uniform, float* data, UINT count = 1 );
+		void		SetTexture( UINT uniform, Texture* texture );
+		void		SetTextureCube( UINT uniform, Texture* texture );
 
-		void SetSampler( UINT index, 
-						 SamplerMode modeU, SamplerMode modeV, 
-						 SamplerFilter minFilter, 
-						 SamplerFilter magFilter, 
-						 SamplerFilter mipFilter );
+		void		SetSampler( UINT index, 
+								SamplerMode modeU, SamplerMode modeV, 
+								SamplerFilter minFilter, 
+								SamplerFilter magFilter, 
+								SamplerFilter mipFilter );
 
 		///////////////////////////////////
 
-		void Enable();
-		void Disable();
+		void		Enable();
+		void		Disable();
 	};
 }

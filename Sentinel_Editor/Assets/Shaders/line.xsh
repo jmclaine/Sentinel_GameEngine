@@ -83,7 +83,7 @@ void main()
 	vec3 dir = normalize(line01);
 
 	// scale to correct window aspect ratio
-	//vec3 ratio = vec3(RenderTargetSize.y, RenderTargetSize.x, 0);
+	//vec3 ratio = vec3(RenderTextureSize.y, RenderTextureSize.x, 0);
 	//vec3 ratio = vec3(1440.0, 900.0, 0.0);
 	//ratio = normalize(ratio);
 

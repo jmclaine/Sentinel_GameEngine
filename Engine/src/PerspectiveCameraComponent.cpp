@@ -39,7 +39,7 @@ namespace Sentinel
 
 	void PerspectiveCameraComponent::Update()
 	{
-		CameraComponent::Update();
+		//CameraComponent::Update();
 
 		mMatrixView.Rotate( mTransform->mOrientation );
 		mLookAt = mTransform->mPosition + mMatrixView.Forward();
@@ -109,11 +109,8 @@ namespace Sentinel
 	{
 		const Matrix4f& mat = GetTransform()->GetMatrixWorld();
 
-		Vector3f right = mat.Right();
-		Vector3f up    = mat.Up();
-		Vector3f dir   = mat.Forward();
-
 		Vector3f pos = GetTransform()->mPosition;
+		Vector3f dir = mat.Forward();
 
 		nearCenter = pos + dir * NearZ();
 		farCenter  = pos + dir * FarZ();

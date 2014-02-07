@@ -134,6 +134,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
     <ClInclude Include="..\Engine\src\PhysicsShape.h" />
     <ClInclude Include="..\Engine\src\PhysicsShapeComponent.h" />
     <ClInclude Include="..\Engine\src\PhysicsRigidBodyComponent.h" />
+    <ClInclude Include="..\Engine\src\PointLightComponent.h" />
     <ClInclude Include="..\Engine\src\Tokenizer.h" />
     <ClInclude Include="..\Engine\src\VertexLayout.h" />
     <ClInclude Include="..\Engine\src\WidgetComponent.h" />
@@ -239,6 +240,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
     <ClCompile Include="..\Engine\src\ParticleSystemNormal.cpp" />
     <ClCompile Include="..\Engine\src\PhysicsShape.cpp" />
     <ClCompile Include="..\Engine\src\PhysicsSystem.cpp" />
+    <ClCompile Include="..\Engine\src\PointLightComponent.cpp" />
     <ClCompile Include="..\Engine\src\SoundManager.cpp" />
     <ClCompile Include="..\Engine\src\Sound.cpp" />
     <ClCompile Include="..\Engine\src\AudioSystemAL.cpp" />

@@ -85,6 +85,9 @@
     <Filter Include="Source Files\Sentinel_Engine\Systems\Renderer\DX">
       <UniqueIdentifier>{0a3b4c92-7da0-4063-9807-b09ac32eaab0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Sentinel_Engine\Components\Light">
+      <UniqueIdentifier>{c3adc59e-9b08-4e4a-b114-5bc655c66a7f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Engine\src\Texture.h">
@@ -154,9 +157,6 @@
       <Filter>Source Files\Sentinel_Engine\Components\View</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\CameraComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\View</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\LightComponent.h">
       <Filter>Source Files\Sentinel_Engine\Components\View</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\DrawableComponent.h">
@@ -399,6 +399,12 @@
     <ClInclude Include="..\Engine\src\Material.h">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\src\PointLightComponent.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\LightComponent.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Light</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\Shader.cpp">
@@ -471,9 +477,6 @@
       <Filter>Source Files\Sentinel_Engine\Components\View</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\PerspectiveCameraComponent.cpp">
-      <Filter>Source Files\Sentinel_Engine\Components\View</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\LightComponent.cpp">
       <Filter>Source Files\Sentinel_Engine\Components\View</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\DrawableComponent.cpp">
@@ -742,6 +745,12 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\MaterialManager.cpp">
       <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\PointLightComponent.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\LightComponent.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components\Light</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

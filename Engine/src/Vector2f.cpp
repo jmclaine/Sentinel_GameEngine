@@ -126,6 +126,16 @@ namespace Sentinel
 		return Vector2f( x*v.x, y*v.y );
 	}
 
+	Vector2f Vector2f::Min( const Vector2f& v ) const
+	{
+		return Vector2f( std::min( x, v.x ), std::min( y, v.y ));
+	}
+
+	Vector2f Vector2f::Max( const Vector2f& v ) const
+	{
+		return Vector2f( std::max( x, v.x ), std::max( y, v.y ));
+	}
+
 	float Vector2f::Length() const
 	{
 		return sqrt( LengthSquared() );

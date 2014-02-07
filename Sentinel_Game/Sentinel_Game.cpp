@@ -29,6 +29,7 @@ upon compilation / linking.
 
 #include "TextureManager.h"
 #include "ShaderManager.h"
+#include "MaterialManager.h"
 #include "SpriteManager.h"
 #include "MeshManager.h"
 #include "ModelManager.h"
@@ -132,8 +133,9 @@ public:
 		mGameWorld->mPhysicsSystem		= BuildPhysicsSystemBT();
 		mGameWorld->mAudioSystem		= BuildAudioSystemAL();
 		
-		mGameWorld->mTextureManager		= new TextureManager();
+		mGameWorld->mTextureManager		= new TextureManager( mRenderer );
 		mGameWorld->mShaderManager		= new ShaderManager();
+		mGameWorld->mMaterialManager	= new MaterialManager();
 		mGameWorld->mSpriteManager		= new SpriteManager();
 		mGameWorld->mMeshManager		= new MeshManager();
 		mGameWorld->mModelManager		= new ModelManager();
@@ -148,8 +150,8 @@ public:
 		mGameWorld->mTextureManager->Load( archive, mRenderer );
 		mGameWorld->mShaderManager->Load( archive, mRenderer );
 		mGameWorld->mSpriteManager->Load( archive );
-		mGameWorld->mMeshManager->Load( archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager );
-		mGameWorld->mModelManager->Load( archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager );
+		mGameWorld->mMeshManager->Load( archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager, mGameWorld->mMaterialManager );
+		mGameWorld->mModelManager->Load( archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager, mGameWorld->mMaterialManager );
 		mGameWorld->mSoundManager->Load( archive, mGameWorld->mAudioSystem );
 
 		mGameWorld->mSpriteSystem = new SpriteSystem( mRenderer, mGameWorld->mShaderManager->Get( "GUI" )->Layout(), 256 );
@@ -211,7 +213,7 @@ public:
 				mRenderer->SetViewport( ((int)width - (int)Renderer::WINDOW_WIDTH_BASE) >> 1, ((int)height - (int)Renderer::WINDOW_HEIGHT_BASE) >> 1, 
 										Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE );
 				mRenderer->SetDepthStencil( 0 );
-				mRenderer->SetRenderTarget( 0 );
+				mRenderer->SetRenderTexture( 0 );
 
 				mRenderer->Clear( color );
 

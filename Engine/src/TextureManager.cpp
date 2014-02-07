@@ -6,8 +6,11 @@
 
 namespace Sentinel
 {
-	TextureManager::TextureManager()
-	{}
+	TextureManager::TextureManager( Renderer* renderer )
+	{
+		Add( "NULL_TEXTURE", renderer->NULL_TEXTURE );
+		Add( "BASE_TEXTURE", renderer->BASE_TEXTURE );
+	}
 
 	TextureManager::~TextureManager()
 	{}
@@ -35,7 +38,7 @@ namespace Sentinel
 
 			// Store the texture file in place.
 			//
-			BYTE* pixels = (BYTE*)renderer->GetTexturePixels( texture );
+			BYTE* pixels = (BYTE*)renderer->GetTexturePixels( texture.get() );
 
 			if( !pixels )
 				throw std::exception( "Failed to GetTexturePixels." );
@@ -92,7 +95,7 @@ namespace Sentinel
 
 			// Create the texture resource.
 			//
-			std::shared_ptr< Texture > texture = renderer->CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA );
+			std::shared_ptr< Texture > texture( renderer->CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA ));
 			
 			delete[] comp_pixels;
 			delete[] pixels;

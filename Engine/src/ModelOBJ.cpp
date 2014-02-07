@@ -40,10 +40,11 @@ namespace Sentinel
 			Release();
 		}
 
-		void Save( Archive&			archive,
-				   Renderer*		renderer, 
-				   ShaderManager*	shaderManager, 
-				   TextureManager*	textureManager )
+		void Save( Archive&				archive,
+				   Renderer*			renderer, 
+				   ShaderManager*		shaderManager, 
+				   TextureManager*		textureManager,
+				   MaterialManager*		materialManager )
 		{
 			// Save the format type.
 			//
@@ -55,13 +56,14 @@ namespace Sentinel
 			archive.Write( &mNumMeshes );
 
 			for( UINT x = 0; x < mNumMeshes; ++x )
-				Mesh::Save( archive, mMesh[ x ], renderer, shaderManager, textureManager );
+				Mesh::Save( archive, mMesh[ x ], renderer, shaderManager, textureManager, materialManager );
 		}
 
 		void Create( Archive&			archive,
 					 Renderer*			renderer, 
 					 ShaderManager*		shaderManager, 
-					 TextureManager*	textureManager )
+					 TextureManager*	textureManager,
+					 MaterialManager*	materialManager )
 		{
 			// Load each mesh.
 			//
@@ -70,13 +72,14 @@ namespace Sentinel
 			mMesh = new Mesh*[ mNumMeshes ];
 
 			for( UINT x = 0; x < mNumMeshes; ++x )
-				mMesh[ x ] = Mesh::Load( archive, renderer, shaderManager, textureManager );
+				mMesh[ x ] = Mesh::Load( archive, renderer, shaderManager, textureManager, materialManager );
 		}
 
 		bool Create( const char*		filename, 
 					 Renderer*			renderer, 
 					 ShaderManager*		shaderManager, 
-					 TextureManager*	textureManager )
+					 TextureManager*	textureManager,
+					 MaterialManager*	materialManager )
 		{
 			// Model data.
 			// OBJ files start with the first index as 1,
@@ -211,7 +214,8 @@ namespace Sentinel
 									{
 										mtlParsehelper >> mtlToken;
 
-										std::shared_ptr< Texture > texture = textureManager->Add( mtlName, renderer->CreateTextureFromFile( mtlToken.c_str() ));
+										std::shared_ptr< Texture > texture( textureManager->Add( mtlName, std::shared_ptr< Texture >(renderer->CreateTextureFromFile( mtlToken.c_str() ))));
+
 										if( texture.get() == NULL )
 										{
 											REPORT_ERROR( "Failed to load image '" << mtlToken << "'", "Load Model Error" );
@@ -421,11 +425,12 @@ namespace Sentinel
 	Model* LoadModelOBJFromFile( const char*		filename, 
 								 Renderer*			renderer, 
 								 ShaderManager*		shaderManager, 
-								 TextureManager*	textureManager )
+								 TextureManager*	textureManager,
+								 MaterialManager*	materialManager )
 	{
 		ModelOBJ* model = new ModelOBJ();
 
-		model->Create( filename, renderer, shaderManager, textureManager );
+		model->Create( filename, renderer, shaderManager, textureManager, materialManager );
 
 		return model;
 	}
@@ -433,11 +438,12 @@ namespace Sentinel
 	Model* LoadModelOBJFromArchive( Archive&			archive,
 									Renderer*			renderer, 
 									ShaderManager*		shaderManager, 
-									TextureManager*		textureManager )
+									TextureManager*		textureManager,
+									MaterialManager*	materialManager )
 	{
 		ModelOBJ* model = new ModelOBJ();
 
-		model->Create( archive, renderer, shaderManager, textureManager );
+		model->Create( archive, renderer, shaderManager, textureManager, materialManager );
 
 		return model;
 	}

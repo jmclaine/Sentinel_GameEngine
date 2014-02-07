@@ -121,6 +121,12 @@ namespace Sentinel
 
 	#define INTERP( start, end, alpha ) ((start) + ((end) - (start)) * (alpha))
 
+	template< class T >
+	std::shared_ptr< T > SHARED( T* ptr )
+	{
+		return std::shared_ptr< T >(ptr);
+	}
+
 	// djb2 algorithm
 	// Warning: Collisions may be possible
 	//

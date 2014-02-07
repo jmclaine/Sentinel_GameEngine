@@ -2,23 +2,41 @@
 #include "TransformComponent.h"
 #include "GameObject.h"
 #include "Archive.h"
+#include "Texture.h"
+#include "Renderer.h"
 
 namespace Sentinel
 {
-	DEFINE_SERIAL_REGISTER( LightComponent );
-	DEFINE_SERIAL_CLONE( LightComponent );
-
 	LightComponent::LightComponent() :
-		mTransform( NULL ),
-		mAttenuation( Vector4f( 1, 1, 1, 10000 ))
+		mAttenuation( Vector4f( 1, 1, 1, 1000 )),
+		mTexture( NULL ),
+		mRenderTexture( NULL )
 	{
 		mType = GameComponent::LIGHT;
 	}
 
-	const TransformComponent* LightComponent::GetTransform()
+	LightComponent::~LightComponent()
+	{
+		SAFE_DELETE( mTexture );
+		SAFE_DELETE( mRenderTexture );
+	}
+
+	TransformComponent* LightComponent::GetTransform()
 	{
 		return mTransform;
 	}
+
+	Texture* LightComponent::GetTexture()
+	{
+		return mTexture;
+	}
+
+	RenderTexture* LightComponent::GetRenderTexture()
+	{
+		return mRenderTexture;
+	}
+
+	///////////////////////////////////////
 
 	void LightComponent::Startup()
 	{
@@ -36,23 +54,19 @@ namespace Sentinel
 		mTransform = NULL;
 	}
 
-	//////////////////////////////
+	///////////////////////////////////////
 
 	void LightComponent::Save( Archive& archive )
 	{
-		SERIAL_REGISTER.Save( archive );
-
 		GameComponent::Save( archive );
 
-		archive.Write( mColor.Ptr(),		ar_sizeof( mColor ));
-		archive.Write( mAttenuation.Ptr(),	ar_sizeof( mAttenuation ));
+		archive.Write( mColor.Ptr(), ar_sizeof( mColor ));
 	}
 
 	void LightComponent::Load( Archive& archive )
 	{
 		GameComponent::Load( archive );
 
-		archive.Read( mColor.Ptr(),			ar_sizeof( mColor ));
-		archive.Read( mAttenuation.Ptr(),	ar_sizeof( mAttenuation ));
+		archive.Read( mColor.Ptr(), ar_sizeof( mColor ));
 	}
 }

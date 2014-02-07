@@ -76,16 +76,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="Assets\Shaders\colnorm.xsh" />
-    <None Include="Assets\Shaders\color.xsh" />
+    <None Include="Assets\Shaders\Color_Lit.xsh" />
+    <None Include="Assets\Shaders\Color_Lit_Shadow.xsh" />
+    <None Include="Assets\Shaders\Color_Only.xsh" />
     <None Include="Assets\Shaders\config.xml" />
-    <None Include="Assets\Shaders\gui.xsh" />
-    <None Include="Assets\Shaders\guimesh.xsh" />
-    <None Include="Assets\Shaders\line.xsh" />
-    <None Include="Assets\Shaders\normmap.xsh" />
-    <None Include="Assets\Shaders\RTnormal.xsh" />
-    <None Include="Assets\Shaders\sprite.xsh" />
-    <None Include="Assets\Shaders\texture.xsh" />
+    <None Include="Assets\Shaders\GUI.xsh" />
+    <None Include="Assets\Shaders\GUI_Mesh.xsh" />
+    <None Include="Assets\Shaders\Line.xsh" />
+    <None Include="Assets\Shaders\Normal_Map.xsh" />
+    <None Include="Assets\Shaders\RT_Color.xsh" />
+    <None Include="Assets\Shaders\RT_Cube_Depth.xsh" />
+    <None Include="Assets\Shaders\Sprite.xsh" />
+    <None Include="Assets\Shaders\Texture_Lit.xsh" />
+    <None Include="Assets\Shaders\Texture_Lit_Shadow.xsh" />
     <None Include="config.xml">
       <SubType>Designer</SubType>
     </None>

@@ -1,8 +1,6 @@
 #include "Renderer.h"
-#include "Texture.h"
 #include "tinyxml.h"
-#include "MeshBuilder.h"
-#include "Mesh.h"
+#include "Shader.h"
 
 #include <iostream>
 #include <fstream>
@@ -67,6 +65,13 @@ namespace Sentinel
 	UINT Renderer::WINDOW_WIDTH_BASE  = 1920;
 	UINT Renderer::WINDOW_HEIGHT_BASE = 1080;
 
+	Renderer::Renderer() :
+		mIsShaderLocked( false )
+	{}
+
+	Renderer::~Renderer()
+	{}
+
 	Renderer* Renderer::Create( const char* filename, WindowInfo& info )
 	{
 		TiXmlDocument doc;
@@ -96,12 +101,12 @@ namespace Sentinel
 		return renderer;
 	}
 
-	std::shared_ptr< Texture > Renderer::CreateTexture( UINT width, UINT height, ImageFormatType format, bool createMips )
+	Texture* Renderer::CreateTexture( UINT width, UINT height, ImageFormatType format, bool createMips )
 	{
 		return CreateTextureFromMemory( 0, width, height, format, createMips );
 	}
 
-	std::shared_ptr< Texture > Renderer::CreateTextureFromResource( void* data, UINT length )
+	Texture* Renderer::CreateTextureFromResource( void* data, UINT length )
 	{
 		int width, height;
 		int nChannels;
@@ -114,31 +119,31 @@ namespace Sentinel
 		return CreateTextureFromMemory( pixels, (UINT)width, (UINT)height, IMAGE_FORMAT_RGBA );
 	}
 
-	Mesh* Renderer::CreateRenderTargetQuad( std::shared_ptr< VertexLayout > layout )
+	void Renderer::SetShader( Shader* shader )
 	{
-		MeshBuilder builder;
+		if( !mIsShaderLocked )
+		{
+			if( mCurrShader )
+				mCurrShader->Disable();
 
-		builder.CreateQuad( 1.0f );
-		builder.mLayout = layout;
+			mCurrShader = shader;
 
-		Mesh* mesh = builder.BuildMesh( this );
-		
-		return mesh;
+			mCurrShader->Enable();
+		}
 	}
 
-	Mesh* Renderer::CreateGUIQuad( std::shared_ptr< VertexLayout > layout )
+	Shader* Renderer::GetShader()
 	{
-		MeshBuilder builder;
+		return mCurrShader;
+	}
 
-		builder.CreateQuad( 0.5f, Vector3f( 0, 0, -1 ));
-		builder.mLayout = layout;
+	void Renderer::LockShader()
+	{
+		mIsShaderLocked = true;
+	}
 
-		Matrix4f matTrans;
-		matTrans.Translate( Vector3f( 0.5f, 0.5f, 0 ));
-		builder.ApplyMatrix( matTrans );
-
-		Mesh* mesh = builder.BuildMesh( this );
-		
-		return mesh;
+	void Renderer::UnlockShader()
+	{
+		mIsShaderLocked = false;
 	}
 }

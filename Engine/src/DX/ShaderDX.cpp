@@ -117,9 +117,7 @@ namespace Sentinel
 		mPixelShader( NULL ),
 		mConstantBuffer( NULL ),
 		mTextureLevel( 0 )
-	{
-		mVertexSize = 0;
-	}
+	{}
 
 	ShaderDX::~ShaderDX()
 	{
@@ -409,11 +407,20 @@ namespace Sentinel
 			if( CreateUniform( "_LightPos", cbuffer ))
 				mUniform.push_back( UNIFORM_LIGHT_POS );
 
+			if( CreateUniform( "_LightDir", cbuffer ))
+				mUniform.push_back( UNIFORM_LIGHT_DIR );
+
 			if( CreateUniform( "_LightColor", cbuffer ))
 				mUniform.push_back( UNIFORM_LIGHT_COLOR );
 
 			if( CreateUniform( "_LightAttn", cbuffer ))
 				mUniform.push_back( UNIFORM_LIGHT_ATTN );
+
+			if( CreateUniform( "_LightMatrix", cbuffer ))
+				mUniform.push_back( UNIFORM_LIGHT_MATRIX );
+
+			if( CreateUniform( "_LightCubeMatrix", cbuffer ))
+				mUniform.push_back( UNIFORM_LIGHT_CUBE_MATRIX );
 
 			if( CreateUniform( "_CameraPos", cbuffer ))
 				mUniform.push_back( UNIFORM_CAMERA_POS );
@@ -509,27 +516,27 @@ namespace Sentinel
 
 	///////////////////////////////////
 
-	void ShaderDX::SetFloat( UINT uniform, float data )
+	void ShaderDX::SetFloat( UINT uniform, float* data, UINT count )
 	{
 		memcpy( mConstantBufferData + mUniformDX[ uniform ], &data, sizeof( float ));
 	}
 
-	void ShaderDX::SetFloat2( UINT uniform, float* data )
+	void ShaderDX::SetFloat2( UINT uniform, float* data, UINT count )
 	{
 		memcpy( mConstantBufferData + mUniformDX[ uniform ], data, 2 * sizeof( float ));
 	}
 
-	void ShaderDX::SetFloat3( UINT uniform, float* data )
+	void ShaderDX::SetFloat3( UINT uniform, float* data, UINT count )
 	{
 		memcpy( mConstantBufferData + mUniformDX[ uniform ], data, 3 * sizeof( float ));
 	}
 
-	void ShaderDX::SetFloat4( UINT uniform, float* data )
+	void ShaderDX::SetFloat4( UINT uniform, float* data, UINT count )
 	{
 		memcpy( mConstantBufferData + mUniformDX[ uniform ], data, 4 * sizeof( float ));
 	}
 
-	void ShaderDX::SetMatrix( UINT uniform, float* data )
+	void ShaderDX::SetMatrix( UINT uniform, float* data, UINT count )
 	{
 		memcpy( mConstantBufferData + mUniformDX[ uniform ], data, 16 * sizeof( float ));
 	}
@@ -548,6 +555,11 @@ namespace Sentinel
 		}
 
 		++mTextureLevel;
+	}
+
+	void ShaderDX::SetTextureCube( UINT uniform, Texture* texture )
+	{
+		_ASSERT(0); // not implemented
 	}
 
 	void ShaderDX::SetSampler( UINT index, 

@@ -12,7 +12,10 @@ namespace Sentinel
 	{	
 	public:
 
-		TextureManager();
+		// Uses Renderer to store default textures
+		// NULL_TEXTURE and BASE_TEXTURE
+		//
+		TextureManager( Renderer* renderer );
 		~TextureManager();
 
 		/////////////////////////////////

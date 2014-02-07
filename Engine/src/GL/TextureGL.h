@@ -7,15 +7,17 @@ namespace Sentinel
 {
 	class TextureGL : public Texture
 	{
-	public:
+	private:
 
 		GLuint	mID;
 
-		///////////////////////////////////
+	public:
 
-		TextureGL( UINT width, UINT height, GLuint id );
+		TextureGL( UINT width, UINT height, ImageFormatType format, GLuint id );
 		~TextureGL();
 
 		void	Release();
+
+		GLuint	ID();
 	};
 }

@@ -43,6 +43,9 @@ namespace Sentinel
 		Vector4f	operator *  ( const Vector4f& v ) const;
 		Vector4f	Mul( const Vector4f& v ) const;
 
+		Vector4f	Min( const Vector4f& v ) const;
+		Vector4f	Max( const Vector4f& v ) const;
+
 		float		Length() const;
 		float		LengthSquared() const;
 		float		LengthManhattan() const;

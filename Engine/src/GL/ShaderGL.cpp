@@ -284,26 +284,32 @@ namespace Sentinel
 		//
 		UINT numTexture = 0;
 
-		CreateUniform( "_WVP",			UNIFORM_WVP );
-		CreateUniform( "_World",		UNIFORM_WORLD );
-		CreateUniform( "_InvWorld",		UNIFORM_INV_WORLD );
-		CreateUniform( "_View",			UNIFORM_VIEW );
-		CreateUniform( "_InvView",		UNIFORM_INV_VIEW );
-		CreateUniform( "_Proj",			UNIFORM_PROJ );
-		CreateUniform( "_InvProj",		UNIFORM_INV_PROJ );
-		CreateUniform( "_Ambient",		UNIFORM_AMBIENT );
-		CreateUniform( "_Diffuse",		UNIFORM_DIFFUSE );
-		CreateUniform( "_Specular",		UNIFORM_SPECULAR );
-		CreateUniform( "_SpecComp",		UNIFORM_SPEC_COMP );
-		CreateUniform( "_LightPos",		UNIFORM_LIGHT_POS );
-		CreateUniform( "_LightColor",	UNIFORM_LIGHT_COLOR );
-		CreateUniform( "_LightAttn",	UNIFORM_LIGHT_ATTN );
-		CreateUniform( "_CameraPos",	UNIFORM_CAMERA_POS );
-		CreateUniform( "_Bones",		UNIFORM_BONES );
-		CreateUniform( "_DeltaTime",	UNIFORM_DELTA_TIME );
+		CreateUniform( "_WVP",				UNIFORM_WVP );
+		CreateUniform( "_World",			UNIFORM_WORLD );
+		CreateUniform( "_InvWorld",			UNIFORM_INV_WORLD );
+		CreateUniform( "_View",				UNIFORM_VIEW );
+		CreateUniform( "_InvView",			UNIFORM_INV_VIEW );
+		CreateUniform( "_Proj",				UNIFORM_PROJ );
+		CreateUniform( "_InvProj",			UNIFORM_INV_PROJ );
+		CreateUniform( "_Ambient",			UNIFORM_AMBIENT );
+		CreateUniform( "_Diffuse",			UNIFORM_DIFFUSE );
+		CreateUniform( "_Specular",			UNIFORM_SPECULAR );
+		CreateUniform( "_SpecComp",			UNIFORM_SPEC_COMP );
+		CreateUniform( "_LightPos",			UNIFORM_LIGHT_POS );
+		CreateUniform( "_LightDir",			UNIFORM_LIGHT_DIR );
+		CreateUniform( "_LightColor",		UNIFORM_LIGHT_COLOR );
+		CreateUniform( "_LightAttn",		UNIFORM_LIGHT_ATTN );
+		CreateUniform( "_LightMatrix",		UNIFORM_LIGHT_MATRIX );
+		CreateUniform( "_LightCubeMatrix",	UNIFORM_LIGHT_CUBE_MATRIX );
+		CreateUniform( "_CameraPos",		UNIFORM_CAMERA_POS );
+		CreateUniform( "_Bones",			UNIFORM_BONES );
+		CreateUniform( "_DeltaTime",		UNIFORM_DELTA_TIME );
 
 		// Create texture samplers.
 		//
+		if( CreateUniform( "_TextureCube", UNIFORM_LIGHT_TEXTURE_CUBE ))
+			++numTexture;
+
 		char texName[16];
 		for( int x = 0; x < MAX_TEXTURES; ++x )
 		{
@@ -384,29 +390,29 @@ namespace Sentinel
 
 	///////////////////////////////////
 
-	void ShaderGL::SetFloat( UINT uniform, float data )
+	void ShaderGL::SetFloat( UINT uniform, float* data, UINT count )
 	{
-		glUniform1f( mUniformGL[ uniform ], data );
+		glUniform1fv( mUniformGL[ uniform ], count, data );
 	}
 
-	void ShaderGL::SetFloat2( UINT uniform, float* data )
+	void ShaderGL::SetFloat2( UINT uniform, float* data, UINT count )
 	{
-		glUniform2fv( mUniformGL[ uniform ], 1, data );
+		glUniform2fv( mUniformGL[ uniform ], count, data );
 	}
 
-	void ShaderGL::SetFloat3( UINT uniform, float* data )
+	void ShaderGL::SetFloat3( UINT uniform, float* data, UINT count )
 	{
-		glUniform3fv( mUniformGL[ uniform ], 1, data );
+		glUniform3fv( mUniformGL[ uniform ], count, data );
 	}
 
-	void ShaderGL::SetFloat4( UINT uniform, float* data )
+	void ShaderGL::SetFloat4( UINT uniform, float* data, UINT count )
 	{
-		glUniform4fv( mUniformGL[ uniform ], 1, data );
+		glUniform4fv( mUniformGL[ uniform ], count, data );
 	}
 
-	void ShaderGL::SetMatrix( UINT uniform, float* matrix )
+	void ShaderGL::SetMatrix( UINT uniform, float* matrix, UINT count )
 	{
-		glUniformMatrix4fv( mUniformGL[ uniform ], 1, false, matrix );
+		glUniformMatrix4fv( mUniformGL[ uniform ], count, false, matrix );
 	}
 
 	void ShaderGL::SetTexture( UINT uniform, Texture* texture )
@@ -417,15 +423,37 @@ namespace Sentinel
 		glClientActiveTexture( texID );
 		glActiveTexture( texID );
 
-		glBindTexture( GL_TEXTURE_2D, ((TextureGL*)texture)->mID );
+		glBindTexture( GL_TEXTURE_2D, ((TextureGL*)texture)->ID() );
 
 		static_cast< SamplerGL* >(mSampler[ mTextureLevel ])->Apply();
 			
 		++mTextureLevel;
 	}
 
+	void ShaderGL::SetTextureCube( UINT uniform, Texture* texture )
+	{
+		glUniform1i( mUniformGL[ uniform ], mTextureLevel );
+			
+		glClientActiveTexture( GL_TEXTURE_CUBE_MAP );
+		glActiveTexture( GL_TEXTURE_CUBE_MAP );
+
+		glBindTexture( GL_TEXTURE_CUBE_MAP, ((TextureGL*)texture)->ID() );
+
+		static_cast< SamplerGL* >(mSampler[ mTextureLevel ])->Apply();
+
+		//GL_CLAMP_TO_EDGE
+		/*glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP );
+		glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP );
+		glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP );
+
+		glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_POINT );
+		glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_POINT );*/
+			
+		++mTextureLevel;
+	}
+
 	void ShaderGL::SetSampler( UINT index, SamplerMode modeU, SamplerMode modeV, 
-						SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter )
+							   SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter )
 	{
 		_ASSERT( index < mNumSamplers );
 

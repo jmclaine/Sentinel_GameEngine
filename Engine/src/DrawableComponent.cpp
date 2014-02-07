@@ -4,7 +4,8 @@
 namespace Sentinel
 {
 	DrawableComponent::DrawableComponent() :
-		mTransform( NULL )
+		mTransform( NULL ),
+		mIsDynamic( false )
 	{
 		mType = GameComponent::DRAWABLE;
 	}
