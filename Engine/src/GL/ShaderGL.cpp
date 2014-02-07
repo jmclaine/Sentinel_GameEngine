@@ -162,8 +162,6 @@ namespace Sentinel
 
 	UINT ShaderGL::CreateFromFile( std::string filename )
 	{
-		filename.append( ".xsh" );
-
 		if( Archive::ToBuffer( filename.c_str(), mSource ) == 0 )
 		{
 			REPORT_ERROR( "Could not open '" << filename << "'", "Shader Loader Error" );
@@ -180,13 +178,13 @@ namespace Sentinel
 	{
 		mSource = source;
 
-		// Create a new program.
-		//
 		mProgram = glCreateProgram();
 
 		if( mProgram < 0 )
 			REPORT_ERROR( "Could not create shader program.", "Shader Loader Error" );
 
+		// Compile Vertex Shader.
+		//
 		if( strstr( mSource, "VERTEX_SHADER" ) != NULL )
 		{
 			const char *vshader[2] = { "#define VERSION_GL\n#define VERTEX_SHADER\n\0", mSource };
@@ -196,7 +194,9 @@ namespace Sentinel
 
 			glAttachShader( mProgram, mVertexShader );
 		}
-			
+		
+		// Compile Geometry Shader.
+		//
 		if( strstr( mSource, "GEOMETRY_SHADER" ) != NULL )
 		{
 			const char *gshader[2] = { "#define VERSION_GL\n#define GEOMETRY_SHADER\n\0", mSource };
@@ -207,6 +207,8 @@ namespace Sentinel
 			glAttachShader( mProgram, mGeometryShader );
 		}
 
+		// Compile Fragment Shader.
+		//
 		if( strstr( mSource, "FRAGMENT_SHADER" ) != NULL )
 		{
 			const char *fshader[2] = { "#define VERSION_GL\n#define FRAGMENT_SHADER\n\0", mSource };

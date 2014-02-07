@@ -19,6 +19,17 @@ namespace Sentinel
 	#endif
 	}
 
+	std::string GetDirectory()
+	{
+	#ifdef WIN32
+		char path[ FILENAME_MAX ];
+		_getcwd( path, sizeof( path ));
+		return path;
+	#else
+		_ASSERT(0);	// not supported
+	#endif
+	}
+
 	// Based on code from: http://www.cse.yorku.ca/~oz/hash.html
 	// djb2 algorithm
 	// Warning: Collisions may be possible

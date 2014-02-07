@@ -106,6 +106,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)\Sentin
     <ClInclude Include="..\Engine\src\AssetManager.h" />
     <ClInclude Include="..\Engine\src\AudioComponent.h" />
     <ClInclude Include="..\Engine\src\Debug.h" />
+    <ClInclude Include="..\Engine\src\dirent.h" />
     <ClInclude Include="..\Engine\src\DX\BufferDX.h" />
     <ClInclude Include="..\Engine\src\DX\CommonDX.h" />
     <ClInclude Include="..\Engine\src\DX\ShaderDX.h" />

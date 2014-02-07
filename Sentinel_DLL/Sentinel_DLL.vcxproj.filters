@@ -90,12 +90,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Engine\src\Texture.h">
-      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\Shader.h">
-      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\Vector4f.h">
       <Filter>Source Files\Sentinel_Engine\Math</Filter>
     </ClInclude>
@@ -405,14 +399,17 @@
     <ClInclude Include="..\Engine\src\LightComponent.h">
       <Filter>Source Files\Sentinel_Engine\Components\Light</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\src\dirent.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Shader.h">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Texture.h">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Engine\src\Shader.cpp">
-      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\Texture.cpp">
-      <Filter>Source Files\Sentinel_Engine\Assets</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\MathCommon.cpp">
       <Filter>Source Files\Sentinel_Engine\Math</Filter>
     </ClCompile>
@@ -751,6 +748,12 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\LightComponent.cpp">
       <Filter>Source Files\Sentinel_Engine\Components\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Shader.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Texture.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

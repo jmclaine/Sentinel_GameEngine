@@ -7,6 +7,8 @@ Edits levels for a game created with the Sentinel Engine.
 #include <exception>
 #include <time.h>
 
+#include "dirent.h"
+
 #include "Sentinel_Editor.h"
 
 #include "Renderer.h"
@@ -185,7 +187,7 @@ public:
 		// Create wire cube from solid cubes.
 		// Adjust spaces using scale of object.
 		//
-		std::shared_ptr< Shader > shaderLine = mEditorWorld->mShaderManager->Get( "Color Only" );
+		std::shared_ptr< Shader > shaderLine = mEditorWorld->mShaderManager->Get( "Color_Only" );
 
 		builder.mLayout = shaderLine->Layout();
 		builder.CreateWireCube( 1 );
@@ -401,9 +403,30 @@ public:
 
 		SetDirectory( "Shaders" );
 
-		if( !ShaderManager::LoadConfig( "config.xml", mRenderer, mEditorWorld->mShaderManager ))
+		DIR *dir;
+		struct dirent *ent;
+		if( (dir = opendir( GetDirectory().c_str() )) != NULL )
 		{
-			throw AppException( "Failed to load 'Assets\\Shaders\\config.xml'" );
+			while( (ent = readdir( dir )) != NULL )
+			{
+				std::string name( ent->d_name );
+				size_t len = name.size();
+
+				if( name.find( ".xsh" ) != std::string::npos )
+				{
+					Shader* shader = mRenderer->CreateShaderFromFile( name.c_str() );
+
+					if( !shader )
+						throw AppException( "Failed to load 'Assets\\Shaders\\" + name );
+
+					mEditorWorld->mShaderManager->Add( name.substr( 0, len-4 ), SHARED( shader ));
+				}
+			}
+			closedir (dir);
+		}
+		else
+		{
+			throw AppException( "Failed to open 'Assets\\Shaders' directory." );
 		}
 
 		/*	
@@ -437,8 +460,8 @@ public:
 		mEditorWorld->mSpriteSystem->mMaterial = material;
 
 		mEditorWorld->mShaderManager->Get( "GUI" )->SetSampler( 0, MODE_WRAP, MODE_WRAP, FILTER_POINT, FILTER_POINT );
-		mEditorWorld->mShaderManager->Get( "GUI Mesh" )->SetSampler( 0, MODE_WRAP, MODE_WRAP, FILTER_LINEAR, FILTER_LINEAR );
-		mEditorWorld->mShaderManager->Get( "RT_Normal" )->SetSampler( 0, MODE_WRAP, MODE_WRAP, FILTER_LINEAR, FILTER_LINEAR );
+		mEditorWorld->mShaderManager->Get( "GUI_Mesh" )->SetSampler( 0, MODE_WRAP, MODE_WRAP, FILTER_LINEAR, FILTER_LINEAR );
+		mEditorWorld->mShaderManager->Get( "RT_Color" )->SetSampler( 0, MODE_WRAP, MODE_WRAP, FILTER_LINEAR, FILTER_LINEAR );
 
 		////////////////////////////////////
 
@@ -448,7 +471,7 @@ public:
 		mDSGameWorld = mRenderer->CreateDepthStencil( Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE );
 		
 		material = mEditorWorld->mMaterialManager->Add( "Backbuffer", std::shared_ptr< Material >( new Material() ));
-		material->mShader = mEditorWorld->mShaderManager->Get( "RT_Normal" );
+		material->mShader = mEditorWorld->mShaderManager->Get( "RT_Color" );
 		material->mBlendState = mRenderer->BLEND_OFF;
 		material->mTexture[ TEXTURE_DIFFUSE ] = mEditorWorld->mTextureManager->Get( "Backbuffer" );
 
@@ -682,7 +705,7 @@ public:
 		model->mScale    = Vector3f( (float)Renderer::WINDOW_WIDTH_BASE-500, (float)Renderer::WINDOW_HEIGHT_BASE, 1 );
 		
 		material = mEditorWorld->mMaterialManager->Add( "World", std::shared_ptr< Material >( new Material() ));
-		material->mShader = mEditorWorld->mShaderManager->Get( "GUI Mesh" );
+		material->mShader = mEditorWorld->mShaderManager->Get( "GUI_Mesh" );
 		material->mBlendState = mRenderer->BLEND_OFF;
 		material->mTexture[ TEXTURE_DIFFUSE ] = mEditorWorld->mTextureManager->Get( "Backbuffer" );
 
@@ -747,12 +770,12 @@ public:
 
 		mGameWorld->mTextureManager->Add( "default-alpha.png", SHARED( mRenderer->CreateTextureFromFile( "Textures\\default-alpha.png" )));
 
-		mGameWorld->mShaderManager->Add( "Color",   mEditorWorld->mShaderManager->Get( "Color" ));
-		mGameWorld->mShaderManager->Add( "Color_Lit_Shadow", mEditorWorld->mShaderManager->Get( "Color_Lit_Shadow" ));
-		mGameWorld->mShaderManager->Add( "Texture", mEditorWorld->mShaderManager->Get( "Texture" ));
-		mGameWorld->mShaderManager->Add( "Texture_Lit_Shadow", mEditorWorld->mShaderManager->Get( "Texture_Lit_Shadow" ));
-		mGameWorld->mShaderManager->Add( "Sprite",  mEditorWorld->mShaderManager->Get( "Sprite" ));
-		mGameWorld->mShaderManager->Add( "RT_Cube_Depth", mEditorWorld->mShaderManager->Get( "RT_Cube_Depth" ));
+		mGameWorld->mShaderManager->Add( "Color_Lit",			mEditorWorld->mShaderManager->Get( "Color_Lit" ));
+		mGameWorld->mShaderManager->Add( "Color_Lit_Shadow",	mEditorWorld->mShaderManager->Get( "Color_Lit_Shadow" ));
+		mGameWorld->mShaderManager->Add( "Texture_Lit",			mEditorWorld->mShaderManager->Get( "Texture_Lit" ));
+		mGameWorld->mShaderManager->Add( "Texture_Lit_Shadow",	mEditorWorld->mShaderManager->Get( "Texture_Lit_Shadow" ));
+		mGameWorld->mShaderManager->Add( "Sprite",				mEditorWorld->mShaderManager->Get( "Sprite" ));
+		mGameWorld->mShaderManager->Add( "RT_Cube_Depth",		mEditorWorld->mShaderManager->Get( "RT_Cube_Depth" ));
 
 		std::shared_ptr< Shader > shaderColor   = mGameWorld->mShaderManager->Get( "Color_Lit_Shadow" );
 		std::shared_ptr< Shader > shaderTexture = mGameWorld->mShaderManager->Get( "Texture_Lit_Shadow" );
@@ -785,7 +808,7 @@ public:
 		obj = mGameWorld->AddGameObject( new GameObject(), "Point_Light" );
 
 		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
-		transform->mPosition = Vector3f( 0, 20, 0 );
+		transform->mPosition = Vector3f( 0, 4, 0 );
 
 		PointLightComponent* light = (PointLightComponent*)obj->AttachComponent( new PointLightComponent( 1024 ), "Light" );
 		light->mColor         = ColorRGBA( 0.8f, 0.6f, 0.0f, 1.0f );
@@ -868,7 +891,7 @@ public:
 		// Test object.
 		//
 		meshBuilder.ClearGeometry();
-		meshBuilder.CreateDodecahedron( 1.0f );
+		meshBuilder.CreateCylinder( 1.0f, 2.0f, 10 );
 		meshBuilder.mLayout = shaderTexture->Layout();
 
 		material = mGameWorld->mMaterialManager->Add( "Dodecahedron", std::shared_ptr< Material >(new Material()));
@@ -884,9 +907,10 @@ public:
 		obj2->mName = "Dodecahedron";
 
 		transform = (TransformComponent*)obj2->AttachComponent( new TransformComponent(), "Transform" );
-		transform->mPosition	= Vector3f( 0, 4, 0 );
+		transform->mPosition	= Vector3f( 0, 2, -10 );
 		transform->mScale		= Vector3f( 1, 1, 1 );
-		transform->mOrientation	= Quatf( 90, 180, 270 );
+		//transform->mOrientation	= Quatf( 90, 180, 270 );
+		transform->mOrientation	= Quatf( 0, 0, 0 );
 
 		meshComp = (MeshComponent*)obj2->AttachComponent( new MeshComponent( mesh ), "Mesh" );
 		meshComp->mIsDynamic = true;
@@ -916,7 +940,7 @@ public:
 		obj = mGameWorld->AddGameObject( new GameObject(), "Sphere" );
 		
 		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
-		transform->mPosition	= Vector3f( -10, 4, 0 );
+		transform->mPosition	= Vector3f( 0, 3, 10 );
 		transform->mScale		= Vector3f( 2, 2, 2 );
 		//transform->mOrientation	= Quatf( 45, 45, 45 );
 
@@ -927,7 +951,7 @@ public:
 		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateSphere( transform->mScale.x ), transform->mPosition, transform->mOrientation, 1.0f ));
 		body = physics->GetRigidBody();
 		
-		obj->AddChild( obj2 );
+		//obj->AddChild( obj2 );
 
 		//AddObject( obj );
 
@@ -955,7 +979,7 @@ public:
 		std::vector< std::shared_ptr< Material >> material;
 		model->GetMaterials( &material );
 
-		material[ 0 ]->mShader = mEditorWorld->mShaderManager->Get( "Color Only" );
+		material[ 0 ]->mShader = mEditorWorld->mShaderManager->Get( "Color_Only" );
 		material[ 0 ]->mCullMode = CULL_NONE;
 		material[ 0 ]->mBlendState = std::shared_ptr< BlendState >(mRenderer->CreateBlendState( BLEND_SRC_ALPHA, BLEND_ONE, BLEND_SRC_ALPHA, BLEND_ONE ));
 		material[ 0 ]->mDepthMode = DEPTH_ALWAYS;

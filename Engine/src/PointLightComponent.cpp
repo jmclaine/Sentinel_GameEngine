@@ -50,7 +50,7 @@ namespace Sentinel
 
 			const Vector3f& pos = mTransform->mPosition;
 			
-			mMatrixView[ CAMERA_AXIS_POS_X ].LookAtView( pos, pos+Vector3f( 1, 0, 0 ), Vector3f( 0, 1, 0 ));
+			mMatrixView[ CAMERA_AXIS_POS_X ].LookAtView( pos, pos+Vector3f( 1, 0, 0 ), Vector3f( 0, -1, 0 ));
 			mMatrixFinal[ CAMERA_AXIS_POS_X ] = mMatrixProjection * mMatrixView[ CAMERA_AXIS_POS_X ];
 
 			mMatrixView[ CAMERA_AXIS_NEG_X ].LookAtView( pos, pos+Vector3f( -1, 0, 0 ), Vector3f( 0, -1, 0 ));
@@ -62,7 +62,7 @@ namespace Sentinel
 			mMatrixView[ CAMERA_AXIS_NEG_Y ].LookAtView( pos, pos+Vector3f( 0, -1, 0 ), Vector3f( 0, 0, -1 ));
 			mMatrixFinal[ CAMERA_AXIS_NEG_Y ] = mMatrixProjection * mMatrixView[ CAMERA_AXIS_NEG_Y ];
 
-			mMatrixView[ CAMERA_AXIS_POS_Z ].LookAtView( pos, pos+Vector3f( 0, 0, 1 ), Vector3f( 0, 1, 0 ));
+			mMatrixView[ CAMERA_AXIS_POS_Z ].LookAtView( pos, pos+Vector3f( 0, 0, 1 ), Vector3f( 0, -1, 0 ));
 			mMatrixFinal[ CAMERA_AXIS_POS_Z ] = mMatrixProjection * mMatrixView[ CAMERA_AXIS_POS_Z ];
 
 			mMatrixView[ CAMERA_AXIS_NEG_Z ].LookAtView( pos, pos+Vector3f( 0, 0, -1 ), Vector3f( 0, -1, 0 ));

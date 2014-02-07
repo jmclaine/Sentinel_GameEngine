@@ -186,17 +186,10 @@ vec4 GetColor( vec3 LPos, vec3 camDir, vec3 N, vec3 color, vec4 attn )
 
 void main()
 {
-	vec3 camVec = -vLightPos;
-
-	float distNearest = texture(_TextureCube, camVec).r;
-
-	float distLight = clamp(length(camVec), 0.0, 50.0);
-
-	distNearest *= 50.0;
-
-	float eps = 0.5;
-	if((distNearest + eps) < distLight)
+	if((texture(_TextureCube, -vLightPos).r * 50.0 + 0.5) < clamp(length(vLightPos), 0.0, 50.0))
+	{
 		gl_FragColor = _Ambient;
+	}
 	else
 	{
 		// Camera Direction

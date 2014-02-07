@@ -15,19 +15,19 @@ following string designations before loading
 a model:
 
 // Color with normal
-ShaderManager::Add( shader, "Color" );
+ShaderManager::Add( shader, "Color_Lit" );
 
 // Texture with normal
-ShaderManager::Add( shader, "Texture" );
+ShaderManager::Add( shader, "Texture_Lit" );
 
 // Normal mapping
-ShaderManager::Add( shader, "Normal Map" );
+ShaderManager::Add( shader, "Normal_Map" );
 
 // Parallax mapping
 ShaderManager::Add( shader, "Parallax" );
 
 // Skinning and bones
-ShaderManager::Add( shader, "Skinning" );
+ShaderManager::Add( shader, "Skinned" );
 
 The previous shaders are created and loaded
 automatically through the editor using the

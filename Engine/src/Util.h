@@ -156,6 +156,7 @@ namespace Sentinel
 	////////////////////////////////////////////////////////////////////
 
 	SENTINEL_DLL void SetDirectory( const char* dest );
+	SENTINEL_DLL std::string GetDirectory();
 
 	template< typename Real >
 	inline void CopyArray( Real& dest, const Real& src, UINT size )

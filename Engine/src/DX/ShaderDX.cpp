@@ -156,13 +156,8 @@ namespace Sentinel
 
 	///////////////////////////////////
 
-	// Use the filename without the extension.
-	// DirectX uses .fx files.
-	//
 	UINT ShaderDX::CreateFromFile( std::string filename )
 	{
-		filename.append( ".xsh" );
-
 		if( Archive::ToBuffer( filename.c_str(), mSource ) == 0 )
 		{
 			REPORT_ERROR( "Could not open '" << filename << "'", "Shader Loader Error" );

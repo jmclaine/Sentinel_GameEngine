@@ -79,7 +79,6 @@
     <None Include="Assets\Shaders\Color_Lit.xsh" />
     <None Include="Assets\Shaders\Color_Lit_Shadow.xsh" />
     <None Include="Assets\Shaders\Color_Only.xsh" />
-    <None Include="Assets\Shaders\config.xml" />
     <None Include="Assets\Shaders\GUI.xsh" />
     <None Include="Assets\Shaders\GUI_Mesh.xsh" />
     <None Include="Assets\Shaders\Line.xsh" />

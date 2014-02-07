@@ -446,22 +446,22 @@ namespace Sentinel
 
 						if( numTextures == 0 )
 						{
-							shader = shaderManager->Get( "Color" );
+							shader = shaderManager->Get( "Color_Lit" );
 						}
 						else
 						if( isSkinned )
 						{
-							shader = shaderManager->Get( "Skinning" );
+							shader = shaderManager->Get( "Skinned" );
 						}
 						else
 						if( numTextures == 1 )
 						{
-							shader = shaderManager->Get( "Texture" );
+							shader = shaderManager->Get( "Texture_Lit" );
 						}
 						else
 						if( numTextures == 2 )
 						{
-							shader = shaderManager->Get( "Normal Map" );
+							shader = shaderManager->Get( "Normal_Map" );
 						}
 						else
 						{

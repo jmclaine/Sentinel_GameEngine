@@ -35,9 +35,6 @@
     <None Include="Assets\Shaders\Color_Only.xsh">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Assets\Shaders\config.xml">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Assets\Shaders\GUI.xsh">
       <Filter>Shaders</Filter>
     </None>
