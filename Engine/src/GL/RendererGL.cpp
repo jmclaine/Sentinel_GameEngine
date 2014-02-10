@@ -411,11 +411,11 @@ namespace Sentinel
 			switch( format )
 			{
 			case IMAGE_FORMAT_R:
-				glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_R, GL_UNSIGNED_BYTE, data );
+				glTexImage2D( GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, data );
 				break;
 
 			case IMAGE_FORMAT_RGB:
-				glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data );
+				glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data );
 				break;
 
 			case IMAGE_FORMAT_RGBA:
@@ -423,7 +423,7 @@ namespace Sentinel
 				break;
 
 			case IMAGE_FORMAT_HDR:
-				glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA32F, GL_UNSIGNED_BYTE, data );
+				glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA32F, GL_UNSIGNED_BYTE, data );
 				break;
 
 			case IMAGE_FORMAT_DEPTH:
@@ -458,12 +458,12 @@ namespace Sentinel
 			{
 			case IMAGE_FORMAT_R:
 				for( UINT x = 0; x < 6; ++x )
-					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGBA, width, height, 0, GL_R, GL_UNSIGNED_BYTE, NULL );
+					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_R32F, width, height, 0, GL_RED, GL_FLOAT, NULL );
 				break;
 
 			case IMAGE_FORMAT_RGB:
 				for( UINT x = 0; x < 6; ++x )
-					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGBA, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL );
+					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_INT, NULL );
 				break;
 
 			case IMAGE_FORMAT_RGBA:
@@ -473,7 +473,7 @@ namespace Sentinel
 
 			case IMAGE_FORMAT_HDR:
 				for( UINT x = 0; x < 6; ++x )
-					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGBA, width, height, 0, GL_RGBA32F, GL_UNSIGNED_BYTE, NULL );
+					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_UNSIGNED_INT, NULL );
 				break;
 
 			case IMAGE_FORMAT_DEPTH:
@@ -510,16 +510,16 @@ namespace Sentinel
 		{
 			GLuint id;
 			glGenFramebuffers( 1, &id );
-			glBindFramebuffer( GL_DRAW_FRAMEBUFFER, id );
+			glBindFramebuffer( GL_FRAMEBUFFER, id );
 
 			switch( texture->Format() )
 			{
 			case IMAGE_FORMAT_DEPTH:
-				glFramebufferTexture( GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, static_cast< TextureGL* >(texture)->ID(), 0 );
+				glFramebufferTexture( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, static_cast< TextureGL* >(texture)->ID(), 0 );
 				break;
 
 			default:
-				glFramebufferTexture( GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, static_cast< TextureGL* >(texture)->ID(), 0 );
+				glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, static_cast< TextureGL* >(texture)->ID(), 0 );
 				break;
 			}
 			

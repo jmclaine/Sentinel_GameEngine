@@ -200,37 +200,37 @@ namespace Sentinel
 		UINT startVert = mVertex.size();
 
 		Vector3f up = Vector3f( normal.y, normal.z, normal.x );
-		Vector3f right = normal.Cross( up ).Normalize();
+		Vector3f right = normal.Cross( up );
 
 		Vector3f cornerUR = right + up;
 		Vector3f cornerUL = up - right;
 
 		Vertex vertex;
-		vertex.mPosition			= cornerUL * -size;
+		vertex.mPosition		= cornerUL * -size;
 		vertex.mTexCoord[ 0 ]	= Vector2f( 0, 1 );
 		vertex.mTexCoord[ 1 ]	= Vector2f( 0, 1 );
-		vertex.mNormal				= normal;
+		vertex.mNormal			= normal;
 
 		mVertex.push_back( vertex );
 		
-		vertex.mPosition			= cornerUR * -size;
+		vertex.mPosition		= cornerUR * -size;
 		vertex.mTexCoord[ 0 ]	= Vector2f( 1, 1 );
 		vertex.mTexCoord[ 1 ]	= Vector2f( 1, 1 );
-		vertex.mNormal				= normal;
+		vertex.mNormal			= normal;
 
 		mVertex.push_back( vertex );
 
-		vertex.mPosition			= cornerUL * size;
+		vertex.mPosition		= cornerUL * size;
 		vertex.mTexCoord[ 0 ]	= Vector2f( 1, 0 );
 		vertex.mTexCoord[ 1 ]	= Vector2f( 1, 0 );
-		vertex.mNormal				= normal;
+		vertex.mNormal			= normal;
 
 		mVertex.push_back( vertex );
 
-		vertex.mPosition			= cornerUR * size;
+		vertex.mPosition		= cornerUR * size;
 		vertex.mTexCoord[ 0 ]	= Vector2f( 0, 0 );
 		vertex.mTexCoord[ 1 ]	= Vector2f( 0, 0 );
-		vertex.mNormal				= normal;
+		vertex.mNormal			= normal;
 
 		mVertex.push_back( vertex );
 

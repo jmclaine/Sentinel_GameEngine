@@ -184,9 +184,7 @@ vec4 GetColor( vec3 LPos, vec3 camDir, vec3 N, vec3 color, vec4 attn )
 		vec4 diffuseFinal = _Diffuse * intensity;
 
 		// Specular
-		vec4 specularFinal;
-		if(dot(-LPos, N) < 0)
-			specularFinal = max(_Specular * pow(clamp(dot(N, H), 0.0, 1.0), _SpecComp), 0.0);
+		vec4 specularFinal = max(_Specular * pow(clamp(dot(N, H), 0.0, 1.0), _SpecComp), 0.0);
 
 		return clamp(vec4(ambientFinal.rgb + (diffuseFinal.rgb + specularFinal.rgb) * attnFinal * color, 
 						  _Ambient.a + _Diffuse.a + _Specular.a), 0.0, 1.0);
@@ -197,31 +195,23 @@ vec4 GetColor( vec3 LPos, vec3 camDir, vec3 N, vec3 color, vec4 attn )
 
 void main()
 {
-	// Camera Direction
-	vec3 camPos = normalize(vCameraPos);
-
-	// Normal
-	vec3 N = normalize(vNormal);
-
-	// Attenuation
-	vec4 color0 = GetColor(vLightPos, camPos, N, _LightColor, _LightAttn);
-
-	// calculate vector from surface point to light position
-	// (both positions are given in world space)
-	vec3 camVec = -vLightPos;
-
-	// read depth value from cubemap shadow map
-	float distNearest = texture(_TextureCube, camVec).r;
-
-	float distLight = length(camVec);
-
-	distNearest *= 50.0;//near_far.y;
-
-	float eps = 0.15; // add a small offset (adjust as needed)
-	if((distNearest + eps) < distLight)
+	/*if((texture(_TextureCube, -vLightPos).r * 50.0 + 0.5) < clamp(length(vLightPos), 0.0, 50.0))
+	{
 		gl_FragColor = texture2D(_Texture0, vTexCoord0) * _Ambient;
+	}
 	else
+	{*/
+		// Camera Direction
+		vec3 camPos = normalize(vCameraPos);
+
+		// Normal
+		vec3 N = normalize(vNormal);
+
+		// Attenuation
+		vec4 color0 = GetColor(vLightPos, camPos, N, _LightColor, _LightAttn);
+
 		gl_FragColor = texture2D(_Texture0, vTexCoord0) * color0;
+	//}
 }
 
 #endif

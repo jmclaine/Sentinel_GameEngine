@@ -417,12 +417,15 @@ public:
 					Shader* shader = mRenderer->CreateShaderFromFile( name.c_str() );
 
 					if( !shader )
+					{
+						closedir( dir );
 						throw AppException( "Failed to load 'Assets\\Shaders\\" + name );
+					}
 
 					mEditorWorld->mShaderManager->Add( name.substr( 0, len-4 ), SHARED( shader ));
 				}
 			}
-			closedir (dir);
+			closedir( dir );
 		}
 		else
 		{
@@ -812,7 +815,7 @@ public:
 
 		PointLightComponent* light = (PointLightComponent*)obj->AttachComponent( new PointLightComponent( 1024 ), "Light" );
 		light->mColor         = ColorRGBA( 0.8f, 0.6f, 0.0f, 1.0f );
-		light->mAttenuation   = Vector4f( 1, 1, 1, 25 );
+		//light->mAttenuation   = Vector4f( 0.333f, 1, 1, 25 );
 		light->mShader        = mGameWorld->mShaderManager->Get( "RT_Cube_Depth" );
 
 		//AddObject( obj );
@@ -831,12 +834,12 @@ public:
 		mesh->mMaterial = material;
 		//mAssetMesh->addChild( new AssetTreeItem< Mesh >( "Ground", mesh ));
 	
-		obj = mGameWorld->AddGameObject( new GameObject(), "Ground" );
+		obj = mGameWorld->AddGameObject( new GameObject(), "Ground_Bottom" );
 
 		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
 		transform->mPosition = Vector3f( 0, 0, 0 );
-		transform->mScale    = Vector3f( 100, 1, 100 );
-		//transform->mOrientation = Quatf( 45, 45, 45 );
+		transform->mScale    = Vector3f( 20, 1, 20 );
+		//transform->mOrientation = Quatf( 0, 0, 0 );
 
 		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
 		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
@@ -846,6 +849,134 @@ public:
 		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
 		meshComp->mIsDynamic = true;
 		//*/
+
+
+		obj = mGameWorld->AddGameObject( new GameObject(), "Ground_Back" );
+
+		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
+		transform->mPosition = Vector3f( 0, 20, -20 );
+		transform->mScale    = Vector3f( 20, 20, 1 );
+		//transform->mOrientation = Quatf( 0, 0, 0 );
+
+		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
+		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
+		body = physics->GetRigidBody();
+		body->SetFlags( DISABLE_GRAVITY );
+			
+		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
+		meshComp->mIsDynamic = true;
+
+
+		obj = mGameWorld->AddGameObject( new GameObject(), "Ground_Right" );
+
+		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
+		transform->mPosition = Vector3f( 20, 20, 0 );
+		transform->mScale    = Vector3f( 1, 20, 20 );
+		//transform->mOrientation = Quatf( 0, 0, 0 );
+
+		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
+		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
+		body = physics->GetRigidBody();
+		body->SetFlags( DISABLE_GRAVITY );
+			
+		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
+		meshComp->mIsDynamic = true;
+
+
+		obj = mGameWorld->AddGameObject( new GameObject(), "Ground_Left" );
+
+		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
+		transform->mPosition = Vector3f( -22, 10, 0 );
+		transform->mScale    = Vector3f( 20, 1, 20 );
+		transform->mOrientation = Quatf( 0, 0, 0 );
+
+		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
+		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
+		body = physics->GetRigidBody();
+		body->SetFlags( DISABLE_GRAVITY );
+
+		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
+		meshComp->mIsDynamic = true;
+
+
+		obj = mGameWorld->AddGameObject( new GameObject(), "Ground_Top" );
+
+		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
+		transform->mPosition = Vector3f( 0, 20, 0 );
+		transform->mScale    = Vector3f( 20, 1, 20 );
+		//transform->mOrientation = Quatf( 0, 0, 0 );
+
+		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
+		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
+		body = physics->GetRigidBody();
+		body->SetFlags( DISABLE_GRAVITY );
+			
+		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
+		meshComp->mIsDynamic = true;
+
+
+		obj = mGameWorld->AddGameObject( new GameObject(), "Box_Right" );
+
+		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
+		transform->mPosition = Vector3f( 10, 2, 5 );
+		transform->mScale    = Vector3f( 1, 1, 1 );
+		//transform->mOrientation = Quatf( 0, 0, 0 );
+
+		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
+		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
+		body = physics->GetRigidBody();
+		body->SetFlags( DISABLE_GRAVITY );
+			
+		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
+		meshComp->mIsDynamic = true;
+
+
+		obj = mGameWorld->AddGameObject( new GameObject(), "Box_Left" );
+
+		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
+		transform->mPosition = Vector3f( -10, 2, 5 );
+		transform->mScale    = Vector3f( 1, 1, 1 );
+		//transform->mOrientation = Quatf( 0, 0, 0 );
+
+		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
+		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
+		body = physics->GetRigidBody();
+		body->SetFlags( DISABLE_GRAVITY );
+			
+		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
+		meshComp->mIsDynamic = true;
+
+
+		obj = mGameWorld->AddGameObject( new GameObject(), "Box_Top" );
+
+		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
+		transform->mPosition = Vector3f( 0, 8, 5 );
+		transform->mScale    = Vector3f( 1, 1, 1 );
+		//transform->mOrientation = Quatf( 0, 0, 0 );
+
+		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
+		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
+		body = physics->GetRigidBody();
+		body->SetFlags( DISABLE_GRAVITY );
+			
+		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
+		meshComp->mIsDynamic = true;
+
+
+		obj = mGameWorld->AddGameObject( new GameObject(), "Box_Back" );
+
+		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
+		transform->mPosition = Vector3f( 0, 3, -10 );
+		transform->mScale    = Vector3f( 1, 1, 1 );
+		transform->mOrientation = Quatf( 45, 45, 45 );
+
+		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
+		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
+		body = physics->GetRigidBody();
+		body->SetFlags( DISABLE_GRAVITY );
+			
+		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
+		meshComp->mIsDynamic = true;
 		//AddObject( obj );
 		
 		// Testing particle effects.
@@ -891,7 +1022,8 @@ public:
 		// Test object.
 		//
 		meshBuilder.ClearGeometry();
-		meshBuilder.CreateCylinder( 1.0f, 2.0f, 10 );
+		meshBuilder.CreateDodecahedron( 1.0f );
+		//meshBuilder.CreateCylinder( 1.0f, 2.0f, 10 );
 		meshBuilder.mLayout = shaderTexture->Layout();
 
 		material = mGameWorld->mMaterialManager->Add( "Dodecahedron", std::shared_ptr< Material >(new Material()));
@@ -907,7 +1039,7 @@ public:
 		obj2->mName = "Dodecahedron";
 
 		transform = (TransformComponent*)obj2->AttachComponent( new TransformComponent(), "Transform" );
-		transform->mPosition	= Vector3f( 0, 2, -10 );
+		transform->mPosition	= Vector3f( 10, 2, -10 );
 		transform->mScale		= Vector3f( 1, 1, 1 );
 		//transform->mOrientation	= Quatf( 90, 180, 270 );
 		transform->mOrientation	= Quatf( 0, 0, 0 );
@@ -940,7 +1072,7 @@ public:
 		obj = mGameWorld->AddGameObject( new GameObject(), "Sphere" );
 		
 		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
-		transform->mPosition	= Vector3f( 0, 3, 10 );
+		transform->mPosition	= Vector3f( 10, 3, 10 );
 		transform->mScale		= Vector3f( 2, 2, 2 );
 		//transform->mOrientation	= Quatf( 45, 45, 45 );
 

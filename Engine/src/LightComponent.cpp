@@ -8,7 +8,7 @@
 namespace Sentinel
 {
 	LightComponent::LightComponent() :
-		mAttenuation( Vector4f( 1, 1, 1, 1000 )),
+		mAttenuation( Vector4f( 1.0f, 0.0f, 0.0f, 25 )),
 		mTexture( NULL ),
 		mRenderTexture( NULL )
 	{

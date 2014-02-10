@@ -69,6 +69,7 @@ void main()
 #ifdef GEOMETRY_SHADER
 
 uniform mat4 _LightCubeMatrix[6];
+uniform vec3 _LightPos;
 
 layout(triangles) in;
 layout(triangle_strip, max_vertices=18) out;
@@ -83,8 +84,8 @@ void main()
 	{
 		for(int tri_vert=0; tri_vert<3; ++tri_vert)
 		{
-			gPosition = vPosition[tri_vert];
-			gl_Position = _LightCubeMatrix[gl_Layer] * gPosition;
+			gPosition = vPosition[tri_vert] - vec4(_LightPos, 1);
+			gl_Position = _LightCubeMatrix[gl_Layer] * vPosition[tri_vert];
 			EmitVertex();
 		}
 		EndPrimitive();
@@ -98,9 +99,16 @@ uniform vec3 _LightPos;
 
 in vec4 gPosition;
 
+const float shadowRadius = 1.0 / 200.0;
+
 void main()
 {
-	gl_FragDepth = distance(gPosition.xyz, _LightPos) * 0.02;
+	float depth = length(gPosition) * shadowRadius;
+	//gl_FragColor.r = min(depth, gl_FragCoord.z);
+	//gl_FragDepth = max(depth, gl_FragDepth);
+	gl_FragDepth = depth;
+	//gl_FragColor.r = depth;
+	//gl_FragColor.g = depth*depth;
 }
 
 #endif

@@ -152,57 +152,112 @@ uniform vec4 _Diffuse;
 uniform vec4 _Specular;
 uniform float _SpecComp;
 
-vec4 GetColor( vec3 LPos, vec3 camDir, vec3 N, vec3 color, vec4 attn )
+vec4 GetColor( vec3 LPos, vec3 camDir, vec3 N, vec3 color, vec4 attn, float sum )
 {
-	if(dot(-LPos, N) < 0)
-	{
-		float dist = max(0.0, length(LPos)-attn.w);
+	float intensity = clamp(dot(N, LPos), 0.0, 1.0);
 
-		LPos = normalize(LPos);
+	if(intensity > 0)
+	{
+		float d = max(0.0, distance(LPos, vWorldPos) - attn.w);
+
 		vec3 H = normalize(LPos + camDir);
 
 		// Attenuation
-		float den = attn.x + (attn.y*2.0*dist)/attn.w + (attn.z*dist*dist)/(attn.w*attn.w);
-		float attnFinal = clamp(1.0 / (den*den), 0.0, 1.0);
-
-		// Ambient
-		vec4 ambientFinal = _Ambient;
-
+		float attenuation = attn.x + (attn.y*d) + (attn.z*d*d);
+		
 		// Diffuse
-		float intensity = clamp(dot(N, LPos), 0.0, 1.0);
 		vec4 diffuseFinal = _Diffuse * intensity;
 
 		// Specular
 		vec4 specularFinal;
-		if(dot(-LPos, N) < 0)
+		if( sum > 0.5 )
 			specularFinal = max(_Specular * pow(clamp(dot(N, H), 0.0, 1.0), _SpecComp), 0.0);
 
-		return clamp(vec4(ambientFinal.rgb + (diffuseFinal.rgb + specularFinal.rgb) * attnFinal * color, 
-						  _Ambient.a + _Diffuse.a + _Specular.a), 0.0, 1.0);
+		return clamp(vec4((diffuseFinal.rgb + specularFinal.rgb) / attenuation * color, 
+						  _Diffuse.a + _Specular.a), 0.0, 1.0);
 	}
 	else
-		return _Ambient;
+		return vec4(0, 0, 0, 0);
+}
+/*
+// 3x3 Gauss
+const float ratio0 = 0.0625;
+const float ratio1 = 0.125;
+const float ratio2 = 0.0625;
+
+const float ratio3 = 0.125;
+const float ratio4 = 0.25;
+const float ratio5 = 0.125;
+
+const float ratio6 = 0.0625;
+const float ratio7 = 0.125;
+const float ratio8 = 0.0625;
+*/
+const int blend = 2;
+const float blendFactor = 1.0 / (((blend<<1)+1) * ((blend<<1)+1));
+const float shadowRadius = 200.0;
+
+float CalculateShadow( int x, int y, float lightDepth, vec3 lightDir, vec3 right, vec3 up )
+{
+	float depth = texture(_TextureCube, -normalize(lightDir+right*x+up*y)).r;
+	
+	float p = lightDepth <= depth;
+
+	float dx = dFdx(depth);
+	float dy = dFdy(depth);
+	
+	float variance = max(0.25*(dx*dx + dy*dy), 0.0000001);
+	float d = lightDepth - depth;
+	float p_max = variance / (variance + d*d);
+			
+	return max(max(p, 0.2), p_max);
 }
 
 void main()
 {
-	if((texture(_TextureCube, -vLightPos).r * 50.0 + 0.5) < clamp(length(vLightPos), 0.0, 50.0))
+	vec4 color0;
+
+	float lightDepth = length(vLightPos) / shadowRadius;
+	vec3 lightDir = normalize(vLightPos);
+
+	// Camera Direction
+	vec3 camPos = normalize(vCameraPos);
+
+	// Normal
+	vec3 N = normalize(vNormal);
+
+	// Shadows
+	vec3 right = normalize(cross(vLightPos, vec3(vLightPos.y, vLightPos.z, vLightPos.x)))*0.0009765625;
+	vec3 up    = normalize(cross(vLightPos, right))*0.0009765625;
+	
+	float shadow = 0.0;
+	
+	// blend x blend PCF
+	for(int x=-blend; x<=blend; ++x)
 	{
-		gl_FragColor = _Ambient;
+		for(int z=-blend; z<=blend; ++z)
+		{
+			shadow += CalculateShadow(x, z, lightDepth, lightDir, right, up);
+		}
 	}
-	else
-	{
-		// Camera Direction
-		vec3 camPos = normalize(vCameraPos);
+	shadow *= blendFactor;
+	
+	/*
+	// 3x3 Gauss
+	shadow += CalculateShadow(-1, -1, lightDepth, lightDir, right, up) * ratio0;
+	shadow += CalculateShadow(0, -1, lightDepth, lightDir, right, up) * ratio1;
+	shadow +=CalculateShadow(1, -1, lightDepth, lightDir, right, up) * ratio2;
 
-		// Normal
-		vec3 N = normalize(vNormal);
+	shadow += CalculateShadow(-1, 0, lightDepth, lightDir, right, up) * ratio3;
+	shadow += CalculateShadow(0, 0, lightDepth, lightDir, right, up) * ratio4;
+	shadow += CalculateShadow(1, 0, lightDepth, lightDir, right, up) * ratio5;
 
-		// Attenuation
-		vec4 color0 = GetColor(vLightPos, camPos, N, _LightColor, _LightAttn);
-
-		gl_FragColor = color0;
-	}
+	shadow += CalculateShadow(-1, 1, lightDepth, lightDir, right, up) * ratio6;
+	shadow += CalculateShadow(0, 1, lightDepth, lightDir, right, up) * ratio7;
+	shadow += CalculateShadow(1, 1, lightDepth, lightDir, right, up) * ratio8;
+	*/
+	color0 = vec4(GetColor(lightDir, camPos, N, _LightColor, _LightAttn, shadow).rgb, 1);
+	gl_FragColor = _Ambient + vec4(color0.rgb * shadow, 1);
 }
 
 #endif

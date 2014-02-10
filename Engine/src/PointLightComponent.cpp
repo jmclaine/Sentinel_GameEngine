@@ -46,7 +46,7 @@ namespace Sentinel
 			// Create view-projection matrices for each side of the cube.
 			//
 			float resolution = static_cast< float >(mResolution);
-			mMatrixProjection.ProjectionPerspective( resolution, resolution, 0.0f, mAttenuation.w, 90.0f );
+			mMatrixProjection.ProjectionPerspective( resolution, resolution, 0.0f, mAttenuation.w * 8.0f, 90.0f );
 
 			const Vector3f& pos = mTransform->mPosition;
 			
@@ -87,7 +87,7 @@ namespace Sentinel
 			renderer->SetShader( mShader.get() );
 			renderer->LockShader();
 
-			static float color[4] = { 0, 0, 0, 0 };
+			static float color[4] = {1, 1, 1, 1};
 
 			renderer->SetViewport( 0, 0, mResolution, mResolution );
 			renderer->SetRenderTexture( mRenderTexture );
