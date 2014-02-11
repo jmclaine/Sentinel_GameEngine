@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ControllerComponent.h"
+#include "GUI\ModelWidget.h"
 #include "Input.h"
 
 namespace Sentinel
@@ -11,14 +12,16 @@ namespace Sentinel
 
 		POINT	mLastMousePos;
 
-		UINT	mLastWindowWidth;
-		UINT	mLastWindowHeight;
+		float	mLastWindowWidth;
+		float	mLastWindowHeight;
 
 	public:
 
 		float	mForwardSpeed;
 		float	mStrafeSpeed;
 		float	mAngularSpeed;
+
+		GUI::ModelWidget* mWorldWidget;
 
 		//////////////////////////////
 		

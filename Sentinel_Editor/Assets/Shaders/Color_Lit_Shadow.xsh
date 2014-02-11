@@ -142,6 +142,29 @@ void main()
 #endif
 #ifdef FRAGMENT_SHADER
 
+/*
+// 3x3 Gauss
+const float ratio0 = 0.0625;
+const float ratio1 = 0.125;
+const float ratio2 = 0.0625;
+
+const float ratio3 = 0.125;
+const float ratio4 = 0.25;
+const float ratio5 = 0.125;
+
+const float ratio6 = 0.0625;
+const float ratio7 = 0.125;
+const float ratio8 = 0.0625;
+//*/
+const float blend = 2.0;
+const float blendInc = 1.0;
+
+const float blendDenom = (blend / blendInc) * 2.0 + 1.0;
+const float blendFactor = 1.0 / (blendDenom * blendDenom);
+
+const float shadowRadius = 200.0;
+const float shadowMin = 0.2;
+
 uniform samplerCube _TextureCube;
 
 uniform vec3 _LightColor;
@@ -159,58 +182,43 @@ vec4 GetColor( vec3 LPos, vec3 camDir, vec3 N, vec3 color, vec4 attn, float sum 
 	if(intensity > 0)
 	{
 		float d = max(0.0, distance(LPos, vWorldPos) - attn.w);
-
-		vec3 H = normalize(LPos + camDir);
-
-		// Attenuation
-		float attenuation = attn.x + (attn.y*d) + (attn.z*d*d);
 		
+		// Attenuation
+		//float attenuation = clamp(1.0 - (attn.y*d/attn.w + (attn.z*d*d)/(attn.w*attn.w)), 0.0, 1.0);
+		float attenuation = clamp(1.0 - d*d/(attn.w*attn.w), 0.0, 1.0);
+		attenuation *= attenuation;
+
 		// Diffuse
 		vec4 diffuseFinal = _Diffuse * intensity;
 
 		// Specular
 		vec4 specularFinal;
-		if( sum > 0.5 )
-			specularFinal = max(_Specular * pow(clamp(dot(N, H), 0.0, 1.0), _SpecComp), 0.0);
+		if( sum > shadowMin )
+		{
+			specularFinal = max(_Specular * pow(clamp(dot(N, normalize(LPos + camDir)), 0.0, 1.0), _SpecComp), 0.0);
+		}
 
-		return clamp(vec4((diffuseFinal.rgb + specularFinal.rgb) / attenuation * color, 
-						  _Diffuse.a + _Specular.a), 0.0, 1.0);
+		return clamp(vec4((diffuseFinal.rgb + specularFinal.rgb) * attenuation * color, 
+						   _Diffuse.a + _Specular.a), 0.0, 1.0);
 	}
 	else
 		return vec4(0, 0, 0, 0);
 }
-/*
-// 3x3 Gauss
-const float ratio0 = 0.0625;
-const float ratio1 = 0.125;
-const float ratio2 = 0.0625;
 
-const float ratio3 = 0.125;
-const float ratio4 = 0.25;
-const float ratio5 = 0.125;
-
-const float ratio6 = 0.0625;
-const float ratio7 = 0.125;
-const float ratio8 = 0.0625;
-*/
-const int blend = 2;
-const float blendFactor = 1.0 / (((blend<<1)+1) * ((blend<<1)+1));
-const float shadowRadius = 200.0;
-
-float CalculateShadow( int x, int y, float lightDepth, vec3 lightDir, vec3 right, vec3 up )
+float CalculateShadow( float offsetU, float offsetV, float lightDepth, vec3 lightDir, vec3 right, vec3 up )
 {
-	float depth = texture(_TextureCube, -normalize(lightDir+right*x+up*y)).r;
+	float depth = texture(_TextureCube, -normalize(lightDir+right*offsetU+up*offsetV)).r;
 	
 	float p = lightDepth <= depth;
 
-	float dx = dFdx(depth);
-	float dy = dFdy(depth);
+	//float dx = dFdx(depth);
+	//float dy = dFdy(depth);
 	
-	float variance = max(0.25*(dx*dx + dy*dy), 0.0000001);
+	float variance = 0.0000001;//max(0.25*(dx*dx + dy*dy), 0.0000001);
 	float d = lightDepth - depth;
 	float p_max = variance / (variance + d*d);
-			
-	return max(max(p, 0.2), p_max);
+
+	return max(p, p_max);
 }
 
 void main()
@@ -227,21 +235,22 @@ void main()
 	vec3 N = normalize(vNormal);
 
 	// Shadows
-	vec3 right = normalize(cross(vLightPos, vec3(vLightPos.y, vLightPos.z, vLightPos.x)))*0.0009765625;
-	vec3 up    = normalize(cross(vLightPos, right))*0.0009765625;
+	vec3 right = normalize(cross(lightDir, vec3(lightDir.y, lightDir.z, lightDir.x)))*0.0009765625;
+	vec3 up    = normalize(cross(lightDir, right))*0.0009765625;
 	
 	float shadow = 0.0;
 	
-	// blend x blend PCF
-	for(int x=-blend; x<=blend; ++x)
+	// PCF blend
+	for(float offsetU=-blend; offsetU<=blend; offsetU+=blendInc)
 	{
-		for(int z=-blend; z<=blend; ++z)
+		for(int offsetV=-blend; offsetV<=blend; offsetV+=blendInc)
 		{
-			shadow += CalculateShadow(x, z, lightDepth, lightDir, right, up);
+			shadow += CalculateShadow(offsetU, offsetV, lightDepth, lightDir, right, up);
 		}
 	}
+
 	shadow *= blendFactor;
-	
+	//*/
 	/*
 	// 3x3 Gauss
 	shadow += CalculateShadow(-1, -1, lightDepth, lightDir, right, up) * ratio0;
@@ -255,7 +264,7 @@ void main()
 	shadow += CalculateShadow(-1, 1, lightDepth, lightDir, right, up) * ratio6;
 	shadow += CalculateShadow(0, 1, lightDepth, lightDir, right, up) * ratio7;
 	shadow += CalculateShadow(1, 1, lightDepth, lightDir, right, up) * ratio8;
-	*/
+	//*/
 	color0 = vec4(GetColor(lightDir, camPos, N, _LightColor, _LightAttn, shadow).rgb, 1);
 	gl_FragColor = _Ambient + vec4(color0.rgb * shadow, 1);
 }

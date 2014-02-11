@@ -17,7 +17,8 @@
 
 namespace Sentinel
 {
-	EditorControllerComponent::EditorControllerComponent()
+	EditorControllerComponent::EditorControllerComponent() :
+		mWorldWidget( NULL )
 	{
 		mForwardSpeed	= 10.0f;
 		mStrafeSpeed	= 3.0f;
@@ -27,6 +28,9 @@ namespace Sentinel
 	void EditorControllerComponent::Startup()
 	{
 		ControllerComponent::Startup();
+
+		if( !mWorldWidget )
+			throw AppException( "EditorControllerComponent::Startup() does not contain GUI::SpriteControllerWidget" );
 	}
 
 	void EditorControllerComponent::Update()
@@ -35,23 +39,23 @@ namespace Sentinel
 		//
 		WindowInfo* info = mOwner->GetWorld()->mRenderer->GetWindow();
 
-		if( mLastWindowWidth != info->Width() || mLastWindowHeight != info->Height() )
+		if( mLastWindowWidth != mWorldWidget->mScale.x || mLastWindowHeight != mWorldWidget->mScale.y )
 		{
 			// Magically ensure the FOV looks correct.
 			// Divide by 32 from the width produces the intended result.
 			//
 			PerspectiveCameraComponent* cameraP = (PerspectiveCameraComponent*)mOwner->GetWorld()->GetCamera( 1 );
 
-			cameraP->Set( (float)info->Width(), (float)info->Height(), cameraP->NearZ(), cameraP->FarZ(), (float)(info->Width() >> 5) );
+			cameraP->Set( mWorldWidget->mScale.x, mWorldWidget->mScale.y, cameraP->NearZ(), cameraP->FarZ(), (float)(info->Width() >> 5) );
 		
-			////////////////////
+			/////////////////////////////////////
 
 			OrthographicCameraComponent* cameraO = (OrthographicCameraComponent*)mOwner->GetWorld()->GetCamera( 0 );
 
 			cameraO->Set( (float)info->Width(), (float)info->Height() );
 
-			mLastWindowWidth = info->Width();
-			mLastWindowHeight = info->Height();
+			mLastWindowWidth  = mWorldWidget->mScale.x;
+			mLastWindowHeight = mWorldWidget->mScale.y;
 		}
 
 		if( mPhysics )

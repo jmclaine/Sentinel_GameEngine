@@ -197,8 +197,8 @@ public:
 		std::shared_ptr< Material > material = mEditorWorld->mMaterialManager->Add( "Bounds", std::shared_ptr< Material >(new Material()));
 		material->mShader     = shaderLine;
 		material->mBlendState = mRenderer->BLEND_OFF;
-		material->mDepthMode  = DEPTH_LESS;
-		material->mCullMode   = CULL_CCW;
+		material->mDepthMode  = DEPTH_LEQUAL;
+		material->mCullMode   = CULL_NONE;
 
 		mBoundsMesh->mMaterial = material;
 
@@ -260,6 +260,7 @@ public:
 
 				BEGIN_PROFILE( timing );
 				mGameWorld->UpdateTransform();
+				mGameWorld->UpdatePhysics();
 				mGameWorld->UpdateLight();
 
 				mRenderer->SetViewport( 0, 0, Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE );
@@ -499,25 +500,6 @@ public:
 		OrthographicCameraComponent* orthoCamera = (OrthographicCameraComponent*)obj->AttachComponent( new OrthographicCameraComponent( (float)Renderer::WINDOW_WIDTH_BASE, (float)Renderer::WINDOW_HEIGHT_BASE ), "OCamera" );
 		
 		//AddObject( obj );
-
-		// World View Camera.
-		//
-		obj = mEditorWorld->AddGameObject( new GameObject(), "Main Camera" );
-
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
-		transform->mPosition    = Vector3f( 0, 25, 25 );
-		transform->mOrientation = Quatf( -45, 0, 0 );
-
-		obj->AttachComponent( new EditorControllerComponent(), "Controller" );
-			
-		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
-		physics->SetRigidBody( mEditorWorld->mPhysicsSystem->CreateRigidBody( mEditorWorld->mPhysicsSystem->CreateSphere( 1.0f ), transform->mPosition, transform->mOrientation, 1.0f ));
-		body = physics->GetRigidBody();
-		body->SetFlags( DISABLE_GRAVITY );
-		body->SetRestitution( 1.0f );
-		body->SetDamping( 0.9f, 0.9f );
-
-		obj->AttachComponent( new PerspectiveCameraComponent( (float)Renderer::WINDOW_WIDTH_BASE, (float)Renderer::WINDOW_HEIGHT_BASE ), "PCamera" );
 		
 		// Create game object for widget.
 		//
@@ -727,6 +709,28 @@ public:
 
 		///////////////////////////////
 
+		// World View Camera.
+		//
+		obj = mEditorWorld->AddGameObject( new GameObject(), "Main Camera" );
+
+		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
+		transform->mPosition    = Vector3f( 0, 15, 40 );
+		transform->mOrientation = Quatf( -15, 0, 0 );
+
+		EditorControllerComponent* editorController = (EditorControllerComponent*)obj->AttachComponent( new EditorControllerComponent(), "Controller" );
+		editorController->mWorldWidget = model;
+			
+		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
+		physics->SetRigidBody( mEditorWorld->mPhysicsSystem->CreateRigidBody( mEditorWorld->mPhysicsSystem->CreateSphere( 1.0f ), transform->mPosition, transform->mOrientation, 1.0f ));
+		body = physics->GetRigidBody();
+		body->SetFlags( DISABLE_GRAVITY );
+		body->SetRestitution( 1.0f );
+		body->SetDamping( 0.9f, 0.9f );
+
+		obj->AttachComponent( new PerspectiveCameraComponent( (float)Renderer::WINDOW_WIDTH_BASE, (float)Renderer::WINDOW_HEIGHT_BASE ), "PCamera" );
+
+		///////////////////////////////
+
 		mEditorWorld->Startup();
 	}
 
@@ -790,8 +794,8 @@ public:
 		obj = mGameWorld->AddGameObject( new GameObject(), "Main Camera" );
 
 		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
-		transform->mPosition    = Vector3f( 0, 25, 25 );
-		transform->mOrientation = Quatf( -45, 0, 0 );
+		transform->mPosition    = Vector3f( 0, 15, 40 );
+		transform->mOrientation = Quatf( -15, 0, 0 );
 
 		obj->AttachComponent( new PlayerControllerComponent(), "Controller" );
 			
@@ -815,7 +819,7 @@ public:
 
 		PointLightComponent* light = (PointLightComponent*)obj->AttachComponent( new PointLightComponent( 1024 ), "Light" );
 		light->mColor         = ColorRGBA( 0.8f, 0.6f, 0.0f, 1.0f );
-		//light->mAttenuation   = Vector4f( 0.333f, 1, 1, 25 );
+		light->mAttenuation   = Vector4f( 1.0f, 0.0f, 0.0f, 25.0f );
 		light->mShader        = mGameWorld->mShaderManager->Get( "RT_Cube_Depth" );
 
 		//AddObject( obj );
@@ -838,7 +842,7 @@ public:
 
 		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
 		transform->mPosition = Vector3f( 0, 0, 0 );
-		transform->mScale    = Vector3f( 20, 1, 20 );
+		transform->mScale    = Vector3f( 100, 1, 100 );
 		//transform->mOrientation = Quatf( 0, 0, 0 );
 
 		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
@@ -934,8 +938,8 @@ public:
 		obj = mGameWorld->AddGameObject( new GameObject(), "Box_Left" );
 
 		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
-		transform->mPosition = Vector3f( -10, 2, 5 );
-		transform->mScale    = Vector3f( 1, 1, 1 );
+		transform->mPosition = Vector3f( 10, 5, 5 );
+		transform->mScale    = Vector3f( 1, 2, 1 );
 		//transform->mOrientation = Quatf( 0, 0, 0 );
 
 		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
@@ -1073,7 +1077,7 @@ public:
 		
 		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
 		transform->mPosition	= Vector3f( 10, 3, 10 );
-		transform->mScale		= Vector3f( 2, 2, 2 );
+		transform->mScale		= Vector3f( 1, 1, 1 );
 		//transform->mOrientation	= Quatf( 45, 45, 45 );
 
 		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
