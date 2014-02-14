@@ -88,12 +88,60 @@ namespace Sentinel
 					shader->SetMatrix( uniformIndex, mMatrixWorld.Ptr() );
 					break;
 
+				case UNIFORM_INV_WORLD:
+					shader->SetMatrix( uniformIndex, mMatrixWorld.Inverse().Ptr() );
+					break;
+
+				case UNIFORM_VIEW:
+					_ASSERT( world );
+					_ASSERT( world->GetCamera() );
+
+					shader->SetFloat3( uniformIndex, const_cast< Matrix4f& >(world->GetCamera()->GetMatrixView()).Ptr() );
+					break;
+
+				case UNIFORM_INV_VIEW:
+					_ASSERT( world );
+					_ASSERT( world->GetCamera() );
+
+					shader->SetFloat3( uniformIndex, world->GetCamera()->GetMatrixView().Inverse().Ptr() );
+					break;
+
+				case UNIFORM_PROJ:
+					_ASSERT( world );
+					_ASSERT( world->GetCamera() );
+
+					shader->SetFloat3( uniformIndex, const_cast< Matrix4f& >(world->GetCamera()->GetMatrixProjection()).Ptr() );
+					break;
+
+				case UNIFORM_INV_PROJ:
+					_ASSERT( world );
+					_ASSERT( world->GetCamera() );
+
+					shader->SetFloat3( uniformIndex, world->GetCamera()->GetMatrixProjection().Inverse().Ptr() );
+					break;
+
 				case UNIFORM_TEXTURE:
 					_ASSERT( mMaterial.get() );
 					_ASSERT( mMaterial->mTexture[ texCount ].get() );	// no texture loaded
 
 					shader->SetTexture( uniformIndex, mMaterial->mTexture[ texCount ].get() );
 					++texCount;
+					break;
+
+				case UNIFORM_AMBIENT:
+					shader->SetFloat4( uniformIndex, mMaterial->mAmbient.Ptr() );
+					break;
+
+				case UNIFORM_DIFFUSE:
+					shader->SetFloat4( uniformIndex, mMaterial->mDiffuse.Ptr() );
+					break;
+
+				case UNIFORM_SPECULAR:
+					shader->SetFloat4( uniformIndex, mMaterial->mSpecular.Ptr() );
+					break;
+
+				case UNIFORM_SPEC_COMP:
+					shader->SetFloat(  uniformIndex, &mMaterial->mSpecularComponent );
 					break;
 
 				case UNIFORM_CAMERA_POS:
@@ -133,9 +181,18 @@ namespace Sentinel
 					shader->SetFloat4( uniformIndex, world->GetLight( lightCount )->mAttenuation.Ptr() );
 					break;
 
+				case UNIFORM_LIGHT_TEXTURE_CUBE:
+					_ASSERT( world );
+					_ASSERT( world->GetLight( lightCount ));
+
+					shader->SetTextureCube( uniformIndex, static_cast< PointLightComponent* >(world->GetLight( lightCount ))->GetTexture() );
+					break;
+
 				case UNIFORM_LIGHT_MATRIX:
 					_ASSERT( world );
 					_ASSERT( world->GetLight( lightCount ));
+
+					//shader->SetMatrix( uniformIndex, static_cast< DirectionalLightComponent* >(world->GetLight( lightCount ))->PtrMatrixFinal() );
 					break;
 
 				case UNIFORM_LIGHT_CUBE_MATRIX:
@@ -144,38 +201,6 @@ namespace Sentinel
 
 					shader->SetMatrix( uniformIndex, static_cast< PointLightComponent* >(world->GetLight( lightCount ))->PtrMatrixFinal(), 6 );
 					break;
-
-				case UNIFORM_LIGHT_TEXTURE_CUBE:
-					_ASSERT( world );
-					_ASSERT( world->GetLight( lightCount ));
-
-					shader->SetTextureCube( uniformIndex, static_cast< PointLightComponent* >(world->GetLight( lightCount ))->GetTexture() );
-					break;
-
-				case UNIFORM_AMBIENT:
-					shader->SetFloat4( uniformIndex, mMaterial->mAmbient.Ptr() );
-					break;
-
-				case UNIFORM_DIFFUSE:
-					shader->SetFloat4( uniformIndex, mMaterial->mDiffuse.Ptr() );
-					break;
-
-				case UNIFORM_SPECULAR:
-					shader->SetFloat4( uniformIndex, mMaterial->mSpecular.Ptr() );
-					break;
-
-				case UNIFORM_SPEC_COMP:
-					shader->SetFloat(  uniformIndex, &mMaterial->mSpecularComponent );
-					break;
-
-				// Shadows.
-				//
-				/*case 'S':
-					mShader->SetMatrix( uniformIndex, (mMatrixShadow * mMatrixWorld).Ptr() );
-					++uniformIndex;
-
-					mShader->SetFloat( uniformIndex, 0.0f );
-					break;*/
 
 				case UNIFORM_DELTA_TIME:
 					{
@@ -187,30 +212,8 @@ namespace Sentinel
 					}
 					break;
 
-				// Screen-Space Ambient Occlusion.
-				//
-					/*
-				case 'A':
-					{
-					_ASSERT( world );
-					_ASSERT( world->GetCamera() );
-
-					const WindowInfo* info = renderer->GetWindow();
-
-					Vector2f pixelSize( 1.0f / info->Width(), 1.0f / info->Height() );
-
-					mShader->SetMatrix( uniformIndex, (world->GetCamera()->GetMatrixProjection().Inverse()).Ptr() );
-					++uniformIndex;
-
-					mShader->SetMatrix( uniformIndex, const_cast< Matrix4f& >(world->GetCamera()->GetMatrixView()).Ptr() );
-					++uniformIndex;
-
-					mShader->SetFloat2( uniformIndex, pixelSize.Ptr() );
-					}
-					break;*/
-
 				default:
-					REPORT_ERROR( "Mesh attempted to Draw with invalid Uniform!", "Mesh Draw Error" );
+					_ASSERT(0);	// Mesh attempted to Draw with invalid Uniform!
 					break;
 				}
 

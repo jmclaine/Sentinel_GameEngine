@@ -162,9 +162,6 @@ vec4 GetColor( vec3 LPos, vec3 camDir, vec3 N, vec3 color, vec4 attn )
 		float den = attn.x + (attn.y*2.0*dist)/attn.w + (attn.z*dist*dist)/(attn.w*attn.w);
 		float attnFinal = clamp(1.0 / (den*den), 0.0, 1.0);
 
-		// Ambient
-		vec4 ambientFinal = _Ambient;
-
 		// Diffuse
 		float intensity = clamp(dot(N, LPos), 0.0, 1.0);
 		vec4 diffuseFinal = _Diffuse * intensity;
@@ -174,11 +171,11 @@ vec4 GetColor( vec3 LPos, vec3 camDir, vec3 N, vec3 color, vec4 attn )
 		if(dot(-LPos, N) < 0)
 			specularFinal = max(_Specular * pow(clamp(dot(N, H), 0.0, 1.0), _SpecComp), 0.0);
 
-		return clamp(vec4(ambientFinal.rgb + (diffuseFinal.rgb + specularFinal.rgb) * attnFinal * color, 
-						  _Ambient.a + _Diffuse.a + _Specular.a), 0.0, 1.0);
+		return clamp(vec4((diffuseFinal.rgb + specularFinal.rgb) * attnFinal * color, 
+						  _Diffuse.a + _Specular.a), 0.0, 1.0);
 	}
 	else
-		return _Ambient;
+		return vec4(0, 0, 0, 0);
 }
 
 void main()
@@ -193,7 +190,7 @@ void main()
 	vec4 color0 = GetColor(vLightPos, camPos, N, _LightColor, _LightAttn);
 
 	// Final fragment color
-	gl_FragColor = color0;
+	gl_FragColor = _Ambient + color0;
 }
 
 #endif
