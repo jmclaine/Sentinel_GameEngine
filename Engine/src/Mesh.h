@@ -41,8 +41,7 @@ namespace Sentinel
 		std::shared_ptr< Material >			mMaterial;
 
 		Matrix4f			mMatrixWorld;
-		Matrix4f			mMatrixShadow;		// camera matrix
-
+		
 		BoundingBox			mBounds;
 
 		//////////////////////////////

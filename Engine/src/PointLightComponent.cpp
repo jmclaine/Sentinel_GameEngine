@@ -4,7 +4,7 @@
 #include "GameWorld.h"
 #include "GameObject.h"
 #include "Renderer.h"
-#include "Shader.h"
+#include "ShaderManager.h"
 #include "Texture.h"
 #include "DrawableComponent.h"
 
@@ -46,7 +46,7 @@ namespace Sentinel
 			// Create view-projection matrices for each side of the cube.
 			//
 			float resolution = static_cast< float >(mResolution);
-			mMatrixProjection.ProjectionPerspective( resolution, resolution, 0.0f, mAttenuation.w * 8.0f, 90.0f );
+			mMatrixProjection.ProjectionPerspective( resolution, resolution, 0.0f, mAttenuation.w, 90.0f );
 
 			const Vector3f& pos = mTransform->mPosition;
 			
@@ -84,21 +84,22 @@ namespace Sentinel
 			//
 			Renderer* renderer = world->mRenderer;
 
-			renderer->SetShader( mShader.get() );
-			renderer->LockShader();
-
 			static float color[4] = {1, 1, 1, 1};
 
+			renderer->SetDepthStencilType( DEPTH_LESS );
 			renderer->SetViewport( 0, 0, mResolution, mResolution );
 			renderer->SetRenderTexture( mRenderTexture );
 			renderer->Clear( color );
+
+			renderer->SetShader( mShader.get() );
+			renderer->LockShader();
 
 			count = (UINT)mDynamic.size();
 			for( UINT x = 0; x < count; ++x )
 			{
 				mDynamic[ x ]->Update();
 			}
-
+			
 			renderer->UnlockShader();
 		}
 	}
@@ -153,13 +154,20 @@ namespace Sentinel
 
 		LightComponent::Save( archive );
 
-		archive.Write( mAttenuation.Ptr(), ar_sizeof( mAttenuation ));
+		archive.Write( &mResolution );
+
+		archive.Write( &mOwner->GetWorld()->mShaderManager->Get( mShader ));
 	}
 
 	void PointLightComponent::Load( Archive& archive )
 	{
 		LightComponent::Load( archive );
 
-		archive.Read( mAttenuation.Ptr(), ar_sizeof( mAttenuation ));
+		archive.Read( &mResolution );
+
+		std::string shader;
+		archive.Read( &shader );
+
+		mShader = mOwner->GetWorld()->mShaderManager->Get( shader );
 	}
 }

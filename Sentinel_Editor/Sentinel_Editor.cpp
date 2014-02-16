@@ -194,7 +194,7 @@ public:
 		
 		mBoundsMesh = builder.BuildMesh( mRenderer );
 
-		std::shared_ptr< Material > material = mEditorWorld->mMaterialManager->Add( "Bounds", std::shared_ptr< Material >(new Material()));
+		std::shared_ptr< Material > material = mEditorWorld->mMaterialManager->Add( "Bounds", SHARED( new Material() ));
 		material->mShader     = shaderLine;
 		material->mBlendState = mRenderer->BLEND_OFF;
 		material->mDepthMode  = DEPTH_LEQUAL;
@@ -372,11 +372,9 @@ public:
 	{
 		MeshBuilder						meshBuilder;
 		std::shared_ptr< Mesh >			mesh;
-
 		std::shared_ptr< Material >		material;
 		std::shared_ptr< Texture >		texture;
 		std::shared_ptr< Shader >		shader;
-
 		std::shared_ptr< Sprite >		sprite;
 
 		GameObject*						obj;
@@ -471,7 +469,7 @@ public:
 
 		// Create backbuffer for world view.
 		//
-		mRTGameWorld = mRenderer->CreateRenderTexture( mEditorWorld->mTextureManager->Add( "Backbuffer", SHARED( mRenderer->CreateTexture( Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE ))).get() );
+		mRTGameWorld = mRenderer->CreateRenderTexture( mEditorWorld->mTextureManager->Add( "Backbuffer", SHARED( mRenderer->CreateTexture( Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE, IMAGE_FORMAT_RGBA ))).get() );
 		mDSGameWorld = mRenderer->CreateDepthStencil( Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE );
 		
 		material = mEditorWorld->mMaterialManager->Add( "Backbuffer", std::shared_ptr< Material >( new Material() ));
@@ -505,12 +503,12 @@ public:
 		//
 		texture = mEditorWorld->mTextureManager->Get( "GUI.png" );
 
-		material = mEditorWorld->mMaterialManager->Add( "GUI", std::shared_ptr< Material >( new Material() ));
+		material = mEditorWorld->mMaterialManager->Add( "GUI", SHARED( new Material() ));
 		material->mShader = mEditorWorld->mShaderManager->Get( "GUI" );
 		material->mBlendState = mRenderer->BLEND_ALPHA;
 		material->mTexture[ TEXTURE_DIFFUSE ] = texture;
 
-		sprite = mEditorWorld->mSpriteManager->Add( "GUI", std::shared_ptr< Sprite >( new Sprite() ));
+		sprite = mEditorWorld->mSpriteManager->Add( "GUI", SHARED( new Sprite() ));
 		sprite->AddFrame( Sprite::QUADtoTEXCOORD( Quad( 0, 0, 1, 1 ), texture->Width(), texture->Height() ));
 		sprite->AddFrame( Sprite::QUADtoTEXCOORD( Quad( 1, 0, 2, 1 ), texture->Width(), texture->Height() ));
 		sprite->AddFrame( Sprite::QUADtoTEXCOORD( Quad( 2, 0, 3, 1 ), texture->Width(), texture->Height() ));
@@ -689,7 +687,7 @@ public:
 		model->mPosition = Vector3f( 0, 0, 0.8f );
 		model->mScale    = Vector3f( (float)Renderer::WINDOW_WIDTH_BASE-500, (float)Renderer::WINDOW_HEIGHT_BASE, 1 );
 		
-		material = mEditorWorld->mMaterialManager->Add( "World", std::shared_ptr< Material >( new Material() ));
+		material = mEditorWorld->mMaterialManager->Add( "World", SHARED( new Material() ));
 		material->mShader = mEditorWorld->mShaderManager->Get( "GUI_Mesh" );
 		material->mBlendState = mRenderer->BLEND_OFF;
 		material->mTexture[ TEXTURE_DIFFUSE ] = mEditorWorld->mTextureManager->Get( "Backbuffer" );
@@ -805,11 +803,10 @@ public:
 		body->SetFlags( DISABLE_GRAVITY );
 		body->SetRestitution( 1.0f );
 		body->SetDamping( 0.9f, 0.9f );
+		body->SetAngularFactor( Vector3f( 0, 0, 0 ));
 			
 		obj->AttachComponent( new PerspectiveCameraComponent( (float)Renderer::WINDOW_WIDTH_BASE, (float)Renderer::WINDOW_HEIGHT_BASE ), "PCamera" );
 		
-		//AddObject( obj );
-
 		// Point Light.
 		//
 		obj = mGameWorld->AddGameObject( new GameObject(), "Point_Light" );
@@ -822,29 +819,27 @@ public:
 		light->mAttenuation   = Vector4f( 1.0f, 0.0f, 0.0f, 25.0f );
 		light->mShader        = mGameWorld->mShaderManager->Get( "RT_Cube_Depth" );
 
-		//AddObject( obj );
-		
-		// Ground object.
+		// Create color only box.
 		//
 		meshBuilder.CreateCube( 1.0f );
 		meshBuilder.mLayout    = shaderColor->Layout();
 		meshBuilder.mPrimitive = TRIANGLE_LIST;
 
-		material = mGameWorld->mMaterialManager->Add( "Ground", std::shared_ptr< Material >(new Material()));
-		material->mShader = shaderColor;
-		material->mBlendState = mRenderer->BLEND_OFF;
+		material = mGameWorld->mMaterialManager->Add( "Box", SHARED( new Material() ));
+		material->mShader      = shaderColor;
+		material->mBlendState  = mRenderer->BLEND_OFF;
 
-		mesh = mGameWorld->mMeshManager->Add( "Ground", std::shared_ptr< Mesh >(meshBuilder.BuildMesh( mRenderer )));
-		mesh->mMaterial = material;
-		//mAssetMesh->addChild( new AssetTreeItem< Mesh >( "Ground", mesh ));
-	
+		mesh = mGameWorld->mMeshManager->Add( "Box", SHARED( meshBuilder.BuildMesh( mRenderer )));
+		mesh->mMaterial        = material;
+		
+		// Ground object - Bottom.
+		//
 		obj = mGameWorld->AddGameObject( new GameObject(), "Ground_Bottom" );
 
 		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
 		transform->mPosition = Vector3f( 0, 0, 0 );
 		transform->mScale    = Vector3f( 100, 1, 100 );
-		//transform->mOrientation = Quatf( 0, 0, 0 );
-
+		
 		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
 		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
 		body = physics->GetRigidBody();
@@ -852,16 +847,15 @@ public:
 			
 		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
 		meshComp->mIsDynamic = true;
-		//*/
-
-
+		
+		// Ground object - Back.
+		//
 		obj = mGameWorld->AddGameObject( new GameObject(), "Ground_Back" );
 
 		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
 		transform->mPosition = Vector3f( 0, 20, -20 );
 		transform->mScale    = Vector3f( 20, 20, 1 );
-		//transform->mOrientation = Quatf( 0, 0, 0 );
-
+		
 		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
 		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
 		body = physics->GetRigidBody();
@@ -870,14 +864,14 @@ public:
 		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
 		meshComp->mIsDynamic = true;
 
-
+		// Ground object - Right.
+		//
 		obj = mGameWorld->AddGameObject( new GameObject(), "Ground_Right" );
 
 		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
 		transform->mPosition = Vector3f( 20, 20, 0 );
 		transform->mScale    = Vector3f( 1, 20, 20 );
-		//transform->mOrientation = Quatf( 0, 0, 0 );
-
+		
 		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
 		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
 		body = physics->GetRigidBody();
@@ -886,7 +880,8 @@ public:
 		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
 		meshComp->mIsDynamic = true;
 
-
+		// Ground object - Left.
+		//
 		obj = mGameWorld->AddGameObject( new GameObject(), "Ground_Left" );
 
 		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
@@ -902,14 +897,14 @@ public:
 		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
 		meshComp->mIsDynamic = true;
 
-
+		// Ground object - Top.
+		//
 		obj = mGameWorld->AddGameObject( new GameObject(), "Ground_Top" );
 
 		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
 		transform->mPosition = Vector3f( 0, 20, 0 );
 		transform->mScale    = Vector3f( 20, 1, 20 );
-		//transform->mOrientation = Quatf( 0, 0, 0 );
-
+		
 		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
 		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
 		body = physics->GetRigidBody();
@@ -918,55 +913,53 @@ public:
 		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
 		meshComp->mIsDynamic = true;
 
-
+		// Box object - Right.
+		//
 		obj = mGameWorld->AddGameObject( new GameObject(), "Box_Right" );
 
 		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
 		transform->mPosition = Vector3f( 10, 2, 5 );
 		transform->mScale    = Vector3f( 1, 1, 1 );
-		//transform->mOrientation = Quatf( 0, 0, 0 );
-
+		
 		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
-		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
+		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 1.0f ));
 		body = physics->GetRigidBody();
-		body->SetFlags( DISABLE_GRAVITY );
 			
 		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
 		meshComp->mIsDynamic = true;
 
-
+		// Box object - Left.
+		//
 		obj = mGameWorld->AddGameObject( new GameObject(), "Box_Left" );
 
 		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
 		transform->mPosition = Vector3f( 10, 5, 5 );
 		transform->mScale    = Vector3f( 1, 2, 1 );
-		//transform->mOrientation = Quatf( 0, 0, 0 );
-
+		
 		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
-		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
+		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 1.0f ));
 		body = physics->GetRigidBody();
-		body->SetFlags( DISABLE_GRAVITY );
 			
 		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
 		meshComp->mIsDynamic = true;
 
-
+		// Box object - Top.
+		//
 		obj = mGameWorld->AddGameObject( new GameObject(), "Box_Top" );
 
 		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
 		transform->mPosition = Vector3f( 0, 8, 5 );
 		transform->mScale    = Vector3f( 1, 1, 1 );
-		//transform->mOrientation = Quatf( 0, 0, 0 );
-
+		
 		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
-		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
+		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 1.0f ));
 		body = physics->GetRigidBody();
-		body->SetFlags( DISABLE_GRAVITY );
 			
 		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
 		meshComp->mIsDynamic = true;
 
-
+		// Box object - Back.
+		//
 		obj = mGameWorld->AddGameObject( new GameObject(), "Box_Back" );
 
 		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
@@ -975,26 +968,84 @@ public:
 		transform->mOrientation = Quatf( 45, 45, 45 );
 
 		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
-		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
+		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 1.0f ));
 		body = physics->GetRigidBody();
-		body->SetFlags( DISABLE_GRAVITY );
 			
 		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
 		meshComp->mIsDynamic = true;
-		//AddObject( obj );
+		
+		// Dodecahedron.
+		//
+		meshBuilder.ClearGeometry();
+		meshBuilder.CreateDodecahedron( 1.0f );
+		meshBuilder.mLayout = shaderTexture->Layout();
+
+		material = mGameWorld->mMaterialManager->Add( "Dodecahedron", SHARED( new Material() ));
+		material->mShader = shaderColor; // intentionally set wrong shader to demonstrate vertex layout compatibility
+		material->mBlendState = mRenderer->BLEND_ALPHA;
+		material->mTexture[ TEXTURE_DIFFUSE ] = mGameWorld->mTextureManager->Get( "default-alpha.png" );
+
+		mesh = mGameWorld->mMeshManager->Add( "Dodecahedron", SHARED( meshBuilder.BuildMesh( mRenderer )));
+		mesh->mMaterial = material;
+		
+		GameObject* obj2 = new GameObject();
+		obj2->mName = "Dodecahedron";
+
+		transform = (TransformComponent*)obj2->AttachComponent( new TransformComponent(), "Transform" );
+		transform->mPosition	= Vector3f( 10, 2, -10 );
+		transform->mScale		= Vector3f( 1, 1, 1 );
+		transform->mOrientation	= Quatf( 0, 0, 0 );
+
+		meshComp = (MeshComponent*)obj2->AttachComponent( new MeshComponent( mesh ), "Mesh" );
+		meshComp->mIsDynamic = true;
+
+		//physics = (PhysicsComponent*)obj2->AttachComponent( new PhysicsComponent(), "Physics" );
+		//physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateMesh( mesh->mVBO, transform->mOrientation, transform->mScale, mesh, 1.0f ));
+		//body = physics->GetRigidBody();
+		
+		mGameWorld->AddGameObject( obj2 );
+		
+		// Sphere.
+		//
+		meshBuilder.ClearGeometry();
+		meshBuilder.CreateSphere( 1.0f, 10, 10 );
+		mesh->mLayout = shaderTexture->Layout();
+
+		material = mGameWorld->mMaterialManager->Add( "Sphere", SHARED( new Material() ));
+		material->mShader = shaderTexture;
+		material->mBlendState = mRenderer->BLEND_ALPHA;
+		material->mTexture[ TEXTURE_DIFFUSE ] = mGameWorld->mTextureManager->Get( "default-alpha.png" );
+
+		mesh = mGameWorld->mMeshManager->Add( "Sphere", SHARED( meshBuilder.BuildMesh( mRenderer )));
+		mesh->mMaterial = material;
+		
+		obj = mGameWorld->AddGameObject( new GameObject(), "Sphere" );
+
+		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
+		transform->mPosition	= Vector3f( 20, 2, 30 );
+		transform->mScale		= Vector3f( 1, 1, 1 );
+		
+		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
+		meshComp->mIsDynamic = true;
+
+		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
+		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateSphere( transform->mScale.x ), transform->mPosition, transform->mOrientation, 1.0f ));
+		body = physics->GetRigidBody();
+		
+		//obj->AddChild( obj2 );
 		
 		// Testing particle effects.
 		//
 		std::shared_ptr< Texture > texture = mGameWorld->mTextureManager->Add( "fire.png", SHARED( mRenderer->CreateTextureFromFile( "Textures\\fire.png" )));
 		
-		material = mGameWorld->mMaterialManager->Add( "Fire", std::shared_ptr< Material >(new Material()));
+		material = mGameWorld->mMaterialManager->Add( "Fire", SHARED( new Material() ));
 		material->mShader = mGameWorld->mShaderManager->Get( "Sprite" );
-		material->mBlendState = std::shared_ptr< BlendState >(mRenderer->CreateBlendState( BLEND_SRC_ALPHA, BLEND_ONE, BLEND_SRC_ALPHA, BLEND_ONE ));
+		material->mBlendState = SHARED( mRenderer->CreateBlendState( BLEND_SRC_ALPHA, BLEND_ONE, BLEND_SRC_ALPHA, BLEND_ONE ));
 		material->mTexture[ TEXTURE_DIFFUSE ] = texture;
 		material->mCullMode  = CULL_NONE;
 		material->mDepthMode = DEPTH_OFF;
 
-		std::shared_ptr< Sprite > sprite = mGameWorld->mSpriteManager->Add( "Fire", std::shared_ptr< Sprite >(new Sprite()));
+		std::shared_ptr< Sprite > sprite = mGameWorld->mSpriteManager->Add( "Fire", SHARED( new Sprite() ));
 		sprite->AddFrame( Sprite::QUADtoTEXCOORD( Quad( 0, 0, 64, 64 ), texture->Width(), texture->Height() ));
 		sprite->AddFrame( Sprite::QUADtoTEXCOORD( Quad( 64, 0, 128, 64 ), texture->Width(), texture->Height() ));
 
@@ -1014,82 +1065,13 @@ public:
 		particleSystem->mEffect.push_back( new FadeToScaleEffect( 1.0f, 2.0f, 1.0f ));
 		particleSystem->mEffect.push_back( new RandomColorEffect( 1.0f, ColorRGBA( 1, 1, 1, 0.125f ), ColorRGBA( 0.9f, 0.9f, 0.9f, 0.125f )));
 		particleSystem->mEffect.push_back( new FadeToColorEffect( 1.0f, 5.0f, ColorRGBA( 0.9f, 0.9f, 0.9f, 0.025f )));
-		//particleSystem->mEffect.push_back( new RandomVelocityEffect( 1, Vector3f( -1, 1, 0 ), Vector3f( 1, 1, 0 )));
-
+		
 		obj = mGameWorld->AddGameObject( new GameObject(), "Particle Emitter" );
 
 		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
 		transform->mScale = Vector3f( 512, 512, 1 );
 
 		obj->AttachComponent( new ParticleEmitterComponent( particleSystem ), "Sprite" );
-
-		// Test object.
-		//
-		meshBuilder.ClearGeometry();
-		meshBuilder.CreateDodecahedron( 1.0f );
-		//meshBuilder.CreateCylinder( 1.0f, 2.0f, 10 );
-		meshBuilder.mLayout = shaderTexture->Layout();
-
-		material = mGameWorld->mMaterialManager->Add( "Dodecahedron", std::shared_ptr< Material >(new Material()));
-		material->mShader = shaderColor; // intentionally set wrong shader to demonstrate vertex layout compatibility
-		material->mBlendState = mRenderer->BLEND_ALPHA;
-		material->mTexture[ TEXTURE_DIFFUSE ] = mGameWorld->mTextureManager->Get( "default-alpha.png" );
-
-		mesh = mGameWorld->mMeshManager->Add( "Dodecahedron", std::shared_ptr< Mesh >(meshBuilder.BuildMesh( mRenderer )));
-		mesh->mMaterial = material;
-		//AddAsset( "Dodecahedron", mesh );
-
-		GameObject* obj2 = new GameObject();
-		obj2->mName = "Dodecahedron";
-
-		transform = (TransformComponent*)obj2->AttachComponent( new TransformComponent(), "Transform" );
-		transform->mPosition	= Vector3f( 10, 2, -10 );
-		transform->mScale		= Vector3f( 1, 1, 1 );
-		//transform->mOrientation	= Quatf( 90, 180, 270 );
-		transform->mOrientation	= Quatf( 0, 0, 0 );
-
-		meshComp = (MeshComponent*)obj2->AttachComponent( new MeshComponent( mesh ), "Mesh" );
-		meshComp->mIsDynamic = true;
-
-		//physics = (PhysicsComponent*)obj2->AttachComponent( new PhysicsComponent(), "Physics" );
-		//physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateMesh( transform->mPosition, transform->mOrientation, transform->mScale, mesh, 1.0f ));
-		//body = physics->GetRigidBody();
-		
-		mGameWorld->AddGameObject( obj2 );
-		
-		// Parent test object.
-		//
-		meshBuilder.ClearGeometry();
-		meshBuilder.CreateSphere( 1.0f, 10, 10 );
-		mesh->mLayout = shaderTexture->Layout();
-
-		material = mGameWorld->mMaterialManager->Add( "Sphere", std::shared_ptr< Material >(new Material()));
-		material->mShader = shaderTexture;
-		material->mBlendState = mRenderer->BLEND_ALPHA;
-		//material->mDepthMode = DEPTH_ALWAYS;
-		material->mTexture[ TEXTURE_DIFFUSE ] = mGameWorld->mTextureManager->Get( "default-alpha.png" );
-
-		mesh = mGameWorld->mMeshManager->Add( "Sphere", std::shared_ptr< Mesh >(meshBuilder.BuildMesh( mRenderer )));
-		mesh->mMaterial = material;
-		//AddAsset( "Sphere", mesh );
-
-		obj = mGameWorld->AddGameObject( new GameObject(), "Sphere" );
-		
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
-		transform->mPosition	= Vector3f( 10, 3, 10 );
-		transform->mScale		= Vector3f( 1, 1, 1 );
-		//transform->mOrientation	= Quatf( 45, 45, 45 );
-
-		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
-		meshComp->mIsDynamic = true;
-
-		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
-		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateSphere( transform->mScale.x ), transform->mPosition, transform->mOrientation, 1.0f ));
-		body = physics->GetRigidBody();
-		
-		//obj->AddChild( obj2 );
-
-		//AddObject( obj );
 
 		///////////////////////////////
 
@@ -1110,14 +1092,14 @@ public:
 		mTranslateObject = new GameObject();
 		const float tileSize = 5;
 
-		std::shared_ptr< Model > model = std::shared_ptr< Model >(LoadModelM3DFromFile( "Editor\\Translate.M3D", mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager, mGameWorld->mMaterialManager ));
+		std::shared_ptr< Model > model = SHARED( LoadModelM3DFromFile( "Editor\\Translate.M3D", mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager, mGameWorld->mMaterialManager ));
 		
 		std::vector< std::shared_ptr< Material >> material;
 		model->GetMaterials( &material );
 
 		material[ 0 ]->mShader = mEditorWorld->mShaderManager->Get( "Color_Only" );
 		material[ 0 ]->mCullMode = CULL_NONE;
-		material[ 0 ]->mBlendState = std::shared_ptr< BlendState >(mRenderer->CreateBlendState( BLEND_SRC_ALPHA, BLEND_ONE, BLEND_SRC_ALPHA, BLEND_ONE ));
+		material[ 0 ]->mBlendState = SHARED( mRenderer->CreateBlendState( BLEND_SRC_ALPHA, BLEND_ONE, BLEND_SRC_ALPHA, BLEND_ONE ));
 		material[ 0 ]->mDepthMode = DEPTH_ALWAYS;
 		
 		model->SetMaterials( material );
@@ -1193,24 +1175,10 @@ public:
 	}
 
 	void CreateRotateMesh()
-	{
-		/*
-		mRotateObject = new WGameObject();
-
-		mRotateObject.SetWorld( mGameWorld );
-		mRotateObject.Startup();
-		*/
-	}
+	{}
 
 	void CreateScaleMesh()
-	{
-		/*
-		mScaleObject = new WGameObject();
-
-		mScaleObject.SetWorld( mGameWorld );
-		mScaleObject.Startup();
-		*/
-	}
+	{}
 
 	void CheckBounds( GameObject* obj )
 	{

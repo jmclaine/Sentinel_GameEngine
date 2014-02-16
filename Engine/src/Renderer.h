@@ -189,11 +189,31 @@ namespace Sentinel
 
 	//////////////////////////////////
 
-	class BlendState
+	class SENTINEL_DLL BlendState
 	{
+	protected:
+
+		BlendType		mSrcBlendColor;
+		BlendType		mDstBlendColor;
+
+		BlendType		mSrcBlendAlpha;
+		BlendType		mDstBlendAlpha;
+
+		BlendFuncType	mBlendFuncColor;
+		BlendFuncType	mBlendFuncAlpha;
+
 	public:
 
 		virtual ~BlendState() {}
+
+		BlendType		SrcBlendColor();
+		BlendType		DstBlendColor();
+
+		BlendType		SrcBlendAlpha();
+		BlendType		DstBlendAlpha();
+
+		BlendFuncType	BlendFuncColor();
+		BlendFuncType	BlendFuncAlpha();
 	};
 
 	//////////////////////////////////
@@ -227,7 +247,7 @@ namespace Sentinel
 
 	public:
 
-		virtual ~Renderer();
+		virtual ~Renderer() {}
 
 		/////////////////////////////////
 

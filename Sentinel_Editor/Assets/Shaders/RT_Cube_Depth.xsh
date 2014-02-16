@@ -5,7 +5,8 @@
 cbuffer Uniforms
 {
 	matrix _World;
-	matrix _CubeVP[6];
+	matrix _LightCubeMatrix[6];
+	float3 _LightPos;
 }
 
 
@@ -13,7 +14,7 @@ cbuffer Uniforms
 //
 struct VSInput
 {
-	float4 Position		:POSITION;
+	float3 Position		:POSITION;
 };
 
 struct VSOutput
@@ -26,24 +27,46 @@ VSOutput VS_Main( VSInput input )
 	VSOutput output;
 
 	// Position
-	output.Position = mul(_World, input.Position);
+	output.Position = mul(_World, float4(input.Position, 1.0));
 
 	return output;
 }
 
-float4 PS_Main( VSOutput input ) : SV_Target
-{	
-	// Camera Direction
-	float3 camPos = normalize(input.CameraPos);
+// Geometry Shader.
+//
+struct GSOutput
+{
+	float4 Position		:SV_POSITION;
+	float3 LightPos		:NORMAL;
+	uint   RTIndex		:SV_RenderTargetArrayIndex;
+};
 
-	// Normal
-	float3 N = normalize(input.Normal);
-	 
-	// Attenuation
-	float4 color0 = GetColor(input.LightPos, camPos, N, _LightColor, _LightAttn);
-	
-	// Final fragment color
-	return color0;
+[maxvertexcount(18)]
+void GS_Main( triangle VSOutput input[3], inout TriangleStream<GSOutput> stream )
+{
+	GSOutput output;
+
+	for( int face = 0; face < 6; ++face )
+    {
+		output.RTIndex = face;
+
+		for( int vert = 0; vert < 3; ++vert )
+		{
+			output.Position = mul(_LightCubeMatrix[face], input[vert].Position);
+			output.LightPos = input[vert].Position.xyz - _LightPos;
+			stream.Append( output );
+		}
+		stream.RestartStrip();
+    }
+}
+
+// Pixel Shader.
+//
+const float shadowRadius = 1.0 / 25.0;
+
+float PS_Main( GSOutput input ) : SV_Target
+{
+	return length(input.LightPos) * shadowRadius;
 }
 
 #endif
@@ -76,16 +99,16 @@ layout(triangle_strip, max_vertices=18) out;
 
 in vec4 vPosition[];
 
-out vec4 gPosition;
+out vec4 gLightPos;
 
 void main()
 {
-	for(gl_Layer=0; gl_Layer<6; ++gl_Layer)
+	for( gl_Layer = 0; gl_Layer < 6; ++gl_Layer )
 	{
-		for(int tri_vert=0; tri_vert<3; ++tri_vert)
+		for( int vert = 0; vert < 3; ++vert )
 		{
-			gPosition = vPosition[tri_vert] - vec4(_LightPos, 1);
-			gl_Position = _LightCubeMatrix[gl_Layer] * vPosition[tri_vert];
+			gl_Position = _LightCubeMatrix[gl_Layer] * vPosition[vert];
+			gLightPos = vec4(vPosition[vert].xyz - _LightPos, 1);
 			EmitVertex();
 		}
 		EndPrimitive();
@@ -95,20 +118,21 @@ void main()
 #endif
 #ifdef FRAGMENT_SHADER
 
-uniform vec3 _LightPos;
+in vec4 gLightPos;
 
-in vec4 gPosition;
-
-const float shadowRadius = 1.0 / 200.0;
+const float shadowRadius = 25.0;
 
 void main()
 {
-	float depth = length(gPosition) * shadowRadius;
-	//gl_FragColor.r = min(depth, gl_FragCoord.z);
-	//gl_FragDepth = max(depth, gl_FragDepth);
+	float depth = length(gLightPos) / shadowRadius;
+
 	gl_FragDepth = depth;
-	//gl_FragColor.r = depth;
-	//gl_FragColor.g = depth*depth;
+	/*
+	float dx = dFdx(depth);
+	float dy = dFdy(depth);
+
+	gl_FragColor.rg = vec2(depth, depth*depth + 0.25*(dx*dx + dy*dy));
+	//*/
 }
 
 #endif

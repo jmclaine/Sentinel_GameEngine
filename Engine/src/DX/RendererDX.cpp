@@ -92,7 +92,7 @@ namespace Sentinel
 
 		public:
 
-			ID3D11BlendState*					mBlendState;
+			ID3D11BlendState* mBlendState;
 
 			//////////////////////////////////////////////////
 

@@ -414,6 +414,10 @@ namespace Sentinel
 				glTexImage2D( GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, data );
 				break;
 
+			case IMAGE_FORMAT_RG:
+				glTexImage2D( GL_TEXTURE_2D, 0, GL_RG, width, height, 0, GL_RG, GL_UNSIGNED_BYTE, data );
+				break;
+
 			case IMAGE_FORMAT_RGB:
 				glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data );
 				break;
@@ -423,7 +427,7 @@ namespace Sentinel
 				break;
 
 			case IMAGE_FORMAT_HDR:
-				glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA32F, GL_UNSIGNED_BYTE, data );
+				glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, data );
 				break;
 
 			case IMAGE_FORMAT_DEPTH:
@@ -461,9 +465,14 @@ namespace Sentinel
 					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_R32F, width, height, 0, GL_RED, GL_FLOAT, NULL );
 				break;
 
+			case IMAGE_FORMAT_RG:
+				for( UINT x = 0; x < 6; ++x )
+					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RG32F, width, height, 0, GL_RGBA, GL_FLOAT, NULL );
+				break;
+
 			case IMAGE_FORMAT_RGB:
 				for( UINT x = 0; x < 6; ++x )
-					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_INT, NULL );
+					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL );
 				break;
 
 			case IMAGE_FORMAT_RGBA:
@@ -473,7 +482,7 @@ namespace Sentinel
 
 			case IMAGE_FORMAT_HDR:
 				for( UINT x = 0; x < 6; ++x )
-					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_UNSIGNED_INT, NULL );
+					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, NULL );
 				break;
 
 			case IMAGE_FORMAT_DEPTH:
@@ -516,6 +525,8 @@ namespace Sentinel
 			{
 			case IMAGE_FORMAT_DEPTH:
 				glFramebufferTexture( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, static_cast< TextureGL* >(texture)->ID(), 0 );
+				glDrawBuffer( GL_NONE );
+				glReadBuffer( GL_NONE );
 				break;
 
 			default:
@@ -576,15 +587,7 @@ namespace Sentinel
 		{
 			_ASSERT( target );
 
-			RenderTextureGL* targetGL = static_cast< RenderTextureGL* >(target);
-
-			glBindFramebuffer( GL_FRAMEBUFFER, targetGL->mID );
-
-			if( targetGL->mTexture->Format() == IMAGE_FORMAT_DEPTH )
-			{
-				glDrawBuffer( GL_NONE );
-				glReadBuffer( GL_NONE );
-			}
+			glBindFramebuffer( GL_FRAMEBUFFER, static_cast< RenderTextureGL* >(target)->mID );
 		}
 
 		void SetDepthStencil( DepthStencil* stencil )

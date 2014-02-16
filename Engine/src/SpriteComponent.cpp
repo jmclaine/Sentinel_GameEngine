@@ -89,7 +89,7 @@ namespace Sentinel
 
 		SERIAL_REGISTER.Save( archive );
 
-		GameComponent::Save( archive );
+		DrawableComponent::Save( archive );
 
 		archive.Write( &mOwner->GetWorld()->mSpriteManager->Get( mSprite ));
 		archive.Write( &mCamera );
@@ -103,7 +103,7 @@ namespace Sentinel
 		_ASSERT( mOwner->GetWorld() );
 		_ASSERT( mOwner->GetWorld()->mSpriteManager );
 
-		GameComponent::Load( archive );
+		DrawableComponent::Load( archive );
 
 		std::string name;
 		archive.Read( &name );

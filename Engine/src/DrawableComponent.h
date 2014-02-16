@@ -35,5 +35,10 @@ namespace Sentinel
 		/////////////////////////////
 
 		const BoundingBox& GetBounds();
+
+	protected:
+
+		virtual DECLARE_SERIAL_SAVE();
+		virtual DECLARE_SERIAL_LOAD();
 	};
 }

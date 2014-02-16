@@ -20,12 +20,5 @@ namespace Sentinel
 		void Save( Archive& archive );
 
 		void Load( Archive& archive, Renderer* renderer );
-
-		// See 'config.xml' within the Shaders folder
-		// for the structure of the shader definitions.
-		//
-		// returns true on success.
-		//
-		static bool LoadConfig( const char* filename, Renderer* renderer, ShaderManager* shaderManager );
 	};
 }

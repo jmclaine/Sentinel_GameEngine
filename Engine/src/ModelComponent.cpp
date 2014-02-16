@@ -57,7 +57,7 @@ namespace Sentinel
 
 		SERIAL_REGISTER.Save( archive );
 
-		GameComponent::Save( archive );
+		DrawableComponent::Save( archive );
 
 		GameWorld* world = mOwner->GetWorld();
 
@@ -70,7 +70,7 @@ namespace Sentinel
 		_ASSERT( mOwner->GetWorld() );
 		_ASSERT( mOwner->GetWorld()->mModelManager );
 
-		GameComponent::Load( archive );
+		DrawableComponent::Load( archive );
 
 		GameWorld* world = mOwner->GetWorld();
 

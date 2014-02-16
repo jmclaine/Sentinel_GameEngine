@@ -52,7 +52,41 @@ namespace Sentinel
 			archive.Write( &texture );
 		}
 
-		// BlendState
+		// Write the blend state type.
+		// 0 = BLEND_OFF
+		// 1 = BLEND_ALPHA
+		// 2 = Custom BlendState
+		//
+		BYTE type;
+		if( material->mBlendState.get() == renderer->BLEND_OFF.get() )
+			type = 0;
+		else
+		if( material->mBlendState.get() == renderer->BLEND_ALPHA.get() )
+			type = 1;
+		else
+			type = 2;
+
+		archive.Write( &type );
+		if( type == 2 )
+		{
+			type = (BYTE)material->mBlendState->SrcBlendColor();
+			archive.Write( &type );
+
+			type = (BYTE)material->mBlendState->DstBlendColor();
+			archive.Write( &type );
+
+			type = (BYTE)material->mBlendState->SrcBlendAlpha();
+			archive.Write( &type );
+
+			type = (BYTE)material->mBlendState->DstBlendAlpha();
+			archive.Write( &type );
+
+			type = (BYTE)material->mBlendState->BlendFuncColor();
+			archive.Write( &type );
+
+			type = (BYTE)material->mBlendState->BlendFuncAlpha();
+			archive.Write( &type );
+		}
 
 		BYTE data = static_cast< BYTE >(material->mCullMode);
 		archive.Write( &data );
@@ -85,7 +119,50 @@ namespace Sentinel
 			material->mTexture[ x ] = textureManager->Get( texture );
 		}
 
-		// BlendState
+		// Read the blend state type.
+		// 0 = BLEND_OFF
+		// 1 = BLEND_ALPHA
+		// 2 = Custom BlendState
+		//
+		BYTE type;
+		archive.Read( &type );
+
+		switch( type )
+		{
+		case 0:
+			material->mBlendState = renderer->BLEND_OFF;
+			break;
+
+		case 1:
+			material->mBlendState = renderer->BLEND_ALPHA;
+			break;
+
+		default:
+			{
+			BYTE srcColor;
+			archive.Read( &srcColor );
+
+			BYTE dstColor;
+			archive.Read( &dstColor );
+
+			BYTE srcAlpha;
+			archive.Read( &srcAlpha );
+
+			BYTE dstAlpha;
+			archive.Read( &dstAlpha );
+			
+			BYTE funcColor;
+			archive.Read( &funcColor );
+			
+			BYTE funcAlpha;
+			archive.Read( &funcAlpha );
+
+			material->mBlendState = SHARED( renderer->CreateBlendState( (BlendType)srcColor, (BlendType)dstColor, 
+																		(BlendType)srcAlpha, (BlendType)dstAlpha, 
+																		(BlendFuncType)funcColor, (BlendFuncType)funcAlpha ));
+			}
+			break;
+		}
 
 		BYTE cull;
 		archive.Read( &cull );

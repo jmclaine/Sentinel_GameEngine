@@ -14,6 +14,7 @@ namespace Sentinel
 	enum ImageFormatType
 	{
 		IMAGE_FORMAT_R,
+		IMAGE_FORMAT_RG,
 		IMAGE_FORMAT_RGB,
 		IMAGE_FORMAT_RGBA,
 		IMAGE_FORMAT_HDR,	// R32G32B32F

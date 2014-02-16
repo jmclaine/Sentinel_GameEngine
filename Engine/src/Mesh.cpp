@@ -32,7 +32,6 @@ namespace Sentinel
 		mMaterial	= NULL;
 
 		mMatrixWorld.Identity();
-		mMatrixShadow.Identity();
 	}
 
 	Mesh::~Mesh()
@@ -69,8 +68,7 @@ namespace Sentinel
 			UINT texCount     = 0;
 			UINT lightCount   = 0;
 			UINT uniformIndex = 0;
-			Vector3f pos;
-
+			
 			const std::vector< UniformType >& uniform = shader->Uniform();
 			
 			for( UINT i = 0; i < uniform.size(); ++i )
@@ -145,12 +143,14 @@ namespace Sentinel
 					break;
 
 				case UNIFORM_CAMERA_POS:
+					{
 					_ASSERT( world );
 					_ASSERT( world->GetCamera() );
 
-					pos = world->GetCamera()->GetTransform()->mPosition;
+					Vector3f pos = world->GetCamera()->GetTransform()->mPosition;
 						
 					shader->SetFloat3( uniformIndex, pos.Ptr() );
+					}
 					break;
 
 				case UNIFORM_LIGHT_POS:
@@ -244,6 +244,18 @@ namespace Sentinel
 		BYTE primitive = mesh->mPrimitive;
 		archive.Write( &primitive );
 
+		const std::vector< AttributeType >& layout = mesh->mLayout->Layout();
+
+		UINT count = (UINT)layout.size();
+		archive.Write( &count );
+
+		BYTE data;
+		TRAVERSE_VECTOR( x, layout )
+		{
+			data = layout[ x ];
+			archive.Write( &data );
+		}
+
 		Buffer::Save( archive, mesh->mVBO );
 		Buffer::Save( archive, mesh->mIBO );
 
@@ -262,6 +274,20 @@ namespace Sentinel
 		BYTE primitive;
 		archive.Read( &primitive );
 		mesh->mPrimitive = (RenderType)primitive;
+
+		std::vector< AttributeType > layout;
+
+		UINT count;
+		archive.Read( &count );
+
+		BYTE data;
+		for( UINT x = 0; x < count; ++x )
+		{
+			archive.Read( &data );
+			layout.push_back( (AttributeType)data );
+		}
+
+		mesh->mLayout = SHARED( renderer->CreateVertexLayout( layout ));
 
 		mesh->mVBO = Buffer::Load( archive, renderer );
 		mesh->mIBO = Buffer::Load( archive, renderer );

@@ -8,7 +8,7 @@
 namespace Sentinel
 {
 	LightComponent::LightComponent() :
-		mAttenuation( Vector4f( 1.0f, 0.0f, 0.0f, 25 )),
+		mAttenuation( Vector4f( 1.0f, 0.0f, 0.0f, 25.0f )),
 		mTexture( NULL ),
 		mRenderTexture( NULL )
 	{
@@ -61,6 +61,7 @@ namespace Sentinel
 		GameComponent::Save( archive );
 
 		archive.Write( mColor.Ptr(), ar_sizeof( mColor ));
+		archive.Write( mAttenuation.Ptr(), ar_sizeof( mAttenuation ));
 	}
 
 	void LightComponent::Load( Archive& archive )
@@ -68,5 +69,6 @@ namespace Sentinel
 		GameComponent::Load( archive );
 
 		archive.Read( mColor.Ptr(), ar_sizeof( mColor ));
+		archive.Read( mAttenuation.Ptr(), ar_sizeof( mAttenuation ));
 	}
 }

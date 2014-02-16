@@ -1,5 +1,6 @@
 #include "GameObject.h"
 #include "DrawableComponent.h"
+#include "Archive.h"
 
 namespace Sentinel
 {
@@ -31,5 +32,21 @@ namespace Sentinel
 	const BoundingBox& DrawableComponent::GetBounds()
 	{
 		return mBounds;
+	}
+
+	///////////////////////////////////
+
+	void DrawableComponent::Save( Archive& archive )
+	{
+		GameComponent::Save( archive );
+
+		archive.Write( &mIsDynamic );
+	}
+
+	void DrawableComponent::Load( Archive& archive )
+	{
+		GameComponent::Load( archive );
+
+		archive.Read( &mIsDynamic );
 	}
 }

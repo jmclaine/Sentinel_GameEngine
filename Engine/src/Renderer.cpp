@@ -60,16 +60,45 @@ namespace Sentinel
 		mHeightRatio = (float)mHeight / (float)Renderer::WINDOW_HEIGHT_BASE;
 	}
 
-	//////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////
+
+	BlendType BlendState::SrcBlendColor()
+	{
+		return mSrcBlendColor;
+	}
+
+	BlendType BlendState::DstBlendColor()
+	{
+		return mDstBlendColor;
+	}
+
+	BlendType BlendState::SrcBlendAlpha()
+	{
+		return mSrcBlendAlpha;
+	}
+
+	BlendType BlendState::DstBlendAlpha()
+	{
+		return mDstBlendAlpha;
+	}
+
+	BlendFuncType BlendState::BlendFuncColor()
+	{
+		return mBlendFuncColor;
+	}
+
+	BlendFuncType BlendState::BlendFuncAlpha()
+	{
+		return mBlendFuncAlpha;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////
 
 	UINT Renderer::WINDOW_WIDTH_BASE  = 1920;
 	UINT Renderer::WINDOW_HEIGHT_BASE = 1080;
 
 	Renderer::Renderer() :
 		mIsShaderLocked( false )
-	{}
-
-	Renderer::~Renderer()
 	{}
 
 	Renderer* Renderer::Create( const char* filename, WindowInfo& info )

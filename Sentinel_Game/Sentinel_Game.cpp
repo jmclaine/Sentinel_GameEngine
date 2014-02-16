@@ -80,6 +80,9 @@ class MainApp
 
 	GameWorld*				mGameWorld;
 
+	RenderTexture*			mRTMain;
+	DepthStencil*			mDSMain;
+
 public:
 
 	MainApp() :
@@ -115,8 +118,8 @@ public:
 		//
 		mGameWindow->Startup( mRenderer, hInstance, nCmdShow, "Sentinel Game", "SentinelClass", info );
 		
-		mRenderer->CreateDepthStencil( Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE );
-		mRenderer->CreateBackbuffer();
+		mDSMain = mRenderer->CreateDepthStencil( Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE );
+		mRTMain = mRenderer->CreateBackbuffer();
 
 		////////////////////////////////////
 
@@ -149,6 +152,7 @@ public:
 
 		mGameWorld->mTextureManager->Load( archive, mRenderer );
 		mGameWorld->mShaderManager->Load( archive, mRenderer );
+		mGameWorld->mMaterialManager->Load( archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager );
 		mGameWorld->mSpriteManager->Load( archive );
 		mGameWorld->mMeshManager->Load( archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager, mGameWorld->mMaterialManager );
 		mGameWorld->mModelManager->Load( archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager, mGameWorld->mMaterialManager );
@@ -209,19 +213,20 @@ public:
 				UINT width  = mGameWindow->GetInfo()->Width();
 				UINT height = mGameWindow->GetInfo()->Height();
 
-				//mRenderer->SetViewport( 0, 0, width, height );
-				mRenderer->SetViewport( ((int)width - (int)Renderer::WINDOW_WIDTH_BASE) >> 1, ((int)height - (int)Renderer::WINDOW_HEIGHT_BASE) >> 1, 
-										Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE );
-				mRenderer->SetDepthStencil( 0 );
-				mRenderer->SetRenderTexture( 0 );
-
-				mRenderer->Clear( color );
-
 				BEGIN_PROFILE( timing );
 				mGameWorld->UpdateController();
 				mGameWorld->UpdatePhysics();
 				mGameWorld->UpdateTransform();
 				mGameWorld->UpdateComponents();
+				mGameWorld->UpdateLight();
+
+				mRenderer->SetViewport( 0, 0, width, height );
+				//mRenderer->SetViewport( ((int)width - (int)Renderer::WINDOW_WIDTH_BASE) >> 1, ((int)height - (int)Renderer::WINDOW_HEIGHT_BASE) >> 1, \
+										Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE );
+				mRenderer->SetDepthStencil( mDSMain );
+				mRenderer->SetRenderTexture( mRTMain );
+				mRenderer->Clear( color );
+
 				mGameWorld->UpdateDrawable();
 				END_PROFILE( timing, "World" );
 
@@ -242,6 +247,9 @@ public:
 
 	void Shutdown()
 	{
+		SAFE_DELETE( mDSMain );
+		SAFE_DELETE( mRTMain );
+
 		SHUTDOWN_DELETE( mGameWorld );
 		SHUTDOWN_DELETE( mGameWindow );
 		

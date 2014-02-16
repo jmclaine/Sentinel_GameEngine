@@ -15,8 +15,6 @@ namespace Sentinel
 
 	void ShaderManager::Save( Archive& archive )
 	{
-		// Store the number of shaders.
-		//
 		UINT count = mData.size();
 		archive.Write( &count );
 
@@ -27,9 +25,6 @@ namespace Sentinel
 			// Store shader info.
 			//
 			archive.Write( &it->first );
-
-			//archive.Write( &shader->Attribute() );
-			//archive.Write( &shader->Uniform() );
 
 			// Store the compressed shader source.
 			//
@@ -53,8 +48,6 @@ namespace Sentinel
 	{
 		RemoveAll();
 
-		// Read the number of shaders to load.
-		//
 		UINT count;
 		archive.Read( &count );
 
@@ -63,12 +56,8 @@ namespace Sentinel
 			std::string name;
 			archive.Read( &name );
 
-			//std::string attrib;
-			//archive.Read( &attrib );
-
-			//std::string uniform;
-			//archive.Read( &uniform );
-
+			// Uncompress shader source.
+			//
 			ULONG size;
 			archive.Read( &size, 1, true );
 
@@ -85,50 +74,10 @@ namespace Sentinel
 
 			TRACE( "Compiling '" << name << "'..." );
 
-			//if( !Add( name, renderer->CreateShaderFromMemory( source, attrib, uniform )))
-			//	throw std::exception( "Failed to read shader." );
+			if( !Add( name, SHARED( renderer->CreateShaderFromMemory( source ))))
+				throw std::exception( "Failed to read shader." );
 
 			free( comp_source );
 		}
-	}
-
-	bool ShaderManager::LoadConfig( const char* filename, Renderer* renderer, ShaderManager* shaderManager )
-	{
-		TiXmlDocument doc;
-		if( !doc.LoadFile( filename ))
-		{
-			TRACE( "Failed to open '" << filename << "'" );
-			return false;
-		}
-
-		TiXmlHandle	hDoc( &doc );
-
-		// Starting enclosure: <Shaders>
-		//
-		TiXmlElement* pMain = hDoc.FirstChild( "Shaders" ).Element();
-
-		// Read <Definition>
-		//
-		TiXmlElement* pDef = pMain->FirstChild( "Definition" )->ToElement();
-
-		// Store each shader.
-		//
-		while( pDef != NULL )
-		{
-			const char* pFile = pDef->Attribute( "FileName" );
-			const char* pName = pDef->Attribute( "Name" );
-
-			std::shared_ptr< Shader > shader( shaderManager->Add( pName, std::shared_ptr< Shader >(renderer->CreateShaderFromFile( pFile ))));
-
-			if( !shader )
-			{
-				TRACE( "Failed to load shader '" << std::string( pFile ) << "'" );
-				return false;
-			}
-
-			pDef = pDef->NextSiblingElement();
-		}
-
-		return true;
 	}
 }
