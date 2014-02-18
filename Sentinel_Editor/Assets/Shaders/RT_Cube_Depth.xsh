@@ -120,19 +120,16 @@ void main()
 
 in vec4 gLightPos;
 
-const float shadowRadius = 25.0;
+const float shadowRadius = 40.0;
 
 void main()
 {
-	float depth = length(gLightPos) / shadowRadius;
+	float depth = length( gLightPos ) / shadowRadius;
 
-	gl_FragDepth = depth;
-	/*
 	float dx = dFdx(depth);
 	float dy = dFdy(depth);
 
-	gl_FragColor.rg = vec2(depth, depth*depth + 0.25*(dx*dx + dy*dy));
-	//*/
+	gl_FragColor = vec4(depth, depth*depth + 0.25*(dx*dx + dy*dy), 0, 0);
 }
 
 #endif

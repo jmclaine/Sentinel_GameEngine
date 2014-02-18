@@ -166,92 +166,66 @@ namespace Sentinel
 
 	/////////////////////////////////////////////////////
 
-	GameObject* GameWorld::AddGameObject( GameObject* entity )
+	GameObject* GameWorld::AddGameObject( GameObject* obj )
 	{
-		if( entity )
+		if( obj )
 		{
 			TRAVERSE_VECTOR( x, mGameObject )
 			{
-				if( mGameObject[ x ] == entity )
-					return entity;
+				if( mGameObject[ x ] == obj )
+					return obj;
 			}
 
-			if( entity->GetParent() )
-				entity->GetParent()->RemoveChild( entity );
+			if( obj->GetParent() )
+				obj->GetParent()->RemoveChild( obj );
 
-			entity->SetWorld( this );
+			obj->SetWorld( this );
 		
-			mGameObject.push_back( entity );
+			mGameObject.push_back( obj );
 
 			////////////////////////////////
 
-			CameraComponent* camera = (CameraComponent*)entity->FindComponent( GameComponent::CAMERA );
+			CameraComponent* camera = (CameraComponent*)obj->FindComponent( GameComponent::CAMERA );
 		
 			if( camera )
-			{
-				bool isDup = false;
-				TRAVERSE_VECTOR( x, mCamera )
-				{
-					if( mCamera[ x ] == camera )
-					{
-						isDup = true;
-						break;
-					}
-				}
-
-				if( !isDup )
-					mCamera.push_back( camera );
-			}
-
-			LightComponent* light = (LightComponent*)entity->FindComponent( GameComponent::LIGHT );
+				AddCamera( camera );
+			
+			LightComponent* light = (LightComponent*)obj->FindComponent( GameComponent::LIGHT );
 			
 			if( light )
-			{
-				bool isDup = false;
-				TRAVERSE_VECTOR( x, mLight )
-				{
-					if( mLight[ x ] == light )
-					{
-						isDup = true;
-						break;
-					}
-				}
-
-				if( !isDup )
-					mLight.push_back( light );
-			}
+				AddLight( light );
 		}
 
-		return entity;
+		return obj;
 	}
 
-	GameObject* GameWorld::AddGameObject( GameObject* entity, const char* name )
+	GameObject* GameWorld::AddGameObject( GameObject* obj, const char* name )
 	{
-		if( entity )
+		if( obj )
 		{
-			entity->mName = name;
+			obj->mName = name;
 
-			return AddGameObject( entity );
+			return AddGameObject( obj );
 		}
 
-		return entity;
+		return obj;
 	}
 
-	GameObject* GameWorld::RemoveGameObject( GameObject* entity )
+	GameObject* GameWorld::RemoveGameObject( GameObject* obj )
 	{
 		TRAVERSE_LIST( it, mGameObject )
 		{
-			if( (*it) == entity )
+			if( (*it) == obj )
 			{
 				mGameObject.erase( it );
 
-				entity->SetWorld( NULL );
+				obj->SetWorld( NULL );
 
-				return entity;
+				return obj;
 			}
 		}
 		
-		return entity;
+		return obj;
 	}
 
 	GameObject* GameWorld::GetGameObject( UINT index )
@@ -288,6 +262,24 @@ namespace Sentinel
 		return mCamera.size();
 	}
 
+	void GameWorld::AddCamera( CameraComponent* camera )
+	{
+		bool isDup = false;
+		TRAVERSE_VECTOR( x, mCamera )
+		{
+			if( mCamera[ x ] == camera )
+			{
+				isDup = true;
+				break;
+			}
+		}
+
+		if( !isDup )
+			mCamera.push_back( camera );
+	}
+
+	/////////////////////////////////////////////////////
+
 	LightComponent* GameWorld::GetLight( UINT index )
 	{
 		_ASSERT( index < mLight.size() );
@@ -298,6 +290,22 @@ namespace Sentinel
 	UINT GameWorld::NumLights()
 	{
 		return mLight.size();
+	}
+
+	void GameWorld::AddLight( LightComponent* light )
+	{
+		bool isDup = false;
+		TRAVERSE_VECTOR( x, mLight )
+		{
+			if( mLight[ x ] == light )
+			{
+				isDup = true;
+				break;
+			}
+		}
+
+		if( !isDup )
+			mLight.push_back( light );
 	}
 
 	/////////////////////////////////////////////////////

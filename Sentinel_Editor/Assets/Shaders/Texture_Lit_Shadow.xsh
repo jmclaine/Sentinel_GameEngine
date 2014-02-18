@@ -115,9 +115,9 @@ float4 PS_Main(VSOutput input):SV_Target
 
 varying vec2 vTexCoord0;
 varying vec3 vNormal;
-varying vec3 vCameraPos;
-varying vec3 vLightPos;
 varying vec4 vWorldPos;
+varying vec3 vCameraDir;
+varying vec3 vLightDir;
 
 #ifdef VERTEX_SHADER
 
@@ -134,84 +134,118 @@ attribute vec3 Normal;
 void main()
 {
 	gl_Position = mul(_WVP, vec4(Position, 1));
-	vWorldPos = mul(_World, vec4(Position, 1));
+	vWorldPos   = mul(_World, vec4(Position, 1));
 
 	// Light direction
-	vLightPos = _LightPos - vWorldPos;
+	vLightDir = _LightPos - vWorldPos.xyz;
 	
 	// Camera direction
-	vCameraPos = _CameraPos - vWorldPos;
+	vCameraDir = _CameraPos - vWorldPos.xyz;
 
 	// Texture
 	vTexCoord0 = TexCoord0;
 
 	// Normal
-	vNormal = mul(_World, vec4(Normal, 0));
+	vNormal = mul(_World, vec4(Normal, 0)).xyz;
 }
 
 #endif
 #ifdef FRAGMENT_SHADER
 
-uniform samplerCube _TextureCube;
+const float blend = 2.0;
+const float blendInc = 1.0;
+const float blendDenom = (blend / blendInc) * 2.0 + 1.0;
+const float blendFactor = 1.0 / (blendDenom * blendDenom);
+
 uniform sampler2D _Texture0;
+uniform samplerCube _TextureCube;
 
 uniform vec3 _LightColor;
 uniform vec4 _LightAttn;
+
+const float shadowRadius = 40.0;
+const float invShadowSize = 1.0 / 512.0;
+const float minVariance = 0.0001;
+const float shadowStep = 0.5;
 
 uniform vec4 _Ambient;
 uniform vec4 _Diffuse;
 uniform vec4 _Specular;
 uniform float _SpecComp;
 
-vec4 GetColor( vec3 LPos, vec3 camDir, vec3 N, vec3 color, vec4 attn )
+vec3 GetColor( vec3 lightDir, vec3 cameraDir, vec3 normal, vec3 color, vec4 attn )
 {
-	if(dot(-LPos, N) < 0)
-	{
-		float dist = max(0.0, length(LPos)-attn.w);
+	float intensity = clamp( dot( normal, lightDir ), 0.0, 1.0 );
 
-		LPos = normalize(LPos);
-		vec3 H = normalize(LPos + camDir);
+	if( intensity > 0 )
+	{
+		float d = distance( lightDir, vWorldPos );
+		float r = attn.w;
 
 		// Attenuation
-		float den = attn.x + (attn.y*2.0*dist)/attn.w + (attn.z*dist*dist)/(attn.w*attn.w);
-		float attnFinal = clamp(1.0 / (den*den), 0.0, 1.0);
+		// Extend light beyond radius using standard attenuation.
+		//d = max( 0.0, d - r );
+		//float attenuation = attn.x + (attn.y*d)/r + (attn.z*d*d)/(r*r);
 
-		// Ambient
-		vec4 ambientFinal = _Ambient;
-
-		// Diffuse
-		float intensity = clamp(dot(N, LPos), 0.0, 1.0);
-		vec4 diffuseFinal = _Diffuse * intensity;
+		// Set to end light at radius.
+		float attenuation = clamp( 1.0 - d*d/(r*r), 0.0, 1.0 );
+		attenuation *= attenuation;
 
 		// Specular
-		vec4 specularFinal = max(_Specular * pow(clamp(dot(N, H), 0.0, 1.0), _SpecComp), 0.0);
+		vec3 specularFinal = max( _Specular.rgb * pow( clamp( dot( normal, normalize( lightDir + cameraDir )), 0.0, 1.0 ), _SpecComp ), 0.0 );
 
-		return clamp(vec4(ambientFinal.rgb + (diffuseFinal.rgb + specularFinal.rgb) * attnFinal * color, 
-						  _Ambient.a + _Diffuse.a + _Specular.a), 0.0, 1.0);
+		return clamp( (_Diffuse.rgb * intensity + specularFinal.rgb) * attenuation * color, 0.0, 1.0 );
 	}
 	else
-		return _Ambient;
+		return vec3(0, 0, 0);
+}
+
+float CalculateShadow( float lightDepth, vec3 tc )
+{
+	vec2 moments = texture( _TextureCube, tc ).rg;
+	
+	float p = lightDepth <= moments.x;
+
+	float variance = moments.y - (moments.x * moments.x);
+	variance = max( variance, minVariance );
+
+	float dist = lightDepth - moments.x;
+
+	float p_max = variance / (variance + dist*dist);
+
+	return max( p, clamp( (p_max - shadowStep) / (1.0 - shadowStep), 0.0, 1.0 ));
 }
 
 void main()
 {
-	/*if((texture(_TextureCube, -vLightPos).r * 50.0 + 0.5) < clamp(length(vLightPos), 0.0, 50.0))
+	float lightDepth = length( vLightDir ) / shadowRadius;
+	vec3 lightDir = normalize( vLightDir );
+
+	// Camera Direction
+	vec3 cameraDir = normalize( vCameraDir );
+
+	// Normal
+	vec3 normal = normalize( vNormal );
+
+	// Shadow with PCF blend
+	vec3 right = vec3( vLightDir.y, vLightDir.z, vLightDir.x )*invShadowSize;
+	vec3 up    = vec3( vLightDir.z, vLightDir.x, vLightDir.y )*invShadowSize;
+	
+	float shadow = 0.0;
+	
+	for( float offsetU = -blend; offsetU <= blend; offsetU += blendInc )
 	{
-		gl_FragColor = texture2D(_Texture0, vTexCoord0) * _Ambient;
+		for( float offsetV = -blend; offsetV <= blend; offsetV += blendInc )
+		{
+			shadow += CalculateShadow( lightDepth, -vLightDir + right*offsetU + up*offsetV );
+		}
 	}
-	else
-	{*/
-		// Camera Direction
-		vec3 camPos = normalize(vCameraPos);
 
-		// Normal
-		vec3 N = normalize(vNormal);
-
-		// Attenuation
-		vec4 color0 = GetColor(vLightPos, camPos, N, _LightColor, _LightAttn);
-
-		gl_FragColor = texture2D(_Texture0, vTexCoord0) * color0;
-	//}
+	shadow *= blendFactor;
+	
+	vec3 color0 = GetColor( lightDir, cameraDir, normal, _LightColor, _LightAttn );
+	
+	gl_FragColor = (_Ambient + vec4(color0 * shadow, 0)) * texture2D(_Texture0, vTexCoord0);
 }
 
 #endif

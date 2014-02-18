@@ -96,8 +96,14 @@ namespace Sentinel
 
 			//////////////////////////////////////////////////
 
-			BlendStateDX( ID3D11BlendState* blendState ) :
-				mBlendState( blendState )
+			BlendStateDX( ID3D11BlendState* blendState,
+						  BlendType srcBlendColor, BlendType dstBlendColor,
+						  BlendType srcBlendAlpha, BlendType dstBlendAlpha,
+						  BlendFuncType blendFuncColor, BlendFuncType blendFuncAlpha) :
+				mBlendState( blendState ),
+				BlendState( srcBlendColor, dstBlendColor, 
+							srcBlendAlpha, dstBlendAlpha,
+							blendFuncColor, blendFuncAlpha )
 			{}
 
 			~BlendStateDX()
@@ -260,7 +266,7 @@ namespace Sentinel
 
 			ID3D11BlendState* blendState = NULL;
 			HV_PTR( mCurrWindow->mDevice->CreateBlendState( &blendDesc, &blendState ));
-			BLEND_OFF = std::shared_ptr< BlendState >(new BlendStateDX( blendState ));
+			BLEND_OFF = std::shared_ptr< BlendState >(new BlendStateDX( blendState, BLEND_ZERO, BLEND_ZERO, BLEND_ZERO, BLEND_ZERO, BLEND_FUNC_ADD, BLEND_FUNC_ADD ));
 
 			// Create BLEND_ALPHA.
 			//
@@ -636,6 +642,8 @@ namespace Sentinel
 
 		RenderTexture* CreateRenderTexture( Texture* texture )
 		{
+			_ASSERT( texture );
+			
 			return CreateRenderTexture( static_cast< TextureDX* >(texture)->mTexture );
 		}
 
@@ -694,7 +702,10 @@ namespace Sentinel
 			ID3D11BlendState* blendState = NULL;
 			HV_PTR( mCurrWindow->mDevice->CreateBlendState( &blendDesc, &blendState ));
 			
-			return new BlendStateDX( blendState );
+			return new BlendStateDX( blendState, \
+									 srcBlendColor, dstBlendColor, \
+									 srcBlendAlpha, dstBlendAlpha, \
+									 blendFuncColor, blendFuncAlpha );
 		}
 
 		UINT ResizeBuffers( UINT width, UINT height )

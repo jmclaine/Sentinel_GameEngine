@@ -6,6 +6,8 @@
 
 namespace Sentinel
 {
+	bool Material::IS_MATERIAL_LOCKED = false;
+
 	Material::Material() :
 		mAmbient( 0.2f, 0.2f, 0.2f, 1.0f ),
 		mDiffuse( 0.8f, 0.8f, 0.8f, 1.0f ),
@@ -22,10 +24,23 @@ namespace Sentinel
 
 	void Material::Apply( Renderer* renderer )
 	{
-		renderer->SetCull( mCullMode );
-		renderer->SetDepthStencilType( mDepthMode );
-		renderer->SetShader( mShader.get() );
-		renderer->SetBlendState( mBlendState.get() );
+		if( !IS_MATERIAL_LOCKED )
+		{
+			renderer->SetCull( mCullMode );
+			renderer->SetDepthStencilType( mDepthMode );
+			renderer->SetShader( mShader.get() );
+			renderer->SetBlendState( mBlendState.get() );
+		}
+	}
+
+	void Material::Lock()
+	{
+		IS_MATERIAL_LOCKED = true;
+	}
+
+	void Material::Unlock()
+	{
+		IS_MATERIAL_LOCKED = false;
 	}
 
 	//////////////////////////////////////////////

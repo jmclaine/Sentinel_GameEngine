@@ -18,6 +18,10 @@ namespace Sentinel
 
 	class SENTINEL_DLL Material
 	{
+	private:
+
+		static bool						IS_MATERIAL_LOCKED;
+
 	public:
 
 		ColorRGBA						mAmbient;
@@ -38,6 +42,11 @@ namespace Sentinel
 		~Material();
 
 		void				Apply( Renderer* renderer );
+
+		// Prevent other drawables from changing the material.
+		//
+		static void			Lock();
+		static void			Unlock();
 
 		//////////////////////////////////////////////
 

@@ -5,7 +5,7 @@
 
 namespace Sentinel
 {
-	class Shader;
+	class Material;
 
 	enum CameraAxisType
 	{
@@ -33,7 +33,7 @@ namespace Sentinel
 
 	public:
 
-		std::shared_ptr< Shader >	mShader;
+		std::shared_ptr< Material > mMaterial;
 
 		///////////////////////////////////////
 

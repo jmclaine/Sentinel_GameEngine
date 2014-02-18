@@ -129,6 +129,19 @@ namespace Sentinel
 			mWorld->RemoveGameObject( obj );
 
 			obj->SetWorld( mWorld );
+			obj->SetParent( this );
+
+			////////////////////////////////
+
+			CameraComponent* camera = (CameraComponent*)obj->FindComponent( GameComponent::CAMERA );
+		
+			if( camera )
+				mWorld->AddCamera( camera );
+			
+			LightComponent* light = (LightComponent*)obj->FindComponent( GameComponent::LIGHT );
+			
+			if( light )
+				mWorld->AddLight( light );
 		}
 
 		return ListNode< GameObject >::AddChild( obj );
@@ -331,8 +344,9 @@ namespace Sentinel
 			obj = (GameObject*)SerialRegister::Load( archive );
 			if( obj )
 			{
-				AddChild( obj );
+				obj->SetWorld( mWorld );
 				obj->Load( archive );
+				AddChild( obj );
 			}
 		}
 	}

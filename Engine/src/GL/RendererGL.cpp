@@ -40,11 +40,9 @@ namespace Sentinel
 		{
 		public:
 
-			Texture*	mTexture;
 			GLuint		mID;
 			
-			RenderTextureGL( Texture* texture, GLuint id ) :
-				mTexture( texture ),
+			RenderTextureGL( GLuint id ) :
 				mID( id )
 			{}
 
@@ -71,27 +69,23 @@ namespace Sentinel
 
 		class BlendStateGL : public BlendState
 		{
+		private:
+
+			static GLenum BLEND_TYPE[ NUM_BLEND_TYPES ];
+			static GLenum BLEND_FUNC[ NUM_BLEND_FUNC_TYPES ];
+
 		public:
 
 			bool		mEnable;
-
-			GLenum		mSrcBlendColor;
-			GLenum		mDstBlendColor;
-
-			GLenum		mSrcBlendAlpha;
-			GLenum		mDstBlendAlpha;
-
-			GLenum		mBlendFuncColor;
-			GLenum		mBlendFuncAlpha;
 
 			BlendStateGL( bool enable,
 						  BlendType srcBlendColor, BlendType dstBlendColor,
 						  BlendType srcBlendAlpha, BlendType dstBlendAlpha,
 						  BlendFuncType blendFuncColor, BlendFuncType blendFuncAlpha ) :
 				mEnable( enable ),
-				mSrcBlendColor( BLENDtoENUM( srcBlendColor )), mDstBlendColor( BLENDtoENUM( dstBlendColor )),
-				mSrcBlendAlpha( BLENDtoENUM( srcBlendAlpha )), mDstBlendAlpha( BLENDtoENUM( dstBlendAlpha )),
-				mBlendFuncColor( FUNCtoENUM( blendFuncColor )), mBlendFuncAlpha( FUNCtoENUM( blendFuncAlpha ))
+				BlendState( srcBlendColor, dstBlendColor, 
+							srcBlendAlpha, dstBlendAlpha,
+							blendFuncColor, blendFuncAlpha )
 			{}
 
 			~BlendStateGL()
@@ -102,77 +96,13 @@ namespace Sentinel
 				if( mEnable )
 				{
 					glEnable( GL_BLEND );
-					glBlendFuncSeparate( mSrcBlendColor, mDstBlendColor, mSrcBlendAlpha, mDstBlendAlpha );
-					glBlendEquationSeparate( mBlendFuncColor, mBlendFuncAlpha );
+					glBlendFuncSeparate( BLEND_TYPE[ mSrcBlendColor ], BLEND_TYPE[ mDstBlendColor ], \
+										 BLEND_TYPE[ mSrcBlendAlpha ], BLEND_TYPE[ mDstBlendAlpha ] );
+					glBlendEquationSeparate( BLEND_FUNC[ mBlendFuncColor ], BLEND_FUNC[ mBlendFuncAlpha ] );
 				}
 				else
 				{
 					glDisable( GL_BLEND );
-				}
-			}
-
-		private:
-
-			static GLenum BLENDtoENUM( BlendType type )
-			{
-				switch( type )
-				{
-				case BLEND_ZERO:
-					return GL_ZERO;
-
-				case BLEND_ONE:
-					return GL_ONE;
-
-				case BLEND_SRC_COLOR:
-					return GL_SRC_COLOR;
-
-				case BLEND_ONE_MINUS_SRC_COLOR:
-					return GL_ONE_MINUS_SRC_COLOR;
-
-				case BLEND_SRC_ALPHA:
-					return GL_SRC_ALPHA;
-
-				case BLEND_ONE_MINUS_SRC_ALPHA:
-					return GL_ONE_MINUS_SRC_ALPHA;
-
-				case BLEND_DST_COLOR:
-					return GL_DST_COLOR;
-
-				case BLEND_ONE_MINUS_DST_COLOR:
-					return GL_ONE_MINUS_DST_COLOR;
-
-				case BLEND_DST_ALPHA:
-					return GL_DST_ALPHA;
-
-				case BLEND_ONE_MINUS_DST_ALPHA:
-					return GL_ONE_MINUS_DST_ALPHA;
-
-				default:
-					return GL_INVALID_ENUM;
-				}
-			}
-
-			static GLenum FUNCtoENUM( BlendFuncType type )
-			{
-				switch( type )
-				{
-				case BLEND_FUNC_ADD:
-					return GL_FUNC_ADD;
-
-				case BLEND_FUNC_SUBTRACT:
-					return GL_FUNC_SUBTRACT;
-
-				case BLEND_FUNC_REVERSE_SUBTRACT:
-					return GL_FUNC_REVERSE_SUBTRACT;
-
-				case BLEND_FUNC_MIN:
-					return GL_MIN;
-
-				case BLEND_FUNC_MAX:
-					return GL_MAX;
-
-				default:
-					return GL_INVALID_ENUM;
 				}
 			}
 		};
@@ -325,9 +255,6 @@ namespace Sentinel
 
 			mCurrWindow = (WindowInfoGL*)info;
 
-			glFinish();
-			glFlush();
-
 			wglMakeCurrent( mCurrWindow->mHDC, mCurrWindow->mContext );
 		}
 
@@ -449,6 +376,7 @@ namespace Sentinel
 		{
 			GLuint texID;
 			glGenTextures( 1, &texID );
+
 			glBindTexture( GL_TEXTURE_CUBE_MAP, texID );
 			
 			glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
@@ -457,7 +385,7 @@ namespace Sentinel
 
 			glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 			glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-
+			
 			switch( format )
 			{
 			case IMAGE_FORMAT_R:
@@ -467,12 +395,12 @@ namespace Sentinel
 
 			case IMAGE_FORMAT_RG:
 				for( UINT x = 0; x < 6; ++x )
-					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RG32F, width, height, 0, GL_RGBA, GL_FLOAT, NULL );
+					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RG32F, width, height, 0, GL_RG, GL_FLOAT, NULL );
 				break;
 
 			case IMAGE_FORMAT_RGB:
 				for( UINT x = 0; x < 6; ++x )
-					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL );
+					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, NULL );
 				break;
 
 			case IMAGE_FORMAT_RGBA:
@@ -487,7 +415,7 @@ namespace Sentinel
 
 			case IMAGE_FORMAT_DEPTH:
 				for( UINT x = 0; x < 6; ++x )
-					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL );
+					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL );
 				break;
 
 			default:
@@ -512,28 +440,22 @@ namespace Sentinel
 		//
 		RenderTexture* CreateBackbuffer()
 		{
-			return new RenderTextureGL( NULL_TEXTURE.get(), 0 );
+			return new RenderTextureGL( 0 );
 		}
 
 		RenderTexture* CreateRenderTexture( Texture* texture )
 		{
+			_ASSERT( texture );
+
 			GLuint id;
 			glGenFramebuffers( 1, &id );
 			glBindFramebuffer( GL_FRAMEBUFFER, id );
 
-			switch( texture->Format() )
-			{
-			case IMAGE_FORMAT_DEPTH:
-				glFramebufferTexture( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, static_cast< TextureGL* >(texture)->ID(), 0 );
-				glDrawBuffer( GL_NONE );
-				glReadBuffer( GL_NONE );
-				break;
-
-			default:
+			if( texture->Format() != IMAGE_FORMAT_DEPTH )
 				glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, static_cast< TextureGL* >(texture)->ID(), 0 );
-				break;
-			}
-			
+			else
+				glFramebufferTexture( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, static_cast< TextureGL* >(texture)->ID(), 0 );
+
 			if( glCheckFramebufferStatus( GL_FRAMEBUFFER ) != GL_FRAMEBUFFER_COMPLETE )
 			{
 				REPORT_ERROR( "Failed to create Render Target", "OpenGL Render Target" );
@@ -541,7 +463,7 @@ namespace Sentinel
 				return NULL;
 			}
 			
-			return new RenderTextureGL( texture, id );
+			return new RenderTextureGL( id );
 		}
 
 		DepthStencil* CreateDepthStencil( UINT width, UINT height )
@@ -778,6 +700,8 @@ namespace Sentinel
 		}
 	};
 
+	///////////////////////////////////////////////////
+
 	const UINT RendererGL::PRIMITIVE[] = 
 		{ GL_POINTS, 
 		  GL_LINES, 
@@ -791,6 +715,27 @@ namespace Sentinel
 	const UINT RendererGL::FILL_TYPE[] = 
 		{ GL_FILL,
 		  GL_LINE };
+
+	GLenum RendererGL::BlendStateGL::BLEND_TYPE[] =
+		{ GL_ZERO,
+		  GL_ONE,
+		  GL_SRC_COLOR,
+		  GL_ONE_MINUS_SRC_COLOR,
+		  GL_SRC_ALPHA,
+		  GL_ONE_MINUS_SRC_ALPHA,
+		  GL_DST_COLOR,
+		  GL_ONE_MINUS_DST_COLOR,
+		  GL_DST_ALPHA,
+		  GL_ONE_MINUS_DST_ALPHA };
+
+	GLenum RendererGL::BlendStateGL::BLEND_FUNC[] =
+		{ GL_FUNC_ADD,
+		  GL_FUNC_SUBTRACT,
+		  GL_FUNC_REVERSE_SUBTRACT,
+		  GL_MIN,
+		  GL_MAX };
+
+	///////////////////////////////////////////////////
 
 	Renderer* BuildRendererGL()
 	{

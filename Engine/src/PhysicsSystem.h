@@ -128,7 +128,7 @@ namespace Sentinel
 		virtual SpherePhysicsShape*		CreateSphere( float radius ) = 0;
 		virtual BoxPhysicsShape*		CreateBox( const Vector3f& scale ) = 0;
 		virtual CylinderPhysicsShape*	CreateCylinder( const Vector3f& scale ) = 0;
-		virtual MeshPhysicsShape*		CreateMesh( Vector3f* verts, UINT count, const Vector3f& scale ) = 0;
+		virtual MeshPhysicsShape*		CreateMesh( Vector3f* verts, UINT count, UINT stride, const Vector3f& scale ) = 0;
 
 		//////////////////////////////////
 

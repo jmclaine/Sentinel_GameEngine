@@ -62,6 +62,21 @@ namespace Sentinel
 
 	////////////////////////////////////////////////////////////////////////////////////
 
+	BlendState::BlendState( BlendType srcBlendColor, BlendType dstBlendColor,
+							BlendType srcBlendAlpha, BlendType dstBlendAlpha,
+							BlendFuncType blendFuncColor, BlendFuncType blendFuncAlpha ) :
+		mSrcBlendColor( srcBlendColor ), mDstBlendColor( dstBlendColor ),
+		mSrcBlendAlpha( srcBlendAlpha ), mDstBlendAlpha( dstBlendAlpha ),
+		mBlendFuncColor( blendFuncColor ), mBlendFuncAlpha( blendFuncAlpha )
+	{
+		_ASSERT( srcBlendColor < NUM_BLEND_TYPES );
+		_ASSERT( dstBlendColor < NUM_BLEND_TYPES );
+		_ASSERT( srcBlendAlpha < NUM_BLEND_TYPES );
+		_ASSERT( dstBlendAlpha < NUM_BLEND_TYPES );
+		_ASSERT( blendFuncColor < NUM_BLEND_FUNC_TYPES );
+		_ASSERT( blendFuncAlpha < NUM_BLEND_FUNC_TYPES );
+	}
+
 	BlendType BlendState::SrcBlendColor()
 	{
 		return mSrcBlendColor;
@@ -97,8 +112,7 @@ namespace Sentinel
 	UINT Renderer::WINDOW_WIDTH_BASE  = 1920;
 	UINT Renderer::WINDOW_HEIGHT_BASE = 1080;
 
-	Renderer::Renderer() :
-		mIsShaderLocked( false )
+	Renderer::Renderer()
 	{}
 
 	Renderer* Renderer::Create( const char* filename, WindowInfo& info )
@@ -150,29 +164,16 @@ namespace Sentinel
 
 	void Renderer::SetShader( Shader* shader )
 	{
-		if( !mIsShaderLocked )
-		{
-			if( mCurrShader )
-				mCurrShader->Disable();
+		if( mCurrShader )
+			mCurrShader->Disable();
 
-			mCurrShader = shader;
+		mCurrShader = shader;
 
-			mCurrShader->Enable();
-		}
+		mCurrShader->Enable();
 	}
 
 	Shader* Renderer::GetShader()
 	{
 		return mCurrShader;
-	}
-
-	void Renderer::LockShader()
-	{
-		mIsShaderLocked = true;
-	}
-
-	void Renderer::UnlockShader()
-	{
-		mIsShaderLocked = false;
 	}
 }

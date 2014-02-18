@@ -437,7 +437,7 @@ namespace Sentinel
 		glUniform1i( mUniformGL[ uniform ], mTextureLevel );
 			
 		glClientActiveTexture( GL_TEXTURE_CUBE_MAP );
-		glActiveTexture( GL_TEXTURE_CUBE_MAP );
+		//glActiveTexture( GL_TEXTURE_CUBE_MAP );
 
 		glBindTexture( GL_TEXTURE_CUBE_MAP, ((TextureGL*)texture)->ID() );
 
@@ -449,6 +449,8 @@ namespace Sentinel
 
 		glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 		glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+
+		glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE );
 			
 		++mTextureLevel;
 	}

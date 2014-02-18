@@ -60,6 +60,7 @@ Edits levels for a game created with the Sentinel Engine.
 #include "Sound.h"
 #include "Sprite.h"
 #include "Shape.h"
+#include "Buffer.h"
 
 #include "GUI/Widget.h"
 #include "GUI/WidgetObject.h"
@@ -261,19 +262,24 @@ public:
 				BEGIN_PROFILE( timing );
 				mGameWorld->UpdateTransform();
 				mGameWorld->UpdatePhysics();
+				
+				BEGIN_PROFILE( timing );
 				mGameWorld->UpdateLight();
+				END_PROFILE( timing, "Light" );
 
 				mRenderer->SetViewport( 0, 0, Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE );
 				mRenderer->SetDepthStencil( mDSGameWorld );
 				mRenderer->SetRenderTexture( mRTGameWorld );
 				mRenderer->Clear( colorWorld );
 
+				BEGIN_PROFILE( timing );
 				mGameWorld->UpdateDrawable();
+				END_PROFILE( timing, "Drawable" );
+
+				END_PROFILE( timing, "World" );
 
 				SelectGameObject();
 				DrawTranslateObject();
-
-				END_PROFILE( timing, "World" );
 
 				////////////////////////////////////
 				
@@ -807,18 +813,6 @@ public:
 			
 		obj->AttachComponent( new PerspectiveCameraComponent( (float)Renderer::WINDOW_WIDTH_BASE, (float)Renderer::WINDOW_HEIGHT_BASE ), "PCamera" );
 		
-		// Point Light.
-		//
-		obj = mGameWorld->AddGameObject( new GameObject(), "Point_Light" );
-
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
-		transform->mPosition = Vector3f( 0, 4, 0 );
-
-		PointLightComponent* light = (PointLightComponent*)obj->AttachComponent( new PointLightComponent( 1024 ), "Light" );
-		light->mColor         = ColorRGBA( 0.8f, 0.6f, 0.0f, 1.0f );
-		light->mAttenuation   = Vector4f( 1.0f, 0.0f, 0.0f, 25.0f );
-		light->mShader        = mGameWorld->mShaderManager->Get( "RT_Cube_Depth" );
-
 		// Create color only box.
 		//
 		meshBuilder.CreateCube( 1.0f );
@@ -988,27 +982,28 @@ public:
 		mesh = mGameWorld->mMeshManager->Add( "Dodecahedron", SHARED( meshBuilder.BuildMesh( mRenderer )));
 		mesh->mMaterial = material;
 		
-		GameObject* obj2 = new GameObject();
-		obj2->mName = "Dodecahedron";
+		obj = new GameObject();
+		obj->mName = "Dodecahedron";
 
-		transform = (TransformComponent*)obj2->AttachComponent( new TransformComponent(), "Transform" );
+		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
 		transform->mPosition	= Vector3f( 10, 2, -10 );
 		transform->mScale		= Vector3f( 1, 1, 1 );
 		transform->mOrientation	= Quatf( 0, 0, 0 );
 
-		meshComp = (MeshComponent*)obj2->AttachComponent( new MeshComponent( mesh ), "Mesh" );
+		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ), "Mesh" );
 		meshComp->mIsDynamic = true;
 
-		//physics = (PhysicsComponent*)obj2->AttachComponent( new PhysicsComponent(), "Physics" );
-		//physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateMesh( mesh->mVBO, transform->mOrientation, transform->mScale, mesh, 1.0f ));
-		//body = physics->GetRigidBody();
+		Buffer* meshVBO = mesh->mVBO;
+		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
+		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateMesh( (Vector3f*)meshVBO->Lock(), meshVBO->Count(), meshVBO->Stride(), transform->mScale ), transform->mPosition, transform->mOrientation, 1.0f ));
+		meshVBO->Unlock();
 		
-		mGameWorld->AddGameObject( obj2 );
+		mGameWorld->AddGameObject( obj );
 		
 		// Sphere.
 		//
 		meshBuilder.ClearGeometry();
-		meshBuilder.CreateSphere( 1.0f, 10, 10 );
+		meshBuilder.CreateSphere( 1.0f, 50, 50 );
 		mesh->mLayout = shaderTexture->Layout();
 
 		material = mGameWorld->mMaterialManager->Add( "Sphere", SHARED( new Material() ));
@@ -1031,9 +1026,7 @@ public:
 		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent(), "Physics" );
 		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateSphere( transform->mScale.x ), transform->mPosition, transform->mOrientation, 1.0f ));
 		body = physics->GetRigidBody();
-		
-		//obj->AddChild( obj2 );
-		
+
 		// Testing particle effects.
 		//
 		std::shared_ptr< Texture > texture = mGameWorld->mTextureManager->Add( "fire.png", SHARED( mRenderer->CreateTextureFromFile( "Textures\\fire.png" )));
@@ -1057,7 +1050,7 @@ public:
 		particleSystem->mEffect.push_back( new AreaPositionEffect( 0, Vector3f( -0.125f, 1, 0 ), Vector3f( 0.125f, 1, 0 )));
 		particleSystem->mEffect.push_back( new RandomRotationEffect( 0, Vector3f( 0, 0, -10 ), Vector3f( 0, 0, 10 )));
 		particleSystem->mEffect.push_back( new ScaleEffect( 0, Vector3f( 1, 1, 1 )));
-		particleSystem->mEffect.push_back( new VelocityEffect( 0, Vector3f( 0, 1.2f, 0 )));
+		particleSystem->mEffect.push_back( new RandomVelocityEffect( 0, Vector3f( 0, 2.0f, 0 ), Vector3f( 0, 2.8f, 0 )));
 		particleSystem->mEffect.push_back( new RandomColorEffect( 0, ColorRGBA( 0.75f, 0.25f, 0, 0.125f ), ColorRGBA( 0.75f, 0.75f, 0, 0.125f )));
 		particleSystem->mEffect.push_back( new FadeToScaleEffect( 0, 0.25f, 0.666f ));
 		particleSystem->mEffect.push_back( new FadeToScaleEffect( 0.5f, 1.0f, 0.1f ));
@@ -1065,13 +1058,38 @@ public:
 		particleSystem->mEffect.push_back( new FadeToScaleEffect( 1.0f, 2.0f, 1.0f ));
 		particleSystem->mEffect.push_back( new RandomColorEffect( 1.0f, ColorRGBA( 1, 1, 1, 0.125f ), ColorRGBA( 0.9f, 0.9f, 0.9f, 0.125f )));
 		particleSystem->mEffect.push_back( new FadeToColorEffect( 1.0f, 5.0f, ColorRGBA( 0.9f, 0.9f, 0.9f, 0.025f )));
+		particleSystem->mEffect.push_back( new RandomVelocityEffect( 1.0f, Vector3f( -0.5f, 1.4f, -0.5f ), Vector3f( 0.5f, 3.0f, 0.5f )));
 		
 		obj = mGameWorld->AddGameObject( new GameObject(), "Particle Emitter" );
 
 		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
-		transform->mScale = Vector3f( 512, 512, 1 );
+		transform->mPosition = Vector3f( 8, 1, 0 );
+		transform->mScale    = Vector3f( 1, 1, 1 );
 
 		obj->AttachComponent( new ParticleEmitterComponent( particleSystem ), "Sprite" );
+
+		// Point Light attached to particle emitter.
+		//
+		GameObject* peObject = obj;
+
+		obj = mGameWorld->AddGameObject( new GameObject(), "Point_Light" );
+
+		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent(), "Transform" );
+		transform->mPosition = Vector3f( 0, 4, 0 );
+
+		PointLightComponent* light = (PointLightComponent*)obj->AttachComponent( new PointLightComponent( 512 ), "Light" );
+		light->mColor         = ColorRGBA( 0.8f, 0.6f, 0.0f, 1.0f );
+		light->mAttenuation   = Vector4f( 1.0f, 0.0f, 0.0f, 40.0f );
+
+		material = mGameWorld->mMaterialManager->Add( "Point Light", SHARED( new Material() ));
+		material->mShader     = mGameWorld->mShaderManager->Get( "RT_Cube_Depth" );
+		material->mBlendState = SHARED( mRenderer->CreateBlendState( BLEND_DST_COLOR, BLEND_SRC_COLOR, BLEND_ZERO, BLEND_ZERO, BLEND_FUNC_MIN, BLEND_FUNC_ADD ));
+		material->mCullMode   = CULL_CCW;
+		material->mDepthMode  = DEPTH_ALWAYS;
+
+		light->mMaterial = material;
+
+		peObject->AddChild( obj );
 
 		///////////////////////////////
 

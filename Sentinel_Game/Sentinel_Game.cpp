@@ -215,10 +215,17 @@ public:
 
 				BEGIN_PROFILE( timing );
 				mGameWorld->UpdateController();
+
+				BEGIN_PROFILE( timing );
 				mGameWorld->UpdatePhysics();
+				END_PROFILE( timing, "Physics" );
+
 				mGameWorld->UpdateTransform();
 				mGameWorld->UpdateComponents();
+
+				BEGIN_PROFILE( timing );
 				mGameWorld->UpdateLight();
+				END_PROFILE( timing, "Light" );
 
 				mRenderer->SetViewport( 0, 0, width, height );
 				//mRenderer->SetViewport( ((int)width - (int)Renderer::WINDOW_WIDTH_BASE) >> 1, ((int)height - (int)Renderer::WINDOW_HEIGHT_BASE) >> 1, \
@@ -227,7 +234,10 @@ public:
 				mRenderer->SetRenderTexture( mRTMain );
 				mRenderer->Clear( color );
 
+				BEGIN_PROFILE( timing );
 				mGameWorld->UpdateDrawable();
+				END_PROFILE( timing, "Drawable" );
+
 				END_PROFILE( timing, "World" );
 
 				BEGIN_PROFILE( timing );

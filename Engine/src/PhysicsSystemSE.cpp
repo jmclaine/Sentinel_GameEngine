@@ -27,13 +27,6 @@ namespace Sentinel
 		~SpherePhysicsShapeSE()
 		{}
 
-	private:
-
-		void Create( float radius )
-		{
-			mRadius = radius;
-		}
-
 	public:
 
 		float GetRadius()
@@ -67,13 +60,6 @@ namespace Sentinel
 
 		~BoxPhysicsShapeSE()
 		{}
-
-	private:
-
-		void Create( const Vector3f& scale )
-		{
-			mScale = scale;
-		}
 
 	public:
 
@@ -109,13 +95,6 @@ namespace Sentinel
 		~CylinderPhysicsShapeSE()
 		{}
 
-	private:
-
-		void Create( const Vector3f& scale )
-		{
-			mScale = scale;
-		}
-
 	public:
 
 		Vector3f GetScale()
@@ -143,25 +122,13 @@ namespace Sentinel
 		MeshPhysicsShapeSE()
 		{}
 
-		MeshPhysicsShapeSE( Vector3f* verts, UINT count, const Vector3f& scale )
+		MeshPhysicsShapeSE( void* verts, UINT count, UINT stride, const Vector3f& scale )
 		{
-			Create( verts, count, scale );
+			Create( verts, count, stride, scale );
 		}
 
 		~MeshPhysicsShapeSE()
 		{}
-
-	private:
-
-		void Create( Vector3f* verts, UINT count, const Vector3f& scale )
-		{
-			for( UINT x = 0; x < count; ++x )
-			{
-				AddPoint( verts[ x ] );
-			}
-
-			SetScale( scale );
-		}
 
 	public:
 
@@ -433,9 +400,9 @@ namespace Sentinel
 			return new CylinderPhysicsShapeSE( scale );
 		}
 
-		MeshPhysicsShape* CreateMesh( Vector3f* verts, UINT count, const Vector3f& scale )
+		MeshPhysicsShape* CreateMesh( Vector3f* verts, UINT count, UINT stride, const Vector3f& scale )
 		{
-			return new MeshPhysicsShapeSE( verts, count, scale );
+			return new MeshPhysicsShapeSE( verts, count, stride, scale );
 		}
 
 		//////////////////////////////////

@@ -4,7 +4,7 @@
 #include "GameWorld.h"
 #include "GameObject.h"
 #include "Renderer.h"
-#include "ShaderManager.h"
+#include "MaterialManager.h"
 #include "Texture.h"
 #include "DrawableComponent.h"
 
@@ -31,7 +31,7 @@ namespace Sentinel
 		Renderer* renderer = mOwner->GetWorld()->mRenderer;
 		
 		if( !mTexture )
-			mTexture = renderer->CreateTextureCube( mResolution, mResolution, IMAGE_FORMAT_DEPTH );
+			mTexture = renderer->CreateTextureCube( mResolution, mResolution, IMAGE_FORMAT_RG );
 
 		if( !mRenderTexture )
 			mRenderTexture = renderer->CreateRenderTexture( mTexture );
@@ -41,14 +41,14 @@ namespace Sentinel
 	{
 		//LightComponent::Update();
 
-		if( mShader.get() )
+		if( mMaterial.get() )
 		{
 			// Create view-projection matrices for each side of the cube.
 			//
 			float resolution = static_cast< float >(mResolution);
 			mMatrixProjection.ProjectionPerspective( resolution, resolution, 0.0f, mAttenuation.w, 90.0f );
 
-			const Vector3f& pos = mTransform->mPosition;
+			const Vector3f& pos = mTransform->GetMatrixWorld().Transform( Vector3f( 0, 0, 0 ));
 			
 			mMatrixView[ CAMERA_AXIS_POS_X ].LookAtView( pos, pos+Vector3f( 1, 0, 0 ), Vector3f( 0, -1, 0 ));
 			mMatrixFinal[ CAMERA_AXIS_POS_X ] = mMatrixProjection * mMatrixView[ CAMERA_AXIS_POS_X ];
@@ -86,21 +86,22 @@ namespace Sentinel
 
 			static float color[4] = {1, 1, 1, 1};
 
-			renderer->SetDepthStencilType( DEPTH_LESS );
+			renderer->SetDepthStencilType( DEPTH_LEQUAL );
 			renderer->SetViewport( 0, 0, mResolution, mResolution );
 			renderer->SetRenderTexture( mRenderTexture );
 			renderer->Clear( color );
 
-			renderer->SetShader( mShader.get() );
-			renderer->LockShader();
+			mMaterial->Apply( renderer );
 
+			Material::Lock();
+			
 			count = (UINT)mDynamic.size();
 			for( UINT x = 0; x < count; ++x )
 			{
 				mDynamic[ x ]->Update();
 			}
 			
-			renderer->UnlockShader();
+			Material::Unlock();
 		}
 	}
 
@@ -156,7 +157,7 @@ namespace Sentinel
 
 		archive.Write( &mResolution );
 
-		archive.Write( &mOwner->GetWorld()->mShaderManager->Get( mShader ));
+		archive.Write( &mOwner->GetWorld()->mMaterialManager->Get( mMaterial ));
 	}
 
 	void PointLightComponent::Load( Archive& archive )
@@ -165,9 +166,9 @@ namespace Sentinel
 
 		archive.Read( &mResolution );
 
-		std::string shader;
-		archive.Read( &shader );
+		std::string material;
+		archive.Read( &material );
 
-		mShader = mOwner->GetWorld()->mShaderManager->Get( shader );
+		mMaterial = mOwner->GetWorld()->mMaterialManager->Get( material );
 	}
 }

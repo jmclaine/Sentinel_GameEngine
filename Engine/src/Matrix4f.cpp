@@ -225,37 +225,28 @@ namespace Sentinel
 
 	void Matrix4f::Billboard( const Vector3f& i, const Vector3f& j, const Vector3f& k, const Vector3f& pos, bool transpose )
 	{
-		Matrix4f matLookAt;
-		
-		matLookAt.m[0]  = i.x;
-		matLookAt.m[1]  = i.y;
-		matLookAt.m[2]  = i.z;
-		matLookAt.m[3]  = 0.0f;
+		m[0]  = i.x;
+		m[1]  = i.y;
+		m[2]  = i.z;
+		m[3]  = 0.0f;
 
-		matLookAt.m[4]  = j.x;
-		matLookAt.m[5]  = j.y;
-		matLookAt.m[6]  = j.z;
-		matLookAt.m[7]  = 0.0f;
+		m[4]  = j.x;
+		m[5]  = j.y;
+		m[6]  = j.z;
+		m[7]  = 0.0f;
 
-		matLookAt.m[8]  = k.x;
-		matLookAt.m[9]  = k.y;
-		matLookAt.m[10] = k.z;
-		matLookAt.m[11] = 0.0f;
+		m[8]  = k.x;
+		m[9]  = k.y;
+		m[10] = k.z;
+		m[11] = 0.0f;
 
-		matLookAt.m[12] = 0.0f;
-		matLookAt.m[13] = 0.0f;
-		matLookAt.m[14] = 0.0f;
-		matLookAt.m[15] = 1.0f;
+		m[12] = 0.0f;
+		m[13] = 0.0f;
+		m[14] = 0.0f;
+		m[15] = 1.0f;
 
 		if( transpose )
-		{
-			matLookAt.Transpose();
-		}
-
-		Matrix4f matTrans;
-		matTrans.Translate( pos );
-
-		*this = matLookAt * matTrans;
+			Transpose();
 	}
 
 	void Matrix4f::LookAtView( const Vector3f& pos, const Vector3f& lookAt, const Vector3f& up )
@@ -272,7 +263,12 @@ namespace Sentinel
 		// Up
 		j = k.Cross( i );
 
-		Billboard( i, j, k, pos * -1.0f, true );
+		Matrix4f matTrans;
+		matTrans.Translate( -pos );
+		
+		Billboard( i, j, k, -pos, true );
+
+		*this = *this * matTrans;
 	}
 
 	void Matrix4f::BillboardAxis( const Vector3f& posBB, const Vector3f& posCamera, const Vector3f& up )
@@ -281,7 +277,7 @@ namespace Sentinel
 
 		j = up.Normalize();
 
-		i = j.Cross( posCamera.Sub( posBB )).Normalize();
+		i = j.Cross( posCamera - posBB ).Normalize();
 
 		k = i.Cross( j ).Normalize();
 
@@ -293,7 +289,7 @@ namespace Sentinel
 		Vector3f i, j, k;
 
 		// Forward
-		k = posCamera.Sub( posBB ).Normalize();
+		k = (posCamera- posBB).Normalize();
 
 		// Side
 		j = up.Normalize();

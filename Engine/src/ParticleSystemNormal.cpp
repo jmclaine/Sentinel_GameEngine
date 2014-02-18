@@ -100,6 +100,9 @@ namespace Sentinel
 
 		void Update( float DT )
 		{
+			CameraComponent* camera = mGameWorld->GetCamera();
+			const TransformComponent* cameraTrans = camera->GetTransform();
+
 			ParticleSystem::Update( DT );
 
 			BYTE* verts = (BYTE*)mMesh->mVBO->Lock();
@@ -117,8 +120,10 @@ namespace Sentinel
 				static Matrix4f matrixParticle;
 				matrixParticle.World( particle.mPosition, Quatf( particle.mRotation ), particle.mScale );
 				
-				mMesh->mMatrixWorld.BillboardAxis( particle.mPosition, mGameWorld->GetCamera()->GetTransform()->mPosition, Vector3f( 0, 1, 0 ));
-				*(Matrix4f*)verts = mGameWorld->GetCamera()->GetMatrixFinal() * mMesh->mMatrixWorld * matrixParticle;
+				static Matrix4f matrixBillboard;
+				matrixBillboard.BillboardAxis( mMesh->mMatrixWorld.Transform( particle.mPosition ), cameraTrans->mPosition, Vector3f( 0, 1, 0 ));
+
+				*(Matrix4f*)verts = camera->GetMatrixFinal() * mMesh->mMatrixWorld * matrixParticle * matrixBillboard;
 				verts += sizeof( Matrix4f );
 			}
 

@@ -32,9 +32,9 @@ namespace Sentinel
 
 		virtual ~SpherePhysicsShape();
 
-	private:
+	protected:
 
-		virtual void Create( float radius ) = 0;
+		void Create( float radius );
 
 	public:
 
@@ -57,9 +57,9 @@ namespace Sentinel
 
 		virtual ~BoxPhysicsShape();
 
-	private:
+	protected:
 
-		virtual void Create( const Vector3f& scale ) = 0;
+		void Create( const Vector3f& scale );
 
 	public:
 
@@ -82,9 +82,9 @@ namespace Sentinel
 
 		virtual ~CylinderPhysicsShape();
 
-	private:
+	protected:
 
-		virtual void Create( const Vector3f& scale ) = 0;
+		void Create( const Vector3f& scale );
 
 	public:
 
@@ -107,9 +107,9 @@ namespace Sentinel
 
 		virtual ~MeshPhysicsShape();
 
-	private:
+	protected:
 
-		virtual void Create( Vector3f* verts, UINT count, const Vector3f& scale ) = 0;
+		void Create( void* verts, UINT count, UINT stride, const Vector3f& scale );
 
 	public:
 

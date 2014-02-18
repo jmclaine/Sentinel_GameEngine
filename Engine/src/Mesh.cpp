@@ -154,10 +154,14 @@ namespace Sentinel
 					break;
 
 				case UNIFORM_LIGHT_POS:
+					{
 					_ASSERT( world );
 					_ASSERT( world->GetLight( lightCount ));
 
-					shader->SetFloat3( uniformIndex, world->GetLight( lightCount )->GetTransform()->mPosition.Ptr() );
+					Vector3f pos = world->GetLight( lightCount )->GetTransform()->GetMatrixWorld().Transform( Vector3f( 0, 0, 0 ));
+
+					shader->SetFloat3( uniformIndex, pos.Ptr() );
+					}
 					break;
 
 				case UNIFORM_LIGHT_DIR:

@@ -19,6 +19,11 @@ namespace Sentinel
 	SpherePhysicsShape::~SpherePhysicsShape()
 	{}
 
+	void SpherePhysicsShape::Create( float radius )
+	{
+		SetRadius( radius );
+	}
+
 	void SpherePhysicsShape::Save( Archive& archive )
 	{
 		PhysicsSystem::SERIAL_CreateSphere.Save( archive );
@@ -42,6 +47,11 @@ namespace Sentinel
 
 	BoxPhysicsShape::~BoxPhysicsShape()
 	{}
+
+	void BoxPhysicsShape::Create( const Vector3f& scale )
+	{
+		SetScale( scale );
+	}
 
 	void BoxPhysicsShape::Save( Archive& archive )
 	{
@@ -67,6 +77,11 @@ namespace Sentinel
 	CylinderPhysicsShape::~CylinderPhysicsShape()
 	{}
 
+	void CylinderPhysicsShape::Create( const Vector3f& scale )
+	{
+		SetScale( scale );
+	}
+
 	void CylinderPhysicsShape::Save( Archive& archive )
 	{
 		PhysicsSystem::SERIAL_CreateCylinder.Save( archive );
@@ -90,6 +105,20 @@ namespace Sentinel
 
 	MeshPhysicsShape::~MeshPhysicsShape()
 	{}
+
+	void MeshPhysicsShape::Create( void* verts, UINT count, UINT stride, const Vector3f& scale )
+	{
+		BYTE* data = (BYTE*)verts;
+
+		for( UINT x = 0; x < count; ++x )
+		{
+			AddPoint( *(Vector3f*)data );
+
+			data += stride;
+		}
+
+		SetScale( scale );
+	}
 
 	void MeshPhysicsShape::Save( Archive& archive )
 	{

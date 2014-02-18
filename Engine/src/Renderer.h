@@ -63,14 +63,15 @@ renderer->SetWindow( windowInfo );
 // Clear buffers.
 renderer->Clear( ColorRGBA( 0.0f, 0.2f, 0.8f, 1.0f ).Ptr() );
 
-// Shaders are required.
-renderer->SetShader( shader );
+// Materials are required.
+material->Apply( renderer );
 
 // VBOs and IBOs required.
 renderer->SetVBO( bufferVBO );
 renderer->SetIBO( bufferIBO );
 
-// Set shader variables here (see Shader.h).
+// Set shader variables here.
+// See 'Mesh.cpp' for a complete example.
 
 // Draw stuff.
 renderer->SetRenderType( primitive );
@@ -202,6 +203,12 @@ namespace Sentinel
 		BlendFuncType	mBlendFuncColor;
 		BlendFuncType	mBlendFuncAlpha;
 
+		//////////////////////////////////
+
+		BlendState( BlendType srcBlendColor, BlendType dstBlendColor,
+					BlendType srcBlendAlpha, BlendType dstBlendAlpha,
+					BlendFuncType blendFuncColor, BlendFuncType blendFuncAlpha );
+
 	public:
 
 		virtual ~BlendState() {}
@@ -228,8 +235,7 @@ namespace Sentinel
 	protected:
 
 		Shader*							mCurrShader;
-		bool							mIsShaderLocked;
-
+		
 	public:
 
 		static UINT						WINDOW_WIDTH_BASE;
@@ -312,8 +318,6 @@ namespace Sentinel
 
 		void					SetShader( Shader* shader );
 		Shader*					GetShader();
-		void					LockShader();
-		void					UnlockShader();
 
 		// Vertex Layout.
 		//

@@ -39,11 +39,13 @@ namespace Sentinel
 
 		SpherePhysicsShapeBT()
 		{
-			Create( 1 );
+			mShape = new btSphereShape( 1 );
 		}
 
 		SpherePhysicsShapeBT( float radius )
 		{
+			mShape = new btSphereShape( 1 );
+
 			Create( radius );
 		}
 
@@ -60,13 +62,6 @@ namespace Sentinel
 		void* GetData()
 		{
 			return mShape;
-		}
-
-	private:
-
-		void Create( float radius )
-		{
-			mShape = new btSphereShape( btScalar( radius ));
 		}
 
 	public:
@@ -94,11 +89,13 @@ namespace Sentinel
 
 		BoxPhysicsShapeBT()
 		{
-			Create( Vector3f( 1, 1, 1 ));
+			mShape = new btBoxShape( btVector3( 1, 1, 1 ));
 		}
 
 		BoxPhysicsShapeBT( const Vector3f& scale )
 		{
+			mShape = new btBoxShape( btVector3( 1, 1, 1 ));
+
 			Create( scale );
 		}
 
@@ -115,15 +112,6 @@ namespace Sentinel
 		void* GetData()
 		{
 			return mShape;
-		}
-
-	private:
-
-		void Create( const Vector3f& scale )
-		{
-			mShape = new btBoxShape( btVector3( 1, 1, 1 ));
-
-			SetScale( scale );
 		}
 
 	public:
@@ -153,11 +141,13 @@ namespace Sentinel
 
 		CylinderPhysicsShapeBT()
 		{
-			Create( Vector3f( 1, 1, 1 ));
+			mShape = new btCylinderShape( btVector3( 1, 1, 1 ));
 		}
 
 		CylinderPhysicsShapeBT( const Vector3f& scale )
 		{
+			mShape = new btCylinderShape( btVector3( 1, 1, 1 ));
+
 			Create( scale );
 		}
 
@@ -174,15 +164,6 @@ namespace Sentinel
 		void* GetData()
 		{
 			return mShape;
-		}
-
-	private:
-
-		void Create( const Vector3f& scale )
-		{
-			mShape = new btCylinderShape( btVector3( 1, 0.5f, 1 ));
-
-			SetScale( scale );
 		}
 
 	public:
@@ -215,9 +196,11 @@ namespace Sentinel
 			mShape = new btConvexHullShape();
 		}
 
-		MeshPhysicsShapeBT( Vector3f* verts, UINT count, const Vector3f& scale )
+		MeshPhysicsShapeBT( void* verts, UINT count, UINT stride, const Vector3f& scale )
 		{
-			Create( verts, count, scale );
+			mShape = new btConvexHullShape();
+
+			Create( verts, count, stride, scale );
 		}
 
 		~MeshPhysicsShapeBT()
@@ -235,42 +218,6 @@ namespace Sentinel
 			return mShape;
 		}
 
-	private:
-
-		void Create( Vector3f* verts, UINT count, const Vector3f& scale )
-		{
-			/*
-			mMesh = mesh;
-
-			Buffer* vbo = mesh->mVBO;
-			
-			UINT   count   = vbo->Count();
-			UCHAR* vboData = (UCHAR*)vbo->Lock();
-			
-			btConvexHullShape* shape = new btConvexHullShape();
-			Vector3f v;
-
-			for( UINT x = 0; x < count; ++x )
-			{
-				v = *(Vector3f*)vboData;
-				shape->addPoint( btVector3( v.x, v.y, v.z ));
-				vboData += vbo->Stride();
-			}
-			vbo->Unlock();
-			*/
-
-			mShape = new btConvexHullShape();
-
-			for( UINT x = 0; x < count; ++x )
-			{
-				const Vector3f& v( verts[ x ] );
-
-				mShape->addPoint( btVector3( v.x, v.y, v.z ));
-			}
-
-			mShape->setLocalScaling( btVector3( scale.x, scale.y, scale.z ));
-		}
-
 	public:
 
 		int GetNumPoints()
@@ -285,7 +232,7 @@ namespace Sentinel
 
 		Vector3f* GetPoints()
 		{
-			_ASSERT( 0 );	// ** unscaled points are 4 floats **
+			_ASSERT( 0 );	// unscaled points are 4 floats
 
 			return (Vector3f*)mShape->getUnscaledPoints();
 		}
@@ -604,9 +551,9 @@ namespace Sentinel
 			return new CylinderPhysicsShapeBT( scale );
 		}
 
-		MeshPhysicsShape* CreateMesh( Vector3f* verts, UINT count, const Vector3f& scale )
+		MeshPhysicsShape* CreateMesh( Vector3f* verts, UINT count, UINT stride, const Vector3f& scale )
 		{
-			return new MeshPhysicsShapeBT( verts, count, scale );
+			return new MeshPhysicsShapeBT( verts, count, stride, scale );
 		}
 
 		//////////////////////////////////
