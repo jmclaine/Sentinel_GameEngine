@@ -12,11 +12,11 @@ namespace Sentinel
 		UINT				mWidth;
 		UINT				mHeight;
 
-		ImageFormatType		mFormat;
+		ImageFormat::Type	mFormat;
 
 		//////////////////////////////
 
-		Texture( UINT width, UINT height, ImageFormatType format );
+		Texture( UINT width, UINT height, ImageFormat::Type format );
 
 	public:
 
@@ -27,6 +27,6 @@ namespace Sentinel
 		UINT				Width();
 		UINT				Height();
 
-		const ImageFormatType& Format();
+		const ImageFormat::Type& Format();
 	};
 }

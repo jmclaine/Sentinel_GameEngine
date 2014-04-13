@@ -115,6 +115,7 @@ float4 PS_Main(VSOutput input):SV_Target
 
 varying vec2 vTexCoord0;
 varying vec3 vNormal;
+varying vec3 vWorldPos;
 varying vec3 vCamDir;
 varying vec3 vLPos0;
 
@@ -126,20 +127,20 @@ uniform mat4 _World;
 uniform vec3 _LightPos;
 uniform vec3 _CameraPos;
 
-attribute vec4 Position;
+attribute vec3 Position;
 attribute vec2 TexCoord0;
 attribute vec3 Normal;
 
 void main()
 {
-	gl_Position   = mul(_WVP, Position);
-	vec3 worldPos = mul(_World, Position);
+	gl_Position = _WVP * vec4(Position, 1);
+	vWorldPos = (_World * vec4(Position, 1)).xyz;
 
 	// Light direction
-	vLPos0  = _LightPos - worldPos;
+	vLPos0  = _LightPos - vWorldPos;
 	
 	// Camera direction
-	vCamDir = _CameraPos - worldPos;
+	vCamDir = _CameraPos - vWorldPos;
 
 	// Texture
 	vTexCoord0 = TexCoord0;
@@ -161,30 +162,31 @@ uniform float _SpecComp;
 uniform vec3 _LightColor;
 uniform vec4 _LightAttn;
 
-vec4 GetColor( vec3 LPos, vec3 camDir, vec3 N, vec3 color, vec4 attn )
+vec3 GetColor( vec3 lightDir, vec3 cameraDir, vec3 normal, vec3 color, vec4 attn )
 {
-	float dist = max(0.0, length(LPos)-attn.w);
+	float intensity = clamp( dot( normal, lightDir ), 0.0, 1.0 );
 
-	LPos = normalize(LPos);
-	vec3 H = normalize(LPos + camDir);
+	if( intensity > 0 )
+	{
+		float d = distance( lightDir, vWorldPos );
+		float r = attn.w;
 
-	// Attenuation
-	float den = attn.x + (attn.y*2.0*dist)/attn.w + (attn.z*dist*dist)/(attn.w*attn.w);
-	float attnFinal = clamp(1.0 / (den*den), 0.0, 1.0);
+		// Attenuation
+		// Extend light beyond radius using standard attenuation.
+		//d = max( 0.0, d - r );
+		//float attenuation = attn.x + (attn.y*d)/r + (attn.z*d*d)/(r*r);
 
-	// Ambient
-	vec4 ambientFinal = _Ambient;
+		// Set to end light at radius.
+		float attenuation = clamp( 1.0 - d*d/(r*r), 0.0, 1.0 );
+		attenuation *= attenuation;
 
-	// Diffuse
-	float intensity = clamp(dot(N, LPos), 0.0, 1.0);
-	vec4 diffuseFinal = _Diffuse * intensity;
+		// Specular
+		vec3 specularFinal = max( _Specular.rgb * pow( clamp( dot( normal, normalize( lightDir + cameraDir )), 0.0, 1.0 ), _SpecComp ), 0.0 );
 
-	// Specular
-	vec4 specularFinal;
-	if(dot(-LPos, N) < 0)
-		specularFinal = max(_Specular * pow(clamp(dot(N, H), 0.0, 1.0), _SpecComp), 0.0);
-
-	return clamp(vec4(ambientFinal.rgb + (diffuseFinal.rgb + specularFinal.rgb) * attnFinal * color, 1.0), 0.0, 1.0);
+		return clamp( (_Diffuse.rgb * intensity + specularFinal.rgb) * attenuation * color, 0.0, 1.0 );
+	}
+	else
+		return vec3(0, 0, 0);
 }
 
 void main()
@@ -196,10 +198,10 @@ void main()
 	vec3 N = normalize(vNormal);
 
 	// Attenuation
-	vec4 color0 = GetColor(vLPos0, camDir, N, _LightColor, _LightAttn);
+	vec3 color0 = GetColor(vLPos0, camDir, N, _LightColor, _LightAttn);
 
 	// Final fragment color
-	gl_FragColor = texture2D(_Texture0, vTexCoord0) * color0;
+	gl_FragColor = (_Ambient + vec4(color0, 0)) * texture2D(_Texture0, vTexCoord0);
 }
 
 #endif

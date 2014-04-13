@@ -23,21 +23,21 @@ namespace Sentinel
 {
 	Mesh::Mesh()
 	{
-		mPrimitive	= TRIANGLE_LIST;
+		mPrimitive    = PrimitiveFormat::TRIANGLES;
 
-		mVBO		= NULL;
-		mIBO		= NULL;
+		mVertexBuffer = NULL;
+		mIndexBuffer  = NULL;
 
-		mLayout		= NULL;
-		mMaterial	= NULL;
+		mLayout       = NULL;
+		mMaterial     = NULL;
 
 		mMatrixWorld.Identity();
 	}
 
 	Mesh::~Mesh()
 	{
-		SAFE_DELETE( mVBO );
-		SAFE_DELETE( mIBO );
+		SAFE_DELETE( mVertexBuffer );
+		SAFE_DELETE( mIndexBuffer );
 	}
 
 	void Mesh::Draw( Renderer* renderer, GameWorld* world, UINT count )
@@ -45,11 +45,9 @@ namespace Sentinel
 		if( count == 0 )
 			return;
 
-		if( mVBO != NULL && mIBO != NULL )
+		if( mVertexBuffer != NULL || mIndexBuffer != NULL )
 		{
 			_ASSERT( renderer );
-			_ASSERT( mVBO );
-			_ASSERT( mIBO );
 			_ASSERT( mLayout );
 			_ASSERT( mMaterial );
 			_ASSERT( mMaterial->mShader );
@@ -58,67 +56,62 @@ namespace Sentinel
 
 			Shader* shader = renderer->GetShader();
 
-			renderer->SetVBO( mVBO );
-			renderer->SetIBO( mIBO );
-
-			renderer->SetVertexLayout( mLayout.get() );
-
 			// Set Uniforms.
 			//
 			UINT texCount     = 0;
 			UINT lightCount   = 0;
 			UINT uniformIndex = 0;
 			
-			const std::vector< UniformType >& uniform = shader->Uniform();
+			const std::vector< ShaderUniform::Type >& uniform = shader->Uniform();
 			
 			for( UINT i = 0; i < uniform.size(); ++i )
 			{
 				switch( uniform[ i ] )
 				{
-				case UNIFORM_WVP:
+				case ShaderUniform::WVP:
 					_ASSERT( world );
 					_ASSERT( world->GetCamera() != NULL );
 
 					shader->SetMatrix( uniformIndex, (world->GetCamera()->GetMatrixFinal() * mMatrixWorld).Ptr() );
 					break;
 
-				case UNIFORM_WORLD:
+				case ShaderUniform::WORLD:
 					shader->SetMatrix( uniformIndex, mMatrixWorld.Ptr() );
 					break;
 
-				case UNIFORM_INV_WORLD:
+				case ShaderUniform::INV_WORLD:
 					shader->SetMatrix( uniformIndex, mMatrixWorld.Inverse().Ptr() );
 					break;
 
-				case UNIFORM_VIEW:
+				case ShaderUniform::VIEW:
 					_ASSERT( world );
 					_ASSERT( world->GetCamera() );
 
 					shader->SetFloat3( uniformIndex, const_cast< Matrix4f& >(world->GetCamera()->GetMatrixView()).Ptr() );
 					break;
 
-				case UNIFORM_INV_VIEW:
+				case ShaderUniform::INV_VIEW:
 					_ASSERT( world );
 					_ASSERT( world->GetCamera() );
 
 					shader->SetFloat3( uniformIndex, world->GetCamera()->GetMatrixView().Inverse().Ptr() );
 					break;
 
-				case UNIFORM_PROJ:
+				case ShaderUniform::PROJ:
 					_ASSERT( world );
 					_ASSERT( world->GetCamera() );
 
 					shader->SetFloat3( uniformIndex, const_cast< Matrix4f& >(world->GetCamera()->GetMatrixProjection()).Ptr() );
 					break;
 
-				case UNIFORM_INV_PROJ:
+				case ShaderUniform::INV_PROJ:
 					_ASSERT( world );
 					_ASSERT( world->GetCamera() );
 
 					shader->SetFloat3( uniformIndex, world->GetCamera()->GetMatrixProjection().Inverse().Ptr() );
 					break;
 
-				case UNIFORM_TEXTURE:
+				case ShaderUniform::TEXTURE:
 					_ASSERT( mMaterial.get() );
 					_ASSERT( mMaterial->mTexture[ texCount ].get() );	// no texture loaded
 
@@ -126,23 +119,23 @@ namespace Sentinel
 					++texCount;
 					break;
 
-				case UNIFORM_AMBIENT:
+				case ShaderUniform::AMBIENT:
 					shader->SetFloat4( uniformIndex, mMaterial->mAmbient.Ptr() );
 					break;
 
-				case UNIFORM_DIFFUSE:
+				case ShaderUniform::DIFFUSE:
 					shader->SetFloat4( uniformIndex, mMaterial->mDiffuse.Ptr() );
 					break;
 
-				case UNIFORM_SPECULAR:
+				case ShaderUniform::SPECULAR:
 					shader->SetFloat4( uniformIndex, mMaterial->mSpecular.Ptr() );
 					break;
 
-				case UNIFORM_SPEC_COMP:
+				case ShaderUniform::SPEC_COMP:
 					shader->SetFloat(  uniformIndex, &mMaterial->mSpecularComponent );
 					break;
 
-				case UNIFORM_CAMERA_POS:
+				case ShaderUniform::CAMERA_POS:
 					{
 					_ASSERT( world );
 					_ASSERT( world->GetCamera() );
@@ -153,7 +146,7 @@ namespace Sentinel
 					}
 					break;
 
-				case UNIFORM_LIGHT_POS:
+				case ShaderUniform::LIGHT_POS:
 					{
 					_ASSERT( world );
 					_ASSERT( world->GetLight( lightCount ));
@@ -164,49 +157,49 @@ namespace Sentinel
 					}
 					break;
 
-				case UNIFORM_LIGHT_DIR:
+				case ShaderUniform::LIGHT_DIR:
 					_ASSERT( world );
 					_ASSERT( world->GetLight( lightCount ));
 
 					shader->SetFloat3( uniformIndex, world->GetLight( lightCount )->GetTransform()->mOrientation.ToEuler().Ptr() );
 					break;
 
-				case UNIFORM_LIGHT_COLOR:
+				case ShaderUniform::LIGHT_COLOR:
 					_ASSERT( world );
 					_ASSERT( world->GetLight( lightCount ));
 
 					shader->SetFloat3( uniformIndex, world->GetLight( lightCount )->mColor.Ptr() );
 					break;
 
-				case UNIFORM_LIGHT_ATTN:
+				case ShaderUniform::LIGHT_ATTN:
 					_ASSERT( world );
 					_ASSERT( world->GetLight( lightCount ));
 
 					shader->SetFloat4( uniformIndex, world->GetLight( lightCount )->mAttenuation.Ptr() );
 					break;
 
-				case UNIFORM_LIGHT_TEXTURE_CUBE:
+				case ShaderUniform::LIGHT_TEXTURE_CUBE:
 					_ASSERT( world );
 					_ASSERT( world->GetLight( lightCount ));
 
 					shader->SetTextureCube( uniformIndex, static_cast< PointLightComponent* >(world->GetLight( lightCount ))->GetTexture() );
 					break;
 
-				case UNIFORM_LIGHT_MATRIX:
+				case ShaderUniform::LIGHT_MATRIX:
 					_ASSERT( world );
 					_ASSERT( world->GetLight( lightCount ));
 
 					//shader->SetMatrix( uniformIndex, static_cast< DirectionalLightComponent* >(world->GetLight( lightCount ))->PtrMatrixFinal() );
 					break;
 
-				case UNIFORM_LIGHT_CUBE_MATRIX:
+				case ShaderUniform::LIGHT_CUBE_MATRIX:
 					_ASSERT( world );
 					_ASSERT( world->GetLight( lightCount ));
 
 					shader->SetMatrix( uniformIndex, static_cast< PointLightComponent* >(world->GetLight( lightCount ))->PtrMatrixFinal(), 6 );
 					break;
 
-				case UNIFORM_DELTA_TIME:
+				case ShaderUniform::DELTA_TIME:
 					{
 					_ASSERT( world );
 					_ASSERT( world->mTiming );
@@ -224,16 +217,44 @@ namespace Sentinel
 				++uniformIndex;
 			}
 
-			renderer->SetRenderType( mPrimitive );
-			renderer->DrawIndexed( (count == UINT_MAX) ? mIBO->Count() : count, 0, 0 );
+			renderer->SetVertexBuffer( mVertexBuffer );
+			renderer->SetVertexLayout( mLayout.get() );
+
+			if( mIndexBuffer )
+			{
+				renderer->SetIndexBuffer( mIndexBuffer );
+
+				renderer->DrawIndexed( mPrimitive, (count == UINT_MAX) ? mIndexBuffer->Count() : count, 0, 0 );
+			}
+			else
+			{
+				switch( mPrimitive )
+				{
+				case PrimitiveFormat::POINTS:
+					renderer->Draw( mPrimitive, (count == UINT_MAX) ? mVertexBuffer->Count() : count, 0 );
+					break;
+
+				case PrimitiveFormat::LINES:
+					renderer->Draw( mPrimitive, ((count == UINT_MAX) ? mVertexBuffer->Count() : count) >> 1, 0 );
+					break;
+
+				case PrimitiveFormat::TRIANGLES:
+					renderer->Draw( mPrimitive, ((count == UINT_MAX) ? mVertexBuffer->Count() : count) / 3, 0 );
+					break;
+
+				default:
+					_ASSERT(0);	// Mesh attempted to Draw with invalid PrimitiveType!
+					break;
+				}
+			}
 		}
 	}
 
 	void Mesh::CalculateBounds()
 	{
-		mBounds.Set( (BYTE*)mVBO->Lock(), mVBO->Count(), mVBO->Stride() );
+		mBounds.Set( (BYTE*)mVertexBuffer->Lock(), mVertexBuffer->Count(), mVertexBuffer->Stride() );
 
-		mVBO->Unlock();
+		mVertexBuffer->Unlock();
 	}
 
 	//////////////////////////////
@@ -248,7 +269,7 @@ namespace Sentinel
 		BYTE primitive = mesh->mPrimitive;
 		archive.Write( &primitive );
 
-		const std::vector< AttributeType >& layout = mesh->mLayout->Layout();
+		const std::vector< VertexAttribute::Type >& layout = mesh->mLayout->Layout();
 
 		UINT count = (UINT)layout.size();
 		archive.Write( &count );
@@ -260,8 +281,8 @@ namespace Sentinel
 			archive.Write( &data );
 		}
 
-		Buffer::Save( archive, mesh->mVBO );
-		Buffer::Save( archive, mesh->mIBO );
+		Buffer::Save( archive, mesh->mVertexBuffer );
+		Buffer::Save( archive, mesh->mIndexBuffer );
 
 		std::string material = materialManager->Get( mesh->mMaterial );
 		archive.Write( &material );
@@ -277,9 +298,9 @@ namespace Sentinel
 
 		BYTE primitive;
 		archive.Read( &primitive );
-		mesh->mPrimitive = (RenderType)primitive;
+		mesh->mPrimitive = (PrimitiveFormat::Type)primitive;
 
-		std::vector< AttributeType > layout;
+		std::vector< VertexAttribute::Type > layout;
 
 		UINT count;
 		archive.Read( &count );
@@ -288,13 +309,13 @@ namespace Sentinel
 		for( UINT x = 0; x < count; ++x )
 		{
 			archive.Read( &data );
-			layout.push_back( (AttributeType)data );
+			layout.push_back( (VertexAttribute::Type)data );
 		}
 
 		mesh->mLayout = SHARED( renderer->CreateVertexLayout( layout ));
 
-		mesh->mVBO = Buffer::Load( archive, renderer );
-		mesh->mIBO = Buffer::Load( archive, renderer );
+		mesh->mVertexBuffer = Buffer::Load( archive, renderer );
+		mesh->mIndexBuffer  = Buffer::Load( archive, renderer );
 
 		std::string material;
 		archive.Read( &material );

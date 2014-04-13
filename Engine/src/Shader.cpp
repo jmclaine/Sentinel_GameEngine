@@ -36,12 +36,12 @@ namespace Sentinel
 		return mSource;
 	}
 
-	const std::vector< AttributeType >& Shader::Attribute()
+	const std::vector< VertexAttribute::Type >& Shader::Attribute()
 	{
 		return mAttribute;
 	}
 
-	const std::vector< UniformType >& Shader::Uniform()
+	const std::vector< ShaderUniform::Type >& Shader::Uniform()
 	{
 		return mUniform;
 	}

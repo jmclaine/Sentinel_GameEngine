@@ -29,63 +29,63 @@ namespace Sentinel
 		mVertexSize += size;
 	}
 
-	void VertexLayoutDX::AddAttribute( AttributeType type )
+	void VertexLayoutDX::AddAttribute( VertexAttribute::Type type )
 	{
 		switch( type )
 		{
-		case ATTRIB_POSITION:
+		case VertexAttribute::POSITION:
 			SetAttribute( "POSITION", DXGI_FORMAT_R32G32B32_FLOAT, 12 );
 			break;
 
-		case ATTRIB_NORMAL:
+		case VertexAttribute::NORMAL:
 			SetAttribute( "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT, 12 );
 			break;
 
-		case ATTRIB_COLOR:
+		case VertexAttribute::COLOR:
 			SetAttribute( "COLOR", DXGI_FORMAT_R8G8B8A8_UNORM, 4 );
 			break;
 
-		case ATTRIB_TEXCOORD0:
+		case VertexAttribute::TEXCOORD0:
 			SetAttribute( "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT, 8 );
 			break;
 
-		case ATTRIB_TEXCOORD1:
+		case VertexAttribute::TEXCOORD1:
 			SetAttribute( "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT, 8, 1 );
 			break;
 
-		case ATTRIB_TEXCOORD2:
+		case VertexAttribute::TEXCOORD2:
 			SetAttribute( "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT, 8, 2 );
 			break;
 
-		case ATTRIB_QUADCOORD0:
+		case VertexAttribute::QUADCOORD0:
 			SetAttribute( "QUADCOORD", DXGI_FORMAT_R32G32B32A32_FLOAT, 16 );
 			break;
 
-		case ATTRIB_QUADCOORD1:
+		case VertexAttribute::QUADCOORD1:
 			SetAttribute( "QUADCOORD", DXGI_FORMAT_R32G32B32A32_FLOAT, 16, 1 );
 			break;
 
-		case ATTRIB_QUADCOORD2:
+		case VertexAttribute::QUADCOORD2:
 			SetAttribute( "QUADCOORD", DXGI_FORMAT_R32G32B32A32_FLOAT, 16, 2 );
 			break;
 
-		case ATTRIB_TANGENT:
+		case VertexAttribute::TANGENT:
 			SetAttribute( "TANGENT", DXGI_FORMAT_R32G32B32A32_FLOAT, 16 );
 			break;
 
-		case ATTRIB_BONE_COUNT:
+		case VertexAttribute::BONE_COUNT:
 			SetAttribute( "BONE_COUNT", DXGI_FORMAT_R32_SINT, 4 );
 			break;
 
-		case ATTRIB_BONE_INDEX:
+		case VertexAttribute::BONE_INDEX:
 			SetAttribute( "BONE_INDEX", DXGI_FORMAT_R32G32B32A32_SINT, 16 );
 			break;
 						
-		case ATTRIB_BONE_WEIGHT:
+		case VertexAttribute::BONE_WEIGHT:
 			SetAttribute( "BONE_WEIGHT", DXGI_FORMAT_R32G32B32A32_FLOAT, 16 );
 			break;
 
-		case ATTRIB_MATRIX:
+		case VertexAttribute::MATRIX:
 			for( UINT x = 0; x < 4; ++x )
 			{
 				SetAttribute( "MATRIX", DXGI_FORMAT_R32G32B32A32_FLOAT, 16, x );
@@ -114,59 +114,59 @@ namespace Sentinel
 		{
 			switch( mLayout[ x ] )
 			{
-			case ATTRIB_POSITION:
+			case VertexAttribute::POSITION:
 				source += "float4 Position:POSITION;\n";
 				break;
 
-			case ATTRIB_TEXCOORD0:
+			case VertexAttribute::TEXCOORD0:
 				source += "float2 TexCoord0:TEXCOORD0;\n";
 				break;
 
-			case ATTRIB_TEXCOORD1:
+			case VertexAttribute::TEXCOORD1:
 				source += "float2 TexCoord1:TEXCOORD1;\n";
 				break;
 
-			case ATTRIB_TEXCOORD2:
+			case VertexAttribute::TEXCOORD2:
 				source += "float2 TexCoord2:TEXCOORD2;\n";
 				break;
 
-			case ATTRIB_QUADCOORD0:
+			case VertexAttribute::QUADCOORD0:
 				source += "float4 QuadCoord0:QUADCOORD0;\n";
 				break;
 
-			case ATTRIB_QUADCOORD1:
+			case VertexAttribute::QUADCOORD1:
 				source += "float4 QuadCoord1:QUADCOORD1;\n";
 				break;
 
-			case ATTRIB_QUADCOORD2:
+			case VertexAttribute::QUADCOORD2:
 				source += "float4 QuadCoord2:QUADCOORD2;\n";
 				break;
 
-			case ATTRIB_NORMAL:
+			case VertexAttribute::NORMAL:
 				source += "float3 Normal:NORMAL;\n";
 				break;
 
-			case ATTRIB_COLOR:
+			case VertexAttribute::COLOR:
 				source += "float4 Color:COLOR;\n";
 				break;
 
-			case ATTRIB_TANGENT:
+			case VertexAttribute::TANGENT:
 				source += "float4 Tangent:TANGENT;\n";
 				break;
 
-			case ATTRIB_BONE_COUNT:
+			case VertexAttribute::BONE_COUNT:
 				source += "int BoneCount:BONE_COUNT;\n";
 				break;
 
-			case ATTRIB_BONE_INDEX:
+			case VertexAttribute::BONE_INDEX:
 				source += "int4 BoneIndex:BONE_INDEX;\n";
 				break;
 						
-			case ATTRIB_BONE_WEIGHT:
+			case VertexAttribute::BONE_WEIGHT:
 				source += "float4 BoneWeight:BONE_WEIGHT;\n";
 				break;
 
-			case ATTRIB_MATRIX:
+			case VertexAttribute::MATRIX:
 				source += "matrix Matrix:MATRIX;\n";
 				break;
 			}

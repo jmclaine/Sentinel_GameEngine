@@ -26,12 +26,8 @@ namespace Sentinel
 	////////////////////////////////
 
 	void GameComponent::Save( Archive& archive )
-	{
-		archive.Write( &mName );
-	}
+	{}
 
 	void GameComponent::Load( Archive& archive )
-	{
-		archive.Read( &mName );
-	}
+	{}
 }

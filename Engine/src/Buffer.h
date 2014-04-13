@@ -12,9 +12,8 @@ namespace Sentinel
 	{
 	protected:
 
-		BufferAccessType	mAccess;
-
-		BufferType			mType;
+		BufferAccess::Type	mAccess;
+		BufferFormat::Type	mFormat;
 		UINT				mSize;
 		UINT				mStride;
 		UINT				mCount;
@@ -32,7 +31,7 @@ namespace Sentinel
 		virtual void*		Lock() = 0;
 		virtual void		Unlock() = 0;
 
-		BufferType			Type();
+		BufferFormat::Type	Format();
 		UINT				Size();
 		UINT				Stride();
 		UINT				Count();

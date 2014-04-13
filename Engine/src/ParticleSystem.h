@@ -72,6 +72,8 @@ namespace Sentinel
 
 		///////////////////////////////////
 
+		virtual void		Draw() = 0;
+
 		void				SetMatrixWorld( const Matrix4f& matWorld );
 
 	private:

@@ -31,12 +31,11 @@ namespace Sentinel
 		for( UINT x = 0; x < maxSprites; ++x )
 		{
 			builder.mVertex.push_back( MeshBuilder::Vertex( Vector3f( 0.0f, 0.0f, 0.0f )));
-			builder.mIndex.push_back( x );
 		}
 
-		builder.mPrimitive = POINT_LIST;
+		builder.mPrimitive = PrimitiveFormat::POINTS;
 
-		mMesh = builder.BuildMesh( mRenderer );
+		mMesh = builder.BuildMesh( mRenderer, false );
 
 		if( !mMesh )
 			throw AppException( "Failed to create Mesh in SpriteSystem" );
@@ -67,8 +66,8 @@ namespace Sentinel
 
 		Storage& store = mStorage[ mNumSprites ];
 
-		store.mFrame		= frame;
-		store.mColor		= color;
+		store.mFrame		= mSprite->GetFrame( frame );
+		store.mColor		= color.ToUINT();
 		store.mMatrixWorld	= matWorld;
 		
 		++mNumSprites;
@@ -76,23 +75,9 @@ namespace Sentinel
 
 	void SpriteSystem::Present()
 	{
-		BYTE* verts = (BYTE*)mMesh->mVBO->Lock();
-
-		for( UINT x = 0; x < (UINT)mNumSprites; ++x )
-		{
-			Storage& store = mStorage[ x ];
-
-			*(Quad*)verts = mSprite->GetFrame( store.mFrame );
-			verts += sizeof( Quad );
-
-			*(UINT*)verts = store.mColor.ToUINT();
-			verts += sizeof( UINT );
-
-			*(Matrix4f*)verts = store.mMatrixWorld;
-			verts += sizeof( Matrix4f );
-		}
-
-		mMesh->mVBO->Unlock();
+		memcpy( mMesh->mVertexBuffer->Lock(), mStorage, sizeof( Storage ) * mNumSprites );
+		
+		mMesh->mVertexBuffer->Unlock();
 
 		mMesh->mMaterial = mMaterial;
 		

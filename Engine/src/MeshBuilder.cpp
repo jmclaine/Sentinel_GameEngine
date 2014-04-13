@@ -22,7 +22,7 @@ namespace Sentinel
 
 	void MeshBuilder::ClearAll()
 	{
-		mPrimitive = TRIANGLE_LIST;
+		mPrimitive = PrimitiveFormat::TRIANGLES;
 
 		mLayout = NULL;
 
@@ -31,8 +31,8 @@ namespace Sentinel
 
 	void MeshBuilder::ClearGeometry()
 	{
-		mVBO = NULL;
-		mIBO = NULL;
+		mVertexBuffer = NULL;
+		mIndexBuffer  = NULL;
 
 		mVertex.clear();
 		mIndex.clear();
@@ -236,7 +236,7 @@ namespace Sentinel
 
 		AddIndex( startVert, startVert+1, startVert+2, startVert+3 );
 
-		mPrimitive = TRIANGLE_LIST;
+		mPrimitive = PrimitiveFormat::TRIANGLES;
 	}
 
 #define CUBE_SIDE( n )\
@@ -345,7 +345,7 @@ namespace Sentinel
 		//AddIndex( startVert+1, startVert+5 );
 		//AddIndex( startVert+3, startVert+7 );
 
-		mPrimitive = LINE_LIST;
+		mPrimitive = PrimitiveFormat::LINES;
 	}
 
 	// Shape code base from geometry.h of OpenGL.
@@ -504,7 +504,7 @@ namespace Sentinel
 		free( sint );
 		free( cost );
 
-		mPrimitive = TRIANGLE_LIST;
+		mPrimitive = PrimitiveFormat::TRIANGLES;
 	}
 
 	void MeshBuilder::CreateTetrahedron( float scale )
@@ -632,7 +632,7 @@ namespace Sentinel
 			AddIndex( x, x+1, x+2 );
 		}
 
-		mPrimitive = TRIANGLE_LIST;
+		mPrimitive = PrimitiveFormat::TRIANGLES;
 	}
 
 	void MeshBuilder::CreateOctahedron( float radius )
@@ -831,7 +831,7 @@ namespace Sentinel
 			AddIndex( x, x+1, x+2 );
 		}
 
-		mPrimitive = TRIANGLE_LIST;
+		mPrimitive = PrimitiveFormat::TRIANGLES;
 	}
 
 	void MeshBuilder::CreateDodecahedron( float scale )
@@ -1292,7 +1292,7 @@ namespace Sentinel
 			AddIndex( x, x+1, x+2, x+3, x+4 );
 		}
 
-		mPrimitive = TRIANGLE_LIST;
+		mPrimitive = PrimitiveFormat::TRIANGLES;
 	}
 
 	void MeshBuilder::CreateWireSphere( float radius, int slices, int stacks )
@@ -1373,7 +1373,7 @@ namespace Sentinel
 		free( sint2 );
 		free( cost2 );
 
-		mPrimitive = LINE_LIST;
+		mPrimitive = PrimitiveFormat::LINES;
 	}
 
 	void MeshBuilder::CreateSphere( float radius, int slices, int stacks, int texWrap )
@@ -1527,7 +1527,7 @@ namespace Sentinel
 		free( sint2 );
 		free( cost2 );
 
-		mPrimitive = TRIANGLE_LIST;
+		mPrimitive = PrimitiveFormat::TRIANGLES;
 	}
 
 	// Apply a matrix transform to a set a vertices.
@@ -1543,15 +1543,14 @@ namespace Sentinel
 		}
 	}
 
-	// Create the VBO and IBO.
+	// Create Vertex Buffer.
 	//
-	void MeshBuilder::CreateBuffers( Renderer* renderer )
+	void MeshBuilder::CreateVertexBuffer( Renderer* renderer )
 	{
 		_ASSERT( mLayout );
 		_ASSERT( mVertex.size() > 0 );
-		_ASSERT( mIndex.size() > 0 );
-
-		std::vector< AttributeType > layout = mLayout->Layout();
+		
+		std::vector< VertexAttribute::Type > layout = mLayout->Layout();
 
 		UINT vertexSize	= mLayout->VertexSize();
 		UINT numVerts	= mVertex.size();
@@ -1571,7 +1570,7 @@ namespace Sentinel
 			{
 				switch( layout[ i ] )
 				{
-				case ATTRIB_POSITION:
+				case VertexAttribute::POSITION:
 					for( UINT k = 0; k < 3; ++k )
 					{
 						*((float*)base) = mVertex[ j ].mPosition[ k ];
@@ -1579,9 +1578,9 @@ namespace Sentinel
 					}
 					break;
 
-				case ATTRIB_TEXCOORD0:
-				case ATTRIB_TEXCOORD1:
-				case ATTRIB_TEXCOORD2:
+				case VertexAttribute::TEXCOORD0:
+				case VertexAttribute::TEXCOORD1:
+				case VertexAttribute::TEXCOORD2:
 					for( UINT k = 0; k < 2; ++k )
 					{
 						*((float*)base) = mVertex[ j ].mTexCoord[ texCount ][ k ];
@@ -1590,9 +1589,9 @@ namespace Sentinel
 					++texCount;
 					break;
 
-				case ATTRIB_QUADCOORD0:
-				case ATTRIB_QUADCOORD1:
-				case ATTRIB_QUADCOORD2:
+				case VertexAttribute::QUADCOORD0:
+				case VertexAttribute::QUADCOORD1:
+				case VertexAttribute::QUADCOORD2:
 					for( UINT k = 0; k < 4; ++k )
 					{
 						*((float*)base) = mVertex[ j ].mQuadCoord[ texCount ][ k ];
@@ -1601,12 +1600,12 @@ namespace Sentinel
 					++texCount;
 					break;
 
-				case ATTRIB_COLOR:
+				case VertexAttribute::COLOR:
 					*((UINT*)base) = mVertex[ j ].mColor;
 					base += sizeof(UINT);
 					break;
 
-				case ATTRIB_NORMAL:
+				case VertexAttribute::NORMAL:
 					for( UINT k = 0; k < 3; ++k )
 					{
 						*((float*)base) = mVertex[ j ].mNormal[ k ];
@@ -1614,7 +1613,7 @@ namespace Sentinel
 					}
 					break;
 
-				case ATTRIB_TANGENT:
+				case VertexAttribute::TANGENT:
 					for( UINT k = 0; k < 4; ++k )
 					{
 						*((float*)base) = mVertex[ j ].mTangent[ k ];
@@ -1622,12 +1621,12 @@ namespace Sentinel
 					}
 					break;
 
-				case ATTRIB_BONE_COUNT:
+				case VertexAttribute::BONE_COUNT:
 					*((int*)base) = mVertex[ j ].mBoneCount;
 					base += sizeof(int);
 					break;
 
-				case ATTRIB_BONE_INDEX:
+				case VertexAttribute::BONE_INDEX:
 					for( UINT k = 0; k < 4; ++k )
 					{
 						*((int*)base) = mVertex[ j ].mBoneIndex[ k ];
@@ -1635,7 +1634,7 @@ namespace Sentinel
 					}
 					break;
 
-				case ATTRIB_BONE_WEIGHT:
+				case VertexAttribute::BONE_WEIGHT:
 					for( UINT k = 0; k < 4; ++k )
 					{
 						*((float*)base) = mVertex[ j ].mBoneWeight[ k ];
@@ -1643,7 +1642,7 @@ namespace Sentinel
 					}
 					break;
 
-				case ATTRIB_MATRIX:
+				case VertexAttribute::MATRIX:
 					for( UINT k = 0; k < 16; ++k )
 					{
 						*((float*)base) = mVertex[ j ].mMatrix[ k ];
@@ -1654,24 +1653,35 @@ namespace Sentinel
 			}
 		}
 
-		mVBO = renderer->CreateBuffer( memBlock, totalSize, vertexSize, VERTEX_BUFFER );
-		mIBO = renderer->CreateBuffer( &mIndex.front(), mIndex.size()*sizeof(UINT), sizeof(UINT), INDEX_BUFFER );
-
+		mVertexBuffer = renderer->CreateBuffer( memBlock, totalSize, vertexSize, BufferFormat::VERTEX );
+		
 		free( memBlock );
+	}
+
+	// Create Index Buffer.
+	//
+	void MeshBuilder::CreateIndexBuffer( Renderer* renderer )
+	{
+		_ASSERT( mIndex.size() > 0 );
+
+		mIndexBuffer  = renderer->CreateBuffer( &mIndex.front(), mIndex.size()*sizeof(UINT), sizeof(UINT), BufferFormat::INDEX );
 	}
 
 	// Returns the mesh created from the buffers; otherwise, NULL.
 	//
-	Mesh* MeshBuilder::BuildMesh( Renderer* renderer )
+	Mesh* MeshBuilder::BuildMesh( Renderer* renderer, bool createIndexBuffer )
 	{
 		Mesh* mesh = new Mesh();
 		
-		CreateBuffers( renderer );
+		CreateVertexBuffer( renderer );
 
-		mesh->mPrimitive	= mPrimitive;
-		mesh->mVBO			= mVBO;
-		mesh->mIBO			= mIBO;
-		mesh->mLayout		= mLayout;
+		if( createIndexBuffer )
+			CreateIndexBuffer( renderer );
+
+		mesh->mPrimitive    = mPrimitive;
+		mesh->mVertexBuffer = mVertexBuffer;
+		mesh->mIndexBuffer  = mIndexBuffer;
+		mesh->mLayout       = mLayout;
 		
 		mesh->mBounds.Set( (BYTE*)mVertex.data(), mVertex.size(), sizeof( Vertex ));
 

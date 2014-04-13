@@ -32,17 +32,17 @@ namespace Sentinel
 
 	public:
 
-		RenderType			mPrimitive;
+		PrimitiveFormat::Type	mPrimitive;
 		
-		Buffer*				mVBO;
-		Buffer*				mIBO;
+		Buffer*					mVertexBuffer;
+		Buffer*					mIndexBuffer;
 
 		std::shared_ptr< VertexLayout >		mLayout;
 		std::shared_ptr< Material >			mMaterial;
 
-		Matrix4f			mMatrixWorld;
+		Matrix4f				mMatrixWorld;
 		
-		BoundingBox			mBounds;
+		BoundingBox				mBounds;
 
 		//////////////////////////////
 

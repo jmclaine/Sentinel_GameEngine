@@ -28,6 +28,8 @@ namespace Sentinel
 
 		GameWorld*							mWorld;
 
+		bool								mIsActive;
+
 	public:
 
 		std::string							mName;
@@ -41,8 +43,6 @@ namespace Sentinel
 		//////////////////////////////
 
 		GameComponent*	AttachComponent( GameComponent* component );
-		GameComponent*	AttachComponent( GameComponent* component, const char* name );
-
 		GameComponent*	DetachComponent( GameComponent* component );
 
 		//////////////////////////////
@@ -53,6 +53,8 @@ namespace Sentinel
 
 		GameWorld*		GetWorld();
 		void			SetWorld( GameWorld* world );
+
+		void			SetActive( bool active );
 
 		//////////////////////////////
 

@@ -15,6 +15,7 @@
 #include "SpriteManager.h"
 #include "MeshManager.h"
 #include "ModelManager.h"
+#include "RenderManager.h"
 
 namespace Sentinel
 {
@@ -27,10 +28,12 @@ namespace Sentinel
 		mSpriteSystem( NULL ),
 		mTextureManager( NULL ),
 		mShaderManager( NULL ),
+		mMaterialManager( NULL ),
 		mSpriteManager( NULL ),
 		mMeshManager( NULL ),
 		mModelManager( NULL ),
-		mSoundManager( NULL )
+		mSoundManager( NULL ),
+		mRenderManager( NULL )
 	{}
 
 	GameWorld::~GameWorld()
@@ -49,6 +52,8 @@ namespace Sentinel
 		SAFE_DELETE( mMeshManager );
 		SAFE_DELETE( mModelManager );
 		SAFE_DELETE( mSoundManager );
+
+		SAFE_DELETE( mRenderManager );
 	}
 
 	void GameWorld::Release()
@@ -57,7 +62,6 @@ namespace Sentinel
 			delete mGameObject[ x ];
 
 		mGameObject.clear();
-		mAlphaOrder.clear();
 		mCamera.clear();
 		mLight.clear();
 
@@ -96,8 +100,10 @@ namespace Sentinel
 
 	void GameWorld::UpdatePhysics()
 	{
-		if( mPhysicsSystem && mTiming )
-			mPhysicsSystem->Update( mTiming->DeltaTime() );
+		_ASSERT( mPhysicsSystem );
+		_ASSERT( mTiming );
+
+		mPhysicsSystem->Update( mTiming->DeltaTime() );
 
 		TRAVERSE_VECTOR( x, mGameObject )
 			mGameObject[ x ]->UpdatePhysics();
@@ -125,6 +131,8 @@ namespace Sentinel
 	{
 		if( mCurrentCamera )
 		{
+			_ASSERT( mRenderManager );
+
 			mCurrentCamera->Update();
 
 			// Meshes may contain alpha values.
@@ -146,11 +154,6 @@ namespace Sentinel
 				if( transform )
 					mAlphaOrder.insert( std::pair< float, GameObject* >( -(camPos - transform->mPosition).LengthSquared(), mGameObject[ x ] ));
 			}
-
-			// Update and Render Meshes.
-			//
-			TRAVERSE_LIST( it, mAlphaOrder )
-				(*it).second->UpdateDrawable();
 			//*/
 
 			TRAVERSE_VECTOR( x, mGameObject )
@@ -166,49 +169,54 @@ namespace Sentinel
 
 	/////////////////////////////////////////////////////
 
+	void GameWorld::Present()
+	{
+		_ASSERT( mRenderManager );
+
+		mRenderManager->Present();
+	}
+
+	/////////////////////////////////////////////////////
+
 	GameObject* GameWorld::AddGameObject( GameObject* obj )
 	{
-		if( obj )
+		_ASSERT( obj );
+		
+		TRAVERSE_VECTOR( x, mGameObject )
 		{
-			TRAVERSE_VECTOR( x, mGameObject )
-			{
-				if( mGameObject[ x ] == obj )
-					return obj;
-			}
-
-			if( obj->GetParent() )
-				obj->GetParent()->RemoveChild( obj );
-
-			obj->SetWorld( this );
-		
-			mGameObject.push_back( obj );
-
-			////////////////////////////////
-
-			CameraComponent* camera = (CameraComponent*)obj->FindComponent( GameComponent::CAMERA );
-		
-			if( camera )
-				AddCamera( camera );
-			
-			LightComponent* light = (LightComponent*)obj->FindComponent( GameComponent::LIGHT );
-			
-			if( light )
-				AddLight( light );
+			if( mGameObject[ x ] == obj )
+				return obj;
 		}
+
+		if( obj->GetParent() )
+			obj->GetParent()->RemoveChild( obj );
+
+		obj->SetWorld( this );
+		
+		mGameObject.push_back( obj );
+
+		////////////////////////////////
+
+		CameraComponent* camera = (CameraComponent*)obj->FindComponent( GameComponent::CAMERA );
+		
+		if( camera )
+			AddCamera( camera );
+			
+		LightComponent* light = (LightComponent*)obj->FindComponent( GameComponent::LIGHT );
+			
+		if( light )
+			AddLight( light );
 
 		return obj;
 	}
 
 	GameObject* GameWorld::AddGameObject( GameObject* obj, const char* name )
 	{
-		if( obj )
-		{
-			obj->mName = name;
+		_ASSERT( obj );
 
-			return AddGameObject( obj );
-		}
+		obj->mName = name;
 
-		return obj;
+		return AddGameObject( obj );
 	}
 
 	GameObject* GameWorld::RemoveGameObject( GameObject* obj )

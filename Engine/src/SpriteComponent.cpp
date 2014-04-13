@@ -11,6 +11,7 @@
 #include "TransformComponent.h"
 #include "CameraComponent.h"
 #include "Archive.h"
+#include "RenderManager.h"
 
 namespace Sentinel
 {
@@ -59,12 +60,27 @@ namespace Sentinel
 
 		if( !mOwner->GetWorld()->GetCamera( mCamera ))
 			throw AppException( "WidgetComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain CameraComponent" );
+
+		mOwner->GetWorld()->mRenderManager->Draw( RenderQueue::ALPHA_BLEND, this );
 	}
 
 	void SpriteComponent::Update()
 	{
 		DrawableComponent::Update();
+	}
 
+	void SpriteComponent::Shutdown()
+	{
+		DrawableComponent::Shutdown();
+	}
+
+	/////////////////////////////////
+
+	void SpriteComponent::CalculateBounds()
+	{}
+
+	void SpriteComponent::Draw()
+	{
 		mSpriteSystem->mSprite = mSprite;
 
 		mSpriteSystem->Clear();
@@ -72,11 +88,6 @@ namespace Sentinel
 		mSpriteSystem->Draw( mFrame, mColor, mOwner->GetWorld()->GetCamera( mCamera )->GetMatrixFinal() * mTransform->GetMatrixWorld() );
 
 		mSpriteSystem->Present();
-	}
-
-	void SpriteComponent::Shutdown()
-	{
-		DrawableComponent::Shutdown();
 	}
 
 	/////////////////////////////////

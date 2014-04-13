@@ -53,8 +53,8 @@ namespace Sentinel
 			// or xyzw / quad based depending on the shader
 			// attribute.
 			//
-			Vector2f	mTexCoord[ NUM_TEXTURES ];
-			Vector4f	mQuadCoord[ NUM_TEXTURES ];
+			Vector2f	mTexCoord[ TextureIndex::COUNT ];
+			Vector4f	mQuadCoord[ TextureIndex::COUNT ];
 			
 			Vector3f	mNormal;
 			UINT		mColor;
@@ -91,14 +91,14 @@ namespace Sentinel
 
 	private:
 
-		Buffer*						mVBO;
-		Buffer*						mIBO;
+		Buffer*						mVertexBuffer;
+		Buffer*						mIndexBuffer;
 
 	public:
 
 		std::shared_ptr< VertexLayout > mLayout;
 
-		RenderType					mPrimitive;
+		PrimitiveFormat::Type		mPrimitive;
 
 		std::vector< Vertex >		mVertex;
 		std::vector< UINT >			mIndex;
@@ -149,14 +149,18 @@ namespace Sentinel
 
 	private:
 
-		void	CreateBuffers( Renderer* renderer );
+		void	CreateVertexBuffer( Renderer* renderer );
+		void	CreateIndexBuffer( Renderer* renderer );
 
 	public:
 
 		// Returns the mesh created from the buffers.
-		// Ensure mShader is set before calling this.
+		// Ensure mLayout is set before calling this.
+		// Most objects require an index buffer,
+		// so be aware that not creating it may result
+		// in the program failing to render correctly.
 		//
-		Mesh*	BuildMesh( Renderer* renderer );
+		Mesh*	BuildMesh( Renderer* renderer, bool createIndexBuffer = true );
 
 		// Helper functions to build quads for both
 		// RenderTextures and GUIs.

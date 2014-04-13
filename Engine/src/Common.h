@@ -27,3 +27,5 @@ typedef unsigned long	DWORD;
 #pragma warning (disable : 4251)
 #pragma warning (disable : 4835)
 #pragma warning (disable : 4275)
+
+#define BIND_FUNC( func ) std::bind( &func, this )

@@ -62,47 +62,40 @@ namespace Sentinel
 
 	////////////////////////////////////////////////////////////////////////////////////
 
-	BlendState::BlendState( BlendType srcBlendColor, BlendType dstBlendColor,
-							BlendType srcBlendAlpha, BlendType dstBlendAlpha,
-							BlendFuncType blendFuncColor, BlendFuncType blendFuncAlpha ) :
+	BlendState::BlendState( BlendFormat::Type srcBlendColor, BlendFormat::Type dstBlendColor,
+							BlendFormat::Type srcBlendAlpha, BlendFormat::Type dstBlendAlpha,
+							BlendFunction::Type blendFuncColor, BlendFunction::Type blendFuncAlpha ) :
 		mSrcBlendColor( srcBlendColor ), mDstBlendColor( dstBlendColor ),
 		mSrcBlendAlpha( srcBlendAlpha ), mDstBlendAlpha( dstBlendAlpha ),
 		mBlendFuncColor( blendFuncColor ), mBlendFuncAlpha( blendFuncAlpha )
-	{
-		_ASSERT( srcBlendColor < NUM_BLEND_TYPES );
-		_ASSERT( dstBlendColor < NUM_BLEND_TYPES );
-		_ASSERT( srcBlendAlpha < NUM_BLEND_TYPES );
-		_ASSERT( dstBlendAlpha < NUM_BLEND_TYPES );
-		_ASSERT( blendFuncColor < NUM_BLEND_FUNC_TYPES );
-		_ASSERT( blendFuncAlpha < NUM_BLEND_FUNC_TYPES );
-	}
+	{}
 
-	BlendType BlendState::SrcBlendColor()
+	BlendFormat::Type BlendState::SrcBlendColor()
 	{
 		return mSrcBlendColor;
 	}
 
-	BlendType BlendState::DstBlendColor()
+	BlendFormat::Type BlendState::DstBlendColor()
 	{
 		return mDstBlendColor;
 	}
 
-	BlendType BlendState::SrcBlendAlpha()
+	BlendFormat::Type BlendState::SrcBlendAlpha()
 	{
 		return mSrcBlendAlpha;
 	}
 
-	BlendType BlendState::DstBlendAlpha()
+	BlendFormat::Type BlendState::DstBlendAlpha()
 	{
 		return mDstBlendAlpha;
 	}
 
-	BlendFuncType BlendState::BlendFuncColor()
+	BlendFunction::Type BlendState::BlendFuncColor()
 	{
 		return mBlendFuncColor;
 	}
 
-	BlendFuncType BlendState::BlendFuncAlpha()
+	BlendFunction::Type BlendState::BlendFuncAlpha()
 	{
 		return mBlendFuncAlpha;
 	}
@@ -144,7 +137,7 @@ namespace Sentinel
 		return renderer;
 	}
 
-	Texture* Renderer::CreateTexture( UINT width, UINT height, ImageFormatType format, bool createMips )
+	Texture* Renderer::CreateTexture( UINT width, UINT height, ImageFormat::Type format, bool createMips )
 	{
 		return CreateTextureFromMemory( 0, width, height, format, createMips );
 	}
@@ -159,7 +152,7 @@ namespace Sentinel
 		if( pixels == NULL )
 			return NULL;
 
-		return CreateTextureFromMemory( pixels, (UINT)width, (UINT)height, IMAGE_FORMAT_RGBA );
+		return CreateTextureFromMemory( pixels, (UINT)width, (UINT)height, ImageFormat::RGBA );
 	}
 
 	void Renderer::SetShader( Shader* shader )

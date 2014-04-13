@@ -36,10 +36,10 @@ namespace Sentinel
 			~SamplerDX();
 
 			bool Create( ID3D11Device* device, ID3D11DeviceContext*	context, 
-						 SamplerMode modeU, SamplerMode modeV, 
-						 SamplerFilter minFilter, 
-						 SamplerFilter magFilter, 
-						 SamplerFilter mipFilter );
+						 SamplerMode::Type modeU, SamplerMode::Type modeV, 
+						 SamplerFilter::Type minFilter, 
+						 SamplerFilter::Type magFilter, 
+						 SamplerFilter::Type mipFilter );
 
 			void Apply();
 		};
@@ -94,10 +94,12 @@ namespace Sentinel
 		void		SetTextureCube( UINT uniform, Texture* texture );
 
 		void		SetSampler( UINT index, 
-								SamplerMode modeU, SamplerMode modeV, 
-								SamplerFilter minFilter, 
-								SamplerFilter magFilter, 
-								SamplerFilter mipFilter );
+								SamplerMode::Type modeU, SamplerMode::Type modeV, 
+								SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter );
+
+		void		SetSamplerCube( UINT index, 
+									SamplerMode::Type modeU, SamplerMode::Type modeV, SamplerMode::Type modeW,
+									SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter );
 
 		///////////////////////////////////
 

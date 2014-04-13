@@ -5,26 +5,39 @@
 
 namespace Sentinel
 {
-	ShaderGL::SamplerGL::SamplerGL() :
-		mWrapS( GL_REPEAT ),
-		mWrapT( GL_REPEAT ),
-		mMinFilter( GL_LINEAR ),
-		mMagFilter( GL_LINEAR )
+/*
+#define APPLY_SAMPLER( target, pname, param )\
+	if( CURR_STATE.param != param )\
+	{\
+		glTexParameteri( target, pname, param );\
+		CURR_STATE.param = param;\
+	}
+	*/
+#define APPLY_SAMPLER( target, pname, param )\
+	glTexParameteri( target, pname, param );
+
+	ShaderGL::SamplerGL::SamplerGL( GLint wrapS, GLint wrapT,
+									GLint minFilter, GLint magFilter ) :
+		mWrapS( wrapS ),
+		mWrapT( wrapT ),
+		mMinFilter( minFilter ),
+		mMagFilter( magFilter )
 	{}
 
-	void ShaderGL::SamplerGL::Create( SamplerMode modeU, SamplerMode modeV, SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter )
+	void ShaderGL::SamplerGL::Create( SamplerMode::Type modeU, SamplerMode::Type modeV, 
+									  SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter )
 	{
-		mWrapS = (modeU == MODE_WRAP) ? GL_REPEAT : GL_CLAMP;
-		mWrapT = (modeV == MODE_WRAP) ? GL_REPEAT : GL_CLAMP;
-
-		if( minFilter == FILTER_LINEAR )
+		mWrapS = SAMPLER_MODE[ modeU ];
+		mWrapT = SAMPLER_MODE[ modeV ];
+		
+		if( minFilter == SamplerFilter::LINEAR )
 		{
-			if( mipFilter == FILTER_LINEAR )
+			if( mipFilter == SamplerFilter::LINEAR )
 			{
 				mMinFilter = GL_LINEAR_MIPMAP_LINEAR;
 			}
 			else
-			if( mipFilter == FILTER_POINT )
+			if( mipFilter == SamplerFilter::POINT )
 			{
 				mMinFilter = GL_LINEAR_MIPMAP_NEAREST;
 			}
@@ -35,12 +48,12 @@ namespace Sentinel
 		}
 		else
 		{
-			if( mipFilter == FILTER_LINEAR )
+			if( mipFilter == SamplerFilter::LINEAR )
 			{
 				mMinFilter = GL_NEAREST_MIPMAP_LINEAR;
 			}
 			else
-			if( mipFilter == FILTER_POINT )
+			if( mipFilter == SamplerFilter::POINT )
 			{
 				mMinFilter = GL_NEAREST_MIPMAP_NEAREST;
 			}
@@ -50,7 +63,7 @@ namespace Sentinel
 			}
 		}
 
-		if( magFilter == FILTER_LINEAR )
+		if( magFilter == SamplerFilter::LINEAR )
 		{
 			mMagFilter = GL_LINEAR;
 		}
@@ -62,12 +75,54 @@ namespace Sentinel
 
 	void ShaderGL::SamplerGL::Apply()
 	{
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mWrapS );
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mWrapT );
+		APPLY_SAMPLER( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mWrapS );
+		APPLY_SAMPLER( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mWrapT );
 
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mMinFilter );
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mMagFilter );
+		APPLY_SAMPLER( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mMinFilter );
+		APPLY_SAMPLER( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mMagFilter );
 	}
+
+	ShaderGL::SamplerGL ShaderGL::SamplerGL::CURR_STATE( SamplerMode::UNKNOWN, SamplerMode::UNKNOWN, 
+														 SamplerFilter::UNKNOWN, SamplerFilter::UNKNOWN );
+
+	GLint ShaderGL::SamplerGL::SAMPLER_MODE[] =
+		{ GL_REPEAT,
+		  GL_CLAMP,
+		  GL_CLAMP_TO_EDGE };
+
+	//////////////////////////////////////////////////////////////////////
+
+	ShaderGL::SamplerCubeGL::SamplerCubeGL( GLint wrapS, GLint wrapT, GLint wrapR,
+											GLint minFilter, GLint magFilter ) :
+		mWrapR( wrapR )
+	{
+		mWrapS = wrapS;
+		mWrapT = wrapT;
+
+		mMinFilter = minFilter;
+		mMagFilter = magFilter;
+	}
+
+	void ShaderGL::SamplerCubeGL::Create( SamplerMode::Type modeU, SamplerMode::Type modeV, SamplerMode::Type modeW, 
+										  SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter )
+	{
+		SamplerGL::Create( modeU, modeV, minFilter, magFilter, mipFilter );
+
+		mWrapR = SamplerGL::SAMPLER_MODE[ modeW ];
+	}
+
+	void ShaderGL::SamplerCubeGL::Apply()
+	{
+		APPLY_SAMPLER( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, mWrapS );
+		APPLY_SAMPLER( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, mWrapT );
+		APPLY_SAMPLER( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, mWrapR );
+
+		APPLY_SAMPLER( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, mMinFilter );
+		APPLY_SAMPLER( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, mMagFilter );
+	}
+
+	ShaderGL::SamplerCubeGL ShaderGL::SamplerCubeGL::CURR_STATE( SamplerMode::UNKNOWN, SamplerMode::UNKNOWN, SamplerMode::UNKNOWN, 
+																 SamplerFilter::UNKNOWN, SamplerFilter::UNKNOWN );
 
 	//////////////////////////////////////////////////////////////////////
 		
@@ -125,7 +180,7 @@ namespace Sentinel
 
 	///////////////////////////////////
 
-	bool ShaderGL::CreateAttribute( char* name, AttributeType type )
+	bool ShaderGL::CreateAttribute( char* name, VertexAttribute::Type type )
 	{
 		GLint attrib = glGetAttribLocation( mProgram, name );
 
@@ -143,7 +198,7 @@ namespace Sentinel
 		return false;
 	}
 
-	bool ShaderGL::CreateUniform( char* name, UniformType type )
+	bool ShaderGL::CreateUniform( char* name, ShaderUniform::Type type )
 	{
 		GLint uniform = glGetUniformLocation( mProgram, name );
 
@@ -253,21 +308,21 @@ namespace Sentinel
 
 		// Create attributes.
 		//
-		CreateAttribute( "Position",	ATTRIB_POSITION );
-		CreateAttribute( "TexCoord0",	ATTRIB_TEXCOORD0 );
-		CreateAttribute( "TexCoord1",	ATTRIB_TEXCOORD1 );
-		CreateAttribute( "TexCoord2",	ATTRIB_TEXCOORD2 );
-		CreateAttribute( "QuadCoord0",	ATTRIB_QUADCOORD0 );
-		CreateAttribute( "QuadCoord1",	ATTRIB_QUADCOORD1 );
-		CreateAttribute( "QuadCoord2",	ATTRIB_QUADCOORD2 );
-		CreateAttribute( "Normal",		ATTRIB_NORMAL );
-		CreateAttribute( "Color",		ATTRIB_COLOR );
-		CreateAttribute( "Tangent",		ATTRIB_TANGENT );
-		CreateAttribute( "BoneCount",	ATTRIB_BONE_COUNT );
-		CreateAttribute( "BoneMatrix",	ATTRIB_BONE_INDEX );
-		CreateAttribute( "BoneWeight",	ATTRIB_BONE_WEIGHT );
+		CreateAttribute( "Position",	VertexAttribute::POSITION );
+		CreateAttribute( "TexCoord0",	VertexAttribute::TEXCOORD0 );
+		CreateAttribute( "TexCoord1",	VertexAttribute::TEXCOORD1 );
+		CreateAttribute( "TexCoord2",	VertexAttribute::TEXCOORD2 );
+		CreateAttribute( "QuadCoord0",	VertexAttribute::QUADCOORD0 );
+		CreateAttribute( "QuadCoord1",	VertexAttribute::QUADCOORD1 );
+		CreateAttribute( "QuadCoord2",	VertexAttribute::QUADCOORD2 );
+		CreateAttribute( "Normal",		VertexAttribute::NORMAL );
+		CreateAttribute( "Color",		VertexAttribute::COLOR );
+		CreateAttribute( "Tangent",		VertexAttribute::TANGENT );
+		CreateAttribute( "BoneCount",	VertexAttribute::BONE_COUNT );
+		CreateAttribute( "BoneMatrix",	VertexAttribute::BONE_INDEX );
+		CreateAttribute( "BoneWeight",	VertexAttribute::BONE_WEIGHT );
 
-		if( CreateAttribute( "Matrix",	ATTRIB_MATRIX ))
+		if( CreateAttribute( "Matrix",	VertexAttribute::MATRIX ))
 			mAttributeSize += 3;
 
 		// Create layout.
@@ -284,51 +339,56 @@ namespace Sentinel
 
 		// Create uniforms.
 		//
-		UINT numTexture = 0;
-
-		CreateUniform( "_WVP",				UNIFORM_WVP );
-		CreateUniform( "_World",			UNIFORM_WORLD );
-		CreateUniform( "_InvWorld",			UNIFORM_INV_WORLD );
-		CreateUniform( "_View",				UNIFORM_VIEW );
-		CreateUniform( "_InvView",			UNIFORM_INV_VIEW );
-		CreateUniform( "_Proj",				UNIFORM_PROJ );
-		CreateUniform( "_InvProj",			UNIFORM_INV_PROJ );
-		CreateUniform( "_Ambient",			UNIFORM_AMBIENT );
-		CreateUniform( "_Diffuse",			UNIFORM_DIFFUSE );
-		CreateUniform( "_Specular",			UNIFORM_SPECULAR );
-		CreateUniform( "_SpecComp",			UNIFORM_SPEC_COMP );
-		CreateUniform( "_LightPos",			UNIFORM_LIGHT_POS );
-		CreateUniform( "_LightDir",			UNIFORM_LIGHT_DIR );
-		CreateUniform( "_LightColor",		UNIFORM_LIGHT_COLOR );
-		CreateUniform( "_LightAttn",		UNIFORM_LIGHT_ATTN );
-		CreateUniform( "_LightMatrix",		UNIFORM_LIGHT_MATRIX );
-		CreateUniform( "_LightCubeMatrix",	UNIFORM_LIGHT_CUBE_MATRIX );
-		CreateUniform( "_CameraPos",		UNIFORM_CAMERA_POS );
-		CreateUniform( "_Bones",			UNIFORM_BONES );
-		CreateUniform( "_DeltaTime",		UNIFORM_DELTA_TIME );
+		CreateUniform( "_WVP",				ShaderUniform::WVP );
+		CreateUniform( "_World",			ShaderUniform::WORLD );
+		CreateUniform( "_InvWorld",			ShaderUniform::INV_WORLD );
+		CreateUniform( "_View",				ShaderUniform::VIEW );
+		CreateUniform( "_InvView",			ShaderUniform::INV_VIEW );
+		CreateUniform( "_Proj",				ShaderUniform::PROJ );
+		CreateUniform( "_InvProj",			ShaderUniform::INV_PROJ );
+		CreateUniform( "_Ambient",			ShaderUniform::AMBIENT );
+		CreateUniform( "_Diffuse",			ShaderUniform::DIFFUSE );
+		CreateUniform( "_Specular",			ShaderUniform::SPECULAR );
+		CreateUniform( "_SpecComp",			ShaderUniform::SPEC_COMP );
+		CreateUniform( "_LightPos",			ShaderUniform::LIGHT_POS );
+		CreateUniform( "_LightDir",			ShaderUniform::LIGHT_DIR );
+		CreateUniform( "_LightColor",		ShaderUniform::LIGHT_COLOR );
+		CreateUniform( "_LightAttn",		ShaderUniform::LIGHT_ATTN );
+		CreateUniform( "_LightMatrix",		ShaderUniform::LIGHT_MATRIX );
+		CreateUniform( "_LightCubeMatrix",	ShaderUniform::LIGHT_CUBE_MATRIX );
+		CreateUniform( "_CameraPos",		ShaderUniform::CAMERA_POS );
+		CreateUniform( "_Bones",			ShaderUniform::BONES );
+		CreateUniform( "_DeltaTime",		ShaderUniform::DELTA_TIME );
 
 		// Create texture samplers.
 		//
-		if( CreateUniform( "_TextureCube", UNIFORM_LIGHT_TEXTURE_CUBE ))
-			++numTexture;
+		UINT numTextureCube = 0;
+		if( CreateUniform( "_TextureCube",	ShaderUniform::LIGHT_TEXTURE_CUBE ))
+			++numTextureCube;
 
+		UINT numTexture = 0;
 		char texName[16];
 		for( int x = 0; x < MAX_TEXTURES; ++x )
 		{
 			sprintf_s( texName, "_Texture%d", x );
 
-			if( CreateUniform( texName, UNIFORM_TEXTURE ))
+			if( CreateUniform( texName,		ShaderUniform::TEXTURE ))
 				++numTexture;
 		}
 
-		if( numTexture > 0 )
+		mNumSamplers = numTexture + numTextureCube;
+
+		if( mNumSamplers > 0 )
 		{
-			mNumSamplers = numTexture;
+			mSampler = new Sampler*[ mNumSamplers ];
 
-			mSampler = new Sampler*[ numTexture ];
+			UINT index = 0;
 
-			for( UINT i = 0; i < numTexture; ++i )
-				mSampler[ i ] = new SamplerGL();
+			for( ; index < numTextureCube; ++index )
+				mSampler[ index ] = new SamplerCubeGL();
+
+			for( ; index < mNumSamplers; ++index )
+				mSampler[ index ] = new SamplerGL();
 		}
 
 		TRACE( "Shader Created Successfully!" );
@@ -421,46 +481,74 @@ namespace Sentinel
 	{
 		glUniform1i( mUniformGL[ uniform ], mTextureLevel );
 			
-		DWORD texID = GL_TEXTURE0 + mTextureLevel;
-		glClientActiveTexture( texID );
-		glActiveTexture( texID );
+		GLenum texID = GL_TEXTURE0 + mTextureLevel;
+		
+		static GLenum CURR_ACTIVE = 0;
 
-		glBindTexture( GL_TEXTURE_2D, ((TextureGL*)texture)->ID() );
+		if( CURR_ACTIVE != texID )
+		{
+			glActiveTexture( texID );
+
+			CURR_ACTIVE = texID;
+		}
+
+		static GLuint CURR_TEXTURE = -1;
+
+		GLuint id = ((TextureGL*)texture)->ID();
+		if( CURR_TEXTURE != id )
+		{
+			glBindTexture( GL_TEXTURE_2D, id );
+
+			CURR_TEXTURE = id;
+		}
 
 		static_cast< SamplerGL* >(mSampler[ mTextureLevel ])->Apply();
-			
+
 		++mTextureLevel;
 	}
 
 	void ShaderGL::SetTextureCube( UINT uniform, Texture* texture )
 	{
 		glUniform1i( mUniformGL[ uniform ], mTextureLevel );
+
+		static bool IS_ACTIVE = false;
+
+		if( !IS_ACTIVE )
+		{
+			glClientActiveTexture( GL_TEXTURE_CUBE_MAP );
+
+			IS_ACTIVE = true;
+		}
+		
+		static GLuint CURR_TEXTURE = -1;
+
+		GLuint id = ((TextureGL*)texture)->ID();
+		if( CURR_TEXTURE != id )
+		{
+			glBindTexture( GL_TEXTURE_CUBE_MAP, ((TextureGL*)texture)->ID() );
 			
-		glClientActiveTexture( GL_TEXTURE_CUBE_MAP );
-		//glActiveTexture( GL_TEXTURE_CUBE_MAP );
+			CURR_TEXTURE = id;
+		}
 
-		glBindTexture( GL_TEXTURE_CUBE_MAP, ((TextureGL*)texture)->ID() );
-
-		//static_cast< SamplerGL* >(mSampler[ mTextureLevel ])->Apply();
-
-		glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-		glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-		glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
-
-		glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-		glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-
-		glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE );
+		static_cast< SamplerCubeGL* >(mSampler[ mTextureLevel ])->Apply();
 			
 		++mTextureLevel;
 	}
 
-	void ShaderGL::SetSampler( UINT index, SamplerMode modeU, SamplerMode modeV, 
-							   SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter )
+	void ShaderGL::SetSampler( UINT index, SamplerMode::Type modeU, SamplerMode::Type modeV, 
+							   SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter )
 	{
 		_ASSERT( index < mNumSamplers );
 
 		static_cast< SamplerGL* >(mSampler[ index ])->Create( modeU, modeV, minFilter, magFilter, mipFilter );
+	}
+
+	void ShaderGL::SetSamplerCube( UINT index, SamplerMode::Type modeU, SamplerMode::Type modeV, SamplerMode::Type modeW,
+								   SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter )
+	{
+		_ASSERT( index < mNumSamplers );
+
+		static_cast< SamplerCubeGL* >(mSampler[ index ])->Create( modeU, modeV, modeW, minFilter, magFilter, mipFilter );
 	}
 
 	///////////////////////////////////

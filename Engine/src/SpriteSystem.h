@@ -16,6 +16,7 @@ Use the current GameWorld camera to render sprites.
 #include "Vector3f.h"
 #include "Matrix4f.h"
 #include "ColorRGBA.h"
+#include "Point.h"
 
 namespace Sentinel
 {
@@ -42,8 +43,8 @@ namespace Sentinel
 		{
 		public:
 
-			UINT			mFrame;
-			ColorRGBA		mColor;
+			Quad			mFrame;
+			UINT			mColor;
 			Matrix4f		mMatrixWorld;
 		};
 

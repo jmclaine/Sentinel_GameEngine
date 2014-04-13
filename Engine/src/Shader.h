@@ -11,48 +11,6 @@ namespace Sentinel
 	#define MAX_LIGHTS				1
 
 	class Texture;
-	
-	enum SamplerMode
-	{
-		MODE_WRAP,
-		MODE_CLAMP,
-
-		NUM_MODES
-	};
-
-	enum SamplerFilter
-	{
-		FILTER_POINT,
-		FILTER_LINEAR,
-		
-		NUM_FILTERS
-	};
-
-	enum UniformType
-	{
-		UNIFORM_WVP,
-		UNIFORM_WORLD,
-		UNIFORM_INV_WORLD,
-		UNIFORM_VIEW,
-		UNIFORM_INV_VIEW,
-		UNIFORM_PROJ,
-		UNIFORM_INV_PROJ,
-		UNIFORM_TEXTURE,
-		UNIFORM_AMBIENT,
-		UNIFORM_DIFFUSE,
-		UNIFORM_SPECULAR,
-		UNIFORM_SPEC_COMP,
-		UNIFORM_LIGHT_POS,
-		UNIFORM_LIGHT_DIR,
-		UNIFORM_LIGHT_COLOR,
-		UNIFORM_LIGHT_ATTN,
-		UNIFORM_LIGHT_TEXTURE_CUBE,
-		UNIFORM_LIGHT_MATRIX,
-		UNIFORM_LIGHT_CUBE_MATRIX,
-		UNIFORM_CAMERA_POS,
-		UNIFORM_BONES,
-		UNIFORM_DELTA_TIME,
-	};
 
 	class SENTINEL_DLL Shader
 	{
@@ -73,8 +31,8 @@ namespace Sentinel
 
 		char*			mSource;
 		
-		std::vector< AttributeType > mAttribute;
-		std::vector< UniformType >   mUniform;
+		std::vector< VertexAttribute::Type > mAttribute;
+		std::vector< ShaderUniform::Type >   mUniform;
 
 		std::shared_ptr< VertexLayout > mLayout;
 
@@ -90,9 +48,9 @@ namespace Sentinel
 		virtual ~Shader();
 
 		const char*		Source();
-		const std::vector< AttributeType >&   Attribute();
-		const std::vector< UniformType >&     Uniform();
-		const std::shared_ptr< VertexLayout > Layout();
+		const std::vector< VertexAttribute::Type >&		Attribute();
+		const std::vector< ShaderUniform::Type >&		Uniform();
+		const std::shared_ptr< VertexLayout >			Layout();
 
 		virtual void	Release() = 0;
 
@@ -106,8 +64,13 @@ namespace Sentinel
 		virtual void	SetTexture( UINT uniform, Texture* texture ) = 0;
 		virtual void	SetTextureCube( UINT uniform, Texture* texture ) = 0;
 
-		virtual void	SetSampler( UINT index, SamplerMode modeU, SamplerMode modeV, 
-									SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter = NUM_FILTERS ) = 0;
+		virtual void	SetSampler( UINT index, 
+									SamplerMode::Type modeU, SamplerMode::Type modeV, 
+									SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter = SamplerFilter::UNKNOWN ) = 0;
+
+		virtual void	SetSamplerCube( UINT index, 
+										SamplerMode::Type modeU, SamplerMode::Type modeV, SamplerMode::Type modeW,
+										SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter = SamplerFilter::UNKNOWN ) = 0;
 
 		////////////////////////////////////
 

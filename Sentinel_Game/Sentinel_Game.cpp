@@ -236,6 +236,7 @@ public:
 
 				BEGIN_PROFILE( timing );
 				mGameWorld->UpdateDrawable();
+				mGameWorld->Present();
 				END_PROFILE( timing, "Drawable" );
 
 				END_PROFILE( timing, "World" );

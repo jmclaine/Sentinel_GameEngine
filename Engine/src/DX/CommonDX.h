@@ -4,11 +4,9 @@
 #include <d3dx11.h>
 #include <D3D11Shader.h>
 #include <D3DCompiler.h>
+#include <D3DCommon.h>
 
 #ifndef NDEBUG
-	#include <D3DCommon.h>
-	#pragma comment (lib, "dxguid.lib") 
-
 	#define SET_DEBUG_NAME( device )\
 	{\
 		const char name[] = #device;\
@@ -19,3 +17,4 @@
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dx11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
+#pragma comment (lib, "dxguid.lib") 

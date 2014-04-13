@@ -122,7 +122,7 @@ namespace Sentinel
 				// Rotate in direction with spherical interpolation.
 				//
 				static Quatf qFinal = body->GetOrientation();
-		
+
 				if( diff.LengthSquared() > 0 )
 				{
 					static Vector3f rot = qFinal.ToEuler();
@@ -135,6 +135,43 @@ namespace Sentinel
 
 				if( qResult.LengthSquared() > 0 )	// slerp can end with an invalid rotation
 					body->SetOrientation( qResult );
+
+				impulse = Vector3f( 0, 0, 0 );
+
+				if( keyboard.IsDown( 'W' ))
+				{
+					impulse += mTransform->GetMatrixWorld().Forward();
+				}
+
+				if( keyboard.IsDown( 'S' ))
+				{
+					impulse -= mTransform->GetMatrixWorld().Forward();
+				}
+
+				if( keyboard.IsDown( 'D' ))
+				{
+					impulse += mTransform->GetMatrixWorld().Right();
+				}
+
+				if( keyboard.IsDown( 'A' ))
+				{
+					impulse -= mTransform->GetMatrixWorld().Right();
+				}
+
+				if( keyboard.IsDown( 'E' ))
+				{
+					impulse += mTransform->GetMatrixWorld().Up();
+				}
+
+				if( keyboard.IsDown( 'Q' ))
+				{
+					impulse -= mTransform->GetMatrixWorld().Up();
+				}
+				
+				// Move in direction.
+				//
+				if( impulse.LengthSquared() > 0 )
+					body->ApplyCentralImpulse( impulse.Normalize() * mStrafeSpeed );
 
 				didMove = true;
 			}

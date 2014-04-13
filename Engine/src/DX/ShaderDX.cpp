@@ -20,21 +20,21 @@ namespace Sentinel
 	}
 
 	bool ShaderDX::SamplerDX::Create( ID3D11Device* device, ID3D11DeviceContext* context, 
-									  SamplerMode modeU, SamplerMode modeV, 
-									  SamplerFilter minFilter, 
-									  SamplerFilter magFilter, 
-									  SamplerFilter mipFilter )
+									  SamplerMode::Type modeU, SamplerMode::Type modeV, 
+									  SamplerFilter::Type minFilter, 
+									  SamplerFilter::Type magFilter, 
+									  SamplerFilter::Type mipFilter )
 	{
 		mContext = context;
 
 		D3D11_SAMPLER_DESC desc;
 		ZeroMemory( &desc, sizeof( desc ));
 
-		if( minFilter == FILTER_LINEAR )
+		if( minFilter == SamplerFilter::LINEAR )
 		{
-			if( magFilter == FILTER_LINEAR )
+			if( magFilter == SamplerFilter::LINEAR )
 			{
-				if( mipFilter == FILTER_LINEAR )
+				if( mipFilter == SamplerFilter::LINEAR )
 				{
 					desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 				}
@@ -45,7 +45,7 @@ namespace Sentinel
 			}
 			else
 			{
-				if( mipFilter == FILTER_LINEAR )
+				if( mipFilter == SamplerFilter::LINEAR )
 				{
 					desc.Filter = D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
 				}
@@ -57,9 +57,9 @@ namespace Sentinel
 		}
 		else
 		{
-			if( magFilter == FILTER_LINEAR )
+			if( magFilter == SamplerFilter::LINEAR )
 			{
-				if( mipFilter == FILTER_LINEAR )
+				if( mipFilter == SamplerFilter::LINEAR )
 				{
 					desc.Filter = D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR;
 				}
@@ -70,7 +70,7 @@ namespace Sentinel
 			}
 			else
 			{
-				if( mipFilter == FILTER_LINEAR )
+				if( mipFilter == SamplerFilter::LINEAR )
 				{
 					desc.Filter = D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
 				}
@@ -81,21 +81,27 @@ namespace Sentinel
 			}
 		}
 
-		desc.AddressU		= (modeU == MODE_WRAP) ? D3D11_TEXTURE_ADDRESS_WRAP : D3D11_TEXTURE_ADDRESS_CLAMP;
-		desc.AddressV		= (modeV == MODE_WRAP) ? D3D11_TEXTURE_ADDRESS_WRAP : D3D11_TEXTURE_ADDRESS_CLAMP;
+		desc.AddressU		= (modeU == SamplerMode::WRAP) ? D3D11_TEXTURE_ADDRESS_WRAP : D3D11_TEXTURE_ADDRESS_CLAMP;
+		desc.AddressV		= (modeV == SamplerMode::WRAP) ? D3D11_TEXTURE_ADDRESS_WRAP : D3D11_TEXTURE_ADDRESS_CLAMP;
 		desc.AddressW		= D3D11_TEXTURE_ADDRESS_WRAP;
 		desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
 		desc.MinLOD			= 0;
-		desc.MaxLOD			= (mipFilter != NUM_FILTERS) ? D3D11_FLOAT32_MAX : 0;
+		desc.MaxLOD			= (mipFilter != SamplerFilter::UNKNOWN) ? D3D11_FLOAT32_MAX : 0;
 		desc.MipLODBias		= 0;
 		desc.MaxAnisotropy	= 1;
 		desc.BorderColor[0] = 0;
 		desc.BorderColor[1] = 0;
 		desc.BorderColor[2] = 0;
 		desc.BorderColor[3] = 0;
-				
-		if( device->CreateSamplerState( &desc, &mSampler ) == S_FALSE )
+		
+		ID3D11SamplerState* sampler;
+		if( device->CreateSamplerState( &desc, &sampler ) == S_FALSE )
 			return false;
+
+		if( mSampler )
+			mSampler->Release();
+
+		mSampler = sampler;
 
 		return true;
 	}
@@ -241,66 +247,66 @@ namespace Sentinel
 
 			if( strcmp( varDesc.SemanticName, "POSITION" ) == 0 )
 			{
-				mAttribute.push_back( ATTRIB_POSITION );
+				mAttribute.push_back( VertexAttribute::POSITION );
 			}
 			else
 			if( strcmp( varDesc.SemanticName, "TEXCOORD" ) == 0 )
 			{
 				if( varDesc.SemanticIndex == 0 )
-					mAttribute.push_back( ATTRIB_TEXCOORD0 );
+					mAttribute.push_back( VertexAttribute::TEXCOORD0 );
 				else
 				if( varDesc.SemanticIndex == 1 )
-					mAttribute.push_back( ATTRIB_TEXCOORD1 );
+					mAttribute.push_back( VertexAttribute::TEXCOORD1 );
 				else
 				if( varDesc.SemanticIndex == 2 )
-					mAttribute.push_back( ATTRIB_TEXCOORD2 );
+					mAttribute.push_back( VertexAttribute::TEXCOORD2 );
 			}
 			else
 			if( strcmp( varDesc.SemanticName, "QUADCOORD" ) == 0 )
 			{
 				if( varDesc.SemanticIndex == 0 )
-					mAttribute.push_back( ATTRIB_QUADCOORD0 );
+					mAttribute.push_back( VertexAttribute::QUADCOORD0 );
 				else
 				if( varDesc.SemanticIndex == 1 )
-					mAttribute.push_back( ATTRIB_QUADCOORD1 );
+					mAttribute.push_back( VertexAttribute::QUADCOORD1 );
 				else
 				if( varDesc.SemanticIndex == 2 )
-					mAttribute.push_back( ATTRIB_QUADCOORD2 );
+					mAttribute.push_back( VertexAttribute::QUADCOORD2 );
 			}
 			else
 			if( strcmp( varDesc.SemanticName, "NORMAL" ) == 0 )
 			{
-				mAttribute.push_back( ATTRIB_NORMAL );
+				mAttribute.push_back( VertexAttribute::NORMAL );
 			}
 			else
 			if( strcmp( varDesc.SemanticName, "COLOR" ) == 0 )
 			{
-				mAttribute.push_back( ATTRIB_COLOR );
+				mAttribute.push_back( VertexAttribute::COLOR );
 			}
 			else
 			if( strcmp( varDesc.SemanticName, "TANGENT" ) == 0 )
 			{
-				mAttribute.push_back( ATTRIB_COLOR );
+				mAttribute.push_back( VertexAttribute::COLOR );
 			}
 			else
 			if( strcmp( varDesc.SemanticName, "BONE_COUNT" ) == 0 )
 			{
-				mAttribute.push_back( ATTRIB_BONE_COUNT );
+				mAttribute.push_back( VertexAttribute::BONE_COUNT );
 			}
 			else
 			if( strcmp( varDesc.SemanticName, "BONE_INDEX" ) == 0 )
 			{
-				mAttribute.push_back( ATTRIB_BONE_INDEX );
+				mAttribute.push_back( VertexAttribute::BONE_INDEX );
 			}
 			else
 			if( strcmp( varDesc.SemanticName, "BONE_WEIGHT" ) == 0 )
 			{
-				mAttribute.push_back( ATTRIB_BONE_WEIGHT );
+				mAttribute.push_back( VertexAttribute::BONE_WEIGHT );
 			}
 			else
 			if( strcmp( varDesc.SemanticName, "MATRIX" ) == 0 )
 			{
-				mAttribute.push_back( ATTRIB_MATRIX );
+				mAttribute.push_back( VertexAttribute::MATRIX );
 				x += 3;
 			}
 		}
@@ -367,64 +373,64 @@ namespace Sentinel
 		if( cbuffer )
 		{
 			if( CreateUniform( "_WVP", cbuffer ))
-				mUniform.push_back( UNIFORM_WVP );
+				mUniform.push_back( ShaderUniform::WVP );
 
 			if( CreateUniform( "_World", cbuffer ))
-				mUniform.push_back( UNIFORM_WORLD );
+				mUniform.push_back( ShaderUniform::WORLD );
 
 			if( CreateUniform( "_InvWorld", cbuffer ))
-				mUniform.push_back( UNIFORM_INV_WORLD );
+				mUniform.push_back( ShaderUniform::INV_WORLD );
 
 			if( CreateUniform( "_View", cbuffer ))
-				mUniform.push_back( UNIFORM_VIEW );
+				mUniform.push_back( ShaderUniform::VIEW );
 
 			if( CreateUniform( "_InvView", cbuffer ))
-				mUniform.push_back( UNIFORM_INV_VIEW );
+				mUniform.push_back( ShaderUniform::INV_VIEW );
 
 			if( CreateUniform( "_Proj", cbuffer ))
-				mUniform.push_back( UNIFORM_PROJ );
+				mUniform.push_back( ShaderUniform::PROJ );
 
 			if( CreateUniform( "_InvProj", cbuffer ))
-				mUniform.push_back( UNIFORM_INV_PROJ );
+				mUniform.push_back( ShaderUniform::INV_PROJ );
 
 			if( CreateUniform( "_Ambient", cbuffer ))
-				mUniform.push_back( UNIFORM_AMBIENT );
+				mUniform.push_back( ShaderUniform::AMBIENT );
 
 			if( CreateUniform( "_Diffuse", cbuffer ))
-				mUniform.push_back( UNIFORM_DIFFUSE );
+				mUniform.push_back( ShaderUniform::DIFFUSE );
 
 			if( CreateUniform( "_Specular", cbuffer ))
-				mUniform.push_back( UNIFORM_SPECULAR );
+				mUniform.push_back( ShaderUniform::SPECULAR );
 
 			if( CreateUniform( "_SpecComp", cbuffer ))
-				mUniform.push_back( UNIFORM_SPEC_COMP );
+				mUniform.push_back( ShaderUniform::SPEC_COMP );
 
 			if( CreateUniform( "_LightPos", cbuffer ))
-				mUniform.push_back( UNIFORM_LIGHT_POS );
+				mUniform.push_back( ShaderUniform::LIGHT_POS );
 
 			if( CreateUniform( "_LightDir", cbuffer ))
-				mUniform.push_back( UNIFORM_LIGHT_DIR );
+				mUniform.push_back( ShaderUniform::LIGHT_DIR );
 
 			if( CreateUniform( "_LightColor", cbuffer ))
-				mUniform.push_back( UNIFORM_LIGHT_COLOR );
+				mUniform.push_back( ShaderUniform::LIGHT_COLOR );
 
 			if( CreateUniform( "_LightAttn", cbuffer ))
-				mUniform.push_back( UNIFORM_LIGHT_ATTN );
+				mUniform.push_back( ShaderUniform::LIGHT_ATTN );
 
 			if( CreateUniform( "_LightMatrix", cbuffer ))
-				mUniform.push_back( UNIFORM_LIGHT_MATRIX );
+				mUniform.push_back( ShaderUniform::LIGHT_MATRIX );
 
 			if( CreateUniform( "_LightCubeMatrix", cbuffer ))
-				mUniform.push_back( UNIFORM_LIGHT_CUBE_MATRIX );
+				mUniform.push_back( ShaderUniform::LIGHT_CUBE_MATRIX );
 
 			if( CreateUniform( "_CameraPos", cbuffer ))
-				mUniform.push_back( UNIFORM_CAMERA_POS );
+				mUniform.push_back( ShaderUniform::CAMERA_POS );
 
 			if( CreateUniform( "_Bones", cbuffer ))
-				mUniform.push_back( UNIFORM_BONES );
+				mUniform.push_back( ShaderUniform::BONES );
 
 			if( CreateUniform( "_DeltaTime", cbuffer ))
-				mUniform.push_back( UNIFORM_DELTA_TIME );
+				mUniform.push_back( ShaderUniform::DELTA_TIME );
 		}
 
 		// Create texture uniforms.
@@ -449,7 +455,7 @@ namespace Sentinel
 
 			if( reflect->GetResourceBindingDescByName( texName, &bindDesc ) == S_OK )
 			{
-				mUniform.push_back( UNIFORM_TEXTURE );
+				mUniform.push_back( ShaderUniform::TEXTURE );
 				++numTexture;
 			}
 		}
@@ -466,7 +472,8 @@ namespace Sentinel
 			{
 				SamplerDX* sampler = new SamplerDX();
 					
-				sampler->Create( mDevice, mContext, MODE_WRAP, MODE_WRAP, FILTER_LINEAR, FILTER_LINEAR, FILTER_LINEAR );
+				sampler->Create( mDevice, mContext, SamplerMode::WRAP, SamplerMode::WRAP, 
+													SamplerFilter::LINEAR, SamplerFilter::LINEAR, SamplerFilter::LINEAR );
 				sampler->mStartSlot = i;
 
 				mSampler[ i ] = sampler;
@@ -558,10 +565,8 @@ namespace Sentinel
 	}
 
 	void ShaderDX::SetSampler( UINT index, 
-							   SamplerMode modeU, SamplerMode modeV, 
-							   SamplerFilter minFilter, 
-							   SamplerFilter magFilter, 
-							   SamplerFilter mipFilter )
+							   SamplerMode::Type modeU, SamplerMode::Type modeV, 
+							   SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter )
 	{
 		_ASSERT( index < mNumSamplers );
 
@@ -574,10 +579,13 @@ namespace Sentinel
 		}
 
 		sampler->mStartSlot = index;
+	}
 
-		delete mSampler[ index ];
-
-		mSampler[ index ] = sampler;
+	void ShaderDX::SetSamplerCube( UINT index, 
+								   SamplerMode::Type modeU, SamplerMode::Type modeV, SamplerMode::Type modeW,
+								   SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter )
+	{
+		_ASSERT(0);	// TODO
 	}
 
 	///////////////////////////////////

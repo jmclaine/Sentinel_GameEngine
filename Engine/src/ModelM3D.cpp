@@ -433,7 +433,7 @@ namespace Sentinel
 						{
 							material = mMaterials[ matID ];
 							
-							for( UINT z = 0; z < NUM_TEXTURES; ++z )
+							for( UINT z = 0; z < TextureIndex::COUNT; ++z )
 								if( material->mTexture[ z ].get() != NULL )
 									++numTextures;
 						}
@@ -626,15 +626,15 @@ namespace Sentinel
 				switch( type )
 				{
 				case AUTODESK_BUMP:
-					type = TEXTURE_NORMAL;
+					type = TextureIndex::NORMAL;
 					break;
 
 				case AUTODESK_PARALLAX:
-					type = TEXTURE_DEPTH;
+					type = TextureIndex::DEPTH;
 					break;
 				
 				default:
-					type = TEXTURE_DIFFUSE;
+					type = TextureIndex::DIFFUSE;
 					break;
 				}
 
@@ -647,25 +647,13 @@ namespace Sentinel
 
 	public:
 
-		void SetMaterials( const std::vector< std::shared_ptr< Material >>& material )
+		void GetMeshList( std::vector< Mesh* >* meshList )
 		{
-			auto it = material.begin();
+			meshList->clear();
 
 			for( UINT x = 0; x < mNumObjects; ++x )
 				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
-				{
-					mObject[ x ].mMesh[ y ]->mMaterial = *it;
-					++it;
-				}
-		}
-
-		void GetMaterials( std::vector< std::shared_ptr< Material >>* material )
-		{
-			material->clear();
-
-			for( UINT x = 0; x < mNumObjects; ++x )
-				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
-					material->push_back( mObject[ x ].mMesh[ y ]->mMaterial );
+					meshList->push_back( mObject[ x ].mMesh[ y ] );
 		}
 
 		void SetTime( float _time, UINT objIndex = 0 )

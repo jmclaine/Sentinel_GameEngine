@@ -23,12 +23,11 @@ namespace Sentinel
 	class MeshManager;
 	class ModelManager;
 	class SoundManager;
+	class RenderManager;
 
 	class SENTINEL_DLL GameWorld
 	{
 	private:
-
-		std::multimap< float, GameObject* >		mAlphaOrder;
 
 		std::vector< CameraComponent* >			mCamera;
 		CameraComponent*						mCurrentCamera;
@@ -54,6 +53,8 @@ namespace Sentinel
 		ModelManager*							mModelManager;
 		SoundManager*							mSoundManager;
 
+		RenderManager*							mRenderManager;
+
 		/////////////////////////////////////////////////////
 
 		GameWorld();
@@ -75,12 +76,16 @@ namespace Sentinel
 		void				UpdatePhysics();
 		void				UpdateTransform();
 		void				UpdateComponents();
-		void				UpdateLight();
 		void				UpdateDrawable();
+		void				UpdateLight();
 
 		// All associated GameObjects and GameComponents also Shutdown().
 		//
 		void				Shutdown();
+
+		/////////////////////////////////////////////////////
+
+		void				Present();
 
 		/////////////////////////////////////////////////////
 

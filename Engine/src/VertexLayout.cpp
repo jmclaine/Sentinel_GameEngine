@@ -9,7 +9,7 @@ namespace Sentinel
 	VertexLayout::~VertexLayout()
 	{}
 
-	const std::vector< AttributeType >& VertexLayout::Layout() const
+	const std::vector< VertexAttribute::Type >& VertexLayout::Layout() const
 	{
 		return mLayout;
 	}

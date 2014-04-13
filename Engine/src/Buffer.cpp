@@ -6,7 +6,7 @@
 namespace Sentinel
 {
 	Buffer::Buffer() :
-		mType( NULL_BUFFER ), 
+		mFormat( BufferFormat::UNKNOWN ), 
 		mSize( 0 ), 
 		mStride( 0 ), 
 		mCount( 0 )
@@ -14,7 +14,7 @@ namespace Sentinel
 
 	Buffer::~Buffer()
 	{
-		mType	= NULL_BUFFER;
+		mFormat	= BufferFormat::UNKNOWN;
 		mSize	= 0;
 		mStride = 0;
 		mCount	= 0;
@@ -22,9 +22,9 @@ namespace Sentinel
 
 	//////////////////////////////
 
-	BufferType Buffer::Type()
+	BufferFormat::Type Buffer::Format()
 	{
-		return mType;
+		return mFormat;
 	}
 
 	UINT Buffer::Size()
@@ -46,8 +46,8 @@ namespace Sentinel
 
 	void Buffer::Save( Archive& archive, Buffer* buffer )
 	{
-		BYTE type = (BYTE)buffer->mType;
-		archive.Write( &type );
+		BYTE format = (BYTE)buffer->mFormat;
+		archive.Write( &format );
 
 		archive.Write( &buffer->mSize );
 		archive.Write( &buffer->mStride );
@@ -69,8 +69,8 @@ namespace Sentinel
 
 	Buffer* Buffer::Load( Archive& archive, Renderer* renderer )
 	{
-		BYTE type;
-		archive.Read( &type );
+		BYTE format;
+		archive.Read( &format );
 		
 		UINT size;
 		archive.Read( &size );
@@ -87,7 +87,7 @@ namespace Sentinel
 		BYTE* data = (BYTE*)malloc( size );
 		uncompress( data, (ULONG*)(&size), comp_data, bound );
 
-		Buffer* buffer = renderer->CreateBuffer( data, size, stride, (BufferType)type );
+		Buffer* buffer = renderer->CreateBuffer( data, size, stride, (BufferFormat::Type)format );
 
 		free( comp_data );
 		free( data );

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Common.h"
+#include "Vector2f.h"
 #include "Vector3f.h"
 #include "Matrix4f.h"
 
@@ -32,7 +33,7 @@ namespace Sentinel
 
 		Plane( const Vector3f& pos = Vector3f(), const Vector3f& normal = Vector3f() );
 
-		float		Distance( const Vector3f& pos );
+		float		Distance( const Vector3f& pos ) const;
 
 		//bool		Intersects( const Ray& ray ) const;
 		//bool		Intersects( const BoundingBox& box ) const;
@@ -94,5 +95,34 @@ namespace Sentinel
 		bool		Intersects( const Vector3f& point ) const;
 		bool		Intersects( const Ray& ray, Vector3f* intersection = NULL ) const;
 		bool		Intersects( const BoundingSphere& sphere ) const;
+	};
+
+	//////////////////////////////////////////////////////
+
+	class SENTINEL_DLL BoundingFrustum
+	{
+	private:
+
+		Plane		mPlane[ 6 ];
+
+	public:
+
+		BoundingFrustum();
+
+		BoundingFrustum( const Vector3f& nearCenter, const Vector3f& farCenter,
+						 const Vector2f& nearExtent, const Vector2f& farExtent );
+
+		BoundingFrustum( const Vector3f& nearCenter, const Vector3f& farCenter,
+						 const Vector2f& nearExtent, const Vector2f& farExtent,
+						 const Vector3f& forward, const Vector3f& right, const Vector3f& up );
+
+		void		Set( const Vector3f& nearCenter, const Vector3f& farCenter,
+						 const Vector2f& nearExtent, const Vector2f& farExtent );
+
+		void		Set( const Vector3f& nearCenter, const Vector3f& farCenter,
+						 const Vector2f& nearExtent, const Vector2f& farExtent,
+						 const Vector3f& forward, const Vector3f& right, const Vector3f& up );
+
+		bool		Intersects( const BoundingBox& box ) const;
 	};
 }

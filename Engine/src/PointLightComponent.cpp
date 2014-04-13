@@ -31,7 +31,7 @@ namespace Sentinel
 		Renderer* renderer = mOwner->GetWorld()->mRenderer;
 		
 		if( !mTexture )
-			mTexture = renderer->CreateTextureCube( mResolution, mResolution, IMAGE_FORMAT_RG );
+			mTexture = renderer->CreateTextureCube( mResolution, mResolution, ImageFormat::RG );
 
 		if( !mRenderTexture )
 			mRenderTexture = renderer->CreateRenderTexture( mTexture );
@@ -39,8 +39,6 @@ namespace Sentinel
 
 	void PointLightComponent::Update()
 	{
-		//LightComponent::Update();
-
 		if( mMaterial.get() )
 		{
 			// Create view-projection matrices for each side of the cube.
@@ -86,10 +84,9 @@ namespace Sentinel
 
 			static float color[4] = {1, 1, 1, 1};
 
-			renderer->SetDepthStencilType( DEPTH_LEQUAL );
 			renderer->SetViewport( 0, 0, mResolution, mResolution );
 			renderer->SetRenderTexture( mRenderTexture );
-			renderer->Clear( color );
+			renderer->ClearColor( color );
 
 			mMaterial->Apply( renderer );
 
@@ -98,7 +95,7 @@ namespace Sentinel
 			count = (UINT)mDynamic.size();
 			for( UINT x = 0; x < count; ++x )
 			{
-				mDynamic[ x ]->Update();
+				mDynamic[ x ]->Draw();
 			}
 			
 			Material::Unlock();
@@ -133,7 +130,7 @@ namespace Sentinel
 		{
 			if( drawable->mIsDynamic )
 			{
-				if( drawable->GetBounds().Intersects( BoundingSphere( mTransform->mPosition, mAttenuation.w )))
+				if( drawable->mBounds.Intersects( BoundingSphere( mTransform->mPosition, mAttenuation.w )))
 				{
 					mDynamic.push_back( drawable );
 				}

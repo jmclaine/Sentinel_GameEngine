@@ -2,7 +2,7 @@
 
 namespace Sentinel
 {
-	TextureGL::TextureGL( UINT width, UINT height, ImageFormatType format, GLuint id ) :
+	TextureGL::TextureGL( UINT width, UINT height, ImageFormat::Type format, GLuint id ) :
 		Texture( width, height, format ),
 		mID( id )
 	{}

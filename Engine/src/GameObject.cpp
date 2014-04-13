@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include "GameWorld.h"
 #include "Archive.h"
+#include "DrawableComponent.h"
 
 namespace Sentinel
 {
@@ -13,7 +14,9 @@ namespace Sentinel
 		mController( NULL ),
 		mPhysics( NULL ),
 		mDrawable( NULL ), 
-		mWorld( NULL )
+		mWorld( NULL ),
+		mName( "GameObject" ),
+		mIsActive( true )
 	{}
 
 	GameObject::~GameObject()
@@ -69,15 +72,6 @@ namespace Sentinel
 				mComponent.push_back( component );
 				return component;
 		}
-	}
-
-	GameComponent* GameObject::AttachComponent( GameComponent* component, const char* name )
-	{
-		if( !component )
-			return NULL;
-
-		component->mName = name;
-		return AttachComponent( component );
 	}
 
 #define DETACH_COMPONENT( obj )\
@@ -164,6 +158,21 @@ namespace Sentinel
 		}
 	}
 
+	void GameObject::SetActive( bool active )
+	{
+		mIsActive = active;
+
+		if( mDrawable && !active )
+		{
+			((DrawableComponent*)mDrawable)->mIsVisible = false;
+		}
+
+		TRAVERSE_VECTOR( x, mChild )
+		{
+			mChild[ x ]->SetActive( active );
+		}
+	}
+
 	////////////////////////////////////////////////////////////
 
 	void GameObject::Startup()
@@ -189,52 +198,67 @@ namespace Sentinel
 
 	void GameObject::UpdateController()
 	{
-		if( mController )
-			mController->Update();
+		if( mIsActive )
+		{
+			if( mController )
+				mController->Update();
 
-		TRAVERSE_VECTOR( x, mChild )
-			mChild[ x ]->UpdateController();
+			TRAVERSE_VECTOR( x, mChild )
+				mChild[ x ]->UpdateController();
+		}
 	}
 
 	void GameObject::UpdatePhysics()
 	{
-		if( mPhysics )
-			mPhysics->Update();
+		if( mIsActive )
+		{
+			if( mPhysics )
+				mPhysics->Update();
 
-		TRAVERSE_VECTOR( x, mChild )
-			mChild[ x ]->UpdatePhysics();
+			TRAVERSE_VECTOR( x, mChild )
+				mChild[ x ]->UpdatePhysics();
+		}
 	}
 
 	void GameObject::UpdateTransform()
 	{
-		if( mTransform )
-			mTransform->Update();
+		if( mIsActive )
+		{
+			if( mTransform )
+				mTransform->Update();
 
-		TRAVERSE_VECTOR( x, mChild )
-			mChild[ x ]->UpdateTransform();
+			TRAVERSE_VECTOR( x, mChild )
+				mChild[ x ]->UpdateTransform();
+		}
 	}
 
 	void GameObject::UpdateComponents()
 	{
-		TRAVERSE_VECTOR( x, mComponent )
+		if( mIsActive )
 		{
-			if( mComponent[ x ]->GetType() != GameComponent::CAMERA &&
-				mComponent[ x ]->GetType() != GameComponent::LIGHT )
-				mComponent[ x ]->Update();
-		}
+			TRAVERSE_VECTOR( x, mComponent )
+			{
+				if( mComponent[ x ]->GetType() != GameComponent::CAMERA &&
+					mComponent[ x ]->GetType() != GameComponent::LIGHT )
+					mComponent[ x ]->Update();
+			}
 
-		TRAVERSE_VECTOR( x, mChild )
-			mChild[ x ]->UpdateComponents();
+			TRAVERSE_VECTOR( x, mChild )
+				mChild[ x ]->UpdateComponents();
+		}
 	}
 
 	void GameObject::UpdateDrawable( bool drawChildren )
 	{
-		if( mDrawable )
-			mDrawable->Update();
+		if( mIsActive )
+		{
+			if( mDrawable )
+				mDrawable->Update();
 		
-		if( drawChildren )
-			TRAVERSE_VECTOR( x, mChild )
-				mChild[ x ]->UpdateDrawable();
+			if( drawChildren )
+				TRAVERSE_VECTOR( x, mChild )
+					mChild[ x ]->UpdateDrawable();
+		}
 	}
 
 #define SHUTDOWN_COMPONENT( component )\

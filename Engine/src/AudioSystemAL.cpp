@@ -93,9 +93,24 @@ namespace Sentinel
 
 		AudioSystemAL()
 		{
+			Init();
+		}
+
+		~AudioSystemAL()
+		{
+			alcMakeContextCurrent( NULL );
+			alcDestroyContext( mContext );
+			alcCloseDevice( mDevice );
+		}
+
+		void Init()
+		{
 			mDevice = alcOpenDevice( NULL );
 			if( !mDevice )
-				throw AppException( "Could not open audio device!" );
+			{
+				REPORT_ERROR( "Could not open audio device!", "Audio Error" );
+				return;
+			}
 
 			mContext = alcCreateContext( mDevice, NULL );
 			if( mContext == NULL || alcMakeContextCurrent( mContext ) == ALC_FALSE )
@@ -105,15 +120,9 @@ namespace Sentinel
 
 				alcCloseDevice( mDevice );
 
-				throw AppException( "Could not set an audio context!" );
+				REPORT_ERROR( "Could not set an audio context!", "Audio Error" );
+				return;
 			}
-		}
-
-		~AudioSystemAL()
-		{
-			alcMakeContextCurrent( NULL );
-			alcDestroyContext( mContext );
-			alcCloseDevice( mDevice );
 		}
 
 		//////////////////////////////////

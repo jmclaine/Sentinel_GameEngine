@@ -469,12 +469,11 @@ namespace Sentinel
 		return inv;
 	}
 
-	Vector3f Matrix4f::Transform( const Vector3f& v ) const
+	Vector3f Matrix4f::Transform( const Vector3f& v, float w ) const
 	{
-		// assume v.w = 1
-		return Vector3f( v.x*m[0]+v.y*m[4]+v.z*m[8]+m[12], 
-						 v.x*m[1]+v.y*m[5]+v.z*m[9]+m[13], 
-						 v.x*m[2]+v.y*m[6]+v.z*m[10]+m[14] );
+		return Vector3f( v.x*m[0]+v.y*m[4]+v.z*m[8]+w*m[12], 
+						 v.x*m[1]+v.y*m[5]+v.z*m[9]+w*m[13], 
+						 v.x*m[2]+v.y*m[6]+v.z*m[10]+w*m[14] );
 	}
 
 	Vector3f Matrix4f::Transform( const Vector4f& v ) const
@@ -486,16 +485,16 @@ namespace Sentinel
 
 	Vector3f Matrix4f::Right() const
 	{
-		return Vector3f( m[0], m[1], m[2] );
+		return Vector3f( m[0], m[1], m[2] ).NormalizeFast();
 	}
 
 	Vector3f Matrix4f::Up() const
 	{
-		return Vector3f( m[4], m[5], m[6] );
+		return Vector3f( m[4], m[5], m[6] ).NormalizeFast();
 	}
 
 	Vector3f Matrix4f::Forward() const
 	{
-		return Vector3f( -m[8], -m[9], -m[10] );
+		return Vector3f( -m[8], -m[9], -m[10] ).NormalizeFast();
 	}
 }

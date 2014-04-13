@@ -42,9 +42,6 @@ namespace Sentinel
 	public:
 
 		static const ColorRGBA& WHITE;
-		static const ColorRGBA& LGRAY;
-		static const ColorRGBA& MGRAY;
-		static const ColorRGBA& DGRAY;
 		static const ColorRGBA& BLACK;
 		static const ColorRGBA& RED;
 		static const ColorRGBA& GREEN;

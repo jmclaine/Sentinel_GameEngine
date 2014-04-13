@@ -14,11 +14,12 @@ namespace Sentinel
 
 		TransformComponent* mTransform;
 
-		BoundingBox		mBounds;
-
 	public:
 
+		BoundingBox		mBounds;
+
 		bool			mIsDynamic;
+		bool			mIsVisible;
 
 	protected:
 
@@ -34,8 +35,10 @@ namespace Sentinel
 
 		/////////////////////////////
 
-		const BoundingBox& GetBounds();
+		virtual void	Draw() = 0;
 
+		virtual void	CalculateBounds() = 0;
+		
 	protected:
 
 		virtual DECLARE_SERIAL_SAVE();

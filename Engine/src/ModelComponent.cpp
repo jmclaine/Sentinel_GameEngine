@@ -6,6 +6,8 @@
 #include "GameObject.h"
 #include "GameWorld.h"
 #include "Archive.h"
+#include "RenderManager.h"
+#include "Timing.h"
 
 namespace Sentinel
 {
@@ -29,22 +31,37 @@ namespace Sentinel
 	void ModelComponent::Startup()
 	{
 		DrawableComponent::Startup();
+
+		if( mOwner->GetWorld() )
+			mOwner->GetWorld()->mRenderManager->Draw( RenderQueue::GEOMETRY, this );
 	}
 
 	void ModelComponent::Update()
 	{
+		mModel->Update( mOwner->GetWorld()->mTiming->DeltaTime() );
+
 		DrawableComponent::Update();
 
-		mModel->mMatrixWorld = mTransform->GetMatrixWorld();
-
-		GameWorld* world = mOwner->GetWorld();
-
-		mModel->Draw( world->mRenderer, world );
+		Draw();
 	}
 
 	void ModelComponent::Shutdown()
 	{
 		DrawableComponent::Shutdown();
+	}
+
+	///////////////////////////////////
+
+	void ModelComponent::CalculateBounds()
+	{}
+
+	void ModelComponent::Draw()
+	{
+		mModel->mMatrixWorld = mTransform->GetMatrixWorld();
+
+		GameWorld* world = mOwner->GetWorld();
+
+		mModel->Draw( world->mRenderer, world );
 	}
 
 	///////////////////////////////////

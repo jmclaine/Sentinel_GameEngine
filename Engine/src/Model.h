@@ -48,7 +48,7 @@ namespace Sentinel
 	class TextureManager;
 	class MaterialManager;
 	class Shader;
-	class Material;
+	class Mesh;
 	class GameWorld;
 
 	class SENTINEL_DLL Model
@@ -95,11 +95,7 @@ namespace Sentinel
 
 		virtual void	Release() = 0;
 
-		// There is no way to tell which materials pertain to what portion of the model.
-		// A name label for each material in conjuction with a std::map would solve this problem.
-		//
-		virtual void	SetMaterials( const std::vector< std::shared_ptr< Material >>& material ) = 0;
-		virtual void	GetMaterials( std::vector< std::shared_ptr< Material >>* material ) = 0;
+		virtual void	GetMeshList( std::vector< Mesh* >* meshList ) = 0;
 
 		virtual void	SetTime( float _time, UINT objIndex = 0 ) = 0;
 		virtual float	GetTime( UINT objIndex = 0 ) = 0;

@@ -373,21 +373,10 @@ namespace Sentinel
 
 		//////////////////////////////////////////////////////////////////////////
 
-		void SetMaterials( const std::vector< std::shared_ptr< Material >>& material )
-		{
-			auto it = material.begin();
-
-			for( UINT x = 0; x < mNumMeshes; ++x )
-			{
-				mMesh[ x ]->mMaterial = *it;
-				++it;
-			}
-		}
-
-		void GetMaterials( std::vector< std::shared_ptr< Material >>* material )
+		void GetMeshList( std::vector< Mesh* >* meshList )
 		{
 			for( UINT x = 0; x < mNumMeshes; ++x )
-				material->push_back( mMesh[ x ]->mMaterial );
+				meshList->push_back( mMesh[ x ] );
 		}
 
 		// OBJ files do not support animation.

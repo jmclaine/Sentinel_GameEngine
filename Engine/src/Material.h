@@ -30,11 +30,12 @@ namespace Sentinel
 		float							mSpecularComponent;
 
 		std::shared_ptr< Shader >		mShader;
-		std::shared_ptr< Texture >		mTexture[ NUM_TEXTURES ];
+		std::shared_ptr< Texture >		mTexture[ TextureIndex::COUNT ];
 		std::shared_ptr< BlendState >	mBlendState;
 
-		CullType						mCullMode;
-		DepthType						mDepthMode;
+		CullFormat::Type				mCullMode;
+		DepthFormat::Type				mDepthMode;
+		WORD							mRenderQueue;
 
 		//////////////////////////////////////////////
 
@@ -42,6 +43,8 @@ namespace Sentinel
 		~Material();
 
 		void				Apply( Renderer* renderer );
+
+		void				CalculateRenderQueue();
 
 		// Prevent other drawables from changing the material.
 		//

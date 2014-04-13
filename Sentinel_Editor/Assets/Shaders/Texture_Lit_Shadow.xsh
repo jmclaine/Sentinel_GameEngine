@@ -115,7 +115,7 @@ float4 PS_Main(VSOutput input):SV_Target
 
 varying vec2 vTexCoord0;
 varying vec3 vNormal;
-varying vec4 vWorldPos;
+varying vec3 vWorldPos;
 varying vec3 vCameraDir;
 varying vec3 vLightDir;
 
@@ -133,8 +133,8 @@ attribute vec3 Normal;
 
 void main()
 {
-	gl_Position = mul(_WVP, vec4(Position, 1));
-	vWorldPos   = mul(_World, vec4(Position, 1));
+	gl_Position = _WVP * vec4(Position, 1);
+	vWorldPos   = (_World * vec4(Position, 1)).xyz;
 
 	// Light direction
 	vLightDir = _LightPos - vWorldPos.xyz;

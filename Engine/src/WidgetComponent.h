@@ -53,5 +53,11 @@ namespace Sentinel
 		void	Update();
 
 		void	Shutdown();
+
+		/////////////////////////////////
+
+		void	CalculateBounds();
+
+		void	Draw();
 	};
 }

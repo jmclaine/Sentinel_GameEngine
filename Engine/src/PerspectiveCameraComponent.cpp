@@ -39,13 +39,18 @@ namespace Sentinel
 
 	void PerspectiveCameraComponent::Update()
 	{
-		//CameraComponent::Update();
-
 		mMatrixView.Rotate( mTransform->mOrientation );
 		mLookAt = mTransform->mPosition + mMatrixView.Forward();
 
 		mMatrixView.LookAtView( mTransform->mPosition, mLookAt, mMatrixView.Up() );
 		mMatrixFinal = mMatrixProjection * mMatrixView;
+
+		const Matrix4f& cameraMatrix = GetTransform()->GetMatrixWorld();
+		Vector3f nearCenter, farCenter;
+		Vector2f nearSize, farSize;
+
+		GetFrustumSize( nearCenter, farCenter, nearSize, farSize );
+		mFrustum.Set( nearCenter, farCenter, nearSize, farSize, cameraMatrix.Forward(), cameraMatrix.Right(), cameraMatrix.Up() );
 	}
 
 	void PerspectiveCameraComponent::Shutdown()

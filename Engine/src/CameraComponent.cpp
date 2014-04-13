@@ -28,9 +28,6 @@ namespace Sentinel
 			throw AppException( "CameraComponent::Startup()\n" + std::string( mOwner->mName ) + " does not contain TransformComponent" );
 	}
 
-	void CameraComponent::Update()
-	{}
-
 	void CameraComponent::Shutdown()
 	{
 		mTransform = NULL;
@@ -54,5 +51,10 @@ namespace Sentinel
 	const Matrix4f& CameraComponent::GetMatrixFinal()
 	{
 		return mMatrixFinal;
+	}
+
+	const BoundingFrustum& CameraComponent::GetFrustum()
+	{
+		return mFrustum;
 	}
 }

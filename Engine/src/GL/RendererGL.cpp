@@ -16,11 +16,11 @@ namespace Sentinel
 	{
 	private:
 
-		static const UINT PRIMITIVE[ NUM_PRIMITIVES ];
-		static const UINT CULL_TYPE[ NUM_CULL_TYPES ];
-		static const UINT FILL_TYPE[ NUM_FILL_TYPES ];
+		static const UINT PRIMITIVE[ PrimitiveFormat::COUNT ];
+		static const GLenum CULL_TYPE[ CullFormat::COUNT ];
+		static const UINT FILL_TYPE[ FillFormat::COUNT ];
 
-		//////////////////////////////////
+	public:
 
 		class WindowInfoGL : public WindowInfo
 		{
@@ -56,13 +56,79 @@ namespace Sentinel
 
 		class DepthStencilGL : public DepthStencil
 		{
+		private:
+
+			DepthFormat::Type	mCurrDepth;
+			bool		mDepthEnabled;
+
 		public:
 
 			GLuint		mID;
-
+			
 			DepthStencilGL( GLuint id ) :
-				mID( id )
+				mID( id ),
+				mCurrDepth( DepthFormat::OFF ),
+				mDepthEnabled( false )
 			{}
+
+			void SetDepth( DepthFormat::Type depth )
+			{
+				if( mCurrDepth != depth )
+				{
+					mCurrDepth = depth;
+
+					switch( depth )
+					{
+					case DepthFormat::LESS:
+						glDepthFunc( GL_LESS );
+						break;
+
+					case DepthFormat::EQUAL:
+						glDepthFunc( GL_EQUAL );
+						break;
+
+					case DepthFormat::GREATER:
+						glDepthFunc( GL_GREATER );
+						break;
+
+					case DepthFormat::NOTEQUAL:
+						glDepthFunc( GL_NOTEQUAL );
+						break;
+
+					case DepthFormat::GEQUAL:
+						glDepthFunc( GL_GEQUAL );
+						break;
+				
+					case DepthFormat::LEQUAL:
+						glDepthFunc( GL_LEQUAL );
+						break;
+
+					case DepthFormat::ALWAYS:
+						glDepthFunc( GL_ALWAYS );
+						break;
+
+					case DepthFormat::OFF:
+						if( mDepthEnabled )
+						{
+							glDepthMask( GL_FALSE );
+
+							mDepthEnabled = false;
+						}
+						return;
+
+					default:
+						_ASSERT(0);	// invalid depth
+						break;
+					}
+				}
+
+				if( !mDepthEnabled )
+				{
+					glDepthMask( GL_TRUE );
+
+					mDepthEnabled = true;
+				}
+			}
 		};
 
 		//////////////////////////////////
@@ -71,17 +137,19 @@ namespace Sentinel
 		{
 		private:
 
-			static GLenum BLEND_TYPE[ NUM_BLEND_TYPES ];
-			static GLenum BLEND_FUNC[ NUM_BLEND_FUNC_TYPES ];
+			static GLenum BLEND_TYPE[ BlendFormat::COUNT ];
+			static GLenum BLEND_FUNC[ BlendFunction::COUNT ];
+
+			static BlendStateGL CURR_STATE;
 
 		public:
 
 			bool		mEnable;
 
 			BlendStateGL( bool enable,
-						  BlendType srcBlendColor, BlendType dstBlendColor,
-						  BlendType srcBlendAlpha, BlendType dstBlendAlpha,
-						  BlendFuncType blendFuncColor, BlendFuncType blendFuncAlpha ) :
+						  BlendFormat::Type srcBlendColor, BlendFormat::Type dstBlendColor,
+						  BlendFormat::Type srcBlendAlpha, BlendFormat::Type dstBlendAlpha,
+						  BlendFunction::Type blendFuncColor, BlendFunction::Type blendFuncAlpha ) :
 				mEnable( enable ),
 				BlendState( srcBlendColor, dstBlendColor, 
 							srcBlendAlpha, dstBlendAlpha,
@@ -95,31 +163,71 @@ namespace Sentinel
 			{
 				if( mEnable )
 				{
-					glEnable( GL_BLEND );
-					glBlendFuncSeparate( BLEND_TYPE[ mSrcBlendColor ], BLEND_TYPE[ mDstBlendColor ], \
-										 BLEND_TYPE[ mSrcBlendAlpha ], BLEND_TYPE[ mDstBlendAlpha ] );
-					glBlendEquationSeparate( BLEND_FUNC[ mBlendFuncColor ], BLEND_FUNC[ mBlendFuncAlpha ] );
+					//if( !CURR_STATE.mEnable )
+					{
+						glEnable( GL_BLEND );
+
+						CURR_STATE.mEnable = true;
+					}
+					
+					//if( CURR_STATE.mSrcBlendColor != mSrcBlendColor || CURR_STATE.mDstBlendColor != mDstBlendColor ||
+					//	CURR_STATE.mSrcBlendAlpha != mSrcBlendAlpha || CURR_STATE.mDstBlendAlpha != mDstBlendAlpha )
+					{	
+						glBlendFuncSeparate( BLEND_TYPE[ mSrcBlendColor ], BLEND_TYPE[ mDstBlendColor ], \
+											 BLEND_TYPE[ mSrcBlendAlpha ], BLEND_TYPE[ mDstBlendAlpha ] );
+
+						CURR_STATE.mSrcBlendColor = mSrcBlendColor;
+						CURR_STATE.mDstBlendColor = mDstBlendColor;
+						CURR_STATE.mSrcBlendAlpha = mSrcBlendAlpha;
+						CURR_STATE.mDstBlendAlpha = mDstBlendAlpha;
+					}
+
+					//if( CURR_STATE.mBlendFuncColor != mBlendFuncColor || CURR_STATE.mBlendFuncAlpha != mBlendFuncAlpha )
+					{
+						glBlendEquationSeparate( BLEND_FUNC[ mBlendFuncColor ], BLEND_FUNC[ mBlendFuncAlpha ] );
+
+						CURR_STATE.mBlendFuncColor = mBlendFuncColor;
+						CURR_STATE.mBlendFuncAlpha = mBlendFuncAlpha;
+					}
 				}
 				else
 				{
-					glDisable( GL_BLEND );
+					//if( CURR_STATE.mEnable )
+					{
+						glDisable( GL_BLEND );
+
+						CURR_STATE.mEnable = false;
+					}
 				}
 			}
 		};
 
-		//////////////////////////////////
+	private:
 
-		WindowInfoGL* mCurrWindow;
+		WindowInfoGL*		mCurrWindow;
+		RenderTexture*		mCurrRenderTexture;
+		DepthStencil*		mCurrDepthStencil;
+
+		Buffer*				mCurrVertexBuffer;
+		Buffer*				mCurrIndexBuffer;
+
+		float				mClearDepth;
+		float*				mClearColor;
 
 	public:
 		
 		RendererGL()
 		{
-			NULL_TEXTURE = NULL;
-			BASE_TEXTURE = NULL;
+			NULL_TEXTURE		= NULL;
+			BASE_TEXTURE		= NULL;
 
-			mCurrWindow  = NULL;
-			mCurrShader  = NULL;
+			mCurrWindow			= NULL;
+			mCurrRenderTexture	= NULL;
+			mCurrDepthStencil	= NULL;
+
+			mClearDepth			= 1.0f;
+
+			mCurrShader			= NULL;
 		}
 
 		RendererGL::~RendererGL()
@@ -160,6 +268,7 @@ namespace Sentinel
 			}
 
 			SetPixelFormat( mCurrWindow->mHDC, pixelFormat, &pixelFormatDescriptor );
+			glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
 			mCurrWindow->mContext = wglCreateContext( mCurrWindow->mHDC );
 			wglMakeCurrent( mCurrWindow->mHDC, mCurrWindow->mContext );
@@ -187,14 +296,13 @@ namespace Sentinel
 			TRACE( "Created OpenGL " << glGetString( GL_VERSION ) << " Renderer" );
 
 			glEnable( GL_DEPTH_TEST );
-
-			glEnable( GL_CULL_FACE );
-			glFrontFace( GL_CCW );
-
+			
+			SetCull( CullFormat::CCW );
+			
 			// Create NULL_TEXTURE.
 			//
 			if( !NULL_TEXTURE.get() )
-				NULL_TEXTURE = std::shared_ptr< Texture >( new TextureGL( 0, 0, IMAGE_FORMAT_RGBA, 0 ));
+				NULL_TEXTURE = std::shared_ptr< Texture >( new TextureGL( 0, 0, ImageFormat::RGBA, 0 ));
 
 			// Create initial white texture as BASE_TEXTURE.
 			//
@@ -207,7 +315,7 @@ namespace Sentinel
 				newTex[ 2 ] = 255;
 				newTex[ 3 ] = 255;
 
-				BASE_TEXTURE = std::shared_ptr< Texture >(CreateTextureFromMemory( newTex, 1, 1, IMAGE_FORMAT_RGBA, false ));
+				BASE_TEXTURE = std::shared_ptr< Texture >(CreateTextureFromMemory( newTex, 1, 1, ImageFormat::RGBA, false ));
 
 				if( !BASE_TEXTURE )
 				{
@@ -221,7 +329,9 @@ namespace Sentinel
 			// Create non-blending state.
 			//
 			if( !BLEND_OFF.get() )
-				BLEND_OFF = std::shared_ptr< BlendState >(new BlendStateGL( false, BLEND_ZERO, BLEND_ZERO, BLEND_ZERO, BLEND_ZERO, BLEND_FUNC_ADD, BLEND_FUNC_ADD ));
+				BLEND_OFF = std::shared_ptr< BlendState >(new BlendStateGL( false, BlendFormat::ZERO, BlendFormat::ZERO, 
+																				   BlendFormat::ZERO, BlendFormat::ZERO, 
+																				   BlendFunction::ADD, BlendFunction::ADD ));
 
 			// Create default alpha-blending state.
 			//
@@ -253,9 +363,12 @@ namespace Sentinel
 		{
 			_ASSERT( info );
 
-			mCurrWindow = (WindowInfoGL*)info;
+			if( mCurrWindow != info )
+			{
+				mCurrWindow = (WindowInfoGL*)info;
 
-			wglMakeCurrent( mCurrWindow->mHDC, mCurrWindow->mContext );
+				wglMakeCurrent( mCurrWindow->mHDC, mCurrWindow->mContext );
+			}
 		}
 
 		WindowInfo* GetWindow()
@@ -270,21 +383,33 @@ namespace Sentinel
 
 		// Buffers.
 		//
-		Buffer* CreateBuffer( void* data, UINT size, UINT stride, BufferType type, BufferAccessType access )
+		Buffer* CreateBuffer( void* data, UINT size, UINT stride, BufferFormat::Type type, BufferAccess::Type access )
 		{
-			return new BufferGL( data, size, stride, type, access );
+			return new BufferGL( this, data, size, stride, type, access );
 		}
 
-		void SetVBO( Buffer* buffer )
+		void SetVertexBuffer( Buffer* buffer )
 		{
-			glBindBuffer( GL_ARRAY_BUFFER, static_cast< BufferGL* >(buffer)->ID() );
+			_ASSERT( buffer );
+
+			if( mCurrVertexBuffer != buffer )
+			{
+				glBindBuffer( GL_ARRAY_BUFFER, static_cast< BufferGL* >(buffer)->ID() );
+
+				mCurrVertexBuffer = buffer;
+			}
 		}
 
-		void SetIBO( Buffer* buffer )
+		void SetIndexBuffer( Buffer* buffer )
 		{
-			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, static_cast< BufferGL* >(buffer)->ID() );
-			glEnableClientState( GL_INDEX_ARRAY );
-			glIndexPointer( GL_UNSIGNED_INT, sizeof( UINT ), 0 );
+			_ASSERT( buffer );
+
+			if( mCurrIndexBuffer != buffer )
+			{
+				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, static_cast< BufferGL* >(buffer)->ID() );
+
+				mCurrIndexBuffer = buffer;
+			}
 		}
 
 		// Textures.
@@ -309,14 +434,14 @@ namespace Sentinel
 				return NULL;
 			}
 
-			Texture* texture = CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA, createMips );
+			Texture* texture = CreateTextureFromMemory( pixels, width, height, ImageFormat::RGBA, createMips );
 
 			stbi_image_free( pixels );
 
 			return texture;
 		}
 
-		Texture* CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormatType format, bool createMips = true )
+		Texture* CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormat::Type format, bool createMips = true )
 		{
 			GLuint texID;
 			glGenTextures( 1, &texID );
@@ -333,31 +458,29 @@ namespace Sentinel
 				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 			}
 			
-			glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-
 			switch( format )
 			{
-			case IMAGE_FORMAT_R:
+			case ImageFormat::R:
 				glTexImage2D( GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, data );
 				break;
 
-			case IMAGE_FORMAT_RG:
+			case ImageFormat::RG:
 				glTexImage2D( GL_TEXTURE_2D, 0, GL_RG, width, height, 0, GL_RG, GL_UNSIGNED_BYTE, data );
 				break;
 
-			case IMAGE_FORMAT_RGB:
+			case ImageFormat::RGB:
 				glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data );
 				break;
 
-			case IMAGE_FORMAT_RGBA:
+			case ImageFormat::RGBA:
 				glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
 				break;
 
-			case IMAGE_FORMAT_HDR:
+			case ImageFormat::HDR:
 				glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, data );
 				break;
 
-			case IMAGE_FORMAT_DEPTH:
+			case ImageFormat::DEPTH:
 				glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, data );
 				break;
 
@@ -372,11 +495,10 @@ namespace Sentinel
 			return new TextureGL( width, height, format, texID );
 		}
 
-		Texture* CreateTextureCube( UINT width, UINT height, ImageFormatType format )
+		Texture* CreateTextureCube( UINT width, UINT height, ImageFormat::Type format )
 		{
 			GLuint texID;
 			glGenTextures( 1, &texID );
-
 			glBindTexture( GL_TEXTURE_CUBE_MAP, texID );
 			
 			glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
@@ -388,32 +510,32 @@ namespace Sentinel
 			
 			switch( format )
 			{
-			case IMAGE_FORMAT_R:
+			case ImageFormat::R:
 				for( UINT x = 0; x < 6; ++x )
 					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_R32F, width, height, 0, GL_RED, GL_FLOAT, NULL );
 				break;
 
-			case IMAGE_FORMAT_RG:
+			case ImageFormat::RG:
 				for( UINT x = 0; x < 6; ++x )
 					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RG32F, width, height, 0, GL_RG, GL_FLOAT, NULL );
 				break;
 
-			case IMAGE_FORMAT_RGB:
+			case ImageFormat::RGB:
 				for( UINT x = 0; x < 6; ++x )
 					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, NULL );
 				break;
 
-			case IMAGE_FORMAT_RGBA:
+			case ImageFormat::RGBA:
 				for( UINT x = 0; x < 6; ++x )
 					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
 				break;
 
-			case IMAGE_FORMAT_HDR:
+			case ImageFormat::HDR:
 				for( UINT x = 0; x < 6; ++x )
 					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, NULL );
 				break;
 
-			case IMAGE_FORMAT_DEPTH:
+			case ImageFormat::DEPTH:
 				for( UINT x = 0; x < 6; ++x )
 					glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL );
 				break;
@@ -451,7 +573,7 @@ namespace Sentinel
 			glGenFramebuffers( 1, &id );
 			glBindFramebuffer( GL_FRAMEBUFFER, id );
 
-			if( texture->Format() != IMAGE_FORMAT_DEPTH )
+			if( texture->Format() != ImageFormat::DEPTH )
 				glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, static_cast< TextureGL* >(texture)->ID(), 0 );
 			else
 				glFramebufferTexture( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, static_cast< TextureGL* >(texture)->ID(), 0 );
@@ -477,9 +599,9 @@ namespace Sentinel
 			return new DepthStencilGL( id );
 		}
 
-		BlendState* CreateBlendState( BlendType srcBlendColor = BLEND_SRC_ALPHA, BlendType dstBlendColor = BLEND_ONE_MINUS_SRC_ALPHA, 
-									  BlendType srcBlendAlpha = BLEND_SRC_ALPHA, BlendType dstBlendAlpha = BLEND_ONE_MINUS_SRC_ALPHA,
-									  BlendFuncType blendFuncColor = BLEND_FUNC_ADD, BlendFuncType blendFuncAlpha = BLEND_FUNC_ADD )
+		BlendState* CreateBlendState( BlendFormat::Type srcBlendColor = BlendFormat::SRC_ALPHA, BlendFormat::Type dstBlendColor = BlendFormat::ONE_MINUS_SRC_ALPHA, 
+									  BlendFormat::Type srcBlendAlpha = BlendFormat::SRC_ALPHA, BlendFormat::Type dstBlendAlpha = BlendFormat::ONE_MINUS_SRC_ALPHA,
+									  BlendFunction::Type blendFuncColor = BlendFunction::ADD, BlendFunction::Type blendFuncAlpha = BlendFunction::ADD )
 		{
 			return new BlendStateGL( true, 
 									 srcBlendColor, dstBlendColor, 
@@ -498,90 +620,165 @@ namespace Sentinel
 			return 1;
 		}
 
-		void SetRenderType( RenderType type )
-		{
-			_ASSERT( mCurrWindow );
-
-			mCurrWindow->mRenderMode = type;
-		}
-
 		void SetRenderTexture( RenderTexture* target )
 		{
 			_ASSERT( target );
 
-			glBindFramebuffer( GL_FRAMEBUFFER, static_cast< RenderTextureGL* >(target)->mID );
+			if( mCurrRenderTexture != target )
+			{
+				glBindFramebuffer( GL_FRAMEBUFFER, static_cast< RenderTextureGL* >(target)->mID );
+				
+				mCurrRenderTexture = target;
+			}
 		}
 
 		void SetDepthStencil( DepthStencil* stencil )
 		{
 			_ASSERT( stencil );
 
-			glBindRenderbuffer( GL_RENDERBUFFER, static_cast< DepthStencilGL* >(stencil)->mID );
+			if( mCurrDepthStencil != stencil )
+			{
+				glBindRenderbuffer( GL_RENDERBUFFER, static_cast< DepthStencilGL* >(stencil)->mID );
+
+				mCurrDepthStencil = stencil;
+			}
 		}
 
-		void SetDepthStencilType( DepthType state )
+		void SetDepthStencilType( DepthFormat::Type depth )
 		{
-			switch( state )
+			//if( mCurrDepthStencil )
+			//	static_cast< DepthStencilGL* >(mCurrDepthStencil)->SetDepth( depth );
+			//else
 			{
-			case DEPTH_LESS:
-				glDepthFunc( GL_LESS );
-				break;
-
-			case DEPTH_EQUAL:
-				glDepthFunc( GL_EQUAL );
-				break;
-
-			case DEPTH_GREATER:
-				glDepthFunc( GL_GREATER );
-				break;
-
-			case DEPTH_NOTEQUAL:
-				glDepthFunc( GL_NOTEQUAL );
-				break;
-
-			case DEPTH_GEQUAL:
-				glDepthFunc( GL_GEQUAL );
-				break;
+				static DepthFormat::Type CURR_DEPTH = DepthFormat::UNKNOWN;
+				static bool DEPTH_ENABLED = true;
 				
-			case DEPTH_LEQUAL:
-				glDepthFunc( GL_LEQUAL );
-				break;
+				if( depth == DepthFormat::OFF )
+				{
+					CURR_DEPTH = depth;
 
-			case DEPTH_ALWAYS:
-				glDepthFunc( GL_ALWAYS );
-				break;
+					if( DEPTH_ENABLED )
+					{
+						glDepthMask( GL_FALSE );
 
-			case DEPTH_OFF:
-				glDepthMask( GL_FALSE );
-				return;
+						DEPTH_ENABLED = false;
+					}
+
+					return;
+				}
+
+				//if( CURR_DEPTH != depth )
+				{
+					CURR_DEPTH = depth;
+
+					switch( depth )
+					{
+					case DepthFormat::LESS:
+						glDepthFunc( GL_LESS );
+						break;
+
+					case DepthFormat::EQUAL:
+						glDepthFunc( GL_EQUAL );
+						break;
+
+					case DepthFormat::GREATER:
+						glDepthFunc( GL_GREATER );
+						break;
+
+					case DepthFormat::NOTEQUAL:
+						glDepthFunc( GL_NOTEQUAL );
+						break;
+
+					case DepthFormat::GEQUAL:
+						glDepthFunc( GL_GEQUAL );
+						break;
+				
+					case DepthFormat::LEQUAL:
+						glDepthFunc( GL_LEQUAL );
+						break;
+
+					case DepthFormat::ALWAYS:
+						glDepthFunc( GL_ALWAYS );
+						break;
+
+					default:
+						_ASSERT(0);	// invalid depth
+						break;
+					}
+				}
+
+				if( !DEPTH_ENABLED )
+				{
+					glDepthMask( GL_TRUE );
+
+					DEPTH_ENABLED = true;
+				}
 			}
-
-			glDepthMask( GL_TRUE );
 		}
 
 		void SetViewport( int x, int y, UINT width, UINT height )
 		{
 			_ASSERT( mCurrWindow );
 
-			glViewport( x, y, width, height );
+			static int CURR_X		= INT_MIN;
+			static int CURR_Y		= INT_MIN;
+			static UINT CURR_WIDTH	= -1;
+			static UINT CURR_HEIGHT = -1;
+
+			if( CURR_X != x || CURR_Y != y || CURR_WIDTH != width || CURR_HEIGHT != height )
+			{
+				glViewport( x, y, width, height );
+
+				CURR_X		= x;
+				CURR_Y		= y;
+				CURR_WIDTH	= width;
+				CURR_HEIGHT	= height;
+			}
 		}
 
-		UINT SetCull( CullType type )
+		UINT SetCull( CullFormat::Type type )
 		{
-			if( type != CULL_NONE )
+			static CullFormat::Type CURR_CULL = CullFormat::CCW;
+
+			if( CURR_CULL != type )
 			{
-				glEnable( GL_CULL_FACE );
-				glFrontFace( CULL_TYPE[ type ] );
-			}
-			else
-			{
-				glDisable( GL_CULL_FACE );
+				CURR_CULL = type;
+
+				static bool ENABLE_CULL = false;
+
+				if( type != CullFormat::NONE )
+				{
+					if( !ENABLE_CULL )
+					{
+						glEnable( GL_CULL_FACE );
+
+						ENABLE_CULL = true;
+					}
+
+					static CullFormat::Type CURR_FACE = CullFormat::CCW;
+
+					if( CURR_FACE != type )
+					{
+						glFrontFace( CULL_TYPE[ type ] );
+
+						CURR_FACE = type;
+					}
+				}
+				else
+				{
+					if( ENABLE_CULL )
+					{
+						glDisable( GL_CULL_FACE );
+
+						ENABLE_CULL = false;
+					}
+				}
 			}
 
 			return S_OK;
 		}
 
-		UINT SetFill( FillType type )
+		UINT SetFill( FillFormat::Type type )
 		{
 			glPolygonMode( GL_FRONT_AND_BACK, FILL_TYPE[ type ] );
 
@@ -614,7 +811,7 @@ namespace Sentinel
 		{
 			ShaderGL* shader = new ShaderGL();
 
-			if( shader->CreateFromMemory( const_cast< char* >(source)) != S_OK )
+			if( shader->CreateFromMemory( const_cast< char* >(source) ) != S_OK )
 			{
 				delete shader;
 				return NULL;
@@ -625,7 +822,7 @@ namespace Sentinel
 
 		// Vertex Layout.
 		//
-		VertexLayout* CreateVertexLayout( const std::vector< AttributeType >& attrib )
+		VertexLayout* CreateVertexLayout( const std::vector< VertexAttribute::Type >& attrib )
 		{
 			VertexLayoutGL* layout = new VertexLayoutGL();
 
@@ -644,11 +841,11 @@ namespace Sentinel
 
 			ShaderGL* shaderGL = static_cast< ShaderGL* >(mCurrShader);
 
-			const std::vector< AttributeType >& layout = vertexLayout->Layout();
+			const std::vector< VertexAttribute::Type >& layout = vertexLayout->Layout();
 			UINT size = (UINT)layout.size();
 			UINT index = 0;
 
-			AttributeType type;
+			VertexAttribute::Type type;
 			GLint loc;
 			
 			for( UINT x = 0; x < size; ++x )
@@ -657,12 +854,12 @@ namespace Sentinel
 
 				loc = (GLint)shaderGL->mAttributeGL[ type ];
 
-				if( type != ATTRIB_MATRIX )
+				if( type != VertexAttribute::MATRIX )
 				{
 					const VertexLayoutGL::AttributeGL& attrib = vertexLayoutGL->GetAttribute( index++ );
 
-					glVertexAttribPointer( loc, \
-									   attrib.mCount, attrib.mType, attrib.mNormalize, vertexLayout->VertexSize(), \
+					glVertexAttribPointer( loc,
+									   attrib.mCount, attrib.mType, attrib.mNormalize, vertexLayout->VertexSize(),
 									   reinterpret_cast< const GLvoid* >( attrib.mOffset ));
 				}
 				else
@@ -671,8 +868,8 @@ namespace Sentinel
 					{
 						const VertexLayoutGL::AttributeGL& attrib = vertexLayoutGL->GetAttribute( index++ );
 						
-						glVertexAttribPointer( loc++, \
-									   attrib.mCount, attrib.mType, attrib.mNormalize, vertexLayout->VertexSize(), \
+						glVertexAttribPointer( loc++,
+									   attrib.mCount, attrib.mType, attrib.mNormalize, vertexLayout->VertexSize(),
 									   reinterpret_cast< const GLvoid* >( attrib.mOffset ));
 					}
 				}
@@ -681,22 +878,66 @@ namespace Sentinel
 
 		// Rendering.
 		//
-		void Clear( float* color )
+		void Clear( float* color, float depth )
 		{
-			glClearColor( color[ 0 ], color[ 1 ], color[ 2 ], color[ 3 ] );
-			glClearDepth( 1 );
+			if( mClearColor != color )
+			{
+				glClearColor( color[ 0 ], color[ 1 ], color[ 2 ], color[ 3 ] );
+
+				mClearColor = color;
+			}
+
+			if( mClearDepth != depth )
+			{
+				glClearDepth( depth );
+
+				mClearDepth = depth;
+			}
+
 			glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		}
 
-		void DrawIndexed( UINT count, UINT startIndex, UINT baseVertex )
+		void ClearColor( float* color )
 		{
-			glDrawRangeElementsBaseVertex( PRIMITIVE[ mCurrWindow->mRenderMode ], startIndex, startIndex + count, count, GL_UNSIGNED_INT, \
-										   reinterpret_cast< void* >( startIndex * sizeof( UINT )), baseVertex );
+			if( mClearColor != color )
+			{
+				glClearColor( color[ 0 ], color[ 1 ], color[ 2 ], color[ 3 ] );
+
+				mClearColor = color;
+			}
+
+			glClear( GL_COLOR_BUFFER_BIT );
+		}
+
+		void ClearDepth( float depth )
+		{
+			if( mClearDepth != depth )
+			{
+				glClearDepth( depth );
+
+				mClearDepth = depth;
+			}
+
+			glClear( GL_DEPTH_BUFFER_BIT );
+		}
+
+		void Draw( PrimitiveFormat::Type primitive, UINT count, UINT baseVertex )
+		{
+			glDrawArrays( PRIMITIVE[ primitive ], baseVertex, count );
+		}
+
+		void DrawIndexed( PrimitiveFormat::Type primitive, UINT count, UINT startIndex, UINT baseVertex )
+		{
+			glDrawRangeElementsBaseVertex( PRIMITIVE[ primitive ], startIndex, startIndex + count, count, GL_UNSIGNED_INT,
+										   reinterpret_cast< void* >(startIndex * sizeof( UINT )), baseVertex );
 		}
 
 		void Present()
 		{
 			SwapBuffers( mCurrWindow->mHDC );
+
+			glFlush();
+			glFinish();
 		}
 	};
 
@@ -707,7 +948,7 @@ namespace Sentinel
 		  GL_LINES, 
 		  GL_TRIANGLES };
 
-	const UINT RendererGL::CULL_TYPE[] = 
+	const GLenum RendererGL::CULL_TYPE[] = 
 		{ GL_NONE, 
 		  GL_CCW,
 		  GL_CW };
@@ -736,6 +977,10 @@ namespace Sentinel
 		  GL_MAX };
 
 	///////////////////////////////////////////////////
+
+	RendererGL::BlendStateGL RendererGL::BlendStateGL::CURR_STATE( false, 
+																   BlendFormat::UNKNOWN, BlendFormat::UNKNOWN, BlendFormat::UNKNOWN, BlendFormat::UNKNOWN,
+																   BlendFunction::ADD, BlendFunction::ADD );
 
 	Renderer* BuildRendererGL()
 	{

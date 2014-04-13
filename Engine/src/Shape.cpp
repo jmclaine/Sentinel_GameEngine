@@ -18,7 +18,7 @@ namespace Sentinel
 		mNormal( normal )
 	{}
 
-	float Plane::Distance( const Vector3f& pos )
+	float Plane::Distance( const Vector3f& pos ) const
 	{
 		return mNormal.Dot( pos ) - mPosition.Dot( mNormal );
 	}
@@ -567,8 +567,12 @@ namespace Sentinel
 		Vector3f center( (maxBounds - minBounds) * 0.5f );
 		Vector3f extent( maxBounds - center );
 
+		Vector3f posX = center + Vector3f( extent.x, 0, 0 );
+		Vector3f posY = center + Vector3f( 0, extent.y, 0 );
+		Vector3f posZ = center + Vector3f( 0, 0, extent.z );
+		
 		Vector3f newCenter = matWorld.Transform( center );
-		Vector3f newExtent = matWorld.Transform( Vector4f( extent.x, extent.y, extent.z, 0 ));
+		Vector3f newExtent = matWorld.Transform( extent, 0 );
 
 		Vector3f minPos( newCenter - newExtent );
 		Vector3f maxPos( newCenter + newExtent );
@@ -607,15 +611,9 @@ namespace Sentinel
 
 		for( UINT x = 0; x < count; ++x )
 		{
-			minPos.x = std::min( ((Vector3f*)verts)->x, minPos.x );
-			maxPos.x = std::max( ((Vector3f*)verts)->x, maxPos.x );
+			minPos = minPos.Min( *(Vector3f*)verts );
+			maxPos = maxPos.Max( *(Vector3f*)verts );
 			
-			minPos.y = std::min( ((Vector3f*)verts)->y, minPos.y );
-			maxPos.y = std::max( ((Vector3f*)verts)->y, maxPos.y );
-
-			minPos.z = std::min( ((Vector3f*)verts)->z, minPos.z );
-			maxPos.z = std::max( ((Vector3f*)verts)->z, maxPos.z );
-
 			verts += stride;
 		}
 
@@ -682,5 +680,102 @@ namespace Sentinel
 	bool BoundingBox::Intersects( const BoundingSphere& sphere ) const
 	{
 		return sphere.Intersects( *this );
+	}
+
+	//////////////////////////////////////////////////////
+
+	BoundingFrustum::BoundingFrustum()
+	{}
+
+	BoundingFrustum::BoundingFrustum( const Vector3f& nearCenter, const Vector3f& farCenter,
+									  const Vector2f& nearExtent, const Vector2f& farExtent )
+	{
+		Set( nearCenter, farCenter, nearExtent, farExtent );
+	}
+
+	BoundingFrustum::BoundingFrustum( const Vector3f& nearCenter, const Vector3f& farCenter,
+									  const Vector2f& nearExtent, const Vector2f& farExtent,
+									  const Vector3f& forward, const Vector3f& right, const Vector3f& up )
+	{
+		Set( nearCenter, farCenter, nearExtent, farExtent, forward, right, up );
+	}
+
+	void BoundingFrustum::Set( const Vector3f& nearCenter, const Vector3f& farCenter,
+							   const Vector2f& nearExtent, const Vector2f& farExtent )
+	{
+		Vector3f forward = (farCenter - nearCenter).NormalizeFast();
+		Vector3f right = (forward.Cross( Vector3f( 0, 1, 0 ))).NormalizeFast();
+		Vector3f up = (forward.Cross( right )).NormalizeFast();
+
+		Set( nearCenter, farCenter, nearExtent, farExtent, forward, right, up );
+	}
+
+	void BoundingFrustum::Set( const Vector3f& nearCenter, const Vector3f& farCenter,
+							   const Vector2f& nearExtent, const Vector2f& farExtent,
+							   const Vector3f& forward, const Vector3f& right, const Vector3f& up )
+	{
+		Vector3f ntl = nearCenter + up * nearExtent.y - right * nearExtent.x;
+		Vector3f ntr = nearCenter + up * nearExtent.y + right * nearExtent.x;
+		Vector3f nbl = nearCenter - up * nearExtent.y - right * nearExtent.x;
+		Vector3f nbr = nearCenter - up * nearExtent.y + right * nearExtent.x;
+
+		Vector3f ftl = farCenter + up * farExtent.y - right * farExtent.x;
+		Vector3f ftr = farCenter + up * farExtent.y + right * farExtent.x;
+		Vector3f fbl = farCenter - up * farExtent.y - right * farExtent.x;
+		Vector3f fbr = farCenter - up * farExtent.y + right * farExtent.x;
+
+		// TOP
+		mPlane[0].mPosition = ntl;
+		mPlane[0].mNormal = (ftl-ntl).Cross(ntr-ntl).NormalizeFast();
+
+		// BOTTOM
+		mPlane[1].mPosition = nbr;
+		mPlane[1].mNormal = (fbr-nbr).Cross(nbl-nbr).NormalizeFast();
+
+		// LEFT
+		mPlane[2].mPosition = nbl;
+		mPlane[2].mNormal = (fbl-nbl).Cross(ntl-nbl).NormalizeFast();
+
+		// RIGHT
+		mPlane[3].mPosition = ntr;
+		mPlane[3].mNormal = (fbr-ntr).Cross(nbr-ntr).NormalizeFast();
+
+		// NEAR
+		mPlane[4].mPosition = ntr;
+		mPlane[4].mNormal = forward;
+
+		// FAR
+		mPlane[5].mPosition = ftl;
+		mPlane[5].mNormal = -forward;
+	}
+
+	bool BoundingFrustum::Intersects( const BoundingBox& box ) const
+	{
+		const Vector3f& vmin = box.GetMinBounds();
+		const Vector3f& vmax = box.GetMaxBounds();
+		
+		for( int i = 0; i < 6; ++i )
+		{
+			Vector3f pv( vmax );	// positive vertex
+
+			const Vector3f& normal = mPlane[i].mNormal;
+
+			// X axis
+			if( normal.x < 0 )
+				pv.x = vmin.x;
+			
+			// Y axis 
+			if( normal.y < 0 )
+				pv.y = vmin.y;
+			
+			// Z axis 
+			if( normal.z < 0 )
+				pv.z = vmin.z;
+			
+			if( mPlane[i].Distance( pv ) < 0 )
+				return false;
+		}
+
+		return true;
 	}
 }

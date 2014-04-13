@@ -7,7 +7,7 @@
 #include "GameObject.h"
 #include "GameWorld.h"
 #include "Archive.h"
-#include "Buffer.h"
+#include "RenderManager.h"
 
 namespace Sentinel
 {
@@ -26,31 +26,41 @@ namespace Sentinel
 	{
 		_ASSERT( mMesh );
 		_ASSERT( mOwner );
-		_ASSERT( mOwner->GetWorld() );
-		_ASSERT( mOwner->GetWorld()->mRenderer );
-
+		
 		DrawableComponent::Startup();
+
+		if( mOwner->GetWorld() )
+			mOwner->GetWorld()->mRenderManager->Draw( mMesh->mMaterial->mRenderQueue, this );
 	}
 
 	void MeshComponent::Update()
 	{
 		DrawableComponent::Update();
-
-		const BoundingBox& bounds = mMesh->mBounds;
-		const Matrix4f& matWorld  = mTransform->GetMatrixWorld();
-
-		mBounds.Set( bounds.GetMinBounds(), bounds.GetMaxBounds(), matWorld );
-
-		mMesh->mMatrixWorld = matWorld;
-
-		GameWorld* world = mOwner->GetWorld();
-
-		mMesh->Draw( world->mRenderer, world );
 	}
 
 	void MeshComponent::Shutdown()
 	{
 		DrawableComponent::Shutdown();
+	}
+
+	///////////////////////////////////
+
+	void MeshComponent::CalculateBounds()
+	{
+		const BoundingBox& bounds = mMesh->mBounds;
+		
+		mBounds.Set( bounds.GetMinBounds(), bounds.GetMaxBounds(), mTransform->GetMatrixWorld() );
+	}
+
+	void MeshComponent::Draw()
+	{
+		_ASSERT( mOwner->GetWorld() );
+
+		mMesh->mMatrixWorld = mTransform->GetMatrixWorld();
+
+		GameWorld* world = mOwner->GetWorld();
+
+		mMesh->Draw( world->mRenderer, world );
 	}
 
 	///////////////////////////////////

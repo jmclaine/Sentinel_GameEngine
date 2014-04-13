@@ -30,11 +30,11 @@ namespace Sentinel
 
 	private:
 
-		static const D3D11_PRIMITIVE_TOPOLOGY	PRIMITIVE[ NUM_PRIMITIVES ];
-		static const D3D11_CULL_MODE			CULL_TYPE[ NUM_CULL_TYPES ];
-		static const D3D11_FILL_MODE			FILL_TYPE[ NUM_FILL_TYPES ];
-		static const D3D11_BLEND				BLEND_TYPE[ NUM_BLEND_TYPES ];
-		static const D3D11_BLEND_OP				BLEND_FUNC_TYPE[ NUM_BLEND_FUNC_TYPES ];
+		static const D3D11_PRIMITIVE_TOPOLOGY	PRIMITIVE[ PrimitiveFormat::COUNT ];
+		static const D3D11_CULL_MODE			CULL_TYPE[ CullFormat::COUNT ];
+		static const D3D11_FILL_MODE			FILL_TYPE[ FillFormat::COUNT ];
+		static const D3D11_BLEND				BLEND_TYPE[ BlendFormat::COUNT ];
+		static const D3D11_BLEND_OP				BLEND_FUNC_TYPE[ BlendFunction::COUNT ];
 
 		class WindowInfoDX : public WindowInfo
 		{
@@ -97,9 +97,9 @@ namespace Sentinel
 			//////////////////////////////////////////////////
 
 			BlendStateDX( ID3D11BlendState* blendState,
-						  BlendType srcBlendColor, BlendType dstBlendColor,
-						  BlendType srcBlendAlpha, BlendType dstBlendAlpha,
-						  BlendFuncType blendFuncColor, BlendFuncType blendFuncAlpha) :
+						  BlendFormat::Type srcBlendColor, BlendFormat::Type dstBlendColor,
+						  BlendFormat::Type srcBlendAlpha, BlendFormat::Type dstBlendAlpha,
+						  BlendFunction::Type blendFuncColor, BlendFunction::Type blendFuncAlpha) :
 				mBlendState( blendState ),
 				BlendState( srcBlendColor, dstBlendColor, 
 							srcBlendAlpha, dstBlendAlpha,
@@ -131,12 +131,12 @@ namespace Sentinel
 			mCurrStencil = NULL;
 			mCurrTarget  = NULL;
 
-			mDepthStencilState = new ID3D11DepthStencilState*[ NUM_DEPTH_TYPES ];
+			mDepthStencilState = new ID3D11DepthStencilState*[ DepthFormat::COUNT ];
 		}
 
 		~RendererDX()
 		{
-			for( UINT x = 0; x < NUM_DEPTH_TYPES; ++x )
+			for( UINT x = 0; x < DepthFormat::COUNT; ++x )
 			{
 				SAFE_RELEASE_PTR( mDepthStencilState[ x ] );
 			}
@@ -223,7 +223,7 @@ namespace Sentinel
 				newTex[ 2 ] = 0;
 				newTex[ 3 ] = 255;
 
-				NULL_TEXTURE = std::shared_ptr< Texture >(CreateTextureFromMemory( newTex, 1, 1, IMAGE_FORMAT_RGBA ));
+				NULL_TEXTURE = std::shared_ptr< Texture >(CreateTextureFromMemory( newTex, 1, 1, ImageFormat::RGBA ));
 				
 				delete newTex;
 			}
@@ -239,7 +239,7 @@ namespace Sentinel
 				newTex[ 2 ] = 255;
 				newTex[ 3 ] = 255;
 
-				BASE_TEXTURE = std::shared_ptr< Texture >(CreateTextureFromMemory( newTex, 1, 1, IMAGE_FORMAT_RGBA ));
+				BASE_TEXTURE = std::shared_ptr< Texture >(CreateTextureFromMemory( newTex, 1, 1, ImageFormat::RGBA ));
 				
 				delete newTex;
 			}
@@ -253,20 +253,22 @@ namespace Sentinel
 			{
 				blendDesc.RenderTarget[ x ].BlendEnable				= FALSE;
 
-				blendDesc.RenderTarget[ x ].SrcBlend				= BLEND_TYPE[ BLEND_SRC_ALPHA ];
-				blendDesc.RenderTarget[ x ].DestBlend				= BLEND_TYPE[ BLEND_ONE_MINUS_SRC_ALPHA ];
-				blendDesc.RenderTarget[ x ].BlendOp					= BLEND_FUNC_TYPE[ BLEND_FUNC_ADD ];
+				blendDesc.RenderTarget[ x ].SrcBlend				= BLEND_TYPE[ BlendFormat::SRC_ALPHA ];
+				blendDesc.RenderTarget[ x ].DestBlend				= BLEND_TYPE[ BlendFormat::ONE_MINUS_SRC_ALPHA ];
+				blendDesc.RenderTarget[ x ].BlendOp					= BLEND_FUNC_TYPE[ BlendFunction::ADD ];
 
-				blendDesc.RenderTarget[ x ].SrcBlendAlpha			= BLEND_TYPE[ BLEND_SRC_ALPHA ];
-				blendDesc.RenderTarget[ x ].DestBlendAlpha			= BLEND_TYPE[ BLEND_ONE_MINUS_SRC_ALPHA ];
-				blendDesc.RenderTarget[ x ].BlendOpAlpha			= BLEND_FUNC_TYPE[ BLEND_FUNC_ADD ];
+				blendDesc.RenderTarget[ x ].SrcBlendAlpha			= BLEND_TYPE[ BlendFormat::SRC_ALPHA ];
+				blendDesc.RenderTarget[ x ].DestBlendAlpha			= BLEND_TYPE[ BlendFormat::ONE_MINUS_SRC_ALPHA ];
+				blendDesc.RenderTarget[ x ].BlendOpAlpha			= BLEND_FUNC_TYPE[ BlendFunction::ADD ];
 
 				blendDesc.RenderTarget[ x ].RenderTargetWriteMask	= 0x0F;
 			}
 
 			ID3D11BlendState* blendState = NULL;
 			HV_PTR( mCurrWindow->mDevice->CreateBlendState( &blendDesc, &blendState ));
-			BLEND_OFF = std::shared_ptr< BlendState >(new BlendStateDX( blendState, BLEND_ZERO, BLEND_ZERO, BLEND_ZERO, BLEND_ZERO, BLEND_FUNC_ADD, BLEND_FUNC_ADD ));
+			BLEND_OFF = std::shared_ptr< BlendState >(new BlendStateDX( blendState, BlendFormat::ZERO, BlendFormat::ZERO, 
+																					BlendFormat::ZERO, BlendFormat::ZERO, 
+																					BlendFunction::ADD, BlendFunction::ADD ));
 
 			// Create BLEND_ALPHA.
 			//
@@ -298,37 +300,37 @@ namespace Sentinel
 
 			stencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
 			HV_PTR( mCurrWindow->mDevice->CreateDepthStencilState( &stencilDesc, &stencilState ));
-			mDepthStencilState[ DEPTH_LESS ] = stencilState;
+			mDepthStencilState[ DepthFormat::LESS ] = stencilState;
 
 			stencilDesc.DepthFunc = D3D11_COMPARISON_EQUAL;
 			HV_PTR( mCurrWindow->mDevice->CreateDepthStencilState( &stencilDesc, &stencilState ));
-			mDepthStencilState[ DEPTH_EQUAL ] = stencilState;
+			mDepthStencilState[ DepthFormat::EQUAL ] = stencilState;
 
 			stencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 			HV_PTR( mCurrWindow->mDevice->CreateDepthStencilState( &stencilDesc, &stencilState ));
-			mDepthStencilState[ DEPTH_LEQUAL ] = stencilState;
+			mDepthStencilState[ DepthFormat::LEQUAL ] = stencilState;
 
 			stencilDesc.DepthFunc = D3D11_COMPARISON_GREATER;
 			HV_PTR( mCurrWindow->mDevice->CreateDepthStencilState( &stencilDesc, &stencilState ));
-			mDepthStencilState[ DEPTH_GREATER ] = stencilState;
+			mDepthStencilState[ DepthFormat::GREATER ] = stencilState;
 
 			stencilDesc.DepthFunc = D3D11_COMPARISON_NOT_EQUAL;
 			HV_PTR( mCurrWindow->mDevice->CreateDepthStencilState( &stencilDesc, &stencilState ));
-			mDepthStencilState[ DEPTH_NOTEQUAL ] = stencilState;
+			mDepthStencilState[ DepthFormat::NOTEQUAL ] = stencilState;
 
 			stencilDesc.DepthFunc = D3D11_COMPARISON_GREATER_EQUAL;
 			HV_PTR( mCurrWindow->mDevice->CreateDepthStencilState( &stencilDesc, &stencilState ));
-			mDepthStencilState[ DEPTH_GEQUAL ] = stencilState;
+			mDepthStencilState[ DepthFormat::GEQUAL ] = stencilState;
 
 			stencilDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
 			HV_PTR( mCurrWindow->mDevice->CreateDepthStencilState( &stencilDesc, &stencilState ));
-			mDepthStencilState[ DEPTH_ALWAYS ] = stencilState;
+			mDepthStencilState[ DepthFormat::ALWAYS ] = stencilState;
 
 			stencilDesc.DepthEnable = FALSE;
 			HV_PTR( mCurrWindow->mDevice->CreateDepthStencilState( &stencilDesc, &stencilState ));
-			mDepthStencilState[ DEPTH_OFF ] = stencilState;
+			mDepthStencilState[ DepthFormat::OFF ] = stencilState;
 			
-			SetDepthStencilType( DEPTH_LEQUAL );
+			SetDepthStencilType( DepthFormat::LEQUAL );
 
 			return mCurrWindow;
 		}
@@ -377,12 +379,12 @@ namespace Sentinel
 
 		// Buffers.
 		//
-		Buffer* CreateBuffer( void* data, UINT size, UINT stride, BufferType type, BufferAccessType access )
+		Buffer* CreateBuffer( void* data, UINT size, UINT stride, BufferFormat::Type type, BufferAccess::Type access )
 		{
 			return new BufferDX( mCurrWindow->mDevice, mCurrWindow->mContext, data, size, stride, type, access );
 		}
 
-		void SetVBO( Buffer* buffer )
+		void SetVertexBuffer( Buffer* buffer )
 		{
 			_ASSERT( mCurrWindow );
 			_ASSERT( mCurrWindow->mContext );
@@ -395,7 +397,7 @@ namespace Sentinel
 			mCurrWindow->mContext->IASetVertexBuffers( 0, 1, &static_cast< BufferDX* >(buffer)->mBuffer, &stride, &offset );
 		}
 
-		void SetIBO( Buffer* buffer )
+		void SetIndexBuffer( Buffer* buffer )
 		{
 			_ASSERT( mCurrWindow );
 			_ASSERT( mCurrWindow->mContext );
@@ -422,7 +424,7 @@ namespace Sentinel
 
 				if( D3DX11CreateShaderResourceViewFromFileA( mCurrWindow->mDevice, filename, &info, NULL, &image, NULL ) == S_OK )
 				{
-					return new TextureDX( info.Width, info.Height, IMAGE_FORMAT_RGBA, 0, image );
+					return new TextureDX( info.Width, info.Height, ImageFormat::RGBA, 0, image );
 				}
 				else
 				{
@@ -443,14 +445,14 @@ namespace Sentinel
 				return NULL;
 			}
 
-			Texture* texture = CreateTextureFromMemory( pixels, width, height, IMAGE_FORMAT_RGBA, createMips );
+			Texture* texture = CreateTextureFromMemory( pixels, width, height, ImageFormat::RGBA, createMips );
 
 			stbi_image_free( pixels );
 
 			return texture;
 		}
 
-		Texture* CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormatType format, bool createMips = true )
+		Texture* CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormat::Type format, bool createMips = true )
 		{
 			UCHAR* newData = NULL;
 			
@@ -459,7 +461,7 @@ namespace Sentinel
 			{
 				// The texture must be converted to RGBA.
 				//
-				case IMAGE_FORMAT_RGB:
+				case ImageFormat::RGB:
 				{
 					UINT prevSize = width * height;
 					newData = (UCHAR*)malloc( (width * height)<<2 );
@@ -476,22 +478,22 @@ namespace Sentinel
 				}
 					break;
 
-				case IMAGE_FORMAT_RGBA:
+				case ImageFormat::RGBA:
 					newData = (UCHAR*)data;
 					newFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 					break;
 
-				case IMAGE_FORMAT_R:
+				case ImageFormat::R:
 					newData = (UCHAR*)data;
 					newFormat = DXGI_FORMAT_R32_FLOAT;
 					break;
 
-				case IMAGE_FORMAT_HDR:
+				case ImageFormat::HDR:
 					newData = (UCHAR*)data;
 					newFormat = DXGI_FORMAT_R32G32B32A32_FLOAT;
 					break;
 
-				case IMAGE_FORMAT_DEPTH:
+				case ImageFormat::DEPTH:
 					newData = (UCHAR*)data;
 					newFormat = DXGI_FORMAT_R24_UNORM_X8_TYPELESS ;
 					break;
@@ -509,7 +511,7 @@ namespace Sentinel
 			desc.Format			= newFormat;
 			desc.SampleDesc		= mSampleDesc;
 			desc.Usage			= D3D11_USAGE_DEFAULT;
-			desc.BindFlags		= ((format != IMAGE_FORMAT_DEPTH ) ? D3D11_BIND_RENDER_TARGET : D3D11_BIND_DEPTH_STENCIL) | D3D11_BIND_SHADER_RESOURCE;
+			desc.BindFlags		= ((format != ImageFormat::DEPTH ) ? D3D11_BIND_RENDER_TARGET : D3D11_BIND_DEPTH_STENCIL) | D3D11_BIND_SHADER_RESOURCE;
 			desc.CPUAccessFlags = D3D11_USAGE_DEFAULT;
 			desc.MiscFlags		= createMips ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
 
@@ -560,7 +562,7 @@ namespace Sentinel
 			HV_PTR( mCurrWindow->mDevice->CreateShaderResourceView( tex0, &rsv, &resource ));
 			mCurrWindow->mContext->GenerateMips( resource );
 			
-			if( format == IMAGE_FORMAT_RGB )
+			if( format == ImageFormat::RGB )
 				free( newData );
 
 			#ifndef NDEBUG
@@ -571,7 +573,7 @@ namespace Sentinel
 			return new TextureDX( width, height, format, tex0, resource );
 		}
 
-		Texture* CreateTextureCube( UINT width, UINT height, ImageFormatType format )
+		Texture* CreateTextureCube( UINT width, UINT height, ImageFormat::Type format )
 		{
 			_ASSERT(0);
 			return 0;
@@ -677,9 +679,9 @@ namespace Sentinel
 			return new DepthStencilDX( view );
 		}
 
-		BlendState* CreateBlendState( BlendType srcBlendColor = BLEND_SRC_ALPHA, BlendType dstBlendColor = BLEND_ONE_MINUS_SRC_ALPHA, 
-									  BlendType srcBlendAlpha = BLEND_SRC_ALPHA, BlendType dstBlendAlpha = BLEND_ONE_MINUS_SRC_ALPHA, 
-									  BlendFuncType blendFuncColor = BLEND_FUNC_ADD, BlendFuncType blendFuncAlpha = BLEND_FUNC_ADD )
+		BlendState* CreateBlendState( BlendFormat::Type srcBlendColor = BlendFormat::SRC_ALPHA, BlendFormat::Type dstBlendColor = BlendFormat::ONE_MINUS_SRC_ALPHA, 
+									  BlendFormat::Type srcBlendAlpha = BlendFormat::SRC_ALPHA, BlendFormat::Type dstBlendAlpha = BlendFormat::ONE_MINUS_SRC_ALPHA, 
+									  BlendFunction::Type blendFuncColor = BlendFunction::ADD, BlendFunction::Type blendFuncAlpha = BlendFunction::ADD )
 		{
 			D3D11_BLEND_DESC blendDesc;
 			ZeroMemory( &blendDesc, sizeof( D3D11_BLEND_DESC ));
@@ -730,13 +732,6 @@ namespace Sentinel
 			return 1;
 		}
 
-		void SetRenderType( RenderType type )
-		{
-			_ASSERT( type < NUM_PRIMITIVES );
-
-			mCurrWindow->mContext->IASetPrimitiveTopology( static_cast< D3D11_PRIMITIVE_TOPOLOGY >( PRIMITIVE[ type ] ));
-		}
-
 		void SetRenderTexture( RenderTexture* target )
 		{
 			_ASSERT( mCurrWindow );
@@ -760,7 +755,7 @@ namespace Sentinel
 			mCurrStencil = static_cast< DepthStencilDX* >(stencil)->mView;
 		}
 
-		void SetDepthStencilType( DepthType state )
+		void SetDepthStencilType( DepthFormat::Type state )
 		{
 			_ASSERT( mCurrWindow );
 			
@@ -785,10 +780,10 @@ namespace Sentinel
 			mCurrWindow->mContext->RSSetViewports( 1, &vp );
 		}
 
-		UINT SetCull( CullType type )
+		UINT SetCull( CullFormat::Type type )
 		{
 			_ASSERT( mCurrWindow );
-			_ASSERT( type < NUM_CULL_TYPES );
+			_ASSERT( type < CullFormat::COUNT );
 
 			D3D11_RASTERIZER_DESC rasterizerstate;
 			mCurrWindow->mRasterizerState->GetDesc( &rasterizerstate );
@@ -802,10 +797,10 @@ namespace Sentinel
 			return S_OK;
 		}
 
-		UINT SetFill( FillType type )
+		UINT SetFill( FillFormat::Type type )
 		{
 			_ASSERT( mCurrWindow );
-			_ASSERT( type < NUM_FILL_TYPES );
+			_ASSERT( type < FillFormat::COUNT );
 
 			D3D11_RASTERIZER_DESC rasterizerstate;
 			mCurrWindow->mRasterizerState->GetDesc( &rasterizerstate );
@@ -860,7 +855,7 @@ namespace Sentinel
 
 		// Vertex Layout.
 		//
-		VertexLayout* CreateVertexLayout( const std::vector< AttributeType >& attrib )
+		VertexLayout* CreateVertexLayout( const std::vector< VertexAttribute::Type >& attrib )
 		{
 			VertexLayoutDX* layout = new VertexLayoutDX();
 
@@ -890,23 +885,44 @@ namespace Sentinel
 
 		// Rendering.
 		//
-		void Clear( float* color )
+		void Clear( float* color, float depth )
 		{
 			_ASSERT( mCurrWindow );
 			_ASSERT( mCurrWindow->mContext );
 			_ASSERT( mCurrTarget );
 			_ASSERT( mCurrStencil );
 
-			mCurrWindow->mContext->ClearRenderTargetView( mCurrTarget, color );
-			mCurrWindow->mContext->ClearDepthStencilView( mCurrStencil, D3D11_CLEAR_DEPTH, 1, 0 );
+			ClearColor( color );
+			ClearDepth( depth );
 		}
 
-		void DrawIndexed( UINT count, UINT startIndex, UINT baseVertex )
+		void ClearColor( float* color )
+		{
+			mCurrWindow->mContext->ClearRenderTargetView( mCurrTarget, color );
+		}
+
+		void ClearDepth( float depth )
+		{
+			mCurrWindow->mContext->ClearDepthStencilView( mCurrStencil, D3D11_CLEAR_DEPTH, depth, 0 );
+		}
+
+		void Draw( PrimitiveFormat::Type primitive, UINT count, UINT baseVertex )
 		{
 			_ASSERT( mCurrWindow );
 			_ASSERT( mCurrWindow->mContext );
 			_ASSERT( mCurrShader );
 
+			mCurrWindow->mContext->IASetPrimitiveTopology( PRIMITIVE[ primitive ] );
+			mCurrWindow->mContext->Draw( count, baseVertex );
+		}
+
+		void DrawIndexed( PrimitiveFormat::Type primitive, UINT count, UINT startIndex, UINT baseVertex )
+		{
+			_ASSERT( mCurrWindow );
+			_ASSERT( mCurrWindow->mContext );
+			_ASSERT( mCurrShader );
+
+			mCurrWindow->mContext->IASetPrimitiveTopology( PRIMITIVE[ primitive ] );
 			mCurrWindow->mContext->DrawIndexed( count, startIndex, baseVertex );
 		}
 

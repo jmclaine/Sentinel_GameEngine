@@ -47,42 +47,42 @@ namespace Sentinel
 
 	//////////////////////////////////////
 
-	void VertexLayoutGL::AddAttribute( AttributeType type )
+	void VertexLayoutGL::AddAttribute( VertexAttribute::Type type )
 	{
 		switch( type )
 		{
-		case ATTRIB_TEXCOORD0:
-		case ATTRIB_TEXCOORD1:
-		case ATTRIB_TEXCOORD2:
+		case VertexAttribute::TEXCOORD0:
+		case VertexAttribute::TEXCOORD1:
+		case VertexAttribute::TEXCOORD2:
 			SetAttribute( 8, GL_FLOAT );
 			break;
 
-		case ATTRIB_POSITION:
-		case ATTRIB_NORMAL:
+		case VertexAttribute::POSITION:
+		case VertexAttribute::NORMAL:
 			SetAttribute( 12, GL_FLOAT );
 			break;
 
-		case ATTRIB_QUADCOORD0:
-		case ATTRIB_QUADCOORD1:
-		case ATTRIB_QUADCOORD2:
-		case ATTRIB_TANGENT:
-		case ATTRIB_BONE_WEIGHT:
+		case VertexAttribute::QUADCOORD0:
+		case VertexAttribute::QUADCOORD1:
+		case VertexAttribute::QUADCOORD2:
+		case VertexAttribute::TANGENT:
+		case VertexAttribute::BONE_WEIGHT:
 			SetAttribute( 16, GL_FLOAT );
 			break;
 
-		case ATTRIB_COLOR:
+		case VertexAttribute::COLOR:
 			SetAttribute( 4, GL_UNSIGNED_BYTE, true );
 			break;
 
-		case ATTRIB_BONE_COUNT:
+		case VertexAttribute::BONE_COUNT:
 			SetAttribute( 4, GL_UNSIGNED_BYTE );
 			break;
 
-		case ATTRIB_BONE_INDEX:
+		case VertexAttribute::BONE_INDEX:
 			SetAttribute( 16, GL_UNSIGNED_BYTE );
 			break;
 
-		case ATTRIB_MATRIX:
+		case VertexAttribute::MATRIX:
 			SetAttribute( 16, GL_FLOAT );
 			SetAttribute( 16, GL_FLOAT );
 			SetAttribute( 16, GL_FLOAT );

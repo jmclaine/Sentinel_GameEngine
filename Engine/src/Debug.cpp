@@ -31,14 +31,11 @@ namespace Sentinel
 
 			builder.mVertex.push_back( MeshBuilder::Vertex( Vector3f( 0.0f, 0.0f, 0.0f )));
 			builder.mVertex.push_back( MeshBuilder::Vertex( Vector3f( 0.0f, 0.0f, 0.0f )));
-
-			builder.mIndex.push_back( index );
-			builder.mIndex.push_back( index+1 );
 		}
 
-		builder.mPrimitive = LINE_LIST;
+		builder.mPrimitive = PrimitiveFormat::LINES;
 
-		mMesh = builder.BuildMesh( mRenderer );
+		mMesh = builder.BuildMesh( mRenderer, false );
 
 		if( !mMesh )
 			throw AppException( "Failed to create Mesh in Debug" );
@@ -68,12 +65,12 @@ namespace Sentinel
 
 	void Debug::DrawLine( const Vector3f& start, const Vector3f& end )
 	{
-		Vector3f* data = (Vector3f*)mMesh->mVBO->Lock() + (mNumLines << 1);
+		Vector3f* data = (Vector3f*)mMesh->mVertexBuffer->Lock() + (mNumLines << 1);
 
 		*data = start;
 		*(data+1) = end;
 
-		mMesh->mVBO->Unlock();
+		mMesh->mVertexBuffer->Unlock();
 
 		++mNumLines;
 	}

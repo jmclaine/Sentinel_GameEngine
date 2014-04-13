@@ -13,6 +13,7 @@
 #include "CameraComponent.h"
 #include "Archive.h"
 #include "Renderer.h"
+#include "RenderManager.h"
 
 namespace Sentinel
 {
@@ -77,12 +78,29 @@ namespace Sentinel
 		mWidgetWorld->mGameWorld	= mOwner->GetWorld();
 
 		mWidgetWorld->Startup();
+
+		mOwner->GetWorld()->mRenderManager->Draw( RenderQueue::FOREGROUND, this );
 	}
 
 	void WidgetComponent::Update()
 	{
-		DrawableComponent::Update();
+		//DrawableComponent::Update();
+	}
 
+	void WidgetComponent::Shutdown()
+	{
+		DrawableComponent::Shutdown();
+
+		mWidgetWorld->Shutdown();
+	}
+
+	/////////////////////////////////
+
+	void WidgetComponent::CalculateBounds()
+	{}
+
+	void WidgetComponent::Draw()
+	{
 		CameraComponent* camera = mOwner->GetWorld()->GetCamera( mCamera );
 
 		if( camera )
@@ -114,13 +132,6 @@ namespace Sentinel
 			mSpriteSystem->Present();
 			mFontSystem->mSpriteSystem->Present();
 		}
-	}
-
-	void WidgetComponent::Shutdown()
-	{
-		DrawableComponent::Shutdown();
-
-		mWidgetWorld->Shutdown();
 	}
 
 	/////////////////////////////////

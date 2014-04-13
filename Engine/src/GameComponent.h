@@ -19,7 +19,6 @@ namespace Sentinel
 		{
 			DEFAULT,
 			CONTROLLER,
-			COLLISION,
 			PHYSICS,
 			TRANSFORM,
 			CAMERA,
@@ -32,10 +31,6 @@ namespace Sentinel
 
 		GameObject*			mOwner;
 		GameComponent::Type	mType;
-
-	public:
-
-		std::string			mName;
 
 	protected:
 

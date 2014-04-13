@@ -15,8 +15,8 @@ namespace Sentinel
 		mSpecularComponent( 8.0f ),
 		mShader( NULL ),
 		mBlendState( NULL ),
-		mCullMode( CULL_CCW ),
-		mDepthMode( DEPTH_LEQUAL )
+		mCullMode( CullFormat::CCW ),
+		mDepthMode( DepthFormat::LEQUAL )
 	{}
 
 	Material::~Material()
@@ -51,8 +51,8 @@ namespace Sentinel
 						 ShaderManager*		shaderManager,
 						 TextureManager*	textureManager )
 	{
-		archive.Write( material->mAmbient.Ptr(), ar_sizeof( material->mAmbient ));
-		archive.Write( material->mDiffuse.Ptr(), ar_sizeof( material->mDiffuse ));
+		archive.Write( material->mAmbient.Ptr(),  ar_sizeof( material->mAmbient ));
+		archive.Write( material->mDiffuse.Ptr(),  ar_sizeof( material->mDiffuse ));
 		archive.Write( material->mSpecular.Ptr(), ar_sizeof( material->mSpecular ));
 		archive.Write( &material->mSpecularComponent );
 
@@ -61,7 +61,7 @@ namespace Sentinel
 
 		std::string texture;
 
-		for( UINT x = 0; x < NUM_TEXTURES; ++x )
+		for( UINT x = 0; x < TextureIndex::COUNT; ++x )
 		{
 			texture = textureManager->Get( material->mTexture[ x ] );
 			archive.Write( &texture );
@@ -117,8 +117,8 @@ namespace Sentinel
 	{
 		Material* material = new Material();
 
-		archive.Read( material->mAmbient.Ptr(), ar_sizeof( material->mAmbient ));
-		archive.Read( material->mDiffuse.Ptr(), ar_sizeof( material->mDiffuse ));
+		archive.Read( material->mAmbient.Ptr(),  ar_sizeof( material->mAmbient ));
+		archive.Read( material->mDiffuse.Ptr(),  ar_sizeof( material->mDiffuse ));
 		archive.Read( material->mSpecular.Ptr(), ar_sizeof( material->mSpecular ));
 		archive.Read( &material->mSpecularComponent );
 
@@ -128,7 +128,7 @@ namespace Sentinel
 		material->mShader = shaderManager->Get( shader );
 
 		std::string texture;
-		for( UINT x = 0; x < NUM_TEXTURES; ++x )
+		for( UINT x = 0; x < TextureIndex::COUNT; ++x )
 		{
 			archive.Read( &texture );
 			material->mTexture[ x ] = textureManager->Get( texture );
@@ -172,20 +172,20 @@ namespace Sentinel
 			BYTE funcAlpha;
 			archive.Read( &funcAlpha );
 
-			material->mBlendState = SHARED( renderer->CreateBlendState( (BlendType)srcColor, (BlendType)dstColor, 
-																		(BlendType)srcAlpha, (BlendType)dstAlpha, 
-																		(BlendFuncType)funcColor, (BlendFuncType)funcAlpha ));
+			material->mBlendState = SHARED( renderer->CreateBlendState( (BlendFormat::Type)srcColor, (BlendFormat::Type)dstColor, 
+																		(BlendFormat::Type)srcAlpha, (BlendFormat::Type)dstAlpha, 
+																		(BlendFunction::Type)funcColor, (BlendFunction::Type)funcAlpha ));
 			}
 			break;
 		}
 
 		BYTE cull;
 		archive.Read( &cull );
-		material->mCullMode = (CullType)cull;
+		material->mCullMode = (CullFormat::Type)cull;
 
 		BYTE depth;
 		archive.Read( &depth );
-		material->mDepthMode = (DepthType)depth;
+		material->mDepthMode = (DepthFormat::Type)depth;
 
 		return material;
 	}

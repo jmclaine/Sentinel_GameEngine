@@ -109,7 +109,7 @@ float4 PS_Main( VSOutput input ) : SV_Target
 #ifdef VERSION_GL
 
 varying vec3 vNormal;
-varying vec4 vWorldPos;
+varying vec3 vWorldPos;
 varying vec3 vCameraDir;
 varying vec3 vLightDir;
 
@@ -127,7 +127,7 @@ attribute vec3 Normal;
 void main()
 {
 	gl_Position = _WVP * vec4(Position, 1);
-	vWorldPos   = _World * vec4(Position, 1);
+	vWorldPos   = (_World * vec4(Position, 1)).xyz;
 
 	// Light direction
 	vLightDir = _LightPos - vWorldPos.xyz;
@@ -142,7 +142,7 @@ void main()
 #endif
 #ifdef FRAGMENT_SHADER
 
-const float blend = 4.0;
+const float blend = 2.0;
 const float blendInc = 1.0;
 const float blendDenom = (blend / blendInc) * 2.0 + 1.0;
 const float blendFactor = 1.0 / (blendDenom * blendDenom);
@@ -202,7 +202,7 @@ float CalculateShadow( float lightDepth, vec3 tc )
 
 	float p_max = variance / (variance + dist*dist);
 
-	return max( p, clamp( (p_max - shadowStep) / (1.0 - shadowStep), 0.0, 1.0 ));
+	return max( p, (p_max - shadowStep) / (1.0 - shadowStep) );
 }
 
 void main()
@@ -215,10 +215,10 @@ void main()
 
 	// Normal
 	vec3 normal = normalize( vNormal );
-
+	
 	// Shadow with PCF blend
-	vec3 right = vec3( vLightDir.y, vLightDir.z, vLightDir.x )*invShadowSize;
-	vec3 up    = vec3( vLightDir.z, vLightDir.x, vLightDir.y )*invShadowSize;
+	vec3 right = vLightDir.yzx*invShadowSize;
+	vec3 up    = vLightDir.zxy*invShadowSize;
 
 	float shadow = 0.0;
 	
@@ -229,12 +229,13 @@ void main()
 			shadow += CalculateShadow( lightDepth, -vLightDir + right*offsetU + up*offsetV );
 		}
 	}
+	shadow += CalculateShadow( lightDepth, -vLightDir );
 
 	shadow *= blendFactor;
 
-	vec3 color0 = GetColor( lightDir, cameraDir, normal, _LightColor, _LightAttn ) * shadow;
+	vec3 color0 = GetColor( lightDir, cameraDir, normal, _LightColor, _LightAttn );
 
-	gl_FragColor = _Ambient + vec4(color0 * shadow, 0);
+	gl_FragColor = _Ambient + vec4(color0 * clamp( shadow, 0.0, 1.0 ), 0);
 }
 
 #endif

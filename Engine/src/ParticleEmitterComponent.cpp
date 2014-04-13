@@ -6,7 +6,7 @@
 #include "GameWorld.h"
 #include "Renderer.h"
 #include "Timing.h"
-#include "Mesh.h"
+#include "RenderManager.h"
 
 namespace Sentinel
 {
@@ -39,17 +39,19 @@ namespace Sentinel
 		DrawableComponent::Startup();
 
 		mParticleSystem->Startup();
+
+		mOwner->GetWorld()->mRenderManager->Draw( RenderQueue::ALPHA_BLEND, this );
 	}
 
 	void ParticleEmitterComponent::Update()
 	{
-		DrawableComponent::Update();
-
 		mParticleSystem->SetMatrixWorld( mTransform->GetMatrixWorld() );
 
 		Renderer* renderer = mOwner->GetWorld()->mRenderer;
 
 		mParticleSystem->Update( mOwner->GetWorld()->mTiming->DeltaTime() );
+
+		DrawableComponent::Update();
 	}
 
 	void ParticleEmitterComponent::Shutdown()
@@ -57,6 +59,16 @@ namespace Sentinel
 		DrawableComponent::Shutdown();
 
 		mParticleSystem->Shutdown();
+	}
+
+	/////////////////////////////////
+
+	void ParticleEmitterComponent::CalculateBounds()
+	{}
+
+	void ParticleEmitterComponent::Draw()
+	{
+		mParticleSystem->Draw();
 	}
 
 	/////////////////////////////////

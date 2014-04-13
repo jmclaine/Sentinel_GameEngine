@@ -1,113 +1,228 @@
 #pragma once
 
+#include "EnumClass.h"
+
 namespace Sentinel
 {
-	enum RenderType
-	{
-		POINT_LIST,
-		LINE_LIST,
-		TRIANGLE_LIST,
+	ENUM_CLASS( PrimitiveFormat )
 
-		NUM_PRIMITIVES
-	};
+		POINTS,
+		LINES,
+		TRIANGLES,
 
-	enum ImageFormatType
-	{
-		IMAGE_FORMAT_R,
-		IMAGE_FORMAT_RG,
-		IMAGE_FORMAT_RGB,
-		IMAGE_FORMAT_RGBA,
-		IMAGE_FORMAT_HDR,	// R32G32B32F
-		IMAGE_FORMAT_DEPTH,
+		COUNT
 
-		NUM_IMAGE_FORMATS
-	};
+	ENUM_END
 
-	enum CullType
-	{
-		CULL_NONE,
-		CULL_CCW,
-		CULL_CW,
+	/////////////////////////////////
 
-		NUM_CULL_TYPES
-	};
+	ENUM_CLASS( ImageFormat )
 
-	enum FillType
-	{
-		FILL_SOLID,
-		FILL_WIREFRAME,
+		R,
+		RG,
+		RGB,
+		RGBA,
+		HDR,	// R32G32B32F
+		DEPTH,
 
-		NUM_FILL_TYPES
-	};
+	ENUM_END
 
-	enum BlendType
-	{
-		BLEND_ZERO,
-		BLEND_ONE,
+	/////////////////////////////////
 
-		BLEND_SRC_COLOR,
-		BLEND_ONE_MINUS_SRC_COLOR,
-		BLEND_SRC_ALPHA,
-		BLEND_ONE_MINUS_SRC_ALPHA,
+	ENUM_CLASS( CullFormat )
 
-		BLEND_DST_COLOR,
-		BLEND_ONE_MINUS_DST_COLOR,
-		BLEND_DST_ALPHA,
-		BLEND_ONE_MINUS_DST_ALPHA,
+		NONE,
+		CCW,
+		CW,
 
-		NUM_BLEND_TYPES
-	};
+		COUNT
 
-	enum BlendFuncType
-	{
-		BLEND_FUNC_ADD,
-		BLEND_FUNC_SUBTRACT,
-		BLEND_FUNC_REVERSE_SUBTRACT,
-		BLEND_FUNC_MIN,
-		BLEND_FUNC_MAX,
+	ENUM_END
 
-		NUM_BLEND_FUNC_TYPES
-	};
+	/////////////////////////////////
 
-	enum DepthType
-	{
-		DEPTH_OFF,
-
-		DEPTH_LESS,
-		DEPTH_EQUAL,
-		DEPTH_LEQUAL,
-		DEPTH_GREATER,
-		DEPTH_NOTEQUAL,
-		DEPTH_GEQUAL,
-		DEPTH_ALWAYS,
+	ENUM_CLASS( FillFormat )
 		
-		NUM_DEPTH_TYPES
-	};
+		SOLID,
+		WIREFRAME,
 
-	enum BufferType
-	{
-		NULL_BUFFER,
+		COUNT
+	
+	ENUM_END
 
-		VERTEX_BUFFER,
-		INDEX_BUFFER,
+	/////////////////////////////////
 
-		NUM_BUFFER_TYPES
-	};
+	ENUM_CLASS( BlendFormat )
+	
+		ZERO,
+		ONE,
 
-	enum BufferAccessType
-	{
-		BUFFER_READ_WRITE,
-		BUFFER_WRITE,
+		SRC_COLOR,
+		ONE_MINUS_SRC_COLOR,
+		SRC_ALPHA,
+		ONE_MINUS_SRC_ALPHA,
 
-		NUM_BUFFER_ACCESS_TYPES
-	};
+		DST_COLOR,
+		ONE_MINUS_DST_COLOR,
+		DST_ALPHA,
+		ONE_MINUS_DST_ALPHA,
 
-	enum TextureType
-	{
-		TEXTURE_DIFFUSE,
-		TEXTURE_NORMAL,
-		TEXTURE_DEPTH,
+		COUNT,
+		UNKNOWN
 
-		NUM_TEXTURES,
-	};
+	ENUM_END
+
+	/////////////////////////////////
+
+	ENUM_CLASS( BlendFunction )
+	
+		ADD,
+		SUBTRACT,
+		REVERSE_SUBTRACT,
+		MIN,
+		MAX,
+
+		COUNT,
+		UNKNOWN
+
+	ENUM_END
+
+	/////////////////////////////////
+
+	ENUM_CLASS( DepthFormat )
+
+		OFF,
+		LESS,
+		EQUAL,
+		LEQUAL,
+		GREATER,
+		NOTEQUAL,
+		GEQUAL,
+		ALWAYS,
+
+		COUNT,
+		UNKNOWN
+
+	ENUM_END
+
+	/////////////////////////////////
+
+	ENUM_CLASS( BufferFormat )
+
+		UNKNOWN,
+
+		VERTEX,
+		INDEX,
+
+	ENUM_END
+
+	/////////////////////////////////
+
+	ENUM_CLASS( BufferAccess )
+	
+		READ_WRITE,
+		WRITE,
+
+	ENUM_END
+
+	/////////////////////////////////
+
+	ENUM_CLASS( TextureIndex )
+
+		DIFFUSE,
+		NORMAL,
+		DEPTH,
+
+		COUNT
+
+	ENUM_END
+
+	/////////////////////////////////
+
+	ENUM_CLASS( VertexAttribute )
+	
+		POSITION,
+		TEXCOORD0,
+		TEXCOORD1,
+		TEXCOORD2,
+		QUADCOORD0,
+		QUADCOORD1,
+		QUADCOORD2,
+		NORMAL,
+		COLOR,
+		TANGENT,
+		BONE_COUNT,
+		BONE_INDEX,
+		BONE_WEIGHT,
+		MATRIX,
+
+		COUNT
+
+	ENUM_END
+
+	/////////////////////////////////
+
+	ENUM_CLASS( ShaderUniform )
+
+		WVP,
+		WORLD,
+		INV_WORLD,
+		VIEW,
+		INV_VIEW,
+		PROJ,
+		INV_PROJ,
+		TEXTURE,
+		AMBIENT,
+		DIFFUSE,
+		SPECULAR,
+		SPEC_COMP,
+		LIGHT_POS,
+		LIGHT_DIR,
+		LIGHT_COLOR,
+		LIGHT_ATTN,
+		LIGHT_TEXTURE_CUBE,
+		LIGHT_MATRIX,
+		LIGHT_CUBE_MATRIX,
+		SHADOW_BLEND,
+		SHADOW_QUALITY,
+		CAMERA_POS,
+		BONES,
+		DELTA_TIME,
+	
+	ENUM_END
+
+	/////////////////////////////////
+
+	ENUM_CLASS( RenderQueue )
+
+		BACKGROUND		= 10000,
+		GEOMETRY		= 20000,
+		ALPHA_BLEND		= 30000,
+		FOREGROUND		= 40000,
+	
+	ENUM_END
+
+	/////////////////////////////////
+
+	ENUM_CLASS( SamplerMode )
+
+		WRAP,
+		CLAMP,
+		CLAMP_TO_EDGE,
+
+		COUNT,
+		UNKNOWN
+
+	ENUM_END
+
+	/////////////////////////////////
+
+	ENUM_CLASS( SamplerFilter )
+
+		POINT,
+		LINEAR,
+
+		UNKNOWN
+	
+	ENUM_END
 }

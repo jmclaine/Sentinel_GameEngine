@@ -3,32 +3,32 @@
 
 namespace Sentinel
 {
-	BufferDX::BufferDX( ID3D11Device* device, ID3D11DeviceContext* context, void* data, UINT size, UINT stride, BufferType type, BufferAccessType access )
+	BufferDX::BufferDX( ID3D11Device* device, ID3D11DeviceContext* context, void* data, UINT size, UINT stride, BufferFormat::Type format, BufferAccess::Type access )
 	{
 		_ASSERT( device );
 		_ASSERT( context );
-		_ASSERT( type == VERTEX_BUFFER || type == INDEX_BUFFER );
+		_ASSERT( format == BufferFormat::VERTEX || format == BufferFormat::INDEX );
 		_ASSERT( size > 0 );
 		_ASSERT( stride > 0 );
 
 		D3D11_BUFFER_DESC bufferDesc;
 		bufferDesc.Usage				= D3D11_USAGE_DYNAMIC;
 		bufferDesc.ByteWidth			= size;
-		bufferDesc.BindFlags			= (type == VERTEX_BUFFER) ? D3D11_BIND_VERTEX_BUFFER : D3D11_BIND_INDEX_BUFFER;
+		bufferDesc.BindFlags			= (format == BufferFormat::VERTEX) ? D3D11_BIND_VERTEX_BUFFER : D3D11_BIND_INDEX_BUFFER;
 		bufferDesc.CPUAccessFlags		= D3D11_CPU_ACCESS_WRITE;
 		bufferDesc.MiscFlags			= 0;
 		bufferDesc.StructureByteStride	= 0;
 
 		mAccess  = access;
 		mContext = context;
-		mType	 = type;
+		mFormat	 = format;
 		mSize	 = size;
 		mStride  = stride;
 		mCount	 = size / stride;
 
 		D3D11_SUBRESOURCE_DATA resourceData;
 
-		if( access == BUFFER_READ_WRITE )
+		if( access == BufferAccess::READ_WRITE )
 		{
 			mData = malloc( size );
 			memcpy( mData, data, size );
@@ -67,7 +67,7 @@ namespace Sentinel
 
 	void* BufferDX::Lock()
 	{
-		if( mAccess == BUFFER_READ_WRITE )
+		if( mAccess == BufferAccess::READ_WRITE )
 		{
 			return mData;
 		}
@@ -84,7 +84,7 @@ namespace Sentinel
 
 	void BufferDX::Unlock()
 	{
-		if( mAccess == BUFFER_READ_WRITE )
+		if( mAccess == BufferAccess::READ_WRITE )
 		{
 			D3D11_MAPPED_SUBRESOURCE mapRes;
 				

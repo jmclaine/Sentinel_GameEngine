@@ -2,7 +2,7 @@
 
 namespace Sentinel
 {
-	Texture::Texture( UINT width, UINT height, ImageFormatType format ) :
+	Texture::Texture( UINT width, UINT height, ImageFormat::Type format ) :
 		mWidth( width ),
 		mHeight( height ),
 		mFormat( format )
@@ -21,7 +21,7 @@ namespace Sentinel
 		return mHeight;
 	}
 
-	const ImageFormatType& Texture::Format()
+	const ImageFormat::Type& Texture::Format()
 	{
 		return mFormat;
 	}

@@ -1,4 +1,7 @@
 #include "GameObject.h"
+#include "GameWorld.h"
+#include "CameraComponent.h"
+#include "Shape.h"
 #include "DrawableComponent.h"
 #include "Archive.h"
 
@@ -6,7 +9,8 @@ namespace Sentinel
 {
 	DrawableComponent::DrawableComponent() :
 		mTransform( NULL ),
-		mIsDynamic( false )
+		mIsDynamic( false ),
+		mIsVisible( true )
 	{
 		mType = GameComponent::DRAWABLE;
 	}
@@ -20,18 +24,15 @@ namespace Sentinel
 	}
 
 	void DrawableComponent::Update()
-	{}
+	{
+		CalculateBounds();
+
+		mIsVisible = mOwner->GetWorld()->GetCamera()->GetFrustum().Intersects( mBounds );
+	}
 
 	void DrawableComponent::Shutdown()
 	{
 		mTransform = NULL;
-	}
-
-	///////////////////////////////////
-
-	const BoundingBox& DrawableComponent::GetBounds()
-	{
-		return mBounds;
 	}
 
 	///////////////////////////////////

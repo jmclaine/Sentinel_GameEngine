@@ -67,16 +67,21 @@ renderer->Clear( ColorRGBA( 0.0f, 0.2f, 0.8f, 1.0f ).Ptr() );
 material->Apply( renderer );
 
 // VBOs and IBOs required.
-renderer->SetVBO( bufferVBO );
-renderer->SetIBO( bufferIBO );
+renderer->SetVertexBuffer( vertexBuffer );
+renderer->SetIndexBuffer( indexBuffer );
 
 // Set shader variables here.
 // See 'Mesh.cpp' for a complete example.
 
-// Draw stuff.
-renderer->SetRenderType( primitive );
-renderer->DrawIndexed( bufferIBO.mCount, 0, 0 );
+// Draw primitives.
+renderer->Draw( primitive, vertexBuffer.mCount, 0 );
 
+* OR *
+
+// Draw primitives with indices.
+renderer->DrawIndexed( primitive, indexBuffer.mCount, 0, 0 );
+
+// Send pixels drawn to backbuffer.
 renderer->Present();
 
 
@@ -194,33 +199,33 @@ namespace Sentinel
 	{
 	protected:
 
-		BlendType		mSrcBlendColor;
-		BlendType		mDstBlendColor;
+		BlendFormat::Type		mSrcBlendColor;
+		BlendFormat::Type		mDstBlendColor;
 
-		BlendType		mSrcBlendAlpha;
-		BlendType		mDstBlendAlpha;
+		BlendFormat::Type		mSrcBlendAlpha;
+		BlendFormat::Type		mDstBlendAlpha;
 
-		BlendFuncType	mBlendFuncColor;
-		BlendFuncType	mBlendFuncAlpha;
+		BlendFunction::Type		mBlendFuncColor;
+		BlendFunction::Type		mBlendFuncAlpha;
 
 		//////////////////////////////////
 
-		BlendState( BlendType srcBlendColor, BlendType dstBlendColor,
-					BlendType srcBlendAlpha, BlendType dstBlendAlpha,
-					BlendFuncType blendFuncColor, BlendFuncType blendFuncAlpha );
+		BlendState( BlendFormat::Type srcBlendColor, BlendFormat::Type dstBlendColor,
+					BlendFormat::Type srcBlendAlpha, BlendFormat::Type dstBlendAlpha,
+					BlendFunction::Type blendFuncColor, BlendFunction::Type blendFuncAlpha );
 
 	public:
 
 		virtual ~BlendState() {}
 
-		BlendType		SrcBlendColor();
-		BlendType		DstBlendColor();
+		BlendFormat::Type		SrcBlendColor();
+		BlendFormat::Type		DstBlendColor();
 
-		BlendType		SrcBlendAlpha();
-		BlendType		DstBlendAlpha();
+		BlendFormat::Type		SrcBlendAlpha();
+		BlendFormat::Type		DstBlendAlpha();
 
-		BlendFuncType	BlendFuncColor();
-		BlendFuncType	BlendFuncAlpha();
+		BlendFunction::Type		BlendFuncColor();
+		BlendFunction::Type		BlendFuncAlpha();
 	};
 
 	//////////////////////////////////
@@ -274,19 +279,19 @@ namespace Sentinel
 
 		// Buffers.
 		//
-		virtual Buffer*			CreateBuffer( void* data, UINT size, UINT stride, BufferType type, BufferAccessType access = BUFFER_READ_WRITE ) = 0;
+		virtual Buffer*			CreateBuffer( void* data, UINT size, UINT stride, BufferFormat::Type type, BufferAccess::Type access = BufferAccess::READ_WRITE ) = 0;
 
-		virtual void			SetVBO( Buffer* buffer ) = 0;
-		virtual void			SetIBO( Buffer* buffer ) = 0;
+		virtual void			SetVertexBuffer( Buffer* buffer ) = 0;
+		virtual void			SetIndexBuffer( Buffer* buffer ) = 0;
 
 		// Textures.
 		//
-		Texture*				CreateTexture( UINT width, UINT height, ImageFormatType format = IMAGE_FORMAT_RGBA, bool createMips = false );
+		Texture*				CreateTexture( UINT width, UINT height, ImageFormat::Type format = ImageFormat::RGBA, bool createMips = false );
 		Texture*				CreateTextureFromResource( void* data, UINT length );
 
 		virtual Texture*		CreateTextureFromFile( const char* filename, bool createMips = true ) = 0;
-		virtual Texture*		CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormatType format, bool createMips = true ) = 0;
-		virtual Texture*		CreateTextureCube( UINT width, UINT height, ImageFormatType format ) = 0;
+		virtual Texture*		CreateTextureFromMemory( void* data, UINT width, UINT height, ImageFormat::Type format, bool createMips = true ) = 0;
+		virtual Texture*		CreateTextureCube( UINT width, UINT height, ImageFormat::Type format ) = 0;
 
 		virtual void*			GetTexturePixels( Texture* texture ) = 0;
 	
@@ -295,21 +300,20 @@ namespace Sentinel
 		virtual RenderTexture*	CreateBackbuffer() = 0;
 		virtual RenderTexture*	CreateRenderTexture( Texture* texture ) = 0;
 		virtual DepthStencil*	CreateDepthStencil( UINT width, UINT height ) = 0;
-		virtual BlendState*		CreateBlendState( BlendType srcBlendColor = BLEND_SRC_ALPHA, BlendType dstBlendColor = BLEND_ONE_MINUS_SRC_ALPHA, 
-											      BlendType srcBlendAlpha = BLEND_SRC_ALPHA, BlendType dstBlendAlpha = BLEND_ONE_MINUS_SRC_ALPHA,
-											      BlendFuncType blendFuncColor = BLEND_FUNC_ADD, BlendFuncType blendFuncAlpha = BLEND_FUNC_ADD ) = 0;
+		virtual BlendState*		CreateBlendState( BlendFormat::Type srcBlendColor = BlendFormat::SRC_ALPHA, BlendFormat::Type dstBlendColor = BlendFormat::ONE_MINUS_SRC_ALPHA, 
+											      BlendFormat::Type srcBlendAlpha = BlendFormat::SRC_ALPHA, BlendFormat::Type dstBlendAlpha = BlendFormat::ONE_MINUS_SRC_ALPHA,
+											      BlendFunction::Type blendFuncColor = BlendFunction::ADD, BlendFunction::Type blendFuncAlpha = BlendFunction::ADD ) = 0;
 
 		virtual UINT			ResizeBuffers( UINT width, UINT height ) = 0;
 
-		virtual void			SetRenderType( RenderType type ) = 0;
 		virtual void			SetRenderTexture( RenderTexture* target ) = 0;
 		virtual void			SetDepthStencil( DepthStencil* stencil ) = 0;
 		virtual void			SetBlendState( BlendState* blend ) = 0;
 
-		virtual void			SetDepthStencilType( DepthType state ) = 0;
+		virtual void			SetDepthStencilType( DepthFormat::Type depth ) = 0;
 		virtual void			SetViewport( int x, int y, UINT width, UINT height ) = 0;
-		virtual UINT			SetCull( CullType type ) = 0;
-		virtual UINT			SetFill( FillType type ) = 0;
+		virtual UINT			SetCull( CullFormat::Type type ) = 0;
+		virtual UINT			SetFill( FillFormat::Type type ) = 0;
 
 		// Shaders.
 		//
@@ -321,14 +325,19 @@ namespace Sentinel
 
 		// Vertex Layout.
 		//
-		virtual VertexLayout*	CreateVertexLayout( const std::vector< AttributeType >& attrib ) = 0;
+		virtual VertexLayout*	CreateVertexLayout( const std::vector< VertexAttribute::Type >& attrib ) = 0;
 
 		virtual void			SetVertexLayout( VertexLayout* vertexLayout ) = 0;
 
 		// Rendering.
 		//
-		virtual void			Clear( float* color ) = 0;
-		virtual void			DrawIndexed( UINT count, UINT startIndex, UINT baseVertex ) = 0;
+		virtual void			Clear( float* color, float depth = 1.0f ) = 0;
+		virtual void			ClearColor( float* color ) = 0;
+		virtual void			ClearDepth( float depth ) = 0;
+
+		virtual void			Draw( PrimitiveFormat::Type primitive, UINT count, UINT baseVertex ) = 0;
+		virtual void			DrawIndexed( PrimitiveFormat::Type primitive, UINT count, UINT startIndex, UINT baseVertex ) = 0;
+
 		virtual void			Present() = 0;
 	};
 

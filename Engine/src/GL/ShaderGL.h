@@ -15,6 +15,14 @@ namespace Sentinel
 		{
 		private:
 
+			static SamplerGL CURR_STATE;
+
+		public:
+
+			static GLint SAMPLER_MODE[ SamplerMode::COUNT ];
+
+		protected:
+
 			GLint	mWrapS;
 			GLint	mWrapT;
 
@@ -23,9 +31,32 @@ namespace Sentinel
 
 		public:
 
-			SamplerGL();
+			SamplerGL( GLint wrapS = GL_REPEAT, GLint wrapT = GL_REPEAT,
+					   GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR );
 
-			void Create( SamplerMode modeU, SamplerMode modeV, SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter );
+			void Create( SamplerMode::Type modeU, SamplerMode::Type modeV,
+						 SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter );
+
+			void Apply();
+		};
+
+		class SamplerCubeGL : public SamplerGL
+		{
+		private:
+
+			static SamplerCubeGL CURR_STATE;
+
+		protected:
+
+			GLint mWrapR;
+
+		public:
+
+			SamplerCubeGL( GLint wrapS = GL_CLAMP_TO_EDGE, GLint wrapT = GL_CLAMP_TO_EDGE, GLint wrapR = GL_CLAMP_TO_EDGE,
+						   GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR );
+
+			void Create( SamplerMode::Type modeU, SamplerMode::Type modeV, SamplerMode::Type modeW,
+						 SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter );
 
 			void Apply();
 		};
@@ -44,7 +75,7 @@ namespace Sentinel
 
 	public:
 
-		GLint		mAttributeGL[ NUM_ATTRIBUTES ];
+		GLint		mAttributeGL[ VertexAttribute::COUNT ];
 
 		std::vector< GLint > mUniformGL;
 
@@ -60,8 +91,8 @@ namespace Sentinel
 
 	private:
 
-		bool		CreateAttribute( char* name, AttributeType type );
-		bool		CreateUniform( char* name, UniformType type );
+		bool		CreateAttribute( char* name, VertexAttribute::Type type );
+		bool		CreateUniform( char* name, ShaderUniform::Type type );
 
 	public:
 
@@ -82,8 +113,13 @@ namespace Sentinel
 		void		SetTexture( UINT uniform, Texture* texture );
 		void		SetTextureCube( UINT uniform, Texture* texture );
 
-		void		SetSampler( UINT index, SamplerMode modeU, SamplerMode modeV, 
-								SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter );
+		void		SetSampler( UINT index, 
+								SamplerMode::Type modeU, SamplerMode::Type modeV, 
+								SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter );
+
+		void		SetSamplerCube( UINT index, 
+									SamplerMode::Type modeU, SamplerMode::Type modeV, SamplerMode::Type modeW,
+									SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter );
 
 		///////////////////////////////////
 
