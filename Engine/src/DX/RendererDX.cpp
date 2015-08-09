@@ -56,8 +56,9 @@ namespace Sentinel
 
 			ID3D11RenderTargetView* mView;
 
-			RenderTextureDX( ID3D11RenderTargetView* view ) :
-				mView( view )
+			RenderTextureDX( ID3D11RenderTargetView* view, Texture* texture ) :
+				mView( view ),
+				RenderTexture( texture )
 			{}
 
 			~RenderTextureDX()
@@ -74,8 +75,9 @@ namespace Sentinel
 
 			ID3D11DepthStencilView* mView;
 
-			DepthStencilDX( ID3D11DepthStencilView* view ) :
-				mView( view )
+			DepthStencilDX( ID3D11DepthStencilView* view, UINT width, UINT height ) :
+				mView( view ),
+				DepthStencil( width, height )
 			{}
 
 			~DepthStencilDX()
@@ -628,10 +630,10 @@ namespace Sentinel
 
 			HV_PTR( mCurrWindow->mSwapChain->GetBuffer( 0, __uuidof(ID3D11Texture2D), (void**)&tex ));
 
-			return CreateRenderTexture( tex );
+			return CreateRenderTexture( tex, NULL );
 		}
 
-		RenderTexture* CreateRenderTexture( ID3D11Texture2D* backbuffer )
+		RenderTexture* CreateRenderTexture( ID3D11Texture2D* backbuffer, Texture* texture )
 		{
 			_ASSERT( mCurrWindow );
 
@@ -639,14 +641,14 @@ namespace Sentinel
 			
 			HV_PTR( mCurrWindow->mDevice->CreateRenderTargetView( backbuffer, NULL, &view ));
 			
-			return new RenderTextureDX( view );
+			return new RenderTextureDX( view, texture );
 		}
 
 		RenderTexture* CreateRenderTexture( Texture* texture )
 		{
 			_ASSERT( texture );
 			
-			return CreateRenderTexture( static_cast< TextureDX* >(texture)->mTexture );
+			return CreateRenderTexture( static_cast< TextureDX* >(texture)->mTexture, texture );
 		}
 
 		DepthStencil* CreateDepthStencil( UINT width, UINT height )
@@ -676,7 +678,7 @@ namespace Sentinel
 			//	SET_DEBUG_NAME( view );
 			//#endif
 
-			return new DepthStencilDX( view );
+			return new DepthStencilDX( view, width, height );
 		}
 
 		BlendState* CreateBlendState( BlendFormat::Type srcBlendColor = BlendFormat::SRC_ALPHA, BlendFormat::Type dstBlendColor = BlendFormat::ONE_MINUS_SRC_ALPHA, 

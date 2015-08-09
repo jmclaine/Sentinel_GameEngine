@@ -1,12 +1,17 @@
 #pragma once
 
-#include "ControllerComponent.h"
-#include "GUI\ModelWidget.h"
+#include "Component/Controller3D.h"
 #include "Input.h"
 
 namespace Sentinel
 {
-	class EditorControllerComponent : public ControllerComponent
+	namespace Component
+	{
+		class OrthographicCamera;
+		class PerspectiveCamera;
+	}
+
+	class EditorControllerComponent : public Component::Controller3D
 	{
 	private:
 
@@ -21,7 +26,8 @@ namespace Sentinel
 		float	mStrafeSpeed;
 		float	mAngularSpeed;
 
-		GUI::ModelWidget* mWorldWidget;
+		Component::OrthographicCamera* mEditorCamera;
+		Component::PerspectiveCamera*  mWorldCamera;
 
 		//////////////////////////////
 		

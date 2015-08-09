@@ -11,11 +11,16 @@ All attached GameComponent(s) are freed on Shutdown()
 
 namespace Sentinel
 {
+	namespace Component
+	{
+		class Camera;
+	}
+
 	class GameWorld;
 
 	class SENTINEL_DLL GameObject : public Serializable, public ListNode< GameObject >
 	{
-	protected:
+	private:
 
 		DECLARE_SERIAL();
 
@@ -23,22 +28,22 @@ namespace Sentinel
 		GameComponent*						mController;
 		GameComponent*						mPhysics;
 		GameComponent*						mDrawable;
-
+		GameComponent*						mCamera;
 		std::vector< GameComponent* >		mComponent;
 
 		GameWorld*							mWorld;
 
-		bool								mIsActive;
+		bool								mEnabled;
 
 	public:
 
 		std::string							mName;
+		WORD								mLayer;
 		
 		//////////////////////////////
 
-		GameObject();
-
-		virtual ~GameObject();
+		GameObject( const std::string& name = "GameObject" );
+		~GameObject();
 
 		//////////////////////////////
 
@@ -58,19 +63,16 @@ namespace Sentinel
 
 		//////////////////////////////
 
-		virtual void	Startup();
+		void			Startup();
 
-		virtual void	UpdateController();
+		void			UpdateController();
+		void			UpdatePhysics();
+		void			UpdateTransform();
+		void			UpdateComponents();
+		void			UpdateCamera();
+		void			UpdateDrawable();
 
-		virtual void	UpdatePhysics();
-
-		virtual void	UpdateTransform();
-
-		virtual void	UpdateComponents();
-
-		virtual void	UpdateDrawable( bool drawChildren = true );
-
-		virtual void	Shutdown();
+		void			Shutdown();
 
 		//////////////////////////////
 
@@ -89,5 +91,9 @@ namespace Sentinel
 					componentList.push_back( (COMPONENT*)mComponent[ x ] );
 			}
 		}
+
+		//////////////////////////////
+
+		GameObject*		Copy();
 	};
 }

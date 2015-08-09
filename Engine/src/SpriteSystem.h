@@ -20,6 +20,11 @@ Use the current GameWorld camera to render sprites.
 
 namespace Sentinel
 {
+	namespace Component
+	{
+		class Camera;
+	}
+
 	class Renderer;
 	class Mesh;
 	class Sprite;
@@ -31,13 +36,15 @@ namespace Sentinel
 	private:
 
 		Renderer*			mRenderer;
-
+		
 		Mesh*				mMesh;
 
 		UINT				mNumSprites;
 		UINT				mMaxSprites;
 		
 	public:
+
+		Component::Camera*	mCamera;
 
 		struct Storage
 		{

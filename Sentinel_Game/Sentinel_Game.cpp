@@ -34,6 +34,7 @@ upon compilation / linking.
 #include "MeshManager.h"
 #include "ModelManager.h"
 #include "SoundManager.h"
+#include "RenderManager.h"
 
 #include "Input.h"
 #include "Timing.h"
@@ -45,23 +46,20 @@ upon compilation / linking.
 #include "GameWorld.h"
 #include "GameObject.h"
 
-#include "TransformComponent.h"
-#include "PhysicsComponent.h"
-#include "LightComponent.h"
-#include "PerspectiveCameraComponent.h"
-#include "OrthographicCameraComponent.h"
-#include "PlayerControllerComponent.h"
-#include "ParticleEmitterComponent.h"
-#include "PhysicsComponent.h"
-#include "MeshComponent.h"
-#include "ModelComponent.h"
-#include "SpriteComponent.h"
-#include "WidgetComponent.h"
+#include "Component/Transform.h"
+#include "Component/Physics.h"
+#include "Component/Light.h"
+#include "Component/PerspectiveCamera.h"
+#include "Component/OrthographicCamera.h"
+#include "Component/PlayerController.h"
+#include "Component/ParticleEmitter.h"
+#include "Component/MeshDrawable.h"
+#include "Component/ModelDrawable.h"
+#include "Component/SpriteDrawable.h"
 
 #include "Sound.h"
 #include "Sprite.h"
 
-#include "GUI/Widget.h"
 #include "GUI/Button.h"
 
 #include "RandomValue.h"
@@ -143,6 +141,7 @@ public:
 		mGameWorld->mMeshManager		= new MeshManager();
 		mGameWorld->mModelManager		= new ModelManager();
 		mGameWorld->mSoundManager		= new SoundManager();
+		mGameWorld->mRenderManager		= new RenderManager();
 
 		mGameWorld->mPhysicsSystem->Startup();
 
@@ -222,14 +221,15 @@ public:
 
 				mGameWorld->UpdateTransform();
 				mGameWorld->UpdateComponents();
+				mGameWorld->UpdateCamera();
 
 				BEGIN_PROFILE( timing );
 				mGameWorld->UpdateLight();
 				END_PROFILE( timing, "Light" );
 
 				mRenderer->SetViewport( 0, 0, width, height );
-				//mRenderer->SetViewport( ((int)width - (int)Renderer::WINDOW_WIDTH_BASE) >> 1, ((int)height - (int)Renderer::WINDOW_HEIGHT_BASE) >> 1, \
-										Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE );
+//				mRenderer->SetViewport( ((int)width - (int)Renderer::WINDOW_WIDTH_BASE) >> 1, ((int)height - (int)Renderer::WINDOW_HEIGHT_BASE) >> 1,
+//										Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE );
 				mRenderer->SetDepthStencil( mDSMain );
 				mRenderer->SetRenderTexture( mRTMain );
 				mRenderer->Clear( color );

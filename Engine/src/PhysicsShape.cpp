@@ -40,6 +40,11 @@ namespace Sentinel
 		SetRadius( radius );
 	}
 
+	PhysicsShape* SpherePhysicsShape::Copy( PhysicsSystem* physics )
+	{
+		return physics->CreateSphere( GetRadius() );
+	}
+
 	///////////////////////////////////////////////
 
 	BoxPhysicsShape::BoxPhysicsShape()
@@ -69,6 +74,11 @@ namespace Sentinel
 		SetScale( scale );
 	}
 
+	PhysicsShape* BoxPhysicsShape::Copy( PhysicsSystem* physics )
+	{
+		return physics->CreateBox( GetScale() );
+	}
+
 	///////////////////////////////////////////////
 
 	CylinderPhysicsShape::CylinderPhysicsShape()
@@ -96,6 +106,11 @@ namespace Sentinel
 		archive.Read( scale.Ptr(), ar_sizeof( scale ));
 
 		SetScale( scale );
+	}
+
+	PhysicsShape* CylinderPhysicsShape::Copy( PhysicsSystem* physics )
+	{
+		return physics->CreateCylinder( GetScale() );
 	}
 
 	///////////////////////////////////////////////
@@ -155,6 +170,11 @@ namespace Sentinel
 		SetScale( v );
 	}
 
+	PhysicsShape* MeshPhysicsShape::Copy( PhysicsSystem* physics )
+	{
+		return physics->CreateMesh( GetPoints(), GetNumPoints(), sizeof( Vector3f ), GetScale() );
+	}
+
 	///////////////////////////////////////////////
 
 	CompoundPhysicsShape::CompoundPhysicsShape()
@@ -168,4 +188,9 @@ namespace Sentinel
 
 	void CompoundPhysicsShape::Load( Archive& archive )
 	{}
+
+	PhysicsShape* CompoundPhysicsShape::Copy( PhysicsSystem* physics )
+	{
+		return NULL;
+	}
 }

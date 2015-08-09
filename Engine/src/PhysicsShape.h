@@ -8,6 +8,8 @@
 
 namespace Sentinel
 {
+	class PhysicsSystem;
+
 	class PhysicsShape : public Serializable
 	{
 	public:
@@ -18,6 +20,8 @@ namespace Sentinel
 
 		virtual void Save( Archive& archive ) = 0;
 		virtual void Load( Archive& archive ) = 0;
+
+		virtual PhysicsShape* Copy( PhysicsSystem* physics ) = 0;
 	};
 
 	///////////////////////////////////////////////
@@ -43,6 +47,8 @@ namespace Sentinel
 
 		void Save( Archive& archive );
 		void Load( Archive& archive );
+
+		PhysicsShape* Copy( PhysicsSystem* physics );
 	};
 
 	///////////////////////////////////////////////
@@ -68,6 +74,8 @@ namespace Sentinel
 
 		void Save( Archive& archive );
 		void Load( Archive& archive );
+
+		PhysicsShape* Copy( PhysicsSystem* physics );
 	};
 
 	///////////////////////////////////////////////
@@ -93,6 +101,8 @@ namespace Sentinel
 
 		void Save( Archive& archive );
 		void Load( Archive& archive );
+
+		PhysicsShape* Copy( PhysicsSystem* physics );
 	};
 
 	///////////////////////////////////////////////
@@ -122,6 +132,8 @@ namespace Sentinel
 
 		void Save( Archive& archive );
 		void Load( Archive& archive );
+
+		PhysicsShape* Copy( PhysicsSystem* physics );
 	};
 
 	///////////////////////////////////////////////
@@ -138,5 +150,7 @@ namespace Sentinel
 
 		virtual void Save( Archive& archive );
 		virtual void Load( Archive& archive );
+
+		PhysicsShape* Copy( PhysicsSystem* physics );
 	};
 }

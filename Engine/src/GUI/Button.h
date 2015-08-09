@@ -1,12 +1,17 @@
 #pragma once
 
-#include "GUI/Widget.h"
+#include "Common.h"
+#include "Event.h"
 
-namespace Sentinel { namespace GUI
+namespace Sentinel
+{
+	class Archive;
+
+namespace GUI
 {
 	class SENTINEL_DLL Button
 	{
-	protected:
+	public:
 
 		enum State
 		{
@@ -15,13 +20,15 @@ namespace Sentinel { namespace GUI
 			DOWN,
 		};
 
+	protected:
+
 		State			mState;
 
 	public:
 
-		WidgetFunc		mActionUp;
-		WidgetFunc		mActionDown;
-		WidgetFunc		mActionClick;
+		Event< void() >	mActionUp;
+		Event< void() >	mActionDown;
+		Event< void() >	mActionClick;
 
 	protected:
 

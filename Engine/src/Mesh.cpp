@@ -8,9 +8,9 @@
 #include "Buffer.h"
 #include "Texture.h"
 #include "Shader.h"
-#include "TransformComponent.h"
-#include "CameraComponent.h"
-#include "PointLightComponent.h"
+#include "Component/Transform.h"
+#include "Component/Camera.h"
+#include "Component/PointLight.h"
 #include "Archive.h"
 #include "ShaderManager.h"
 #include "TextureManager.h"
@@ -40,7 +40,7 @@ namespace Sentinel
 		SAFE_DELETE( mIndexBuffer );
 	}
 
-	void Mesh::Draw( Renderer* renderer, GameWorld* world, UINT count )
+	void Mesh::Draw( Renderer* renderer, GameWorld* world, Component::Camera* camera, UINT count )
 	{
 		if( count == 0 )
 			return;
@@ -69,10 +69,9 @@ namespace Sentinel
 				switch( uniform[ i ] )
 				{
 				case ShaderUniform::WVP:
-					_ASSERT( world );
-					_ASSERT( world->GetCamera() != NULL );
+					_ASSERT( camera );
 
-					shader->SetMatrix( uniformIndex, (world->GetCamera()->GetMatrixFinal() * mMatrixWorld).Ptr() );
+					shader->SetMatrix( uniformIndex, (camera->GetMatrixWVP() * mMatrixWorld).Ptr() );
 					break;
 
 				case ShaderUniform::WORLD:
@@ -84,31 +83,27 @@ namespace Sentinel
 					break;
 
 				case ShaderUniform::VIEW:
-					_ASSERT( world );
-					_ASSERT( world->GetCamera() );
+					_ASSERT( camera );
 
-					shader->SetFloat3( uniformIndex, const_cast< Matrix4f& >(world->GetCamera()->GetMatrixView()).Ptr() );
+					shader->SetFloat3( uniformIndex, const_cast< Matrix4f& >(camera->GetMatrixView()).Ptr() );
 					break;
 
 				case ShaderUniform::INV_VIEW:
-					_ASSERT( world );
-					_ASSERT( world->GetCamera() );
+					_ASSERT( camera );
 
-					shader->SetFloat3( uniformIndex, world->GetCamera()->GetMatrixView().Inverse().Ptr() );
+					shader->SetFloat3( uniformIndex, camera->GetMatrixView().Inverse().Ptr() );
 					break;
 
 				case ShaderUniform::PROJ:
-					_ASSERT( world );
-					_ASSERT( world->GetCamera() );
+					_ASSERT( camera );
 
-					shader->SetFloat3( uniformIndex, const_cast< Matrix4f& >(world->GetCamera()->GetMatrixProjection()).Ptr() );
+					shader->SetFloat3( uniformIndex, const_cast< Matrix4f& >(camera->GetMatrixProjection()).Ptr() );
 					break;
 
 				case ShaderUniform::INV_PROJ:
-					_ASSERT( world );
-					_ASSERT( world->GetCamera() );
+					_ASSERT( camera );
 
-					shader->SetFloat3( uniformIndex, world->GetCamera()->GetMatrixProjection().Inverse().Ptr() );
+					shader->SetFloat3( uniformIndex, camera->GetMatrixProjection().Inverse().Ptr() );
 					break;
 
 				case ShaderUniform::TEXTURE:
@@ -137,10 +132,9 @@ namespace Sentinel
 
 				case ShaderUniform::CAMERA_POS:
 					{
-					_ASSERT( world );
-					_ASSERT( world->GetCamera() );
+					_ASSERT( camera );
 
-					Vector3f pos = world->GetCamera()->GetTransform()->mPosition;
+					Vector3f pos = camera->GetTransform()->mPosition;
 						
 					shader->SetFloat3( uniformIndex, pos.Ptr() );
 					}
@@ -182,7 +176,7 @@ namespace Sentinel
 					_ASSERT( world );
 					_ASSERT( world->GetLight( lightCount ));
 
-					shader->SetTextureCube( uniformIndex, static_cast< PointLightComponent* >(world->GetLight( lightCount ))->GetTexture() );
+					shader->SetTextureCube( uniformIndex, static_cast< Component::PointLight* >(world->GetLight( lightCount ))->GetTexture() );
 					break;
 
 				case ShaderUniform::LIGHT_MATRIX:
@@ -196,7 +190,7 @@ namespace Sentinel
 					_ASSERT( world );
 					_ASSERT( world->GetLight( lightCount ));
 
-					shader->SetMatrix( uniformIndex, static_cast< PointLightComponent* >(world->GetLight( lightCount ))->PtrMatrixFinal(), 6 );
+					shader->SetMatrix( uniformIndex, static_cast< Component::PointLight* >(world->GetLight( lightCount ))->PtrMatrixFinal(), 6 );
 					break;
 
 				case ShaderUniform::DELTA_TIME:

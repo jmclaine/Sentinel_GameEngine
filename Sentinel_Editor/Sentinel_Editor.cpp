@@ -42,19 +42,17 @@ Edits levels for a game created with the Sentinel Engine.
 #include "GameWorld.h"
 #include "GameObject.h"
 
-#include "TransformComponent.h"
-#include "PhysicsComponent.h"
+#include "Component/Transform.h"
+#include "Component/Physics.h"
 //#include "DirectionalLightComponent.h"
-#include "PointLightComponent.h"
-#include "PerspectiveCameraComponent.h"
-#include "OrthographicCameraComponent.h"
-#include "PlayerControllerComponent.h"
-#include "PhysicsComponent.h"
-#include "ParticleEmitterComponent.h"
-#include "SpriteComponent.h"
-#include "WidgetComponent.h"
-#include "MeshComponent.h"
-#include "ModelComponent.h"
+#include "Component/PointLight.h"
+#include "Component/PerspectiveCamera.h"
+#include "Component/OrthographicCamera.h"
+#include "Component/PlayerController.h"
+#include "Component/ParticleEmitter.h"
+#include "Component/SpriteDrawable.h"
+#include "Component/MeshDrawable.h"
+#include "Component/ModelDrawable.h"
 
 #include "EditorControllerComponent.h"
 
@@ -63,21 +61,16 @@ Edits levels for a game created with the Sentinel Engine.
 #include "Shape.h"
 #include "Buffer.h"
 
-#include "GUI/Widget.h"
-#include "GUI/WidgetObject.h"
-#include "GUI/WidgetWorld.h"
-#include "GUI/ModelWidget.h"
-#include "GUI/SpriteViewWidget.h"
-#include "GUi/SpriteControllerWidget.h"
-#include "GUI/SpriteButtonWidget.h"
-#include "GUI/LabelWidget.h"
-#include "GUI/MeshViewWidget.h"
+#include "GUI/SpriteController.h"
+#include "GUI/SpriteButton.h"
+#include "GUI/Label.h"
 
 #include "RandomValue.h"
 
 #include "Debug.h"
 
 using namespace Sentinel;
+using namespace Sentinel::Component;
 
 // Main Application.
 //
@@ -87,7 +80,7 @@ class MainApp
 	
 	GameWindow*				mGameWindow;
 	Renderer*				mRenderer;
-
+	
 	GameWorld*				mGameWorld;
 	GameWorld*				mEditorWorld;
 
@@ -111,13 +104,15 @@ class MainApp
 	ColorRGBA				mSelectedColorZ;
 	ColorRGBA				mSelectedColorAxis;
 
-	FontSystem*				mFontSystem;
-	GUI::LabelWidget*		mDebugText;
-	GUI::WidgetObject*		mGameWorldWidget;
+	GameObject*				mGameWorldWidget;
+	GUI::Label*				mDebugText;
 
 	Debug*					mDebug;
 
 	Ray						mMouseToWorldRay;
+
+	OrthographicCamera*		mEditorCamera;
+	PerspectiveCamera*		mWorldCamera;
 
 public:
 
@@ -140,7 +135,6 @@ public:
 		mSelectedColorY( 0, 1, 0, 0.5f ),
 		mSelectedColorZ( 0, 0, 1, 0.5f ),
 		mSelectedColorAxis( 1, 1, 0, 0.5f ),
-		mFontSystem( NULL ),
 		mDebug( NULL ),
 		mMouseToWorldRay( Vector3f(), Vector3f() )
 	{
@@ -183,6 +177,9 @@ public:
 		PrepareEditorWorld();
 		PrepareGameWorld();
 		PrepareDebug();
+
+		GUI::SpriteController* controller = (GUI::SpriteController*)mGameWorldWidget->FindComponent( GameComponent::CONTROLLER );
+		controller->mActionOver += BIND( MainApp::SelectGameObject );
 
 		SetDirectory( ".." );
 	}
@@ -232,8 +229,6 @@ public:
 					SaveMAP( "Default.MAP" );
 				}
 
-				static float colorWorld[] = {0.0f, 0.2f, 0.8f, 1.0f};
-
 				mGameWindow->Update();
 
 				BEGIN_PROFILE( timing );
@@ -246,23 +241,17 @@ public:
 				mGameWorld->UpdateLight();
 				END_PROFILE( timing, "Light" );
 
-				mRenderer->SetViewport( 0, 0, Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE );
-				mRenderer->SetDepthStencil( mDSGameWorld );
-				mRenderer->SetRenderTexture( mRTGameWorld );
-				mRenderer->Clear( colorWorld );
-
 				BEGIN_PROFILE( timing );
 				mGameWorld->UpdateDrawable();
-				mGameWorld->Present();
+				mGameWorld->Present( mWorldCamera );
 
-				SelectGameObject();
+				DrawBounds();
 				DrawTranslateObject();
+
 				END_PROFILE( timing, "Drawable" );
 
 				////////////////////////////////////
 				
-				static float colorEditor[] = {0.2f, 0.2f, 0.2f, 1.0f};
-
 				const WindowInfo* info = mGameWindow->GetInfo();
 
 				BEGIN_PROFILE( timing );
@@ -271,20 +260,20 @@ public:
 				mEditorWorld->UpdateTransform();
 				mEditorWorld->UpdateComponents();
 
-				mRenderer->SetViewport( 0, 0, info->Width(), info->Height() );
-				mRenderer->SetDepthStencil( mDSMain );
-				mRenderer->SetRenderTexture( mRTMain );
-				mRenderer->Clear( colorEditor );
+				mEditorCamera->Set( info->Width(), info->Height() );
+				mEditorCamera->mViewportWidth  = info->Width();
+				mEditorCamera->mViewportHeight = info->Height();
 
+				mEditorWorld->UpdateCamera();
 				mEditorWorld->UpdateDrawable();
-				mEditorWorld->Present();
+				mEditorWorld->Present( mEditorCamera );
 				END_PROFILE( timing, "Editor" );
 
 				// ** DEBUG **
 				// Draw GameWorld over Backbuffer.
 				//
 				//mRTBackbufferMesh->mMatrixWorld.Identity();
-				//mRTBackbufferMesh->Draw( mRenderer, mGameWorld );
+				//mRTBackbufferMesh->Draw( mRenderer, mGameWorld, mWorldCamera );
 				
 				BEGIN_PROFILE( timing );
 				mRenderer->Present();
@@ -304,11 +293,6 @@ public:
 
 	void Shutdown()
 	{
-		if( mFontSystem )
-			SAFE_DELETE( mFontSystem->mSpriteSystem );
-
-		SAFE_DELETE( mFontSystem );
-
 		SAFE_DELETE( mRTMain );
 		SAFE_DELETE( mDSMain );
 
@@ -362,8 +346,8 @@ public:
 		std::shared_ptr< Sprite >		sprite;
 
 		GameObject*						obj;
-		TransformComponent*				transform;
-		PhysicsComponent*				physics;
+		Transform*						transform;
+		Physics*						physics;
 		RigidBody*						body;
 
 		/////////////////////////////////////////////////////////////////////////
@@ -373,6 +357,7 @@ public:
 		mEditorWorld->mTiming			= new Timing();
 		mEditorWorld->mPhysicsSystem	= BuildPhysicsSystemBT();
 		mEditorWorld->mAudioSystem		= BuildAudioSystemAL();
+		mEditorWorld->mFontSystem		= BuildFontSystemFT();
 
 		mEditorWorld->mPhysicsSystem->Startup();
 		
@@ -431,24 +416,31 @@ public:
 
 		shader = mEditorWorld->mShaderManager->Get( "GUI" );
 
-		mFontSystem = BuildFontSystemFT();
-		mFontSystem->mSpriteSystem = new SpriteSystem( mRenderer, shader->Layout(), 256 );
-		mFontSystem->Load( "Font\\courbd.ttf" );
-		mFontSystem->mFont = mFontSystem->Build( 16, 16 );
+		FontSystem* fontSystem = mEditorWorld->mFontSystem;
+		fontSystem->mSpriteSystem = SHARED( new SpriteSystem( mRenderer, shader->Layout(), 256 ));
+		fontSystem->Load( "Font\\courbd.ttf" );
+		fontSystem->mFont = fontSystem->Build( 12, 12 );
 
-		material = mFontSystem->mFont->mMaterial;
+		material = fontSystem->mFont->mMaterial;
 		material->mShader		= shader;
 		material->mBlendState	= mRenderer->BLEND_ALPHA;
 		material->mCullMode		= CullFormat::NONE;
 		material->mDepthMode	= DepthFormat::OFF;
+
+		fontSystem->mSpriteSystem->mMaterial = material;
+
 
 		mEditorWorld->mSpriteSystem = new SpriteSystem( mRenderer, shader->Layout(), 256 );
 
-		material = std::shared_ptr< Material >(new Material());
-		material->mShader		= shader;
-		material->mBlendState	= mRenderer->BLEND_ALPHA;
-		material->mCullMode		= CullFormat::NONE;
-		material->mDepthMode	= DepthFormat::OFF;
+		texture = mEditorWorld->mTextureManager->Add( "GUI.png", SHARED( mRenderer->CreateTextureFromFile( "Textures\\GUI.png" )));
+
+		material = mEditorWorld->mMaterialManager->Add( "GUI", SHARED( new Material() ));
+		material->mShader = mEditorWorld->mShaderManager->Get( "GUI" );
+		material->mBlendState = mRenderer->BLEND_ALPHA;
+		material->mTexture[ TextureIndex::DIFFUSE ] = texture;
+		material->mRenderQueue = RenderQueue::FOREGROUND;
+		material->mCullMode = CullFormat::NONE;
+		material->mDepthMode = DepthFormat::OFF;
 		
 		mEditorWorld->mSpriteSystem->mMaterial = material;
 
@@ -472,254 +464,259 @@ public:
 		mRTBackbufferMesh = MeshBuilder::BuildRenderTextureMesh( mRenderer, material->mShader->Layout() );
 		mRTBackbufferMesh->mMaterial = material;
 
-		// Add GUI texture.
-		//
-		texture = mEditorWorld->mTextureManager->Add( "GUI.png", SHARED( mRenderer->CreateTextureFromFile( "Textures\\GUI.png" )));
-		
 		////////////////////////////////////
 
 		// GUI Camera.
 		//
-		obj = mEditorWorld->AddGameObject( new GameObject(), "GUI Camera" );
+		GameObject* cameraGUI = mEditorWorld->AddGameObject( new GameObject() );
+		cameraGUI->mName = "GUI Camera";
 
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent() );
-		transform->mPosition = Vector3f( 0, 0, 0 );
-	
-		OrthographicCameraComponent* orthoCamera = (OrthographicCameraComponent*)obj->AttachComponent( new OrthographicCameraComponent( (float)Renderer::WINDOW_WIDTH_BASE, (float)Renderer::WINDOW_HEIGHT_BASE ));
+		transform = (Transform*)cameraGUI->AttachComponent( new Transform() );
 		
-		//AddObject( obj );
-		
+		mEditorCamera = (OrthographicCamera*)cameraGUI->AttachComponent( new OrthographicCamera( Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE ));
+		mEditorCamera->mDepthStencil = mDSMain;
+		mEditorCamera->mRenderTexture = mRTMain;
+		mEditorCamera->mClearColor = ColorRGBA( 0.2f, 0.2f, 0.2f, 1.0f );
+
 		// Create game object for widget.
 		//
-		texture = mEditorWorld->mTextureManager->Get( "GUI.png" );
-
-		material = mEditorWorld->mMaterialManager->Add( "GUI", SHARED( new Material() ));
-		material->mShader = mEditorWorld->mShaderManager->Get( "GUI" );
-		material->mBlendState = mRenderer->BLEND_ALPHA;
-		material->mTexture[ TextureIndex::DIFFUSE ] = texture;
-		material->mRenderQueue = RenderQueue::FOREGROUND;
-		material->mCullMode		= CullFormat::NONE;
-		material->mDepthMode	= DepthFormat::OFF;
-		
 		sprite = mEditorWorld->mSpriteManager->Add( "GUI", SHARED( new Sprite() ));
 		sprite->AddFrame( Sprite::QUADtoTEXCOORD( Quad( 0, 0, 1, 1 ), texture->Width(), texture->Height() ));
 		sprite->AddFrame( Sprite::QUADtoTEXCOORD( Quad( 1, 0, 2, 1 ), texture->Width(), texture->Height() ));
 		sprite->AddFrame( Sprite::QUADtoTEXCOORD( Quad( 2, 0, 3, 1 ), texture->Width(), texture->Height() ));
 
-		obj = mEditorWorld->AddGameObject( new GameObject(), "GUI Widget" );
-
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent() );
-
-		WidgetComponent* widgetComp = (WidgetComponent*)obj->AttachComponent( new WidgetComponent( sprite, material, mFontSystem, 0 ));
-		
-		GUI::WidgetObject*				widget;
-		GUI::ModelWidget*				model;
-		GUI::SpriteViewWidget*			view;
-		GUI::MeshViewWidget*			drawableMesh;
-		GUI::LabelWidget*				label;
-		GUI::SpriteControllerWidget*	controller;
-		GUI::SpriteButtonWidget*		button;
+		GameObject*					widget;
+		GUI::Label*					label;
+		GUI::SpriteController*		controller;
+		GUI::SpriteButton*			button;
+		SpriteDrawable*				view;
 
 		// Menu Bar.
 		//
-		widget = (GUI::WidgetObject*)widgetComp->mWidgetWorld->AddWidgetObject( new GUI::WidgetObject() );
+		widget = mEditorWorld->AddGameObject( new GameObject() );
+		widget->mName = "Menu Bar";
 
-		model = new GUI::ModelWidget();
-		model->mPosition	= Vector3f( 0, 0, 1 );
-		model->mScale		= Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 0, 1 );
+		transform = (Transform*)widget->AttachComponent( new Transform() );
+		transform->mPosition = Vector3f( 0, 0, 1 );
+		transform->mScale = Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 0, 1 );
 		
-		view = new GUI::SpriteViewWidget();
-		view->mFrame		= 0;
-		view->mColor		= ColorRGBA( 0.7f, 0.7f, 0.7f, 1 );
+		view = (SpriteDrawable*)widget->AttachComponent( new SpriteDrawable( sprite ));
+		view->mFrame = 0;
+		view->mColor = ColorRGBA( 0.7f, 0.7f, 0.7f, 1 );
 
-		controller = new GUI::SpriteControllerWidget();
+		controller = (GUI::SpriteController*)widget->AttachComponent( new GUI::SpriteController() );
 		controller->mMargin.bottom = 30;
 		controller->mScaleToWindowX = true;
 		
-		widget->SetModel( model );
-		widget->SetView( view );
-		widget->SetController( controller );
+		// Menu Transform.
+		//
+		GameObject* menu = mEditorWorld->AddGameObject( new GameObject() );
+		menu->mName = "Menu Transform";
+
+		transform = (Transform*)menu->AttachComponent( new Transform() );
+		transform->mPosition = Vector3f( 0, 0, 0.9f );
+		transform->mScale = Vector3f( 1, 1, 1 );
 
 		// Menu Labels.
 		//
-		widget = (GUI::WidgetObject*)widgetComp->mWidgetWorld->AddWidgetObject( new GUI::WidgetObject() );
+		widget = mEditorWorld->AddGameObject( new GameObject() );
+		widget->mName = "Menu Labels";
 
-		model = new GUI::ModelWidget();
-		model->mPosition = Vector3f( 10, 20, 0.9f );
-		model->mScale    = Vector3f( 16, 16, 1 );
+		transform = (Transform*)widget->AttachComponent( new Transform() );
+		transform->mPosition = Vector3f( 10, 20, 0 );
+		transform->mScale = Vector3f( 12, 12, 1 );
 
-		//label = (GUI::Label*)widgetComp->mRoot.AddChild( new GUI::Label( "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ{}[]!@#$%^&*()1234567890" ));
-		label = new GUI::LabelWidget( "File" );
+		//label = (GUI::Label*)widget->AttachComponent( new GUI::Label( "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ{}[]!@#$%^&*()1234567890" ));
+		label = (GUI::Label*)widget->AttachComponent( new GUI::Label( "File" ));
 		label->mColor = ColorRGBA( 0, 0, 0, 1 );
 
-		controller = new GUI::SpriteControllerWidget();
+		controller = (GUI::SpriteController*)widget->AttachComponent( new GUI::SpriteController() );
+
+		menu->AddChild( widget );
 		
-		widget->SetModel( model );
-		widget->SetView( label );
-		widget->SetController( controller );
+		//////////////////////////////////////
+
+		widget = mEditorWorld->AddGameObject( new GameObject() );
+		widget->mName = "Edit";
+
+		transform = (Transform*)widget->AttachComponent( new Transform() );
+		transform->mPosition = Vector3f( 110, 20, 0 );
+		transform->mScale = Vector3f( 12, 12, 1 );
+
+		label = (GUI::Label*)widget->AttachComponent( new GUI::Label( "Edit" ));
+		label->mColor = ColorRGBA( 0, 0, 0, 1 );
+
+		controller = (GUI::SpriteController*)widget->AttachComponent( new GUI::SpriteController() );
+
+		menu->AddChild( widget );
+		
+		//////////////////////////////////////
+
+		widget = mEditorWorld->AddGameObject( new GameObject() );
+		widget->mName = "Help";
+
+		transform = (Transform*)widget->AttachComponent( new Transform() );
+		transform->mPosition = Vector3f( 210, 20, 0 );
+		transform->mScale = Vector3f( 12, 12, 1 );
+
+		label = (GUI::Label*)widget->AttachComponent( new GUI::Label( "Help" ));
+		label->mColor = ColorRGBA( 0, 0, 0, 1 );
+
+		controller = (GUI::SpriteController*)widget->AttachComponent( new GUI::SpriteController() );
+
+		menu->AddChild( widget );
 
 		//////////////////////////////////////
 
-		widget = (GUI::WidgetObject*)widgetComp->mWidgetWorld->AddWidgetObject( new GUI::WidgetObject() );
+		widget = mEditorWorld->AddGameObject( new GameObject() );
+		widget->mName = "Debug";
 
-		model = new GUI::ModelWidget();
-		model->mPosition = Vector3f( 110, 20, 0.9f );
-		model->mScale    = Vector3f( 16, 16, 1 );
+		transform = (Transform*)widget->AttachComponent( new Transform() );
+		transform->mPosition = Vector3f( 0, 40, 0.9f );
+		transform->mScale = Vector3f( 10, 10, 1 );
 
-		label = new GUI::LabelWidget( "Edit" );
-		label->mColor = ColorRGBA( 0, 0, 0, 1 );
-
-		controller = new GUI::SpriteControllerWidget();
-		
-		widget->SetModel( model );
-		widget->SetView( label );
-		widget->SetController( controller );
-
-		//////////////////////////////////////
-
-		widget = (GUI::WidgetObject*)widgetComp->mWidgetWorld->AddWidgetObject( new GUI::WidgetObject() );
-
-		model = new GUI::ModelWidget();
-		model->mPosition = Vector3f( 210, 20, 0.9f );
-		model->mScale = Vector3f( 16, 16, 1 );
-
-		label = new GUI::LabelWidget( "Help" );
-		label->mColor = ColorRGBA( 0, 0, 0, 1 );
-
-		controller = new GUI::SpriteControllerWidget();
-		
-		widget->SetModel( model );
-		widget->SetView( label );
-		widget->SetController( controller );
-
-		//////////////////////////////////////
-
-		widget = (GUI::WidgetObject*)widgetComp->mWidgetWorld->AddWidgetObject( new GUI::WidgetObject() );
-
-		model = new GUI::ModelWidget();
-		model->mPosition = Vector3f( 0, 40, 0.9f );
-		model->mScale = Vector3f( 16, 16, 1 );
-
-		mDebugText = new GUI::LabelWidget();
+		mDebugText = new GUI::Label();
 		mDebugText->mColor = ColorRGBA( 0, 0, 0, 1 );
+		widget->AttachComponent( mDebugText );
 
-		controller = new GUI::SpriteControllerWidget();
-
-		widget->SetModel( model );
-		widget->SetView( mDebugText );
-		widget->SetController( controller );
+		controller = (GUI::SpriteController*)widget->AttachComponent( new GUI::SpriteController() );
 
 		// Toolbar.
 		//
-		widget = (GUI::WidgetObject*)widgetComp->mWidgetWorld->AddWidgetObject( new GUI::WidgetObject() );
+		widget = mEditorWorld->AddGameObject( new GameObject() );
+		widget->mName = "Toolbar";
 
-		model = new GUI::ModelWidget();
-		model->mPosition	= Vector3f( 0, 0, 1 );
-		model->mScale		= Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 0, 1 );
+		transform = (Transform*)widget->AttachComponent( new Transform() );
+		transform->mPosition = Vector3f( 0, 0, 1 );
+		transform->mScale = Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 0, 1 );
 		
-		view = new GUI::SpriteViewWidget();
-		view->mFrame		= 0;
-		view->mColor		= ColorRGBA( 0.9f, 0.9f, 0.9f, 1 );
+		view = (SpriteDrawable*)widget->AttachComponent( new SpriteDrawable( sprite ));
+		view->mFrame = 0;
+		view->mColor = ColorRGBA( 0.9f, 0.9f, 0.9f, 1 );
 
-		controller = new GUI::SpriteControllerWidget();
+		controller = (GUI::SpriteController*)widget->AttachComponent( new GUI::SpriteController() );
 		controller->mMargin = Quad( 0, 30, 0, 30 );
 		controller->mScaleToWindowX = true;
 
-		widget->SetModel( model );
-		widget->SetView( view );
-		widget->SetController( controller );
-
 		// Status Bar.
 		//
-		widget = (GUI::WidgetObject*)widgetComp->mWidgetWorld->AddWidgetObject( new GUI::WidgetObject() );
+		widget = mEditorWorld->AddGameObject( new GameObject() );
+		widget->mName = "Status Bar";
 
-		model = new GUI::ModelWidget();
-		model->mPosition	= Vector3f( 0, (float)Renderer::WINDOW_HEIGHT_BASE, 0.1f );
-		model->mScale		= Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 0, 1 );
+		transform = (Transform*)widget->AttachComponent( new Transform() );
+		transform->mPosition = Vector3f( 0, (float)Renderer::WINDOW_HEIGHT_BASE, 0.1f );
+		transform->mScale = Vector3f( (float)Renderer::WINDOW_WIDTH_BASE, 0, 1 );
 		
-		view = new GUI::SpriteViewWidget();
-		view->mFrame		= 0;
-		view->mColor		= ColorRGBA( 0.7f, 0.7f, 0.7f, 1 );
+		view = (SpriteDrawable*)widget->AttachComponent( new SpriteDrawable( sprite ));
+		view->mFrame = 0;
+		view->mColor = ColorRGBA( 0.7f, 0.7f, 0.7f, 1 );
 
-		controller = new GUI::SpriteControllerWidget();
+		controller = (GUI::SpriteController*)widget->AttachComponent( new GUI::SpriteController() );
 		controller->mMargin				= Quad( 0, -30, 0, 30 );
 		controller->mScaleToWindowX		= true;
 		controller->mPositionToWindowY	= true;
 
-		widget->SetModel( model );
-		widget->SetView( view );
-		widget->SetController( controller );
+		// Button with label.
+		//
+		GameObject* testButton = mEditorWorld->AddGameObject( new GameObject() );
+		testButton->mName = "Test Button";
+
+		transform = (Transform*)testButton->AttachComponent( new Transform() );
+		transform->mPosition    = Vector3f( 200, 30, 0.7f );
+		transform->mOrientation = Quatf( 0, 0, 45 );
+		transform->mScale       = Vector3f( 1, 1, 1 );
+
 
 		// Button.
 		//
-		widget = (GUI::WidgetObject*)widgetComp->mWidgetWorld->AddWidgetObject( new GUI::WidgetObject() );
+		widget = testButton->AddChild( new GameObject() );
+		widget->mName = "Button";
 
-		model = new GUI::ModelWidget();
-		model->mPosition    = Vector3f( 200, 0, 0.7f );
-		model->mOrientation = Quatf( 0, 0, 45 );
-		model->mScale       = Vector3f( 128, 64, 1 );
+		transform = (Transform*)widget->AttachComponent( new Transform() );
+		transform->mPosition    = Vector3f( 0, 0, 0 );
+		transform->mOrientation = Quatf( 0, 0, 0 );
+		transform->mScale       = Vector3f( 128, 64, 1 );
 		
-		view = new GUI::SpriteViewWidget();
+		view = (SpriteDrawable*)widget->AttachComponent( new SpriteDrawable( sprite ));
 		
-		button = new GUI::SpriteButtonWidget();
-		button->mMargin     = Quad( 0, 30, 0, 0 );
-		button->mPositionToWindowX = true;
-		button->mPositionToWindowY = true;
-		button->mScaleToWindowX = true;
-		button->mScaleToWindowY = true;
+		button = (GUI::SpriteButton*)widget->AttachComponent( new GUI::SpriteButton() );
+		button->mPositionToWindowX	= true;
+		button->mPositionToWindowY	= true;
+		button->mScaleToWindowX		= true;
+		button->mScaleToWindowY		= true;
 
-		widget->SetModel( model );
-		widget->SetView( view );
-		widget->SetController( button );
-
-		// World Drawable.
+		// Label.
 		//
-		mGameWorldWidget = (GUI::WidgetObject*)widgetComp->mWidgetWorld->AddWidgetObject( new GUI::WidgetObject() );
-
-		model = new GUI::ModelWidget();
-		model->mPosition = Vector3f( 0, 0, 0.8f );
-		model->mScale    = Vector3f( (float)Renderer::WINDOW_WIDTH_BASE-500, (float)Renderer::WINDOW_HEIGHT_BASE, 1 );
+		widget = testButton->AddChild( new GameObject() );
+		widget->mName = "Label";
 		
-		material = mEditorWorld->mMaterialManager->Add( "World", SHARED( new Material() ));
-		material->mShader = mEditorWorld->mShaderManager->Get( "GUI_Mesh" );
-		material->mBlendState = mRenderer->BLEND_OFF;
-		material->mTexture[ TextureIndex::DIFFUSE ] = mEditorWorld->mTextureManager->Get( "Backbuffer" );
-		material->mRenderQueue = RenderQueue::FOREGROUND;
-
-		drawableMesh = new GUI::MeshViewWidget();
-		drawableMesh->mMesh = mEditorWorld->mMeshManager->Add( "World", SHARED( MeshBuilder::BuildGUIMesh( mRenderer, material->mShader->Layout() )));
-		drawableMesh->mMesh->mMaterial = material;
+		transform = (Transform*)widget->AttachComponent( new Transform() );
+		transform->mPosition    = Vector3f( 48, 32, 0 );
+		transform->mOrientation = Quatf( 0, 0, 0 );
+		transform->mScale       = Vector3f( 16, 16, 1 );
 		
-		controller = new GUI::SpriteControllerWidget();
-		controller->mScaleToWindowX = true;
-		controller->mScaleToWindowY = true;
-		controller->mMargin = Quad( 0, 60, 0, -90 );
-
-		mGameWorldWidget->SetModel( model );
-		mGameWorldWidget->SetView( drawableMesh );
-		mGameWorldWidget->SetController( controller );
+		label = (GUI::Label*)widget->AttachComponent( new GUI::Label( "Ok" ));
+		label->mColor = ColorRGBA( 0, 0, 0, 1 );
+		
+		controller = (GUI::SpriteController*)widget->AttachComponent( new GUI::SpriteController() );
+		//controller->mPositionToWindowX	= true;
+		//controller->mPositionToWindowY	= true;
+		//controller->mScaleToWindowX		= true;
+		//controller->mScaleToWindowY		= true;
 
 		///////////////////////////////
 
 		// World View Camera.
 		//
-		obj = mEditorWorld->AddGameObject( new GameObject(), "Main Camera" );
+		obj = mEditorWorld->AddGameObject( new GameObject() );
+		obj->mName = "Main Camera";
 
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent() );
+		transform = (Transform*)obj->AttachComponent( new Transform() );
 		transform->mPosition    = Vector3f( 0, 15, 40 );
 		transform->mOrientation = Quatf( -15, 0, 0 );
-
-		EditorControllerComponent* editorController = (EditorControllerComponent*)obj->AttachComponent( new EditorControllerComponent() );
-		editorController->mWorldWidget = model;
 			
-		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent() );
+		physics = (Physics*)obj->AttachComponent( new Physics() );
 		physics->SetRigidBody( mEditorWorld->mPhysicsSystem->CreateRigidBody( mEditorWorld->mPhysicsSystem->CreateSphere( 1.0f ), transform->mPosition, transform->mOrientation, 1.0f ));
 		body = physics->GetRigidBody();
 		body->SetFlags( DISABLE_GRAVITY );
 		body->SetRestitution( 1.0f );
 		body->SetDamping( 0.9f, 0.9f );
 
-		obj->AttachComponent( new PerspectiveCameraComponent( (float)Renderer::WINDOW_WIDTH_BASE, (float)Renderer::WINDOW_HEIGHT_BASE ));
+		mWorldCamera = (PerspectiveCamera*)obj->AttachComponent( new PerspectiveCamera( Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE ));
+		mWorldCamera->mClearColor = ColorRGBA( 0.0f, 0.2f, 0.8f, 1.0f );
+		mWorldCamera->mViewportWidth = Renderer::WINDOW_WIDTH_BASE;
+		mWorldCamera->mViewportHeight = Renderer::WINDOW_HEIGHT_BASE;
+		mWorldCamera->mDepthStencil = mDSGameWorld;
+		mWorldCamera->mRenderTexture = mRTGameWorld;
+		
+		EditorControllerComponent* editorController = (EditorControllerComponent*)obj->AttachComponent( new EditorControllerComponent() );
+		editorController->mEditorCamera = mEditorCamera;
+		editorController->mWorldCamera = mWorldCamera;
+
+		// World Drawable.
+		//
+		mGameWorldWidget = mEditorWorld->AddGameObject( new GameObject() );
+		mGameWorldWidget->mName = "World Drawable";
+
+		transform = (Transform*)mGameWorldWidget->AttachComponent( new Transform() );
+		transform->mPosition = Vector3f( 0.0f, 0.0f, 1.0f );
+		transform->mScale    = Vector3f( (float)(Renderer::WINDOW_WIDTH_BASE-500), (float)Renderer::WINDOW_HEIGHT_BASE, 1.0f);
+
+		material = mEditorWorld->mMaterialManager->Add( "World", SHARED( new Material() ));
+		material->mShader = mEditorWorld->mShaderManager->Get( "GUI_Mesh" );
+		material->mBlendState = mRenderer->BLEND_OFF;
+		material->mCullMode = CullFormat::NONE;
+		material->mTexture[ TextureIndex::DIFFUSE ] = mEditorWorld->mTextureManager->Get( "Backbuffer" );
+		material->mRenderQueue = RenderQueue::GEOMETRY;
+		
+		mesh = mEditorWorld->mMeshManager->Add( "World", SHARED( MeshBuilder::BuildGUIMesh( mRenderer, material->mShader->Layout() )));
+		mesh->mMaterial = material;
+		mGameWorldWidget->AttachComponent( new MeshDrawable( mesh ));
+		
+		controller = (GUI::SpriteController*)mGameWorldWidget->AttachComponent( new GUI::SpriteController() );
+		controller->mScaleToWindowX = true;
+		controller->mScaleToWindowY = true;
+		controller->mMargin = Quad( 0, 60, 0, -90 );
 
 		///////////////////////////////
 
@@ -730,14 +727,14 @@ public:
 	{
 		MeshBuilder						meshBuilder;
 		std::shared_ptr< Mesh >			mesh;
-
 		std::shared_ptr< Material >		material;
 
 		GameObject*						obj;
-		TransformComponent*				transform;
-		PhysicsComponent*				physics;
+		Transform*						transform;
+		Physics*						physics;
 		RigidBody*						body;
-		MeshComponent*					meshComp;
+		MeshDrawable*					meshComp;
+		Camera*							camera;
 
 		/////////////////////////////////////////////////////////////////////////
 
@@ -784,15 +781,16 @@ public:
 
 		// Main Camera.
 		//
-		obj = mGameWorld->AddGameObject( new GameObject(), "Main Camera" );
+		obj = mGameWorld->AddGameObject( new GameObject() );
+		obj->mName = "Main Camera";
 
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent() );
+		transform = (Transform*)obj->AttachComponent( new Transform() );
 		transform->mPosition    = Vector3f( 0, 15, 40 );
 		transform->mOrientation = Quatf( -15, 0, 0 );
 
-		obj->AttachComponent( new PlayerControllerComponent() );
+		obj->AttachComponent( new PlayerController() );
 			
-		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent() );
+		physics = (Physics*)obj->AttachComponent( new Physics() );
 		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateSphere( 1.0f ), transform->mPosition, transform->mOrientation, 1.0f ));
 		body = physics->GetRigidBody();
 		body->SetFlags( DISABLE_GRAVITY );
@@ -800,7 +798,9 @@ public:
 		body->SetDamping( 0.9f, 0.9f );
 		body->SetAngularFactor( Vector3f( 0, 0, 0 ));
 			
-		obj->AttachComponent( new PerspectiveCameraComponent( (float)Renderer::WINDOW_WIDTH_BASE, (float)Renderer::WINDOW_HEIGHT_BASE ));
+		camera = (Camera*)obj->AttachComponent( new PerspectiveCamera( Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE ));
+		camera->mViewportWidth = Renderer::WINDOW_WIDTH_BASE;
+		camera->mViewportHeight = Renderer::WINDOW_HEIGHT_BASE;
 		
 		// Create color only box.
 		//
@@ -818,144 +818,153 @@ public:
 		
 		// Ground object - Bottom.
 		//
-		obj = mGameWorld->AddGameObject( new GameObject(), "Ground_Bottom" );
+		obj = mGameWorld->AddGameObject( new GameObject() );
+		obj->mName = "Ground_Bottom";
 
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent() );
+		transform = (Transform*)obj->AttachComponent( new Transform() );
 		transform->mPosition = Vector3f( 0, 0, 0 );
 		transform->mScale    = Vector3f( 100, 1, 100 );
 		
-		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent() );
+		physics = (Physics*)obj->AttachComponent( new Physics() );
 		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
 		body = physics->GetRigidBody();
 		body->SetFlags( DISABLE_GRAVITY );
 			
-		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ));
+		meshComp = (MeshDrawable*)obj->AttachComponent( new MeshDrawable( mesh ));
 		meshComp->mIsDynamic = true;
 		
 		// Ground object - Back.
 		//
-		obj = mGameWorld->AddGameObject( new GameObject(), "Ground_Back" );
+		obj = mGameWorld->AddGameObject( new GameObject() );
+		obj->mName = "Ground_Back";
 
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent() );
+		transform = (Transform*)obj->AttachComponent( new Transform() );
 		transform->mPosition = Vector3f( 0, 20, -20 );
 		transform->mScale    = Vector3f( 20, 20, 1 );
 		
-		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent() );
+		physics = (Physics*)obj->AttachComponent( new Physics() );
 		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
 		body = physics->GetRigidBody();
 		body->SetFlags( DISABLE_GRAVITY );
 			
-		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ));
+		meshComp = (MeshDrawable*)obj->AttachComponent( new MeshDrawable( mesh ));
 		meshComp->mIsDynamic = true;
 
 		// Ground object - Right.
 		//
-		obj = mGameWorld->AddGameObject( new GameObject(), "Ground_Right" );
+		obj = mGameWorld->AddGameObject( new GameObject() );
+		obj->mName = "Ground_Right";
 
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent() );
+		transform = (Transform*)obj->AttachComponent( new Transform() );
 		transform->mPosition = Vector3f( 20, 20, 0 );
 		transform->mScale    = Vector3f( 1, 20, 20 );
 		
-		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent() );
+		physics = (Physics*)obj->AttachComponent( new Physics() );
 		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
 		body = physics->GetRigidBody();
 		body->SetFlags( DISABLE_GRAVITY );
 			
-		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ));
+		meshComp = (MeshDrawable*)obj->AttachComponent( new MeshDrawable( mesh ));
 		meshComp->mIsDynamic = true;
 
 		// Ground object - Left.
 		//
-		obj = mGameWorld->AddGameObject( new GameObject(), "Ground_Left" );
+		obj = mGameWorld->AddGameObject( new GameObject() );
+		obj->mName = "Ground_Left";
 
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent() );
+		transform = (Transform*)obj->AttachComponent( new Transform() );
 		transform->mPosition = Vector3f( -22, 10, 0 );
 		transform->mScale    = Vector3f( 20, 1, 20 );
 		transform->mOrientation = Quatf( 0, 0, 0 );
 
-		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent() );
+		physics = (Physics*)obj->AttachComponent( new Physics() );
 		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
 		body = physics->GetRigidBody();
 		body->SetFlags( DISABLE_GRAVITY );
 
-		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ));
+		meshComp = (MeshDrawable*)obj->AttachComponent( new MeshDrawable( mesh ));
 		meshComp->mIsDynamic = true;
 
 		// Ground object - Top.
 		//
-		obj = mGameWorld->AddGameObject( new GameObject(), "Ground_Top" );
+		obj = mGameWorld->AddGameObject( new GameObject() );
+		obj->mName = "Ground_Top";
 
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent() );
+		transform = (Transform*)obj->AttachComponent( new Transform() );
 		transform->mPosition = Vector3f( 0, 20, 0 );
 		transform->mScale    = Vector3f( 20, 1, 20 );
 		
-		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent() );
+		physics = (Physics*)obj->AttachComponent( new Physics() );
 		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 0.0f ));
 		body = physics->GetRigidBody();
 		body->SetFlags( DISABLE_GRAVITY );
 			
-		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ));
+		meshComp = (MeshDrawable*)obj->AttachComponent( new MeshDrawable( mesh ));
 		meshComp->mIsDynamic = true;
 
 		// Box object - Right.
 		//
-		obj = mGameWorld->AddGameObject( new GameObject(), "Box_Right" );
+		obj = mGameWorld->AddGameObject( new GameObject() );
+		obj->mName = "Box_Right";
 
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent() );
+		transform = (Transform*)obj->AttachComponent( new Transform() );
 		transform->mPosition = Vector3f( 10, 2, 5 );
 		transform->mScale    = Vector3f( 1, 1, 1 );
 		
-		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent() );
+		physics = (Physics*)obj->AttachComponent( new Physics() );
 		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 1.0f ));
 		body = physics->GetRigidBody();
 			
-		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ) );
+		meshComp = (MeshDrawable*)obj->AttachComponent( new MeshDrawable( mesh ) );
 		meshComp->mIsDynamic = true;
 
 		// Box object - Left.
 		//
-		obj = mGameWorld->AddGameObject( new GameObject(), "Box_Left" );
+		obj = mGameWorld->AddGameObject( new GameObject() );
+		obj->mName = "Box_Left";
 
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent() );
+		transform = (Transform*)obj->AttachComponent( new Transform() );
 		transform->mPosition = Vector3f( 10, 5, 5 );
 		transform->mScale    = Vector3f( 1, 2, 1 );
 		
-		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent() );
+		physics = (Physics*)obj->AttachComponent( new Physics() );
 		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 1.0f ));
 		body = physics->GetRigidBody();
 			
-		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ));
+		meshComp = (MeshDrawable*)obj->AttachComponent( new MeshDrawable( mesh ));
 		meshComp->mIsDynamic = true;
 
 		// Box object - Top.
 		//
-		obj = mGameWorld->AddGameObject( new GameObject(), "Box_Top" );
+		obj = mGameWorld->AddGameObject( new GameObject() );
+		obj->mName = "Box_Top";
 
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent() );
+		transform = (Transform*)obj->AttachComponent( new Transform() );
 		transform->mPosition = Vector3f( 0, 8, 5 );
 		transform->mScale    = Vector3f( 1, 1, 1 );
 		
-		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent() );
+		physics = (Physics*)obj->AttachComponent( new Physics() );
 		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 1.0f ));
 		body = physics->GetRigidBody();
 			
-		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ));
+		meshComp = (MeshDrawable*)obj->AttachComponent( new MeshDrawable( mesh ));
 		meshComp->mIsDynamic = true;
 
 		// Box object - Back.
 		//
-		obj = mGameWorld->AddGameObject( new GameObject(), "Box_Back" );
+		obj = mGameWorld->AddGameObject( new GameObject() );
+		obj->mName = "Box_Back";
 
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent() );
+		transform = (Transform*)obj->AttachComponent( new Transform() );
 		transform->mPosition = Vector3f( 0, 3, -10 );
 		transform->mScale    = Vector3f( 1, 1, 1 );
 		transform->mOrientation = Quatf( 45, 45, 45 );
 
-		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent() );
+		physics = (Physics*)obj->AttachComponent( new Physics() );
 		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateBox( transform->mScale ), transform->mPosition, transform->mOrientation, 1.0f ));
 		body = physics->GetRigidBody();
 			
-		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ));
+		meshComp = (MeshDrawable*)obj->AttachComponent( new MeshDrawable( mesh ));
 		meshComp->mIsDynamic = true;
 		
 		// Dodecahedron.
@@ -976,16 +985,16 @@ public:
 		obj = new GameObject();
 		obj->mName = "Dodecahedron";
 
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent() );
+		transform = (Transform*)obj->AttachComponent( new Transform() );
 		transform->mPosition	= Vector3f( 10, 2, -10 );
 		transform->mScale		= Vector3f( 1, 1, 1 );
 		transform->mOrientation	= Quatf( 0, 0, 0 );
 
-		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ));
+		meshComp = (MeshDrawable*)obj->AttachComponent( new MeshDrawable( mesh ));
 		meshComp->mIsDynamic = true;
 
 		Buffer* meshVBO = mesh->mVertexBuffer;
-		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent() );
+		physics = (Physics*)obj->AttachComponent( new Physics() );
 		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateMesh( (Vector3f*)meshVBO->Lock(), meshVBO->Count(), meshVBO->Stride(), transform->mScale ), transform->mPosition, transform->mOrientation, 1.0f ));
 		meshVBO->Unlock();
 		
@@ -1006,16 +1015,17 @@ public:
 		mesh = mGameWorld->mMeshManager->Add( "Sphere", SHARED( meshBuilder.BuildMesh( mRenderer )));
 		mesh->mMaterial = material;
 		
-		obj = mGameWorld->AddGameObject( new GameObject(), "Sphere" );
+		obj = mGameWorld->AddGameObject( new GameObject() );
+		obj->mName = "Sphere";
 
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent() );
+		transform = (Transform*)obj->AttachComponent( new Transform() );
 		transform->mPosition	= Vector3f( 20, 2, 30 );
 		transform->mScale		= Vector3f( 1, 1, 1 );
 		
-		meshComp = (MeshComponent*)obj->AttachComponent( new MeshComponent( mesh ));
+		meshComp = (MeshDrawable*)obj->AttachComponent( new MeshDrawable( mesh ));
 		meshComp->mIsDynamic = true;
 
-		physics = (PhysicsComponent*)obj->AttachComponent( new PhysicsComponent() );
+		physics = (Physics*)obj->AttachComponent( new Physics() );
 		physics->SetRigidBody( mGameWorld->mPhysicsSystem->CreateRigidBody( mGameWorld->mPhysicsSystem->CreateSphere( transform->mScale.x ), transform->mPosition, transform->mOrientation, 1.0f ));
 		body = physics->GetRigidBody();
 
@@ -1053,13 +1063,14 @@ public:
 		particleSystem->mEffect.push_back( new FadeToColorEffect( 1.0f, 5.0f, ColorRGBA( 0.9f, 0.9f, 0.9f, 0.025f )));
 		particleSystem->mEffect.push_back( new RandomVelocityEffect( 1.0f, Vector3f( -0.5f, 1.4f, -0.5f ), Vector3f( 0.5f, 3.0f, 0.5f )));
 		
-		obj = mGameWorld->AddGameObject( new GameObject(), "Particle Emitter" );
+		obj = mGameWorld->AddGameObject( new GameObject() );
+		obj->mName = "Particle Emitter";
 
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent() );
+		transform = (Transform*)obj->AttachComponent( new Transform() );
 		transform->mPosition = Vector3f( 8, 1, 0 );
 		transform->mScale    = Vector3f( 1, 1, 1 );
 
-		obj->AttachComponent( new ParticleEmitterComponent( particleSystem ));
+		obj->AttachComponent( new ParticleEmitter( particleSystem ));
 		
 		// Point Light attached to particle emitter.
 		//
@@ -1068,18 +1079,18 @@ public:
 		obj = new GameObject();
 		obj->mName = "Point Light";
 
-		transform = (TransformComponent*)obj->AttachComponent( new TransformComponent() );
+		transform = (Transform*)obj->AttachComponent( new Transform() );
 		transform->mPosition   = Vector3f( 0, 4, 0 );
 
-		PointLightComponent* light = (PointLightComponent*)obj->AttachComponent( new PointLightComponent( 512 ));
+		PointLight* light = (PointLight*)obj->AttachComponent( new PointLight( 512 ));
 		light->mColor          = ColorRGBA( 0.8f, 0.6f, 0.0f, 1.0f );
 		light->mAttenuation    = Vector4f( 1.0f, 0.0f, 0.0f, 40.0f );
 
 		material = mGameWorld->mMaterialManager->Add( "Point Light", SHARED( new Material() ));
 		material->mShader      = mGameWorld->mShaderManager->Get( "RT_Cube_Depth" );
 		material->mBlendState  = SHARED( mRenderer->CreateBlendState( BlendFormat::DST_COLOR, BlendFormat::SRC_COLOR, 
-																	 BlendFormat::ZERO, BlendFormat::ZERO, 
-																	 BlendFunction::MIN, BlendFunction::ADD ));
+																	  BlendFormat::ZERO, BlendFormat::ZERO, 
+																	  BlendFunction::MIN, BlendFunction::ADD ));
 		material->mCullMode    = CullFormat::CCW;
 		material->mDepthMode   = DepthFormat::ALWAYS;
 		material->mRenderQueue = RenderQueue::BACKGROUND;
@@ -1114,9 +1125,7 @@ public:
 		material->mCullMode    = CullFormat::NONE;
 		material->mRenderQueue = RenderQueue::FOREGROUND;
 
-		mGameWorld->SetCamera( mEditorWorld->GetCamera( 1 ));
-
-		mDebug = new Debug( mRenderer, mGameWorld, material );
+		//mDebug = new Debug( mRenderer, mGameWorld, material );
 	}
 
 	void CreateTranslateObject()
@@ -1146,19 +1155,19 @@ public:
 		
 		// Root Translate Object.
 		//
-		mTranslateObject->AttachComponent( new TransformComponent() );
+		mTranslateObject->AttachComponent( new Transform() );
 			
 		///////////////////////////////
 
 		GameObject* obj = new GameObject();
 		obj->mName = "X-Axis";
 			
-		TransformComponent* transform = new TransformComponent();
+		Transform* transform = new Transform();
 		transform->mPosition    = Vector3f( tileSize, 0, 0 );
 		transform->mOrientation = Quatf( Vector3f( 0, 0, -90 ));
 		obj->AttachComponent( transform );
 
-		ModelComponent* modelComp = new ModelComponent( model );
+		ModelDrawable* modelComp = new ModelDrawable( model );
 		//modelComp->SetMaterial( mSelectedMaterialX );
 		obj->AttachComponent( modelComp );
 
@@ -1169,12 +1178,12 @@ public:
 		obj = new GameObject();
 		obj->mName = "Y-Axis";
 
-		transform = new TransformComponent();
+		transform = new Transform();
 		transform->mPosition    = Vector3f( 0, tileSize, 0 );
 		transform->mOrientation = Quatf( Vector3f( 0, 0, 0 ));
 		obj->AttachComponent( transform );
 
-		modelComp = new ModelComponent( model );
+		modelComp = new ModelDrawable( model );
 		//modelComp->SetMaterial( mSelectedMaterialY );
 		obj->AttachComponent( modelComp );
 
@@ -1185,12 +1194,12 @@ public:
 		obj = new GameObject();
 		obj->mName = "Z-Axis";
 
-		transform = new TransformComponent();
+		transform = new Transform();
 		transform->mPosition    = Vector3f( 0, 0, tileSize );
 		transform->mOrientation = Quatf( Vector3f( 90, 0, 0 ));
 		obj->AttachComponent( transform );
 
-		modelComp = new ModelComponent( model );
+		modelComp = new ModelDrawable( model );
 		//modelComp->SetMaterial( mSelectedMaterialZ );
 		obj->AttachComponent( modelComp );
 
@@ -1208,11 +1217,11 @@ public:
 	{
 		if( mSelectedObject )
 		{
-			TransformComponent* transformObject = (TransformComponent*)mTranslateObject->FindComponent( GameComponent::TRANSFORM );
-			TransformComponent* transformSelect = (TransformComponent*)mSelectedObject->FindComponent( GameComponent::TRANSFORM );
+			Transform* transformObject = (Transform*)mTranslateObject->FindComponent( GameComponent::TRANSFORM );
+			Transform* transformSelect = (Transform*)mSelectedObject->FindComponent( GameComponent::TRANSFORM );
 
 			transformObject->mPosition = transformSelect->mPosition;
-			transformObject->mScale    = Vector3f::ONE * (mGameWorld->GetCamera()->GetTransform()->mPosition - transformSelect->mPosition).Length() * 0.005f;
+			transformObject->mScale    = Vector3f::ONE * (mWorldCamera->GetTransform()->mPosition - transformSelect->mPosition).Length() * 0.005f;
 			
 			mTranslateObject->UpdateTransform();
 			mTranslateObject->UpdateDrawable();
@@ -1248,8 +1257,8 @@ public:
 		mBoundsObject = new GameObject();
 		mBoundsObject->mName = "Bounds";
 
-		mBoundsObject->AttachComponent( new TransformComponent() );
-		mBoundsObject->AttachComponent( new MeshComponent( SHARED( mesh )));
+		mBoundsObject->AttachComponent( new Transform() );
+		mBoundsObject->AttachComponent( new MeshDrawable( SHARED( mesh )));
 
 		mBoundsObject->Startup();
 		mBoundsObject->SetWorld( mGameWorld );
@@ -1257,7 +1266,7 @@ public:
 
 	void CheckBounds( GameObject* obj )
 	{
-		DrawableComponent* drawable = (DrawableComponent*)obj->FindComponent( GameComponent::DRAWABLE );
+		Drawable* drawable = (Drawable*)obj->FindComponent( GameComponent::DRAWABLE );
 
 		if( drawable )
 		{
@@ -1289,7 +1298,7 @@ public:
 
 	void DrawBounds( GameObject* obj )
 	{
-		DrawableComponent* drawable = (DrawableComponent*)obj->FindComponent( GameComponent::DRAWABLE );
+		Drawable* drawable = (Drawable*)obj->FindComponent( GameComponent::DRAWABLE );
 
 		if( drawable )
 		{
@@ -1298,7 +1307,7 @@ public:
 			Vector3f center = (box.GetMaxBounds() + box.GetMinBounds()) * 0.5f;
 			Vector3f scale  = (box.GetMaxBounds() - center);
 
-			MeshComponent* mesh = (MeshComponent*)(mBoundsObject->FindComponent( GameComponent::DRAWABLE ));
+			MeshDrawable* mesh = (MeshDrawable*)(mBoundsObject->FindComponent( GameComponent::DRAWABLE ));
 			std::shared_ptr< Material > material = mesh->mMesh->mMaterial;
 
 			if( obj != mHoverObject )
@@ -1314,16 +1323,18 @@ public:
 			else
 				material->mAmbient = ColorRGBA::GREEN;
 
-			TransformComponent* transform = (TransformComponent*)(mBoundsObject->FindComponent( GameComponent::TRANSFORM ));
+			Transform* transform = (Transform*)(mBoundsObject->FindComponent( GameComponent::TRANSFORM ));
 			transform->mPosition	= center;
 			transform->mOrientation = Quatf::IDENTITY;
 			transform->mScale		= scale;
 
-			mesh->mMesh->mBounds = box;
+			mesh->mMesh->mBounds = BoundingBox();
 
 			mBoundsObject->UpdateTransform();
 			mBoundsObject->UpdateDrawable();
-			mesh->Draw();
+
+			if( mesh->CheckVisible( mWorldCamera ))
+				mesh->Draw();
 		}
 
 		UINT count = obj->NumChildren();
@@ -1334,20 +1345,30 @@ public:
 		}
 	}
 
+	void DrawBounds()
+	{
+		UINT count = mGameWorld->NumGameObjects();
+
+		for( UINT x = 0; x < count; ++x )
+		{
+			DrawBounds( mGameWorld->GetGameObject( x ));
+		}
+
+		mHoverObject = NULL;
+		mHoverDist = FLT_MAX;
+	}
+
 	void SelectGameObject()
 	{
 		POINT mousePos = Mouse::Get().GetPosition( (HWND)mGameWindow->GetInfo()->Handle() );
 
-		GUI::ModelWidget* model = (GUI::ModelWidget*)mGameWorldWidget->GetModel();
-		const Vector3f& worldPos   = model->mPosition;
-		const Vector3f& worldScale = model->mScale;
+		Transform* transform = (Transform*)mGameWorldWidget->FindComponent( GameComponent::TRANSFORM );
+		const Vector3f& worldPos   = transform->mPosition;
+		const Vector3f& worldScale = transform->mScale;
 
-		mMouseToWorldRay = mGameWorld->GetCamera()->ScreenPointToRay( mousePos.x - (UINT)worldPos.x, mousePos.y - (UINT)worldPos.y, (UINT)worldScale.x, (UINT)worldScale.y );
+		mMouseToWorldRay = mWorldCamera->ScreenPointToRay( mousePos.x - (UINT)worldPos.x, mousePos.y - (UINT)worldPos.y, (UINT)worldScale.x, (UINT)worldScale.y );
 				
 		UINT count = mGameWorld->NumGameObjects();
-
-		mHoverObject = NULL;
-		mHoverDist = FLT_MAX;
 
 		for( UINT x = 0; x < count; ++x )
 		{
@@ -1359,11 +1380,6 @@ public:
 			mSelectedObject = mHoverObject;
 
 			mTranslateObject->SetActive( (mSelectedObject != NULL) ? true : false );
-		}
-
-		for( UINT x = 0; x < count; ++x )
-		{
-			DrawBounds( mGameWorld->GetGameObject( x ));
 		}
 	}
 };

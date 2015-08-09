@@ -27,7 +27,7 @@ namespace Sentinel
 		virtual ~ListNode()
 		{
 			TRAVERSE_VECTOR( x, mChild )
-				delete mChild[ x ];
+				SAFE_DELETE( mChild[ x ] );
 		}
 
 		virtual T* AddChild( T* obj )

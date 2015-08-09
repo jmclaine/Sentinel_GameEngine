@@ -74,15 +74,10 @@ namespace Sentinel
 			// Create font.
 			//
 			std::shared_ptr< Sprite > sprite( new Sprite() );
-
 			std::shared_ptr< Font > font( new Font() );
 
 			font->mSprite = sprite;
-
-			// Set glyph texture cell to be within powers of 2.
-			//
-			glyphWidth  = NextPowerOf2( glyphWidth );
-			glyphHeight = NextPowerOf2( glyphHeight );
+			font->mSize = Vector2f( (float)glyphWidth, (float)glyphHeight );
 
 			// 16x16 cells.
 			//

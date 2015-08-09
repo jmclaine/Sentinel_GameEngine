@@ -6,8 +6,8 @@
 #include "Sprite.h"
 #include "Renderer.h"
 #include "GameWorld.h"
-#include "CameraComponent.h"
-#include "TransformComponent.h"
+#include "Component/Camera.h"
+#include "Component/Transform.h"
 #include "VertexLayout.h"
 #include "Material.h"
 
@@ -75,12 +75,14 @@ namespace Sentinel
 
 	void SpriteSystem::Present()
 	{
+		_ASSERT( mCamera );
+
 		memcpy( mMesh->mVertexBuffer->Lock(), mStorage, sizeof( Storage ) * mNumSprites );
 		
 		mMesh->mVertexBuffer->Unlock();
 
 		mMesh->mMaterial = mMaterial;
 		
-		mMesh->Draw( mRenderer, NULL, mNumSprites );
+		mMesh->Draw( mRenderer, NULL, mCamera, mNumSprites );
 	}
 }

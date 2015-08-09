@@ -17,9 +17,10 @@ namespace Sentinel
 		std::shared_ptr< Sprite >   mSprite;
 		std::shared_ptr< Material > mMaterial;
 
-		float mOffsetX[ NUM_CHARS ];	// image offset
-		float mOffsetY[ NUM_CHARS ];
-		float mAdvance[ NUM_CHARS ];	// next character starting position (x-axis)
+		Vector2f	mSize;
+		float		mOffsetX[ NUM_CHARS ];	// image offset
+		float		mOffsetY[ NUM_CHARS ];
+		float		mAdvance[ NUM_CHARS ];	// next character starting position (x-axis)
 
 		/////////////////////
 
@@ -33,14 +34,16 @@ namespace Sentinel
 	{
 	public:
 
-		SpriteSystem*			mSpriteSystem;
+		std::shared_ptr< SpriteSystem > mSpriteSystem;
+
 		Matrix4f				mMatrixWVP;
 
 		std::shared_ptr< Font > mFont;
 
 		////////////////////////
 
-		virtual ~FontSystem() {}
+		virtual ~FontSystem()
+		{}
 
 		////////////////////////
 
@@ -51,6 +54,16 @@ namespace Sentinel
 		////////////////////////
 
 		virtual void Draw( char text, const ColorRGBA& color, const Matrix4f& matWorld ) = 0;
+
+		void Clear()
+		{
+			mSpriteSystem->Clear();
+		}
+
+		void Present()
+		{
+			mSpriteSystem->Present();
+		}
 	};
 
 	extern SENTINEL_DLL FontSystem* BuildFontSystemFT();

@@ -19,6 +19,11 @@ in order to spawn outside the origin.
 
 namespace Sentinel
 {
+	namespace Component
+	{
+		class Camera;
+	}
+
 	class GameWorld;
 	class Renderer;
 	class Mesh;
@@ -34,7 +39,7 @@ namespace Sentinel
 
 		Renderer*			mRenderer;
 		GameWorld*			mGameWorld;
-
+		
 		UINT				mNumParticles;
 		UINT				mMaxParticles;
 
@@ -87,7 +92,7 @@ namespace Sentinel
 		virtual void		Load( Archive& archive );
 	};
 
-	extern SENTINEL_DLL ParticleSystem* BuildParticleSystemNormal( Renderer* renderer, GameWorld* world, 
+	extern SENTINEL_DLL ParticleSystem* BuildParticleSystemNormal( Renderer* renderer, GameWorld* world,
 																   std::shared_ptr< Material > material, 
 																   std::shared_ptr< Sprite > sprite, 
 																   UINT maxParticles );

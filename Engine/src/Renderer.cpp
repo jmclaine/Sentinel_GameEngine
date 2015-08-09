@@ -1,6 +1,7 @@
 #include "Renderer.h"
 #include "tinyxml.h"
 #include "Shader.h"
+#include "Texture.h"
 
 #include <iostream>
 #include <fstream>
@@ -53,11 +54,45 @@ namespace Sentinel
 		static RECT rect;
 		GetClientRect( (HWND)mHandle, &rect );
 
-		mWidth  = (UINT)rect.right;
-		mHeight = (UINT)rect.bottom;
+		mWidth  = (UINT)(rect.right - rect.left);
+		mHeight = (UINT)(rect.bottom - rect.top);
 
 		mWidthRatio  = (float)mWidth  / (float)Renderer::WINDOW_WIDTH_BASE;
 		mHeightRatio = (float)mHeight / (float)Renderer::WINDOW_HEIGHT_BASE;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////
+
+	RenderTexture::RenderTexture( Texture* texture ) :
+		mTexture( texture )
+	{}
+
+	RenderTexture::~RenderTexture()
+	{}
+
+	Texture* RenderTexture::GetTexture() const
+	{
+		return mTexture;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////
+
+	DepthStencil::DepthStencil( UINT width, UINT height ) :
+		mWidth( width ),
+		mHeight( height )
+	{}
+
+	DepthStencil::~DepthStencil()
+	{}
+
+	UINT DepthStencil::Width() const
+	{
+		return mWidth;
+	}
+
+	UINT DepthStencil::Height() const
+	{
+		return mHeight;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////

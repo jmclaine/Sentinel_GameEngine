@@ -1,12 +1,10 @@
 #include "GUI/Button.h"
+#include "Serializable.h"
 #include "Input.h"
 
 namespace Sentinel { namespace GUI
 {
 	Button::Button() :
-		mActionUp( NULL ),
-		mActionDown( NULL ),
-		mActionClick( NULL ),
 		mState( UP )
 	{}
 
@@ -18,22 +16,22 @@ namespace Sentinel { namespace GUI
 		if( isOver )
 		{
 			if( mState == UP )
+			{
 				mState = OVER;
+			}
 			
 			if( Mouse::Get().IsDown( BUTTON_LEFT ))
 			{
 				mState = DOWN;
 
-				if( mActionDown )
-					mActionDown();
+				mActionDown.Activate();
 			}
 
 			if( mState == DOWN && Mouse::Get().DidGoUp( BUTTON_LEFT ))
 			{
 				mState = UP;
 
-				if( mActionClick )
-					mActionClick();
+				mActionClick.Activate();
 			}
 		}
 		else
@@ -41,8 +39,7 @@ namespace Sentinel { namespace GUI
 		{
 			mState = UP;
 
-			if( mActionUp )
-				mActionUp();
+			mActionUp.Activate();
 		}
 	}
 

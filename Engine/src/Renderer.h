@@ -162,35 +162,57 @@ namespace Sentinel
 
 		WindowInfo();
 
-		bool	Fullscreen() const;
+		bool		Fullscreen() const;
 
-		UINT	Width() const;
-		UINT	Height() const;
+		UINT		Width() const;
+		UINT		Height() const;
 
-		float	WidthRatio() const;
-		float	HeightRatio() const;
+		float		WidthRatio() const;
+		float		HeightRatio() const;
 
-		void*	Handle() const;
+		void*		Handle() const;
 
-		void	Update();
+		void		Update();
 	};
 
 	//////////////////////////////////
 
 	class RenderTexture
 	{
+	protected:
+
+		Texture*	mTexture;
+
+		//////////////////
+
+		RenderTexture( Texture* texture );
+
 	public:
 
-		virtual ~RenderTexture() {}
+		virtual ~RenderTexture();
+
+		Texture*	GetTexture() const;
 	};
 
 	//////////////////////////////////
 
 	class DepthStencil
 	{
+	protected:
+
+		UINT		mWidth;
+		UINT		mHeight;
+
+	//////////////////
+
+		DepthStencil( UINT width, UINT height );
+
 	public:
 
-		virtual ~DepthStencil() {}
+		virtual ~DepthStencil();
+
+		UINT		Width() const;
+		UINT		Height() const;
 	};
 
 	//////////////////////////////////

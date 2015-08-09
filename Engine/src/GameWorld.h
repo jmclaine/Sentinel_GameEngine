@@ -7,15 +7,20 @@
 
 namespace Sentinel
 {
+	namespace Component
+	{
+		class Camera;
+		class Light;
+	}
+
 	class GameObject;
-	class CameraComponent;
-	class LightComponent;
 	class Archive;
 	class Renderer;
 	class Timing;
 	class PhysicsSystem;
 	class AudioSystem;
 	class SpriteSystem;
+	class FontSystem;
 	class TextureManager;
 	class ShaderManager;
 	class MaterialManager;
@@ -27,40 +32,39 @@ namespace Sentinel
 
 	class SENTINEL_DLL GameWorld
 	{
-	private:
+		friend class GameObject;
 
-		std::vector< CameraComponent* >			mCamera;
-		CameraComponent*						mCurrentCamera;
+	protected:
 
-		std::vector< LightComponent* >			mLight;
-
-		std::vector< GameObject* >				mGameObject;
+		std::vector< GameObject* >			mGameObject;
+		std::vector< Component::Camera* >	mCamera;
+		std::vector< Component::Light* >	mLight;
 
 	public:
 
-		Renderer*								mRenderer;		// must be deleted outside this class
+		Renderer*							mRenderer;		// must be deleted outside this class
 
-		Timing*									mTiming;
-		PhysicsSystem*							mPhysicsSystem;
-		AudioSystem*							mAudioSystem;
-		SpriteSystem*							mSpriteSystem;
+		Timing*								mTiming;
+		PhysicsSystem*						mPhysicsSystem;
+		AudioSystem*						mAudioSystem;
+		SpriteSystem*						mSpriteSystem;
+		FontSystem*							mFontSystem;
 		
-		TextureManager*							mTextureManager;
-		ShaderManager*							mShaderManager;
-		MaterialManager*						mMaterialManager;
-		SpriteManager*							mSpriteManager;
-		MeshManager*							mMeshManager;
-		ModelManager*							mModelManager;
-		SoundManager*							mSoundManager;
+		TextureManager*						mTextureManager;
+		ShaderManager*						mShaderManager;
+		MaterialManager*					mMaterialManager;
+		SpriteManager*						mSpriteManager;
+		MeshManager*						mMeshManager;
+		ModelManager*						mModelManager;
+		SoundManager*						mSoundManager;
 
-		RenderManager*							mRenderManager;
+		RenderManager*						mRenderManager;
+		Component::Camera*					mCurrentCamera;
 
 		/////////////////////////////////////////////////////
 
 		GameWorld();
 		~GameWorld();
-
-	public:
 
 		// Release all GameObjects and GameComponents.
 		//
@@ -76,8 +80,9 @@ namespace Sentinel
 		void				UpdatePhysics();
 		void				UpdateTransform();
 		void				UpdateComponents();
-		void				UpdateDrawable();
+		void				UpdateCamera();
 		void				UpdateLight();
+		void				UpdateDrawable();
 
 		// All associated GameObjects and GameComponents also Shutdown().
 		//
@@ -85,32 +90,40 @@ namespace Sentinel
 
 		/////////////////////////////////////////////////////
 
-		void				Present();
-
-		/////////////////////////////////////////////////////
-
-		// Returns entity.
+		// Renders all cameras if set to NULL
 		//
+		void				Present( Component::Camera* camera = NULL );
+
+	private:
+
+		void				PresentCamera( Component::Camera* camera );
+
+	public:
+
 		GameObject*			AddGameObject( GameObject* obj );
-		GameObject*			AddGameObject( GameObject* obj, const char* name );
-
-		// Removes and returns entity.
-		//
 		GameObject*			RemoveGameObject( GameObject* obj );
 
 		GameObject*			GetGameObject( UINT index );
+		GameObject*			GetGameObject( const std::string& name );
+
+	private:
+
+		GameObject*			GetGameObject( const std::string& name, GameObject* parent );
+
+	public:
+
 		UINT				NumGameObjects();
+		
+	protected:
 
-		/////////////////////////////////////////////////////
+		Component::Camera*	AddCamera( Component::Camera* camera );
 
-		CameraComponent*	GetCamera( int index = -1 );	// -1 = mCurrentCamera
-		void				SetCamera( CameraComponent* camera );
-		UINT				NumCameras();
-		void				AddCamera( CameraComponent* camera );
+		Component::Light*	AddLight( Component::Light* light );
 
-		LightComponent*		GetLight( UINT index );
+	public:
+
+		Component::Light*	GetLight( UINT index );
 		UINT				NumLights();
-		void				AddLight( LightComponent* light );
 
 		/////////////////////////////////////////////////////
 

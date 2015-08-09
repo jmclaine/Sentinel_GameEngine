@@ -254,7 +254,7 @@ namespace Sentinel
 		Vector3f i, j, k;
 
 		// Forward
-		k = Vector3f( pos.x-lookAt.x, pos.y-lookAt.y, pos.z-lookAt.z ).Normalize();
+		k = (pos - lookAt).Normalize();
 
 		// Side
 		j = up;
@@ -343,6 +343,23 @@ namespace Sentinel
 		SCALE.Scale( scale );
 
 		*this = TRANSLATION * ROTATION * SCALE;
+	}
+
+	void Matrix4f::World( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, const Vector3f& offset )
+	{
+		// TODO: Do all matrix math without using matrices.
+		//
+		static Matrix4f TRANSLATION;
+		static Matrix4f ROTATION;
+		static Matrix4f SCALE;
+		static Matrix4f OFFSET;
+
+		TRANSLATION.Translate( position );
+		ROTATION.Rotate( orientation );
+		SCALE.Scale( scale );
+		OFFSET.Translate( offset );
+
+		*this = TRANSLATION * ROTATION * OFFSET * SCALE;
 	}
 
 	void Matrix4f::World( const Vector2f& position, float degrees, const Vector2f& scale )

@@ -3,20 +3,23 @@
 #include "GameObject.h"
 #include "GameWorld.h"
 #include "Archive.h"
-#include "DrawableComponent.h"
+#include "Component/Drawable.h"
+#include "Component/Camera.h"
 
 namespace Sentinel
 {
 	DEFINE_SERIAL_REGISTER( GameObject );
 
-	GameObject::GameObject() :
+	GameObject::GameObject( const std::string& name ) :
 		mTransform( NULL ),
 		mController( NULL ),
 		mPhysics( NULL ),
-		mDrawable( NULL ), 
+		mDrawable( NULL ),
+		mCamera( NULL ),
 		mWorld( NULL ),
-		mName( "GameObject" ),
-		mIsActive( true )
+		mName( name ),
+		mLayer( 0x0001 ),
+		mEnabled( true )
 	{}
 
 	GameObject::~GameObject()
@@ -25,10 +28,10 @@ namespace Sentinel
 		SAFE_DELETE( mController );
 		SAFE_DELETE( mPhysics );
 		SAFE_DELETE( mDrawable );
+		SAFE_DELETE( mCamera );
 
 		TRAVERSE_VECTOR( x, mComponent )
 			delete mComponent[ x ];
-		mComponent.clear();
 	}
 
 	DEFINE_SERIAL_CLONE( GameObject );
@@ -68,6 +71,12 @@ namespace Sentinel
 				mDrawable = component;
 				return component;
 
+			case GameComponent::CAMERA:
+				_ASSERT( !mCamera );
+
+				mCamera = component;
+				return component;
+
 			default:
 				mComponent.push_back( component );
 				return component;
@@ -97,6 +106,9 @@ namespace Sentinel
 			case GameComponent::DRAWABLE:
 				DETACH_COMPONENT( mDrawable );
 
+			case GameComponent::CAMERA:
+				DETACH_COMPONENT( mCamera );
+
 			default:
 				TRAVERSE_VECTOR( x, mComponent )
 				{
@@ -117,9 +129,6 @@ namespace Sentinel
 	{
 		if( mWorld )
 		{
-			// Ensure the GameWorld no longer has
-			// the object as a parent object.
-			//
 			mWorld->RemoveGameObject( obj );
 
 			obj->SetWorld( mWorld );
@@ -127,12 +136,7 @@ namespace Sentinel
 
 			////////////////////////////////
 
-			CameraComponent* camera = (CameraComponent*)obj->FindComponent( GameComponent::CAMERA );
-		
-			if( camera )
-				mWorld->AddCamera( camera );
-			
-			LightComponent* light = (LightComponent*)obj->FindComponent( GameComponent::LIGHT );
+			Component::Light* light = (Component::Light*)obj->FindComponent( GameComponent::LIGHT );
 			
 			if( light )
 				mWorld->AddLight( light );
@@ -160,11 +164,11 @@ namespace Sentinel
 
 	void GameObject::SetActive( bool active )
 	{
-		mIsActive = active;
+		mEnabled = active;
 
 		if( mDrawable && !active )
 		{
-			((DrawableComponent*)mDrawable)->mIsVisible = false;
+			((Component::Drawable*)mDrawable)->mEnabled = false;
 		}
 
 		TRAVERSE_VECTOR( x, mChild )
@@ -188,9 +192,20 @@ namespace Sentinel
 
 		if( mDrawable )
 			mDrawable->Startup();
+
+		if( mCamera )
+		{
+			mWorld->AddCamera( (Component::Camera*)mCamera );
+			mCamera->Startup();
+		}
 		
 		TRAVERSE_VECTOR( x, mComponent )
+		{
+			if( mComponent[ x ]->GetType() == GameComponent::LIGHT )
+				mWorld->AddLight( (Component::Light*)mComponent[ x ] );
+
 			mComponent[ x ]->Startup();
+		}
 
 		TRAVERSE_VECTOR( x, mChild )
 			mChild[ x ]->Startup();
@@ -198,7 +213,7 @@ namespace Sentinel
 
 	void GameObject::UpdateController()
 	{
-		if( mIsActive )
+		if( mEnabled )
 		{
 			if( mController )
 				mController->Update();
@@ -210,7 +225,7 @@ namespace Sentinel
 
 	void GameObject::UpdatePhysics()
 	{
-		if( mIsActive )
+		if( mEnabled )
 		{
 			if( mPhysics )
 				mPhysics->Update();
@@ -222,7 +237,7 @@ namespace Sentinel
 
 	void GameObject::UpdateTransform()
 	{
-		if( mIsActive )
+		if( mEnabled )
 		{
 			if( mTransform )
 				mTransform->Update();
@@ -234,12 +249,12 @@ namespace Sentinel
 
 	void GameObject::UpdateComponents()
 	{
-		if( mIsActive )
+		if( mEnabled )
 		{
+			// WARNING
 			TRAVERSE_VECTOR( x, mComponent )
 			{
-				if( mComponent[ x ]->GetType() != GameComponent::CAMERA &&
-					mComponent[ x ]->GetType() != GameComponent::LIGHT )
+				if( mComponent[ x ]->GetType() != GameComponent::LIGHT )
 					mComponent[ x ]->Update();
 			}
 
@@ -248,16 +263,27 @@ namespace Sentinel
 		}
 	}
 
-	void GameObject::UpdateDrawable( bool drawChildren )
+	void GameObject::UpdateCamera()
 	{
-		if( mIsActive )
+		if( mEnabled )
+		{
+			if( mCamera )
+				mCamera->Update();
+		
+			TRAVERSE_VECTOR( x, mChild )
+				mChild[ x ]->UpdateCamera();
+		}
+	}
+
+	void GameObject::UpdateDrawable()
+	{
+		if( mEnabled )
 		{
 			if( mDrawable )
 				mDrawable->Update();
 		
-			if( drawChildren )
-				TRAVERSE_VECTOR( x, mChild )
-					mChild[ x ]->UpdateDrawable();
+			TRAVERSE_VECTOR( x, mChild )
+				mChild[ x ]->UpdateDrawable();
 		}
 	}
 
@@ -373,5 +399,37 @@ namespace Sentinel
 				AddChild( obj );
 			}
 		}
+	}
+
+	GameObject* GameObject::Copy()
+	{
+		GameObject* obj = new GameObject( mName );
+		
+		if( mTransform )
+			obj->AttachComponent( mTransform->Copy() );
+		
+		if( mController )
+			obj->AttachComponent( mController->Copy() );
+
+		if( mPhysics )
+			obj->AttachComponent( mPhysics->Copy() );
+
+		if( mDrawable )
+			obj->AttachComponent( mDrawable->Copy() );
+
+		if( mCamera )
+			obj->AttachComponent( mCamera->Copy() );
+		
+		TRAVERSE_VECTOR( x, mComponent )
+		{
+			obj->AttachComponent( mComponent[ x ]->Copy() );
+		}
+
+		TRAVERSE_VECTOR( x, mChild )
+		{
+			obj->AddChild( mChild[ x ]->Copy() );
+		}
+
+		return obj;
 	}
 }

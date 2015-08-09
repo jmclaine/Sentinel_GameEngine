@@ -87,13 +87,8 @@ out mat4 gvMatrix;
 
 void main()
 {
-	// Quadture color
 	gvQuadCoord0 = QuadCoord0;
-
-	// Vertex color
 	gvColor = Color;
-
-	// Matrix
 	gvMatrix = Matrix;
 }
 

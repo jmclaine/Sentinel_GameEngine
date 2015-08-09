@@ -10,13 +10,15 @@
 
 namespace Sentinel
 {
-	Debug::Debug( Renderer* renderer, GameWorld* world, std::shared_ptr< Material > material, UINT maxLines ) :
+	Debug::Debug( Renderer* renderer, GameWorld* world, Component::Camera* camera, std::shared_ptr< Material > material, UINT maxLines ) :
 		mRenderer( renderer ),
 		mWorld( world ),
+		mCamera( camera ),
 		mMaterial( material ),
 		mMaxLines( maxLines )
 	{
 		_ASSERT( renderer );
+		_ASSERT( camera );
 		_ASSERT( material.get() );
 		_ASSERT( material->mShader.get() );
 		_ASSERT( maxLines > 0 );
@@ -79,6 +81,6 @@ namespace Sentinel
 	{
 		mMesh->mMaterial = mMaterial;
 
-		mMesh->Draw( mRenderer, mWorld, mNumLines << 1 );
+		mMesh->Draw( mRenderer, mWorld, mCamera, mNumLines << 1 );
 	}
 }

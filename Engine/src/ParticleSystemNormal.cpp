@@ -4,8 +4,8 @@
 #include "Renderer.h"
 #include "GameWorld.h"
 #include "MeshBuilder.h"
-#include "TransformComponent.h"
-#include "CameraComponent.h"
+#include "Component/Transform.h"
+#include "Component/Camera.h"
 #include "Mesh.h"
 #include "Buffer.h"
 #include "Texture.h"
@@ -99,10 +99,14 @@ namespace Sentinel
 
 		void Update( float DT )
 		{
-			CameraComponent* camera = mGameWorld->GetCamera();
-			const TransformComponent* cameraTrans = camera->GetTransform();
-
 			ParticleSystem::Update( DT );
+		}
+
+		///////////////////////////////////
+
+		void Draw()
+		{
+			const Component::Transform* transform = mGameWorld->mCurrentCamera->GetTransform();
 
 			BYTE* verts = (BYTE*)mMesh->mVertexBuffer->Lock();
 
@@ -120,20 +124,15 @@ namespace Sentinel
 				matrixParticle.World( particle.mPosition, Quatf( particle.mRotation ), particle.mScale );
 				
 				static Matrix4f matrixBillboard;
-				matrixBillboard.BillboardAxis( mMesh->mMatrixWorld.Transform( particle.mPosition ), cameraTrans->mPosition, Vector3f( 0, 1, 0 ));
+				matrixBillboard.BillboardAxis( mMesh->mMatrixWorld.Transform( particle.mPosition ), transform->mPosition, Vector3f( 0, 1, 0 ));
 
-				*(Matrix4f*)verts = camera->GetMatrixFinal() * mMesh->mMatrixWorld * matrixParticle * matrixBillboard;
+				*(Matrix4f*)verts = mGameWorld->mCurrentCamera->GetMatrixWVP() * mMesh->mMatrixWorld * matrixParticle * matrixBillboard;
 				verts += sizeof( Matrix4f );
 			}
 
 			mMesh->mVertexBuffer->Unlock();
-		}
 
-		///////////////////////////////////
-
-		void Draw()
-		{
-			mMesh->Draw( mRenderer, mGameWorld, mNumParticles );
+			mMesh->Draw( mRenderer, mGameWorld, mGameWorld->mCurrentCamera, mNumParticles );
 		}
 
 		Particle& GetParticle( UINT index )
@@ -169,7 +168,7 @@ namespace Sentinel
 
 	DEFINE_SERIAL_REGISTER( ParticleSystemNormal );
 
-	ParticleSystem* BuildParticleSystemNormal( Renderer* renderer, GameWorld* world, 
+	ParticleSystem* BuildParticleSystemNormal( Renderer* renderer, GameWorld* world,
 											   std::shared_ptr< Material > material, 
 											   std::shared_ptr< Sprite > sprite, 
 											   UINT maxParticles )

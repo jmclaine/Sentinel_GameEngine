@@ -14,6 +14,11 @@ Mesh creation helpers are in MeshBuilder.h or Model.h
 
 namespace Sentinel
 {
+	namespace Component
+	{
+		class Camera;
+	}
+
 	class Renderer;
 	class GameWorld;
 	class Buffer;
@@ -49,7 +54,7 @@ namespace Sentinel
 		Mesh();
 		~Mesh();
 
-		void		 Draw( Renderer* renderer, GameWorld* world, UINT count = UINT_MAX );
+		void		 Draw( Renderer* renderer, GameWorld* world, Component::Camera* camera, UINT count = UINT_MAX );
 
 		// Helper function to calculate the bounding box using the VBO.
 		//

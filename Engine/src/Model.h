@@ -42,6 +42,11 @@ Each Model has self contained Materials.
 
 namespace Sentinel
 {
+	namespace Component
+	{
+		class Camera;
+	}
+
 	class Archive;
 	class Renderer;
 	class ShaderManager;
@@ -101,7 +106,7 @@ namespace Sentinel
 		virtual float	GetTime( UINT objIndex = 0 ) = 0;
 		virtual void	Update( float DT = 0 ) = 0;
 
-		virtual void	Draw( Renderer* renderer, GameWorld* world ) = 0;
+		virtual void	Draw( Renderer* renderer, GameWorld* world, Component::Camera* camera ) = 0;
 	};
 
 	extern SENTINEL_DLL Model* LoadModelOBJFromFile( 

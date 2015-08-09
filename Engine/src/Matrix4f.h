@@ -68,6 +68,7 @@ namespace Sentinel
 		void		ProjectionPerspective( float windowWidth, float windowHeight, float nearZ = 0.3f, float farZ = 1000.0f, float FOV = 60.0f );
 
 		void		World( const Vector3f& position, const Quatf& orientation, const Vector3f& scale );
+		void		World( const Vector3f& position, const Quatf& orientation, const Vector3f& scale, const Vector3f& offset );
 		void		World( const Vector2f& position, float degrees, const Vector2f& scale );
 
 		Vector3f	Transform( const Vector3f& v, float w = 1.0f ) const;

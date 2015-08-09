@@ -7,6 +7,7 @@
 #include "MeshBuilder.h"
 #include "Util.h"
 #include "Renderer.h"
+#include "Component/Camera.h"
 #include "TextureManager.h"
 #include "ShaderManager.h"
 #include "MaterialManager.h"
@@ -399,12 +400,12 @@ namespace Sentinel
 
 		// Render the model.
 		//
-		void Draw( Renderer* renderer, GameWorld* world )
+		void Draw( Renderer* renderer, GameWorld* world, Component::Camera* camera )
 		{
 			for( UINT x = 0; x < mNumMeshes; ++x )
 			{
 				mMesh[ x ]->mMatrixWorld = mMatrixWorld;
-				mMesh[ x ]->Draw( renderer, world );
+				mMesh[ x ]->Draw( renderer, world, camera );
 			}
 		}
 	};

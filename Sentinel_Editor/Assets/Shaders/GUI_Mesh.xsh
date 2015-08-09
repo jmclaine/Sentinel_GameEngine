@@ -54,7 +54,7 @@ float4 PS_Main(VSOutput input):SV_Target
 
 #ifdef VERTEX_SHADER
 
-uniform mat4 _World;
+uniform mat4 _WVP;
 
 in vec4 Position;
 in vec2 TexCoord0;
@@ -63,10 +63,9 @@ out vec2 gvTexCoord0;
 
 void main()
 {
-	gl_Position = _World * Position;
-
-	// Texture color
-	gvTexCoord0 = vec2(TexCoord0.x, 1.0-TexCoord0.y);
+	gl_Position = _WVP * Position;
+	
+	gvTexCoord0 = vec2(TexCoord0.x, 1.0 - TexCoord0.y);
 }
 
 #endif

@@ -1,6 +1,6 @@
 #include "EditorControllerComponent.h"
-#include "PhysicsComponent.h"
-#include "TransformComponent.h"
+#include "Component/Physics.h"
+#include "Component/Transform.h"
 #include "MathCommon.h"
 #include "GameObject.h"
 #include "GameWorld.h"
@@ -12,13 +12,12 @@
 #include "PhysicsSystem.h"
 #include "Renderer.h"
 #include "GameWindow.h"
-#include "PerspectiveCameraComponent.h"
-#include "OrthographicCameraComponent.h"
+#include "Component/PerspectiveCamera.h"
+#include "Component/OrthographicCamera.h"
 
 namespace Sentinel
 {
-	EditorControllerComponent::EditorControllerComponent() :
-		mWorldWidget( NULL )
+	EditorControllerComponent::EditorControllerComponent()
 	{
 		mForwardSpeed	= 10.0f;
 		mStrafeSpeed	= 3.0f;
@@ -27,10 +26,7 @@ namespace Sentinel
 
 	void EditorControllerComponent::Startup()
 	{
-		ControllerComponent::Startup();
-
-		if( !mWorldWidget )
-			throw AppException( "EditorControllerComponent::Startup() does not contain GUI::SpriteControllerWidget" );
+		Component::Controller3D::Startup();
 	}
 
 	void EditorControllerComponent::Update()
@@ -39,23 +35,19 @@ namespace Sentinel
 		//
 		WindowInfo* info = mOwner->GetWorld()->mRenderer->GetWindow();
 
-		if( mLastWindowWidth != mWorldWidget->mScale.x || mLastWindowHeight != mWorldWidget->mScale.y )
+		if( mLastWindowWidth != mTransform->mScale.x || mLastWindowHeight != mTransform->mScale.y )
 		{
 			// Magically ensure the FOV looks correct.
 			// Divide by 32 from the width produces the intended result.
 			//
-			PerspectiveCameraComponent* cameraP = (PerspectiveCameraComponent*)mOwner->GetWorld()->GetCamera( 1 );
-
-			cameraP->Set( mWorldWidget->mScale.x, mWorldWidget->mScale.y, cameraP->NearZ(), cameraP->FarZ(), (float)(info->Width() >> 5) );
+			mWorldCamera->Set( (UINT)mTransform->mScale.x, (UINT)mTransform->mScale.y, mWorldCamera->NearZ(), mWorldCamera->FarZ(), (float)(info->Width() >> 5) );
 		
 			/////////////////////////////////////
 
-			OrthographicCameraComponent* cameraO = (OrthographicCameraComponent*)mOwner->GetWorld()->GetCamera( 0 );
+			mEditorCamera->Set( info->Width(), info->Height() );
 
-			cameraO->Set( (float)info->Width(), (float)info->Height() );
-
-			mLastWindowWidth  = mWorldWidget->mScale.x;
-			mLastWindowHeight = mWorldWidget->mScale.y;
+			mLastWindowWidth  = mTransform->mScale.x;
+			mLastWindowHeight = mTransform->mScale.y;
 		}
 
 		if( mPhysics )
@@ -183,6 +175,6 @@ namespace Sentinel
 
 	void EditorControllerComponent::Shutdown()
 	{
-		ControllerComponent::Shutdown();
+		Component::Controller3D::Shutdown();
 	}
 }

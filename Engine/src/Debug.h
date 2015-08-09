@@ -6,6 +6,11 @@
 
 namespace Sentinel
 {
+	namespace Component
+	{
+		class Camera;
+	}
+
 	class Renderer;
 	class GameWorld;
 	class Shader;
@@ -16,30 +21,31 @@ namespace Sentinel
 	{
 	private:
 
-		Renderer*	mRenderer;
-		GameWorld*	mWorld;
+		Renderer*			mRenderer;
+		GameWorld*			mWorld;
+		Component::Camera*	mCamera;
 
-		Mesh*		mMesh;
+		Mesh*				mMesh;
 
-		UINT		mNumLines;
-		UINT		mMaxLines;
+		UINT				mNumLines;
+		UINT				mMaxLines;
 
 	public:
 
 		std::shared_ptr< Material > mMaterial;
 
-		Debug( Renderer* renderer, GameWorld* world, std::shared_ptr< Material > material, UINT maxLines = 1000 );
+		Debug( Renderer* renderer, GameWorld* world, Component::Camera* camera, std::shared_ptr< Material > material, UINT maxLines = 1000 );
 		~Debug();
 
-		Renderer*	GetRenderer();
-		GameWorld*	GetWorld();
+		Renderer*			GetRenderer();
+		GameWorld*			GetWorld();
 
 		/////////////////////////////////////
 
-		void	Clear();
+		void				Clear();
 
-		void	DrawLine( const Vector3f& start, const Vector3f& end );
+		void				DrawLine( const Vector3f& start, const Vector3f& end );
 
-		void	Present();
+		void				Present();
 	};
 }

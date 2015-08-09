@@ -1,6 +1,7 @@
 #include "ParticleSystem.h"
 #include "Renderer.h"
 #include "GameWorld.h"
+#include "Component/Camera.h"
 #include "Archive.h"
 #include "MeshBuilder.h"
 #include "Mesh.h"
@@ -40,8 +41,8 @@ namespace Sentinel
 		_ASSERT( renderer );
 		_ASSERT( world );
 
-		mRenderer  = renderer;
-		mGameWorld = world;
+		mRenderer	= renderer;
+		mGameWorld	= world;
 	}
 
 	void ParticleSystem::Startup()

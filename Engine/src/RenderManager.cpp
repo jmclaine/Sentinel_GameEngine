@@ -1,11 +1,16 @@
 #include "RenderManager.h"
-#include "DrawableComponent.h"
+#include "Component/Drawable.h"
 #include "RendererTypes.h"
 
 namespace Sentinel
 {
 	RenderManager::RenderManager()
-	{}
+	{
+		for( WORD x = 0; x < (int)RenderLayer::LENGTH; ++x )
+		{
+			mBackground[(1 << x)] = std::multimap< WORD, Component::Drawable* >();
+		}
+	}
 
 	RenderManager::~RenderManager()
 	{
@@ -16,40 +21,72 @@ namespace Sentinel
 
 	void RenderManager::Clear()
 	{
-		mBackground.clear();
-		mAlpha.clear();
-		mForeground.clear();
-	}
+		WORD currLayer;
 
-	void RenderManager::Draw( WORD renderQueue, DrawableComponent* drawable )
-	{
-		if( renderQueue < (WORD)(RenderQueue::ALPHA_BLEND) )
+		for( WORD x = 0; x < (int)RenderLayer::LENGTH; ++x )
 		{
-			mBackground.insert( std::pair< WORD, DrawableComponent* >( renderQueue, drawable ));
-		}
-		else
-		if( renderQueue < (WORD)(RenderQueue::FOREGROUND) )
-		{
-			mAlpha.insert( std::pair< WORD, DrawableComponent* >( renderQueue, drawable ));
-		}
-		else
-		{
-			mForeground.insert( std::pair< WORD, DrawableComponent* >( renderQueue, drawable ));
+			currLayer = 1 << x;
+
+			mBackground[currLayer].clear();
+			mAlpha[currLayer].clear();
+			mForeground[currLayer].clear();
 		}
 	}
 
-	void RenderManager::Present()
+	void RenderManager::Draw( Component::Drawable* drawable, WORD renderQueue, WORD layer )
 	{
-		for( auto it = mBackground.begin(); it != mBackground.end(); ++it )
-			if( it->second->mIsVisible )
-				it->second->Draw();
+		WORD currLayer;
 
-		for( auto it = mAlpha.begin(); it != mAlpha.end(); ++it )
-			if( it->second->mIsVisible )
-				it->second->Draw();
+		for( WORD x = 0; x < (int)RenderLayer::LENGTH; ++x )
+		{
+			currLayer = 1 << x;
 
-		for( auto it = mForeground.begin(); it != mForeground.end(); ++it )
-			if( it->second->mIsVisible )
-				it->second->Draw();
+			if( layer & currLayer )
+			{
+				if( renderQueue < (WORD)(RenderQueue::ALPHA_BLEND) )
+				{
+					mBackground[currLayer].insert( std::pair< WORD, Component::Drawable* >( renderQueue, drawable ));
+				}
+				else
+				if( renderQueue < (WORD)(RenderQueue::FOREGROUND) )
+				{
+					mAlpha[currLayer].insert( std::pair< WORD, Component::Drawable* >( renderQueue, drawable ));
+				}
+				else
+				{
+					mForeground[currLayer].insert( std::pair< WORD, Component::Drawable* >( renderQueue, drawable ));
+				}
+			}
+		}
+	}
+
+	void RenderManager::Present( Component::Camera* camera )
+	{
+		WORD layer = camera->mRenderLayer;
+		WORD currLayer = 0;
+		std::multimap< WORD, Component::Drawable* >* drawable;
+
+		for( WORD x = 0; x < (int)RenderLayer::LENGTH; ++x )
+		{
+			currLayer = 1 << x;
+
+			if (layer & currLayer)
+			{
+				drawable = &mBackground[currLayer];
+				for( auto it = drawable->begin(); it != drawable->end(); ++it )
+					if( it->second->CheckVisible( camera ))
+						it->second->Draw();
+
+				drawable = &mAlpha[currLayer];
+				for( auto it = drawable->begin(); it != drawable->end(); ++it )
+					if( it->second->CheckVisible( camera ))
+						it->second->Draw();
+
+				drawable = &mForeground[currLayer];
+				for( auto it = drawable->begin(); it != drawable->end(); ++it )
+					if( it->second->CheckVisible( camera ))
+						it->second->Draw();
+			}
+		}
 	}
 }

@@ -86,6 +86,7 @@ namespace Sentinel
 		BoundingBox( const Vector3f& minBounds, const Vector3f& maxBounds );
 		BoundingBox( const BYTE* verts, UINT count, UINT stride = sizeof( Vector3f ));
 
+		void		Set( const Matrix4f& matWorld = Matrix4f::IDENTITY );
 		void		Set( const Vector3f& minBounds, const Vector3f& maxBounds, const Matrix4f& matWorld = Matrix4f::IDENTITY );
 		void		Set( const BYTE* verts, UINT count, UINT stride = sizeof( Vector3f ));
 

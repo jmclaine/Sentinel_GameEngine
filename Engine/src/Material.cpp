@@ -108,6 +108,8 @@ namespace Sentinel
 
 		data = static_cast< BYTE >(material->mDepthMode);
 		archive.Write( &data );
+
+		archive.Write( &material->mRenderQueue );
 	}
 
 	Material* Material::Load( Archive&			archive,
@@ -186,6 +188,10 @@ namespace Sentinel
 		BYTE depth;
 		archive.Read( &depth );
 		material->mDepthMode = (DepthFormat::Type)depth;
+
+		WORD renderQueue;
+		archive.Read( &renderQueue );
+		material->mRenderQueue = renderQueue;
 
 		return material;
 	}

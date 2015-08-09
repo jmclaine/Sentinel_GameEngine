@@ -5,11 +5,11 @@
 
 #include "Common.h"
 #include "Serializable.h"
+#include "Archive.h"
 
 namespace Sentinel
 {
 	class GameObject;
-	class Archive;
 
 	class SENTINEL_DLL GameComponent : public Serializable
 	{
@@ -32,6 +32,10 @@ namespace Sentinel
 		GameObject*			mOwner;
 		GameComponent::Type	mType;
 
+	public:
+
+		bool				mEnabled;
+
 	protected:
 
 		GameComponent();
@@ -42,11 +46,11 @@ namespace Sentinel
 
 		////////////////////////////////
 
-		virtual void Startup() = 0;
+		virtual void Startup();
 
-		virtual void Update() = 0;
+		virtual void Update();
 
-		virtual void Shutdown() = 0;
+		virtual void Shutdown();
 
 		////////////////////////////////
 
@@ -58,5 +62,11 @@ namespace Sentinel
 
 		virtual void Save( Archive& archive );
 		virtual void Load( Archive& archive );
+
+		virtual GameComponent* Copy();
+
+	protected:
+
+		virtual void Copy( GameComponent* component );
 	};
 }

@@ -52,9 +52,6 @@
     <Filter Include="Source Files\Sentinel_Engine\GUI">
       <UniqueIdentifier>{9d095b94-5c58-4d1f-9928-df83977cd1a5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Sentinel_Engine\Assets\Manager">
-      <UniqueIdentifier>{1afb54e4-934e-4d15-8c6b-441dd62e4b25}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Sentinel_Engine\Systems\Physics">
       <UniqueIdentifier>{5da3953f-ae9e-499d-b464-1b830a40034a}</UniqueIdentifier>
     </Filter>
@@ -66,9 +63,6 @@
     </Filter>
     <Filter Include="Source Files\Sentinel_Engine\Systems\Renderer">
       <UniqueIdentifier>{afab9e9f-7481-4d64-bf2f-716d8f74efcc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Sentinel_Engine\GUI\Model">
-      <UniqueIdentifier>{933021b1-bf6c-4d6f-8998-65022345690e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Sentinel_Engine\GUI\View">
       <UniqueIdentifier>{ee7562f8-fae1-4366-9d10-8a50f52c42ef}</UniqueIdentifier>
@@ -85,8 +79,11 @@
     <Filter Include="Source Files\Sentinel_Engine\Systems\Renderer\DX">
       <UniqueIdentifier>{0a3b4c92-7da0-4063-9807-b09ac32eaab0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Sentinel_Engine\Managers">
+      <UniqueIdentifier>{1afb54e4-934e-4d15-8c6b-441dd62e4b25}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source Files\Sentinel_Engine\Components\Light">
-      <UniqueIdentifier>{c3adc59e-9b08-4e4a-b114-5bc655c66a7f}</UniqueIdentifier>
+      <UniqueIdentifier>{0d2f978e-3fa2-4e94-a3c3-149eb881f02d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -144,39 +141,6 @@
     <ClInclude Include="..\Engine\src\FixedPoint.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\OrthographicCameraComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\View</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\PerspectiveCameraComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\View</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\CameraComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\View</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\DrawableComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\MeshComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\ModelComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\SpriteComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\PhysicsComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\AIControllerComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\PlayerControllerComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\ControllerComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\GameWorld.h">
       <Filter>Source Files\Sentinel_Engine\Components</Filter>
     </ClInclude>
@@ -201,9 +165,6 @@
     <ClInclude Include="..\Engine\src\FloatCompressor.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\AudioComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\Audio</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\AudioSystem.h">
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
     </ClInclude>
@@ -213,50 +174,35 @@
     <ClInclude Include="..\Engine\src\Sound.h">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\ParticleEmitterComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\Sprite.h">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\TriggerComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\SpriteSystem.h">
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\TransformComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\AssetManager.h">
-      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+      <Filter>Source Files\Sentinel_Engine\Managers</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\MeshManager.h">
-      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+      <Filter>Source Files\Sentinel_Engine\Managers</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\ModelManager.h">
-      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+      <Filter>Source Files\Sentinel_Engine\Managers</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\ShaderManager.h">
-      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+      <Filter>Source Files\Sentinel_Engine\Managers</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\SoundManager.h">
-      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+      <Filter>Source Files\Sentinel_Engine\Managers</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\TextureManager.h">
-      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+      <Filter>Source Files\Sentinel_Engine\Managers</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\SpriteManager.h">
-      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+      <Filter>Source Files\Sentinel_Engine\Managers</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\GameWindow.h">
       <Filter>Source Files\Sentinel_Engine\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\WidgetComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\GUI\Widget.h">
-      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\Serializable.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
@@ -266,15 +212,6 @@
     </ClInclude>
     <ClInclude Include="..\Engine\src\FontSystem.h">
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\PhysicsConstraintComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\PhysicsShapeComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\PhysicsRigidBodyComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\PhysicsSystem.h">
       <Filter>Source Files\Sentinel_Engine\Systems\Physics</Filter>
@@ -306,44 +243,14 @@
     <ClInclude Include="..\Engine\src\Renderer.h">
       <Filter>Source Files\Sentinel_Engine\Systems\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\GUI\WidgetObject.h">
-      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\GUI\ViewWidget.h">
-      <Filter>Source Files\Sentinel_Engine\GUI\View</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\GUI\ControllerWidget.h">
-      <Filter>Source Files\Sentinel_Engine\GUI\Controller</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\GUI\WidgetWorld.h">
-      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\GUI\SpriteViewWidget.h">
-      <Filter>Source Files\Sentinel_Engine\GUI\View</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\GUI\SpriteControllerWidget.h">
-      <Filter>Source Files\Sentinel_Engine\GUI\Controller</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\GUI\Button.h">
       <Filter>Source Files\Sentinel_Engine\GUI\Controller</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\GUI\SpriteButtonWidget.h">
-      <Filter>Source Files\Sentinel_Engine\GUI\Controller</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\GUI\LabelWidget.h">
-      <Filter>Source Files\Sentinel_Engine\GUI\View</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\GUI\MeshViewWidget.h">
-      <Filter>Source Files\Sentinel_Engine\GUI\View</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\GameComponent.h">
       <Filter>Source Files\Sentinel_Engine\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\Shape.h">
       <Filter>Source Files\Sentinel_Engine\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\GUI\ModelWidget.h">
-      <Filter>Source Files\Sentinel_Engine\GUI\Model</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\Debug.h">
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
@@ -388,16 +295,10 @@
       <Filter>Source Files\Sentinel_Engine\Systems\Renderer\DX</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\MaterialManager.h">
-      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+      <Filter>Source Files\Sentinel_Engine\Managers</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\Material.h">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\PointLightComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\Light</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\LightComponent.h">
-      <Filter>Source Files\Sentinel_Engine\Components\Light</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\dirent.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
@@ -408,11 +309,77 @@
     <ClInclude Include="..\Engine\src\Texture.h">
       <Filter>Source Files\Sentinel_Engine\Systems\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\RenderManager.h">
-      <Filter>Source Files\Sentinel_Engine\Systems\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\EnumClass.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\GUI\SpriteController.h">
+      <Filter>Source Files\Sentinel_Engine\GUI\Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\GUI\SpriteButton.h">
+      <Filter>Source Files\Sentinel_Engine\GUI\Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\GUI\Label.h">
+      <Filter>Source Files\Sentinel_Engine\GUI\View</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\RenderManager.h">
+      <Filter>Source Files\Sentinel_Engine\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Component\Transform.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Component\Drawable.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Component\ParticleEmitter.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Component\AudioSource.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Component\AIController.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Component\Physics.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Component\PlayerController.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Component\Trigger.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\src\component\Camera.h">
+      <Filter>Source Files\Sentinel_Engine\Components\View</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Component\OrthographicCamera.h">
+      <Filter>Source Files\Sentinel_Engine\Components\View</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Component\PerspectiveCamera.h">
+      <Filter>Source Files\Sentinel_Engine\Components\View</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Component\Controller3D.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Component\MeshDrawable.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Component\ModelDrawable.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Component\SpriteDrawable.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\GUI\Controller2D.h">
+      <Filter>Source Files\Sentinel_Engine\GUI\Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Event.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Component\Light.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Component\PointLight.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Light</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -472,36 +439,6 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\NetworkSocket.cpp">
       <Filter>Source Files\Sentinel_Engine\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\CameraComponent.cpp">
-      <Filter>Source Files\Sentinel_Engine\Components\View</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\OrthographicCameraComponent.cpp">
-      <Filter>Source Files\Sentinel_Engine\Components\View</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\PerspectiveCameraComponent.cpp">
-      <Filter>Source Files\Sentinel_Engine\Components\View</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\DrawableComponent.cpp">
-      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\MeshComponent.cpp">
-      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\ModelComponent.cpp">
-      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\SpriteComponent.cpp">
-      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\PhysicsComponent.cpp">
-      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\ControllerComponent.cpp">
-      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\PlayerControllerComponent.cpp">
-      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\GameObject.cpp">
       <Filter>Source Files\Sentinel_Engine\Components</Filter>
@@ -584,47 +521,32 @@
     <ClCompile Include="..\Engine\src\Sound.cpp">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\ParticleEmitterComponent.cpp">
-      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\Sprite.cpp">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\TriggerComponent.cpp">
-      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\SpriteSystem.cpp">
       <Filter>Source Files\Sentinel_Engine\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\TransformComponent.cpp">
-      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\MeshManager.cpp">
-      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+      <Filter>Source Files\Sentinel_Engine\Managers</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\ModelManager.cpp">
-      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+      <Filter>Source Files\Sentinel_Engine\Managers</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\ShaderManager.cpp">
-      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+      <Filter>Source Files\Sentinel_Engine\Managers</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\SoundManager.cpp">
-      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+      <Filter>Source Files\Sentinel_Engine\Managers</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\TextureManager.cpp">
-      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+      <Filter>Source Files\Sentinel_Engine\Managers</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\SpriteManager.cpp">
-      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
+      <Filter>Source Files\Sentinel_Engine\Managers</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\GameWindow.cpp">
       <Filter>Source Files\Sentinel_Engine\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\WidgetComponent.cpp">
-      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\GUI\Widget.cpp">
-      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\Serializable.cpp">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
@@ -662,38 +584,8 @@
     <ClCompile Include="..\Engine\src\Renderer.cpp">
       <Filter>Source Files\Sentinel_Engine\Systems\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\src\GUI\WidgetObject.cpp">
-      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\GUI\ControllerWidget.cpp">
-      <Filter>Source Files\Sentinel_Engine\GUI\Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\GUI\ViewWidget.cpp">
-      <Filter>Source Files\Sentinel_Engine\GUI\View</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\GUI\SpriteControllerWidget.cpp">
-      <Filter>Source Files\Sentinel_Engine\GUI\Controller</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\GUI\Button.cpp">
       <Filter>Source Files\Sentinel_Engine\GUI\Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\GUI\SpriteButtonWidget.cpp">
-      <Filter>Source Files\Sentinel_Engine\GUI\Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\GUI\SpriteViewWidget.cpp">
-      <Filter>Source Files\Sentinel_Engine\GUI\View</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\GUI\LabelWidget.cpp">
-      <Filter>Source Files\Sentinel_Engine\GUI\View</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\GUI\MeshViewWidget.cpp">
-      <Filter>Source Files\Sentinel_Engine\GUI\View</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\GUI\ModelWidget.cpp">
-      <Filter>Source Files\Sentinel_Engine\GUI\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\GUI\WidgetWorld.cpp">
-      <Filter>Source Files\Sentinel_Engine\GUI</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\GameComponent.cpp">
       <Filter>Source Files\Sentinel_Engine\Components</Filter>
@@ -747,13 +639,7 @@
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\MaterialManager.cpp">
-      <Filter>Source Files\Sentinel_Engine\Assets\Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\PointLightComponent.cpp">
-      <Filter>Source Files\Sentinel_Engine\Components\Light</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\LightComponent.cpp">
-      <Filter>Source Files\Sentinel_Engine\Components\Light</Filter>
+      <Filter>Source Files\Sentinel_Engine\Managers</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\Shader.cpp">
       <Filter>Source Files\Sentinel_Engine\Systems\Renderer</Filter>
@@ -761,8 +647,65 @@
     <ClCompile Include="..\Engine\src\Texture.cpp">
       <Filter>Source Files\Sentinel_Engine\Systems\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="..\Engine\src\GUI\SpriteController.cpp">
+      <Filter>Source Files\Sentinel_Engine\GUI\Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\GUI\SpriteButton.cpp">
+      <Filter>Source Files\Sentinel_Engine\GUI\Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\GUI\Label.cpp">
+      <Filter>Source Files\Sentinel_Engine\GUI\View</Filter>
+    </ClCompile>
     <ClCompile Include="..\Engine\src\RenderManager.cpp">
-      <Filter>Source Files\Sentinel_Engine\Systems\Renderer</Filter>
+      <Filter>Source Files\Sentinel_Engine\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Component\Transform.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Component\Drawable.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Component\ParticleEmitter.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Component\Physics.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Component\PlayerController.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Component\Trigger.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Component\Camera.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components\View</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Component\OrthographicCamera.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components\View</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Component\PerspectiveCamera.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components\View</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\GUI\Controller2D.cpp">
+      <Filter>Source Files\Sentinel_Engine\GUI\Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Component\Controller3D.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Component\MeshDrawable.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Component\ModelDrawable.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Component\SpriteDrawable.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Component\Light.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Component\PointLight.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components\Light</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

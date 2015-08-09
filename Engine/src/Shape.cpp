@@ -548,7 +548,9 @@ namespace Sentinel
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	BoundingBox::BoundingBox()
-	{}
+	{
+		Set();
+	}
 
 	BoundingBox::BoundingBox( const Vector3f& minBounds, const Vector3f& maxBounds )
 	{
@@ -558,6 +560,11 @@ namespace Sentinel
 	BoundingBox::BoundingBox( const BYTE* verts, UINT count, UINT stride )
 	{
 		Set( verts, count, stride );
+	}
+
+	void BoundingBox::Set( const Matrix4f& matWorld )
+	{
+		Set( Vector3f( -1, -1, -1 ), Vector3f( 1, 1, 1 ), matWorld );
 	}
 
 	void BoundingBox::Set( const Vector3f& minBounds, const Vector3f& maxBounds, const Matrix4f& matWorld )

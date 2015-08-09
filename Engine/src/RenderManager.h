@@ -3,18 +3,23 @@
 #include <map>
 
 #include "Common.h"
+#include "RendererTypes.h"
 
 namespace Sentinel
 {
-	class DrawableComponent;
+	namespace Component
+	{
+		class Drawable;
+		class Camera;
+	}
 	
 	class SENTINEL_DLL RenderManager
 	{
 	private:
 
-		std::multimap< WORD, DrawableComponent* > mBackground;
-		std::multimap< WORD, DrawableComponent* > mAlpha;
-		std::multimap< WORD, DrawableComponent* > mForeground;
+		std::map< WORD, std::multimap< WORD, Component::Drawable* >> mBackground;
+		std::map< WORD, std::multimap< WORD, Component::Drawable* >> mAlpha;
+		std::map< WORD, std::multimap< WORD, Component::Drawable* >> mForeground;
 
 	public:
 
@@ -25,13 +30,13 @@ namespace Sentinel
 
 		void	Clear();
 
-		// Place a DrawableComponent within the queue.
+		// Place a Component::Drawable within the queue.
 		// Draw is called on the component.
 		//
-		void	Draw( WORD renderQueue, DrawableComponent* drawable );
+		void	Draw( Component::Drawable* drawable, WORD renderQueue, WORD layer = RenderLayer::LAYER0 );
 
 		// Render all geometry.
 		//
-		void	Present();
+		void	Present( Component::Camera* camera );
 	};
 }

@@ -8,6 +8,7 @@
 #include "Timing.h"
 #include "Archive.h"
 #include "Renderer.h"
+#include "Component/Camera.h"
 #include "ShaderManager.h"
 #include "TextureManager.h"
 #include "Material.h"
@@ -725,7 +726,7 @@ namespace Sentinel
 			}
 		}
 
-		void Draw( Renderer* renderer, GameWorld* world )
+		void Draw( Renderer* renderer, GameWorld* world, Component::Camera* camera )
 		{
 			// Set up model transforms.
 			//
@@ -745,7 +746,7 @@ namespace Sentinel
 				for( UINT y = 0; y < mObject[ x ].mNumMeshes; ++y )
 				{
 					mObject[ x ].mMesh[ y ]->mMatrixWorld = matWorldObject;
-					mObject[ x ].mMesh[ y ]->Draw( renderer, world );
+					mObject[ x ].mMesh[ y ]->Draw( renderer, world, camera );
 				}
 			}
 		}

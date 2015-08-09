@@ -42,8 +42,9 @@ namespace Sentinel
 
 			GLuint		mID;
 			
-			RenderTextureGL( GLuint id ) :
-				mID( id )
+			RenderTextureGL( GLuint id, Texture* texture ) :
+				mID( id ),
+				RenderTexture( texture )
 			{}
 
 			~RenderTextureGL()
@@ -59,16 +60,19 @@ namespace Sentinel
 		private:
 
 			DepthFormat::Type	mCurrDepth;
-			bool		mDepthEnabled;
+			bool				mDepthEnabled;
 
 		public:
 
-			GLuint		mID;
+			GLuint				mID;
 			
-			DepthStencilGL( GLuint id ) :
+			/////////////////////////
+
+			DepthStencilGL( GLuint id, UINT width, UINT height ) :
 				mID( id ),
 				mCurrDepth( DepthFormat::OFF ),
-				mDepthEnabled( false )
+				mDepthEnabled( false ),
+				DepthStencil( width, height )
 			{}
 
 			void SetDepth( DepthFormat::Type depth )
@@ -290,7 +294,7 @@ namespace Sentinel
 					return NULL;
 				}
 			}
-
+			
 			glewInit();
 
 			TRACE( "Created OpenGL " << glGetString( GL_VERSION ) << " Renderer" );
@@ -562,7 +566,7 @@ namespace Sentinel
 		//
 		RenderTexture* CreateBackbuffer()
 		{
-			return new RenderTextureGL( 0 );
+			return new RenderTextureGL( 0, NULL );
 		}
 
 		RenderTexture* CreateRenderTexture( Texture* texture )
@@ -585,7 +589,7 @@ namespace Sentinel
 				return NULL;
 			}
 			
-			return new RenderTextureGL( id );
+			return new RenderTextureGL( id, texture );
 		}
 
 		DepthStencil* CreateDepthStencil( UINT width, UINT height )
@@ -596,7 +600,7 @@ namespace Sentinel
 			glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height );
 			glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, id );
 			
-			return new DepthStencilGL( id );
+			return new DepthStencilGL( id, width, height );
 		}
 
 		BlendState* CreateBlendState( BlendFormat::Type srcBlendColor = BlendFormat::SRC_ALPHA, BlendFormat::Type dstBlendColor = BlendFormat::ONE_MINUS_SRC_ALPHA, 
