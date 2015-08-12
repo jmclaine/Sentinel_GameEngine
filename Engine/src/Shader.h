@@ -2,6 +2,10 @@
 
 #include <vector>
 
+#if (_MSC_VER > 1600)
+#include <memory>
+#endif
+
 #include "VertexLayout.h"
 
 namespace Sentinel
@@ -29,15 +33,15 @@ namespace Sentinel
 
 	protected:
 
-		char*			mSource;
-		
-		std::vector< VertexAttribute::Type > mAttribute;
-		std::vector< ShaderUniform::Type >   mUniform;
+		char* mSource;
 
-		std::shared_ptr< VertexLayout > mLayout;
+		std::vector<VertexAttribute::Type> mAttribute;
+		std::vector<ShaderUniform::Type> mUniform;
 
-		Sampler**		mSampler;
-		UINT			mNumSamplers;
+		std::shared_ptr<VertexLayout> mLayout;
+
+		Sampler** mSampler;
+		UINT mNumSamplers;
 
 		////////////////////////////////////
 
@@ -47,34 +51,36 @@ namespace Sentinel
 
 		virtual ~Shader();
 
-		const char*		Source();
-		const std::vector< VertexAttribute::Type >&		Attribute();
-		const std::vector< ShaderUniform::Type >&		Uniform();
-		const std::shared_ptr< VertexLayout >			Layout();
+		const char* Source();
+		const std::vector<VertexAttribute::Type>& Attribute();
+		const std::vector<ShaderUniform::Type>& Uniform();
+		const std::shared_ptr<VertexLayout> Layout();
 
-		virtual void	Release() = 0;
-
-		////////////////////////////////////
-		
-		virtual void	SetFloat( UINT uniform, float* data, UINT count = 1 ) = 0;
-		virtual void	SetFloat2( UINT uniform, float* data, UINT count = 1 ) = 0;
-		virtual void	SetFloat3( UINT uniform, float* data, UINT count = 1 ) = 0;
-		virtual void	SetFloat4( UINT uniform, float* data, UINT count = 1 ) = 0;
-		virtual void	SetMatrix( UINT uniform, float* data, UINT count = 1 ) = 0;
-		virtual void	SetTexture( UINT uniform, Texture* texture ) = 0;
-		virtual void	SetTextureCube( UINT uniform, Texture* texture ) = 0;
-
-		virtual void	SetSampler( UINT index, 
-									SamplerMode::Type modeU, SamplerMode::Type modeV, 
-									SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter = SamplerFilter::UNKNOWN ) = 0;
-
-		virtual void	SetSamplerCube( UINT index, 
-										SamplerMode::Type modeU, SamplerMode::Type modeV, SamplerMode::Type modeW,
-										SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter = SamplerFilter::UNKNOWN ) = 0;
+		virtual void Release() = 0;
 
 		////////////////////////////////////
 
-		virtual void	Enable() = 0;
-		virtual void	Disable() = 0;
+		virtual void SetFloat(UINT uniform, float* data, UINT count = 1) = 0;
+		virtual void SetFloat2(UINT uniform, float* data, UINT count = 1) = 0;
+		virtual void SetFloat3(UINT uniform, float* data, UINT count = 1) = 0;
+		virtual void SetFloat4(UINT uniform, float* data, UINT count = 1) = 0;
+		virtual void SetMatrix(UINT uniform, float* data, UINT count = 1) = 0;
+		virtual void SetTexture(UINT uniform, Texture* texture) = 0;
+		virtual void SetTextureCube(UINT uniform, Texture* texture) = 0;
+
+		virtual void SetSampler(
+			UINT index,
+			SamplerMode::Type modeU, SamplerMode::Type modeV,
+			SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter = SamplerFilter::UNKNOWN) = 0;
+
+		virtual void SetSamplerCube(
+			UINT index,
+			SamplerMode::Type modeU, SamplerMode::Type modeV, SamplerMode::Type modeW,
+			SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter = SamplerFilter::UNKNOWN) = 0;
+
+		////////////////////////////////////
+
+		virtual void Enable() = 0;
+		virtual void Disable() = 0;
 	};
 }

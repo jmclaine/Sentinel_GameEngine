@@ -4,7 +4,8 @@
 #include "Component/Camera.h"
 #include "Shape.h"
 
-namespace Sentinel { namespace Component
+namespace Sentinel {
+namespace Component
 {
 	class Transform;
 
@@ -16,9 +17,9 @@ namespace Sentinel { namespace Component
 
 	public:
 
-		BoundingBox			mBounds;
+		BoundingBox mBounds;
 
-		bool				mIsDynamic;
+		bool mIsDynamic;
 
 	protected:
 
@@ -26,25 +27,27 @@ namespace Sentinel { namespace Component
 
 	public:
 
-		virtual void		Startup();
-
-		virtual void		Update();
-
-		virtual void		Shutdown();
+		virtual void Startup();
+		virtual void Update();
+		virtual void Shutdown();
 
 		/////////////////////////////
 
-		virtual void		CalculateBounds() = 0;
+		virtual void Execute();
 
-		virtual bool		CheckVisible( Camera* camera ) = 0;
+		void SetOwner(GameObject* owner);
 
-		virtual void		Draw() = 0;
-		
+		virtual void CalculateBounds() = 0;
+
+		virtual bool CheckVisible(Camera* camera) = 0;
+
+		virtual void Draw() = 0;
+
 	protected:
 
 		virtual DECLARE_SERIAL_SAVE();
 		virtual DECLARE_SERIAL_LOAD();
 
-		virtual void Copy( GameComponent* component );
+		virtual void Copy(GameComponent* component);
 	};
 }}

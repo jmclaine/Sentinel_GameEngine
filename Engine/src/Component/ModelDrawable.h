@@ -19,28 +19,26 @@ namespace Component
 
 	public:
 
-		std::shared_ptr< Model > mModel;
+		std::shared_ptr<Model> mModel;
 
 		///////////////////////////////////
 
 		ModelDrawable();
-		ModelDrawable( std::shared_ptr< Model > model );
-		
-		void	Set( std::shared_ptr< Model > model );
+		ModelDrawable(std::shared_ptr<Model> model);
 
-		void	Startup();
+		void Set(std::shared_ptr<Model> model);
 
-		void	Update();
-
-		void	Shutdown();
+		void Startup();
 
 		///////////////////////////////////
 
-		void	CalculateBounds();
+		void Execute();
 
-		bool	CheckVisible( Camera* camera );
+		void CalculateBounds();
 
-		void	Draw();
+		bool CheckVisible(Camera* camera);
+
+		void Draw();
 
 		///////////////////////////////////
 

@@ -25,9 +25,9 @@ namespace Sentinel
 
 	protected:
 
-		size_t m_offset;
-		const std::string m_string;
-		std::string m_token;
-		std::string m_delimiters;
+		size_t mOffset;
+		const std::string mString;
+		std::string mToken;
+		std::string mDelimiters;
 	};
 }

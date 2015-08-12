@@ -5,7 +5,8 @@
 #include "Vector3f.h"
 #include "Quatf.h"
 
-namespace Sentinel { namespace Component
+namespace Sentinel {
+namespace Component
 {
 	class SENTINEL_DLL Transform : public GameComponent
 	{
@@ -13,33 +14,38 @@ namespace Sentinel { namespace Component
 
 	protected:
 
-		Transform*		mParentTransform;
+		Transform* mParentTransform;
 
-		Matrix4f		mMatrixWorld;
+		Matrix4f mMatrixWorld;
 
 	public:
 
-		Vector3f		mPosition;
-		Quatf			mOrientation;
-		Vector3f		mScale;
+		Vector3f mPosition;
+		Quatf mOrientation;
+		Vector3f mScale;
 
 		///////////////////////////////////
 
 		Transform();
+		~Transform();
 
-		virtual void	Startup();
+		virtual void Startup();
 
-		virtual void	Update();
+		virtual void Update();
 
-		virtual void	Shutdown();
+		virtual void Shutdown();
 
 		///////////////////////////////////
+
+		virtual void Execute();
+
+		virtual void SetOwner(GameObject* owner);
 
 		const Matrix4f&	GetMatrixWorld() const;
-		const Matrix4f&	GetMatrixWorld( const Vector3f& offset );
+		const Matrix4f&	GetMatrixWorld(const Vector3f& offset);
 
 		///////////////////////////////////
 
-		GameComponent*	Copy();
+		GameComponent* Copy();
 	};
 }}

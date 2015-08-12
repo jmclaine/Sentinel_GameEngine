@@ -2,17 +2,17 @@
 
 // Textures.
 //
-Texture2D    _Texture0	:register(t0);
-SamplerState _Sampler0	:register(s0);
+Texture2D _Texture0 : register(t0);
+SamplerState _Sampler0 : register(s0);
 
 
 // Vertex Shader.
 //
 struct VSInput
 {
-	float4 QuadCoord0	:QUADCOORD0;
-	float4 Color		:COLOR;
-	matrix Matrix		:MATRIX;
+	float4 QuadCoord0 : QUADCOORD0;
+	float4 Color : COLOR;
+	matrix Matrix : MATRIX;
 };
 
 VSInput VS_Main(VSInput input)
@@ -25,9 +25,9 @@ VSInput VS_Main(VSInput input)
 //
 struct GSOutput
 {
-	float4 Position		:SV_POSITION;
-	float4 Color		:COLOR;
-	float2 TexCoord0	:TEXCOORD0;
+	float4 Position : SV_POSITION;
+	float4 Color : COLOR;
+	float2 TexCoord0 : TEXCOORD0;
 };
 
 [maxvertexcount(4)]
@@ -35,7 +35,7 @@ void GS_Main(point VSInput input[1], inout TriangleStream<GSOutput> TriStream)
 {
 	GSOutput output;
 	output.Color = input[0].Color;
-	
+
 	// Top right.
 	//
 	output.Position = mul(input[0].Matrix, float4(1, 0, 0, 1));
@@ -64,17 +64,16 @@ void GS_Main(point VSInput input[1], inout TriangleStream<GSOutput> TriStream)
 
 // Pixel Shader.
 //
-float4 PS_Main(GSOutput input):SV_Target
+float4 PS_Main(GSOutput input) :SV_Target
 {
 	return saturate(_Texture0.Sample(_Sampler0, input.TexCoord0) * input.Color);
 }
 
 #endif
+
 //////////////////////////////////////////////////////////////////////////////
+
 #ifdef VERSION_GL
-
-#version 330
-
 #ifdef VERTEX_SHADER
 
 in vec4 QuadCoord0;
@@ -102,8 +101,8 @@ in mat4 gvMatrix[];
 out vec2 vTexCoord0;
 out vec4 vColor;
 
-layout (points) in;
-layout (triangle_strip, max_vertices=4) out;
+layout(points) in;
+layout(triangle_strip, max_vertices = 4) out;
 
 void main()
 {
@@ -132,7 +131,7 @@ void main()
 	gl_Position = gvMatrix[0] * vec4(0, 1, 0, 1);
 	vTexCoord0 = vec2(gvQuadCoord0[0].x, gvQuadCoord0[0].w);
 	EmitVertex();
-	
+
 	EndPrimitive();
 }
 

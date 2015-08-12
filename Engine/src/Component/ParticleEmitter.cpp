@@ -8,18 +8,19 @@
 #include "Timing.h"
 #include "RenderManager.h"
 
-namespace Sentinel { namespace Component
+namespace Sentinel {
+namespace Component
 {
-	DEFINE_SERIAL_REGISTER( ParticleEmitter );
-	DEFINE_SERIAL_CLONE( ParticleEmitter );
+	DEFINE_SERIAL_REGISTER(ParticleEmitter);
+	DEFINE_SERIAL_CLONE(ParticleEmitter);
 
 	ParticleEmitter::ParticleEmitter() :
-		mParticleSystem( NULL )
+		mParticleSystem(NULL)
 	{}
 
-	ParticleEmitter::ParticleEmitter( ParticleSystem* particle )
+	ParticleEmitter::ParticleEmitter(ParticleSystem* particle)
 	{
-		Set( particle );
+		Set(particle);
 	}
 
 	ParticleEmitter::~ParticleEmitter()
@@ -27,7 +28,7 @@ namespace Sentinel { namespace Component
 		delete mParticleSystem;
 	}
 
-	void ParticleEmitter::Set( ParticleSystem* particle )
+	void ParticleEmitter::Set(ParticleSystem* particle)
 	{
 		mParticleSystem = particle;
 	}
@@ -40,18 +41,7 @@ namespace Sentinel { namespace Component
 
 		mParticleSystem->Startup();
 
-		mOwner->GetWorld()->mRenderManager->Draw( this, RenderQueue::ALPHA_BLEND, mOwner->mLayer );
-	}
-
-	void ParticleEmitter::Update()
-	{
-		mParticleSystem->SetMatrixWorld( mTransform->GetMatrixWorld() );
-
-		Renderer* renderer = mOwner->GetWorld()->mRenderer;
-
-		mParticleSystem->Update( mOwner->GetWorld()->mTiming->DeltaTime() );
-
-		Drawable::Update();
+		mOwner->GetWorld()->mRenderManager->Draw(this, RenderQueue::ALPHA_BLEND, mOwner->mLayer);
 	}
 
 	void ParticleEmitter::Shutdown()
@@ -63,12 +53,23 @@ namespace Sentinel { namespace Component
 
 	/////////////////////////////////
 
-	void ParticleEmitter::CalculateBounds()
+	void ParticleEmitter::Execute()
 	{
-		mBounds.Set( mTransform->GetMatrixWorld() );
+		mParticleSystem->SetMatrixWorld(mTransform->GetMatrixWorld());
+
+		Renderer* renderer = mOwner->GetWorld()->mRenderer;
+
+		mParticleSystem->Update(mOwner->GetWorld()->mTiming->DeltaTime());
+
+		Drawable::Execute();
 	}
 
-	bool ParticleEmitter::CheckVisible( Camera* camera )
+	void ParticleEmitter::CalculateBounds()
+	{
+		mBounds.Set(mTransform->GetMatrixWorld());
+	}
+
+	bool ParticleEmitter::CheckVisible(Camera* camera)
 	{
 		return true;
 	}
@@ -80,35 +81,35 @@ namespace Sentinel { namespace Component
 
 	/////////////////////////////////
 
-	void ParticleEmitter::Save( Archive& archive )
+	void ParticleEmitter::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		Drawable::Save( archive );
+		Drawable::Save(archive);
 
-		mParticleSystem->Save( archive );
+		mParticleSystem->Save(archive);
 	}
 
-	void ParticleEmitter::Load( Archive& archive )
+	void ParticleEmitter::Load(Archive& archive)
 	{
-		Drawable::Load( archive );
+		Drawable::Load(archive);
 
-		mParticleSystem = (ParticleSystem*)SerialRegister::Load( archive );
+		mParticleSystem = (ParticleSystem*)SerialRegister::Load(archive);
 
 		GameWorld* world = mOwner->GetWorld();
 
-		mParticleSystem->Set( world->mRenderer, world );
+		mParticleSystem->Set(world->mRenderer, world);
 
-		mParticleSystem->Load( archive );
+		mParticleSystem->Load(archive);
 	}
 
 	///////////////////////////////////
 
 	GameComponent* ParticleEmitter::Copy()
 	{
-		ParticleEmitter* emitter = new ParticleEmitter( mParticleSystem );
+		ParticleEmitter* emitter = new ParticleEmitter(mParticleSystem);
 
-		Drawable::Copy( emitter );
+		Drawable::Copy(emitter);
 
 		return emitter;
 	}

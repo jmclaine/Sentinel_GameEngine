@@ -5,57 +5,48 @@
 #include "GameObject.h"
 #include "GameWorld.h"
 
-namespace Sentinel { namespace Component
+namespace Sentinel {
+namespace Component
 {
-	DEFINE_SERIAL_REGISTER( OrthographicCamera );
-	DEFINE_SERIAL_CLONE( OrthographicCamera );
+	DEFINE_SERIAL_REGISTER(OrthographicCamera);
+	DEFINE_SERIAL_CLONE(OrthographicCamera);
 
 	OrthographicCamera::OrthographicCamera()
 	{}
 
-	OrthographicCamera::OrthographicCamera( UINT windowWidth, UINT windowHeight )
+	OrthographicCamera::OrthographicCamera(UINT windowWidth, UINT windowHeight)
 	{
-		Set( windowWidth, windowHeight );
-	}
-
-	void OrthographicCamera::Startup()
-	{
-		Component::Camera::Startup();
-	}
-
-	void OrthographicCamera::Shutdown()
-	{
-		Component::Camera::Shutdown();
+		Set(windowWidth, windowHeight);
 	}
 
 	//////////////////////////////
 
-	void OrthographicCamera::Set( UINT windowWidth, UINT windowHeight )
+	void OrthographicCamera::Set(UINT windowWidth, UINT windowHeight)
 	{
-		mMatrixProjection.ProjectionOrthographic( (float)windowWidth, (float)windowHeight );
+		mMatrixProjection.ProjectionOrthographic((float)windowWidth, (float)windowHeight);
 	}
 
-	Ray OrthographicCamera::ScreenPointToRay( UINT mouseX, UINT mouseY, UINT screenWidth, UINT screenHeight )
+	Ray OrthographicCamera::ScreenPointToRay(UINT mouseX, UINT mouseY, UINT screenWidth, UINT screenHeight)
 	{
-		return Ray( Vector3f( (float)mouseX, (float)mouseY, 0 ), Vector3f( 0, 0, -1 ));
+		return Ray(Vector3f((float)mouseX, (float)mouseY, 0), Vector3f(0, 0, -1));
 	}
 
 	//////////////////////////////
 
-	void OrthographicCamera::Save( Archive& archive )
+	void OrthographicCamera::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		Camera::Save( archive );
+		Camera::Save(archive);
 
-		archive.Write( mMatrixProjection.Ptr(), ar_sizeof( mMatrixProjection ));
+		archive.Write(mMatrixProjection.Ptr(), ar_sizeof(mMatrixProjection));
 	}
 
-	void OrthographicCamera::Load( Archive& archive )
+	void OrthographicCamera::Load(Archive& archive)
 	{
-		Camera::Load( archive );
+		Camera::Load(archive);
 
-		archive.Read( mMatrixProjection.Ptr(), ar_sizeof( mMatrixProjection ));
+		archive.Read(mMatrixProjection.Ptr(), ar_sizeof(mMatrixProjection));
 	}
 
 	//////////////////////////////
@@ -64,7 +55,7 @@ namespace Sentinel { namespace Component
 	{
 		OrthographicCamera* camera = new OrthographicCamera();
 
-		Camera::Copy( camera );
+		Camera::Copy(camera);
 
 		camera->mMatrixProjection = mMatrixProjection;
 

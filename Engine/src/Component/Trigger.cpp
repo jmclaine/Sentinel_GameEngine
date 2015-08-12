@@ -2,26 +2,25 @@
 #include "GameObject.h"
 #include "Component/Physics.h"
 
-namespace Sentinel { namespace Component
+namespace Sentinel {
+namespace Component
 {
-	DEFINE_SERIAL_REGISTER( Trigger );
-	DEFINE_SERIAL_CLONE( Trigger );
+	DEFINE_SERIAL_REGISTER(Trigger);
+	DEFINE_SERIAL_CLONE(Trigger);
 
 	Trigger::Trigger() :
-		mPhysics( NULL )
-	{
-		mType = GameComponent::TRIGGER;
-	}
+		mPhysics(NULL)
+	{}
 
 	Trigger::~Trigger()
 	{}
 
 	void Trigger::Startup()
 	{
-		mPhysics = (Physics*)mOwner->FindComponent( GameComponent::TRANSFORM );
+		mPhysics = mOwner->GetComponent<Physics>();
 
-		if( mPhysics == NULL )
-			throw AppException( "Trigger::Startup()\n" + std::string( mOwner->mName ) + " does not contain PhysicsComponent" );
+		if (mPhysics == NULL)
+			throw AppException("Trigger::Startup()\n" + std::string(mOwner->mName) + " does not contain PhysicsComponent");
 	}
 
 	void Trigger::Update()
@@ -34,15 +33,15 @@ namespace Sentinel { namespace Component
 
 	/////////////////////////////////
 
-	void Trigger::Save( Archive& archive )
+	void Trigger::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		GameComponent::Save( archive );
+		GameComponent::Save(archive);
 	}
 
-	void Trigger::Load( Archive& archive )
+	void Trigger::Load(Archive& archive)
 	{
-		GameComponent::Load( archive );
+		GameComponent::Load(archive);
 	}
 }}

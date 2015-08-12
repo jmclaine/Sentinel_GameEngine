@@ -5,119 +5,60 @@
 #include "Archive.h"
 #include "Component/Drawable.h"
 #include "Component/Camera.h"
+#include "Component/Light.h"
+#include "Component/Transform.h"
+#include "Component/Controller3D.h"
+#include "Component/Physics.h"
 
 namespace Sentinel
 {
-	DEFINE_SERIAL_REGISTER( GameObject );
+	DEFINE_SERIAL_REGISTER(GameObject);
 
-	GameObject::GameObject( const std::string& name ) :
-		mTransform( NULL ),
-		mController( NULL ),
-		mPhysics( NULL ),
-		mDrawable( NULL ),
-		mCamera( NULL ),
-		mWorld( NULL ),
-		mName( name ),
-		mLayer( 0x0001 ),
-		mEnabled( true )
+	GameObject::GameObject(const std::string& name) :
+		mTransform(NULL),
+		mController(NULL),
+		mPhysics(NULL),
+		mDrawable(NULL),
+		mCamera(NULL),
+		mWorld(NULL),
+		mName(name),
+		mLayer(0x0001),
+		mEnabled(true)
 	{}
 
 	GameObject::~GameObject()
 	{
-		SAFE_DELETE( mTransform );
-		SAFE_DELETE( mController );
-		SAFE_DELETE( mPhysics );
-		SAFE_DELETE( mDrawable );
-		SAFE_DELETE( mCamera );
-
-		TRAVERSE_VECTOR( x, mComponent )
-			delete mComponent[ x ];
+		TRAVERSE_VECTOR(x, mComponent)
+			delete mComponent[x];
 	}
 
-	DEFINE_SERIAL_CLONE( GameObject );
+	DEFINE_SERIAL_CLONE(GameObject);
 
 	////////////////////////////////////////////////////////////
 
-	GameComponent* GameObject::AttachComponent( GameComponent* component )
+	GameComponent* GameObject::Attach(GameComponent* component)
 	{
-		if( !component )
+		if (!component)
 			return NULL;
 
-		component->SetOwner( this );
-		
-		switch( component->GetType() )
-		{
-			case GameComponent::TRANSFORM:
-				_ASSERT( !mTransform );
+		component->SetOwner(this);
 
-				mTransform = component;
-				return component;
+		mComponent.push_back(component);
 
-			case GameComponent::CONTROLLER:
-				_ASSERT( !mController );
-
-				mController = component;
-				return component;
-
-			case GameComponent::PHYSICS:
-				_ASSERT( !mPhysics );
-				
-				mPhysics = component;
-				return component;
-
-			case GameComponent::DRAWABLE:
-				_ASSERT( !mDrawable );
-
-				mDrawable = component;
-				return component;
-
-			case GameComponent::CAMERA:
-				_ASSERT( !mCamera );
-
-				mCamera = component;
-				return component;
-
-			default:
-				mComponent.push_back( component );
-				return component;
-		}
+		return component;
 	}
 
-#define DETACH_COMPONENT( obj )\
-	if( component == obj )\
-		obj = NULL;\
-	return component;
-
-	GameComponent* GameObject::DetachComponent( GameComponent* component )
+	GameComponent* GameObject::Detach(GameComponent* component)
 	{
-		_ASSERT( component );
+		_ASSERT(component);
 
-		switch( component->GetType() )
+		TRAVERSE_VECTOR(x, mComponent)
 		{
-			case GameComponent::TRANSFORM:
-				DETACH_COMPONENT( mTransform );
-
-			case GameComponent::CONTROLLER:
-				DETACH_COMPONENT( mController );
-
-			case GameComponent::PHYSICS:
-				DETACH_COMPONENT( mPhysics );
-
-			case GameComponent::DRAWABLE:
-				DETACH_COMPONENT( mDrawable );
-
-			case GameComponent::CAMERA:
-				DETACH_COMPONENT( mCamera );
-
-			default:
-				TRAVERSE_VECTOR( x, mComponent )
-				{
-					if( component == mComponent[ x ] )
-					{
-						mComponent.erase( mComponent.begin() + x );
-						return component;
-					}
-				}
+			if (component == mComponent[x])
+			{
+				mComponent.erase(mComponent.begin() + x);
+				break;
+			}
 		}
 
 		return component;
@@ -125,24 +66,17 @@ namespace Sentinel
 
 	////////////////////////////////////////////////////////////
 
-	GameObject* GameObject::AddChild( GameObject* obj )
+	GameObject* GameObject::AddChild(GameObject* obj)
 	{
-		if( mWorld )
+		if (mWorld)
 		{
-			mWorld->RemoveGameObject( obj );
+			mWorld->RemoveGameObject(obj);
 
-			obj->SetWorld( mWorld );
-			obj->SetParent( this );
-
-			////////////////////////////////
-
-			Component::Light* light = (Component::Light*)obj->FindComponent( GameComponent::LIGHT );
-			
-			if( light )
-				mWorld->AddLight( light );
+			obj->SetWorld(mWorld);
+			obj->SetParent(this);
 		}
 
-		return ListNode< GameObject >::AddChild( obj );
+		return ListNode<GameObject>::AddChild(obj);
 	}
 
 	////////////////////////////////////////////////////////////
@@ -152,283 +86,187 @@ namespace Sentinel
 		return mWorld;
 	}
 
-	void GameObject::SetWorld( GameWorld* world )
+	void GameObject::SetWorld(GameWorld* world)
 	{
 		mWorld = world;
 
-		TRAVERSE_VECTOR( x, mChild )
+		TRAVERSE_VECTOR(x, mChild)
 		{
-			mChild[ x ]->SetWorld( world );
+			mChild[x]->SetWorld(world);
 		}
 	}
 
-	void GameObject::SetActive( bool active )
+	void GameObject::SetActive(bool active)
 	{
 		mEnabled = active;
 
-		if( mDrawable && !active )
-		{
-			((Component::Drawable*)mDrawable)->mEnabled = false;
-		}
+		if (mDrawable)
+			mDrawable->mEnabled = active;
 
-		TRAVERSE_VECTOR( x, mChild )
-		{
-			mChild[ x ]->SetActive( active );
-		}
+		TRAVERSE_VECTOR(x, mChild)
+			mChild[x]->SetActive(active);
 	}
 
 	////////////////////////////////////////////////////////////
 
 	void GameObject::Startup()
 	{
-		if( mTransform )
-			mTransform->Startup();
+		TRAVERSE_VECTOR(x, mComponent)
+			mComponent[x]->Startup();
 
-		if( mController )
-			mController->Startup();
-
-		if( mPhysics )
-			mPhysics->Startup();
-
-		if( mDrawable )
-			mDrawable->Startup();
-
-		if( mCamera )
-		{
-			mWorld->AddCamera( (Component::Camera*)mCamera );
-			mCamera->Startup();
-		}
-		
-		TRAVERSE_VECTOR( x, mComponent )
-		{
-			if( mComponent[ x ]->GetType() == GameComponent::LIGHT )
-				mWorld->AddLight( (Component::Light*)mComponent[ x ] );
-
-			mComponent[ x ]->Startup();
-		}
-
-		TRAVERSE_VECTOR( x, mChild )
-			mChild[ x ]->Startup();
+		TRAVERSE_VECTOR(x, mChild)
+			mChild[x]->Startup();
 	}
 
 	void GameObject::UpdateController()
 	{
-		if( mEnabled )
+		if (mEnabled)
 		{
-			if( mController )
-				mController->Update();
+			if (mController)
+				mController->Execute();
 
-			TRAVERSE_VECTOR( x, mChild )
-				mChild[ x ]->UpdateController();
+			TRAVERSE_VECTOR(x, mChild)
+				mChild[x]->UpdateController();
 		}
 	}
 
 	void GameObject::UpdatePhysics()
 	{
-		if( mEnabled )
+		if (mEnabled)
 		{
-			if( mPhysics )
-				mPhysics->Update();
+			if (mPhysics)
+				mPhysics->Execute();
 
-			TRAVERSE_VECTOR( x, mChild )
-				mChild[ x ]->UpdatePhysics();
+			TRAVERSE_VECTOR(x, mChild)
+				mChild[x]->UpdatePhysics();
 		}
 	}
 
 	void GameObject::UpdateTransform()
 	{
-		if( mEnabled )
+		if (mEnabled)
 		{
-			if( mTransform )
-				mTransform->Update();
+			if (mTransform)
+				mTransform->Execute();
 
-			TRAVERSE_VECTOR( x, mChild )
-				mChild[ x ]->UpdateTransform();
+			TRAVERSE_VECTOR(x, mChild)
+				mChild[x]->UpdateTransform();
 		}
 	}
 
 	void GameObject::UpdateComponents()
 	{
-		if( mEnabled )
+		if (mEnabled)
 		{
-			// WARNING
-			TRAVERSE_VECTOR( x, mComponent )
-			{
-				if( mComponent[ x ]->GetType() != GameComponent::LIGHT )
-					mComponent[ x ]->Update();
-			}
+			TRAVERSE_VECTOR(x, mComponent)
+				mComponent[x]->Update();
 
-			TRAVERSE_VECTOR( x, mChild )
-				mChild[ x ]->UpdateComponents();
+			TRAVERSE_VECTOR(x, mChild)
+				mChild[x]->UpdateComponents();
 		}
 	}
 
 	void GameObject::UpdateCamera()
 	{
-		if( mEnabled )
+		if (mEnabled)
 		{
-			if( mCamera )
-				mCamera->Update();
-		
-			TRAVERSE_VECTOR( x, mChild )
-				mChild[ x ]->UpdateCamera();
+			if (mCamera)
+				mCamera->Execute();
+
+			TRAVERSE_VECTOR(x, mChild)
+				mChild[x]->UpdateCamera();
 		}
 	}
 
 	void GameObject::UpdateDrawable()
 	{
-		if( mEnabled )
+		if (mEnabled)
 		{
-			if( mDrawable )
-				mDrawable->Update();
-		
-			TRAVERSE_VECTOR( x, mChild )
-				mChild[ x ]->UpdateDrawable();
+			if (mDrawable)
+				mDrawable->Execute();
+
+			TRAVERSE_VECTOR(x, mChild)
+				mChild[x]->UpdateDrawable();
 		}
 	}
-
-#define SHUTDOWN_COMPONENT( component )\
-	if( component ) { component->Shutdown(); }
 
 	void GameObject::Shutdown()
 	{
-		SHUTDOWN_COMPONENT( mTransform );
-		SHUTDOWN_COMPONENT( mController );
-		SHUTDOWN_COMPONENT( mPhysics );
-		SHUTDOWN_COMPONENT( mDrawable );
+		TRAVERSE_VECTOR(x, mComponent)
+			mComponent[x]->Shutdown();
 
-		TRAVERSE_VECTOR( x, mComponent )
-			mComponent[ x ]->Shutdown();
-
-		TRAVERSE_VECTOR( x, mChild )
-			mChild[ x ]->Shutdown();
-	}
-
-	GameComponent* GameObject::FindComponent( GameComponent::Type type )
-	{
-		switch( type )
-		{
-			case GameComponent::TRANSFORM:
-				return mTransform;
-				
-			case GameComponent::CONTROLLER:
-				return mController;
-
-			case GameComponent::PHYSICS:
-				return mPhysics;
-				
-			case GameComponent::DRAWABLE:
-				return mDrawable;
-				
-			default:
-				TRAVERSE_VECTOR( x, mComponent )
-				{
-					if( mComponent[ x ]->GetType() == type )
-						return mComponent[ x ];
-				}
-				break;
-		}
-
-		return NULL;
+		TRAVERSE_VECTOR(x, mChild)
+			mChild[x]->Shutdown();
 	}
 
 	////////////////////////////////////////////////////////////
 
-	#define SAVE_COMPONENT( component )\
-	(component) ? component->Save( archive ) : archive.Write( &noValue, 1, true );
-
-	void GameObject::Save( Archive& archive )
+	void GameObject::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
-		
-		archive.Write( &mName );
-		
-		int noValue = 0;
-		SAVE_COMPONENT( mTransform );
-		SAVE_COMPONENT( mController );
-		SAVE_COMPONENT( mPhysics );
-		SAVE_COMPONENT( mDrawable );
+		SERIAL_REGISTER.Save(archive);
+
+		archive.Write(&mName);
 
 		BYTE size = (BYTE)mComponent.size();
-		archive.Write( &size );
+		archive.Write(&size);
 
-		TRAVERSE_VECTOR( x, mComponent )
-			mComponent[ x ]->Save( archive );
-		
+		TRAVERSE_VECTOR(x, mComponent)
+			mComponent[x]->Save(archive);
+
 		size = (BYTE)mChild.size();
-		archive.Write( &size );
+		archive.Write(&size);
 
-		TRAVERSE_VECTOR( x, mChild )
-			mChild[ x ]->Save( archive );
+		TRAVERSE_VECTOR(x, mChild)
+			mChild[x]->Save(archive);
 	}
 
 #define LOAD_COMPONENT()\
-{	component = (GameComponent*)SerialRegister::Load( archive );\
-	if( component ) {\
-	AttachComponent( component );\
-	component->Load( archive ); }}
+{\
+	component = (GameComponent*)SerialRegister::Load(archive);\
+	if (component)\
+	{\
+		Attach(component);\
+		component->Load(archive);\
+	}\
+}
 
-	void GameObject::Load( Archive& archive )
+	void GameObject::Load(Archive& archive)
 	{
-		archive.Read( &mName );
+		archive.Read(&mName);
 
 		int id = 0;
 		GameComponent* component;
 
-		LOAD_COMPONENT();
-		LOAD_COMPONENT();
-		LOAD_COMPONENT();
-		LOAD_COMPONENT();
-
 		BYTE size = 0;
-		archive.Read( &size );
+		archive.Read(&size);
 
-		for( BYTE x = 0; x < size; ++x )
+		for (BYTE x = 0; x < size; ++x)
 			LOAD_COMPONENT();
 
-		archive.Read( &size );
+		archive.Read(&size);
 
 		GameObject* obj;
-		for( BYTE x = 0; x < size; ++x )
+		for (BYTE x = 0; x < size; ++x)
 		{
-			obj = (GameObject*)SerialRegister::Load( archive );
-			if( obj )
+			obj = (GameObject*)SerialRegister::Load(archive);
+			if (obj)
 			{
-				obj->SetWorld( mWorld );
-				obj->Load( archive );
-				AddChild( obj );
+				obj->SetWorld(mWorld);
+				obj->Load(archive);
+				AddChild(obj);
 			}
 		}
 	}
 
 	GameObject* GameObject::Copy()
 	{
-		GameObject* obj = new GameObject( mName );
-		
-		if( mTransform )
-			obj->AttachComponent( mTransform->Copy() );
-		
-		if( mController )
-			obj->AttachComponent( mController->Copy() );
+		GameObject* obj = new GameObject(mName);
 
-		if( mPhysics )
-			obj->AttachComponent( mPhysics->Copy() );
+		TRAVERSE_VECTOR(x, mComponent)
+			obj->Attach(mComponent[x]->Copy());
 
-		if( mDrawable )
-			obj->AttachComponent( mDrawable->Copy() );
-
-		if( mCamera )
-			obj->AttachComponent( mCamera->Copy() );
-		
-		TRAVERSE_VECTOR( x, mComponent )
-		{
-			obj->AttachComponent( mComponent[ x ]->Copy() );
-		}
-
-		TRAVERSE_VECTOR( x, mChild )
-		{
-			obj->AddChild( mChild[ x ]->Copy() );
-		}
+		TRAVERSE_VECTOR(x, mChild)
+			obj->AddChild(mChild[x]->Copy());
 
 		return obj;
 	}

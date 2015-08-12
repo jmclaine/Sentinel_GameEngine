@@ -6,11 +6,11 @@ cbuffer Uniforms
 {
 	matrix _WVP;
 	matrix _World;
-	
+
 	float3 _LightPos;
 	float3 _LightColor;
 	float4 _LightAttn;
-	
+
 	float3 _CameraPos;
 
 	float4 _Ambient;
@@ -22,45 +22,45 @@ cbuffer Uniforms
 
 // Textures.
 //
-Texture2D    _Texture0	:register(t0);
-SamplerState _Sampler0	:register(s0);
+Texture2D _Texture0 : register(t0);
+SamplerState _Sampler0 : register(s0);
 
 
 // Vertex Shader.
 //
 struct VSInput
 {
-	float4 Position		:POSITION;
-	float3 Normal		:NORMAL;
-	float2 TexCoord0	:TEXCOORD0;
+	float4 Position : POSITION;
+	float3 Normal : NORMAL;
+	float2 TexCoord0 : TEXCOORD0;
 };
 
 struct VSOutput
 {
-	float4 Position		:SV_POSITION;
-	float2 TexCoord0	:TEXCOORD0;
-	float3 Normal		:NORMAL;
-	float3 CameraDir	:CAMERA_DIR;
-	float3 LightPos		:LIGHT_POS;
+	float4 Position : SV_POSITION;
+	float2 TexCoord0 : TEXCOORD0;
+	float3 Normal : NORMAL;
+	float3 CameraDir : CAMERA_DIR;
+	float3 LightPos : LIGHT_POS;
 };
 
-VSOutput VS_Main( VSInput input )
+VSOutput VS_Main(VSInput input)
 {
 	VSOutput output;
 
 	// Position
-	output.Position = mul(_WVP,   input.Position);
+	output.Position = mul(_WVP, input.Position);
 	float3 worldPos = mul(_World, input.Position).xyz;
-	
+
 	// Light direction
-	output.LightPos  = _LightPos - worldPos;
-	
+	output.LightPos = _LightPos - worldPos;
+
 	// Camera direction
 	output.CameraDir = _CameraPos - worldPos;
 
 	// Texture
 	output.TexCoord0 = input.TexCoord0;
-	
+
 	// Normal
 	output.Normal = mul(_World, float4(input.Normal, 0)).xyz;
 
@@ -72,13 +72,13 @@ VSOutput VS_Main( VSInput input )
 //
 float4 GetColor(float3 LPos, float3 camDir, float3 N, float3 color, float4 attn)
 {
-	float dist = max(0.0, length(LPos)-attn.w);
+	float dist = max(0.0, length(LPos) - attn.w);
 
 	LPos = normalize(LPos);
 	float3 H = normalize(LPos + camDir);
 
 	// Attenuation
-	float den = attn.x + (attn.y*2.0*dist)/attn.w + (attn.z*dist*dist)/(attn.w*attn.w);
+	float den = attn.x + (attn.y*2.0*dist) / attn.w + (attn.z*dist*dist) / (attn.w*attn.w);
 	float attnFinal = clamp(1.0 / (den*den), 0.0, 1.0);
 
 	// Ambient
@@ -94,8 +94,8 @@ float4 GetColor(float3 LPos, float3 camDir, float3 N, float3 color, float4 attn)
 	return saturate(float4(ambientFinal.rgb + (diffuseFinal.rgb + specularFinal.rgb) * attnFinal * color, 1));
 }
 
-float4 PS_Main(VSOutput input):SV_Target
-{	
+float4 PS_Main(VSOutput input) :SV_Target
+{
 	// Camera Direction
 	input.CameraDir = normalize(input.CameraDir);
 
@@ -104,21 +104,16 @@ float4 PS_Main(VSOutput input):SV_Target
 
 	// Attenuation
 	float4 color0 = GetColor(input.LightPos, input.CameraDir, N, _LightColor, _LightAttn);
-	
+
 	// Final fragment color
 	return _Texture0.Sample(_Sampler0, input.TexCoord0) * color0;
 }
 
 #endif
+
 //////////////////////////////////////////////////////////////////////////////
+
 #ifdef VERSION_GL
-
-varying vec2 vTexCoord0;
-varying vec3 vNormal;
-varying vec3 vWorldPos;
-varying vec3 vCamDir;
-varying vec3 vLPos0;
-
 #ifdef VERTEX_SHADER
 
 uniform mat4 _WVP;
@@ -127,9 +122,15 @@ uniform mat4 _World;
 uniform vec3 _LightPos;
 uniform vec3 _CameraPos;
 
-attribute vec3 Position;
-attribute vec2 TexCoord0;
-attribute vec3 Normal;
+in vec3 Position;
+in vec2 TexCoord0;
+in vec3 Normal;
+
+out vec2 vTexCoord0;
+out vec3 vNormal;
+out vec3 vWorldPos;
+out vec3 vCamDir;
+out vec3 vLPos0;
 
 void main()
 {
@@ -137,8 +138,8 @@ void main()
 	vWorldPos = (_World * vec4(Position, 1)).xyz;
 
 	// Light direction
-	vLPos0  = _LightPos - vWorldPos;
-	
+	vLPos0 = _LightPos - vWorldPos;
+
 	// Camera direction
 	vCamDir = _CameraPos - vWorldPos;
 
@@ -146,7 +147,7 @@ void main()
 	vTexCoord0 = TexCoord0;
 
 	// Normal
-	vNormal = mul(_World, vec4(Normal, 0));
+	vNormal = (_World * vec4(Normal, 0)).xyz;
 }
 
 #endif
@@ -162,13 +163,21 @@ uniform float _SpecComp;
 uniform vec3 _LightColor;
 uniform vec4 _LightAttn;
 
-vec3 GetColor( vec3 lightDir, vec3 cameraDir, vec3 normal, vec3 color, vec4 attn )
-{
-	float intensity = clamp( dot( normal, lightDir ), 0.0, 1.0 );
+in vec2 vTexCoord0;
+in vec3 vNormal;
+in vec3 vWorldPos;
+in vec3 vCamDir;
+in vec3 vLPos0;
 
-	if( intensity > 0 )
+out vec4 vFragColor;
+
+vec3 GetColor(vec3 lightDir, vec3 cameraDir, vec3 normal, vec3 color, vec4 attn)
+{
+	float intensity = clamp(dot(normal, lightDir), 0.0, 1.0);
+
+	if (intensity > 0)
 	{
-		float d = distance( lightDir, vWorldPos );
+		float d = distance(lightDir, vWorldPos);
 		float r = attn.w;
 
 		// Attenuation
@@ -177,16 +186,15 @@ vec3 GetColor( vec3 lightDir, vec3 cameraDir, vec3 normal, vec3 color, vec4 attn
 		//float attenuation = attn.x + (attn.y*d)/r + (attn.z*d*d)/(r*r);
 
 		// Set to end light at radius.
-		float attenuation = clamp( 1.0 - d*d/(r*r), 0.0, 1.0 );
+		float attenuation = clamp(1.0 - d*d / (r*r), 0.0, 1.0);
 		attenuation *= attenuation;
 
 		// Specular
-		vec3 specularFinal = max( _Specular.rgb * pow( clamp( dot( normal, normalize( lightDir + cameraDir )), 0.0, 1.0 ), _SpecComp ), 0.0 );
+		vec3 specularFinal = max(_Specular.rgb * pow(clamp(dot(normal, normalize(lightDir + cameraDir)), 0.0, 1.0), _SpecComp), 0.0);
 
-		return clamp( (_Diffuse.rgb * intensity + specularFinal.rgb) * attenuation * color, 0.0, 1.0 );
+		return clamp((_Diffuse.rgb * intensity + specularFinal.rgb) * attenuation * color, 0.0, 1.0);
 	}
-	else
-		return vec3(0, 0, 0);
+	else return vec3(0, 0, 0);
 }
 
 void main()
@@ -201,7 +209,7 @@ void main()
 	vec3 color0 = GetColor(vLPos0, camDir, N, _LightColor, _LightAttn);
 
 	// Final fragment color
-	gl_FragColor = (_Ambient + vec4(color0, 0)) * texture2D(_Texture0, vTexCoord0);
+	vFragColor = (_Ambient + vec4(color0, 0)) * texture2D(_Texture0, vTexCoord0);
 }
 
 #endif

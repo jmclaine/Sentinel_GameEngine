@@ -4,7 +4,8 @@
 #include "Vector3f.h"
 #include "Vector2f.h"
 
-namespace Sentinel { namespace Component
+namespace Sentinel {
+namespace Component
 {
 	class SENTINEL_DLL PerspectiveCamera : public Camera
 	{
@@ -12,43 +13,40 @@ namespace Sentinel { namespace Component
 
 	private:
 
-		float			mNearZ;
-		float			mFarZ;
-		float			mFOV;
-		float			mAspectRatio;
+		float mNearZ;
+		float mFarZ;
+		float mFOV;
+		float mAspectRatio;
 
-		float			mAngle;
+		float mAngle;
 
 	public:
 
 		PerspectiveCamera();
-		PerspectiveCamera( UINT windowWidth, UINT windowHeight );
-		PerspectiveCamera( UINT windowWidth, UINT windowHeight, float nearZ, float farZ, float FOV );
-
-		void			Startup();
-
-		void			Update();
-
-		void			Shutdown();
+		PerspectiveCamera(UINT windowWidth, UINT windowHeight);
+		PerspectiveCamera(UINT windowWidth, UINT windowHeight, float nearZ, float farZ, float FOV);
 
 		//////////////////////////////
 
-		void			Set( UINT windowWidth, UINT windowHeight );
-		void			Set( UINT windowWidth, UINT windowHeight, float nearZ, float farZ, float FOV );
+		void Execute();
 
-		float			NearZ();
-		float			FarZ();
-		float			FOV();
-		float			AspectRatio();
+		void Set(UINT windowWidth, UINT windowHeight);
+		void Set(UINT windowWidth, UINT windowHeight, float nearZ, float farZ, float FOV);
 
-		float			Angle();
+		float NearZ();
+		float FarZ();
+		float FOV();
+		float AspectRatio();
+
+		float Angle();
 
 		const Vector3f& LookAt();
 
-		void			GetFrustumSize( Vector3f& nearCenter, Vector3f& farCenter,
-										Vector2f& nearSize,   Vector2f& farSize );
+		void GetFrustumSize(
+			Vector3f& nearCenter, Vector3f& farCenter,
+			Vector2f& nearSize, Vector2f& farSize);
 
-		Ray				ScreenPointToRay( UINT mouseX, UINT mouseY, UINT screenWidth = 0, UINT screenHeight = 0 );
+		Ray ScreenPointToRay(UINT mouseX, UINT mouseY, UINT screenWidth = 0, UINT screenHeight = 0);
 
 		//////////////////////////////
 

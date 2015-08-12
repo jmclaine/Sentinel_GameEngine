@@ -37,42 +37,44 @@ namespace Sentinel
 
 	public:
 
-		PrimitiveFormat::Type	mPrimitive;
-		
-		Buffer*					mVertexBuffer;
-		Buffer*					mIndexBuffer;
+		PrimitiveFormat::Type mPrimitive;
 
-		std::shared_ptr< VertexLayout >		mLayout;
-		std::shared_ptr< Material >			mMaterial;
+		Buffer* mVertexBuffer;
+		Buffer* mIndexBuffer;
 
-		Matrix4f				mMatrixWorld;
-		
-		BoundingBox				mBounds;
+		std::shared_ptr<VertexLayout> mLayout;
+		std::shared_ptr<Material> mMaterial;
+
+		Matrix4f mMatrixWorld;
+
+		BoundingBox mBounds;
 
 		//////////////////////////////
 
 		Mesh();
 		~Mesh();
 
-		void		 Draw( Renderer* renderer, GameWorld* world, Component::Camera* camera, UINT count = UINT_MAX );
+		void Draw(Renderer* renderer, GameWorld* world, Component::Camera* camera, UINT count = UINT_MAX);
 
 		// Helper function to calculate the bounding box using the VBO.
 		//
-		void		 CalculateBounds();
+		void CalculateBounds();
 
 		//////////////////////////////
 
-		static void  Save( Archive&				archive, 
-						   Mesh*				mesh,
-						   Renderer*			renderer, 
-						   ShaderManager*		shaderManager, 
-						   TextureManager*		textureManager,
-						   MaterialManager*		materialManager );
+		static void Save(
+			Archive& archive,
+			Mesh* mesh,
+			Renderer* renderer,
+			ShaderManager* shaderManager,
+			TextureManager* textureManager,
+			MaterialManager* materialManager);
 
-		static Mesh* Load( Archive&				archive, 
-						   Renderer*			renderer, 
-						   ShaderManager*		shaderManager, 
-						   TextureManager*		textureManager,
-						   MaterialManager*		materialManager );
+		static Mesh* Load(
+			Archive& archive,
+			Renderer* renderer,
+			ShaderManager* shaderManager,
+			TextureManager* textureManager,
+			MaterialManager* materialManager);
 	};
 }

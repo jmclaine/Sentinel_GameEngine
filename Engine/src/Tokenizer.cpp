@@ -5,49 +5,51 @@ namespace Sentinel
 	const std::string Tokenizer::DELIMITERS(" \t\n\r");
 
 	Tokenizer::Tokenizer(const std::string& s) :
-		m_string(s), 
-		m_offset(0), 
-		m_delimiters(DELIMITERS) {}
+		mString(s), 
+		mOffset(0), 
+		mDelimiters(DELIMITERS)
+	{}
 
 	Tokenizer::Tokenizer(const std::string& s, const std::string& delimiters) :
-		m_string(s), 
-		m_offset(0), 
-		m_delimiters(delimiters) {}
+		mString(s), 
+		mOffset(0), 
+		mDelimiters(delimiters)
+	{}
 
 	bool Tokenizer::NextToken() 
 	{
-		return NextToken(m_delimiters);
+		return NextToken(mDelimiters);
 	}
 
 	bool Tokenizer::NextToken(const std::string& delimiters) 
 	{
-		size_t i = m_string.find_first_not_of(delimiters, m_offset);
+		size_t i = mString.find_first_not_of(delimiters, mOffset);
 		if (std::string::npos == i) 
 		{
-			m_offset = m_string.length();
+			mOffset = mString.length();
 			return false;
 		}
 
-		size_t j = m_string.find_first_of(delimiters, i);
+		size_t j = mString.find_first_of(delimiters, i);
 		if (std::string::npos == j) 
 		{
-			m_token = m_string.substr(i);
-			m_offset = m_string.length();
+			mToken = mString.substr(i);
+			mOffset = mString.length();
 			return true;
 		}
 
-		m_token = m_string.substr(i, j - i);
-		m_offset = j;
+		mToken = mString.substr(i, j - i);
+		mOffset = j;
 		return true;
 	}
 
 	const std::string& Tokenizer::GetToken() const
 	{
-		return m_token;
+		return mToken;
 	}
 
 	void Tokenizer::Reset()
 	{
-		m_offset = 0;
+		mOffset = 0;
 	}
 }

@@ -9,21 +9,22 @@
 #include "RenderManager.h"
 #include "Timing.h"
 
-namespace Sentinel { namespace Component
+namespace Sentinel {
+namespace Component
 {
-	DEFINE_SERIAL_REGISTER( ModelDrawable );
-	DEFINE_SERIAL_CLONE( ModelDrawable );
+	DEFINE_SERIAL_REGISTER(ModelDrawable);
+	DEFINE_SERIAL_CLONE(ModelDrawable);
 
 	ModelDrawable::ModelDrawable() :
-		mModel( NULL )
+		mModel(NULL)
 	{}
 
-	ModelDrawable::ModelDrawable( std::shared_ptr< Model > model )
+	ModelDrawable::ModelDrawable(std::shared_ptr<Model> model)
 	{
-		Set( model );
+		Set(model);
 	}
 
-	void ModelDrawable::Set( std::shared_ptr< Model > model )
+	void ModelDrawable::Set(std::shared_ptr<Model> model)
 	{
 		mModel = model;
 	}
@@ -32,30 +33,25 @@ namespace Sentinel { namespace Component
 	{
 		Drawable::Startup();
 
-		if( mOwner->GetWorld() )
-			mOwner->GetWorld()->mRenderManager->Draw( this, RenderQueue::GEOMETRY, mOwner->mLayer );
-	}
-
-	void ModelDrawable::Update()
-	{
-		mModel->Update( mOwner->GetWorld()->mTiming->DeltaTime() );
-
-		Drawable::Update();
-
-		Draw();
-	}
-
-	void ModelDrawable::Shutdown()
-	{
-		Drawable::Shutdown();
+		if (mOwner->GetWorld())
+			mOwner->GetWorld()->mRenderManager->Draw(this, RenderQueue::GEOMETRY, mOwner->mLayer);
 	}
 
 	///////////////////////////////////
 
+	void ModelDrawable::Execute()
+	{
+		mModel->Update(mOwner->GetWorld()->mTiming->DeltaTime());
+
+		Drawable::Execute();
+
+		Draw();
+	}
+
 	void ModelDrawable::CalculateBounds()
 	{}
 
-	bool ModelDrawable::CheckVisible( Camera* camera )
+	bool ModelDrawable::CheckVisible(Camera* camera)
 	{
 		return true;
 	}
@@ -66,49 +62,49 @@ namespace Sentinel { namespace Component
 
 		GameWorld* world = mOwner->GetWorld();
 
-		mModel->Draw( world->mRenderer, world, world->mCurrentCamera );
+		mModel->Draw(world->mRenderer, world, world->mCurrentCamera);
 	}
 
 	///////////////////////////////////
 
-	void ModelDrawable::Save( Archive& archive )
+	void ModelDrawable::Save(Archive& archive)
 	{
-		_ASSERT( mOwner );
-		_ASSERT( mOwner->GetWorld() );
-		_ASSERT( mOwner->GetWorld()->mModelManager );
+		_ASSERT(mOwner);
+		_ASSERT(mOwner->GetWorld());
+		_ASSERT(mOwner->GetWorld()->mModelManager);
 
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		Drawable::Save( archive );
+		Drawable::Save(archive);
 
 		GameWorld* world = mOwner->GetWorld();
 
-		archive.Write( &world->mModelManager->Get( mModel ));
+		archive.Write(&world->mModelManager->Get(mModel));
 	}
 
-	void ModelDrawable::Load( Archive& archive )
+	void ModelDrawable::Load(Archive& archive)
 	{
-		_ASSERT( mOwner );
-		_ASSERT( mOwner->GetWorld() );
-		_ASSERT( mOwner->GetWorld()->mModelManager );
+		_ASSERT(mOwner);
+		_ASSERT(mOwner->GetWorld());
+		_ASSERT(mOwner->GetWorld()->mModelManager);
 
-		Drawable::Load( archive );
+		Drawable::Load(archive);
 
 		GameWorld* world = mOwner->GetWorld();
 
 		std::string name;
-		archive.Read( &name );
+		archive.Read(&name);
 
-		mModel = world->mModelManager->Get( name );
+		mModel = world->mModelManager->Get(name);
 	}
 
 	///////////////////////////////////
 
 	GameComponent* ModelDrawable::Copy()
 	{
-		ModelDrawable* drawable = new ModelDrawable( mModel );
-		
-		Drawable::Copy( drawable );
+		ModelDrawable* drawable = new ModelDrawable(mModel);
+
+		Drawable::Copy(drawable);
 
 		return drawable;
 	}

@@ -1,46 +1,51 @@
 #pragma once
 
+#include <unordered_map>
+#include <functional>
+
 #include "Common.h"
 #include "Util.h"
 
-#include <list>
-#include <functional>
-#define DELEGATE( type ) std::function< type >
-#define BIND( func ) std::bind( &func, this )
+#define DELEGATE(type) std::function<type>
+#define BIND(func) std::bind(&func, this)
 
-typedef DELEGATE( void() ) Action;
+typedef DELEGATE(void()) Action;
 
 namespace Sentinel
 {
-	template< typename T >
 	class Event
 	{
 	private:
 
-		std::list< std::function< T >> events;
+		std::unordered_map<void(*const*)(), Action> events;
 
 	public:
 
 		Event()
 		{}
 
-		void operator += ( std::function< T > right )
+		void operator += (Action right)
 		{
-			events.push_back( right );
+			events[right.target<void(*)()>()] = right;
 		}
 
-		void operator -= ( std::function< T > right )
+		void operator -= (Action right)
 		{
-			events.remove( right );
+			events.erase(right.target<void(*)()>());
 		}
 
-		void Activate()
+		void operator -= (void(*const* func)())
 		{
-			if( events.empty() )
+			events.erase(func);
+		}
+
+		void operator () ()
+		{
+			if (events.empty())
 				return;
 
-			TRAVERSE_LIST( it, events )
-				(*it)();
+			TRAVERSE_LIST(it, events)
+				it->second();
 		}
 	};
 }

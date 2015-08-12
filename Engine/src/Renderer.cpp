@@ -1,22 +1,22 @@
+#include <iostream>
+#include <fstream>
+
 #include "Renderer.h"
 #include "tinyxml.h"
 #include "Shader.h"
 #include "Texture.h"
 
-#include <iostream>
-#include <fstream>
-
 namespace Sentinel
 {
 	WindowInfo::WindowInfo()
 	{
-		mFullscreen		= false;
+		mFullscreen = false;
 
-		mWidth			= 1920;
-		mHeight			= 1080;
+		mWidth = 1920;
+		mHeight = 1080;
 
-		mWidthRatio		= 1.0f;
-		mHeightRatio	= 1.0f;
+		mWidthRatio = 1.0f;
+		mHeightRatio = 1.0f;
 	}
 
 	bool WindowInfo::Fullscreen() const
@@ -52,19 +52,19 @@ namespace Sentinel
 	void WindowInfo::Update()
 	{
 		static RECT rect;
-		GetClientRect( (HWND)mHandle, &rect );
+		GetClientRect((HWND)mHandle, &rect);
 
-		mWidth  = (UINT)(rect.right - rect.left);
+		mWidth = (UINT)(rect.right - rect.left);
 		mHeight = (UINT)(rect.bottom - rect.top);
 
-		mWidthRatio  = (float)mWidth  / (float)Renderer::WINDOW_WIDTH_BASE;
+		mWidthRatio = (float)mWidth / (float)Renderer::WINDOW_WIDTH_BASE;
 		mHeightRatio = (float)mHeight / (float)Renderer::WINDOW_HEIGHT_BASE;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////
 
-	RenderTexture::RenderTexture( Texture* texture ) :
-		mTexture( texture )
+	RenderTexture::RenderTexture(Texture* texture) :
+		mTexture(texture)
 	{}
 
 	RenderTexture::~RenderTexture()
@@ -77,9 +77,9 @@ namespace Sentinel
 
 	////////////////////////////////////////////////////////////////////////////////////
 
-	DepthStencil::DepthStencil( UINT width, UINT height ) :
-		mWidth( width ),
-		mHeight( height )
+	DepthStencil::DepthStencil(UINT width, UINT height) :
+		mWidth(width),
+		mHeight(height)
 	{}
 
 	DepthStencil::~DepthStencil()
@@ -97,12 +97,13 @@ namespace Sentinel
 
 	////////////////////////////////////////////////////////////////////////////////////
 
-	BlendState::BlendState( BlendFormat::Type srcBlendColor, BlendFormat::Type dstBlendColor,
-							BlendFormat::Type srcBlendAlpha, BlendFormat::Type dstBlendAlpha,
-							BlendFunction::Type blendFuncColor, BlendFunction::Type blendFuncAlpha ) :
-		mSrcBlendColor( srcBlendColor ), mDstBlendColor( dstBlendColor ),
-		mSrcBlendAlpha( srcBlendAlpha ), mDstBlendAlpha( dstBlendAlpha ),
-		mBlendFuncColor( blendFuncColor ), mBlendFuncAlpha( blendFuncAlpha )
+	BlendState::BlendState(
+		BlendFormat::Type srcBlendColor, BlendFormat::Type dstBlendColor,
+		BlendFormat::Type srcBlendAlpha, BlendFormat::Type dstBlendAlpha,
+		BlendFunction::Type blendFuncColor, BlendFunction::Type blendFuncAlpha) :
+		mSrcBlendColor(srcBlendColor), mDstBlendColor(dstBlendColor),
+		mSrcBlendAlpha(srcBlendAlpha), mDstBlendAlpha(dstBlendAlpha),
+		mBlendFuncColor(blendFuncColor), mBlendFuncAlpha(blendFuncAlpha)
 	{}
 
 	BlendFormat::Type BlendState::SrcBlendColor()
@@ -137,66 +138,65 @@ namespace Sentinel
 
 	////////////////////////////////////////////////////////////////////////////////////
 
-	UINT Renderer::WINDOW_WIDTH_BASE  = 1920;
+	UINT Renderer::WINDOW_WIDTH_BASE = 1920;
 	UINT Renderer::WINDOW_HEIGHT_BASE = 1080;
 
 	Renderer::Renderer()
 	{}
 
-	Renderer* Renderer::Create( const char* filename, WindowInfo& info )
+	Renderer* Renderer::Create(const char* filename, WindowInfo& info)
 	{
 		TiXmlDocument doc;
-		if( !doc.LoadFile( filename ))
+		if (!doc.LoadFile(filename))
 			return NULL;
 
-		TiXmlHandle	hDoc( &doc );
+		TiXmlHandle	hDoc(&doc);
 
-		TiXmlElement* pElem = hDoc.FirstChild( "Renderer" ).Element();
-		const char*   pName = pElem->Attribute( "Type" );
+		TiXmlElement* pElem = hDoc.FirstChild("Renderer").Element();
+		const char*   pName = pElem->Attribute("Type");
 
-		Renderer* renderer = (strcmp( "DIRECTX", pName ) == 0) ? BuildRendererDX() : BuildRendererGL();
+		Renderer* renderer = (strcmp("DIRECTX", pName) == 0) ? BuildRendererDX() : BuildRendererGL();
 
-		if( !renderer )
+		if (!renderer)
 			return NULL;
-		
-		pElem->QueryBoolAttribute(		"Fullscreen",	&info.mFullscreen );
-		pElem->QueryUnsignedAttribute(	"Width",		&info.mWidth );
-		pElem->QueryUnsignedAttribute(	"Height",		&info.mHeight );
 
-		Renderer::WINDOW_WIDTH_BASE  = info.mWidth;
+		pElem->QueryBoolAttribute("Fullscreen", &info.mFullscreen);
+		pElem->QueryUnsignedAttribute("Width", &info.mWidth);
+		pElem->QueryUnsignedAttribute("Height", &info.mHeight);
+
+		Renderer::WINDOW_WIDTH_BASE = info.mWidth;
 		Renderer::WINDOW_HEIGHT_BASE = info.mHeight;
 
-		info.mWidthRatio  = 1;
+		info.mWidthRatio = 1;
 		info.mHeightRatio = 1;
 
 		return renderer;
 	}
 
-	Texture* Renderer::CreateTexture( UINT width, UINT height, ImageFormat::Type format, bool createMips )
+	Texture* Renderer::CreateTexture(UINT width, UINT height, ImageFormat::Type format, bool createMips)
 	{
-		return CreateTextureFromMemory( 0, width, height, format, createMips );
+		return CreateTextureFromMemory(0, width, height, format, createMips);
 	}
 
-	Texture* Renderer::CreateTextureFromResource( void* data, UINT length )
+	Texture* Renderer::CreateTextureFromResource(void* data, UINT length)
 	{
 		int width, height;
 		int nChannels;
 
-		unsigned char* pixels = stbi_load_from_memory( (const unsigned char*)data, (int)length, &width, &height, &nChannels, 4 );
+		unsigned char* pixels = stbi_load_from_memory((const unsigned char*)data, (int)length, &width, &height, &nChannels, 4);
 
-		if( pixels == NULL )
+		if (pixels == NULL)
 			return NULL;
 
-		return CreateTextureFromMemory( pixels, (UINT)width, (UINT)height, ImageFormat::RGBA );
+		return CreateTextureFromMemory(pixels, (UINT)width, (UINT)height, ImageFormat::RGBA);
 	}
 
-	void Renderer::SetShader( Shader* shader )
+	void Renderer::SetShader(Shader* shader)
 	{
-		if( mCurrShader )
+		if (mCurrShader)
 			mCurrShader->Disable();
 
 		mCurrShader = shader;
-
 		mCurrShader->Enable();
 	}
 

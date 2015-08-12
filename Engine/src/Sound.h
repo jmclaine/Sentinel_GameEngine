@@ -11,21 +11,21 @@ namespace Sentinel
 	{
 	public:
 
-		float				mPitch;
-		float				mGain;
-		Vector3f			mPosition;
-		Vector3f			mVelocity;
-		bool				mLoop;
+		float mPitch;
+		float mGain;
+		Vector3f mPosition;
+		Vector3f mVelocity;
+		bool mLoop;
 
 	protected:
 
-		UINT				mFormat;
-		DWORD				mSampleRate;
+		UINT mFormat;
+		DWORD mSampleRate;
 
-		UINT				mBoundSize;
-		UINT				mDataSize;
-		BYTE*				mData;
-   
+		UINT mBoundSize;
+		UINT mDataSize;
+		BYTE* mData;
+
 		///////////////////////////
 
 		Sound();
@@ -36,30 +36,30 @@ namespace Sentinel
 
 		///////////////////////////
 
-		virtual void		Play() = 0;
+		virtual void Play() = 0;
 
-		virtual void		Pause() = 0;
+		virtual void Pause() = 0;
 
-		virtual void		Stop() = 0;
-
-		///////////////////////////
-
-		UINT				Format();
-
-		DWORD				SampleRate();
-
-		UINT				DataSize();
-
-		BYTE*				Data();
+		virtual void Stop() = 0;
 
 		///////////////////////////
 
-		static void			Save( Archive& archive, Sound* source );
+		UINT Format();
 
-		static Sound*	Load( Archive& archive, AudioSystem* audio );
+		DWORD SampleRate();
+
+		UINT DataSize();
+
+		BYTE* Data();
+
+		///////////////////////////
+
+		static void Save(Archive& archive, Sound* source);
+
+		static Sound* Load(Archive& archive, AudioSystem* audio);
 
 	protected:
 
-		void				Load( Archive& archive );
+		void Load(Archive& archive);
 	};
 }

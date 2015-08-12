@@ -40,11 +40,10 @@ float4 PS_Main(VSOutput input):SV_Target
 }
 
 #endif
+
 //////////////////////////////////////////////////////////////////////////////
+
 #ifdef VERSION_GL
-
-#version 150
-
 #ifdef VERTEX_SHADER
 
 uniform mat4 _WVP;

@@ -2,7 +2,8 @@
 
 #include "Component/Controller3D.h"
 
-namespace Sentinel { namespace Component
+namespace Sentinel {
+namespace Component
 {
 	class SENTINEL_DLL PlayerController : public Controller3D
 	{
@@ -14,16 +15,15 @@ namespace Sentinel { namespace Component
 		float mAngularSpeed;
 
 		//////////////////////////////
-		
+
 		PlayerController();
 
 		void Startup();
-
-		void Update();
-
 		void Shutdown();
 
 		//////////////////////////////
+
+		void Execute();
 
 		GameComponent* Copy();
 	};

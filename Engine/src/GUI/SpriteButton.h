@@ -21,32 +21,32 @@ namespace GUI
 
 		DECLARE_SERIAL_REGISTER_SAVE();
 
-		UINT				mFrameUp;
-		ColorRGBA			mColorUp;
+		UINT mFrameUp;
+		ColorRGBA mColorUp;
 
-		UINT				mFrameOver;
-		ColorRGBA			mColorOver;
+		UINT mFrameOver;
+		ColorRGBA mColorOver;
 
-		UINT				mFrameDown;
-		ColorRGBA			mColorDown;
+		UINT mFrameDown;
+		ColorRGBA mColorDown;
 
 	protected:
 
-		Component::SpriteDrawable*	mSprite;
+		Component::SpriteDrawable* mSprite;
 
 	public:
 
 		SpriteButton();
 		virtual ~SpriteButton();
 
-		virtual void		Startup();
+		virtual void Startup();
 
-		virtual void		Update();
+		virtual void Update();
 
-		virtual void		Shutdown();
+		virtual void Shutdown();
 
 		///////////////////////////////////
 
-		GameComponent*		Copy();
+		GameComponent* Copy();
 	};
 }}

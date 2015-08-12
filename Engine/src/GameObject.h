@@ -4,6 +4,8 @@ All attached GameComponent(s) are freed on Shutdown()
 */
 #include <set>
 #include <vector>
+#include <typeinfo>
+#include <iostream>
 
 #include "Util.h"
 #include "GameComponent.h"
@@ -14,86 +16,114 @@ namespace Sentinel
 	namespace Component
 	{
 		class Camera;
+		class Controller;
+		class Physics;
+		class Transform;
+		class Drawable;
 	}
 
 	class GameWorld;
 
-	class SENTINEL_DLL GameObject : public Serializable, public ListNode< GameObject >
+	class SENTINEL_DLL GameObject : public Serializable, public ListNode<GameObject>
 	{
 	private:
 
 		DECLARE_SERIAL();
 
-		GameComponent*						mTransform;
-		GameComponent*						mController;
-		GameComponent*						mPhysics;
-		GameComponent*						mDrawable;
-		GameComponent*						mCamera;
-		std::vector< GameComponent* >		mComponent;
+		std::vector<GameComponent*> mComponent;
 
-		GameWorld*							mWorld;
+		GameWorld* mWorld;
 
-		bool								mEnabled;
+		bool mEnabled;
 
 	public:
 
-		std::string							mName;
-		WORD								mLayer;
-		
+		Component::Controller* mController;
+		Component::Physics* mPhysics;
+		Component::Transform* mTransform;
+		Component::Camera* mCamera;
+		Component::Drawable* mDrawable;
+
+		std::string mName;
+		WORD mLayer;
+
 		//////////////////////////////
 
-		GameObject( const std::string& name = "GameObject" );
+		GameObject(const std::string& name = "GameObject");
 		~GameObject();
 
 		//////////////////////////////
 
-		GameComponent*	AttachComponent( GameComponent* component );
-		GameComponent*	DetachComponent( GameComponent* component );
+		GameComponent* Attach(GameComponent* component);
+		GameComponent* Detach(GameComponent* component);
 
 		//////////////////////////////
 
-		GameObject*		AddChild( GameObject* obj );	// override
+		GameObject* AddChild(GameObject* obj);	// override
 
 		//////////////////////////////
 
-		GameWorld*		GetWorld();
-		void			SetWorld( GameWorld* world );
+		GameWorld* GetWorld();
+		void SetWorld(GameWorld* world);
 
-		void			SetActive( bool active );
+		void SetActive(bool active);
 
 		//////////////////////////////
 
-		void			Startup();
+		void Startup();
 
-		void			UpdateController();
-		void			UpdatePhysics();
-		void			UpdateTransform();
-		void			UpdateComponents();
-		void			UpdateCamera();
-		void			UpdateDrawable();
+		void UpdateController();
+		void UpdatePhysics();
+		void UpdateTransform();
+		void UpdateComponents();
+		void UpdateCamera();
+		void UpdateDrawable();
 
-		void			Shutdown();
+		void Shutdown();
 
 		//////////////////////////////
 
 		// Find the first occurrence of a component by type.
 		//
-		GameComponent*	FindComponent( GameComponent::Type type );
-
-		// Find all components of a type to the componentList.
-		//
-		template< class COMPONENT >
-		void FindComponent( GameComponent::Type type, std::vector< COMPONENT* >& componentList )
+		template <typename Component = GameComponent>
+		Component* GetComponent()
 		{
-			TRAVERSE_VECTOR( x, mComponent )
+			_ASSERT((std::is_base_of<GameComponent, Component>::value));
+
+			GameComponent* component;
+
+			TRAVERSE_VECTOR(x, mComponent)
 			{
-				if( mComponent[ x ]->GetType() == type )
-					componentList.push_back( (COMPONENT*)mComponent[ x ] );
+				component = mComponent[x];
+
+				if (dynamic_cast<Component*>(component))
+					return (Component*)component;
 			}
+
+			return NULL;
+		}
+
+		template <typename Component = GameComponent>
+		std::vector<Component*> GetComponents()
+		{
+			_ASSERT((std::is_base_of<GameComponent, Component>::value));
+
+			std::vector<GameComponent*> componentList;
+			GameComponent* component;
+
+			TRAVERSE_VECTOR(x, mComponent)
+			{
+				component = mComponent[x];
+
+				if (dynamic_cast<Component*>(component))
+					componentList.push_back((Component*)component);
+			}
+
+			return componentList;
 		}
 
 		//////////////////////////////
 
-		GameObject*		Copy();
+		GameObject* Copy();
 	};
 }

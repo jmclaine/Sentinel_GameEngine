@@ -6,7 +6,8 @@
 #include "Material.h"
 #include "Mesh.h"
 
-namespace Sentinel { namespace Component
+namespace Sentinel {
+namespace Component
 {
 	class Camera;
 
@@ -16,26 +17,22 @@ namespace Sentinel { namespace Component
 
 	public:
 
-		std::shared_ptr< Mesh > mMesh;
-		
+		std::shared_ptr<Mesh> mMesh;
+
 		///////////////////////////////////
 
 		MeshDrawable();
-		MeshDrawable( std::shared_ptr< Mesh > mesh );
-		
-		void	Startup();
+		MeshDrawable(std::shared_ptr<Mesh> mesh);
 
-		void	Update();
-
-		void	Shutdown();
+		void Startup();
 
 		///////////////////////////////////
 
-		void	CalculateBounds();
+		void CalculateBounds();
 
-		bool	CheckVisible( Camera* camera );
+		bool CheckVisible(Camera* camera);
 
-		void	Draw();
+		void Draw();
 
 		///////////////////////////////////
 

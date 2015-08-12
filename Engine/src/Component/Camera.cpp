@@ -5,51 +5,59 @@
 #include "Component/Transform.h"
 #include "RenderManager.h"
 
-namespace Sentinel { namespace Component
+namespace Sentinel {
+namespace Component
 {
 	Camera::Camera() :
-		mTransform( NULL ),
-		mRenderLayer( RenderLayer::LAYER0 ),
-		mClearDepth( 1.0f ),
-		mViewportOffsetX( 0 ),
-		mViewportOffsetY( 0 ),
-		mViewportWidth( Renderer::WINDOW_WIDTH_BASE ),
-		mViewportHeight( Renderer::WINDOW_HEIGHT_BASE ),
-		mDepthStencil( NULL ),
-		mRenderTexture( NULL )
+		mTransform(NULL),
+		mRenderLayer(RenderLayer::LAYER0),
+		mClearDepth(1.0f),
+		mViewportOffsetX(0),
+		mViewportOffsetY(0),
+		mViewportWidth(Renderer::WINDOW_WIDTH_BASE),
+		mViewportHeight(Renderer::WINDOW_HEIGHT_BASE),
+		mDepthStencil(NULL),
+		mRenderTexture(NULL)
 	{
-		mType = GameComponent::CAMERA;
-
 		mMatrixView.Identity();
 		mMatrixProjection.Identity();
 		mMatrixWVP.Identity();
 	}
 
-	const Transform* Camera::GetTransform()
-	{
-		return mTransform;
-	}
-
 	void Camera::Startup()
 	{
-		mTransform = (Transform*)mOwner->FindComponent( GameComponent::TRANSFORM );
+		mTransform = mOwner->mTransform;
 
-		if( mTransform == NULL )
-			throw AppException( "Camera::Startup()\n" + std::string( mOwner->mName ) + " does not contain TransformComponent" );
-	}
-
-	void Camera::Update()
-	{
-		mMatrixView.Rotate( mTransform->mOrientation );
-		mLookAt = mTransform->mPosition + mMatrixView.Forward();
-
-		mMatrixView.LookAtView( mTransform->mPosition, mLookAt, mMatrixView.Up() );
-		mMatrixWVP = mMatrixProjection * mMatrixView;
+		if (mTransform == NULL)
+			throw AppException("Camera::Startup()\n" + std::string(mOwner->mName) + " does not contain TransformComponent");
 	}
 
 	void Camera::Shutdown()
 	{
 		mTransform = NULL;
+	}
+
+	////////////////////////////////
+
+	void Camera::Execute()
+	{
+		mMatrixView.Rotate(mTransform->mOrientation);
+		mLookAt = mTransform->mPosition + mMatrixView.Forward();
+
+		mMatrixView.LookAtView(mTransform->mPosition, mLookAt, mMatrixView.Up());
+		mMatrixWVP = mMatrixProjection * mMatrixView;
+	}
+
+	void Camera::SetOwner(GameObject* owner)
+	{
+		GameComponent::SetOwner(owner);
+
+		mOwner->mCamera = this;
+	}
+
+	const Transform* Camera::GetTransform()
+	{
+		return mTransform;
 	}
 
 	const Matrix4f& Camera::GetMatrixWorld()
@@ -77,69 +85,67 @@ namespace Sentinel { namespace Component
 		return mFrustum;
 	}
 
-	void Camera::Apply( Renderer* renderer )
+	void Camera::Apply(Renderer* renderer)
 	{
-		renderer->SetViewport( mViewportOffsetX, mViewportOffsetY, 
-							   mViewportWidth,   mViewportHeight );
+		renderer->SetViewport(mViewportOffsetX, mViewportOffsetY,
+			mViewportWidth, mViewportHeight);
 
-		renderer->SetDepthStencil( mDepthStencil );
-		renderer->SetRenderTexture( mRenderTexture );
+		renderer->SetDepthStencil(mDepthStencil);
+		renderer->SetRenderTexture(mRenderTexture);
 
-		if( mDepthStencil != NULL && mRenderTexture != NULL)
-		{	
-			renderer->Clear( mClearColor.Ptr(), mClearDepth );
-		}
-		else
-		if( mDepthStencil != NULL )
+		if (mDepthStencil != NULL && mRenderTexture != NULL)
 		{
-			renderer->ClearDepth( mClearDepth );
+			renderer->Clear(mClearColor.Ptr(), mClearDepth);
 		}
-		else
-		if( mRenderTexture != NULL )
+		else if (mDepthStencil != NULL)
 		{
-			renderer->ClearColor( mClearColor.Ptr() );
+			renderer->ClearDepth(mClearDepth);
+		}
+		else if (mRenderTexture != NULL)
+		{
+			renderer->ClearColor(mClearColor.Ptr());
 		}
 	}
 
 	////////////////////////////////
 
-	void Camera::Save( Archive& archive )
+	void Camera::Save(Archive& archive)
 	{
-		GameComponent::Save( archive );
+		GameComponent::Save(archive);
 
-		archive.Write( &mViewportOffsetX );
-		archive.Write( &mViewportOffsetY );
-		archive.Write( &mViewportWidth );
-		archive.Write( &mViewportHeight );
-		archive.Write( mClearColor.Ptr(), ar_sizeof( mClearColor ));
-		archive.Write( &mClearDepth );
+		archive.Write(&mViewportOffsetX);
+		archive.Write(&mViewportOffsetY);
+		archive.Write(&mViewportWidth);
+		archive.Write(&mViewportHeight);
+		archive.Write(mClearColor.Ptr(), ar_sizeof(mClearColor));
+		archive.Write(&mClearDepth);
 	}
 
-	void Camera::Load( Archive& archive )
+	void Camera::Load(Archive& archive)
 	{
-		GameComponent::Load( archive );
+		GameComponent::Load(archive);
 
-		archive.Read( &mViewportOffsetX );
-		archive.Read( &mViewportOffsetY );
-		archive.Read( &mViewportWidth );
-		archive.Read( &mViewportHeight );
-		archive.Read( mClearColor.Ptr(), ar_sizeof( mClearColor ));
-		archive.Read( &mClearDepth );
+		archive.Read(&mViewportOffsetX);
+		archive.Read(&mViewportOffsetY);
+		archive.Read(&mViewportWidth);
+		archive.Read(&mViewportHeight);
+		archive.Read(mClearColor.Ptr(), ar_sizeof(mClearColor));
+		archive.Read(&mClearDepth);
 	}
 
 	////////////////////////////////
 
-	void Camera::Copy( GameComponent* component )
+	void Camera::Copy(GameComponent* component)
 	{
 		Camera* camera = (Camera*)component;
 
-		GameComponent::Copy( camera );
+		GameComponent::Copy(camera);
 
 		camera->mViewportOffsetX = mViewportOffsetX;
 		camera->mViewportOffsetY = mViewportOffsetY;
-		camera->mViewportWidth   = mViewportWidth;
-		camera->mViewportHeight  = mViewportHeight;
-		camera->mClearColor      = mClearColor;
-		camera->mClearDepth      = mClearDepth;
+		camera->mViewportWidth = mViewportWidth;
+		camera->mViewportHeight = mViewportHeight;
+		camera->mClearColor = mClearColor;
+		camera->mClearDepth = mClearDepth;
 	}
 }}

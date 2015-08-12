@@ -132,12 +132,6 @@
     <ClInclude Include="..\Engine\src\Model.h">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\NetworkPacket.h">
-      <Filter>Source Files\Sentinel_Engine\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\NetworkSocket.h">
-      <Filter>Source Files\Sentinel_Engine\Network</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\FixedPoint.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClInclude>
@@ -381,6 +375,15 @@
     <ClInclude Include="..\Engine\src\Component\PointLight.h">
       <Filter>Source Files\Sentinel_Engine\Components\Light</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\src\Network\Packet.h">
+      <Filter>Source Files\Sentinel_Engine\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Network\Socket.h">
+      <Filter>Source Files\Sentinel_Engine\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Component\Controller.h">
+      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\MathCommon.cpp">
@@ -433,12 +436,6 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\Model.cpp">
       <Filter>Source Files\Sentinel_Engine\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\NetworkPacket.cpp">
-      <Filter>Source Files\Sentinel_Engine\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\NetworkSocket.cpp">
-      <Filter>Source Files\Sentinel_Engine\Network</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\src\GameObject.cpp">
       <Filter>Source Files\Sentinel_Engine\Components</Filter>
@@ -706,6 +703,15 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\Component\PointLight.cpp">
       <Filter>Source Files\Sentinel_Engine\Components\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Network\Packet.cpp">
+      <Filter>Source Files\Sentinel_Engine\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Network\Socket.cpp">
+      <Filter>Source Files\Sentinel_Engine\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Component\Controller.cpp">
+      <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

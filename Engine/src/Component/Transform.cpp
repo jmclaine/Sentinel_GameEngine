@@ -2,33 +2,34 @@
 #include "GameObject.h"
 #include "Archive.h"
 
-namespace Sentinel { namespace Component
+namespace Sentinel {
+namespace Component
 {
-	DEFINE_SERIAL_REGISTER( Transform );
-	DEFINE_SERIAL_CLONE( Transform );
+	DEFINE_SERIAL_REGISTER(Transform);
+	DEFINE_SERIAL_CLONE(Transform);
 
 	Transform::Transform() :
-		mParentTransform( NULL ),
-		mScale( Vector3f( 1, 1, 1 ))
+		mParentTransform(NULL),
+		mScale(Vector3f(1, 1, 1))
+	{}
+
+	Transform::~Transform()
 	{
-		mType = GameComponent::TRANSFORM;
+		if (mOwner->mTransform == this)
+			mOwner->mTransform = NULL;
 	}
 
 	void Transform::Startup()
 	{
-		if( mOwner->GetParent() )
-			mParentTransform = static_cast< Transform* >(mOwner->GetParent()->FindComponent( GameComponent::TRANSFORM ));
-		else
-			mParentTransform = NULL;
+		_ASSERT(mOwner);
+
+		GameObject* parent = mOwner->GetParent();
+
+		mParentTransform = (parent) ? parent->mTransform : NULL;
 	}
 
 	void Transform::Update()
-	{
-		mMatrixWorld.World( mPosition, mOrientation, mScale );
-		
-		if( mParentTransform )
-			mMatrixWorld = mParentTransform->GetMatrixWorld() * mMatrixWorld;
-	}
+	{}
 
 	void Transform::Shutdown()
 	{
@@ -37,16 +38,32 @@ namespace Sentinel { namespace Component
 
 	///////////////////////////////////
 
+	void Transform::Execute()
+	{
+		mMatrixWorld.World(mPosition, mOrientation, mScale);
+
+		if (mParentTransform)
+			mMatrixWorld = mParentTransform->GetMatrixWorld() * mMatrixWorld;
+	}
+
+	void Transform::SetOwner(GameObject* owner)
+	{
+		GameComponent::SetOwner(owner);
+
+		if (owner->mTransform == NULL)
+			owner->mTransform = this;
+	}
+
 	const Matrix4f& Transform::GetMatrixWorld() const
 	{
 		return mMatrixWorld;
 	}
 
-	const Matrix4f& Transform::GetMatrixWorld( const Vector3f& offset )
+	const Matrix4f& Transform::GetMatrixWorld(const Vector3f& offset)
 	{
-		mMatrixWorld.World( mPosition, mOrientation, mScale, offset );
+		mMatrixWorld.World(mPosition, mOrientation, mScale, offset);
 
-		if( mParentTransform )
+		if (mParentTransform)
 			mMatrixWorld = mParentTransform->GetMatrixWorld() * mMatrixWorld;
 
 		return mMatrixWorld;
@@ -54,24 +71,24 @@ namespace Sentinel { namespace Component
 
 	///////////////////////////////////
 
-	void Transform::Save( Archive& archive )
+	void Transform::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		GameComponent::Save( archive );
+		GameComponent::Save(archive);
 
-		archive.Write( mPosition.Ptr(),		ar_sizeof( mPosition ));
-		archive.Write( mOrientation.Ptr(),  ar_sizeof( mOrientation ));
-		archive.Write( mScale.Ptr(),		ar_sizeof( mScale ));
+		archive.Write(mPosition.Ptr(), ar_sizeof(mPosition));
+		archive.Write(mOrientation.Ptr(), ar_sizeof(mOrientation));
+		archive.Write(mScale.Ptr(), ar_sizeof(mScale));
 	}
 
-	void Transform::Load( Archive& archive )
+	void Transform::Load(Archive& archive)
 	{
-		GameComponent::Load( archive );
+		GameComponent::Load(archive);
 
-		archive.Read( mPosition.Ptr(),		ar_sizeof( mPosition ));
-		archive.Read( mOrientation.Ptr(),	ar_sizeof( mOrientation ));
-		archive.Read( mScale.Ptr(),			ar_sizeof( mScale ));
+		archive.Read(mPosition.Ptr(), ar_sizeof(mPosition));
+		archive.Read(mOrientation.Ptr(), ar_sizeof(mOrientation));
+		archive.Read(mScale.Ptr(), ar_sizeof(mScale));
 	}
 
 	///////////////////////////////////
@@ -80,7 +97,7 @@ namespace Sentinel { namespace Component
 	{
 		Transform* transform = new Transform();
 
-		GameComponent::Copy( transform );
+		GameComponent::Copy(transform);
 
 		transform->mParentTransform = mParentTransform;
 		transform->mPosition = mPosition;

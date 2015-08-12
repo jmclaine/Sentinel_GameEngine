@@ -17,13 +17,13 @@ namespace GUI
 
 	protected:
 
-		bool			mIsOver;
+		bool mIsOver;
 
 	public:
 
-		Event< void() > mActionEnter;
-		Event< void() >	mActionOver;
-		Event< void() > mActionExit;
+		Event mActionEnter;
+		Event mActionOver;
+		Event mActionExit;
 
 	protected:
 
@@ -33,15 +33,15 @@ namespace GUI
 
 		virtual ~Controller2D();
 
-		virtual void	Startup();
+		virtual void Startup();
 
-		virtual void	SerialSave( Archive& archive ) = 0;
+		virtual void SerialSave(Archive& archive) = 0;
 
-		void			Save( Archive& archive );
-		void			Load( Archive& archive );
+		void Save(Archive& archive);
+		void Load(Archive& archive);
 
 		///////////////////////////////
 
-		virtual void	Copy( GameComponent* component );
+		virtual void Copy(GameComponent* component);
 	};
 }}

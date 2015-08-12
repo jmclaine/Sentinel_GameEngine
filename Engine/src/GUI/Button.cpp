@@ -2,54 +2,54 @@
 #include "Serializable.h"
 #include "Input.h"
 
-namespace Sentinel { namespace GUI
+namespace Sentinel {
+namespace GUI
 {
 	Button::Button() :
-		mState( UP )
+		mState(UP)
 	{}
 
 	Button::~Button()
 	{}
 
-	void Button::Update( bool isOver )
+	void Button::Update(bool isOver)
 	{
-		if( isOver )
+		if (isOver)
 		{
-			if( mState == UP )
+			if (mState == UP)
 			{
 				mState = OVER;
 			}
-			
-			if( Mouse::Get().IsDown( BUTTON_LEFT ))
+
+			if (Mouse::Get().IsDown(BUTTON_LEFT))
 			{
 				mState = DOWN;
 
-				mActionDown.Activate();
+				mActionDown();
 			}
 
-			if( mState == DOWN && Mouse::Get().DidGoUp( BUTTON_LEFT ))
+			if (mState == DOWN && Mouse::Get().DidGoUp(BUTTON_LEFT))
 			{
 				mState = UP;
 
-				mActionClick.Activate();
+				mActionClick();
 			}
 		}
-		else
-		if( mState != UP )
+		else if (mState != UP)
 		{
 			mState = UP;
 
-			mActionUp.Activate();
+			mActionUp();
 		}
 	}
 
 	///////////////////////////////////
 
-	void Button::Save( Archive& archive )
+	void Button::Save(Archive& archive)
 	{
 		//SerialFunctionFactory::Get().Find( mActionUp );
 	}
 
-	void Button::Load( Archive& archive )
+	void Button::Load(Archive& archive)
 	{}
 }}

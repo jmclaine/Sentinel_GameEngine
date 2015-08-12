@@ -22,13 +22,13 @@ namespace GUI
 
 	protected:
 
-		State			mState;
+		State mState;
 
 	public:
 
-		Event< void() >	mActionUp;
-		Event< void() >	mActionDown;
-		Event< void() >	mActionClick;
+		Event mActionUp;
+		Event mActionDown;
+		Event mActionClick;
 
 	protected:
 
@@ -40,11 +40,11 @@ namespace GUI
 
 		////////////////////////////////
 
-		virtual void	Update( bool isOver );
+		virtual void Update(bool isOver);
 
 		////////////////////////////////
 
-		virtual void	Save( Archive& archive );
-		virtual void	Load( Archive& archive );
+		virtual void Save(Archive& archive);
+		virtual void Load(Archive& archive);
 	};
 }}

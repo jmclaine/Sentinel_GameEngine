@@ -63,7 +63,7 @@ namespace Sentinel
 
 		////////////////////////
 
-		// Returns the size of the allocation.
+		// Returns size of the buffer.
 		//
 		static unsigned int ToBuffer( const char *filename, char*& buf );
 	};

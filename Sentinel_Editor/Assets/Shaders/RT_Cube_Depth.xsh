@@ -14,15 +14,15 @@ cbuffer Uniforms
 //
 struct VSInput
 {
-	float3 Position		:POSITION;
+	float3 Position : POSITION;
 };
 
 struct VSOutput
 {
-	float4 Position		:SV_POSITION;
+	float4 Position : SV_POSITION;
 };
 
-VSOutput VS_Main( VSInput input )
+VSOutput VS_Main(VSInput input)
 {
 	VSOutput output;
 
@@ -36,45 +36,44 @@ VSOutput VS_Main( VSInput input )
 //
 struct GSOutput
 {
-	float4 Position		:SV_POSITION;
-	float3 LightPos		:NORMAL;
-	uint   RTIndex		:SV_RenderTargetArrayIndex;
+	float4 Position : SV_POSITION;
+	float3 LightPos : NORMAL;
+	uint   RTIndex : SV_RenderTargetArrayIndex;
 };
 
 [maxvertexcount(18)]
-void GS_Main( triangle VSOutput input[3], inout TriangleStream<GSOutput> stream )
+void GS_Main(triangle VSOutput input[3], inout TriangleStream<GSOutput> stream)
 {
 	GSOutput output;
 
-	for( int face = 0; face < 6; ++face )
-    {
+	for (int face = 0; face < 6; ++face)
+	{
 		output.RTIndex = face;
 
-		for( int vert = 0; vert < 3; ++vert )
+		for (int vert = 0; vert < 3; ++vert)
 		{
 			output.Position = mul(_LightCubeMatrix[face], input[vert].Position);
 			output.LightPos = input[vert].Position.xyz - _LightPos;
-			stream.Append( output );
+			stream.Append(output);
 		}
 		stream.RestartStrip();
-    }
+	}
 }
 
 // Pixel Shader.
 //
 const float shadowRadius = 1.0 / 25.0;
 
-float PS_Main( GSOutput input ) : SV_Target
+float PS_Main(GSOutput input) : SV_Target
 {
 	return length(input.LightPos) * shadowRadius;
 }
 
 #endif
+
 //////////////////////////////////////////////////////////////////////////////
+
 #ifdef VERSION_GL
-
-#version 330
-
 #ifdef VERTEX_SHADER
 
 uniform mat4 _World;
@@ -95,7 +94,7 @@ uniform mat4 _LightCubeMatrix[6];
 uniform vec3 _LightPos;
 
 layout(triangles) in;
-layout(triangle_strip, max_vertices=18) out;
+layout(triangle_strip, max_vertices = 18) out;
 
 in vec4 vPosition[];
 
@@ -103,9 +102,9 @@ out vec4 gLightPos;
 
 void main()
 {
-	for( gl_Layer = 0; gl_Layer < 6; ++gl_Layer )
+	for (gl_Layer = 0; gl_Layer < 6; ++gl_Layer)
 	{
-		for( int vert = 0; vert < 3; ++vert )
+		for (int vert = 0; vert < 3; ++vert)
 		{
 			gl_Position = _LightCubeMatrix[gl_Layer] * vPosition[vert];
 			gLightPos = vec4(vPosition[vert].xyz - _LightPos, 1);
@@ -120,16 +119,18 @@ void main()
 
 in vec4 gLightPos;
 
+out vec4 vFragColor;
+
 const float shadowRadius = 40.0;
 
 void main()
 {
-	float depth = length( gLightPos ) / shadowRadius;
+	float depth = length(gLightPos) / shadowRadius;
 
 	float dx = dFdx(depth);
 	float dy = dFdy(depth);
 
-	gl_FragColor = vec4(depth, depth*depth + 0.25*(dx*dx + dy*dy), 0, 0);
+	vFragColor = vec4(depth, depth*depth + 0.25*(dx*dx + dy*dy), 0, 0);
 }
 
 #endif

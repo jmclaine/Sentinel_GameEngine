@@ -20,7 +20,7 @@ upon compilation / linking.
 #include "PhysicsSystem.h"
 #include "ParticleSystem.h"
 #include "SpriteSystem.h"
-#include "NetworkSocket.h"
+#include "Network/Socket.h"
 #include "AudioSystem.h"
 
 #include "GameWindow.h"

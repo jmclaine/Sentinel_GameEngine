@@ -8,41 +8,41 @@ namespace Sentinel
 {
 	// Singleton for the entire application.
 	//
-	template< class T >
+	template<class Type>
 	class Singleton
 	{
 	protected:
 
-		static T* mSingle;
+		static Type* mSingle;
 
 		/////////////////////////////////////////
 
 		Singleton() {}
-		Singleton( const Singleton& ) {}
-		Singleton& operator = ( const Singleton& ) { return *this; }
+		Singleton(const Singleton&) {}
+		Singleton& operator = (const Singleton&) { return *this; }
 		~Singleton() {}
 
 	public:
 
-		static T* volatile Inst()
+		static Type* volatile Inst()
 		{
-			if( !mSingle )
-				mSingle = new T();
-			
-			return const_cast< T* >(mSingle);
+			if (!mSingle)
+				mSingle = new Type();
+
+			return const_cast<Type*>(mSingle);
 		}
 
-		static T* volatile Inst( T* obj )
+		static Type* volatile Inst(Type* obj)
 		{
-			if( !mSingle )
+			if (!mSingle)
 				mSingle = obj;
 
-			return const_cast< T* >(mSingle);
+			return const_cast<Type*>(mSingle);
 		}
 
 		static void volatile Destroy()
 		{
-			if( mSingle )
+			if (mSingle)
 			{
 				delete mSingle;
 				mSingle = NULL;
@@ -50,44 +50,44 @@ namespace Sentinel
 		}
 	};
 
-	template< class T > T* Singleton< T >::mSingle = NULL;
-	
+	template<class Type> Type* Singleton<Type>::mSingle = NULL;
+
 	//////////////////////////////////////////////////////////////////////////
 
 	// Singleton for the entire application for abstract classes.
 	//
-	template< class T >
+	template<class Type>
 	class SingletonAbstract
 	{
 	protected:
 
-		static T* mSingle;
+		static Type* mSingle;
 
 		/////////////////////////////////////////
 
 		SingletonAbstract() {}
-		SingletonAbstract( const SingletonAbstract& ) {}
-		SingletonAbstract& operator = ( const SingletonAbstract& ) { return *this; }
+		SingletonAbstract(const SingletonAbstract&) {}
+		SingletonAbstract& operator = (const SingletonAbstract&) { return *this; }
 		~SingletonAbstract() {}
 
 	public:
 
-		static T* Inst( T* obj )
+		static Type* Inst(Type* obj)
 		{
-			if( !mSingle )
+			if (!mSingle)
 				mSingle = obj;
-			
-			return const_cast< T* >(mSingle);
+
+			return const_cast<Type*>(mSingle);
 		}
 
-		static T* Inst()
+		static Type* Inst()
 		{
-			return const_cast< T* >(mSingle);
+			return const_cast<Type*>(mSingle);
 		}
 
 		static void Destroy()
 		{
-			if( mSingle )
+			if (mSingle)
 			{
 				delete mSingle;
 				mSingle = NULL;
@@ -95,63 +95,63 @@ namespace Sentinel
 		}
 	};
 
-	template< class T > T* SingletonAbstract< T >::mSingle = NULL;
-	
+	template<class Type> Type* SingletonAbstract<Type>::mSingle = NULL;
+
 	//////////////////////////////////////////////////////////////////////////
 
 	// Singleton for the entire application.
 	//
-	template< class T >
+	template<class Type>
 	class SingletonSafe
 	{
 	protected:
 
-		static CriticalSection		mCS;
+		static CriticalSection mCS;
 
-		static volatile T* volatile mSingle;
+		static volatile Type* volatile mSingle;
 
 		/////////////////////////////////////////
 
 		SingletonSafe() {}
-		SingletonSafe( const SingletonSafe& ) {}
-		SingletonSafe& operator = ( const SingletonSafe& ) { return *this; }
+		SingletonSafe(const SingletonSafe&) {}
+		SingletonSafe& operator = (const SingletonSafe&) { return *this; }
 		~SingletonSafe() {}
 
 	public:
 
-		static T* volatile Inst()
+		static Type* volatile Inst()
 		{
-			if( !mSingle )
+			if (!mSingle)
 			{
 				mCS.Lock();
 
-				if( !mSingle )
-					mSingle = new T();
+				if (!mSingle)
+					mSingle = new Type();
 
 				mCS.Unlock();
 			}
-			
-			return const_cast< T* >(mSingle);
+
+			return const_cast<Type*>(mSingle);
 		}
 
-		static T* volatile Inst( T* obj )
+		static Type* volatile Inst(Type* obj)
 		{
-			if( !mSingle )
+			if (!mSingle)
 			{
 				mCS.Lock();
 
-				if( !mSingle )
+				if (!mSingle)
 					mSingle = obj;
 
 				mCS.Unlock();
 			}
-			
-			return const_cast< T* >(mSingle);
+
+			return const_cast<T*>(mSingle);
 		}
 
 		static void volatile Destroy()
 		{
-			if( mSingle )
+			if (mSingle)
 			{
 				mCS.Lock();
 
@@ -163,54 +163,54 @@ namespace Sentinel
 		}
 	};
 
-	template< class T > volatile T* volatile SingletonSafe< T >::mSingle = NULL;
-	template< class T > CriticalSection SingletonSafe< T >::mCS;
+	template<class Type> volatile Type* volatile SingletonSafe<Type>::mSingle = NULL;
+	template<class Type> CriticalSection SingletonSafe<Type>::mCS;
 
 	//////////////////////////////////////////////////////////////////////////
 
 	// Singleton for the entire application for abstract classes.
 	//
-	template< class T >
+	template<class Type>
 	class SingletonAbstractSafe
 	{
 	protected:
 
-		static CriticalSection		mCS;
+		static CriticalSection mCS;
 
 		static volatile T* volatile mSingle;
 
 		/////////////////////////////////////////
 
 		SingletonAbstractSafe() {}
-		SingletonAbstractSafe( const SingletonAbstractSafe& ) {}
-		SingletonAbstractSafe& operator = ( const SingletonAbstractSafe& ) { return *this; }
+		SingletonAbstractSafe(const SingletonAbstractSafe&) {}
+		SingletonAbstractSafe& operator = (const SingletonAbstractSafe&) { return *this; }
 		~SingletonAbstractSafe() {}
 
 	public:
 
-		static T* volatile Inst( T* obj )
+		static Type* volatile Inst(Type* obj)
 		{
-			if( !mSingle )
+			if (!mSingle)
 			{
 				mCS.Lock();
 
-				if( !mSingle )
+				if (!mSingle)
 					mSingle = obj;
 
 				mCS.Unlock();
 			}
-			
-			return const_cast< T* >(mSingle);
+
+			return const_cast<Type*>(mSingle);
 		}
 
-		static T* volatile Inst()
+		static Type* volatile Inst()
 		{
-			return const_cast< T* >(mSingle);
+			return const_cast<Type*>(mSingle);
 		}
 
 		static void volatile Destroy()
 		{
-			if( mSingle )
+			if (mSingle)
 			{
 				mCS.Lock();
 
@@ -222,99 +222,99 @@ namespace Sentinel
 		}
 	};
 
-	template< class T > volatile T* volatile SingletonAbstractSafe< T >::mSingle = NULL;
-	template< class T > CriticalSection SingletonAbstractSafe< T >::mCS;
+	template<class Type> volatile Type* volatile SingletonAbstractSafe<Type>::mSingle = NULL;
+	template<class Type> CriticalSection SingletonAbstractSafe<Type>::mCS;
 
 	//////////////////////////////////////////////////////////////////////////
 
 	// Singleton for a single thread.
 	//
-	template< class T >
+	template<class Type>
 	class SingletonThreaded
 	{
 	private:
 
-		static std::unordered_map< DWORD, T* > mObj;
+		static std::unordered_map<DWORD, Type*> mObj;
 
 	protected:
 
 		SingletonThreaded() {}
-		SingletonThreaded( const SingletonThreaded& ) {}
-		SingletonThreaded& operator = ( const SingletonThreaded& ) { return *this; }
+		SingletonThreaded(const SingletonThreaded&) {}
+		SingletonThreaded& operator = (const SingletonThreaded&) { return *this; }
 		~SingletonThreaded() {}
 
 	public:
 
-		static T* Inst()
+		static Type* Inst()
 		{
 			DWORD threadID = GetCurrentThreadId();
 
-			if( mObj.find( threadID ) == mObj.end() )
-				mObj[ threadID ] = new T();
-			
-			return mObj[ threadID ];
+			if (mObj.find(threadID) == mObj.end())
+				mObj[threadID] = new Type();
+
+			return mObj[threadID];
 		}
 
 		static void Destroy()
 		{
 			DWORD threadID = GetCurrentThreadId();
 
-			if( mObj.find( threadID ) != mObj.end() )
+			if (mObj.find(threadID) != mObj.end())
 			{
-				delete mObj[ threadID ];
-				mObj.erase( threadID );
+				delete mObj[threadID];
+				mObj.erase(threadID);
 			}
 		}
 	};
 
-	template< class T > std::unordered_map< DWORD, T* > SingletonThreaded< T >::mObj;
+	template<class Type> std::unordered_map<DWORD, Type*> SingletonThreaded<Type>::mObj;
 
 	//////////////////////////////////////////////////////////////////////////
 
 	// Singleton for a single thread for abstract classes.
 	//
-	template< class T >
+	template<class Type>
 	class SingletonAbstractThreaded
 	{
 	private:
 
-		static std::unordered_map< DWORD, T* > mObj;
+		static std::unordered_map<DWORD, Type*> mObj;
 
 	protected:
 
 		SingletonAbstractThreaded() {}
-		SingletonAbstractThreaded( const SingletonAbstractThreaded& ) {}
-		SingletonAbstractThreaded& operator = ( const SingletonAbstractThreaded& ) { return *this; }
+		SingletonAbstractThreaded(const SingletonAbstractThreaded&) {}
+		SingletonAbstractThreaded& operator = (const SingletonAbstractThreaded&) { return *this; }
 		~SingletonAbstractThreaded() {}
 
 	public:
 
-		static T* Inst( T* obj )
+		static Type* Inst(Type* obj)
 		{
 			DWORD threadID = GetCurrentThreadId();
 
-			if( mObj.find( threadID ) == mObj.end() )
-				mObj[ threadID ] = obj;
-			
-			return mObj[ threadID ];
+			if (mObj.find(threadID) == mObj.end())
+				mObj[threadID] = obj;
+
+			return mObj[threadID];
 		}
 
-		static T* Inst()
+		static Type* Inst()
 		{
-			return mObj[ GetCurrentThreadId() ];
+			return mObj[GetCurrentThreadId()];
 		}
 
 		static void Destroy()
 		{
 			DWORD threadID = GetCurrentThreadId();
 
-			if( mObj.find( threadID ) != mObj.end() )
+			if (mObj.find(threadID) != mObj.end())
 			{
-				delete mObj[ threadID ];
-				mObj.erase( threadID );
+				delete mObj[threadID];
+				mObj.erase(threadID);
 			}
 		}
 	};
 
-	template< class T > std::unordered_map< DWORD, T* > SingletonAbstractThreaded< T >::mObj;
+	template<class Type> std::unordered_map<DWORD, Type*> SingletonAbstractThreaded<Type>::mObj;
 }

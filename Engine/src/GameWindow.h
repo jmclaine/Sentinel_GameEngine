@@ -19,29 +19,35 @@ namespace Sentinel
 	{
 	private:
 
-		HINSTANCE				mINST;
+		HINSTANCE mINST;
 
-		UINT					mIcon;
-		UINT					mIconSmall;
-		UINT					mMenu;
-		LPCSTR					mCursor;
-		
-		char					mTitle[ MAX_TITLE_LENGTH ];
-		char					mWindowClass[ MAX_CLASS_LENGTH ];
+		UINT mIcon;
+		UINT mIconSmall;
+		UINT mMenu;
+		LPCSTR mCursor;
 
-		WindowInfo*				mWindowInfo;
-		Renderer*				mRenderer;
+		char mTitle[MAX_TITLE_LENGTH];
+		char mWindowClass[MAX_CLASS_LENGTH];
+
+		WindowInfo* mWindowInfo;
+		Renderer* mRenderer;
 
 	public:
 
-		GameWindow( UINT icon, UINT iconSmall, UINT menu, LPCSTR cursor = IDC_ARROW );
+		GameWindow(UINT icon, UINT iconSmall, UINT menu, LPCSTR cursor = IDC_ARROW);
 		~GameWindow();
 
-		void	Startup( Renderer* renderer, HINSTANCE hInstance, int nCmdShow, char* title, char* windowClass, const WindowInfo& info );
+		void Startup(
+			Renderer* renderer, 
+			HINSTANCE hInstance, 
+			int nCmdShow, 
+			char* title, 
+			char* windowClass, 
+			const WindowInfo& info);
 
-		void	Update();
+		void Update();
 
-		void	Shutdown();
+		void Shutdown();
 
 		///////////////////////////
 
@@ -49,8 +55,8 @@ namespace Sentinel
 
 	private:
 
-		static LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
+		static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-		bool	RegisterWindowClass();
+		bool RegisterWindowClass();
 	};
 }

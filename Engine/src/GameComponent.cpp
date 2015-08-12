@@ -5,9 +5,8 @@
 namespace Sentinel
 {
 	GameComponent::GameComponent() :
-		mOwner( NULL ),
-		mType( DEFAULT ),
-		mEnabled( true )
+		mOwner(NULL),
+		mEnabled(true)
 	{}
 
 	GameComponent::~GameComponent()
@@ -26,22 +25,22 @@ namespace Sentinel
 
 	////////////////////////////////
 
-	void GameComponent::SetOwner( GameObject* owner )
+	const GameObject* GameComponent::GetOwner()
+	{
+		return mOwner;
+	}
+
+	void GameComponent::SetOwner(GameObject* owner)
 	{
 		mOwner = owner;
 	}
 
-	GameComponent::Type GameComponent::GetType()
-	{
-		return mType;
-	}
-
 	////////////////////////////////
 
-	void GameComponent::Save( Archive& archive )
+	void GameComponent::Save(Archive& archive)
 	{}
 
-	void GameComponent::Load( Archive& archive )
+	void GameComponent::Load(Archive& archive)
 	{}
 
 	GameComponent* GameComponent::Copy()
@@ -49,10 +48,9 @@ namespace Sentinel
 		return NULL;
 	}
 
-	void GameComponent::Copy( GameComponent* component )
+	void GameComponent::Copy(GameComponent* component)
 	{
-		component->mOwner   = mOwner;
-		component->mType    = mType;
+		component->mOwner = mOwner;
 		component->mEnabled = mEnabled;
 	}
 }

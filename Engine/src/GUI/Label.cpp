@@ -7,17 +7,18 @@
 #include "Material.h"
 #include "Component/Transform.h"
 
-namespace Sentinel { namespace GUI
+namespace Sentinel {
+namespace GUI
 {
-	DEFINE_SERIAL_REGISTER( Label );
-	DEFINE_SERIAL_CLONE( Label );
+	DEFINE_SERIAL_REGISTER(Label);
+	DEFINE_SERIAL_CLONE(Label);
 
 	Label::Label()
 	{}
 
-	Label::Label( const std::string& text ) :
-		mText( text ),
-		mColor( 1, 1, 1, 1 )
+	Label::Label(const std::string& text) :
+		mText(text),
+		mColor(1, 1, 1, 1)
 	{}
 
 	Label::~Label()
@@ -31,7 +32,7 @@ namespace Sentinel { namespace GUI
 
 		mFontSystem = mOwner->GetWorld()->mFontSystem;
 
-		mOwner->GetWorld()->mRenderManager->Draw( this, mFontSystem->mSpriteSystem->mMaterial->mRenderQueue, mOwner->mLayer );
+		mOwner->GetWorld()->mRenderManager->Draw(this, mFontSystem->mSpriteSystem->mMaterial->mRenderQueue, mOwner->mLayer);
 	}
 
 	void Label::Update()
@@ -45,35 +46,35 @@ namespace Sentinel { namespace GUI
 	void Label::CalculateBounds()
 	{}
 
-	bool Label::CheckVisible( Component::Camera* camera )
+	bool Label::CheckVisible(Component::Camera* camera)
 	{
 		return true;
 	}
 
 	void Label::Draw()
 	{
-		if( mEnabled )
+		if (mEnabled)
 		{
 			mFontSystem->Clear();
 
 			std::shared_ptr< Font > font = mFontSystem->mFont;
 
-			Vector2f scale( mTransform->mScale.x / font->mSize.x, mTransform->mScale.y / font->mSize.y );
-			
+			Vector2f scale(mTransform->mScale.x / font->mSize.x, mTransform->mScale.y / font->mSize.y);
+
 			Matrix4f matWVP = mOwner->GetWorld()->mCurrentCamera->GetMatrixWVP();
 
 			Vector3f offset;
 
-			for( UINT i = 0; i < mText.size(); ++i )
+			for (UINT i = 0; i < mText.size(); ++i)
 			{
-				char& c = mText[ i ];
+				char& c = mText[i];
 
-				offset.x += font->mOffsetX[ c ] * scale.x;
-				offset.y = -font->mOffsetY[ c ] * scale.y;
+				offset.x += font->mOffsetX[c] * scale.x;
+				offset.y = -font->mOffsetY[c] * scale.y;
 
-				mFontSystem->Draw( c, mColor, matWVP * mTransform->GetMatrixWorld( offset ));
+				mFontSystem->Draw(c, mColor, matWVP * mTransform->GetMatrixWorld(offset));
 
-				offset.x += font->mAdvance[ c ] * scale.x;
+				offset.x += font->mAdvance[c] * scale.x;
 				offset.z -= 0.0001f;
 			}
 
@@ -83,31 +84,31 @@ namespace Sentinel { namespace GUI
 
 	//////////////////////////////////
 
-	DEFINE_SERIAL_REGISTER_SAVE( Label );
+	DEFINE_SERIAL_REGISTER_SAVE(Label);
 
-	void Label::Save( Archive& archive )
+	void Label::Save(Archive& archive)
 	{
-		Component::Drawable::Save( archive );
+		Component::Drawable::Save(archive);
 
-		archive.Write( &mText );
-		archive.Write( mColor.Ptr(), ar_sizeof( mColor ));
+		archive.Write(&mText);
+		archive.Write(mColor.Ptr(), ar_sizeof(mColor));
 	}
 
-	void Label::Load( Archive& archive )
+	void Label::Load(Archive& archive)
 	{
-		Component::Drawable::Load( archive );
+		Component::Drawable::Load(archive);
 
-		archive.Read( &mText );
-		archive.Read( mColor.Ptr(), ar_sizeof( mColor ));
+		archive.Read(&mText);
+		archive.Read(mColor.Ptr(), ar_sizeof(mColor));
 	}
 
 	//////////////////////////////////
 
 	GameComponent* Label::Copy()
 	{
-		Label* label = new Label( mText );
+		Label* label = new Label(mText);
 
-		Component::Drawable::Copy( label );
+		Component::Drawable::Copy(label);
 
 		label->mColor = mColor;
 

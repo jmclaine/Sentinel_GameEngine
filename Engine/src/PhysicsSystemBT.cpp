@@ -6,13 +6,13 @@ PhysicsSystem based on BulletPhysics.
 #include "btBulletDynamicsCommon.h"
 
 #ifdef NDEBUG
-	#pragma comment (lib, "BulletCollision_vs2010.lib")
-	#pragma comment (lib, "BulletDynamics_vs2010.lib")
-	#pragma comment (lib, "LinearMath_vs2010.lib")
+#pragma comment (lib, "Release/BulletCollision.lib")
+#pragma comment (lib, "Release/BulletDynamics.lib")
+#pragma comment (lib, "Release/LinearMath.lib")
 #else
-	#pragma comment (lib, "BulletCollision_vs2010_debug.lib")
-	#pragma comment (lib, "BulletDynamics_vs2010_debug.lib")
-	#pragma comment (lib, "LinearMath_vs2010_debug.lib")
+#pragma comment (lib, "Debug/BulletCollision.lib")
+#pragma comment (lib, "Debug/BulletDynamics.lib")
+#pragma comment (lib, "Debug/LinearMath.lib")
 #endif
 
 #include "PhysicsSystem.h"
@@ -39,14 +39,14 @@ namespace Sentinel
 
 		SpherePhysicsShapeBT()
 		{
-			mShape = new btSphereShape( 1 );
+			mShape = new btSphereShape(1);
 		}
 
-		SpherePhysicsShapeBT( float radius )
+		SpherePhysicsShapeBT(float radius)
 		{
-			mShape = new btSphereShape( 1 );
+			mShape = new btSphereShape(1);
 
-			Create( radius );
+			Create(radius);
 		}
 
 		~SpherePhysicsShapeBT()
@@ -71,9 +71,9 @@ namespace Sentinel
 			return mShape->getRadius();
 		}
 
-		void SetRadius( float radius )
+		void SetRadius(float radius)
 		{
-			mShape->setUnscaledRadius( radius );
+			mShape->setUnscaledRadius(radius);
 		}
 	};
 
@@ -89,14 +89,14 @@ namespace Sentinel
 
 		BoxPhysicsShapeBT()
 		{
-			mShape = new btBoxShape( btVector3( 1, 1, 1 ));
+			mShape = new btBoxShape(btVector3(1, 1, 1));
 		}
 
-		BoxPhysicsShapeBT( const Vector3f& scale )
+		BoxPhysicsShapeBT(const Vector3f& scale)
 		{
-			mShape = new btBoxShape( btVector3( 1, 1, 1 ));
+			mShape = new btBoxShape(btVector3(1, 1, 1));
 
-			Create( scale );
+			Create(scale);
 		}
 
 		~BoxPhysicsShapeBT()
@@ -120,12 +120,12 @@ namespace Sentinel
 		{
 			const btVector3& v = mShape->getLocalScaling();
 
-			return Vector3f( v.x(), v.y(), v.z() );
+			return Vector3f(v.x(), v.y(), v.z());
 		}
 
-		void SetScale( const Vector3f& scale )
+		void SetScale(const Vector3f& scale)
 		{
-			mShape->setLocalScaling( btVector3( scale.x, scale.y, scale.z ));
+			mShape->setLocalScaling(btVector3(scale.x, scale.y, scale.z));
 		}
 	};
 
@@ -141,14 +141,14 @@ namespace Sentinel
 
 		CylinderPhysicsShapeBT()
 		{
-			mShape = new btCylinderShape( btVector3( 1, 1, 1 ));
+			mShape = new btCylinderShape(btVector3(1, 1, 1));
 		}
 
-		CylinderPhysicsShapeBT( const Vector3f& scale )
+		CylinderPhysicsShapeBT(const Vector3f& scale)
 		{
-			mShape = new btCylinderShape( btVector3( 1, 1, 1 ));
+			mShape = new btCylinderShape(btVector3(1, 1, 1));
 
-			Create( scale );
+			Create(scale);
 		}
 
 		~CylinderPhysicsShapeBT()
@@ -172,12 +172,12 @@ namespace Sentinel
 		{
 			const btVector3& v = mShape->getLocalScaling();
 
-			return Vector3f( v.x(), v.y(), v.z() );
+			return Vector3f(v.x(), v.y(), v.z());
 		}
 
-		void SetScale( const Vector3f& scale )
+		void SetScale(const Vector3f& scale)
 		{
-			mShape->setLocalScaling( btVector3( scale.x, scale.y, scale.z ));
+			mShape->setLocalScaling(btVector3(scale.x, scale.y, scale.z));
 		}
 	};
 
@@ -196,11 +196,11 @@ namespace Sentinel
 			mShape = new btConvexHullShape();
 		}
 
-		MeshPhysicsShapeBT( void* verts, UINT count, UINT stride, const Vector3f& scale )
+		MeshPhysicsShapeBT(void* verts, UINT count, UINT stride, const Vector3f& scale)
 		{
 			mShape = new btConvexHullShape();
 
-			Create( verts, count, stride, scale );
+			Create(verts, count, stride, scale);
 		}
 
 		~MeshPhysicsShapeBT()
@@ -225,14 +225,14 @@ namespace Sentinel
 			return mShape->getNumPoints();
 		}
 
-		void AddPoint( const Vector3f& point )
+		void AddPoint(const Vector3f& point)
 		{
-			mShape->addPoint( btVector3( point.x, point.y, point.z ));
+			mShape->addPoint(btVector3(point.x, point.y, point.z));
 		}
 
 		Vector3f* GetPoints()
 		{
-			_ASSERT( 0 );	// unscaled points are 4 floats
+			_ASSERT(0);	// unscaled points are 4 floats
 
 			return (Vector3f*)mShape->getUnscaledPoints();
 		}
@@ -241,12 +241,12 @@ namespace Sentinel
 		{
 			const btVector3& v = mShape->getLocalScaling();
 
-			return Vector3f( v.x(), v.y(), v.z() );
+			return Vector3f(v.x(), v.y(), v.z());
 		}
 
-		void SetScale( const Vector3f& scale )
+		void SetScale(const Vector3f& scale)
 		{
-			mShape->setLocalScaling( btVector3( scale.x, scale.y, scale.z ));
+			mShape->setLocalScaling(btVector3(scale.x, scale.y, scale.z));
 		}
 	};
 
@@ -282,20 +282,20 @@ namespace Sentinel
 	};
 
 	/////////////////////////////////////////////////////////////////////////////
-	
+
 	class RigidBodyBT : public RigidBody
 	{
 		friend class PhysicsSystemBT;
 
 	private:
 
-		btRigidBody*	mRigidBody;
+		btRigidBody* mRigidBody;
 
 	public:
 
-		RigidBodyBT( PhysicsShape* shape, btRigidBody* body )
+		RigidBodyBT(PhysicsShape* shape, btRigidBody* body)
 		{
-			mShape     = shape;
+			mShape = shape;
 			mRigidBody = body;
 		}
 
@@ -307,38 +307,38 @@ namespace Sentinel
 
 		Vector3f GetPosition()
 		{
-			btVector3 v( mRigidBody->getCenterOfMassPosition() );
+			btVector3 v(mRigidBody->getCenterOfMassPosition());
 
-			return Vector3f( v.x(), v.y(), v.z() );
+			return Vector3f(v.x(), v.y(), v.z());
 		}
 
-		void SetPosition( const Vector3f& position )
+		void SetPosition(const Vector3f& position)
 		{
-			mRigidBody->getWorldTransform().setOrigin( btVector3( position.x, position.y, position.z ));
+			mRigidBody->getWorldTransform().setOrigin(btVector3(position.x, position.y, position.z));
 		}
 
 		Quatf GetOrientation()
 		{
-			btQuaternion q( mRigidBody->getOrientation() );
+			btQuaternion q(mRigidBody->getOrientation());
 
-			return Quatf( q.x(), q.y(), q.z(), q.w() );
+			return Quatf(q.x(), q.y(), q.z(), q.w());
 		}
 
-		void SetOrientation( const Quatf& orientation )
+		void SetOrientation(const Quatf& orientation)
 		{
-			mRigidBody->getWorldTransform().setRotation( btQuaternion( orientation.x, orientation.y, orientation.z, orientation.w ));
+			mRigidBody->getWorldTransform().setRotation(btQuaternion(orientation.x, orientation.y, orientation.z, orientation.w));
 		}
 
 		Vector3f GetScale()
 		{
-			btVector3 v( mRigidBody->getCollisionShape()->getLocalScaling() );
+			btVector3 v(mRigidBody->getCollisionShape()->getLocalScaling());
 
-			return Vector3f( v.x(), v.y(), v.z() );
+			return Vector3f(v.x(), v.y(), v.z());
 		}
 
-		void SetScale( const Vector3f& scale )
+		void SetScale(const Vector3f& scale)
 		{
-			mRigidBody->getCollisionShape()->setLocalScaling( btVector3( scale.x, scale.y, scale.z ));
+			mRigidBody->getCollisionShape()->setLocalScaling(btVector3(scale.x, scale.y, scale.z));
 		}
 
 		//////////////////////////////////
@@ -348,9 +348,9 @@ namespace Sentinel
 			return 1.0f / mRigidBody->getInvMass();
 		}
 
-		void SetMass( float mass )
+		void SetMass(float mass)
 		{
-			mRigidBody->setMassProps( mass, btVector3() );
+			mRigidBody->setMassProps(mass, btVector3());
 		}
 
 		PhysicsShape* GetShape()
@@ -358,7 +358,7 @@ namespace Sentinel
 			return mShape;
 		}
 
-		void SetShape( PhysicsShape* shape )
+		void SetShape(PhysicsShape* shape)
 		{
 			_ASSERT(0); // unsupported
 		}
@@ -368,9 +368,9 @@ namespace Sentinel
 			return mRigidBody->getFlags();
 		}
 
-		void SetFlags( int flags )
+		void SetFlags(int flags)
 		{
-			mRigidBody->setFlags( flags );
+			mRigidBody->setFlags(flags);
 		}
 
 		float GetLinearDamping()
@@ -383,19 +383,19 @@ namespace Sentinel
 			return mRigidBody->getAngularDamping();
 		}
 
-		void SetDamping( float linear, float angular )
+		void SetDamping(float linear, float angular)
 		{
-			mRigidBody->setDamping( linear, angular );
+			mRigidBody->setDamping(linear, angular);
 		}
-		
+
 		float GetRestitution()
 		{
 			return mRigidBody->getRestitution();
 		}
 
-		void SetRestitution( float rest )
+		void SetRestitution(float rest)
 		{
-			mRigidBody->setRestitution( rest );
+			mRigidBody->setRestitution(rest);
 		}
 
 		float GetFriction()
@@ -403,55 +403,55 @@ namespace Sentinel
 			return mRigidBody->getFriction();
 		}
 
-		void SetFriction( float friction )
+		void SetFriction(float friction)
 		{
-			mRigidBody->setFriction( friction );
+			mRigidBody->setFriction(friction);
 		}
 
 		Vector3f GetAngularFactor()
 		{
-			btVector3 v( mRigidBody->getAngularFactor() );
+			btVector3 v(mRigidBody->getAngularFactor());
 
-			return Vector3f( v.x(), v.y(), v.z() );
+			return Vector3f(v.x(), v.y(), v.z());
 		}
 
-		void SetAngularFactor( const Vector3f& factor )
+		void SetAngularFactor(const Vector3f& factor)
 		{
-			mRigidBody->setAngularFactor( btVector3( factor.x, factor.y, factor.z ));
+			mRigidBody->setAngularFactor(btVector3(factor.x, factor.y, factor.z));
 		}
 
 		Vector3f GetGravity()
 		{
-			btVector3 v( mRigidBody->getGravity() );
+			btVector3 v(mRigidBody->getGravity());
 
-			return Vector3f( v.x(), v.y(), v.z() );
+			return Vector3f(v.x(), v.y(), v.z());
 		}
 
-		void SetGravity( const Vector3f& gravity )
+		void SetGravity(const Vector3f& gravity)
 		{
-			mRigidBody->setGravity( btVector3( gravity.x, gravity.y, gravity.z ));
+			mRigidBody->setGravity(btVector3(gravity.x, gravity.y, gravity.z));
 		}
 
 		//////////////////////////////////
 
-		void ApplyCentralImpulse( const Vector3f& impulse )
+		void ApplyCentralImpulse(const Vector3f& impulse)
 		{
-			mRigidBody->activate( true );
-			mRigidBody->applyCentralImpulse( btVector3( impulse.x, impulse.y, impulse.z ));
+			mRigidBody->activate(true);
+			mRigidBody->applyCentralImpulse(btVector3(impulse.x, impulse.y, impulse.z));
 		}
 	};
 
 	/////////////////////////////////////////////////////////////////////////////
-	
+
 	class PhysicsSystemBT : public PhysicsSystem
 	{
 	private:
 
-		btDefaultCollisionConfiguration*		mConfig;
-		btCollisionDispatcher*					mDispatcher;
-		btBroadphaseInterface*					mCache;
-		btSequentialImpulseConstraintSolver*	mSolver;
-		btDiscreteDynamicsWorld*				mWorld;
+		btDefaultCollisionConfiguration* mConfig;
+		btCollisionDispatcher* mDispatcher;
+		btBroadphaseInterface* mCache;
+		btSequentialImpulseConstraintSolver* mSolver;
+		btDiscreteDynamicsWorld* mWorld;
 
 		bool mIsActive;
 
@@ -459,37 +459,37 @@ namespace Sentinel
 
 		PhysicsSystemBT()
 		{
-			mConfig		= new btDefaultCollisionConfiguration();
-			mDispatcher	= new btCollisionDispatcher( mConfig );
-			mCache		= new btDbvtBroadphase();
+			mConfig = new btDefaultCollisionConfiguration();
+			mDispatcher = new btCollisionDispatcher(mConfig);
+			mCache = new btDbvtBroadphase();
 
-			mSolver		= new btSequentialImpulseConstraintSolver;
-			mWorld		= new btDiscreteDynamicsWorld( mDispatcher, mCache, mSolver, mConfig );
+			mSolver = new btSequentialImpulseConstraintSolver;
+			mWorld = new btDiscreteDynamicsWorld(mDispatcher, mCache, mSolver, mConfig);
 
-			mWorld->setGravity( btVector3( 0, -9.81f, 0 ));
+			mWorld->setGravity(btVector3(0, -9.81f, 0));
 
 			mIsActive = false;
 		}
 
 		~PhysicsSystemBT()
 		{
-			for( int i = mWorld->getNumCollisionObjects()-1; i >=0; --i )
+			for (int i = mWorld->getNumCollisionObjects() - 1; i >= 0; --i)
 			{
-				btCollisionObject* obj = mWorld->getCollisionObjectArray()[ i ];
-				btRigidBody* body = btRigidBody::upcast( obj );
+				btCollisionObject* obj = mWorld->getCollisionObjectArray()[i];
+				btRigidBody* body = btRigidBody::upcast(obj);
 
-				if( body && body->getMotionState() )
+				if (body && body->getMotionState())
 					delete body->getMotionState();
 
-				mWorld->removeCollisionObject( obj );
+				mWorld->removeCollisionObject(obj);
 				delete obj;
 			}
 
-			SAFE_DELETE( mWorld );
-			SAFE_DELETE( mDispatcher );
-			SAFE_DELETE( mConfig );
-			SAFE_DELETE( mCache );
-			SAFE_DELETE( mSolver );
+			SAFE_DELETE(mWorld);
+			SAFE_DELETE(mDispatcher);
+			SAFE_DELETE(mConfig);
+			SAFE_DELETE(mCache);
+			SAFE_DELETE(mSolver);
 		}
 
 	public:
@@ -499,11 +499,11 @@ namespace Sentinel
 			mIsActive = true;
 		}
 
-		void Update( float DT )
+		void Update(float DT)
 		{
-			if( mIsActive )
+			if (mIsActive)
 			{
-				mWorld->stepSimulation( btScalar( DT ));
+				mWorld->stepSimulation(btScalar(DT));
 			}
 		}
 
@@ -536,59 +536,59 @@ namespace Sentinel
 
 		//////////////////////////////////
 
-		SpherePhysicsShape* CreateSphere( float radius )
+		SpherePhysicsShape* CreateSphere(float radius)
 		{
-			return new SpherePhysicsShapeBT( radius );
+			return new SpherePhysicsShapeBT(radius);
 		}
 
-		BoxPhysicsShape* CreateBox( const Vector3f& scale )
+		BoxPhysicsShape* CreateBox(const Vector3f& scale)
 		{
-			return new BoxPhysicsShapeBT( scale );
+			return new BoxPhysicsShapeBT(scale);
 		}
 
-		CylinderPhysicsShape* CreateCylinder( const Vector3f& scale )
+		CylinderPhysicsShape* CreateCylinder(const Vector3f& scale)
 		{
-			return new CylinderPhysicsShapeBT( scale );
+			return new CylinderPhysicsShapeBT(scale);
 		}
 
-		MeshPhysicsShape* CreateMesh( Vector3f* verts, UINT count, UINT stride, const Vector3f& scale )
+		MeshPhysicsShape* CreateMesh(Vector3f* verts, UINT count, UINT stride, const Vector3f& scale)
 		{
-			return new MeshPhysicsShapeBT( verts, count, stride, scale );
+			return new MeshPhysicsShapeBT(verts, count, stride, scale);
 		}
 
 		//////////////////////////////////
 
-		RigidBody* CreateRigidBody( PhysicsShape* shape, const Vector3f& position, const Quatf& orientation, float mass )
+		RigidBody* CreateRigidBody(PhysicsShape* shape, const Vector3f& position, const Quatf& orientation, float mass)
 		{
-			btScalar  tMass( mass );
-			btVector3 localInertia( 0, 0, 0 );
+			btScalar  tMass(mass);
+			btVector3 localInertia(0, 0, 0);
 
 			btCollisionShape* btShape = (btCollisionShape*)shape->GetData();
 
-			if( tMass != 0.0f )
-				btShape->calculateLocalInertia( tMass, localInertia );
+			if (tMass != 0.0f)
+				btShape->calculateLocalInertia(tMass, localInertia);
 
 			btTransform transform;
 			transform.setIdentity();
-			transform.setOrigin( btVector3( position.x, position.y, position.z ));
-			transform.setRotation( btQuaternion( orientation.x, orientation.y, orientation.z, orientation.w ));
+			transform.setOrigin(btVector3(position.x, position.y, position.z));
+			transform.setRotation(btQuaternion(orientation.x, orientation.y, orientation.z, orientation.w));
 
-			btDefaultMotionState* myMotionState = new btDefaultMotionState( transform );
+			btDefaultMotionState* myMotionState = new btDefaultMotionState(transform);
 
-			btRigidBody::btRigidBodyConstructionInfo rbInfo( tMass, myMotionState, btShape, localInertia );
+			btRigidBody::btRigidBodyConstructionInfo rbInfo(tMass, myMotionState, btShape, localInertia);
 
-			return new RigidBodyBT( shape, new btRigidBody( rbInfo ));
+			return new RigidBodyBT(shape, new btRigidBody(rbInfo));
 		}
 
-		void AddRigidBody( RigidBody* body )
+		void AddRigidBody(RigidBody* body)
 		{
-			mWorld->addRigidBody( ((RigidBodyBT*)body)->mRigidBody );
+			mWorld->addRigidBody(((RigidBodyBT*)body)->mRigidBody);
 		}
 
-		void RemoveRigidBody( RigidBody* body )
+		void RemoveRigidBody(RigidBody* body)
 		{
-			mWorld->removeCollisionObject( ((RigidBodyBT*)body)->mRigidBody );
-			mWorld->removeRigidBody( ((RigidBodyBT*)body)->mRigidBody );
+			mWorld->removeCollisionObject(((RigidBodyBT*)body)->mRigidBody);
+			mWorld->removeRigidBody(((RigidBodyBT*)body)->mRigidBody);
 		}
 	};
 

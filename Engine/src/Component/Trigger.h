@@ -2,7 +2,8 @@
 
 #include "GameComponent.h"
 
-namespace Sentinel { namespace Component
+namespace Sentinel {
+namespace Component
 {
 	class Physics;
 

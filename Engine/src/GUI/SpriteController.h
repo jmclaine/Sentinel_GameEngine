@@ -4,7 +4,8 @@
 #include "Vector3f.h"
 #include "Point.h"
 
-namespace Sentinel { namespace GUI
+namespace Sentinel {
+namespace GUI
 {
 	class SENTINEL_DLL SpriteController : public Controller2D
 	{
@@ -16,18 +17,18 @@ namespace Sentinel { namespace GUI
 
 	protected:
 
-		Vector3f		mBasePosition;
-		Vector3f		mBaseScale;
+		Vector3f mBasePosition;
+		Vector3f mBaseScale;
 
 	public:
 
-		bool			mPositionToWindowX;
-		bool			mPositionToWindowY;
+		bool mPositionToWindowX;
+		bool mPositionToWindowY;
 
-		bool			mScaleToWindowX;
-		bool			mScaleToWindowY;
+		bool mScaleToWindowX;
+		bool mScaleToWindowY;
 
-		Quad			mMargin;
+		Quad mMargin;
 
 	public:
 
@@ -36,16 +37,16 @@ namespace Sentinel { namespace GUI
 
 		///////////////////////////////////
 
-		virtual void	Startup();
+		virtual void Startup();
 
-		virtual void	Update();
+		virtual void Update();
 
-		virtual void	Shutdown();
+		virtual void Shutdown();
 
 		///////////////////////////////////
 
 		virtual GameComponent* Copy();
 
-		virtual void	Copy( GameComponent* component );
+		virtual void Copy(GameComponent* component);
 	};
 }}

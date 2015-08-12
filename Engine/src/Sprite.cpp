@@ -13,19 +13,19 @@ namespace Sentinel
 
 	//////////////////////////////////////
 
-	void Sprite::AddFrame( const Quad& coords )
+	void Sprite::AddFrame(const Quad& coords)
 	{
-		mFrame.push_back( coords );
+		mFrame.push_back(coords);
 	}
 
-	void Sprite::RemoveFrame( UINT index )
+	void Sprite::RemoveFrame(UINT index)
 	{
-		mFrame.erase( mFrame.begin() + index );
+		mFrame.erase(mFrame.begin() + index);
 	}
 
-	Quad& Sprite::GetFrame( UINT index )
+	Quad& Sprite::GetFrame(UINT index)
 	{
-		return mFrame[ index ];
+		return mFrame[index];
 	}
 
 	UINT Sprite::NumFrames()
@@ -35,11 +35,12 @@ namespace Sentinel
 
 	//////////////////////////////////////
 
-	Quad Sprite::QUADtoTEXCOORD( const Quad& coords, UINT textureWidth, UINT textureHeight )
+	Quad Sprite::QUADtoTEXCOORD(const Quad& coords, UINT textureWidth, UINT textureHeight)
 	{
-		return Quad( coords.left   / static_cast< float >(textureWidth),
-					 coords.top    / static_cast< float >(textureHeight),
-					 coords.right  / static_cast< float >(textureWidth), 
-					 coords.bottom / static_cast< float >(textureHeight) );
+		return Quad(
+			coords.left / static_cast<float>(textureWidth),
+			coords.top / static_cast<float>(textureHeight),
+			coords.right / static_cast<float>(textureWidth),
+			coords.bottom / static_cast<float>(textureHeight));
 	}
 }

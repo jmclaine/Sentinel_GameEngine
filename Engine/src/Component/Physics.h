@@ -13,36 +13,36 @@ namespace Component
 	class SENTINEL_DLL Physics : public GameComponent
 	{
 		DECLARE_SERIAL();
-		
+
 	protected:
 
-		Transform*		mTransform;
-
-		RigidBody*		mRigidBody;
+		Transform* mTransform;
+		RigidBody* mRigidBody;
 
 	public:
 
 		Physics();
-		Physics( RigidBody* body );
+		Physics(RigidBody* body);
 		~Physics();
 
-		void			Startup();
-
-		void			Update();
-
-		void			Shutdown();
+		void Startup();
+		void Shutdown();
 
 		/////////////////////////////////
 
-		RigidBody*		GetRigidBody();
+		void Execute();
+
+		void SetOwner(GameObject* owner);
+
+		RigidBody* GetRigidBody();
 
 		// Startup must be called to add the RigidBody
 		// to the PhysicsSystem within GameWorld.
 		//
-		void			SetRigidBody( RigidBody* body );
+		void SetRigidBody(RigidBody* body);
 
 		/////////////////////////////////
 
-		GameComponent*	Copy();
+		GameComponent* Copy();
 	};
 }}

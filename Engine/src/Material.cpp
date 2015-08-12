@@ -9,27 +9,27 @@ namespace Sentinel
 	bool Material::IS_MATERIAL_LOCKED = false;
 
 	Material::Material() :
-		mAmbient( 0.2f, 0.2f, 0.2f, 1.0f ),
-		mDiffuse( 0.8f, 0.8f, 0.8f, 1.0f ),
-		mSpecular( 0.2f, 0.2f, 0.2f, 1.0f ),
-		mSpecularComponent( 8.0f ),
-		mShader( NULL ),
-		mBlendState( NULL ),
-		mCullMode( CullFormat::CCW ),
-		mDepthMode( DepthFormat::LEQUAL )
+		mAmbient(0.2f, 0.2f, 0.2f, 1.0f),
+		mDiffuse(0.8f, 0.8f, 0.8f, 1.0f),
+		mSpecular(0.2f, 0.2f, 0.2f, 1.0f),
+		mSpecularComponent(8.0f),
+		mShader(NULL),
+		mBlendState(NULL),
+		mCullMode(CullFormat::CCW),
+		mDepthMode(DepthFormat::LEQUAL)
 	{}
 
 	Material::~Material()
 	{}
 
-	void Material::Apply( Renderer* renderer )
+	void Material::Apply(Renderer* renderer)
 	{
-		if( !IS_MATERIAL_LOCKED )
+		if (!IS_MATERIAL_LOCKED)
 		{
-			renderer->SetCull( mCullMode );
-			renderer->SetDepthStencilType( mDepthMode );
-			renderer->SetShader( mShader.get() );
-			renderer->SetBlendState( mBlendState.get() );
+			renderer->SetCull(mCullMode);
+			renderer->SetDepthStencilType(mDepthMode);
+			renderer->SetShader(mShader.get());
+			renderer->SetBlendState(mBlendState.get());
 		}
 	}
 
@@ -45,26 +45,27 @@ namespace Sentinel
 
 	//////////////////////////////////////////////
 
-	void Material::Save( Archive&			archive, 
-						 Material*			material,
-						 Renderer*			renderer,
-						 ShaderManager*		shaderManager,
-						 TextureManager*	textureManager )
+	void Material::Save(
+		Archive& archive,
+		Material* material,
+		Renderer* renderer,
+		ShaderManager* shaderManager,
+		TextureManager* textureManager)
 	{
-		archive.Write( material->mAmbient.Ptr(),  ar_sizeof( material->mAmbient ));
-		archive.Write( material->mDiffuse.Ptr(),  ar_sizeof( material->mDiffuse ));
-		archive.Write( material->mSpecular.Ptr(), ar_sizeof( material->mSpecular ));
-		archive.Write( &material->mSpecularComponent );
+		archive.Write(material->mAmbient.Ptr(), ar_sizeof(material->mAmbient));
+		archive.Write(material->mDiffuse.Ptr(), ar_sizeof(material->mDiffuse));
+		archive.Write(material->mSpecular.Ptr(), ar_sizeof(material->mSpecular));
+		archive.Write(&material->mSpecularComponent);
 
-		std::string shader = shaderManager->Get( material->mShader );
-		archive.Write( &shader );
+		std::string shader = shaderManager->Get(material->mShader);
+		archive.Write(&shader);
 
 		std::string texture;
 
-		for( UINT x = 0; x < TextureIndex::COUNT; ++x )
+		for (UINT x = 0; x < TextureIndex::COUNT; ++x)
 		{
-			texture = textureManager->Get( material->mTexture[ x ] );
-			archive.Write( &texture );
+			texture = textureManager->Get(material->mTexture[x]);
+			archive.Write(&texture);
 		}
 
 		// Write the blend state type.
@@ -73,67 +74,67 @@ namespace Sentinel
 		// 2 = Custom BlendState
 		//
 		BYTE type;
-		if( material->mBlendState.get() == renderer->BLEND_OFF.get() )
+		if (material->mBlendState.get() == renderer->BLEND_OFF.get())
 			type = 0;
-		else
-		if( material->mBlendState.get() == renderer->BLEND_ALPHA.get() )
+		else if (material->mBlendState.get() == renderer->BLEND_ALPHA.get())
 			type = 1;
 		else
 			type = 2;
 
-		archive.Write( &type );
-		if( type == 2 )
+		archive.Write(&type);
+		if (type == 2)
 		{
 			type = (BYTE)material->mBlendState->SrcBlendColor();
-			archive.Write( &type );
+			archive.Write(&type);
 
 			type = (BYTE)material->mBlendState->DstBlendColor();
-			archive.Write( &type );
+			archive.Write(&type);
 
 			type = (BYTE)material->mBlendState->SrcBlendAlpha();
-			archive.Write( &type );
+			archive.Write(&type);
 
 			type = (BYTE)material->mBlendState->DstBlendAlpha();
-			archive.Write( &type );
+			archive.Write(&type);
 
 			type = (BYTE)material->mBlendState->BlendFuncColor();
-			archive.Write( &type );
+			archive.Write(&type);
 
 			type = (BYTE)material->mBlendState->BlendFuncAlpha();
-			archive.Write( &type );
+			archive.Write(&type);
 		}
 
-		BYTE data = static_cast< BYTE >(material->mCullMode);
-		archive.Write( &data );
+		BYTE data = static_cast<BYTE>(material->mCullMode);
+		archive.Write(&data);
 
-		data = static_cast< BYTE >(material->mDepthMode);
-		archive.Write( &data );
+		data = static_cast<BYTE>(material->mDepthMode);
+		archive.Write(&data);
 
-		archive.Write( &material->mRenderQueue );
+		archive.Write(&material->mRenderQueue);
 	}
 
-	Material* Material::Load( Archive&			archive,
-							  Renderer*			renderer,
-							  ShaderManager*	shaderManager,
-							  TextureManager*	textureManager )
+	Material* Material::Load(
+		Archive& archive,
+		Renderer* renderer,
+		ShaderManager* shaderManager,
+		TextureManager* textureManager)
 	{
 		Material* material = new Material();
 
-		archive.Read( material->mAmbient.Ptr(),  ar_sizeof( material->mAmbient ));
-		archive.Read( material->mDiffuse.Ptr(),  ar_sizeof( material->mDiffuse ));
-		archive.Read( material->mSpecular.Ptr(), ar_sizeof( material->mSpecular ));
-		archive.Read( &material->mSpecularComponent );
+		archive.Read(material->mAmbient.Ptr(), ar_sizeof(material->mAmbient));
+		archive.Read(material->mDiffuse.Ptr(), ar_sizeof(material->mDiffuse));
+		archive.Read(material->mSpecular.Ptr(), ar_sizeof(material->mSpecular));
+		archive.Read(&material->mSpecularComponent);
 
 		std::string shader;
-		archive.Read( &shader );
+		archive.Read(&shader);
 
-		material->mShader = shaderManager->Get( shader );
+		material->mShader = shaderManager->Get(shader);
 
 		std::string texture;
-		for( UINT x = 0; x < TextureIndex::COUNT; ++x )
+		for (UINT x = 0; x < TextureIndex::COUNT; ++x)
 		{
-			archive.Read( &texture );
-			material->mTexture[ x ] = textureManager->Get( texture );
+			archive.Read(&texture);
+			material->mTexture[x] = textureManager->Get(texture);
 		}
 
 		// Read the blend state type.
@@ -142,9 +143,9 @@ namespace Sentinel
 		// 2 = Custom BlendState
 		//
 		BYTE type;
-		archive.Read( &type );
+		archive.Read(&type);
 
-		switch( type )
+		switch (type)
 		{
 		case 0:
 			material->mBlendState = renderer->BLEND_OFF;
@@ -157,40 +158,41 @@ namespace Sentinel
 		default:
 			{
 			BYTE srcColor;
-			archive.Read( &srcColor );
+			archive.Read(&srcColor);
 
 			BYTE dstColor;
-			archive.Read( &dstColor );
+			archive.Read(&dstColor);
 
 			BYTE srcAlpha;
-			archive.Read( &srcAlpha );
+			archive.Read(&srcAlpha);
 
 			BYTE dstAlpha;
-			archive.Read( &dstAlpha );
-			
-			BYTE funcColor;
-			archive.Read( &funcColor );
-			
-			BYTE funcAlpha;
-			archive.Read( &funcAlpha );
+			archive.Read(&dstAlpha);
 
-			material->mBlendState = SHARED( renderer->CreateBlendState( (BlendFormat::Type)srcColor, (BlendFormat::Type)dstColor, 
-																		(BlendFormat::Type)srcAlpha, (BlendFormat::Type)dstAlpha, 
-																		(BlendFunction::Type)funcColor, (BlendFunction::Type)funcAlpha ));
+			BYTE funcColor;
+			archive.Read(&funcColor);
+
+			BYTE funcAlpha;
+			archive.Read(&funcAlpha);
+
+			material->mBlendState = SHARED(renderer->CreateBlendState(
+				(BlendFormat::Type)srcColor, (BlendFormat::Type)dstColor,
+				(BlendFormat::Type)srcAlpha, (BlendFormat::Type)dstAlpha,
+				(BlendFunction::Type)funcColor, (BlendFunction::Type)funcAlpha));
 			}
 			break;
 		}
 
 		BYTE cull;
-		archive.Read( &cull );
+		archive.Read(&cull);
 		material->mCullMode = (CullFormat::Type)cull;
 
 		BYTE depth;
-		archive.Read( &depth );
+		archive.Read(&depth);
 		material->mDepthMode = (DepthFormat::Type)depth;
 
 		WORD renderQueue;
-		archive.Read( &renderQueue );
+		archive.Read(&renderQueue);
 		material->mRenderQueue = renderQueue;
 
 		return material;

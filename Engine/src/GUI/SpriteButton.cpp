@@ -2,18 +2,19 @@
 #include "Component/SpriteDrawable.h"
 #include "GameObject.h"
 
-namespace Sentinel { namespace GUI
+namespace Sentinel {
+namespace GUI
 {
-	DEFINE_SERIAL_REGISTER( SpriteButton );
-	DEFINE_SERIAL_CLONE( SpriteButton );
+	DEFINE_SERIAL_REGISTER(SpriteButton);
+	DEFINE_SERIAL_CLONE(SpriteButton);
 
 	SpriteButton::SpriteButton() :
-		mFrameUp( 0 ),
-		mColorUp( 1, 1, 1, 1 ),
-		mFrameOver( 0 ),
-		mColorOver( 0, 0.8f, 1, 1 ),
-		mFrameDown( 0 ),
-		mColorDown( 0, 0, 0.5f, 1 )
+		mFrameUp(0),
+		mColorUp(1, 1, 1, 1),
+		mFrameOver(0),
+		mColorOver(0, 0.8f, 1, 1),
+		mFrameDown(0),
+		mColorDown(0, 0, 0.5f, 1)
 	{}
 
 	SpriteButton::~SpriteButton()
@@ -23,20 +24,20 @@ namespace Sentinel { namespace GUI
 	{
 		SpriteController::Startup();
 
-		mSprite = (Component::SpriteDrawable*)mOwner->FindComponent( GameComponent::DRAWABLE );
+		mSprite = mOwner->GetComponent<Component::SpriteDrawable>();
 
-		if( mSprite == NULL )
-			throw AppException( "SpriteButton::Startup()\n" + std::string( mOwner->mName ) + " does not contain SpriteComponent" );
+		if (mSprite == NULL)
+			throw AppException("SpriteButton::Startup()\n" + std::string(mOwner->mName) + " does not contain SpriteComponent");
 	}
 
 	void SpriteButton::Update()
 	{
 		SpriteController::Update();
-		Button::Update( mIsOver );
+		Button::Update(mIsOver);
 
-		if( mEnabled )
+		if (mEnabled)
 		{
-			switch( mState )
+			switch (mState)
 			{
 			case UP:
 				mSprite->mFrame = mFrameUp;
@@ -63,28 +64,28 @@ namespace Sentinel { namespace GUI
 
 	///////////////////////////////////
 
-	DEFINE_SERIAL_REGISTER_SAVE( SpriteButton );
+	DEFINE_SERIAL_REGISTER_SAVE(SpriteButton);
 
-	void SpriteButton::Save( Sentinel::Archive& archive )
+	void SpriteButton::Save(Sentinel::Archive& archive)
 	{
-		Button::Save( archive );
+		Button::Save(archive);
 
-		SpriteController::Save( archive );
+		SpriteController::Save(archive);
 
-		archive.Write( &mFrameUp );
-		archive.Write( &mFrameOver );
-		archive.Write( &mFrameDown );
+		archive.Write(&mFrameUp);
+		archive.Write(&mFrameOver);
+		archive.Write(&mFrameDown);
 	}
 
-	void SpriteButton::Load( Sentinel::Archive& archive )
+	void SpriteButton::Load(Sentinel::Archive& archive)
 	{
-		Button::Load( archive );
+		Button::Load(archive);
 
-		SpriteController::Load( archive );
+		SpriteController::Load(archive);
 
-		archive.Read( &mFrameUp );
-		archive.Read( &mFrameOver );
-		archive.Read( &mFrameDown );
+		archive.Read(&mFrameUp);
+		archive.Read(&mFrameOver);
+		archive.Read(&mFrameDown);
 	}
 
 	///////////////////////////////////
@@ -93,9 +94,9 @@ namespace Sentinel { namespace GUI
 	{
 		SpriteButton* button = new SpriteButton();
 
-		SpriteController::Copy( button );
+		SpriteController::Copy(button);
 
-		button->mFrameUp   = mFrameUp;
+		button->mFrameUp = mFrameUp;
 		button->mFrameOver = mFrameOver;
 		button->mFrameDown = mFrameDown;
 

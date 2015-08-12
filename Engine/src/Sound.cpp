@@ -5,15 +5,15 @@
 namespace Sentinel
 {
 	Sound::Sound() :
-		mPitch( 1.0f ), mGain( 1.0f ), mLoop( false ),
-		mFormat( 0 ), mSampleRate( 0 ), mDataSize( 0 ), mData( NULL )
+		mPitch(1.0f), mGain(1.0f), mLoop(false),
+		mFormat(0), mSampleRate(0), mDataSize(0), mData(NULL)
 	{}
 
 	Sound::~Sound()
 	{
-		if( mData )
+		if (mData)
 		{
-			free( mData );
+			free(mData);
 			mData = NULL;
 		}
 	}
@@ -42,50 +42,50 @@ namespace Sentinel
 
 	///////////////////////////
 
-	void Sound::Save( Archive& archive, Sound* source )
+	void Sound::Save(Archive& archive, Sound* source)
 	{
-		archive.Write( &source->mPitch );
-		archive.Write( &source->mGain );
-		archive.Write( source->mPosition.Ptr(), ar_sizeof( source->mPosition ));
-		archive.Write( source->mVelocity.Ptr(), ar_sizeof( source->mVelocity ));
+		archive.Write(&source->mPitch);
+		archive.Write(&source->mGain);
+		archive.Write(source->mPosition.Ptr(), ar_sizeof(source->mPosition));
+		archive.Write(source->mVelocity.Ptr(), ar_sizeof(source->mVelocity));
 
 		BYTE loop = (source->mLoop) ? 1 : 0;
-		archive.Write( &loop );
-			
-		archive.Write( &source->mFormat );
-		archive.Write( &source->mSampleRate );
+		archive.Write(&loop);
 
-		archive.Write( &source->mDataSize );
-			
-		archive.Write( source->mData, source->mDataSize );
+		archive.Write(&source->mFormat);
+		archive.Write(&source->mSampleRate);
 
-		archive.Write( &source->mBoundSize );
+		archive.Write(&source->mDataSize);
+
+		archive.Write(source->mData, source->mDataSize);
+
+		archive.Write(&source->mBoundSize);
 	}
 
-	Sound* Sound::Load( Archive& archive, AudioSystem* audio )
+	Sound* Sound::Load(Archive& archive, AudioSystem* audio)
 	{
-		return audio->CreateSound( archive );
+		return audio->CreateSound(archive);
 	}
 
-	void Sound::Load( Archive& archive )
+	void Sound::Load(Archive& archive)
 	{
-		archive.Read( &mPitch );
-		archive.Read( &mGain );
-		archive.Read( mPosition.Ptr(), ar_sizeof( mPosition ));
-		archive.Read( mVelocity.Ptr(), ar_sizeof( mVelocity ));
+		archive.Read(&mPitch);
+		archive.Read(&mGain);
+		archive.Read(mPosition.Ptr(), ar_sizeof(mPosition));
+		archive.Read(mVelocity.Ptr(), ar_sizeof(mVelocity));
 
 		BYTE loop;
-		archive.Read( &loop );
+		archive.Read(&loop);
 		mLoop = (loop) ? true : false;
-			
-		archive.Read( &mFormat );
-		archive.Read( &mSampleRate );
 
-		archive.Read( &mDataSize );
-			
-		mData = (BYTE*)malloc( mDataSize );
-		archive.Read( mData, mDataSize );
+		archive.Read(&mFormat);
+		archive.Read(&mSampleRate);
 
-		archive.Read( &mBoundSize );
+		archive.Read(&mDataSize);
+
+		mData = (BYTE*)malloc(mDataSize);
+		archive.Read(mData, mDataSize);
+
+		archive.Read(&mBoundSize);
 	}
 }

@@ -23,18 +23,18 @@ namespace Component
 		virtual DECLARE_SERIAL_SAVE();
 		virtual DECLARE_SERIAL_LOAD();
 
-		Transform*			mTransform;
+		Transform* mTransform;
 
-		std::vector< Drawable* > mDynamic;
+		std::vector<Drawable*> mDynamic;
 
-		Texture*			mTexture;
-		RenderTexture*		mRenderTexture;
+		Texture* mTexture;
+		RenderTexture* mRenderTexture;
 
 	public:
 
-		ColorRGBA			mColor;
-		Vector4f			mAttenuation;	// radius = w
-		
+		ColorRGBA mColor;
+		Vector4f mAttenuation; // radius = w
+
 	protected:
 
 		Light();
@@ -43,23 +43,20 @@ namespace Component
 
 		virtual ~Light();
 
-		virtual void		Startup();
-
-		virtual void		Update();
-
-		virtual void		Shutdown();
+		virtual void Startup();
+		virtual void Shutdown();
 
 		///////////////////////////////////////
 
-		virtual void		Present() = 0;
+		virtual void Present() = 0;
 
-		Transform*			GetTransform();
+		Transform* GetTransform();
 
-		Texture*			GetTexture();
-		RenderTexture*		GetRenderTexture();
+		Texture* GetTexture();
+		RenderTexture* GetRenderTexture();
 
 	protected:
 
-		void Copy( GameComponent* component );
+		void Copy(GameComponent* component);
 	};
 }}

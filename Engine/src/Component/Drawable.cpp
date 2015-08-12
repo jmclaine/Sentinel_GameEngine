@@ -2,30 +2,28 @@
 #include "GameWorld.h"
 #include "Component/Camera.h"
 #include "Component/Drawable.h"
+#include "Component/Transform.h"
 #include "Shape.h"
 #include "Archive.h"
 
-namespace Sentinel { namespace Component
+namespace Sentinel {
+namespace Component
 {
 	Drawable::Drawable() :
-		mTransform( NULL ),
-		mIsDynamic( false )
-	{
-		mType = GameComponent::DRAWABLE;
-	}
+		mTransform(NULL),
+		mIsDynamic(false)
+	{}
 
 	void Drawable::Startup()
 	{
-		mTransform = (Transform*)mOwner->FindComponent( GameComponent::TRANSFORM );
+		mTransform = mOwner->GetComponent<Transform>();
 
-		if( mTransform == NULL )
-			throw AppException( "Drawable::Startup()\n" + std::string( mOwner->mName ) + " does not contain Transform" );
+		if (mTransform == NULL)
+			throw AppException("Drawable::Startup()\n" + std::string(mOwner->mName) + " does not contain Transform");
 	}
 
 	void Drawable::Update()
-	{
-		CalculateBounds();
-	}
+	{}
 
 	void Drawable::Shutdown()
 	{
@@ -34,23 +32,35 @@ namespace Sentinel { namespace Component
 
 	///////////////////////////////////
 
-	void Drawable::Save( Archive& archive )
+	void Drawable::Execute()
 	{
-		GameComponent::Save( archive );
-
-		archive.Write( &mIsDynamic );
+		CalculateBounds();
 	}
 
-	void Drawable::Load( Archive& archive )
+	void Drawable::SetOwner(GameObject* owner)
 	{
-		GameComponent::Load( archive );
+		GameComponent::SetOwner(owner);
 
-		archive.Read( &mIsDynamic );
+		mOwner->mDrawable = this;
 	}
 
-	void Drawable::Copy( GameComponent* component )
+	void Drawable::Save(Archive& archive)
 	{
-		GameComponent::Copy( component );
+		GameComponent::Save(archive);
+
+		archive.Write(&mIsDynamic);
+	}
+
+	void Drawable::Load(Archive& archive)
+	{
+		GameComponent::Load(archive);
+
+		archive.Read(&mIsDynamic);
+	}
+
+	void Drawable::Copy(GameComponent* component)
+	{
+		GameComponent::Copy(component);
 
 		((Drawable*)component)->mIsDynamic = mIsDynamic;
 	}

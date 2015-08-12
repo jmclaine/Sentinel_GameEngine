@@ -17,35 +17,35 @@ namespace GUI
 
 		DECLARE_SERIAL_REGISTER_SAVE();
 
-		FontSystem*		mFontSystem;
+		FontSystem* mFontSystem;
 
-		std::string		mText;
-		ColorRGBA		mColor;
+		std::string mText;
+		ColorRGBA mColor;
 
 		//////////////////////////////////
 
 		Label();
-		Label( const std::string& text );
+		Label(const std::string& text);
 		virtual ~Label();
 
 		//////////////////////////////////
 
-		void			Startup();
+		void Startup();
 
-		void			Update();
+		void Update();
 
-		void			Shutdown();
-
-		//////////////////////////////////
-
-		void			CalculateBounds();
-
-		bool			CheckVisible( Component::Camera* camera );
-
-		void			Draw();
+		void Shutdown();
 
 		//////////////////////////////////
 
-		GameComponent*	Copy();
+		void CalculateBounds();
+
+		bool CheckVisible(Component::Camera* camera);
+
+		void Draw();
+
+		//////////////////////////////////
+
+		GameComponent* Copy();
 	};
 }}

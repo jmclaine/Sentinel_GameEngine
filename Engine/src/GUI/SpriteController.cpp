@@ -7,16 +7,17 @@
 #include "GameObject.h"
 #include "Input.h"
 
-namespace Sentinel { namespace GUI
+namespace Sentinel {
+namespace GUI
 {
-	DEFINE_SERIAL_REGISTER( SpriteController );
-	DEFINE_SERIAL_CLONE( SpriteController );
+	DEFINE_SERIAL_REGISTER(SpriteController);
+	DEFINE_SERIAL_CLONE(SpriteController);
 
 	SpriteController::SpriteController() :
-		mPositionToWindowX( false ),
-		mPositionToWindowY( false ),
-		mScaleToWindowX( false ),
-		mScaleToWindowY( false )
+		mPositionToWindowX(false),
+		mPositionToWindowY(false),
+		mScaleToWindowX(false),
+		mScaleToWindowY(false)
 	{}
 
 	SpriteController::~SpriteController()
@@ -29,7 +30,7 @@ namespace Sentinel { namespace GUI
 		Controller2D::Startup();
 
 		mBasePosition = mTransform->mPosition;
-		mBaseScale    = mTransform->mScale;
+		mBaseScale = mTransform->mScale;
 	}
 
 	void SpriteController::Update()
@@ -39,13 +40,13 @@ namespace Sentinel { namespace GUI
 		// Adjust position.
 		//
 		Vector3f* pos = &mTransform->mPosition;
-		
+
 		*pos = mBasePosition;
 
-		if( mPositionToWindowX )
+		if (mPositionToWindowX)
 			pos->x *= info->WidthRatio();
-		
-		if( mPositionToWindowY )
+
+		if (mPositionToWindowY)
 			pos->y *= info->HeightRatio();
 
 		pos->x += mMargin.left;
@@ -57,10 +58,10 @@ namespace Sentinel { namespace GUI
 
 		*scale = mBaseScale;
 
-		if( mScaleToWindowX )
+		if (mScaleToWindowX)
 			scale->x *= info->WidthRatio();
-		
-		if( mScaleToWindowY )
+
+		if (mScaleToWindowY)
 			scale->y *= info->HeightRatio();
 
 		scale->x += mMargin.right;
@@ -68,62 +69,62 @@ namespace Sentinel { namespace GUI
 
 		// Check for mouse being over the widget.
 		//
-		POINT mousePos = Mouse::Get().GetPosition( (HWND)info->Handle() );
+		POINT mousePos = Mouse::Get().GetPosition((HWND)info->Handle());
 
-		Vector3f v = mTransform->GetMatrixWorld().Inverse().Transform( Vector3f( (float)mousePos.x, (float)mousePos.y, 0 ));
+		Vector3f v = mTransform->GetMatrixWorld().Inverse().Transform(Vector3f((float)mousePos.x, (float)mousePos.y, 0));
 
-		if( v.x >= 0 && v.y >= 0 &&
-			v.x <= 1 && v.y <= 1 )
+		if (v.x >= 0 && v.y >= 0 &&
+			v.x <= 1 && v.y <= 1)
 		{
-			if( !mIsOver )
+			if (!mIsOver)
 			{
 				mIsOver = true;
-				mActionEnter.Activate();
+				mActionEnter();
 			}
 			else
 			{
-				mActionOver.Activate();
+				mActionOver();
 			}
 		}
-		else if( mIsOver )
+		else if (mIsOver)
 		{
 			mIsOver = false;
-			mActionExit.Activate();
+			mActionExit();
 		}
 	}
 
 	void SpriteController::Shutdown()
 	{
 		mTransform->mPosition = mBasePosition;
-		mTransform->mScale    = mBaseScale;
+		mTransform->mScale = mBaseScale;
 	}
 
-	DEFINE_SERIAL_REGISTER_SAVE( SpriteController );
+	DEFINE_SERIAL_REGISTER_SAVE(SpriteController);
 
-	void SpriteController::Save( Archive& archive )
+	void SpriteController::Save(Archive& archive)
 	{
-		Controller2D::Save( archive );
+		Controller2D::Save(archive);
 
-		archive.Write( &mPositionToWindowX );
-		archive.Write( &mPositionToWindowY );
+		archive.Write(&mPositionToWindowX);
+		archive.Write(&mPositionToWindowY);
 
-		archive.Write( &mScaleToWindowX );
-		archive.Write( &mScaleToWindowY );
+		archive.Write(&mScaleToWindowX);
+		archive.Write(&mScaleToWindowY);
 
-		archive.Write( mMargin.Ptr(), ar_sizeof( mMargin ));
+		archive.Write(mMargin.Ptr(), ar_sizeof(mMargin));
 	}
 
-	void SpriteController::Load( Archive& archive )
+	void SpriteController::Load(Archive& archive)
 	{
-		Controller2D::Load( archive );
+		Controller2D::Load(archive);
 
-		archive.Read( &mPositionToWindowX );
-		archive.Read( &mPositionToWindowY );
+		archive.Read(&mPositionToWindowX);
+		archive.Read(&mPositionToWindowY);
 
-		archive.Read( &mScaleToWindowX );
-		archive.Read( &mScaleToWindowY );
+		archive.Read(&mScaleToWindowX);
+		archive.Read(&mScaleToWindowY);
 
-		archive.Read( mMargin.Ptr(), ar_sizeof( mMargin ));
+		archive.Read(mMargin.Ptr(), ar_sizeof(mMargin));
 	}
 
 	///////////////////////////////////
@@ -132,7 +133,7 @@ namespace Sentinel { namespace GUI
 	{
 		SpriteController* controller = new SpriteController();
 
-		Controller2D::Copy( controller );
+		Controller2D::Copy(controller);
 
 		controller->mPositionToWindowX = mPositionToWindowX;
 		controller->mPositionToWindowY = mPositionToWindowY;
@@ -143,8 +144,8 @@ namespace Sentinel { namespace GUI
 		return controller;
 	}
 
-	void SpriteController::Copy( GameComponent* component )
+	void SpriteController::Copy(GameComponent* component)
 	{
-		Controller2D::Copy( component );
+		Controller2D::Copy(component);
 	}
 }}

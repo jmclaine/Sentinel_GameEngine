@@ -10,22 +10,22 @@ cbuffer Uniforms
 
 // Textures.
 //
-Texture2D    _Texture0	:register(t0);
-SamplerState _Sampler0	:register(s0);
+Texture2D    _Texture0 : register(t0);
+SamplerState _Sampler0 : register(s0);
 
 
 // Vertex Shader.
 //
 struct VSInput
 {
-	float3 Position		:POSITION;
-	float2 Texture0		:TEXCOORD0;
+	float3 Position : POSITION;
+	float2 Texture0 : TEXCOORD0;
 };
 
 struct VSOutput
 {
-	float4 Position		:SV_POSITION;
-	float2 Texture0		:TEXCOORD0;
+	float4 Position : SV_POSITION;
+	float2 Texture0 : TEXCOORD0;
 };
 
 VSOutput VS_Main(VSInput input)
@@ -41,17 +41,16 @@ VSOutput VS_Main(VSInput input)
 
 // Fragment Shader.
 //
-float4 PS_Main(VSOutput input):SV_Target
+float4 PS_Main(VSOutput input) :SV_Target
 {
 	return float4(_Texture0.Sample(_Sampler0, input.Texture0).xyz, 1);
 }
 
 #endif
+
 //////////////////////////////////////////////////////////////////////////////
+
 #ifdef VERSION_GL
-
-#version 330
-
 #ifdef VERTEX_SHADER
 
 uniform mat4 _WVP;
@@ -64,7 +63,7 @@ out vec2 gvTexCoord0;
 void main()
 {
 	gl_Position = _WVP * Position;
-	
+
 	gvTexCoord0 = vec2(TexCoord0.x, 1.0 - TexCoord0.y);
 }
 

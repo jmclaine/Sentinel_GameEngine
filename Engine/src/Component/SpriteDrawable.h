@@ -23,14 +23,14 @@ namespace Component
 
 	protected:
 
-		SpriteSystem*	mSpriteSystem;
+		SpriteSystem* mSpriteSystem;
 
 	public:
 
-		UINT			mFrame;
-		ColorRGBA		mColor;
+		UINT mFrame;
+		ColorRGBA mColor;
 
-		std::shared_ptr< Sprite > mSprite;
+		std::shared_ptr<Sprite> mSprite;
 
 	protected:
 
@@ -38,26 +38,22 @@ namespace Component
 
 	public:
 
-		SpriteDrawable( std::shared_ptr< Sprite > sprite );
+		SpriteDrawable(std::shared_ptr<Sprite> sprite);
 		~SpriteDrawable();
 
-		void	Set( std::shared_ptr< Sprite > sprite );
+		void Set(std::shared_ptr<Sprite> sprite);
 
 		/////////////////////////////////
 
-		void	Startup();
-
-		void	Update();
-
-		void	Shutdown();
+		void Startup();
 
 		/////////////////////////////////
 
-		bool	CheckVisible( Camera* camera );
+		bool CheckVisible(Camera* camera);
 
-		void	CalculateBounds();
+		void CalculateBounds();
 
-		void	Draw();
+		void Draw();
 
 		///////////////////////////////////
 

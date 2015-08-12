@@ -13,28 +13,13 @@ namespace Sentinel
 
 	class SENTINEL_DLL GameComponent : public Serializable
 	{
-	public:
-
-		enum Type
-		{
-			DEFAULT,
-			CONTROLLER,
-			PHYSICS,
-			TRANSFORM,
-			CAMERA,
-			LIGHT,
-			DRAWABLE,
-			TRIGGER,
-		};
-
 	protected:
 
-		GameObject*			mOwner;
-		GameComponent::Type	mType;
+		GameObject* mOwner;
 
 	public:
 
-		bool				mEnabled;
+		bool mEnabled;
 
 	protected:
 
@@ -54,19 +39,19 @@ namespace Sentinel
 
 		////////////////////////////////
 
-		void SetOwner( GameObject* owner );
+		const GameObject* GetOwner();
 
-		GameComponent::Type GetType();
+		virtual void SetOwner(GameObject* owner);
 
 		////////////////////////////////
 
-		virtual void Save( Archive& archive );
-		virtual void Load( Archive& archive );
+		virtual void Save(Archive& archive);
+		virtual void Load(Archive& archive);
 
 		virtual GameComponent* Copy();
 
 	protected:
 
-		virtual void Copy( GameComponent* component );
+		virtual void Copy(GameComponent* component);
 	};
 }

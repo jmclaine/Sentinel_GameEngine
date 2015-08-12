@@ -4,7 +4,8 @@
 #include "Matrix4f.h"
 #include "Material.h"
 
-namespace Sentinel { namespace Component
+namespace Sentinel {
+namespace Component
 {
 	enum CameraAxisType
 	{
@@ -24,42 +25,40 @@ namespace Sentinel { namespace Component
 
 	protected:
 
-		UINT		mResolution;
+		UINT mResolution;
 
-		Matrix4f	mMatrixProjection;
-		Matrix4f	mMatrixView[ NUM_CAMERA_AXIS ];
-		Matrix4f	mMatrixFinal[ NUM_CAMERA_AXIS ];
+		Matrix4f mMatrixProjection;
+		Matrix4f mMatrixView[NUM_CAMERA_AXIS];
+		Matrix4f mMatrixFinal[NUM_CAMERA_AXIS];
 
 	public:
 
-		std::shared_ptr< Material > mMaterial;
+		std::shared_ptr<Material> mMaterial;
 
 		///////////////////////////////////////
 
 		PointLight();
-		PointLight( UINT resolution );	// creates a cube texture with dimensions of resolution^3
+		PointLight(UINT resolution);	// creates a cube texture with dimensions of resolution^3
 		~PointLight();
 
-		void		Startup();
-
-		void		Update();
-
-		void		Shutdown();
+		void Startup();
+		void Update();
+		void Shutdown();
 
 		///////////////////////////////////////
 
-		void		Present();
+		void Present();
 
-		const Matrix4f& GetMatrixFinal( CameraAxisType axis );
+		const Matrix4f& GetMatrixFinal(CameraAxisType axis);
 
-		float*		PtrMatrixFinal();
+		float* PtrMatrixFinal();
 
 	private:
 
 		// Adds Component::Drawables is they are dynamic,
 		// and within range of the light.
 		//
-		void		AddDynamic( GameObject* obj );
+		void AddDynamic(GameObject* obj);
 
 		///////////////////////////////////////
 

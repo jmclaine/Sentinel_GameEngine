@@ -14,7 +14,7 @@ namespace Component
 
 	protected:
 
-		ParticleSystem*		mParticleSystem;
+		ParticleSystem* mParticleSystem;
 
 		/////////////////////////////////
 
@@ -22,26 +22,25 @@ namespace Component
 
 	public:
 
-		ParticleEmitter( ParticleSystem* particle );
+		ParticleEmitter(ParticleSystem* particle);
 		~ParticleEmitter();
 
-		void	Set( ParticleSystem* particle );
+		void Set(ParticleSystem* particle);
 
 		/////////////////////////////////
 
-		void	Startup();
-
-		void	Update();
-
-		void	Shutdown();
+		void Startup();
+		void Shutdown();
 
 		/////////////////////////////////
 
-		void	CalculateBounds();
+		void Execute();
 
-		bool	CheckVisible( Camera* camera );
+		void CalculateBounds();
 
-		void	Draw();
+		bool CheckVisible(Camera* camera);
+
+		void Draw();
 
 		///////////////////////////////////
 
