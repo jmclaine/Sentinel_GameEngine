@@ -4,8 +4,10 @@
 #include <stdio.h>
 #include <functional>
 
-#include "Common.h"
-#include "Util.h"
+#include "Sentinel.h"
+#include "Types.h"
+#include "Hash.h"
+#include "Exception.h"
 
 namespace Sentinel
 {
@@ -37,40 +39,40 @@ namespace Sentinel
 #define DECLARE_SERIAL_REGISTER_SAVE()\
 	void SerialSave( Archive& archive )
 
-#define DEFINE_SERIAL_REGISTER_SAVE( clazz )\
-	void clazz::SerialSave( Archive& archive ) { SERIAL_REGISTER.Save( archive ); Save( archive ); }
+#define DEFINE_SERIAL_REGISTER_SAVE(clazz)\
+	void clazz::SerialSave(Archive& archive) { SERIAL_REGISTER.Save(archive); Save(archive); }
 
-#define DEFINE_SERIAL_REGISTER_EX( refClass, func )\
-	SerialRegister refClass::SERIAL_REGISTER( #refClass, func );
+#define DEFINE_SERIAL_REGISTER_EX(refClass, func)\
+	SerialRegister refClass::SERIAL_REGISTER(#refClass, func);
 
-#define DEFINE_SERIAL_REGISTER_CLONE( refClass, cloneClass )\
-	SerialRegister cloneClass::SERIAL_REGISTER( #refClass, cloneClass::Clone );
+#define DEFINE_SERIAL_REGISTER_CLONE(refClass, cloneClass)\
+	SerialRegister cloneClass::SERIAL_REGISTER(#refClass, cloneClass::Clone);
 
-#define DEFINE_SERIAL_REGISTER( clazz )\
-	DEFINE_SERIAL_REGISTER_CLONE( clazz, clazz );
+#define DEFINE_SERIAL_REGISTER(clazz)\
+	DEFINE_SERIAL_REGISTER_CLONE(clazz, clazz);
 
-#define DEFINE_SERIAL_CLONE( clazz )\
+#define DEFINE_SERIAL_CLONE(clazz)\
 	Serializable* clazz::Clone() {\
 		return new clazz(); }
 
-#define DEFINE_SERIAL_CLONE_INLINE( clazz )\
+#define DEFINE_SERIAL_CLONE_INLINE(clazz)\
 	static Serializable* Clone() {\
 		return new clazz(); }
 
-#define DEFINE_SERIAL_SAVE( clazz )\
-	void clazz::Save( Archive& archive ) {\
-		SERIAL_REGISTER.Save( archive );\
-		archive.Write( (const char*)this, sizeof( clazz )); }
+#define DEFINE_SERIAL_SAVE(clazz)\
+	void clazz::Save(Archive& archive) {\
+		SERIAL_REGISTER.Save(archive);\
+		archive.Write((const char*)this, sizeof(clazz)); }
 
-#define DEFINE_SERIAL_LOAD( clazz )\
-	void clazz::Load( Archive& archive ) {\
-		archive.Read( (char*)this, sizeof( clazz )); }
+#define DEFINE_SERIAL_LOAD(clazz)\
+	void clazz::Load(Archive& archive) {\
+		archive.Read((char*)this, sizeof(clazz)); }
 
-#define DEFINE_SERIAL( clazz )\
-	DEFINE_SERIAL_REGISTER( clazz )\
-	DEFINE_SERIAL_CLONE( clazz )\
-	DEFINE_SERIAL_SAVE( clazz )\
-	DEFINE_SERIAL_LOAD( clazz )
+#define DEFINE_SERIAL(clazz)\
+	DEFINE_SERIAL_REGISTER(clazz)\
+	DEFINE_SERIAL_CLONE(clazz)\
+	DEFINE_SERIAL_SAVE(clazz)\
+	DEFINE_SERIAL_LOAD(clazz)
 
 
 	// Inherit from this class.
@@ -91,9 +93,9 @@ namespace Sentinel
 
 		virtual ~Serializable() {}
 
-		virtual void	Save( Archive& archive ) = 0;
-		
-		virtual void	Load( Archive& archive ) = 0;
+		virtual void Save(Archive& archive) = 0;
+
+		virtual void Load(Archive& archive) = 0;
 	};
 
 	// Stores the Serializable->Clone() function of each object.
@@ -106,10 +108,10 @@ namespace Sentinel
 		typedef Serializable* (*CloneFunc)();
 
 	private:
-		
+
 		static Serializable* NullClone();
 
-		std::map< UINT, CloneFunc > mRegistry;
+		std::map<UINT, CloneFunc> mRegistry;
 
 	protected:
 
@@ -120,12 +122,12 @@ namespace Sentinel
 		~SerialFactory();
 
 		static SerialFactory& Get();
-		
+
 		///////////////////////////
 
-		bool			Register( UINT value, CloneFunc func );
+		bool Register(UINT value, CloneFunc func);
 
-		Serializable*	Create( UINT value );
+		Serializable* Create(UINT value);
 	};
 
 	// Automatically registers the class within the SerialFactory.
@@ -138,33 +140,33 @@ namespace Sentinel
 
 	public:
 
-		SerialRegister( const char* clazz, SerialFactory::CloneFunc func );
+		SerialRegister(const char* clazz, SerialFactory::CloneFunc func);
 
-		void					Save( Archive& archive );
+		void Save(Archive& archive);
 
-		static Serializable*	Load( Archive& archive );
+		static Serializable* Load(Archive& archive);
 	};
 
 	///////////////////////////////////////////////////////////////////////////////////
 
-#define REGISTER_SERIAL_FUNCTION( func )\
-	SerialFunctionFactory::Get().Register( HashString( #func ), std::function< void() >( [=]() { func(); } ))
+#define REGISTER_SERIAL_FUNCTION(func)\
+	SerialFunctionFactory::Get().Register(HashString(#func), std::function<void()>([=]() { func(); } ))
 
-#define CREATE_SERIAL_FUNCTION( func )\
-	SerialFunctionFactory::Get().Create( HashString( #func ))
+#define CREATE_SERIAL_FUNCTION(func)\
+	SerialFunctionFactory::Get().Create(HashString(#func))
 
 	class SENTINEL_DLL SerialFunctionFactory
 	{
 	public:
 
-		typedef std::function< void() > Func;
+		typedef std::function<void()> Func;
 
 	private:
 
 		static void NullFunc();
-		static std::function< void() > NullFuncPtr;
-		
-		std::map< UINT, Func > mRegistry; 
+		static std::function<void()> NullFuncPtr;
+
+		std::map<UINT, Func> mRegistry;
 
 	protected:
 
@@ -175,23 +177,23 @@ namespace Sentinel
 		~SerialFunctionFactory();
 
 		static SerialFunctionFactory& Get();
-		
+
 		///////////////////////////
 
-		bool Register( UINT value, Func func );
+		bool Register(UINT value, Func func);
 
-		const std::function< void() >& Create( UINT value );
+		const std::function<void()>& Create(UINT value);
 
-		UINT Find( Func func );
+		UINT Find(Func func);
 	};
 
 	///////////////////////////////////////////////////////////////////////////////////
 
-#define DECLARE_SERIAL_MEMBER_FUNCTION( clazz, func )\
-	static SerialMemberFunctionRegister< clazz > SERIAL_##func;
+#define DECLARE_SERIAL_MEMBER_FUNCTION(clazz, func)\
+	static SerialMemberFunctionRegister<clazz> SERIAL_##func;
 
-#define DEFINE_SERIAL_MEMBER_FUNCTION( clazz, func )\
-	SerialMemberFunctionRegister< clazz > clazz::SERIAL_##func( #func, &clazz::func );
+#define DEFINE_SERIAL_MEMBER_FUNCTION(clazz, func)\
+	SerialMemberFunctionRegister<clazz> clazz::SERIAL_##func(#func, &clazz::func);
 
 	template< class T >
 	class SerialMemberFunctionFactory
@@ -199,10 +201,10 @@ namespace Sentinel
 	public:
 
 		typedef Serializable* (T::*Func)();
-		
+
 	private:
 
-		std::map< UINT, Func > mRegistry; 
+		std::map<UINT, Func> mRegistry;
 
 	protected:
 
@@ -219,34 +221,34 @@ namespace Sentinel
 			static SerialMemberFunctionFactory mSingle;
 			return mSingle;
 		}
-		
+
 		///////////////////////////
 
-		bool Register( UINT value, Func func )
+		bool Register(UINT value, Func func)
 		{
-			if( mRegistry.find( value ) != mRegistry.end() )
+			if (mRegistry.find(value) != mRegistry.end())
 				return false;
 
-			mRegistry.insert( std::pair< UINT, Func >( value, func ));
+			mRegistry.insert(std::pair<UINT, Func>(value, func));
 
 			return true;
 		}
 
-		Func Create( UINT value )
+		Func Create(UINT value)
 		{
-			auto it = mRegistry.find( value );
+			auto it = mRegistry.find(value);
 
-			if( it != mRegistry.end() )
+			if (it != mRegistry.end())
 				return it->second;
 
 			return 0;
 		}
 
-		UINT Find( Func func )
+		UINT Find(Func func)
 		{
-			TRAVERSE_LIST( it, mRegistry )
+			TRAVERSE_LIST(it, mRegistry)
 			{
-				if( it->second == func )
+				if (it->second == func)
 					return it->first;
 			}
 
@@ -269,25 +271,25 @@ namespace Sentinel
 
 	public:
 
-		SerialMemberFunctionRegister( const char* name, Func func )
+		SerialMemberFunctionRegister(const char* name, Func func)
 		{
-			mID = HashString( name );
-			if( !SerialMemberFunctionFactory< T >::Get().Register( mID, func ))
-				throw AppException( "Failed to register serial '" + std::string( name ) + "'" );
+			mID = HashString(name);
+			if (!SerialMemberFunctionFactory<T>::Get().Register(mID, func))
+				throw AppException("Failed to register serial '" + std::string(name) + "'");
 		}
 
-		void Save( Archive& archive )
+		void Save(Archive& archive)
 		{
-			archive.Write( &mID, 1, true );
+			archive.Write(&mID, 1, true);
 		}
 
-		static Serializable* Load( T* obj, Archive& archive )
+		static Serializable* Load(T* obj, Archive& archive)
 		{
 			UINT id;
-			archive.Read( &id, 1, true );
+			archive.Read(&id, 1, true);
 
-			if( id != 0 )
-				return (obj->*SerialMemberFunctionFactory< T >::Get().Create( id ))();
+			if (id != 0)
+				return (obj->*SerialMemberFunctionFactory< T >::Get().Create(id))();
 
 			return NULL;
 		}

@@ -3,9 +3,9 @@
 #include "ParticleEffect.h"
 #include "Particle.h"
 #include "RandomValue.h"
-#include "Util.h"
 #include "Timing.h"
 #include "Archive.h"
+#include "MathUtil.h"
 
 namespace Sentinel
 {
@@ -15,788 +15,788 @@ namespace Sentinel
 	ParticleEffect::ParticleEffect()
 	{}
 
-	ParticleEffect::ParticleEffect( float startTime ) :
-		mStartTime( startTime )
+	ParticleEffect::ParticleEffect(float startTime) :
+		mStartTime(startTime)
 	{}
 
-	void ParticleEffect::Startup( Particle& particle )
+	void ParticleEffect::Startup(Particle& particle)
 	{}
 
-	void ParticleEffect::Update( Particle& particle )
+	void ParticleEffect::Update(Particle& particle)
 	{}
 
-	void ParticleEffect::Save( Archive& archive )
+	void ParticleEffect::Save(Archive& archive)
 	{
-		archive.Write( &mStartTime );
+		archive.Write(&mStartTime);
 	}
 
-	void ParticleEffect::Load( Archive& archive )
+	void ParticleEffect::Load(Archive& archive)
 	{
-		archive.Read( &mStartTime );
+		archive.Read(&mStartTime);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 	// Texture.
 	// NormalParticle only.
 	//
-	DEFINE_SERIAL_REGISTER( TextureEffect );
-	DEFINE_SERIAL_CLONE( TextureEffect );
+	DEFINE_SERIAL_REGISTER(TextureEffect);
+	DEFINE_SERIAL_CLONE(TextureEffect);
 
 	TextureEffect::TextureEffect()
 	{}
 
-	TextureEffect::TextureEffect( float startTime, UINT frame ) :
-		ParticleEffect( startTime ),
-		mFrame( frame )
+	TextureEffect::TextureEffect(float startTime, UINT frame) :
+		ParticleEffect(startTime),
+		mFrame(frame)
 	{}
 
-	void TextureEffect::Startup( Particle& particle )
+	void TextureEffect::Startup(Particle& particle)
 	{
-		static_cast< NormalParticle& >(particle).mFrame = mFrame;
+		static_cast<NormalParticle&>(particle).mFrame = mFrame;
 	}
 
-	void TextureEffect::Save( Archive& archive )
+	void TextureEffect::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		ParticleEffect::Save( archive );
+		ParticleEffect::Save(archive);
 
-		archive.Write( &mFrame );
+		archive.Write(&mFrame);
 	}
 
-	void TextureEffect::Load( Archive& archive )
+	void TextureEffect::Load(Archive& archive)
 	{
-		ParticleEffect::Load( archive );
+		ParticleEffect::Load(archive);
 
-		archive.Read( &mFrame );
+		archive.Read(&mFrame);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 
-	DEFINE_SERIAL_REGISTER( RandomTextureEffect );
-	DEFINE_SERIAL_CLONE( RandomTextureEffect );
+	DEFINE_SERIAL_REGISTER(RandomTextureEffect);
+	DEFINE_SERIAL_CLONE(RandomTextureEffect);
 
 	RandomTextureEffect::RandomTextureEffect()
 	{}
 
-	RandomTextureEffect::RandomTextureEffect( float startTime, UINT minFrame, UINT maxFrame ) :
-		TextureEffect( startTime, minFrame ),
-		mMaxFrame( maxFrame )
+	RandomTextureEffect::RandomTextureEffect(float startTime, UINT minFrame, UINT maxFrame) :
+		TextureEffect(startTime, minFrame),
+		mMaxFrame(maxFrame)
 	{}
 
-	void RandomTextureEffect::Startup( Particle& particle )
+	void RandomTextureEffect::Startup(Particle& particle)
 	{
-		static_cast< NormalParticle& >(particle).mFrame = RandomValue( mFrame, mMaxFrame );
+		static_cast<NormalParticle&>(particle).mFrame = RandomValue(mFrame, mMaxFrame);
 	}
 
-	void RandomTextureEffect::Save( Archive& archive )
+	void RandomTextureEffect::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		ParticleEffect::Save( archive );
+		ParticleEffect::Save(archive);
 
-		archive.Write( &mFrame );
-		archive.Write( &mMaxFrame );
+		archive.Write(&mFrame);
+		archive.Write(&mMaxFrame);
 	}
 
-	void RandomTextureEffect::Load( Archive& archive )
+	void RandomTextureEffect::Load(Archive& archive)
 	{
-		TextureEffect::Load( archive );
+		TextureEffect::Load(archive);
 
-		archive.Read( &mMaxFrame );
+		archive.Read(&mMaxFrame);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 	// Color.
 	// NormalParticle only.
 	//
-	DEFINE_SERIAL_REGISTER( ColorEffect );
-	DEFINE_SERIAL_CLONE( ColorEffect );
+	DEFINE_SERIAL_REGISTER(ColorEffect);
+	DEFINE_SERIAL_CLONE(ColorEffect);
 
 	ColorEffect::ColorEffect()
 	{}
 
-	ColorEffect::ColorEffect( float startTime, const ColorRGBA& color ) :
-		ParticleEffect( startTime ),
-		mColor( color )
+	ColorEffect::ColorEffect(float startTime, const ColorRGBA& color) :
+		ParticleEffect(startTime),
+		mColor(color)
 	{}
 
-	void ColorEffect::Startup( Particle& particle )
+	void ColorEffect::Startup(Particle& particle)
 	{
-		static_cast< NormalParticle& >(particle).mColor = mColor;
+		static_cast<NormalParticle&>(particle).mColor = mColor;
 	}
 
-	void ColorEffect::Save( Archive& archive )
+	void ColorEffect::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		ParticleEffect::Save( archive );
+		ParticleEffect::Save(archive);
 
-		archive.Write( mColor.Ptr(), ar_sizeof( mColor ));
+		archive.Write(mColor.Ptr(), ar_sizeof(mColor));
 	}
 
-	void ColorEffect::Load( Archive& archive )
+	void ColorEffect::Load(Archive& archive)
 	{
-		ParticleEffect::Load( archive );
+		ParticleEffect::Load(archive);
 
-		archive.Read( mColor.Ptr(), ar_sizeof( mColor ));
+		archive.Read(mColor.Ptr(), ar_sizeof(mColor));
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 
-	DEFINE_SERIAL_REGISTER( RandomColorEffect );
-	DEFINE_SERIAL_CLONE( RandomColorEffect );
+	DEFINE_SERIAL_REGISTER(RandomColorEffect);
+	DEFINE_SERIAL_CLONE(RandomColorEffect);
 
 	RandomColorEffect::RandomColorEffect()
 	{}
 
-	RandomColorEffect::RandomColorEffect( float startTime, const ColorRGBA& minColor, const ColorRGBA& maxColor ) :
-		ColorEffect( startTime, minColor ),
-		mMaxColor( maxColor )
+	RandomColorEffect::RandomColorEffect(float startTime, const ColorRGBA& minColor, const ColorRGBA& maxColor) :
+		ColorEffect(startTime, minColor),
+		mMaxColor(maxColor)
 	{}
 
-	void RandomColorEffect::Startup( Particle& particle )
+	void RandomColorEffect::Startup(Particle& particle)
 	{
-		static_cast< NormalParticle& >(particle).mColor = RandomValue( mColor, mMaxColor );
+		static_cast<NormalParticle&>(particle).mColor = RandomValue(mColor, mMaxColor);
 	}
 
-	void RandomColorEffect::Save( Archive& archive )
+	void RandomColorEffect::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		ParticleEffect::Save( archive );
+		ParticleEffect::Save(archive);
 
-		archive.Write( mColor.Ptr(),	ar_sizeof( mColor ));
-		archive.Write( mMaxColor.Ptr(), ar_sizeof( mMaxColor ));
+		archive.Write(mColor.Ptr(), ar_sizeof(mColor));
+		archive.Write(mMaxColor.Ptr(), ar_sizeof(mMaxColor));
 	}
 
-	void RandomColorEffect::Load( Archive& archive )
+	void RandomColorEffect::Load(Archive& archive)
 	{
-		ColorEffect::Load( archive );
+		ColorEffect::Load(archive);
 
-		archive.Read( mMaxColor.Ptr(), ar_sizeof( mMaxColor ));
+		archive.Read(mMaxColor.Ptr(), ar_sizeof(mMaxColor));
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 
-	DEFINE_SERIAL_REGISTER( FadeToColorEffect );
-	DEFINE_SERIAL_CLONE( FadeToColorEffect );
+	DEFINE_SERIAL_REGISTER(FadeToColorEffect);
+	DEFINE_SERIAL_CLONE(FadeToColorEffect);
 
 	FadeToColorEffect::FadeToColorEffect()
 	{}
 
-	FadeToColorEffect::FadeToColorEffect( float startTime, float endTime, const ColorRGBA& color ) :
-		ColorEffect( startTime, color ),
-		mEndTime( endTime )
+	FadeToColorEffect::FadeToColorEffect(float startTime, float endTime, const ColorRGBA& color) :
+		ColorEffect(startTime, color),
+		mEndTime(endTime)
 	{
-		_ASSERT( endTime > 0 );
-		_ASSERT( startTime < endTime );
+		_ASSERT(endTime > 0);
+		_ASSERT(startTime < endTime);
 	}
 
-	void FadeToColorEffect::Startup( Particle& particle )
+	void FadeToColorEffect::Startup(Particle& particle)
 	{
-		_ASSERT( mEndTime > 0 );
-		_ASSERT( mStartTime < mEndTime );
+		_ASSERT(mEndTime > 0);
+		_ASSERT(mStartTime < mEndTime);
 	}
 
-	void FadeToColorEffect::Update( Particle& particle )
+	void FadeToColorEffect::Update(Particle& particle)
 	{
-		if( particle.mElapsedTime < mEndTime + Timing::DESIRED_FRAME_RATE )
-			static_cast< NormalParticle& >(particle).mColor = lerp( static_cast< NormalParticle& >(particle).mColor, mColor, particle.mElapsedTime / mEndTime );
+		if (particle.mElapsedTime < mEndTime + Timing::DESIRED_FRAME_RATE)
+			static_cast<NormalParticle&>(particle).mColor = LERP(static_cast<NormalParticle&>(particle).mColor, mColor, (particle.mElapsedTime / mEndTime));
 	}
 
-	void FadeToColorEffect::Save( Archive& archive )
+	void FadeToColorEffect::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		ParticleEffect::Save( archive );
+		ParticleEffect::Save(archive);
 
-		archive.Write( mColor.Ptr(), ar_sizeof( mColor ));
-		archive.Write( &mEndTime );
+		archive.Write(mColor.Ptr(), ar_sizeof(mColor));
+		archive.Write(&mEndTime);
 	}
 
-	void FadeToColorEffect::Load( Archive& archive )
+	void FadeToColorEffect::Load(Archive& archive)
 	{
-		ColorEffect::Load( archive );
+		ColorEffect::Load(archive);
 
-		archive.Read( &mEndTime );
+		archive.Read(&mEndTime);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 	// Position.
 	//
-	DEFINE_SERIAL_REGISTER( PositionEffect );
-	DEFINE_SERIAL_CLONE( PositionEffect );
+	DEFINE_SERIAL_REGISTER(PositionEffect);
+	DEFINE_SERIAL_CLONE(PositionEffect);
 
 	PositionEffect::PositionEffect()
 	{}
 
-	PositionEffect::PositionEffect( float startTime, const Vector3f& position ) :
-		ParticleEffect( startTime ),
-		mPosition( position )
+	PositionEffect::PositionEffect(float startTime, const Vector3f& position) :
+		ParticleEffect(startTime),
+		mPosition(position)
 	{}
 
-	void PositionEffect::Startup( Particle& particle )
+	void PositionEffect::Startup(Particle& particle)
 	{
 		particle.mPosition = mPosition;
 	}
 
-	void PositionEffect::Save( Archive& archive )
+	void PositionEffect::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		ParticleEffect::Save( archive );
+		ParticleEffect::Save(archive);
 
-		archive.Write( mPosition.Ptr(), ar_sizeof( mPosition ));
+		archive.Write(mPosition.Ptr(), ar_sizeof(mPosition));
 	}
 
-	void PositionEffect::Load( Archive& archive )
+	void PositionEffect::Load(Archive& archive)
 	{
-		ParticleEffect::Load( archive );
+		ParticleEffect::Load(archive);
 
-		archive.Read( mPosition.Ptr(), ar_sizeof( mPosition ));
+		archive.Read(mPosition.Ptr(), ar_sizeof(mPosition));
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 
-	DEFINE_SERIAL_REGISTER( AreaPositionEffect );
-	DEFINE_SERIAL_CLONE( AreaPositionEffect );
+	DEFINE_SERIAL_REGISTER(AreaPositionEffect);
+	DEFINE_SERIAL_CLONE(AreaPositionEffect);
 
 	AreaPositionEffect::AreaPositionEffect()
 	{}
 
-	AreaPositionEffect::AreaPositionEffect( float startTime, const Vector3f& minPosition, const Vector3f& maxPosition ) :
-		PositionEffect( startTime, minPosition ),
-		mMaxPosition( maxPosition )
+	AreaPositionEffect::AreaPositionEffect(float startTime, const Vector3f& minPosition, const Vector3f& maxPosition) :
+		PositionEffect(startTime, minPosition),
+		mMaxPosition(maxPosition)
 	{}
 
-	void AreaPositionEffect::Startup( Particle& particle )
+	void AreaPositionEffect::Startup(Particle& particle)
 	{
-		particle.mPosition = RandomValue( mPosition, mMaxPosition );
+		particle.mPosition = RandomValue(mPosition, mMaxPosition);
 	}
 
-	void AreaPositionEffect::Save( Archive& archive )
+	void AreaPositionEffect::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		ParticleEffect::Save( archive );
+		ParticleEffect::Save(archive);
 
-		archive.Write( mPosition.Ptr(),		ar_sizeof( mPosition ));
-		archive.Write( mMaxPosition.Ptr(),	ar_sizeof( mMaxPosition ));
+		archive.Write(mPosition.Ptr(), ar_sizeof(mPosition));
+		archive.Write(mMaxPosition.Ptr(), ar_sizeof(mMaxPosition));
 	}
 
-	void AreaPositionEffect::Load( Archive& archive )
+	void AreaPositionEffect::Load(Archive& archive)
 	{
-		PositionEffect::Load( archive );
+		PositionEffect::Load(archive);
 
-		archive.Read( mMaxPosition.Ptr(), ar_sizeof( mMaxPosition ));
+		archive.Read(mMaxPosition.Ptr(), ar_sizeof(mMaxPosition));
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 
-	DEFINE_SERIAL_REGISTER( SpherePositionEffect );
-	DEFINE_SERIAL_CLONE( SpherePositionEffect );
+	DEFINE_SERIAL_REGISTER(SpherePositionEffect);
+	DEFINE_SERIAL_CLONE(SpherePositionEffect);
 
 	SpherePositionEffect::SpherePositionEffect()
 	{}
 
-	SpherePositionEffect::SpherePositionEffect( float startTime, const Vector3f& position, float radius ) :
-		PositionEffect( startTime, position ),
-		mRadius( radius )
+	SpherePositionEffect::SpherePositionEffect(float startTime, const Vector3f& position, float radius) :
+		PositionEffect(startTime, position),
+		mRadius(radius)
 	{}
 
-	void SpherePositionEffect::Startup( Particle& particle )
+	void SpherePositionEffect::Startup(Particle& particle)
 	{
-		particle.mPosition = mPosition + RandomValue( Vector3f( -mRadius, -mRadius, -mRadius ), Vector3f( mRadius, mRadius, mRadius ));
+		particle.mPosition = mPosition + RandomValue(Vector3f(-mRadius, -mRadius, -mRadius), Vector3f(mRadius, mRadius, mRadius));
 	}
 
-	void SpherePositionEffect::Save( Archive& archive )
+	void SpherePositionEffect::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		ParticleEffect::Save( archive );
+		ParticleEffect::Save(archive);
 
-		archive.Write( mPosition.Ptr(), ar_sizeof( mPosition ));
-		archive.Write( &mRadius );
+		archive.Write(mPosition.Ptr(), ar_sizeof(mPosition));
+		archive.Write(&mRadius);
 	}
 
-	void SpherePositionEffect::Load( Archive& archive )
+	void SpherePositionEffect::Load(Archive& archive)
 	{
-		PositionEffect::Load( archive );
+		PositionEffect::Load(archive);
 
-		archive.Read( &mRadius );
+		archive.Read(&mRadius);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 	// Rotation.
 	//
-	DEFINE_SERIAL_REGISTER( RotationEffect );
-	DEFINE_SERIAL_CLONE( RotationEffect );
+	DEFINE_SERIAL_REGISTER(RotationEffect);
+	DEFINE_SERIAL_CLONE(RotationEffect);
 
 	RotationEffect::RotationEffect()
 	{}
 
-	RotationEffect::RotationEffect( float startTime, const Vector3f& rotation ) :
-		ParticleEffect( startTime ),
-		mRotation( rotation )
+	RotationEffect::RotationEffect(float startTime, const Vector3f& rotation) :
+		ParticleEffect(startTime),
+		mRotation(rotation)
 	{}
 
-	void RotationEffect::Startup( Particle& particle )
+	void RotationEffect::Startup(Particle& particle)
 	{
 		particle.mRotation = mRotation;
 	}
 
-	void RotationEffect::Save( Archive& archive )
+	void RotationEffect::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		ParticleEffect::Save( archive );
+		ParticleEffect::Save(archive);
 
-		archive.Write( mRotation.Ptr(), ar_sizeof( mRotation ));
+		archive.Write(mRotation.Ptr(), ar_sizeof(mRotation));
 	}
 
-	void RotationEffect::Load( Archive& archive )
+	void RotationEffect::Load(Archive& archive)
 	{
-		ParticleEffect::Load( archive );
+		ParticleEffect::Load(archive);
 
-		archive.Read( mRotation.Ptr(), ar_sizeof( mRotation ));
+		archive.Read(mRotation.Ptr(), ar_sizeof(mRotation));
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 
-	DEFINE_SERIAL_REGISTER( RandomRotationEffect );
-	DEFINE_SERIAL_CLONE( RandomRotationEffect );
+	DEFINE_SERIAL_REGISTER(RandomRotationEffect);
+	DEFINE_SERIAL_CLONE(RandomRotationEffect);
 
 	RandomRotationEffect::RandomRotationEffect()
 	{}
 
-	RandomRotationEffect::RandomRotationEffect( float startTime, const Vector3f& minRotation, const Vector3f& maxRotation ) :
-		RotationEffect( startTime, minRotation ),
-		mMaxRotation( maxRotation )
+	RandomRotationEffect::RandomRotationEffect(float startTime, const Vector3f& minRotation, const Vector3f& maxRotation) :
+		RotationEffect(startTime, minRotation),
+		mMaxRotation(maxRotation)
 	{}
-	
-	void RandomRotationEffect::Startup( Particle& particle )
+
+	void RandomRotationEffect::Startup(Particle& particle)
 	{
-		particle.mRotation = RandomValue( mRotation, mMaxRotation );
+		particle.mRotation = RandomValue(mRotation, mMaxRotation);
 	}
 
-	void RandomRotationEffect::Save( Archive& archive )
+	void RandomRotationEffect::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		ParticleEffect::Save( archive );
+		ParticleEffect::Save(archive);
 
-		archive.Write( mRotation.Ptr(), ar_sizeof( mRotation ));
-		archive.Write( mMaxRotation.Ptr(), ar_sizeof( mMaxRotation ));
+		archive.Write(mRotation.Ptr(), ar_sizeof(mRotation));
+		archive.Write(mMaxRotation.Ptr(), ar_sizeof(mMaxRotation));
 	}
 
-	void RandomRotationEffect::Load( Archive& archive )
+	void RandomRotationEffect::Load(Archive& archive)
 	{
-		RotationEffect::Load( archive );
+		RotationEffect::Load(archive);
 
-		archive.Read( mMaxRotation.Ptr(), ar_sizeof( mMaxRotation ));
+		archive.Read(mMaxRotation.Ptr(), ar_sizeof(mMaxRotation));
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 	// Scale.
 	//
-	DEFINE_SERIAL_REGISTER( ScaleEffect );
-	DEFINE_SERIAL_CLONE( ScaleEffect );
+	DEFINE_SERIAL_REGISTER(ScaleEffect);
+	DEFINE_SERIAL_CLONE(ScaleEffect);
 
 	ScaleEffect::ScaleEffect()
 	{}
 
-	ScaleEffect::ScaleEffect( float startTime, const Vector3f& scale ) :
-		ParticleEffect( startTime ),
-		mScale( scale )
+	ScaleEffect::ScaleEffect(float startTime, const Vector3f& scale) :
+		ParticleEffect(startTime),
+		mScale(scale)
 	{}
 
-	void ScaleEffect::Startup( Particle& particle )
+	void ScaleEffect::Startup(Particle& particle)
 	{
 		particle.mScale = mScale;
 	}
 
-	void ScaleEffect::Save( Archive& archive )
+	void ScaleEffect::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		ParticleEffect::Save( archive );
+		ParticleEffect::Save(archive);
 
-		archive.Write( mScale.Ptr(), ar_sizeof( mScale ));
+		archive.Write(mScale.Ptr(), ar_sizeof(mScale));
 	}
 
-	void ScaleEffect::Load( Archive& archive )
+	void ScaleEffect::Load(Archive& archive)
 	{
-		ParticleEffect::Load( archive );
+		ParticleEffect::Load(archive);
 
-		archive.Read( mScale.Ptr(), ar_sizeof( mScale ));
+		archive.Read(mScale.Ptr(), ar_sizeof(mScale));
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 
-	DEFINE_SERIAL_REGISTER( RandomScaleEffect );
-	DEFINE_SERIAL_CLONE( RandomScaleEffect );
+	DEFINE_SERIAL_REGISTER(RandomScaleEffect);
+	DEFINE_SERIAL_CLONE(RandomScaleEffect);
 
 	RandomScaleEffect::RandomScaleEffect()
 	{}
 
-	RandomScaleEffect::RandomScaleEffect( float startTime, const Vector3f& minScale, const Vector3f& maxScale ) :
-		ScaleEffect( startTime, minScale ),
-		mMaxScale( maxScale )
+	RandomScaleEffect::RandomScaleEffect(float startTime, const Vector3f& minScale, const Vector3f& maxScale) :
+		ScaleEffect(startTime, minScale),
+		mMaxScale(maxScale)
 	{}
 
-	void RandomScaleEffect::Startup( Particle& particle )
+	void RandomScaleEffect::Startup(Particle& particle)
 	{
-		particle.mScale = RandomValue( mScale, mMaxScale );
+		particle.mScale = RandomValue(mScale, mMaxScale);
 	}
 
-	void RandomScaleEffect::Save( Archive& archive )
+	void RandomScaleEffect::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		ParticleEffect::Save( archive );
+		ParticleEffect::Save(archive);
 
-		archive.Write( mScale.Ptr(), ar_sizeof( mScale ));
-		archive.Write( mMaxScale.Ptr(), ar_sizeof( mMaxScale ));
+		archive.Write(mScale.Ptr(), ar_sizeof(mScale));
+		archive.Write(mMaxScale.Ptr(), ar_sizeof(mMaxScale));
 	}
 
-	void RandomScaleEffect::Load( Archive& archive )
+	void RandomScaleEffect::Load(Archive& archive)
 	{
-		ScaleEffect::Load( archive );
+		ScaleEffect::Load(archive);
 
-		archive.Read( mMaxScale.Ptr(), ar_sizeof( mMaxScale ));
+		archive.Read(mMaxScale.Ptr(), ar_sizeof(mMaxScale));
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 
-	DEFINE_SERIAL_REGISTER( FadeToScaleEffect );
-	DEFINE_SERIAL_CLONE( FadeToScaleEffect );
+	DEFINE_SERIAL_REGISTER(FadeToScaleEffect);
+	DEFINE_SERIAL_CLONE(FadeToScaleEffect);
 
 	FadeToScaleEffect::FadeToScaleEffect()
 	{}
 
-	FadeToScaleEffect::FadeToScaleEffect( float startTime, float endTime, float scale ) :
-		ScaleEffect( startTime, Vector3f( scale, scale, scale )),
-		mEndTime( endTime )
+	FadeToScaleEffect::FadeToScaleEffect(float startTime, float endTime, float scale) :
+		ScaleEffect(startTime, Vector3f(scale, scale, scale)),
+		mEndTime(endTime)
 	{
-		_ASSERT( endTime > 0 );
-		_ASSERT( startTime < endTime );
+		_ASSERT(endTime > 0);
+		_ASSERT(startTime < endTime);
 	}
 
-	FadeToScaleEffect::FadeToScaleEffect( float startTime, float endTime, const Vector3f& scale ) :
-		ScaleEffect( startTime, scale ),
-		mEndTime( endTime )
+	FadeToScaleEffect::FadeToScaleEffect(float startTime, float endTime, const Vector3f& scale) :
+		ScaleEffect(startTime, scale),
+		mEndTime(endTime)
 	{
-		_ASSERT( endTime > 0 );
-		_ASSERT( startTime < endTime );
+		_ASSERT(endTime > 0);
+		_ASSERT(startTime < endTime);
 	}
 
-	void FadeToScaleEffect::Startup( Particle& particle )
+	void FadeToScaleEffect::Startup(Particle& particle)
 	{
-		_ASSERT( mEndTime > 0 );
-		_ASSERT( mStartTime < mEndTime );
+		_ASSERT(mEndTime > 0);
+		_ASSERT(mStartTime < mEndTime);
 	}
 
-	void FadeToScaleEffect::Update( Particle& particle )
+	void FadeToScaleEffect::Update(Particle& particle)
 	{
-		if( particle.mElapsedTime < mEndTime + Timing::DESIRED_FRAME_RATE )
-			particle.mScale = lerp( particle.mScale, mScale, particle.mElapsedTime / mEndTime );
+		if (particle.mElapsedTime < mEndTime + Timing::DESIRED_FRAME_RATE)
+			particle.mScale = LERP(particle.mScale, mScale, (particle.mElapsedTime / mEndTime));
 	}
 
-	void FadeToScaleEffect::Save( Archive& archive )
+	void FadeToScaleEffect::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		ParticleEffect::Save( archive );
+		ParticleEffect::Save(archive);
 
-		archive.Write( mScale.Ptr(), ar_sizeof( mScale ));
-		archive.Write( &mEndTime );
+		archive.Write(mScale.Ptr(), ar_sizeof(mScale));
+		archive.Write(&mEndTime);
 	}
 
-	void FadeToScaleEffect::Load( Archive& archive )
+	void FadeToScaleEffect::Load(Archive& archive)
 	{
-		ScaleEffect::Load( archive );
+		ScaleEffect::Load(archive);
 
-		archive.Read( &mEndTime );
+		archive.Read(&mEndTime);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 	// Velocity.
 	//
-	DEFINE_SERIAL_REGISTER( VelocityEffect );
-	DEFINE_SERIAL_CLONE( VelocityEffect );
+	DEFINE_SERIAL_REGISTER(VelocityEffect);
+	DEFINE_SERIAL_CLONE(VelocityEffect);
 
 	VelocityEffect::VelocityEffect()
 	{}
 
-	VelocityEffect::VelocityEffect( float startTime, const Vector3f& velocity ) :
-		ParticleEffect( startTime ),
-		mVelocity( velocity )
+	VelocityEffect::VelocityEffect(float startTime, const Vector3f& velocity) :
+		ParticleEffect(startTime),
+		mVelocity(velocity)
 	{}
 
-	void VelocityEffect::Startup( Particle& particle )
+	void VelocityEffect::Startup(Particle& particle)
 	{
 		particle.mVelocity = mVelocity;
 	}
 
-	void VelocityEffect::Save( Archive& archive )
+	void VelocityEffect::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		ParticleEffect::Save( archive );
+		ParticleEffect::Save(archive);
 
-		archive.Write( mVelocity.Ptr(), ar_sizeof( mVelocity ));
+		archive.Write(mVelocity.Ptr(), ar_sizeof(mVelocity));
 	}
 
-	void VelocityEffect::Load( Archive& archive )
+	void VelocityEffect::Load(Archive& archive)
 	{
-		ParticleEffect::Load( archive );
+		ParticleEffect::Load(archive);
 
-		archive.Read( mVelocity.Ptr(), ar_sizeof( mVelocity ));
+		archive.Read(mVelocity.Ptr(), ar_sizeof(mVelocity));
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 
-	DEFINE_SERIAL_REGISTER( RandomVelocityEffect );
-	DEFINE_SERIAL_CLONE( RandomVelocityEffect );
+	DEFINE_SERIAL_REGISTER(RandomVelocityEffect);
+	DEFINE_SERIAL_CLONE(RandomVelocityEffect);
 
 	RandomVelocityEffect::RandomVelocityEffect()
 	{}
 
-	RandomVelocityEffect::RandomVelocityEffect( float startTime, const Vector3f& minVelocity, const Vector3f& maxVelocity ) :
-		VelocityEffect( startTime, minVelocity ),
-		mMaxVelocity( maxVelocity )
+	RandomVelocityEffect::RandomVelocityEffect(float startTime, const Vector3f& minVelocity, const Vector3f& maxVelocity) :
+		VelocityEffect(startTime, minVelocity),
+		mMaxVelocity(maxVelocity)
 	{}
 
-	void RandomVelocityEffect::Startup( Particle& particle )
+	void RandomVelocityEffect::Startup(Particle& particle)
 	{
-		particle.mVelocity = RandomValue( mVelocity, mMaxVelocity );
+		particle.mVelocity = RandomValue(mVelocity, mMaxVelocity);
 	}
 
-	void RandomVelocityEffect::Save( Archive& archive )
+	void RandomVelocityEffect::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		ParticleEffect::Save( archive );
+		ParticleEffect::Save(archive);
 
-		archive.Write( mVelocity.Ptr(),		ar_sizeof( mVelocity ));
-		archive.Write( mMaxVelocity.Ptr(),	ar_sizeof( mMaxVelocity ));
+		archive.Write(mVelocity.Ptr(), ar_sizeof(mVelocity));
+		archive.Write(mMaxVelocity.Ptr(), ar_sizeof(mMaxVelocity));
 	}
 
-	void RandomVelocityEffect::Load( Archive& archive )
+	void RandomVelocityEffect::Load(Archive& archive)
 	{
-		VelocityEffect::Load( archive );
+		VelocityEffect::Load(archive);
 
-		archive.Read( mMaxVelocity.Ptr(), ar_sizeof( mMaxVelocity ));
+		archive.Read(mMaxVelocity.Ptr(), ar_sizeof(mMaxVelocity));
 	}
-	
+
 	////////////////////////////////////////////////////////////////////////////
 	// Angular Velocity.
 	//
-	DEFINE_SERIAL_REGISTER( AngularVelocityEffect );
-	DEFINE_SERIAL_CLONE( AngularVelocityEffect );
+	DEFINE_SERIAL_REGISTER(AngularVelocityEffect);
+	DEFINE_SERIAL_CLONE(AngularVelocityEffect);
 
 	AngularVelocityEffect::AngularVelocityEffect()
 	{}
 
-	AngularVelocityEffect::AngularVelocityEffect( float startTime, const Vector3f& angularVelocity ) :
-		ParticleEffect( startTime ),
-		mAngularVelocity( angularVelocity )
+	AngularVelocityEffect::AngularVelocityEffect(float startTime, const Vector3f& angularVelocity) :
+		ParticleEffect(startTime),
+		mAngularVelocity(angularVelocity)
 	{}
 
-	void AngularVelocityEffect::Startup( Particle& particle )
+	void AngularVelocityEffect::Startup(Particle& particle)
 	{
 		particle.mAngularVelocity = mAngularVelocity;
 	}
 
-	void AngularVelocityEffect::Save( Archive& archive )
+	void AngularVelocityEffect::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		ParticleEffect::Save( archive );
+		ParticleEffect::Save(archive);
 
-		archive.Write( mAngularVelocity.Ptr(), ar_sizeof( mAngularVelocity ));
+		archive.Write(mAngularVelocity.Ptr(), ar_sizeof(mAngularVelocity));
 	}
 
-	void AngularVelocityEffect::Load( Archive& archive )
+	void AngularVelocityEffect::Load(Archive& archive)
 	{
-		ParticleEffect::Load( archive );
+		ParticleEffect::Load(archive);
 
-		archive.Read( mAngularVelocity.Ptr(), ar_sizeof( mAngularVelocity ));
+		archive.Read(mAngularVelocity.Ptr(), ar_sizeof(mAngularVelocity));
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 
-	DEFINE_SERIAL_REGISTER( RandomAngularVelocityEffect );
-	DEFINE_SERIAL_CLONE( RandomAngularVelocityEffect );
+	DEFINE_SERIAL_REGISTER(RandomAngularVelocityEffect);
+	DEFINE_SERIAL_CLONE(RandomAngularVelocityEffect);
 
 	RandomAngularVelocityEffect::RandomAngularVelocityEffect()
 	{}
 
-	RandomAngularVelocityEffect::RandomAngularVelocityEffect( float startTime, const Vector3f& minAngularVelocity, const Vector3f& maxAngularVelocity ) :
-		AngularVelocityEffect( startTime, minAngularVelocity ),
-		mMaxAngularVelocity( maxAngularVelocity )
+	RandomAngularVelocityEffect::RandomAngularVelocityEffect(float startTime, const Vector3f& minAngularVelocity, const Vector3f& maxAngularVelocity) :
+		AngularVelocityEffect(startTime, minAngularVelocity),
+		mMaxAngularVelocity(maxAngularVelocity)
 	{}
 
-	void RandomAngularVelocityEffect::Startup( Particle& particle )
+	void RandomAngularVelocityEffect::Startup(Particle& particle)
 	{
-		particle.mAngularVelocity = RandomValue( mAngularVelocity, mMaxAngularVelocity );
+		particle.mAngularVelocity = RandomValue(mAngularVelocity, mMaxAngularVelocity);
 	}
 
-	void RandomAngularVelocityEffect::Save( Archive& archive )
+	void RandomAngularVelocityEffect::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		ParticleEffect::Save( archive );
+		ParticleEffect::Save(archive);
 
-		archive.Write( mAngularVelocity.Ptr(),		ar_sizeof( mAngularVelocity ));
-		archive.Write( mMaxAngularVelocity.Ptr(),	ar_sizeof( mMaxAngularVelocity ));
+		archive.Write(mAngularVelocity.Ptr(), ar_sizeof(mAngularVelocity));
+		archive.Write(mMaxAngularVelocity.Ptr(), ar_sizeof(mMaxAngularVelocity));
 	}
 
-	void RandomAngularVelocityEffect::Load( Archive& archive )
+	void RandomAngularVelocityEffect::Load(Archive& archive)
 	{
-		AngularVelocityEffect::Load( archive );
+		AngularVelocityEffect::Load(archive);
 
-		archive.Read( mMaxAngularVelocity.Ptr(), ar_sizeof( mMaxAngularVelocity ));
+		archive.Read(mMaxAngularVelocity.Ptr(), ar_sizeof(mMaxAngularVelocity));
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 	// Acceleration.
 	//
-	DEFINE_SERIAL_REGISTER( AccelEffect );
-	DEFINE_SERIAL_CLONE( AccelEffect );
+	DEFINE_SERIAL_REGISTER(AccelEffect);
+	DEFINE_SERIAL_CLONE(AccelEffect);
 
 	AccelEffect::AccelEffect()
 	{}
 
-	AccelEffect::AccelEffect( float startTime, const Vector3f& accel ) :
-		ParticleEffect( startTime ),
-		mAccel( accel )
+	AccelEffect::AccelEffect(float startTime, const Vector3f& accel) :
+		ParticleEffect(startTime),
+		mAccel(accel)
 	{}
 
-	void AccelEffect::Startup( Particle& particle )
+	void AccelEffect::Startup(Particle& particle)
 	{
 		particle.mAccel = mAccel;
 	}
 
-	void AccelEffect::Save( Archive& archive )
+	void AccelEffect::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		ParticleEffect::Save( archive );
+		ParticleEffect::Save(archive);
 
-		archive.Write( mAccel.Ptr(), ar_sizeof( mAccel ));
+		archive.Write(mAccel.Ptr(), ar_sizeof(mAccel));
 	}
 
-	void AccelEffect::Load( Archive& archive )
+	void AccelEffect::Load(Archive& archive)
 	{
-		ParticleEffect::Load( archive );
+		ParticleEffect::Load(archive);
 
-		archive.Read( mAccel.Ptr(), ar_sizeof( mAccel ));
+		archive.Read(mAccel.Ptr(), ar_sizeof(mAccel));
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 
-	DEFINE_SERIAL_REGISTER( RandomAccelEffect );
-	DEFINE_SERIAL_CLONE( RandomAccelEffect );
+	DEFINE_SERIAL_REGISTER(RandomAccelEffect);
+	DEFINE_SERIAL_CLONE(RandomAccelEffect);
 
 	RandomAccelEffect::RandomAccelEffect()
 	{}
 
-	RandomAccelEffect::RandomAccelEffect( float startTime, const Vector3f& minAccel, const Vector3f& maxAccel ) :
-		AccelEffect( startTime, minAccel ),
-		mMaxAccel( maxAccel )
+	RandomAccelEffect::RandomAccelEffect(float startTime, const Vector3f& minAccel, const Vector3f& maxAccel) :
+		AccelEffect(startTime, minAccel),
+		mMaxAccel(maxAccel)
 	{}
 
-	void RandomAccelEffect::Startup( Particle& particle )
+	void RandomAccelEffect::Startup(Particle& particle)
 	{
-		particle.mAccel = RandomValue( mAccel, mMaxAccel );
+		particle.mAccel = RandomValue(mAccel, mMaxAccel);
 	}
 
-	void RandomAccelEffect::Save( Archive& archive )
+	void RandomAccelEffect::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		ParticleEffect::Save( archive );
+		ParticleEffect::Save(archive);
 
-		archive.Write( mAccel.Ptr(),	ar_sizeof( mAccel ));
-		archive.Write( mMaxAccel.Ptr(), ar_sizeof( mMaxAccel ));
+		archive.Write(mAccel.Ptr(), ar_sizeof(mAccel));
+		archive.Write(mMaxAccel.Ptr(), ar_sizeof(mMaxAccel));
 	}
 
-	void RandomAccelEffect::Load( Archive& archive )
+	void RandomAccelEffect::Load(Archive& archive)
 	{
-		AccelEffect::Load( archive );
+		AccelEffect::Load(archive);
 
-		archive.Read( mMaxAccel.Ptr(), ar_sizeof( mMaxAccel ));
+		archive.Read(mMaxAccel.Ptr(), ar_sizeof(mMaxAccel));
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 	// Angular Acceleration.
 	//
-	DEFINE_SERIAL_REGISTER( AngularAccelEffect );
-	DEFINE_SERIAL_CLONE( AngularAccelEffect );
+	DEFINE_SERIAL_REGISTER(AngularAccelEffect);
+	DEFINE_SERIAL_CLONE(AngularAccelEffect);
 
 	AngularAccelEffect::AngularAccelEffect()
 	{}
 
-	AngularAccelEffect::AngularAccelEffect( float startTime, const Vector3f& angularAccel ) :
-		ParticleEffect( startTime ),
-		mAngularAccel( angularAccel )
+	AngularAccelEffect::AngularAccelEffect(float startTime, const Vector3f& angularAccel) :
+		ParticleEffect(startTime),
+		mAngularAccel(angularAccel)
 	{}
 
-	void AngularAccelEffect::Startup( Particle& particle )
+	void AngularAccelEffect::Startup(Particle& particle)
 	{
 		particle.mAngularAccel = mAngularAccel;
 	}
 
-	void AngularAccelEffect::Save( Archive& archive )
+	void AngularAccelEffect::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		ParticleEffect::Save( archive );
+		ParticleEffect::Save(archive);
 
-		archive.Write( mAngularAccel.Ptr(), ar_sizeof( mAngularAccel ));
+		archive.Write(mAngularAccel.Ptr(), ar_sizeof(mAngularAccel));
 	}
 
-	void AngularAccelEffect::Load( Archive& archive )
+	void AngularAccelEffect::Load(Archive& archive)
 	{
-		ParticleEffect::Load( archive );
+		ParticleEffect::Load(archive);
 
-		archive.Read( mAngularAccel.Ptr(), ar_sizeof( mAngularAccel ));
+		archive.Read(mAngularAccel.Ptr(), ar_sizeof(mAngularAccel));
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 
-	DEFINE_SERIAL_REGISTER( RandomAngularAccelEffect );
-	DEFINE_SERIAL_CLONE( RandomAngularAccelEffect );
+	DEFINE_SERIAL_REGISTER(RandomAngularAccelEffect);
+	DEFINE_SERIAL_CLONE(RandomAngularAccelEffect);
 
 	RandomAngularAccelEffect::RandomAngularAccelEffect()
 	{}
 
-	RandomAngularAccelEffect::RandomAngularAccelEffect( float startTime, const Vector3f& minAngularAccel, const Vector3f& maxAngularAccel ) :
-		AngularAccelEffect( startTime, minAngularAccel ),
-		mMaxAngularAccel( maxAngularAccel )
+	RandomAngularAccelEffect::RandomAngularAccelEffect(float startTime, const Vector3f& minAngularAccel, const Vector3f& maxAngularAccel) :
+		AngularAccelEffect(startTime, minAngularAccel),
+		mMaxAngularAccel(maxAngularAccel)
 	{}
 
-	void RandomAngularAccelEffect::Startup( Particle& particle )
+	void RandomAngularAccelEffect::Startup(Particle& particle)
 	{
-		particle.mAngularAccel = RandomValue( mAngularAccel, mMaxAngularAccel );
+		particle.mAngularAccel = RandomValue(mAngularAccel, mMaxAngularAccel);
 	}
 
-	void RandomAngularAccelEffect::Save( Archive& archive )
+	void RandomAngularAccelEffect::Save(Archive& archive)
 	{
-		SERIAL_REGISTER.Save( archive );
+		SERIAL_REGISTER.Save(archive);
 
-		ParticleEffect::Save( archive );
+		ParticleEffect::Save(archive);
 
-		archive.Write( mAngularAccel.Ptr(),		ar_sizeof( mAngularAccel ));
-		archive.Write( mMaxAngularAccel.Ptr(),	ar_sizeof( mMaxAngularAccel ));
+		archive.Write(mAngularAccel.Ptr(), ar_sizeof(mAngularAccel));
+		archive.Write(mMaxAngularAccel.Ptr(), ar_sizeof(mMaxAngularAccel));
 	}
 
-	void RandomAngularAccelEffect::Load( Archive& archive )
+	void RandomAngularAccelEffect::Load(Archive& archive)
 	{
-		AngularAccelEffect::Load( archive );
+		AngularAccelEffect::Load(archive);
 
-		archive.Read( mMaxAngularAccel.Ptr(), ar_sizeof( mMaxAngularAccel ));
+		archive.Read(mMaxAngularAccel.Ptr(), ar_sizeof(mMaxAngularAccel));
 	}
 }

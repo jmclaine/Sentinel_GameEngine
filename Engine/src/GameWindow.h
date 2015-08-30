@@ -2,7 +2,7 @@
 
 #include <Windows.h>
 
-#include "Common.h"
+#include "Sentinel.h"
 
 namespace Sentinel
 {

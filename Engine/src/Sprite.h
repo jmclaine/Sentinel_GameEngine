@@ -9,7 +9,8 @@ sprite->AddFrame(Sprite::QUADtoTEXCOORD(Quad(0, 0, 64, 64), texture->Width(), te
 #include <memory>
 #include <vector>
 
-#include "Common.h"
+#include "Sentinel.h"
+#include "Types.h"
 #include "Point.h"
 
 namespace Sentinel

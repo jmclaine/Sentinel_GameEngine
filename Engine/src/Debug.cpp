@@ -1,86 +1,91 @@
 #include "Debug.h"
-#include "MeshBuilder.h"
-#include "Mesh.h"
-#include "Buffer.h"
-#include "Renderer.h"
-#include "GameWorld.h"
-#include "Shader.h"
-#include "VertexLayout.h"
-#include "Material.h"
+#include <sstream>
+
+#ifndef WIN32
+#define OutputDebugStringA(str)\
+	printf("%s\n", str);
+
+#define MessageBoxA(ptr, msg, title, flags)\
+	printf("%s: %s\n", title, msg);
+
+#define strcat_s strcat
+#define sprintf_s sprintf
+#else
+#include <windows.h>
+#endif
 
 namespace Sentinel
 {
-	Debug::Debug( Renderer* renderer, GameWorld* world, Component::Camera* camera, std::shared_ptr< Material > material, UINT maxLines ) :
-		mRenderer( renderer ),
-		mWorld( world ),
-		mCamera( camera ),
-		mMaterial( material ),
-		mMaxLines( maxLines )
+#define GET_LOG_VAR(append, stream, var)\
+	std::stringstream _##stream;\
+	_##stream << append << stream.rdbuf() << std::endl;\
+	const std::string& var = _##stream.str();
+	
+#define GET_LOG(stream)\
+	GET_LOG_VAR("", stream, text)\
+	OutputDebugStringA(text.c_str());
+
+#define GET_WARNING(stream)\
+	GET_LOG_VAR("WARNING: ", stream, text)\
+	OutputDebugStringA(text.c_str());
+
+#define GET_ERROR(stream)\
+	GET_LOG_VAR("ERROR: ", stream, text)\
+	OutputDebugStringA(text.c_str());
+
+	void Debug::Log(const std::string& text)
 	{
-		_ASSERT( renderer );
-		_ASSERT( camera );
-		_ASSERT( material.get() );
-		_ASSERT( material->mShader.get() );
-		_ASSERT( maxLines > 0 );
-
-		MeshBuilder builder;
-
-		builder.mLayout = material->mShader->Layout();
-
-		for( UINT x = 0; x < maxLines; ++x )
-		{
-			UINT index = x << 1;
-
-			builder.mVertex.push_back( MeshBuilder::Vertex( Vector3f( 0.0f, 0.0f, 0.0f )));
-			builder.mVertex.push_back( MeshBuilder::Vertex( Vector3f( 0.0f, 0.0f, 0.0f )));
-		}
-
-		builder.mPrimitive = PrimitiveFormat::LINES;
-
-		mMesh = builder.BuildMesh( mRenderer, false );
-
-		if( !mMesh )
-			throw AppException( "Failed to create Mesh in Debug" );
+		Log(STREAM(text));
 	}
 
-	Debug::~Debug()
+	void Debug::Log(StringStream& stream)
 	{
-		delete mMesh;
+		GET_LOG(stream);
 	}
 
-	Renderer* Debug::GetRenderer()
+	void Debug::LogWarning(const std::string& text)
 	{
-		return mRenderer;
+		LogWarning(STREAM(text));
 	}
 
-	GameWorld* Debug::GetWorld()
+	void Debug::LogWarning(StringStream& stream)
 	{
-		return mWorld;
+		GET_WARNING(stream);
 	}
 
-	/////////////////////////////////////
-
-	void Debug::Clear()
+	void Debug::ShowWarning(const std::string& msg, const std::string& title)
 	{
-		mNumLines = 0;
+		ShowWarning(STREAM(msg), STREAM(title));
 	}
 
-	void Debug::DrawLine( const Vector3f& start, const Vector3f& end )
+	void Debug::ShowWarning(StringStream& msg, StringStream& title)
 	{
-		Vector3f* data = (Vector3f*)mMesh->mVertexBuffer->Lock() + (mNumLines << 1);
+		GET_LOG_VAR("", msg, msgStr);
+		GET_LOG_VAR("", title, titleStr);
 
-		*data = start;
-		*(data+1) = end;
-
-		mMesh->mVertexBuffer->Unlock();
-
-		++mNumLines;
+		MessageBoxA(NULL, msgStr.c_str(), titleStr.c_str(), MB_OK | MB_ICONWARNING);
 	}
 
-	void Debug::Present()
+	void Debug::LogError(const std::string& text)
 	{
-		mMesh->mMaterial = mMaterial;
+		LogError(STREAM(text));
+	}
 
-		mMesh->Draw( mRenderer, mWorld, mCamera, mNumLines << 1 );
+	void Debug::LogError(StringStream& stream)
+	{
+		GET_ERROR(stream);
+	}
+
+	void Debug::ShowError(const std::string& msg, const std::string& title)
+	{
+		ShowError(STREAM(msg), STREAM(title));
+	}
+
+	void Debug::ShowError(StringStream& msg, StringStream& title)
+	{
+		GET_LOG_VAR("", msg, msgStr);
+		GET_LOG_VAR("", title, titleStr);
+
+		MessageBoxA(NULL, msgStr.c_str(), titleStr.c_str(), MB_OK | MB_ICONERROR);
 	}
 }

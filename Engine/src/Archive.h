@@ -11,60 +11,60 @@ A double is never compressed.
 */
 #include <stdio.h>
 
-#include "Common.h"
+#include "Sentinel.h"
 
 namespace Sentinel
 {
 	template< typename T >
-	unsigned int ar_sizeof( T& var )
+	unsigned int ar_sizeof(T& var)
 	{
-		return sizeof( var ) / sizeof( *(var.Ptr()) );
+		return sizeof(var) / sizeof(*(var.Ptr()));
 	}
 
 	class SENTINEL_DLL Archive
 	{
 	public:
 
-		FILE*	mFile;
+		FILE* mFile;
 
 		////////////////////////
 
 		Archive();
 		~Archive();
-		
-		bool	Open( const char* filename, const char* mode );
-		void	Close();
 
-		void	Read(  char* data,					unsigned int length = 1 );
-		void	Read(  unsigned char* data,			unsigned int length = 1 );
-		void	Read(  short* data,					unsigned int length = 1 );
-		void	Read(  unsigned short* data,		unsigned int length = 1 );
-		void	Read(  int* data, 					unsigned int length = 1, bool is32bit = true );
-		void	Read(  unsigned int* data, 			unsigned int length = 1, bool is32bit = true );
-		void	Read(  long* data, 					unsigned int length = 1, bool is32bit = true );
-		void	Read(  unsigned long* data, 		unsigned int length = 1, bool is32bit = true );
-		void	Read(  float* data,					unsigned int length = 1, bool is32bit = true );
-		void	Read(  double* data,				unsigned int length = 1 );
-		void	Read(  bool* data,					unsigned int length = 1 );
-		void	Read(  std::string* data );
-		
-		void	Write( const char* data,			unsigned int length = 1 );
-		void	Write( const unsigned char* data,	unsigned int length = 1 );
-		void	Write( const short* data,			unsigned int length = 1 );
-		void	Write( const unsigned short* data,	unsigned int length = 1 );
-		void	Write( const int* data, 			unsigned int length = 1, bool is32bit = true );
-		void	Write( const unsigned int* data,	unsigned int length = 1, bool is32bit = true );
-		void	Write( const long* data, 			unsigned int length = 1, bool is32bit = true );
-		void	Write( const unsigned long* data, 	unsigned int length = 1, bool is32bit = true );
-		void	Write( const float* data,			unsigned int length = 1, bool is32bit = true );
-		void	Write( const double* data,			unsigned int length = 1 );
-		void	Write( const bool* data,			unsigned int length = 1 );
-		void	Write( const std::string* data );
+		bool Open(const char* filename, const char* mode);
+		void Close();
+
+		void Read(char* data, unsigned int length = 1);
+		void Read(unsigned char* data, unsigned int length = 1);
+		void Read(short* data, unsigned int length = 1);
+		void Read(unsigned short* data, unsigned int length = 1);
+		void Read(int* data, unsigned int length = 1, bool is32bit = true);
+		void Read(unsigned int* data, unsigned int length = 1, bool is32bit = true);
+		void Read(long* data, unsigned int length = 1, bool is32bit = true);
+		void Read(unsigned long* data, unsigned int length = 1, bool is32bit = true);
+		void Read(float* data, unsigned int length = 1, bool is32bit = true);
+		void Read(double* data, unsigned int length = 1);
+		void Read(bool* data, unsigned int length = 1);
+		void Read(std::string* data);
+
+		void Write(const char* data, unsigned int length = 1);
+		void Write(const unsigned char* data, unsigned int length = 1);
+		void Write(const short* data, unsigned int length = 1);
+		void Write(const unsigned short* data, unsigned int length = 1);
+		void Write(const int* data, unsigned int length = 1, bool is32bit = true);
+		void Write(const unsigned int* data, unsigned int length = 1, bool is32bit = true);
+		void Write(const long* data, unsigned int length = 1, bool is32bit = true);
+		void Write(const unsigned long* data, unsigned int length = 1, bool is32bit = true);
+		void Write(const float* data, unsigned int length = 1, bool is32bit = true);
+		void Write(const double* data, unsigned int length = 1);
+		void Write(const bool* data, unsigned int length = 1);
+		void Write(const std::string* data);
 
 		////////////////////////
 
 		// Returns size of the buffer.
 		//
-		static unsigned int ToBuffer( const char *filename, char*& buf );
+		static unsigned int ToBuffer(const char *filename, char*& buf);
 	};
 }

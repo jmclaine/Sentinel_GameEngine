@@ -11,12 +11,12 @@
 #include "Texture.h"
 #include "Sprite.h"
 #include "RandomValue.h"
-#include "Util.h"
 #include "Point.h"
 #include "ShaderManager.h"
 #include "SpriteManager.h"
 #include "MaterialManager.h"
 #include "Archive.h"
+#include "Exception.h"
 
 namespace Sentinel
 {

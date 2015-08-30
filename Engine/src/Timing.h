@@ -3,36 +3,15 @@
 #include <time.h>
 
 #ifndef WIN32
-    typedef timespec LARGE_INTEGER;
+typedef timespec LARGE_INTEGER;
 #else
-	#include <Windows.h>
+#include <Windows.h>
 #endif
 
-#include "Common.h"
+#include "Sentinel.h"
 
 namespace Sentinel
 {
-
-	// Time sections of code to determine bottlenecks.
-	//
-#define BEGIN_PROFILE( timingName )\
-{	static double startCounter = 0;\
-	static double timeCounter = 0;\
-	static UINT counter = 0;\
-	startCounter = timingName->QueryCounter();
-
-#define END_PROFILE( timingName, msg )\
-	timeCounter += timingName->QueryCounter() - startCounter;\
-	if( ++counter >= 60 ) {\
-		TRACE( msg << ": " << timeCounter / (double)counter );\
-		counter = 0; timeCounter = 0; }}\
-
-#define SEPARATE_PROFILE( msg )\
-{	static UINT counter = 0;\
-	if( ++counter >= 60 ) {\
-	TRACE( msg );\
-	counter = 0; }}
-	
 	// Sets a maximum frame rate.
 	// Generally, this is 60 Hz as defaulted by DESIRED_FRAME_RATE.
 	//
@@ -51,26 +30,26 @@ namespace Sentinel
 
 	private:
 
-		LARGE_INTEGER	mCounter;
-		LARGE_INTEGER	mFrequency;
+		LARGE_INTEGER mCounter;
+		LARGE_INTEGER mFrequency;
 
-		double			mTimeNow;
-		double			mTimeLater;
+		double mTimeNow;
+		double mTimeLater;
 
-		float			mDeltaTime;
+		float mDeltaTime;
 
 	public:
-		
+
 		Timing();
-		
+
 		///////////////////////////////////
 
-		double			QueryCounter();
+		double QueryCounter();
 
-		void			Update();
+		void Update();
 
-		void			Limit( double frameRate = DESIRED_FRAME_RATE );
+		void Limit(double frameRate = DESIRED_FRAME_RATE);
 
-		float			DeltaTime();
+		float DeltaTime();
 	};
 }

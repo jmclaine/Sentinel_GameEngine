@@ -1,4 +1,6 @@
 #include "GameWindow.h"
+#include "Exception.h"
+#include "Debug.h"
 #include "Input.h"
 #include "Renderer.h"
 
@@ -138,7 +140,7 @@ namespace Sentinel
 
 		if (!RegisterClassEx(&wcex))
 		{
-			TRACE("Error: RegisterClass = " << GetLastError());
+			Debug::Log(STREAM("Error: RegisterClass = " << GetLastError()));
 			return false;
 		}
 

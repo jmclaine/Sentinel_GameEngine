@@ -3,7 +3,7 @@
 
 #include "MeshBuilder.h"
 #include "Renderer.h"
-#include "MathCommon.h"
+#include "MathUtil.h"
 #include "Mesh.h"
 #include "Shader.h"
 #include "Buffer.h"

@@ -133,6 +133,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)Sentine
     <ClInclude Include="..\Engine\src\Component\Transform.h" />
     <ClInclude Include="..\Engine\src\Component\Trigger.h" />
     <ClInclude Include="..\Engine\src\Debug.h" />
+    <ClInclude Include="..\Engine\src\DebugDraw.h" />
     <ClInclude Include="..\Engine\src\dirent.h" />
     <ClInclude Include="..\Engine\src\DX\BufferDX.h" />
     <ClInclude Include="..\Engine\src\DX\CommonDX.h" />
@@ -141,6 +142,8 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)Sentine
     <ClInclude Include="..\Engine\src\DX\VertexLayoutDX.h" />
     <ClInclude Include="..\Engine\src\EnumClass.h" />
     <ClInclude Include="..\Engine\src\Event.h" />
+    <ClInclude Include="..\Engine\src\Exception.h" />
+    <ClInclude Include="..\Engine\src\FileUtil.h" />
     <ClInclude Include="..\Engine\src\GL\BufferGL.h" />
     <ClInclude Include="..\Engine\src\GL\CommonGL.h" />
     <ClInclude Include="..\Engine\src\GL\ShaderGL.h" />
@@ -148,16 +151,21 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)Sentine
     <ClInclude Include="..\Engine\src\GL\VertexLayoutGL.h" />
     <ClInclude Include="..\Engine\src\GUI\Controller2D.h" />
     <ClInclude Include="..\Engine\src\GUI\SpriteController.h" />
+    <ClInclude Include="..\Engine\src\Hash.h" />
     <ClInclude Include="..\Engine\src\MaterialManager.h" />
     <ClInclude Include="..\Engine\src\FontSystem.h" />
     <ClInclude Include="..\Engine\src\GUI\Button.h" />
     <ClInclude Include="..\Engine\src\GUI\SpriteButton.h" />
     <ClInclude Include="..\Engine\src\GUI\Label.h" />
+    <ClInclude Include="..\Engine\src\Memory.h" />
     <ClInclude Include="..\Engine\src\Network\Packet.h" />
     <ClInclude Include="..\Engine\src\Network\Socket.h" />
     <ClInclude Include="..\Engine\src\PhysicsShape.h" />
+    <ClInclude Include="..\Engine\src\Profile.h" />
     <ClInclude Include="..\Engine\src\RenderManager.h" />
+    <ClInclude Include="..\Engine\src\StringStream.h" />
     <ClInclude Include="..\Engine\src\Tokenizer.h" />
+    <ClInclude Include="..\Engine\src\Types.h" />
     <ClInclude Include="..\Engine\src\VertexLayout.h" />
     <ClInclude Include="..\Engine\src\ListNode.h" />
     <ClInclude Include="..\Engine\src\Particle.h" />
@@ -169,7 +177,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)Sentine
     <ClInclude Include="..\Engine\src\Buffer.h" />
     <ClInclude Include="..\Engine\src\CDPI.h" />
     <ClInclude Include="..\Engine\src\ColorRGBA.h" />
-    <ClInclude Include="..\Engine\src\Common.h" />
+    <ClInclude Include="..\Engine\src\Sentinel.h" />
     <ClInclude Include="..\Engine\src\CriticalSection.h" />
     <ClInclude Include="..\Engine\src\FixedPoint.h" />
     <ClInclude Include="..\Engine\src\FloatCompressor.h" />
@@ -178,7 +186,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)Sentine
     <ClInclude Include="..\Engine\src\GameWorld.h" />
     <ClInclude Include="..\Engine\src\Input.h" />
     <ClInclude Include="..\Engine\src\Material.h" />
-    <ClInclude Include="..\Engine\src\MathCommon.h" />
+    <ClInclude Include="..\Engine\src\MathUtil.h" />
     <ClInclude Include="..\Engine\src\Matrix4f.h" />
     <ClInclude Include="..\Engine\src\Mesh.h" />
     <ClInclude Include="..\Engine\src\MeshBuilder.h" />
@@ -231,11 +239,13 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)Sentine
     <ClCompile Include="..\Engine\src\Component\Transform.cpp" />
     <ClCompile Include="..\Engine\src\Component\Trigger.cpp" />
     <ClCompile Include="..\Engine\src\Debug.cpp" />
+    <ClCompile Include="..\Engine\src\DebugDraw.cpp" />
     <ClCompile Include="..\Engine\src\DX\BufferDX.cpp" />
     <ClCompile Include="..\Engine\src\DX\RendererDX.cpp" />
     <ClCompile Include="..\Engine\src\DX\ShaderDX.cpp" />
     <ClCompile Include="..\Engine\src\DX\TextureDX.cpp" />
     <ClCompile Include="..\Engine\src\DX\VertexLayoutDX.cpp" />
+    <ClCompile Include="..\Engine\src\FileUtil.cpp" />
     <ClCompile Include="..\Engine\src\FontSystemFT.cpp" />
     <ClCompile Include="..\Engine\src\GL\BufferGL.cpp" />
     <ClCompile Include="..\Engine\src\GL\RendererGL.cpp" />
@@ -247,6 +257,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)Sentine
     <ClCompile Include="..\Engine\src\GUI\Controller2D.cpp" />
     <ClCompile Include="..\Engine\src\GUI\Label.cpp" />
     <ClCompile Include="..\Engine\src\GUI\SpriteController.cpp" />
+    <ClCompile Include="..\Engine\src\Hash.cpp" />
     <ClCompile Include="..\Engine\src\MaterialManager.cpp" />
     <ClCompile Include="..\Engine\src\Network\Packet.cpp" />
     <ClCompile Include="..\Engine\src\Network\Socket.cpp" />
@@ -266,7 +277,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)Sentine
     <ClCompile Include="..\Engine\src\GameWorld.cpp" />
     <ClCompile Include="..\Engine\src\Input.cpp" />
     <ClCompile Include="..\Engine\src\Material.cpp" />
-    <ClCompile Include="..\Engine\src\MathCommon.cpp" />
+    <ClCompile Include="..\Engine\src\MathUtil.cpp" />
     <ClCompile Include="..\Engine\src\Matrix4f.cpp" />
     <ClCompile Include="..\Engine\src\Mesh.cpp" />
     <ClCompile Include="..\Engine\src\MeshBuilder.cpp" />

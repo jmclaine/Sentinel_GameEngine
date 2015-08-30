@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <Windows.h>
 
 #include "Renderer.h"
 #include "tinyxml.h"

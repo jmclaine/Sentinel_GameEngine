@@ -3,6 +3,8 @@
 
 #include "Network/Socket.h"
 #include "Timing.h"
+#include "Debug.h"
+#include "Memory.h"
 
 namespace Sentinel {
 namespace Network
@@ -77,7 +79,7 @@ namespace Network
 	{
 		_ASSERT(flags != NULL);
 
-		TRACE("Initializing...");
+		Debug::Log("Initializing...");
 
 	#ifdef WIN32
 		WSADATA	m_wsaData;
@@ -126,7 +128,7 @@ namespace Network
 		if (!Startup(flags))
 		{
 			int lastError = WSAGetLastError();
-			TRACE("Error " << lastError << ": Initialization Failed.");
+			Debug::LogError(STREAM(lastError << ": Initialization Failed."));
 			Shutdown();
 
 			return false;
@@ -139,7 +141,7 @@ namespace Network
 		if (bind(mCurrConnection->mNetworkSocket, (SOCKADDR*)&mReceiverInfo, mReceiverAddrSize) == SOCKET_ERROR)
 		{
 			int lastError = WSAGetLastError();
-			TRACE("Error " << lastError << ": Host Failure.");
+			Debug::LogError(STREAM(lastError << ": Host Failure."));
 			Shutdown();
 
 			return false;
@@ -150,7 +152,7 @@ namespace Network
 			if (listen(mCurrConnection->mNetworkSocket, SOMAXCONN) == SOCKET_ERROR)
 			{
 				int lastError = WSAGetLastError();
-				TRACE("Error " << lastError << ": Listen Failure.");
+				Debug::LogError(STREAM(lastError << ": Listen Failure."));
 				Shutdown();
 
 				return false;
@@ -159,7 +161,7 @@ namespace Network
 
 		mFlags |= NETWORK_SERVER;
 
-		TRACE("Hosting on Port " << port << " ...");
+		Debug::Log(STREAM("Hosting on Port " << port << " ..."));
 
 		return true;
 	}
@@ -171,13 +173,13 @@ namespace Network
 		if (!Startup(flags))
 		{
 			int lastError = WSAGetLastError();
-			TRACE("Error " << lastError << ": Initialization Failed.");
+			Debug::LogError(STREAM(lastError << ": Initialization Failed."));
 			Shutdown();
 
 			return false;
 		}
 
-		TRACE("Connecting to IP: " << ipAddress << " @ Port: " << port << " ...");
+		Debug::Log(STREAM("Connecting to IP: " << ipAddress << " @ Port: " << port << " ..."));
 
 		mCurrConnection->mReceiver.sin_family = AF_INET;
 		mCurrConnection->mReceiver.sin_addr.s_addr = (!ipAddress) ? INADDR_ANY : inet_addr(ipAddress);
@@ -210,7 +212,7 @@ namespace Network
 
 						if (connectResult == 0)
 						{
-							TRACE("Connection Timeout.");
+							Debug::Log("Connection Timeout.");
 
 							Shutdown();
 
@@ -220,7 +222,7 @@ namespace Network
 						{
 							connectResult = WSAGetLastError();
 
-							TRACE("Error " << connectResult << ": Connection Failed (select)");
+							Debug::LogError(STREAM(connectResult << ": Connection Failed (select)"));
 
 							Shutdown();
 
@@ -228,7 +230,7 @@ namespace Network
 							{ }
 							else if (FD_ISSET(socket, &socket_error))
 							{
-								TRACE("Server Not Found.");
+								Debug::LogWarning("Server Not Found.");
 							}
 
 							return false;
@@ -239,7 +241,7 @@ namespace Network
 					}
 					else
 					{
-						TRACE("Error " << connectResult << ": Connection Failed (nonblock)");
+						Debug::LogError(STREAM(connectResult << ": Connection Failed (nonblock)"));
 						Shutdown();
 
 						return false;
@@ -248,7 +250,7 @@ namespace Network
 				else
 				{
 					int lastError = WSAGetLastError();
-					TRACE("Error " << lastError << ": Connection Failed");
+					Debug::LogError(STREAM(lastError << ": Connection Failed"));
 					Shutdown();
 
 					return false;
@@ -256,7 +258,7 @@ namespace Network
 			}
 		}
 
-		TRACE("Connected!");
+		Debug::Log("Connected!");
 
 		mCurrConnection->mStatus = STATUS_GOOD;
 
@@ -290,7 +292,7 @@ namespace Network
 
 				if (rv < 0)
 				{
-					TRACE("Error " << rv << ": Select Failure on Client #" << it->second->mID);
+					Debug::LogError(STREAM(rv << ": Select Failure on Client #" << it->second->mID));
 				}
 
 				// Send packet.
@@ -300,7 +302,7 @@ namespace Network
 					if (::sendto(connection->mNetworkSocket, data, size, 0, (SOCKADDR*)&connection->mReceiver, mReceiverAddrSize) == SOCKET_ERROR)
 					{
 						int lastError = WSAGetLastError();
-						TRACE("Error " << lastError << ": Send Failure");
+						Debug::LogError(STREAM(lastError << ": Send Failure"));
 
 						if (lastError != WSAEWOULDBLOCK && (mFlags & NETWORK_NONBLOCKING))
 						{
@@ -318,7 +320,7 @@ namespace Network
 					if (::send(connection->mNetworkSocket, data, size, 0) == SOCKET_ERROR)
 					{
 						int lastError = WSAGetLastError();
-						TRACE("Error " << lastError << ": Send Failure");
+						Debug::LogError(STREAM(lastError << ": Send Failure"));
 
 						if (lastError != WSAEWOULDBLOCK && (mFlags & NETWORK_NONBLOCKING))
 						{
@@ -333,7 +335,7 @@ namespace Network
 			else result = false;
 		}
 
-		//TRACE( "Message Sent: %s\n", data );
+		//Debug::Log( "Message Sent: %s\n", data );
 
 		return result;
 	}
@@ -352,14 +354,14 @@ namespace Network
 				if (ioctlsocket(client, FIONREAD, &readSize) != NO_ERROR)
 				{
 					int lastError = WSAGetLastError();
-					TRACE("Error " << lastError << ": Receive Non-Blocking Failure");
+					Debug::LogError(STREAM(lastError << ": Receive Non-Blocking Failure"));
 
 					return false;
 				}
 
 				if (readSize > (u_long)size)
 				{
-					TRACE("Attempted to 'recv': " << readSize << " --> size: " << size);
+					Debug::LogWarning(STREAM("Attempted to 'recv': " << readSize << " --> size: " << size));
 
 					return false;
 				}
@@ -373,7 +375,7 @@ namespace Network
 
 				if (rv < 0)
 				{
-					TRACE("Error " << rv << ": Select Failure on 'recv'");
+					Debug::LogError(STREAM(rv << ": Select Failure on 'recv'"));
 				}
 
 				if (::recvfrom(client, data, readSize, 0, (SOCKADDR*)&mReceiverInfo, (int*)&mReceiverAddrSize) == SOCKET_ERROR)
@@ -382,7 +384,7 @@ namespace Network
 					int lastError = WSAGetLastError();
 					if (lastError != WSAECONNRESET)	// some connection has been lost
 					{
-						TRACE("Error " << lastError << ": Receive Failure");
+						Debug::LogError(STREAM(lastError << ": Receive Failure"));
 					}
 				#else
 					printf( "Receive Failure\n" );
@@ -410,14 +412,14 @@ namespace Network
 						if (ioctlsocket(client, FIONREAD, &readSize) != NO_ERROR)
 						{
 							int lastError = WSAGetLastError();
-							TRACE("Error " << lastError << ": Receive Non-Blocking Failure");
+							Debug::LogError(STREAM(lastError << ": Receive Non-Blocking Failure"));
 
 							mCurrConnection->mStatus = STATUS_FAIL;
 						}
 
 						if (readSize > PACKET_SIZE)
 						{
-							TRACE("Attempted to RECV " << readSize << " Bytes");
+							Debug::LogWarning(STREAM("Attempted to RECV " << readSize << " Bytes"));
 
 							return false;
 						}
@@ -431,7 +433,7 @@ namespace Network
 
 						if (rv < 0)
 						{
-							TRACE("Error " << rv << ": Select Failure on 'recv' from " << mCurrConnection->mID);
+							Debug::LogError(STREAM(rv << ": Select Failure on 'recv' from " << mCurrConnection->mID));
 						}
 
 						if (::recv(client, data, readSize, 0) == SOCKET_ERROR)
@@ -441,7 +443,7 @@ namespace Network
 							{ }
 							else
 							{
-								TRACE("Error " << lastErr << ": Receive Failure");
+								Debug::LogError(STREAM(lastErr << ": Receive Failure"));
 
 								mCurrConnection->mStatus = STATUS_FAIL;
 							}
@@ -521,7 +523,7 @@ namespace Network
 
 				if (mCurrConnection->mConnectionTimer > CONNECTION_TIMEOUT)
 				{
-					TRACE(mCurrConnection->mUserName << " Logged Out.");
+					Debug::Log(STREAM(mCurrConnection->mUserName << " Logged Out."));
 
 					mCurrConnection->mStatus = STATUS_FAIL;
 				}

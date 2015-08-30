@@ -7,7 +7,7 @@
 #include "Archive.h"
 #include "Vector3f.h"
 #include "Quatf.h"
-#include "Util.h"
+#include "Exception.h"
 
 namespace Sentinel {
 namespace Component

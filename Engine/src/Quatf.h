@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common.h"
+#include "Sentinel.h"
 #include "Matrix4f.h"
 #include "Vector3f.h"
 
@@ -25,43 +25,43 @@ namespace Sentinel
 		Quatf(const Vector3f& rotation);
 		Quatf(float _x, float _y, float _z, float _w);
 
-		float*		Ptr();
+		float* Ptr();
 
-		Quatf		operator - () const;
+		Quatf operator - () const;
 
-		bool		operator == (const Quatf& v) const;
-		bool		operator != (const Quatf& v) const;
-		bool		Equals(const Quatf& v) const;
+		bool operator == (const Quatf& v) const;
+		bool operator != (const Quatf& v) const;
+		bool Equals(const Quatf& v) const;
 
-		Quatf&		operator *= (const Quatf& q);
-		Quatf		operator * (const Quatf& q) const;
-		Quatf		Mul(const Quatf& q) const;
-		Quatf		Mul(float scalar) const;
+		Quatf& operator *= (const Quatf& q);
+		Quatf operator * (const Quatf& q) const;
+		Quatf Mul(const Quatf& q) const;
+		Quatf Mul(float scalar) const;
 
-		float		Length() const;
-		float		LengthSquared() const;
-		float		LengthManhattan() const;
+		float Length() const;
+		float LengthSquared() const;
+		float LengthManhattan() const;
 
-		Quatf		Normalize() const;
-		Quatf		NormalizeFast() const;
+		Quatf Normalize() const;
+		Quatf NormalizeFast() const;
 
-		float		Dot(const Quatf& q) const;
+		float Dot(const Quatf& q) const;
 
-		Quatf		Inverse() const;
+		Quatf Inverse() const;
 
-		Quatf&		AxisAngle(float _x, float _y, float _z, float _degrees);
-		Quatf&		AxisAngle();
+		Quatf& AxisAngle(float _x, float _y, float _z, float _degrees);
+		Quatf& AxisAngle();
 
-		Quatf&		Euler(float _pitch, float _yaw, float _roll);
-		Quatf&		Euler();
-		Vector3f	ToEuler();
+		Quatf& Euler(float _pitch, float _yaw, float _roll);
+		Quatf& Euler();
+		Vector3f ToEuler();
 
-		Vector3f	Transform(const Vector3f& v) const;
+		Vector3f Transform(const Vector3f& v) const;
 
-		Quatf		Slerp(const Quatf& q, float t);
+		Quatf Slerp(const Quatf& q, float t);
 
-		Vector3f	Forward() const;
-		Vector3f	Up() const;
-		Vector3f	Right() const;
+		Vector3f Forward() const;
+		Vector3f Up() const;
+		Vector3f Right() const;
 	};
 }

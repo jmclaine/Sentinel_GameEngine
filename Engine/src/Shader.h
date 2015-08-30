@@ -7,6 +7,7 @@
 #endif
 
 #include "VertexLayout.h"
+#include "Types.h"
 
 namespace Sentinel
 {

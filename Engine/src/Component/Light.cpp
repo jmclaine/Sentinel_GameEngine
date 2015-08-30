@@ -5,6 +5,7 @@
 #include "Archive.h"
 #include "Texture.h"
 #include "Renderer.h"
+#include "Exception.h"
 
 namespace Sentinel {
 namespace Component

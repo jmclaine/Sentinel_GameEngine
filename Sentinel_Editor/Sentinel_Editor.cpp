@@ -35,6 +35,8 @@ Edits levels for a game created with the Sentinel Engine.
 #include "Input.h"
 #include "Timing.h"
 #include "Util.h"
+#include "FileUtil.h"
+#include "Profile.h"
 
 #include "MeshBuilder.h"
 #include "Model.h"
@@ -157,7 +159,9 @@ public:
 
 		if (!mRenderer)
 		{
-			REPORT_ERROR("Failed to load 'config.xml'\nDefaulting to OpenGL", "Renderer Setup Failure");
+			Debug::ShowError(
+				"Failed to load 'config.xml'\nDefaulting to OpenGL", 
+				"Renderer Setup Failure");
 
 			if (!(mRenderer = BuildRendererGL()))
 				throw AppException("Failed to create OpenGL Renderer");
@@ -320,7 +324,10 @@ public:
 		Archive archive;
 		if (!archive.Open(filename, "wb+"))
 		{
-			REPORT_ERROR("Failed to save " << filename, "File IO Error");
+			Debug::ShowError(
+				STREAM("Failed to save " << filename), 
+				STREAM("File IO Error"));
+
 			return;
 		}
 
@@ -1409,19 +1416,19 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	}
 	catch (AppException e)
 	{
-		REPORT_ERROR(e.what(), "Application Error");
+		Debug::ShowError(e.what(), "Application Error");
 	}
 	catch (std::exception e)
 	{
-		REPORT_ERROR(e.what(), "Application Error");
+		Debug::ShowError(e.what(), "Application Error");
 	}
 	catch (std::bad_alloc&)
 	{
-		REPORT_ERROR("Failed to allocate memory.", "Application Error");
+		Debug::ShowError("Failed to allocate memory.", "Application Error");
 	}
 	catch (...)
 	{
-		REPORT_ERROR("Failed to initialize.", "Application Error");
+		Debug::ShowError("Failed to initialize.", "Application Error");
 	}
 
 	if (mainApp)

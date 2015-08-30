@@ -2,6 +2,7 @@
 
 #include "CommonGL.h"
 #include "Shader.h"
+#include "Types.h"
 
 namespace Sentinel
 {
@@ -19,23 +20,25 @@ namespace Sentinel
 
 		public:
 
-			static GLint SAMPLER_MODE[ SamplerMode::COUNT ];
+			static GLint SAMPLER_MODE[SamplerMode::COUNT];
 
 		protected:
 
-			GLint	mWrapS;
-			GLint	mWrapT;
+			GLint mWrapS;
+			GLint mWrapT;
 
-			GLint	mMinFilter;
-			GLint	mMagFilter;
+			GLint mMinFilter;
+			GLint mMagFilter;
 
 		public:
 
-			SamplerGL( GLint wrapS = GL_REPEAT, GLint wrapT = GL_REPEAT,
-					   GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR );
+			SamplerGL(
+				GLint wrapS = GL_REPEAT, GLint wrapT = GL_REPEAT,
+				GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR);
 
-			void Create( SamplerMode::Type modeU, SamplerMode::Type modeV,
-						 SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter );
+			void Create(
+				SamplerMode::Type modeU, SamplerMode::Type modeV,
+				SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter);
 
 			void Apply();
 		};
@@ -52,78 +55,82 @@ namespace Sentinel
 
 		public:
 
-			SamplerCubeGL( GLint wrapS = GL_CLAMP_TO_EDGE, GLint wrapT = GL_CLAMP_TO_EDGE, GLint wrapR = GL_CLAMP_TO_EDGE,
-						   GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR );
+			SamplerCubeGL(
+				GLint wrapS = GL_CLAMP_TO_EDGE, GLint wrapT = GL_CLAMP_TO_EDGE, GLint wrapR = GL_CLAMP_TO_EDGE,
+				GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR);
 
-			void Create( SamplerMode::Type modeU, SamplerMode::Type modeV, SamplerMode::Type modeW,
-						 SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter );
+			void Create(
+				SamplerMode::Type modeU, SamplerMode::Type modeV, SamplerMode::Type modeW,
+				SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter);
 
 			void Apply();
 		};
 
 	private:
-		
-		GLuint		mProgram;
 
-		GLuint		mVertexShader;
-		GLuint		mGeometryShader;
-		GLuint		mFragmentShader;
+		GLuint mProgram;
 
-		UINT		mTextureLevel;
+		GLuint mVertexShader;
+		GLuint mGeometryShader;
+		GLuint mFragmentShader;
 
-		UINT		mAttributeSize;
+		UINT mTextureLevel;
+
+		UINT mAttributeSize;
 
 	public:
 
-		GLint		mAttributeGL[ VertexAttribute::COUNT ];
+		GLint mAttributeGL[VertexAttribute::COUNT];
 
-		std::vector< GLint > mUniformGL;
+		std::vector<GLint> mUniformGL;
 
 		///////////////////////////////////
 
 		ShaderGL();
 		~ShaderGL();
 
-		void		Release();
+		void Release();
 
-		GLuint		Program();
-		UINT		AttributeSize();
-
-	private:
-
-		bool		CreateAttribute( char* name, VertexAttribute::Type type );
-		bool		CreateUniform( char* name, ShaderUniform::Type type );
-
-	public:
-
-		UINT		CreateFromFile( std::string filename );
-		UINT		CreateFromMemory( char* source );
+		GLuint Program();
+		UINT AttributeSize();
 
 	private:
 
-		int			Compile( const GLchar** source, GLuint& shader, GLenum type, GLsizei count );
-		
+		bool CreateAttribute(char* name, VertexAttribute::Type type);
+		bool CreateUniform(char* name, ShaderUniform::Type type);
+
 	public:
 
-		void		SetFloat( UINT uniform, float* data, UINT count = 1 );
-		void		SetFloat2( UINT uniform, float* data, UINT count = 1 );
-		void		SetFloat3( UINT uniform, float* data, UINT count = 1 );
-		void		SetFloat4( UINT uniform, float* data, UINT count = 1 );
-		void		SetMatrix( UINT uniform, float* matrix, UINT count = 1 );
-		void		SetTexture( UINT uniform, Texture* texture );
-		void		SetTextureCube( UINT uniform, Texture* texture );
+		UINT CreateFromFile(std::string filename);
+		UINT CreateFromMemory(char* source);
 
-		void		SetSampler( UINT index, 
-								SamplerMode::Type modeU, SamplerMode::Type modeV, 
-								SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter );
+	private:
 
-		void		SetSamplerCube( UINT index, 
-									SamplerMode::Type modeU, SamplerMode::Type modeV, SamplerMode::Type modeW,
-									SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter );
+		int Compile(const GLchar** source, GLuint& shader, GLenum type, GLsizei count);
+
+	public:
+
+		void SetFloat(UINT uniform, float* data, UINT count = 1);
+		void SetFloat2(UINT uniform, float* data, UINT count = 1);
+		void SetFloat3(UINT uniform, float* data, UINT count = 1);
+		void SetFloat4(UINT uniform, float* data, UINT count = 1);
+		void SetMatrix(UINT uniform, float* matrix, UINT count = 1);
+		void SetTexture(UINT uniform, Texture* texture);
+		void SetTextureCube(UINT uniform, Texture* texture);
+
+		void SetSampler(
+			UINT index,
+			SamplerMode::Type modeU, SamplerMode::Type modeV,
+			SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter);
+
+		void SetSamplerCube(
+			UINT index,
+			SamplerMode::Type modeU, SamplerMode::Type modeV, SamplerMode::Type modeW,
+			SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter);
 
 		///////////////////////////////////
 
-		void		Enable();
-		void		Disable();
+		void Enable();
+		void Disable();
 	};
 }

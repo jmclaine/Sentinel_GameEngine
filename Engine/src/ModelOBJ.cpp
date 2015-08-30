@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 
+#include "Debug.h"
 #include "Model.h"
 #include "MeshBuilder.h"
 #include "Util.h"
@@ -13,7 +14,7 @@
 #include "MaterialManager.h"
 #include "MeshManager.h"
 #include "Archive.h"
-#include "MathCommon.h"
+#include "MathUtil.h"
 
 namespace Sentinel
 {
@@ -218,7 +219,10 @@ namespace Sentinel
 
 										if (texture.get() == NULL)
 										{
-											REPORT_ERROR("Failed to load image '" << mtlToken << "'", "Load Model Error");
+											Debug::ShowError(
+												STREAM("Failed to load image '" << mtlToken << "'"), 
+												STREAM("Load Model Error"));
+
 											return false;
 										}
 
@@ -254,7 +258,10 @@ namespace Sentinel
 					{
 						if (meshBuilder == NULL)
 						{
-							REPORT_ERROR("Invalid syntax for OBJ file.", "OBJ Load Error");
+							Debug::ShowError(
+								"Invalid syntax for OBJ file.", 
+								"OBJ Load Error");
+
 							return false;
 						}
 
@@ -354,7 +361,10 @@ namespace Sentinel
 			}
 			else
 			{
-				REPORT_ERROR("Failed to load " << filename, "OBJ Model Load Failure");
+				Debug::ShowError(
+					STREAM("Failed to load " << filename), 
+					STREAM("OBJ Model Load Failure"));
+
 				return false;
 			}
 

@@ -2,7 +2,8 @@
 
 #include <vector>
 
-#include "Common.h"
+#include "Sentinel.h"
+#include "Types.h"
 #include "RendererTypes.h"
 
 namespace Sentinel
@@ -11,9 +12,9 @@ namespace Sentinel
 	{
 	protected:
 
-		std::vector< VertexAttribute::Type > mLayout;
+		std::vector<VertexAttribute::Type> mLayout;
 
-		UINT	mVertexSize;
+		UINT mVertexSize;
 
 		///////////////////////////////////
 
@@ -25,8 +26,8 @@ namespace Sentinel
 
 		///////////////////////////////////
 
-		const std::vector< VertexAttribute::Type >& Layout() const;
+		const std::vector<VertexAttribute::Type>& Layout() const;
 
-		UINT	VertexSize() const;
+		UINT VertexSize() const;
 	};
 }

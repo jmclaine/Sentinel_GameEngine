@@ -41,7 +41,7 @@ namespace Sentinel
 
 	public:
 
-		static int16_t Compress( float value )
+		static int16_t Compress(float value)
 		{
 			Bits v, s;
 			v.f = value;
@@ -59,7 +59,7 @@ namespace Sentinel
 			return (int16_t)(v.ui | sign);
 		}
 
-		static float Decompress( int16_t value )
+		static float Decompress(int16_t value)
 		{
 			Bits v;
 			v.ui = value;

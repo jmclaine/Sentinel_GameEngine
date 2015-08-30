@@ -12,41 +12,43 @@ namespace Sentinel
 	ModelManager::~ModelManager()
 	{}
 
-	void ModelManager::Save( Archive&			archive, 
-							 Renderer*			renderer, 
-							 ShaderManager*		shaderManager, 
-							 TextureManager*	textureManager,
-							 MaterialManager*	materialManager )
+	void ModelManager::Save(
+		Archive& archive,
+		Renderer* renderer,
+		ShaderManager* shaderManager,
+		TextureManager* textureManager,
+		MaterialManager* materialManager)
 	{
 		UINT count = mData.size();
-		archive.Write( &count );
+		archive.Write(&count);
 
-		TRAVERSE_LIST( it, mData )
+		TRAVERSE_LIST(it, mData)
 		{
-			archive.Write( &it->first );
+			archive.Write(&it->first);
 
-			it->second->Save( archive, renderer, shaderManager, textureManager, materialManager );
+			it->second->Save(archive, renderer, shaderManager, textureManager, materialManager);
 		}
 	}
 
-	void ModelManager::Load( Archive&			archive, 
-							 Renderer*			renderer, 
-							 ShaderManager*		shaderManager, 
-							 TextureManager*	textureManager,
-							 MaterialManager*	materialManager )
+	void ModelManager::Load(
+		Archive& archive,
+		Renderer* renderer,
+		ShaderManager* shaderManager,
+		TextureManager* textureManager,
+		MaterialManager* materialManager)
 	{
 		RemoveAll();
 
 		UINT count;
-		archive.Read( &count );
+		archive.Read(&count);
 
-		for( UINT x = 0; x < count; ++x )
+		for (UINT x = 0; x < count; ++x)
 		{
 			std::string name;
-			archive.Read( &name );
+			archive.Read(&name);
 
-			if( !Add( name, std::shared_ptr< Model >( Model::Load( archive, renderer, shaderManager, textureManager, materialManager ))))
-				throw std::exception( "Failed to load mesh." );
+			if (!Add(name, std::shared_ptr<Model>(Model::Load(archive, renderer, shaderManager, textureManager, materialManager))))
+				throw std::exception("Failed to load mesh.");
 		}
 	}
 }

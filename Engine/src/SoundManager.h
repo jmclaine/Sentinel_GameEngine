@@ -8,8 +8,8 @@ namespace Sentinel
 	class Archive;
 	class AudioSystem;
 
-	class SENTINEL_DLL SoundManager : public AssetManager< Sound >
-	{	
+	class SENTINEL_DLL SoundManager : public AssetManager <Sound>
+	{
 	public:
 
 		SoundManager();
@@ -17,8 +17,8 @@ namespace Sentinel
 
 		/////////////////////////////////
 
-		void Save( Archive& archive );
+		void Save(Archive& archive);
 
-		void Load( Archive& archive, AudioSystem* audio );
+		void Load(Archive& archive, AudioSystem* audio);
 	};
 }

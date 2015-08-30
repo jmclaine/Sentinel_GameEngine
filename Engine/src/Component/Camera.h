@@ -8,7 +8,7 @@
 
 #ifndef WIN32
 #define HWND void*
-#define GetClientRect( x, y );
+#define GetClientRect(x, y);
 
 struct RECT
 {

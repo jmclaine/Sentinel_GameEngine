@@ -13,32 +13,32 @@
 
 namespace Sentinel
 {
-	SpriteSystem::SpriteSystem( Renderer* renderer, std::shared_ptr< VertexLayout > layout, UINT maxSprites ) :
-		mRenderer( renderer ),
-		mMaxSprites( maxSprites ),
-		mNumSprites( 0 )
+	SpriteSystem::SpriteSystem(Renderer* renderer, std::shared_ptr<VertexLayout> layout, UINT maxSprites) :
+		mRenderer(renderer),
+		mMaxSprites(maxSprites),
+		mNumSprites(0)
 	{
-		_ASSERT( renderer );
-		_ASSERT( layout.get() );
-		_ASSERT( maxSprites > 0 );
+		_ASSERT(renderer);
+		_ASSERT(layout.get());
+		_ASSERT(maxSprites > 0);
 
-		mStorage = new Storage[ maxSprites ];
+		mStorage = new Storage[maxSprites];
 
 		MeshBuilder builder;
 
 		builder.mLayout = layout;
 
-		for( UINT x = 0; x < maxSprites; ++x )
+		for (UINT x = 0; x < maxSprites; ++x)
 		{
-			builder.mVertex.push_back( MeshBuilder::Vertex( Vector3f( 0.0f, 0.0f, 0.0f )));
+			builder.mVertex.push_back(MeshBuilder::Vertex(Vector3f(0.0f, 0.0f, 0.0f)));
 		}
 
 		builder.mPrimitive = PrimitiveFormat::POINTS;
 
-		mMesh = builder.BuildMesh( mRenderer, false );
+		mMesh = builder.BuildMesh(mRenderer, false);
 
-		if( !mMesh )
-			throw AppException( "Failed to create Mesh in SpriteSystem" );
+		if (!mMesh)
+			throw AppException("Failed to create Mesh in SpriteSystem");
 	}
 
 	SpriteSystem::~SpriteSystem()
@@ -60,29 +60,29 @@ namespace Sentinel
 		mNumSprites = 0;
 	}
 
-	void SpriteSystem::Draw( UINT frame, const ColorRGBA& color, const Matrix4f& matWorld )
+	void SpriteSystem::Draw(UINT frame, const ColorRGBA& color, const Matrix4f& matWorld)
 	{
-		_ASSERT( mNumSprites < mMaxSprites );
+		_ASSERT(mNumSprites < mMaxSprites);
 
-		Storage& store = mStorage[ mNumSprites ];
+		Storage& store = mStorage[mNumSprites];
 
-		store.mFrame		= mSprite->GetFrame( frame );
-		store.mColor		= color.ToUINT();
-		store.mMatrixWorld	= matWorld;
-		
+		store.mFrame = mSprite->GetFrame(frame);
+		store.mColor = color.ToUINT();
+		store.mMatrixWorld = matWorld;
+
 		++mNumSprites;
 	}
 
 	void SpriteSystem::Present()
 	{
-		_ASSERT( mCamera );
+		_ASSERT(mCamera);
 
-		memcpy( mMesh->mVertexBuffer->Lock(), mStorage, sizeof( Storage ) * mNumSprites );
-		
+		memcpy(mMesh->mVertexBuffer->Lock(), mStorage, sizeof(Storage) * mNumSprites);
+
 		mMesh->mVertexBuffer->Unlock();
 
 		mMesh->mMaterial = mMaterial;
-		
-		mMesh->Draw( mRenderer, NULL, mCamera, mNumSprites );
+
+		mMesh->Draw(mRenderer, NULL, mCamera, mNumSprites);
 	}
 }

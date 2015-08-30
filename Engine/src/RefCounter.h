@@ -9,7 +9,7 @@ namespace Sentinel
 	public:
 
 		RefCounter() :
-			refc( 0 )
+			refc(0)
 		{}
 
 		void incRef()
@@ -35,13 +35,13 @@ namespace Sentinel
 			incRef();
 		}
 
-		RefObject( T _data )
+		RefObject(T _data)
 		{
 			data = _data;
 			incRef();
 		}
 
-		void assign( const T& right )
+		void assign(const T& right)
 		{
 			incRef();
 			data = right;

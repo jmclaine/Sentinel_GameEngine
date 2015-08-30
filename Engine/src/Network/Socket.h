@@ -33,7 +33,7 @@ typedef sockaddr SOCKADDR;
 #include <IPHlpApi.h>
 #endif
 
-#include "Common.h"
+#include "Sentinel.h"
 #include "Util.h"
 
 #define MAX_RTT_COUNT		5

@@ -1,51 +1,27 @@
 #pragma once
 
-#include <memory>
-
-#include "Vector3f.h"
+#include "Sentinel.h"
+#include "StringStream.h"
 
 namespace Sentinel
 {
-	namespace Component
-	{
-		class Camera;
-	}
-
-	class Renderer;
-	class GameWorld;
-	class Shader;
-	class Mesh;
-	class Material;
-	
 	class SENTINEL_DLL Debug
 	{
-	private:
-
-		Renderer*			mRenderer;
-		GameWorld*			mWorld;
-		Component::Camera*	mCamera;
-
-		Mesh*				mMesh;
-
-		UINT				mNumLines;
-		UINT				mMaxLines;
-
 	public:
 
-		std::shared_ptr< Material > mMaterial;
+		static void Log(const std::string& text);
+		static void Log(StringStream& stream);
 
-		Debug( Renderer* renderer, GameWorld* world, Component::Camera* camera, std::shared_ptr< Material > material, UINT maxLines = 1000 );
-		~Debug();
+		static void LogWarning(const std::string& text);
+		static void LogWarning(StringStream& stream);
 
-		Renderer*			GetRenderer();
-		GameWorld*			GetWorld();
+		static void ShowWarning(const std::string& msg, const std::string& title);
+		static void ShowWarning(StringStream& msg, StringStream& title);
 
-		/////////////////////////////////////
+		static void LogError(const std::string& text);
+		static void LogError(StringStream& stream);
 
-		void				Clear();
-
-		void				DrawLine( const Vector3f& start, const Vector3f& end );
-
-		void				Present();
+		static void ShowError(const std::string& msg, const std::string& title);
+		static void ShowError(StringStream& msg, StringStream& title);
 	};
 }

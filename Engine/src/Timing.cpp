@@ -4,30 +4,30 @@
 
 namespace Sentinel
 {
-	const double Timing::INVERSE_FRAME_RATE		= 60.0;
-	const double Timing::DESIRED_FRAME_RATE		= 1.0 / 60.0;
-	const double Timing::THRESHOLD_FRAME_RATE	= DESIRED_FRAME_RATE * 4.0;
+	const double Timing::INVERSE_FRAME_RATE = 60.0;
+	const double Timing::DESIRED_FRAME_RATE = 1.0 / 60.0;
+	const double Timing::THRESHOLD_FRAME_RATE = DESIRED_FRAME_RATE * 4.0;
 
 	Timing::Timing()
 	{
-		mDeltaTime = static_cast< float >(DESIRED_FRAME_RATE);
+		mDeltaTime = static_cast<float>(DESIRED_FRAME_RATE);
 
-    #ifdef WIN32
-		QueryPerformanceFrequency( &mFrequency );
-    #else
-        clock_getres( CLOCK_PROCESS_CPUTIME_ID, &m_frequency );
-    #endif
+	#ifdef WIN32
+		QueryPerformanceFrequency(&mFrequency);
+	#else
+		clock_getres(CLOCK_PROCESS_CPUTIME_ID, &m_frequency);
+	#endif
 	}
 
 	double Timing::QueryCounter()
 	{
-    #ifdef WIN32
-		QueryPerformanceCounter( &mCounter );
+	#ifdef WIN32
+		QueryPerformanceCounter(&mCounter);
 		return mCounter.QuadPart / static_cast<double>(mFrequency.QuadPart);
-    #else
-        clock_gettime( CLOCK_PROCESS_CPUTIME_ID, &m_counter );
-        return (double)m_counter.tv_nsec * 0.000000001;
-    #endif
+	#else
+		clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &m_counter);
+		return (double)m_counter.tv_nsec * 0.000000001;
+	#endif
 	}
 
 	void Timing::Update()
@@ -35,16 +35,16 @@ namespace Sentinel
 		mTimeNow = QueryCounter();
 	}
 
-	void Timing::Limit( double frameRate )
+	void Timing::Limit(double frameRate)
 	{
-	    mTimeLater = QueryCounter();
-		while( (mTimeLater - mTimeNow) < frameRate )
+		mTimeLater = QueryCounter();
+		while ((mTimeLater - mTimeNow) < frameRate)
 		{
 			mTimeLater = QueryCounter();
 		}
 
-		mDeltaTime = static_cast< float >(mTimeLater - mTimeNow);
-		if( mDeltaTime > (float)THRESHOLD_FRAME_RATE )
+		mDeltaTime = static_cast<float>(mTimeLater - mTimeNow);
+		if (mDeltaTime > (float)THRESHOLD_FRAME_RATE)
 			mDeltaTime = (float)THRESHOLD_FRAME_RATE;
 	}
 

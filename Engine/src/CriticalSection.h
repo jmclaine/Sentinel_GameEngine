@@ -2,7 +2,7 @@
 
 #include <windows.h>
 
-#include "Common.h"
+#include "Sentinel.h"
 
 namespace Sentinel
 {
@@ -10,31 +10,31 @@ namespace Sentinel
 	{
 	private:
 
-		CRITICAL_SECTION	mCS;
+		CRITICAL_SECTION mCS;
 
-		CriticalSection( const CriticalSection& );
-		CriticalSection& operator = ( const CriticalSection& );
+		CriticalSection(const CriticalSection&);
+		CriticalSection& operator = (const CriticalSection&);
 
 	public:
 
 		CriticalSection()
 		{
-			InitializeCriticalSection( &mCS );
+			InitializeCriticalSection(&mCS);
 		}
 
 		~CriticalSection()
 		{
-			DeleteCriticalSection( &mCS );
+			DeleteCriticalSection(&mCS);
 		}
 
 		void Lock()
 		{
-			EnterCriticalSection( &mCS );
+			EnterCriticalSection(&mCS);
 		}
 
 		void Unlock()
 		{
-			LeaveCriticalSection( &mCS );
+			LeaveCriticalSection(&mCS);
 		}
 	};
 }

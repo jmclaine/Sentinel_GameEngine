@@ -12,6 +12,7 @@
 #include "Component/Camera.h"
 #include "Archive.h"
 #include "RenderManager.h"
+#include "Exception.h"
 
 namespace Sentinel {
 namespace Component

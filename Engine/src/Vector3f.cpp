@@ -1,4 +1,4 @@
-#include "MathCommon.h"
+#include "MathUtil.h"
 #include "Vector3f.h"
 
 namespace Sentinel

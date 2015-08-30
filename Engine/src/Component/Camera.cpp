@@ -1,5 +1,5 @@
 #include "Component/Camera.h"
-#include "Util.h"
+#include "Exception.h"
 #include "GameObject.h"
 #include "GameWorld.h"
 #include "Component/Transform.h"

@@ -2,9 +2,9 @@
 /*
 Creates a point mesh to generate quads using a geometry shader.
 
-Use 'sprite.xsh' as a basis to create a custom shader.  
-Be aware that the vertex attributes must remain the same 
-to ensure the SpriteSystem can modify and render the 
+Use 'sprite.xsh' as a basis to create a custom shader.
+Be aware that the vertex attributes must remain the same
+to ensure the SpriteSystem can modify and render the
 quads correctly.
 
 Uniforms can be added freely.
@@ -35,48 +35,47 @@ namespace Sentinel
 	{
 	private:
 
-		Renderer*			mRenderer;
-		
-		Mesh*				mMesh;
+		Renderer* mRenderer;
+		Mesh* mMesh;
 
-		UINT				mNumSprites;
-		UINT				mMaxSprites;
-		
+		UINT mNumSprites;
+		UINT mMaxSprites;
+
 	public:
 
-		Component::Camera*	mCamera;
+		Component::Camera* mCamera;
 
 		struct Storage
 		{
 		public:
 
-			Quad			mFrame;
-			UINT			mColor;
-			Matrix4f		mMatrixWorld;
+			Quad mFrame;
+			UINT mColor;
+			Matrix4f mMatrixWorld;
 		};
 
 	private:
 
-		Storage*			mStorage;
+		Storage* mStorage;
 
 	public:
 
-		std::shared_ptr< Sprite >   mSprite;
-		std::shared_ptr< Material > mMaterial;
+		std::shared_ptr<Sprite> mSprite;
+		std::shared_ptr<Material> mMaterial;
 
 		/////////////////////////////////////
 
-		SpriteSystem( Renderer* renderer, std::shared_ptr< VertexLayout > layout, UINT maxSprites );
+		SpriteSystem(Renderer* renderer, std::shared_ptr<VertexLayout> layout, UINT maxSprites);
 		~SpriteSystem();
 
-		Renderer*	GetRenderer();
+		Renderer* GetRenderer();
 
 		/////////////////////////////////////
 
-		void		Clear();
+		void Clear();
 
-		void		Draw( UINT frame, const ColorRGBA& color, const Matrix4f& matWorld );
+		void Draw(UINT frame, const ColorRGBA& color, const Matrix4f& matWorld);
 
-		void		Present();
+		void Present();
 	};
 }

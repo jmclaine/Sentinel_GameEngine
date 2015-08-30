@@ -1,7 +1,7 @@
 #include "Component/PlayerController.h"
 #include "Component/Physics.h"
 #include "Component/Transform.h"
-#include "MathCommon.h"
+#include "MathUtil.h"
 #include "Input.h"
 #include "GameObject.h"
 #include "GameWorld.h"
@@ -112,7 +112,7 @@ namespace Component
 				qFinal = Quatf(rot);
 			}
 
-			Quatf qResult = body->GetOrientation().Slerp(qFinal, clamp(mOwner->GetWorld()->mTiming->DeltaTime()*10.0f, 0.0f, 1.0f));
+			Quatf qResult = body->GetOrientation().Slerp(qFinal, CLAMP(mOwner->GetWorld()->mTiming->DeltaTime()*10.0f, 0.0f, 1.0f));
 
 			if (qResult.LengthSquared() > 0)	// slerp can end with an invalid rotation
 				body->SetOrientation(qResult);

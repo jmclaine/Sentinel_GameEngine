@@ -4,7 +4,7 @@
 #include "Renderer.h"
 #include "GameObject.h"
 #include "GameWorld.h"
-#include "MathCommon.h"
+#include "MathUtil.h"
 
 namespace Sentinel {
 namespace Component

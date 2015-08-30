@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Vector3f.h"
+#include "Types.h"
 
 namespace Sentinel
 {
@@ -13,8 +14,10 @@ namespace Sentinel
 
 		float mPitch;
 		float mGain;
+
 		Vector3f mPosition;
 		Vector3f mVelocity;
+
 		bool mLoop;
 
 	protected:

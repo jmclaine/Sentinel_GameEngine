@@ -10,7 +10,7 @@ namespace Sentinel
 	class ShaderManager;
 	class TextureManager;
 
-	class SENTINEL_DLL MeshManager : public AssetManager< Mesh >
+	class SENTINEL_DLL MeshManager : public AssetManager <Mesh>
 	{
 	public:
 
@@ -19,16 +19,18 @@ namespace Sentinel
 
 		/////////////////////////////////
 
-		void Save( Archive&				archive, 
-				   Renderer*			renderer, 
-				   ShaderManager*		shaderManager, 
-				   TextureManager*		textureManager,
-				   MaterialManager*		materialManager );
+		void Save(
+			Archive& archive,
+			Renderer* renderer,
+			ShaderManager* shaderManager,
+			TextureManager* textureManager,
+			MaterialManager* materialManager);
 
-		void Load( Archive&				archive, 
-				   Renderer*			renderer, 
-				   ShaderManager*		shaderManager, 
-				   TextureManager*		textureManager,
-				   MaterialManager*		materialManager );
+		void Load(
+			Archive& archive,
+			Renderer* renderer,
+			ShaderManager* shaderManager,
+			TextureManager* textureManager,
+			MaterialManager* materialManager);
 	};
 }

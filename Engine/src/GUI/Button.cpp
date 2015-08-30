@@ -47,7 +47,7 @@ namespace GUI
 
 	void Button::Save(Archive& archive)
 	{
-		//SerialFunctionFactory::Get().Find( mActionUp );
+		//SerialFunctionFactory::Get().Find(mActionUp);
 	}
 
 	void Button::Load(Archive& archive)

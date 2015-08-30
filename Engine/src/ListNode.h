@@ -2,73 +2,74 @@
 /*
 ListNode must be inherited by the base object.
 
-e.g. class GameObject : public ListNode< GameObject >
+e.g. class GameObject : public ListNode<GameObject>
 */
 #include <vector>
 
-#include "Util.h"
+#include "Memory.h"
+#include "Types.h"
 
 namespace Sentinel
 {
-	template< class T >
+	template<class T>
 	class ListNode
 	{
 	protected:
 
-		T*					mParent;
-		std::vector< T* >	mChild;
+		T* mParent;
+		std::vector<T*>	mChild;
 
 	public:
 
 		ListNode() :
-			mParent( NULL )
+			mParent(NULL)
 		{}
 
 		virtual ~ListNode()
 		{
-			TRAVERSE_VECTOR( x, mChild )
-				SAFE_DELETE( mChild[ x ] );
+			TRAVERSE_VECTOR(x, mChild)
+				SAFE_DELETE(mChild[x]);
 		}
 
-		virtual T* AddChild( T* obj )
+		virtual T* AddChild(T* obj)
 		{
 			// Check if the object is already a child.
 			//
-			TRAVERSE_VECTOR( x, mChild )
-				if( mChild[ x ] == obj )
+			TRAVERSE_VECTOR(x, mChild)
+				if (mChild[x] == obj)
 					return obj;
 
 			// Remove the object from its parent.
 			//
-			if( obj->mParent )
-				obj->mParent->RemoveChild( obj );
+			if (obj->mParent)
+				obj->mParent->RemoveChild(obj);
 
 			// Add the object as a child.
 			//
-			mChild.push_back( obj );
+			mChild.push_back(obj);
 			obj->mParent = (T*)this;
 
 			return obj;
 		}
 
-		virtual void RemoveChild( T* obj )
+		virtual void RemoveChild(T* obj)
 		{
-			TRAVERSE_LIST( it, mChild )
+			TRAVERSE_LIST(it, mChild)
 			{
-				if( *it == obj )
+				if (*it == obj)
 				{
 					obj->mParent = NULL;
-					mChild.erase( it );
+					mChild.erase(it);
 					return;
 				}
 			}
 		}
 
-		T* GetChild( UINT index )
+		T* GetChild(UINT index)
 		{
-			_ASSERT( index < NumChildren() );
+			_ASSERT(index < NumChildren());
 
-			return mChild[ index ];
+			return mChild[index];
 		}
 
 		UINT NumChildren()
@@ -78,7 +79,7 @@ namespace Sentinel
 
 	protected:
 
-		void SetParent( T* item )
+		void SetParent(T* item)
 		{
 			mParent = item;
 		}

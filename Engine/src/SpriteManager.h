@@ -9,7 +9,7 @@ namespace Sentinel
 	class Renderer;
 	class TextureManager;
 
-	class SENTINEL_DLL SpriteManager : public AssetManager< Sprite >
+	class SENTINEL_DLL SpriteManager : public AssetManager <Sprite>
 	{
 	public:
 
@@ -18,8 +18,8 @@ namespace Sentinel
 
 		/////////////////////////////////
 
-		void Save( Archive&			archive );
+		void Save(Archive& archive);
 
-		void Load( Archive&			archive );
+		void Load(Archive& archive);
 	};
 }

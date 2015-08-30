@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Common.h"
+#include "Sentinel.h"
+#include "Types.h"
 #include "RendererTypes.h"
 
 namespace Sentinel
@@ -9,23 +10,23 @@ namespace Sentinel
 	{
 	protected:
 
-		UINT				mWidth;
-		UINT				mHeight;
+		UINT mWidth;
+		UINT mHeight;
 
-		ImageFormat::Type	mFormat;
+		ImageFormat::Type mFormat;
 
 		//////////////////////////////
 
-		Texture( UINT width, UINT height, ImageFormat::Type format );
+		Texture(UINT width, UINT height, ImageFormat::Type format);
 
 	public:
 
 		virtual ~Texture();
 
-		virtual void		Release() = 0;
+		virtual void Release() = 0;
 
-		UINT				Width();
-		UINT				Height();
+		UINT Width();
+		UINT Height();
 
 		const ImageFormat::Type& Format();
 	};

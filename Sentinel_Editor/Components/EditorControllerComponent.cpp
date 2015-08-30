@@ -1,7 +1,7 @@
 #include "EditorControllerComponent.h"
 #include "Component/Physics.h"
 #include "Component/Transform.h"
-#include "MathCommon.h"
+#include "MathUtil.h"
 #include "GameObject.h"
 #include "GameWorld.h"
 #include "Timing.h"
@@ -19,9 +19,9 @@ namespace Sentinel
 {
 	EditorControllerComponent::EditorControllerComponent()
 	{
-		mForwardSpeed	= 10.0f;
-		mStrafeSpeed	= 3.0f;
-		mAngularSpeed	= 0.2f;
+		mForwardSpeed = 10.0f;
+		mStrafeSpeed = 3.0f;
+		mAngularSpeed = 0.2f;
 	}
 
 	void EditorControllerComponent::Startup()
@@ -35,141 +35,141 @@ namespace Sentinel
 		//
 		WindowInfo* info = mOwner->GetWorld()->mRenderer->GetWindow();
 
-		if( mLastWindowWidth != mTransform->mScale.x || mLastWindowHeight != mTransform->mScale.y )
+		if (mLastWindowWidth != mTransform->mScale.x || mLastWindowHeight != mTransform->mScale.y)
 		{
 			// Magically ensure the FOV looks correct.
 			// Divide by 32 from the width produces the intended result.
 			//
-			mWorldCamera->Set( (UINT)mTransform->mScale.x, (UINT)mTransform->mScale.y, mWorldCamera->NearZ(), mWorldCamera->FarZ(), (float)(info->Width() >> 5) );
-		
+			mWorldCamera->Set((UINT)mTransform->mScale.x, (UINT)mTransform->mScale.y, mWorldCamera->NearZ(), mWorldCamera->FarZ(), (float)(info->Width() >> 5));
+
 			/////////////////////////////////////
 
-			mEditorCamera->Set( info->Width(), info->Height() );
+			mEditorCamera->Set(info->Width(), info->Height());
 
-			mLastWindowWidth  = mTransform->mScale.x;
+			mLastWindowWidth = mTransform->mScale.x;
 			mLastWindowHeight = mTransform->mScale.y;
 		}
 
-		if( mPhysics )
+		if (mPhysics)
 		{
-			RigidBody* body		= mPhysics->GetRigidBody();
+			RigidBody* body = mPhysics->GetRigidBody();
 
-			Keyboard& keyboard	= Keyboard::Get();
+			Keyboard& keyboard = Keyboard::Get();
 
-			Mouse& mouse		= Mouse::Get();
-			POINT mousePos		= mouse.GetPosition();
+			Mouse& mouse = Mouse::Get();
+			POINT mousePos = mouse.GetPosition();
 
 			bool didMove = false;
 
-			if( mouse.DidGoDown( BUTTON_MIDDLE ) || mouse.DidGoDown( BUTTON_RIGHT ))
+			if (mouse.DidGoDown(BUTTON_MIDDLE) || mouse.DidGoDown(BUTTON_RIGHT))
 			{
 				mLastMousePos = mouse.GetPosition();
 			}
 
-			Vector3f impulse( 0, 0, 0 );
+			Vector3f impulse(0, 0, 0);
 
 			int scroll = mouse.ScrollDistance();
 
 			// Forward.
 			//
-			if( scroll > 0 )
+			if (scroll > 0)
 				impulse += mTransform->GetMatrixWorld().Forward();
-		
+
 			// Backward.
 			//
-			if( scroll < 0 )
+			if (scroll < 0)
 				impulse -= mTransform->GetMatrixWorld().Forward();
 
 			// Move in direction.
 			//
-			if( impulse.LengthSquared() > 0 )
-				body->ApplyCentralImpulse( impulse.Normalize() * mForwardSpeed );
+			if (impulse.LengthSquared() > 0)
+				body->ApplyCentralImpulse(impulse.Normalize() * mForwardSpeed);
 
 			// Strafe.
 			//
-			if( mouse.IsDown( BUTTON_MIDDLE ))
+			if (mouse.IsDown(BUTTON_MIDDLE))
 			{
-				impulse = Vector3f( 0, 0, 0 );
+				impulse = Vector3f(0, 0, 0);
 
-				float x = (float)(mLastMousePos.x-mousePos.x);
-				float y = (float)(mLastMousePos.y-mousePos.y);
+				float x = (float)(mLastMousePos.x - mousePos.x);
+				float y = (float)(mLastMousePos.y - mousePos.y);
 
 				impulse -= mTransform->GetMatrixWorld().Right() * x;
 				impulse += mTransform->GetMatrixWorld().Up() * y;
 
 				// Move in direction.
 				//
-				if( impulse.LengthSquared() > 0 )
-					body->ApplyCentralImpulse( impulse.Normalize() * mStrafeSpeed );
+				if (impulse.LengthSquared() > 0)
+					body->ApplyCentralImpulse(impulse.Normalize() * mStrafeSpeed);
 
 				didMove = true;
 			}
-		
+
 			///////////////////////////////////
 
-			if( mouse.IsDown( BUTTON_RIGHT ))
+			if (mouse.IsDown(BUTTON_RIGHT))
 			{
-				Vector3f diff = Vector3f( (float)(mLastMousePos.y-mousePos.y), (float)(mLastMousePos.x-mousePos.x), 0 ) * mAngularSpeed;
+				Vector3f diff = Vector3f((float)(mLastMousePos.y - mousePos.y), (float)(mLastMousePos.x - mousePos.x), 0) * mAngularSpeed;
 
 				// Rotate in direction with spherical interpolation.
 				//
 				static Quatf qFinal = body->GetOrientation();
 
-				if( diff.LengthSquared() > 0 )
+				if (diff.LengthSquared() > 0)
 				{
 					static Vector3f rot = qFinal.ToEuler();
 					rot += diff;
-	
-					qFinal = Quatf( rot );
+
+					qFinal = Quatf(rot);
 				}
 
-				Quatf qResult = body->GetOrientation().Slerp( qFinal, clamp( mOwner->GetWorld()->mTiming->DeltaTime()*10.0f, 0.0f, 1.0f ));
+				Quatf qResult = body->GetOrientation().Slerp(qFinal, CLAMP((mOwner->GetWorld()->mTiming->DeltaTime()*10.0f), 0.0f, 1.0f));
 
-				if( qResult.LengthSquared() > 0 )	// slerp can end with an invalid rotation
-					body->SetOrientation( qResult );
+				if (qResult.LengthSquared() > 0)	// slerp can end with an invalid rotation
+					body->SetOrientation(qResult);
 
-				impulse = Vector3f( 0, 0, 0 );
+				impulse = Vector3f(0, 0, 0);
 
-				if( keyboard.IsDown( 'W' ))
+				if (keyboard.IsDown('W'))
 				{
 					impulse += mTransform->GetMatrixWorld().Forward();
 				}
 
-				if( keyboard.IsDown( 'S' ))
+				if (keyboard.IsDown('S'))
 				{
 					impulse -= mTransform->GetMatrixWorld().Forward();
 				}
 
-				if( keyboard.IsDown( 'D' ))
+				if (keyboard.IsDown('D'))
 				{
 					impulse += mTransform->GetMatrixWorld().Right();
 				}
 
-				if( keyboard.IsDown( 'A' ))
+				if (keyboard.IsDown('A'))
 				{
 					impulse -= mTransform->GetMatrixWorld().Right();
 				}
 
-				if( keyboard.IsDown( 'E' ))
+				if (keyboard.IsDown('E'))
 				{
 					impulse += mTransform->GetMatrixWorld().Up();
 				}
 
-				if( keyboard.IsDown( 'Q' ))
+				if (keyboard.IsDown('Q'))
 				{
 					impulse -= mTransform->GetMatrixWorld().Up();
 				}
-				
+
 				// Move in direction.
 				//
-				if( impulse.LengthSquared() > 0 )
-					body->ApplyCentralImpulse( impulse.Normalize() * mStrafeSpeed );
+				if (impulse.LengthSquared() > 0)
+					body->ApplyCentralImpulse(impulse.Normalize() * mStrafeSpeed);
 
 				didMove = true;
 			}
 
-			if( didMove )
-				SetCursorPos( mLastMousePos.x, mLastMousePos.y );
+			if (didMove)
+				SetCursorPos(mLastMousePos.x, mLastMousePos.y);
 		}
 	}
 

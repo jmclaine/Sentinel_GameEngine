@@ -6,7 +6,8 @@ Mesh creation helpers are in MeshBuilder.h or Model.h
 */
 #include <memory>
 
-#include "Common.h"
+#include "Sentinel.h"
+#include "Types.h"
 #include "RendererTypes.h"
 #include "Matrix4f.h"
 #include "Vector4f.h"

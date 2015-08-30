@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "Util.h"
+#include "Types.h"
 
 #ifdef _DEBUG
 inline void HANDLE_GL_ERRORS()

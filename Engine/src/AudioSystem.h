@@ -4,7 +4,7 @@ The AudioSystem is based on OpenAL, but has been created
 as an abstract class to remove the core OpenAL source from
 the header in order for the Editor to use it.
 */
-#include "Common.h"
+#include "Sentinel.h"
 #include "Vector3f.h"
 
 namespace Sentinel

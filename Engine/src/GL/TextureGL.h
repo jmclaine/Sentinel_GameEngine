@@ -9,15 +9,15 @@ namespace Sentinel
 	{
 	private:
 
-		GLuint	mID;
+		GLuint mID;
 
 	public:
 
-		TextureGL( UINT width, UINT height, ImageFormat::Type format, GLuint id );
+		TextureGL(UINT width, UINT height, ImageFormat::Type format, GLuint id);
 		~TextureGL();
 
-		void	Release();
+		void Release();
 
-		GLuint	ID();
+		GLuint ID();
 	};
 }

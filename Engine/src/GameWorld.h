@@ -3,7 +3,8 @@
 #include <vector>
 #include <map>
 
-#include "Common.h"
+#include "Sentinel.h"
+#include "Types.h"
 
 namespace Sentinel
 {

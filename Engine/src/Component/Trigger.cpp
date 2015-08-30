@@ -1,6 +1,7 @@
 #include "Component/Trigger.h"
 #include "GameObject.h"
 #include "Component/Physics.h"
+#include "Exception.h"
 
 namespace Sentinel {
 namespace Component

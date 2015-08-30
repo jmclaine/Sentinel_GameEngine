@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Common.h"
+#include "Sentinel.h"
+#include "Types.h"
 #include "Vector2f.h"
 #include "Vector3f.h"
 #include "Matrix4f.h"

@@ -1,6 +1,7 @@
 #include "GUI/SpriteButton.h"
 #include "Component/SpriteDrawable.h"
 #include "GameObject.h"
+#include "Exception.h"
 
 namespace Sentinel {
 namespace GUI

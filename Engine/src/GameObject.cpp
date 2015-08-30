@@ -158,8 +158,15 @@ namespace Sentinel
 	{
 		if (mEnabled)
 		{
+			GameComponent* component;
+
 			TRAVERSE_VECTOR(x, mComponent)
-				mComponent[x]->Update();
+			{
+				component = mComponent[x];
+
+				if (component->mEnabled)
+					component->Update();
+			}
 
 			TRAVERSE_VECTOR(x, mChild)
 				mChild[x]->UpdateComponents();

@@ -1,6 +1,7 @@
 #include <map>
 #include <vector>
 
+#include "Debug.h"
 #include "Model.h"
 #include "Mesh.h"
 #include "Util.h"
@@ -527,7 +528,7 @@ namespace Sentinel
 			}
 			catch (AppException e)
 			{
-				REPORT_ERROR(e.what(), "Model Load Failure");
+				Debug::ShowError(e.what(), "Model Load Failure");
 
 				SAFE_DELETE_ARRAY(vertices);
 				SAFE_DELETE_ARRAY(normals);

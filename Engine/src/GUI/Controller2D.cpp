@@ -2,6 +2,7 @@
 
 #include "GUI\Controller2D.h"
 #include "GameObject.h"
+#include "Exception.h"
 
 namespace Sentinel {
 namespace GUI

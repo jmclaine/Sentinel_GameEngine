@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common.h"
+#include "Sentinel.h"
 #include "Vector3f.h"
 #include "ColorRGBA.h"
 

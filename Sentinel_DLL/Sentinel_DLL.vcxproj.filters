@@ -90,9 +90,6 @@
     <ClInclude Include="..\Engine\src\Vector4f.h">
       <Filter>Source Files\Sentinel_Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\src\MathCommon.h">
-      <Filter>Source Files\Sentinel_Engine\Math</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\Matrix4f.h">
       <Filter>Source Files\Sentinel_Engine\Math</Filter>
     </ClInclude>
@@ -199,9 +196,6 @@
       <Filter>Source Files\Sentinel_Engine\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\Serializable.h">
-      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\Common.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\src\FontSystem.h">
@@ -384,11 +378,38 @@
     <ClInclude Include="..\Engine\src\Component\Controller.h">
       <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\src\MathUtil.h">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\DebugDraw.h">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Types.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Hash.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Sentinel.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\FileUtil.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Exception.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Memory.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\StringStream.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Profile.h">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Engine\src\MathCommon.cpp">
-      <Filter>Source Files\Sentinel_Engine\Math</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\Matrix4f.cpp">
       <Filter>Source Files\Sentinel_Engine\Math</Filter>
     </ClCompile>
@@ -712,6 +733,18 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\Component\Controller.cpp">
       <Filter>Source Files\Sentinel_Engine\Components\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\MathUtil.cpp">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\DebugDraw.cpp">
+      <Filter>Source Files\Sentinel_Engine\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\FileUtil.cpp">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Hash.cpp">
+      <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

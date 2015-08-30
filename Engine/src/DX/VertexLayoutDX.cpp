@@ -1,10 +1,11 @@
 #include "VertexLayoutDX.h"
-#include "Util.h"
+#include "Debug.h"
+#include "Memory.h"
 
 namespace Sentinel
 {
 	VertexLayoutDX::VertexLayoutDX() :
-		mInputLayout( NULL )
+		mInputLayout(NULL)
 	{}
 
 	VertexLayoutDX::~VertexLayoutDX()
@@ -12,95 +13,95 @@ namespace Sentinel
 
 	////////////////////////////////////
 
-	void VertexLayoutDX::SetAttribute( LPCSTR name, DXGI_FORMAT format, UINT size, UINT index )
+	void VertexLayoutDX::SetAttribute(LPCSTR name, DXGI_FORMAT format, UINT size, UINT index)
 	{
-		mInputDesc.push_back( D3D11_INPUT_ELEMENT_DESC() );
+		mInputDesc.push_back(D3D11_INPUT_ELEMENT_DESC());
 
 		D3D11_INPUT_ELEMENT_DESC &desc = mInputDesc.back();
 
-		desc.SemanticName		= name;
-		desc.Format				= format;
-		desc.SemanticIndex		= index;
-		desc.AlignedByteOffset	= mVertexSize;
-		desc.InputSlot			= 0;
-		desc.InputSlotClass		= D3D11_INPUT_PER_VERTEX_DATA;
+		desc.SemanticName = name;
+		desc.Format = format;
+		desc.SemanticIndex = index;
+		desc.AlignedByteOffset = mVertexSize;
+		desc.InputSlot = 0;
+		desc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		desc.InstanceDataStepRate = 0;
 
 		mVertexSize += size;
 	}
 
-	void VertexLayoutDX::AddAttribute( VertexAttribute::Type type )
+	void VertexLayoutDX::AddAttribute(VertexAttribute::Type type)
 	{
-		switch( type )
+		switch (type)
 		{
 		case VertexAttribute::POSITION:
-			SetAttribute( "POSITION", DXGI_FORMAT_R32G32B32_FLOAT, 12 );
+			SetAttribute("POSITION", DXGI_FORMAT_R32G32B32_FLOAT, 12);
 			break;
 
 		case VertexAttribute::NORMAL:
-			SetAttribute( "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT, 12 );
+			SetAttribute("NORMAL", DXGI_FORMAT_R32G32B32_FLOAT, 12);
 			break;
 
 		case VertexAttribute::COLOR:
-			SetAttribute( "COLOR", DXGI_FORMAT_R8G8B8A8_UNORM, 4 );
+			SetAttribute("COLOR", DXGI_FORMAT_R8G8B8A8_UNORM, 4);
 			break;
 
 		case VertexAttribute::TEXCOORD0:
-			SetAttribute( "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT, 8 );
+			SetAttribute("TEXCOORD", DXGI_FORMAT_R32G32_FLOAT, 8);
 			break;
 
 		case VertexAttribute::TEXCOORD1:
-			SetAttribute( "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT, 8, 1 );
+			SetAttribute("TEXCOORD", DXGI_FORMAT_R32G32_FLOAT, 8, 1);
 			break;
 
 		case VertexAttribute::TEXCOORD2:
-			SetAttribute( "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT, 8, 2 );
+			SetAttribute("TEXCOORD", DXGI_FORMAT_R32G32_FLOAT, 8, 2);
 			break;
 
 		case VertexAttribute::QUADCOORD0:
-			SetAttribute( "QUADCOORD", DXGI_FORMAT_R32G32B32A32_FLOAT, 16 );
+			SetAttribute("QUADCOORD", DXGI_FORMAT_R32G32B32A32_FLOAT, 16);
 			break;
 
 		case VertexAttribute::QUADCOORD1:
-			SetAttribute( "QUADCOORD", DXGI_FORMAT_R32G32B32A32_FLOAT, 16, 1 );
+			SetAttribute("QUADCOORD", DXGI_FORMAT_R32G32B32A32_FLOAT, 16, 1);
 			break;
 
 		case VertexAttribute::QUADCOORD2:
-			SetAttribute( "QUADCOORD", DXGI_FORMAT_R32G32B32A32_FLOAT, 16, 2 );
+			SetAttribute("QUADCOORD", DXGI_FORMAT_R32G32B32A32_FLOAT, 16, 2);
 			break;
 
 		case VertexAttribute::TANGENT:
-			SetAttribute( "TANGENT", DXGI_FORMAT_R32G32B32A32_FLOAT, 16 );
+			SetAttribute("TANGENT", DXGI_FORMAT_R32G32B32A32_FLOAT, 16);
 			break;
 
 		case VertexAttribute::BONE_COUNT:
-			SetAttribute( "BONE_COUNT", DXGI_FORMAT_R32_SINT, 4 );
+			SetAttribute("BONE_COUNT", DXGI_FORMAT_R32_SINT, 4);
 			break;
 
 		case VertexAttribute::BONE_INDEX:
-			SetAttribute( "BONE_INDEX", DXGI_FORMAT_R32G32B32A32_SINT, 16 );
+			SetAttribute("BONE_INDEX", DXGI_FORMAT_R32G32B32A32_SINT, 16);
 			break;
-						
+
 		case VertexAttribute::BONE_WEIGHT:
-			SetAttribute( "BONE_WEIGHT", DXGI_FORMAT_R32G32B32A32_FLOAT, 16 );
+			SetAttribute("BONE_WEIGHT", DXGI_FORMAT_R32G32B32A32_FLOAT, 16);
 			break;
 
 		case VertexAttribute::MATRIX:
-			for( UINT x = 0; x < 4; ++x )
+			for (UINT x = 0; x < 4; ++x)
 			{
-				SetAttribute( "MATRIX", DXGI_FORMAT_R32G32B32A32_FLOAT, 16, x );
+				SetAttribute("MATRIX", DXGI_FORMAT_R32G32B32A32_FLOAT, 16, x);
 			}
 			break;
 
 		default:
-			TRACE( "Attempted to add unknown Attribute: " << type );
+			Debug::Log(STREAM("Attempted to add unknown Attribute: " << type));
 			return;
 		}
 
-		mLayout.push_back( type );
+		mLayout.push_back(type);
 	}
 
-	HRESULT VertexLayoutDX::Create( ID3D11Device* device )
+	HRESULT VertexLayoutDX::Create(ID3D11Device* device)
 	{
 		// Creating a dummy shader source is the only
 		// method of creating a valid vertex layout.
@@ -108,11 +109,11 @@ namespace Sentinel
 		std::string source;
 
 		source = "struct VSInput {\n";
-		
+
 		UINT size = (UINT)mLayout.size();
-		for( UINT x = 0; x < size; ++x )
+		for (UINT x = 0; x < size; ++x)
 		{
-			switch( mLayout[ x ] )
+			switch (mLayout[x])
 			{
 			case VertexAttribute::POSITION:
 				source += "float4 Position:POSITION;\n";
@@ -161,7 +162,7 @@ namespace Sentinel
 			case VertexAttribute::BONE_INDEX:
 				source += "int4 BoneIndex:BONE_INDEX;\n";
 				break;
-						
+
 			case VertexAttribute::BONE_WEIGHT:
 				source += "float4 BoneWeight:BONE_WEIGHT;\n";
 				break;
@@ -176,27 +177,27 @@ namespace Sentinel
 		source += "VSInput VS_Main( VSInput input ) { return input; }\n";
 
 		ID3D10Blob* shaderBlob = NULL;
-		
-		if( D3DX11CompileFromMemory( source.c_str(), source.size(), 0, 0, NULL, 
-									 "VS_Main", "vs_4_0", 
-									 D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &shaderBlob, NULL, NULL ) == S_FALSE )
+
+		if (D3DX11CompileFromMemory(source.c_str(), source.size(), 0, 0, NULL,
+			"VS_Main", "vs_4_0",
+			D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &shaderBlob, NULL, NULL) == S_FALSE)
 		{
-			SAFE_RELEASE_PTR( shaderBlob );
+			SAFE_RELEASE_PTR(shaderBlob);
 
 			return S_FALSE;
 		}
-			
-		HRESULT result = Create( device, shaderBlob );
 
-		SAFE_RELEASE_PTR( shaderBlob );
+		HRESULT result = Create(device, shaderBlob);
+
+		SAFE_RELEASE_PTR(shaderBlob);
 
 		return result;
 	}
 
-	HRESULT VertexLayoutDX::Create( ID3D11Device* device, ID3D10Blob* shaderBlob )
+	HRESULT VertexLayoutDX::Create(ID3D11Device* device, ID3D10Blob* shaderBlob)
 	{
-		return device->CreateInputLayout( mInputDesc.data(), mInputDesc.size(), 
-										  shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), 
-										  &mInputLayout );
+		return device->CreateInputLayout(mInputDesc.data(), mInputDesc.size(),
+			shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(),
+			&mInputLayout);
 	}
 }

@@ -8,7 +8,9 @@
 
 #pragma comment (lib, "libvorbis_static.lib" )
 
+#include "Types.h"
 #include "Util.h"
+#include "Debug.h"
 #include "AudioSystem.h"
 #include "Sound.h"
 #include "Archive.h"
@@ -17,18 +19,18 @@
 namespace Sentinel
 {
 
-#define CHECK_AUDIO_ERROR( msg )\
-	if( alGetError() != AL_NO_ERROR )\
-		AUDIO_ERROR( msg );
+#define CHECK_AUDIO_ERROR(msg)\
+	if (alGetError() != AL_NO_ERROR)\
+		AUDIO_ERROR(msg);
 
-#define AUDIO_ERROR( msg )\
+#define AUDIO_ERROR(msg)\
 {	delete audio;\
-	REPORT_ERROR( msg, "Audio Error" );\
-	return NULL;	}
+	Debug::ShowError(STREAM(msg), STREAM("Audio Error"));\
+	return NULL; }
 
-#define CHECK_AUDIO_SOURCE_ERROR( msg )\
-	if( alGetError() != AL_NO_ERROR )\
-		REPORT_ERROR( msg, "Audio Error" );
+#define CHECK_AUDIO_SOURCE_ERROR(msg)\
+	if (alGetError() != AL_NO_ERROR)\
+		Debug::ShowError(STREAM(msg), STREAM("Audio Error"));
 
 	/////////////////////////////////////////
 
@@ -46,37 +48,37 @@ namespace Sentinel
 
 		~SoundAL()
 		{
-			alDeleteSources( 1, &mSource );
-			alDeleteBuffers( 1, &mBuffer );
+			alDeleteSources(1, &mSource);
+			alDeleteBuffers(1, &mBuffer);
 		}
 
 		/////////////////////////////////
 
 		void Play()
 		{
-			alSourcef ( mSource, AL_PITCH,    mPitch );
-			alSourcef ( mSource, AL_GAIN,     mGain );
-			alSourcefv( mSource, AL_POSITION, mPosition.Ptr() );
-			alSourcefv( mSource, AL_VELOCITY, mVelocity.Ptr() );
-			alSourcei ( mSource, AL_LOOPING,  (mLoop) ? AL_TRUE : AL_FALSE );
-    
-			alSourcePlay( mSource );
-		
-			CHECK_AUDIO_SOURCE_ERROR( "Failed to play sound." );
+			alSourcef(mSource, AL_PITCH, mPitch);
+			alSourcef(mSource, AL_GAIN, mGain);
+			alSourcefv(mSource, AL_POSITION, mPosition.Ptr());
+			alSourcefv(mSource, AL_VELOCITY, mVelocity.Ptr());
+			alSourcei(mSource, AL_LOOPING, (mLoop) ? AL_TRUE : AL_FALSE);
+
+			alSourcePlay(mSource);
+
+			CHECK_AUDIO_SOURCE_ERROR("Failed to play sound.");
 		}
 
 		void Pause()
 		{
-			alSourcePause( mSource );
+			alSourcePause(mSource);
 
-			CHECK_AUDIO_SOURCE_ERROR( "Failed to pause sound." );
+			CHECK_AUDIO_SOURCE_ERROR("Failed to pause sound.");
 		}
 
 		void Stop()
 		{
-			alSourceStop( mSource );
+			alSourceStop(mSource);
 
-			CHECK_AUDIO_SOURCE_ERROR( "Failed to stop sound." );
+			CHECK_AUDIO_SOURCE_ERROR("Failed to stop sound.");
 		}
 	};
 
@@ -98,43 +100,52 @@ namespace Sentinel
 
 		~AudioSystemAL()
 		{
-			alcMakeContextCurrent( NULL );
-			alcDestroyContext( mContext );
-			alcCloseDevice( mDevice );
+			alcMakeContextCurrent(NULL);
+			alcDestroyContext(mContext);
+			alcCloseDevice(mDevice);
 		}
 
 		void Init()
 		{
-			mDevice = alcOpenDevice( NULL );
-			if( !mDevice )
+			mDevice = alcOpenDevice(NULL);
+			if (!mDevice)
 			{
-				REPORT_ERROR( "Could not open audio device!", "Audio Error" );
+				Debug::ShowError(
+					"Could not open audio device!", 
+					"Audio Error");
+
 				return;
 			}
 
-			mContext = alcCreateContext( mDevice, NULL );
-			if( mContext == NULL || alcMakeContextCurrent( mContext ) == ALC_FALSE )
+			mContext = alcCreateContext(mDevice, NULL);
+			if (mContext == NULL || alcMakeContextCurrent(mContext) == ALC_FALSE)
 			{
-				if( mContext != NULL )
-					alcDestroyContext( mContext );
+				if (mContext != NULL)
+					alcDestroyContext(mContext);
 
-				alcCloseDevice( mDevice );
+				alcCloseDevice(mDevice);
 
-				REPORT_ERROR( "Could not set an audio context!", "Audio Error" );
+				Debug::ShowError(
+					"Could not set an audio context!", 
+					"Audio Error");
+
 				return;
 			}
 		}
 
 		//////////////////////////////////
 
-		Sound* CreateSound( const char* filename )
+		Sound* CreateSound(const char* filename)
 		{
-			TRACE( "Loading '" << filename << "'..." );
+			Debug::Log(STREAM("Loading '" << filename << "'..."));
 
 			Archive archive;
-			if( !archive.Open( filename, "rb" ))
+			if (!archive.Open(filename, "rb"))
 			{
-				REPORT_ERROR( "Failed to load '" << filename << "'", "Audio Error" );
+				Debug::ShowError(
+					STREAM("Failed to load '" << filename << "'"),
+					STREAM("Audio Error"));
+
 				return NULL;
 			}
 
@@ -142,19 +153,22 @@ namespace Sentinel
 
 			// Determine what file format to load by checking the last three chars.
 			//
-			int len = strlen( filename );
-			if( toupper(filename[ len-3 ]) == 'W' && toupper(filename[ len-2 ]) == 'A' && toupper(filename[ len-1 ]) == 'V' )
+			int len = strlen(filename);
+
+			if (toupper(filename[len - 3]) == 'W' && toupper(filename[len - 2]) == 'A' && toupper(filename[len - 1]) == 'V')
 			{
-				audio = CreateSoundWAV( archive );
+				audio = CreateSoundWAV(archive);
+			}
+			else if (toupper(filename[len - 3]) == 'O' && toupper(filename[len - 2]) == 'G' && toupper(filename[len - 1]) == 'G')
+			{
+				audio = CreateSoundOGG(archive);
 			}
 			else
-			if( toupper(filename[ len-3 ]) == 'O' && toupper(filename[ len-2 ]) == 'G' && toupper(filename[ len-1 ]) == 'G' )
 			{
-				audio = CreateSoundOGG( archive );
-			}
-			else
-			{
-				REPORT_ERROR( "Sound format not supported.", "Audio Error" );
+				Debug::ShowError(
+					"Sound format not supported.", 
+					"Audio Error");
+
 				return NULL;
 			}
 
@@ -163,36 +177,36 @@ namespace Sentinel
 			return audio;
 		}
 
-		Sound* CreateSound( Archive& archive )
+		Sound* CreateSound(Archive& archive)
 		{
 			SoundAL* source = new SoundAL();
 
-			source->Load( archive );
-			
+			source->Load(archive);
+
 			// Create buffer and source.
 			//
-			alGenBuffers( 1, &source->mBuffer );
-			alGenSources( 1, &source->mSource );
+			alGenBuffers(1, &source->mBuffer);
+			alGenSources(1, &source->mSource);
 
 			// Uncompress sound.
 			//
 			ULONG bound = (ULONG)source->mBoundSize;
-			BYTE* data = (BYTE*)malloc( source->mBoundSize );
-			uncompress( data, &bound, source->mData, source->mDataSize );
+			BYTE* data = (BYTE*)malloc(source->mBoundSize);
+			uncompress(data, &bound, source->mData, source->mDataSize);
 
 			// Create sound buffer.
 			//
-			alBufferData( source->mBuffer, source->mFormat, data, bound, source->mSampleRate );
-			alSourcei( source->mSource, AL_BUFFER, source->mBuffer );
+			alBufferData(source->mBuffer, source->mFormat, data, bound, source->mSampleRate);
+			alSourcei(source->mSource, AL_BUFFER, source->mBuffer);
 
-			free( data );
+			free(data);
 
-			CHECK_AUDIO_SOURCE_ERROR( "Error creating sound buffer." );
-			
+			CHECK_AUDIO_SOURCE_ERROR("Error creating sound buffer.");
+
 			return source;
 		}
 
-		Sound* CreateSoundWAV( Archive& archive )
+		Sound* CreateSoundWAV(Archive& archive)
 		{
 			char  type[4];
 			DWORD size, chunkSize;
@@ -200,118 +214,130 @@ namespace Sentinel
 			DWORD sampleRate, avgBytesPerSec;
 			short bytesPerSample, bitsPerSample;
 			DWORD dataSize;
-    
+
 			// Check for valid WAV file.
 			//
-			archive.Read( type, 4 );
-			if( type[0] != 'R' || type[1] != 'I' || type[2] != 'F' || type[3] != 'F' )
+			archive.Read(type, 4);
+			if (type[0] != 'R' || type[1] != 'I' || type[2] != 'F' || type[3] != 'F')
 			{
-				REPORT_ERROR( "Invalid format.", "Audio Error" );
+				Debug::ShowError(
+					"Invalid format.", 
+					"Audio Error");
+
 				return NULL;
 			}
 
-			archive.Read( &size );
-			archive.Read( type, 4 );
-			if( type[0] != 'W' || type[1] != 'A' || type[2] != 'V' || type[3] != 'E' )
+			archive.Read(&size);
+			archive.Read(type, 4);
+			if (type[0] != 'W' || type[1] != 'A' || type[2] != 'V' || type[3] != 'E')
 			{
-				REPORT_ERROR( "Invalid format.", "Audio Error" );
+				Debug::ShowError(
+					"Invalid format.", 
+					"Audio Error");
+
 				return NULL;
 			}
 
-			archive.Read( type, 4 );
-			if( type[0] != 'f' || type[1] != 'm' || type[2] != 't' || type[3] != ' ' )
+			archive.Read(type, 4);
+			if (type[0] != 'f' || type[1] != 'm' || type[2] != 't' || type[3] != ' ')
 			{
-				REPORT_ERROR( "Invalid format.", "Audio Error" );
+				Debug::ShowError(
+					"Invalid format.", 
+					"Audio Error");
+
 				return NULL;
 			}
-			
+
 			// Read WAV info.
 			//
-			archive.Read( &chunkSize );
-			archive.Read( &formatType );
-			archive.Read( &channels );
-			archive.Read( &sampleRate );
-			archive.Read( &avgBytesPerSec );
-			archive.Read( &bytesPerSample );
-			archive.Read( &bitsPerSample );
-    
-			archive.Read( type, 4 );
-			if( type[0] != 'd' || type[1] != 'a' || type[2] != 't' || type[3] != 'a' )
+			archive.Read(&chunkSize);
+			archive.Read(&formatType);
+			archive.Read(&channels);
+			archive.Read(&sampleRate);
+			archive.Read(&avgBytesPerSec);
+			archive.Read(&bytesPerSample);
+			archive.Read(&bitsPerSample);
+
+			archive.Read(type, 4);
+			if (type[0] != 'd' || type[1] != 'a' || type[2] != 't' || type[3] != 'a')
 			{
-				REPORT_ERROR( "Invalid format.", "Audio Error" );
+				Debug::ShowError(
+					"Invalid format.", 
+					"Audio Error");
+
 				return NULL;
 			}
-			
+
 			// Create audio source.
 			//
-			SoundAL* audio  = new SoundAL();
+			SoundAL* audio = new SoundAL();
 			ALenum		   format = 0;
 
 			// Read sound data.
 			//
-			archive.Read( &dataSize );
-    
-			BYTE* data = (BYTE*)malloc( dataSize );
+			archive.Read(&dataSize);
 
-			archive.Read( data, dataSize );
+			BYTE* data = (BYTE*)malloc(dataSize);
+
+			archive.Read(data, dataSize);
 
 			// Create buffer and source.
 			//
-			alGenBuffers( 1, &audio->mBuffer );
-			alGenSources( 1, &audio->mSource );
+			alGenBuffers(1, &audio->mBuffer);
+			alGenSources(1, &audio->mSource);
 
-			CHECK_AUDIO_ERROR( "Failed to generate source." );
-			
+			CHECK_AUDIO_ERROR("Failed to generate source.");
+
 			// Determine audio format.
 			//
-			if( bitsPerSample == 8 )
+			if (bitsPerSample == 8)
 			{
-				if( channels == 1 )
+				if (channels == 1)
 					format = AL_FORMAT_MONO8;
 				else
-				if( channels == 2 )
-					format = AL_FORMAT_STEREO8;
+					if (channels == 2)
+						format = AL_FORMAT_STEREO8;
 			}
 			else
-			if( bitsPerSample == 16 )
-			{
-				if( channels == 1 )
-					format = AL_FORMAT_MONO16;
-				else
-				if( channels == 2 )
-					format = AL_FORMAT_STEREO16;
-			}
-			
-			if( !format )
-				AUDIO_ERROR( "Invalid sample rate." );
-			
-			audio->mFormat     = format;
+				if (bitsPerSample == 16)
+				{
+					if (channels == 1)
+						format = AL_FORMAT_MONO16;
+					else
+						if (channels == 2)
+							format = AL_FORMAT_STEREO16;
+				}
+
+			if (!format)
+				AUDIO_ERROR("Invalid sample rate.");
+
+			audio->mFormat = format;
 			audio->mSampleRate = sampleRate;
 
 			// Create sound buffer.
 			//
-			alBufferData( audio->mBuffer, audio->mFormat, data, dataSize, audio->mSampleRate );
-			alSourcei( audio->mSource, AL_BUFFER, audio->mBuffer );
+			alBufferData(audio->mBuffer, audio->mFormat, data, dataSize, audio->mSampleRate);
+			alSourcei(audio->mSource, AL_BUFFER, audio->mBuffer);
 
 			// Compress sound data and store it.
 			//
-			ULONG bound = compressBound( dataSize );
-			audio->mData = (BYTE*)malloc( bound );
-			compress( audio->mData, &bound, data, dataSize );
-			
-			audio->mDataSize  = (UINT)bound;
+			ULONG bound = compressBound(dataSize);
+			audio->mData = (BYTE*)malloc(bound);
+			compress(audio->mData, &bound, data, dataSize);
+
+			audio->mDataSize = (UINT)bound;
 			audio->mBoundSize = dataSize;
 
-			free( data );
+			free(data);
 
-			CHECK_AUDIO_ERROR( "Error creating sound buffer." );
-			
+			CHECK_AUDIO_ERROR("Error creating sound buffer.");
+
 			return audio;
 		}
 
 #define BUFFER_SIZE 32767
 
-		Sound* CreateSoundOGG( Archive& archive )
+		Sound* CreateSoundOGG(Archive& archive)
 		{
 			/*
 			int				endian = 0;	// 0 for Little-Endian, 1 for Big-Endian
@@ -320,37 +346,37 @@ namespace Sentinel
 			char			array[ BUFFER_SIZE ];
 			ALenum			format;
 			ALsizei			freq;
-			
+
 			vorbis_info*	pInfo;
 			OggVorbis_File	oggFile;
 
 			if( ov_open( archive.mFile, &oggFile, NULL, 0 ) != 0 )
 			{
-				REPORT_ERROR( "Error decoding...", "Audio Error" );
-				return NULL;
+			REPORT_ERROR( "Error decoding...", "Audio Error" );
+			return NULL;
 			}
-			
+
 			pInfo = ov_info( &oggFile, -1 );
 
 			if( pInfo->channels == 1 )
-				format = AL_FORMAT_MONO16;
+			format = AL_FORMAT_MONO16;
 			else
-				format = AL_FORMAT_STEREO16;
-			
+			format = AL_FORMAT_STEREO16;
+
 			freq = pInfo->rate;
 
 			do
 			{
-				bytes = ov_read( &oggFile, array, BUFFER_SIZE, endian, 2, 1, &bitStream );
+			bytes = ov_read( &oggFile, array, BUFFER_SIZE, endian, 2, 1, &bitStream );
 
-				if( bytes < 0 )
-				{
-					ov_clear( &oggFile );
-					REPORT_ERROR( "Error reading...", "Audio Error" );
-					return NULL;
-				}
-				
-				buffer.insert(buffer.end(), array, array + bytes);
+			if( bytes < 0 )
+			{
+			ov_clear( &oggFile );
+			REPORT_ERROR( "Error reading...", "Audio Error" );
+			return NULL;
+			}
+
+			buffer.insert(buffer.end(), array, array + bytes);
 			}
 			while (bytes > 0);
 
@@ -359,21 +385,21 @@ namespace Sentinel
 			return NULL;
 		}
 
-		void SetListenerPosition( const Vector3f& position )
+		void SetListenerPosition(const Vector3f& position)
 		{
-			alListenerfv( AL_POSITION, position.Ptr() );
+			alListenerfv(AL_POSITION, position.Ptr());
 		}
 
-		void SetListenerVelocity( const Vector3f& velocity )
+		void SetListenerVelocity(const Vector3f& velocity)
 		{
-			alListenerfv( AL_VELOCITY, velocity.Ptr() );
+			alListenerfv(AL_VELOCITY, velocity.Ptr());
 		}
 
-		void SetListenerOrientation( const Vector3f& direction, const Vector3f& up )
+		void SetListenerOrientation(const Vector3f& direction, const Vector3f& up)
 		{
 			float orientation[] = { direction.x, direction.y, direction.z, up.x, up.y, up.z };
 
-			alListenerfv( AL_ORIENTATION, orientation );
+			alListenerfv(AL_ORIENTATION, orientation);
 		}
 	};
 

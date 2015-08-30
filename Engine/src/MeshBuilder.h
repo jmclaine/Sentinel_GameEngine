@@ -19,7 +19,8 @@ the correct amount of memory before adding them to the list.
 #include <memory>
 #include <vector>
 
-#include "Common.h"
+#include "Sentinel.h"
+#include "Types.h"
 #include "RendererTypes.h"
 #include "Vector2f.h"
 #include "Vector3f.h"

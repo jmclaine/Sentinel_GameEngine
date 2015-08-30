@@ -1,4 +1,4 @@
-#include "MathCommon.h"
+#include "MathUtil.h"
 #include "Quatf.h"
 
 namespace Sentinel
@@ -7,7 +7,8 @@ namespace Sentinel
 
 	////////////////////////////////
 
-	Quatf::Quatf() : x(0), y(0), z(0), w(1)
+	Quatf::Quatf() : 
+		x(0), y(0), z(0), w(1)
 	{}
 
 	Quatf::Quatf(float _pitch, float _yaw, float _roll)
@@ -66,7 +67,8 @@ namespace Sentinel
 		//	(Q1 * Q2).x = (w1x2 + x1w2 + y1z2 - z1y2)
 		//	(Q1 * Q2).y = (w1y2 - x1z2 + y1w2 + z1x2)
 		//	(Q1 * Q2).z = (w1z2 + x1y2 - y1x2 + z1w2)
-		return Quatf(w*q.x + x*q.w + y*q.z - z*q.y,
+		return Quatf(
+			w*q.x + x*q.w + y*q.z - z*q.y,
 			w*q.y - x*q.z + y*q.w + z*q.x,
 			w*q.z + x*q.y - y*q.x + z*q.w,
 			w*q.w - x*q.x - y*q.y - z*q.z);
@@ -186,12 +188,14 @@ namespace Sentinel
 		float y_y = y*y;
 		float py = w*y - z*x;
 
-		v.x = (float)atan2(2 * (x*w + y*z),
+		v.x = (float)atan2(
+			2 * (x*w + y*z),
 			1 - 2 * (x*x + y_y));
 
 		v.y = (float)asin(2 * py);
 
-		v.z = (float)atan2(2 * (z*w + y*x),
+		v.z = (float)atan2(
+			2 * (z*w + y*x),
 			1 - 2 * (y_y + z*z));
 
 		if (py >= 0.499f)
@@ -199,12 +203,11 @@ namespace Sentinel
 			v.x = (float)(-2 * atan2(x, w));
 			v.z = 0;
 		}
-		else
-			if (py <= -0.499f)
-			{
-				v.x = (float)(2 * atan2(x, w));
-				v.z = 0;
-			}
+		else if (py <= -0.499f)
+		{
+			v.x = (float)(2 * atan2(x, w));
+			v.z = 0;
+		}
 
 		for (int i = 0; i < 3; ++i)
 			if (v[i] > -EPSILON && v[i] < EPSILON)
@@ -233,7 +236,8 @@ namespace Sentinel
 			float s1 = sin(sign * t * theta);
 			float d = 1.0f / sin(theta);
 
-			return Quatf((x * s0 + q.x * s1) * d,
+			return Quatf(
+				(x * s0 + q.x * s1) * d,
 				(y * s0 + q.y * s1) * d,
 				(z * s0 + q.z * s1) * d,
 				(w * s0 + q.w * s1) * d);
@@ -249,21 +253,24 @@ namespace Sentinel
 	//
 	Vector3f Quatf::Forward() const
 	{
-		return Vector3f(-2 * (x * z + w * y),
+		return Vector3f(
+			-2 * (x * z + w * y),
 			-2 * (y * z - w * x),
 			-1 + 2 * (x * x + y * y)).NormalizeFast();
 	}
 
 	Vector3f Quatf::Up() const
 	{
-		return Vector3f(2 * (x * y - w * z),
+		return Vector3f(
+			2 * (x * y - w * z),
 			1 - 2 * (x * x + z * z),
 			2 * (y * z + w * x)).NormalizeFast();
 	}
 
 	Vector3f Quatf::Right() const
 	{
-		return Vector3f(1 - 2 * (y * y + z * z),
+		return Vector3f(
+			1 - 2 * (y * y + z * z),
 			2 * (x * y + w * z),
 			2 * (x * z - w * y)).NormalizeFast();
 	}

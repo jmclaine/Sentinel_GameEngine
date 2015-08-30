@@ -11,7 +11,7 @@ ensure a smooth transition between them.
 */
 #include <memory>
 
-#include "Common.h"
+#include "Sentinel.h"
 #include "Archive.h"
 #include "PhysicsShape.h"
 

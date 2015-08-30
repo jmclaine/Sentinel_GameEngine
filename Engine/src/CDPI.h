@@ -9,7 +9,7 @@ namespace Sentinel
 	{
 	public:
 		CDPI() : _fInitialized(false), _dpiX(96), _dpiY(96) { }
-    
+
 		// Get screen DPI.
 		int GetDPIX() { _Init(); return _dpiX; }
 		int GetDPIY() { _Init(); return _dpiY; }
@@ -34,9 +34,9 @@ namespace Sentinel
 		}
 		// Determine if screen resolution meets minimum requirements in relative
 		// pixels.
-		bool IsResolutionAtLeast(int cxMin, int cyMin) 
-		{ 
-			return (ScaledScreenWidth() >= cxMin) && (ScaledScreenHeight() >= cyMin); 
+		bool IsResolutionAtLeast(int cxMin, int cyMin)
+		{
+			return (ScaledScreenWidth() >= cxMin) && (ScaledScreenHeight() >= cyMin);
 		}
 
 		// Convert a point size (1/72 of an inch) to raw pixels.
@@ -61,16 +61,16 @@ namespace Sentinel
 			}
 		}
 
-		int _ScaledSystemMetricX(int nIndex) 
-		{ 
-			_Init(); 
-			return MulDiv(GetSystemMetrics(nIndex), 96, _dpiX); 
+		int _ScaledSystemMetricX(int nIndex)
+		{
+			_Init();
+			return MulDiv(GetSystemMetrics(nIndex), 96, _dpiX);
 		}
 
-		int _ScaledSystemMetricY(int nIndex) 
-		{ 
-			_Init(); 
-			return MulDiv(GetSystemMetrics(nIndex), 96, _dpiY); 
+		int _ScaledSystemMetricY(int nIndex)
+		{
+			_Init();
+			return MulDiv(GetSystemMetrics(nIndex), 96, _dpiY);
 		}
 	private:
 		bool _fInitialized;

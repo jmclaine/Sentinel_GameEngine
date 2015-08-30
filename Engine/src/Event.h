@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <functional>
 
-#include "Common.h"
+#include "Sentinel.h"
 #include "Util.h"
 
 #define DELEGATE(type) std::function<type>

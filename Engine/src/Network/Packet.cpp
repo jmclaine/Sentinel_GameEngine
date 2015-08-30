@@ -1,5 +1,8 @@
 #include "Network/Packet.h"
 #include "Network/Socket.h"
+#include "Debug.h"
+#include "MathUtil.h"
+#include "FileUtil.h"
 
 namespace Sentinel {
 namespace Network
@@ -167,7 +170,7 @@ namespace Network
 			//
 			if (pHeader->mType >= HEADER_UNKNOWN)
 			{
-				TRACE("Bad Header!");
+				Debug::Log("Bad Header!");
 
 				return false;
 			}
@@ -224,7 +227,7 @@ namespace Network
 					}
 					else
 					{
-						TRACE("Attempted GHeader Size: " << size);
+						Debug::Log(STREAM("Attempted GHeader Size: " << size));
 
 						return false;
 					}
@@ -295,7 +298,7 @@ namespace Network
 					}
 					else if (!(pHeader->mType & HEADER_CLIENT))
 					{
-						TRACE("Received NetworkPacket from Invalid ID #" << pHeader->mSenderID);
+						Debug::Log(STREAM("Received NetworkPacket from Invalid ID #" << pHeader->mSenderID));
 
 						return false;
 					}
@@ -318,7 +321,7 @@ namespace Network
 					else if (pHeader->mType & HEADER_ACK)
 					{
 						++connection->mIndexRTT;
-						wrap(connection->mIndexRTT, 0, MAX_RTT_COUNT - 1);
+						WRAP(connection->mIndexRTT, 0, (MAX_RTT_COUNT - 1));
 
 						connection->mAverageRTT = 0;
 						for (UINT x = 0; x < MAX_RTT_COUNT; ++x)
@@ -342,7 +345,7 @@ namespace Network
 						connection->mEndRTT[connection->mIndexRTT] = (*it)->mTotalTime;
 						sender.erase(it);
 
-						//TRACE( "ACK #" << ack << " from " << connection->mUserName );
+						//Debug::Log( "ACK #" << ack << " from " << connection->mUserName );
 					}
 					// Setup a client on the server.
 					//
@@ -363,11 +366,11 @@ namespace Network
 
 								if (connection->mStatus == Socket::STATUS_FAIL)
 								{
-									TRACE(connection->mUserName << " Reconnected.");
+									Debug::Log(STREAM(connection->mUserName << " Reconnected."));
 								}
 								else
 								{
-									TRACE(connection->mUserName << " Connected.");
+									Debug::Log(STREAM(connection->mUserName << " Connected."));
 								}
 
 								connection->mStatus = Socket::STATUS_GOOD;
@@ -376,12 +379,14 @@ namespace Network
 							{
 								// UDP client logging into server.
 								//
-								REPORT_ERROR("This should not have happened.", "NetworkSocket Failure");
+								Debug::ShowError(
+									"This should not have happened.",
+									"NetworkSocket Failure");
 
 								connection->mID = mSocket->mNextID++;
 								strcpy_s(connection->mUserName, name.c_str());
 
-								TRACE(connection->mUserName << " Logged In.");
+								Debug::Log(STREAM(connection->mUserName << " Logged In."));
 							}
 						}
 						else
@@ -395,7 +400,7 @@ namespace Network
 
 							mSocket->mConnection[connection->mID] = connection;
 
-							TRACE(connection->mUserName << " Logged In.");
+							Debug::Log(STREAM(connection->mUserName << " Logged In."));
 						}
 
 						// Overwrite the client ID so that the server
@@ -408,7 +413,7 @@ namespace Network
 							connection->mStatus = Socket::STATUS_GOOD;
 							connection->mConnectionTimer = 0;
 
-							TRACE("Assigned ID: " << pHeader->mSenderID);
+							Debug::Log(STREAM("Assigned ID: " << pHeader->mSenderID));
 
 							// Send the client its ID on the server.
 							//
@@ -424,7 +429,7 @@ namespace Network
 					{
 						connection = mSocket->mConnection[0];
 
-						TRACE("Logged In --> " << connection->mUserName);
+						Debug::Log(STREAM("Logged In --> " << connection->mUserName));
 
 						// Set the current order number.
 						//
@@ -436,13 +441,14 @@ namespace Network
 							connection->mID = *(UINT*)mPosition;
 						}
 
-						TRACE("Assigned ID: " << connection->mID);
+						Debug::Log(STREAM("Assigned ID: " << connection->mID));
 					}
 					else
 					{
-						TRACE("Invalid Header Received" << "; Type: " << pHeader->mType <<
+						Debug::Log(STREAM(
+							"Invalid Header Received" << "; Type: " << pHeader->mType <<
 							"; Sender: " << pHeader->mSenderID <<
-							"; Size: " << pHeader->mSize);
+							"; Size: " << pHeader->mSize));
 
 						return false;
 					}
@@ -451,7 +457,7 @@ namespace Network
 					//
 					if (pHeader->mType & HEADER_GUARANTEED)
 					{
-						//TRACE( "Sending ACK #" << gHeader->ack << " --> " << mCurrReceiver->userName );
+						//Debug::Log( "Sending ACK #" << gHeader->ack << " --> " << mCurrReceiver->userName );
 
 						mSender->AddHeader(HEADER_ACK);
 						mSender->AddValue((UINT)gHeader->mACK);

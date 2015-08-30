@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "Common.h"
+#include "Sentinel.h"
 #include "ColorRGBA.h"
 #include "RendererTypes.h"
 

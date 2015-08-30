@@ -3,7 +3,7 @@
 #include <exception>
 #include <typeinfo>
 
-#include "Common.h"
+#include "Sentinel.h"
 #include "Serializable.h"
 #include "Archive.h"
 

@@ -2,9 +2,17 @@
 #include "TextureGL.h"
 #include "VertexLayoutGL.h"
 #include "Archive.h"
+#include "Debug.h"
+#include "Memory.h"
 
 namespace Sentinel
 {
+#define S_OK 0
+#define S_FALSE 1
+
+#define APPLY_SAMPLER(target, pname, param)\
+	glTexParameteri(target, pname, param);
+
 	/*
 	#define APPLY_SAMPLER( target, pname, param )\
 	if( CURR_STATE.param != param )\
@@ -13,8 +21,6 @@ namespace Sentinel
 	CURR_STATE.param = param;\
 	}
 	*/
-#define APPLY_SAMPLER(target, pname, param)\
-	glTexParameteri(target, pname, param);
 
 	ShaderGL::SamplerGL::SamplerGL(
 		GLint wrapS, GLint wrapT,
@@ -224,12 +230,14 @@ namespace Sentinel
 	{
 		if (Archive::ToBuffer(filename.c_str(), mSource) == 0)
 		{
-			REPORT_ERROR("Could not open '" << filename << "'", "Shader Loader Error");
+			Debug::ShowError(
+				STREAM("Could not open '" << filename << "'"),
+				STREAM("Shader Loader Error"));
 
 			return S_FALSE;
 		}
 
-		TRACE("Compiling '" << filename << "'...");
+		Debug::Log(STREAM("Compiling '" << filename << "'..."));
 
 		return CreateFromMemory(mSource);
 	}
@@ -241,7 +249,11 @@ namespace Sentinel
 		mProgram = glCreateProgram();
 
 		if (mProgram < 0)
-			REPORT_ERROR("Could not create shader program.", "Shader Loader Error");
+		{
+			Debug::ShowError(
+				"Could not create shader program.",
+				"Shader Loader Error");
+		}
 
 		// Compile Vertex Shader.
 		//
@@ -279,7 +291,7 @@ namespace Sentinel
 			glAttachShader(mProgram, mFragmentShader);
 		}
 
-		TRACE("Shader Compiled Successfully!");
+		Debug::Log("Shader Compiled Successfully!");
 
 		// Link the shaders.
 		//
@@ -301,8 +313,8 @@ namespace Sentinel
 
 			glGetProgramInfoLog(mProgram, length, &length, compileLog);
 
-			TRACE("\nLink Shader Log");
-			TRACE(compileLog);
+			Debug::Log("\nLink Shader Log");
+			Debug::Log(compileLog);
 
 			free(compileLog);
 
@@ -396,7 +408,7 @@ namespace Sentinel
 				mSampler[index] = new SamplerGL();
 		}
 
-		TRACE("Shader Created Successfully!");
+		Debug::Log("Shader Created Successfully!");
 
 		return S_OK;
 	}
@@ -431,19 +443,19 @@ namespace Sentinel
 			switch (type)
 			{
 			case GL_VERTEX_SHADER:
-				TRACE("\nVertex Shader Compile Log");
+				Debug::Log("\nVertex Shader Compile Log");
 				break;
 
 			case GL_GEOMETRY_SHADER:
-				TRACE("\nGeometry Shader Compile Log");
+				Debug::Log("\nGeometry Shader Compile Log");
 				break;
 
 			case GL_FRAGMENT_SHADER:
-				TRACE("\nFragment Shader Compile Log");
+				Debug::Log("\nFragment Shader Compile Log");
 				break;
 			}
 
-			TRACE(compileLog);
+			Debug::Log(compileLog);
 
 			free(compileLog);
 

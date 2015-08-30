@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common.h"
+#include "Sentinel.h"
 #include "Serializable.h"
 #include "ColorRGBA.h"
 #include "Vector3f.h"
@@ -8,7 +8,7 @@
 namespace Sentinel
 {
 	class Particle;
-	
+
 	////////////////////////////////////////////////////////////////////////////
 	// Base particle effect.
 	//
@@ -16,24 +16,24 @@ namespace Sentinel
 	{
 	public:
 
-		float		mStartTime;
+		float mStartTime;
 
 	protected:
 
 		ParticleEffect();
-		ParticleEffect( float startTime );
+		ParticleEffect(float startTime);
 
 	public:
 
-		virtual void Startup( Particle& particle );
+		virtual void Startup(Particle& particle);
 
-		virtual void Update( Particle& particle );
+		virtual void Update(Particle& particle);
 
 		//////////////////////////////////////
 
-		virtual void Save( Archive& archive );
+		virtual void Save(Archive& archive);
 
-		virtual void Load( Archive& archive );
+		virtual void Load(Archive& archive);
 	};
 
 	////////////////////////////////////////////////////////////////////////////
@@ -46,19 +46,19 @@ namespace Sentinel
 
 	protected:
 
-		UINT		mFrame;
-		
+		UINT mFrame;
+
 		//////////////////////////////////////
 
 		TextureEffect();
 
 	public:
 
-		TextureEffect( float startTime, UINT frame );
+		TextureEffect(float startTime, UINT frame);
 
 		//////////////////////////////////////
 
-		void		Startup( Particle& particle );
+		void Startup(Particle& particle);
 	};
 
 	class SENTINEL_DLL RandomTextureEffect : public TextureEffect
@@ -68,19 +68,19 @@ namespace Sentinel
 	protected:
 
 		// uses mFrame as min
-		UINT		mMaxFrame;
+		UINT mMaxFrame;
 
 		//////////////////////////////////////
-		
+
 		RandomTextureEffect();
 
 	public:
 
-		RandomTextureEffect( float startTime, UINT minFrame, UINT maxFrame );
+		RandomTextureEffect(float startTime, UINT minFrame, UINT maxFrame);
 
 		//////////////////////////////////////
 
-		void		Startup( Particle& particle );
+		void Startup(Particle& particle);
 	};
 
 	////////////////////////////////////////////////////////////////////////////
@@ -93,19 +93,19 @@ namespace Sentinel
 
 	protected:
 
-		ColorRGBA	mColor;
+		ColorRGBA mColor;
 
 		//////////////////////////////////////
 
 		ColorEffect();
-		
+
 	public:
 
-		ColorEffect( float startTime, const ColorRGBA& color );
+		ColorEffect(float startTime, const ColorRGBA& color);
 
 		//////////////////////////////////////
 
-		virtual void Startup( Particle& particle );
+		virtual void Startup(Particle& particle);
 	};
 
 	class SENTINEL_DLL RandomColorEffect : public ColorEffect
@@ -115,19 +115,19 @@ namespace Sentinel
 	protected:
 
 		// uses mColor as min
-		ColorRGBA	mMaxColor;
+		ColorRGBA mMaxColor;
 
 		//////////////////////////////////////
 
 		RandomColorEffect();
-		
+
 	public:
 
-		RandomColorEffect( float startTime, const ColorRGBA& minColor, const ColorRGBA& maxColor );
+		RandomColorEffect(float startTime, const ColorRGBA& minColor, const ColorRGBA& maxColor);
 
 		//////////////////////////////////////
 
-		void		Startup( Particle& particle );
+		void Startup(Particle& particle);
 	};
 
 	class SENTINEL_DLL FadeToColorEffect : public ColorEffect
@@ -136,7 +136,7 @@ namespace Sentinel
 
 	protected:
 
-		float		mEndTime;
+		float mEndTime;
 
 		//////////////////////////////////////
 
@@ -144,13 +144,13 @@ namespace Sentinel
 
 	public:
 
-		FadeToColorEffect( float startTime, float endTime, const ColorRGBA& color );
+		FadeToColorEffect(float startTime, float endTime, const ColorRGBA& color);
 
 		//////////////////////////////////////
 
-		void		Startup( Particle& particle );
+		void Startup(Particle& particle);
 
-		void		Update( Particle& particle );
+		void Update(Particle& particle);
 	};
 
 	////////////////////////////////////////////////////////////////////////////
@@ -162,7 +162,7 @@ namespace Sentinel
 
 	protected:
 
-		Vector3f	mPosition;
+		Vector3f mPosition;
 
 		//////////////////////////////////////
 
@@ -170,11 +170,11 @@ namespace Sentinel
 
 	public:
 
-		PositionEffect( float startTime, const Vector3f& position );
+		PositionEffect(float startTime, const Vector3f& position);
 
 		//////////////////////////////////////
 
-		virtual void Startup( Particle& particle );
+		virtual void Startup(Particle& particle);
 	};
 
 	class SENTINEL_DLL AreaPositionEffect : public PositionEffect
@@ -184,7 +184,7 @@ namespace Sentinel
 	protected:
 
 		// uses mPosition as min
-		Vector3f	mMaxPosition;
+		Vector3f mMaxPosition;
 
 		//////////////////////////////////////
 
@@ -192,11 +192,11 @@ namespace Sentinel
 
 	public:
 
-		AreaPositionEffect( float startTime, const Vector3f& minPosition, const Vector3f& maxPosition );
+		AreaPositionEffect(float startTime, const Vector3f& minPosition, const Vector3f& maxPosition);
 
 		//////////////////////////////////////
 
-		void		Startup( Particle& particle );
+		void Startup(Particle& particle);
 	};
 
 	class SENTINEL_DLL SpherePositionEffect : public PositionEffect
@@ -205,7 +205,7 @@ namespace Sentinel
 
 	protected:
 
-		float		mRadius;
+		float mRadius;
 
 		//////////////////////////////////////
 
@@ -213,11 +213,11 @@ namespace Sentinel
 
 	public:
 
-		SpherePositionEffect( float startTime, const Vector3f& position, float radius );
+		SpherePositionEffect(float startTime, const Vector3f& position, float radius);
 
 		//////////////////////////////////////
 
-		void		Startup( Particle& particle );
+		void Startup(Particle& particle);
 	};
 
 	////////////////////////////////////////////////////////////////////////////
@@ -229,7 +229,7 @@ namespace Sentinel
 
 	protected:
 
-		Vector3f	mRotation;
+		Vector3f mRotation;
 
 		//////////////////////////////////////
 
@@ -237,11 +237,11 @@ namespace Sentinel
 
 	public:
 
-		RotationEffect( float startTime, const Vector3f& rotation );
+		RotationEffect(float startTime, const Vector3f& rotation);
 
 		//////////////////////////////////////
 
-		void		Startup( Particle& particle );
+		void Startup(Particle& particle);
 	};
 
 	class SENTINEL_DLL RandomRotationEffect : public RotationEffect
@@ -251,7 +251,7 @@ namespace Sentinel
 	protected:
 
 		// uses mRotation as min
-		Vector3f	mMaxRotation;
+		Vector3f mMaxRotation;
 
 		//////////////////////////////////////
 
@@ -259,11 +259,11 @@ namespace Sentinel
 
 	public:
 
-		RandomRotationEffect( float startTime, const Vector3f& minRotation, const Vector3f& maxRotation );
+		RandomRotationEffect(float startTime, const Vector3f& minRotation, const Vector3f& maxRotation);
 
 		//////////////////////////////////////
 
-		void		Startup( Particle& particle );
+		void Startup(Particle& particle);
 	};
 
 	////////////////////////////////////////////////////////////////////////////
@@ -275,7 +275,7 @@ namespace Sentinel
 
 	protected:
 
-		Vector3f	mScale;
+		Vector3f mScale;
 
 		//////////////////////////////////////
 
@@ -283,11 +283,11 @@ namespace Sentinel
 
 	public:
 
-		ScaleEffect( float startTime, const Vector3f& scale );
+		ScaleEffect(float startTime, const Vector3f& scale);
 
 		//////////////////////////////////////
 
-		virtual void Startup( Particle& particle );
+		virtual void Startup(Particle& particle);
 	};
 
 	class SENTINEL_DLL RandomScaleEffect : public ScaleEffect
@@ -296,7 +296,7 @@ namespace Sentinel
 
 	protected:
 
-		Vector3f	mMaxScale;
+		Vector3f mMaxScale;
 
 		//////////////////////////////////////
 
@@ -304,11 +304,11 @@ namespace Sentinel
 
 	public:
 
-		RandomScaleEffect( float startTime, const Vector3f& minScale, const Vector3f& maxScale );
+		RandomScaleEffect(float startTime, const Vector3f& minScale, const Vector3f& maxScale);
 
 		//////////////////////////////////////
 
-		virtual void Startup( Particle& particle );
+		virtual void Startup(Particle& particle);
 	};
 
 	class SENTINEL_DLL FadeToScaleEffect : public ScaleEffect
@@ -317,7 +317,7 @@ namespace Sentinel
 
 	protected:
 
-		float		mEndTime;
+		float mEndTime;
 
 		//////////////////////////////////////
 
@@ -325,14 +325,14 @@ namespace Sentinel
 
 	public:
 
-		FadeToScaleEffect( float startTime, float endTime, float scale );
-		FadeToScaleEffect( float startTime, float endTime, const Vector3f& scale );
+		FadeToScaleEffect(float startTime, float endTime, float scale);
+		FadeToScaleEffect(float startTime, float endTime, const Vector3f& scale);
 
 		//////////////////////////////////////
 
-		void		Startup( Particle& particle );
+		void Startup(Particle& particle);
 
-		void		Update( Particle& particle );
+		void Update(Particle& particle);
 	};
 
 	////////////////////////////////////////////////////////////////////////////
@@ -344,7 +344,7 @@ namespace Sentinel
 
 	protected:
 
-		Vector3f	mVelocity;
+		Vector3f mVelocity;
 
 		//////////////////////////////////////
 
@@ -352,11 +352,11 @@ namespace Sentinel
 
 	public:
 
-		VelocityEffect( float startTime, const Vector3f& velocity );
+		VelocityEffect(float startTime, const Vector3f& velocity);
 
 		//////////////////////////////////////
 
-		void		Startup( Particle& particle );
+		void Startup(Particle& particle);
 	};
 
 	class SENTINEL_DLL RandomVelocityEffect : public VelocityEffect
@@ -366,7 +366,7 @@ namespace Sentinel
 	protected:
 
 		// uses mVelocity as min
-		Vector3f	mMaxVelocity;
+		Vector3f mMaxVelocity;
 
 		//////////////////////////////////////
 
@@ -374,11 +374,11 @@ namespace Sentinel
 
 	public:
 
-		RandomVelocityEffect( float startTime, const Vector3f& minVelocity, const Vector3f& maxVelocity );
+		RandomVelocityEffect(float startTime, const Vector3f& minVelocity, const Vector3f& maxVelocity);
 
 		//////////////////////////////////////
 
-		void		Startup( Particle& particle );
+		void Startup(Particle& particle);
 	};
 
 	////////////////////////////////////////////////////////////////////////////
@@ -390,7 +390,7 @@ namespace Sentinel
 
 	protected:
 
-		Vector3f	mAngularVelocity;
+		Vector3f mAngularVelocity;
 
 		//////////////////////////////////////
 
@@ -398,11 +398,11 @@ namespace Sentinel
 
 	public:
 
-		AngularVelocityEffect( float startTime, const Vector3f& angularVelocity );
+		AngularVelocityEffect(float startTime, const Vector3f& angularVelocity);
 
 		//////////////////////////////////////
 
-		void		Startup( Particle& particle );
+		void Startup(Particle& particle);
 	};
 
 	class SENTINEL_DLL RandomAngularVelocityEffect : public AngularVelocityEffect
@@ -412,7 +412,7 @@ namespace Sentinel
 	protected:
 
 		// uses mAngularVelocity as min
-		Vector3f	mMaxAngularVelocity;
+		Vector3f mMaxAngularVelocity;
 
 		//////////////////////////////////////
 
@@ -420,11 +420,11 @@ namespace Sentinel
 
 	public:
 
-		RandomAngularVelocityEffect( float startTime, const Vector3f& minAngularVelocity, const Vector3f& maxAngularVelocity );
+		RandomAngularVelocityEffect(float startTime, const Vector3f& minAngularVelocity, const Vector3f& maxAngularVelocity);
 
 		//////////////////////////////////////
 
-		void		Startup( Particle& particle );
+		void Startup(Particle& particle);
 	};
 
 	////////////////////////////////////////////////////////////////////////////
@@ -436,7 +436,7 @@ namespace Sentinel
 
 	protected:
 
-		Vector3f	mAccel;
+		Vector3f mAccel;
 
 		//////////////////////////////////////
 
@@ -444,11 +444,11 @@ namespace Sentinel
 
 	public:
 
-		AccelEffect( float startTime, const Vector3f& accel );
+		AccelEffect(float startTime, const Vector3f& accel);
 
 		//////////////////////////////////////
 
-		void		Startup( Particle& particle );
+		void Startup(Particle& particle);
 	};
 
 	class SENTINEL_DLL RandomAccelEffect : public AccelEffect
@@ -458,7 +458,7 @@ namespace Sentinel
 	protected:
 
 		// uses mAccel as min
-		Vector3f	mMaxAccel;
+		Vector3f mMaxAccel;
 
 		//////////////////////////////////////
 
@@ -466,11 +466,11 @@ namespace Sentinel
 
 	public:
 
-		RandomAccelEffect( float startTime, const Vector3f& minAccel, const Vector3f& maxAccel );
+		RandomAccelEffect(float startTime, const Vector3f& minAccel, const Vector3f& maxAccel);
 
 		//////////////////////////////////////
 
-		void		Startup( Particle& particle );
+		void Startup(Particle& particle);
 	};
 
 	////////////////////////////////////////////////////////////////////////////
@@ -482,7 +482,7 @@ namespace Sentinel
 
 	protected:
 
-		Vector3f	mAngularAccel;
+		Vector3f mAngularAccel;
 
 		//////////////////////////////////////
 
@@ -490,11 +490,11 @@ namespace Sentinel
 
 	public:
 
-		AngularAccelEffect( float startTime, const Vector3f& angularAccel );
+		AngularAccelEffect(float startTime, const Vector3f& angularAccel);
 
 		//////////////////////////////////////
 
-		void		Startup( Particle& particle );
+		void Startup(Particle& particle);
 	};
 
 	class SENTINEL_DLL RandomAngularAccelEffect : public AngularAccelEffect
@@ -504,7 +504,7 @@ namespace Sentinel
 	protected:
 
 		// uses mAngularAccel as min
-		Vector3f	mMaxAngularAccel;
+		Vector3f mMaxAngularAccel;
 
 		//////////////////////////////////////
 
@@ -512,10 +512,10 @@ namespace Sentinel
 
 	public:
 
-		RandomAngularAccelEffect( float startTime, const Vector3f& minAngularAccel, const Vector3f& maxAngularAccel );
+		RandomAngularAccelEffect(float startTime, const Vector3f& minAngularAccel, const Vector3f& maxAngularAccel);
 
 		//////////////////////////////////////
 
-		void		Startup( Particle& particle );
+		void Startup(Particle& particle);
 	};
 }

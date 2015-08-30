@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 
-#include "Common.h"
+#include "Sentinel.h"
 #include "Network/Socket.h"
 
 namespace Sentinel {
@@ -10,17 +10,17 @@ namespace Network
 {
 	enum HeaderType
 	{
-		HEADER_NULL = 0x00,		// undefined header
+		HEADER_NULL			= 0x00,		// undefined header
 
-		HEADER_CLIENT = 0x01,		// from client (for init)
-		HEADER_SERVER = 0x02,		// from server (for init)
-		HEADER_PACKET = 0x04,		// normal packet
-		HEADER_ACK = 0x08,		// acknowledgment
+		HEADER_CLIENT		= 0x01,		// from client (for init)
+		HEADER_SERVER		= 0x02,		// from server (for init)
+		HEADER_PACKET		= 0x04,		// normal packet
+		HEADER_ACK			= 0x08,		// acknowledgment
 
-		HEADER_GUARANTEED = 0x10,		// guaranteed message
-		HEADER_KEEP_ALIVE = 0x20,		// tag as keep alive packet
+		HEADER_GUARANTEED	= 0x10,		// guaranteed message
+		HEADER_KEEP_ALIVE	= 0x20,		// tag as keep alive packet
 
-		HEADER_UNKNOWN = 0x40,		// this must be an error
+		HEADER_UNKNOWN		= 0x40,		// this must be an error
 	};
 
 	////////////////////////////////////////////////
@@ -34,9 +34,9 @@ namespace Network
 
 		struct Header
 		{
-			UCHAR mType; // HeaderType
-			UINT mSenderID; // ID of sender
-			WORD mSize; // size of packet
+			UCHAR mType;
+			UINT mSenderID;
+			WORD mSize;
 
 			Header(UCHAR _type, UINT _senderID, WORD _size) :
 				mType((UCHAR)_type),
@@ -49,7 +49,7 @@ namespace Network
 		//
 		struct GuaranteedHeader
 		{
-			UINT mACK; // ACK number
+			UINT mACK;
 			float mAdvanceTimer; // time to advance ahead when received
 
 			GuaranteedHeader(UINT _ack, float _advTimer) :

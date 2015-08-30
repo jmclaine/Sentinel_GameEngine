@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common.h"
+#include "Sentinel.h"
 #include "Event.h"
 
 namespace Sentinel

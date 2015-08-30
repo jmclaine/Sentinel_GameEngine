@@ -7,56 +7,56 @@
 #include <iostream>
 #include <fstream>
 
-#include "Util.h"
+#include "Debug.h"
 #include "FixedPoint.h"
 #include "RefCounter.h"
 
 namespace Sentinel
 {
 
-#define NATIVE_NUM_FUNC1( type, globalFunc, classFunc, cast )\
-		Value globalFunc( const Value& value )\
+#define NATIVE_NUM_FUNC1(type, globalFunc, classFunc, cast)\
+		Value globalFunc(const Value& value)\
 		{\
-			type::Global->classFunc( (cast)value.num->data );\
+			type::Global->classFunc((cast)value.num->data);\
 			return Value();\
 		}
 
-#define NATIVE_NUM_FUNC2( type, globalFunc, classFunc, cast )\
-		Value globalFunc( const Value& X, const Value& Y )\
+#define NATIVE_NUM_FUNC2(type, globalFunc, classFunc, cast)\
+		Value globalFunc(const Value& X, const Value& Y)\
 		{\
-			type::Global->classFunc( vec2< cast >( (cast)X.num->data, (cast)Y.num->data ));\
+			type::Global->classFunc(vec2<cast>((cast)X.num->data, (cast)Y.num->data));\
 			return Value();\
 		}
 
-#define NATIVE_NUM_FUNC3( type, globalFunc, classFunc, cast )\
-		Value globalFunc( const Value& X, const Value& Y, const Value& Z )\
+#define NATIVE_NUM_FUNC3(type, globalFunc, classFunc, cast)\
+		Value globalFunc(const Value& X, const Value& Y, const Value& Z)\
 		{\
-			type::Global->classFunc( vec3< cast >( (cast)X.num->data, (cast)Y.num->data, (cast)Z.num->data ));\
+			type::Global->classFunc(vec3<cast>((cast)X.num->data, (cast)Y.num->data, (cast)Z.num->data));\
 			return Value();\
 		}
 
 	////////////////////////////////////////////////////////////////////////////////////////
 
-#define REPORT_SCRIPT_ERROR( linenumber, title, msg )\
-		TRACE( linenumber << "\t" << title << "\t" << msg );
+#define REPORT_SCRIPT_ERROR(linenumber, title, msg)\
+		Debug::Log(STREAM(linenumber << "\t" << title << "\t" << msg));
 
-#define OUTPUT_INFO( a, ... )\
-		if( !file.is_open() )\
+#define OUTPUT_INFO(a, ...)\
+		if (!file.is_open())\
 		{\
-			printf( a, __VA_ARGS__ );\
+			printf(a, __VA_ARGS__);\
 		}\
 		else\
 		{\
-			char buf[ 256 ];\
-			memset( buf, 0, 256 );\
-			sprintf_s( buf, a, __VA_ARGS__ );\
-			file.write( buf, strlen( buf ));\
+			char buf[256];\
+			memset(buf, 0, 256);\
+			sprintf_s(buf, a, __VA_ARGS__);\
+			file.write(buf, strlen(buf));\
 		}
 
-	#define THROW_SCRIPT_EXCEPTION( linenumber, title, msg, ... )\
-		char buf[ 256 ];\
-		sprintf_s( buf, msg, __VA_ARGS__ );\
-		throw( ScriptException( linenumber, title, buf ));
+#define THROW_SCRIPT_EXCEPTION(linenumber, title, msg, ...)\
+		char buf[256];\
+		sprintf_s(buf, msg, __VA_ARGS__);\
+		throw(ScriptException(linenumber, title, buf));
 
 	////////////////////////////////////////////////////////////////////////////////////////
 
@@ -66,33 +66,33 @@ namespace Sentinel
 	static int vectorAlloc   = 0;
 	static int vectorDealloc = 0;
 
-	#define STRING_ALLOC()		++stringAlloc;
-	#define STRING_DEALLOC()	++stringDealloc;
-	#define VECTOR_ALLOC()		++vectorAlloc;
-	#define VECTOR_DEALLOC()	++vectorDealloc;
-	#define OUTPUT_ALLOCS()\
-		TRACE( "Script Info:" );\
-		TRACE( "String Allocations: " << stringAlloc );\
-		TRACE( "String Deallocations: " << stringDealloc );\
-		TRACE( "Vector Allocations: " << vectorAlloc );\
-		TRACE( "Vector Deallocations: " << vectorDealloc );
+#define STRING_ALLOC() ++stringAlloc;
+#define STRING_DEALLOC() ++stringDealloc;
+#define VECTOR_ALLOC() ++vectorAlloc;
+#define VECTOR_DEALLOC() ++vectorDealloc;
+#define OUTPUT_ALLOCS()\
+	Debug::Log("Script Info:");\
+	Debug::Log(STREAM("String Allocations: " << stringAlloc));\
+	Debug::Log(STREAM("String Deallocations: " << stringDealloc));\
+	Debug::Log(STREAM("Vector Allocations: " << vectorAlloc));\
+	Debug::Log(STREAM("Vector Deallocations: " << vectorDealloc));
 #else
-	#define STRING_ALLOC();
-	#define STRING_DEALLOC();
-	#define VECTOR_ALLOC();
-	#define VECTOR_DEALLOC();
-	#define OUTPUT_ALLOCS();
+#define STRING_ALLOC();
+#define STRING_DEALLOC();
+#define VECTOR_ALLOC();
+#define VECTOR_DEALLOC();
+#define OUTPUT_ALLOCS();
 #endif
 
 	enum ScriptExecution
 	{
-		SCRIPT_END		= -2,
+		SCRIPT_END = -2,
 		SCRIPT_CONTINUE = -1,
 	};
-	
+
 	enum TokenTypes
 	{
-		TOKEN_VOID		= -4,	// function call may return a Value, but it is unused
+		TOKEN_VOID = -4,	// function call may return a Value, but it is unused
 		TOKEN_FUNC_CALL,		// function call returns Value
 		TOKEN_ERROR,
 		TOKEN_EOF,
@@ -207,36 +207,37 @@ namespace Sentinel
 		GLOBAL_DELTATIME,
 	};
 
-	char* TokenToString( int token );
+	char* TokenToString(int token);
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Storage for each token for processing.
 	//
 	struct ScriptNode
 	{
-		int				type;
-		ScriptNode*		sibling;
+		int type;
+		ScriptNode* sibling;
 
 		union ChildData
 		{
 			ScriptNode* child;
-			Fixed16*	numberData;
-			char*		stringData;
+			Fixed16* numberData;
+			char* stringData;
 		};
-		ChildData		child;
+		ChildData child;
 
 		ScriptNode();
-		ScriptNode( int type );
-		ScriptNode( int type, ScriptNode* sibling );
-		ScriptNode( int type, ScriptNode* sibling, ChildData child );
-			
+		ScriptNode(int type);
+		ScriptNode(int type, ScriptNode* sibling);
+		ScriptNode(int type, ScriptNode* sibling, ChildData child);
+
 		void Shutdown();
 
-		void Output( std::fstream& file, int width = 0 );
+		void Output(std::fstream& file, int width = 0);
 	};
-	union ScriptNode::ChildData SetData( ScriptNode* child );
-	union ScriptNode::ChildData SetData( Fixed16* child );
-	union ScriptNode::ChildData SetData( const char* child );
+
+	union ScriptNode::ChildData SetData(ScriptNode* child);
+	union ScriptNode::ChildData SetData(Fixed16* child);
+	union ScriptNode::ChildData SetData(const char* child);
 
 
 	////////////////////////////////////////////////////////////////////////////////////////
@@ -248,9 +249,10 @@ namespace Sentinel
 		int type;
 		union
 		{
-			RefObject< Fixed16 >*				num;
-			RefObject< std::string >*			str;
-			RefObject< std::vector< Value >>*	vec;
+			RefObject<Fixed16>* num;
+			RefObject<std::string>* str;
+			RefObject<std::vector<Value>>* vec;
+
 			int FP;	// frame (stack) pointer
 			int RA;	// return address
 		};
@@ -258,12 +260,12 @@ namespace Sentinel
 		//////////////////////////////////////
 
 		Value();
-		Value( Fixed16 _num );
-		Value( const char* _str );
+		Value(Fixed16 _num);
+		Value(const char* _str);
 
 		void Release();
 
-		void Assign( Value& right );
+		void Assign(Value& right);
 	};
 
 	////////////////////////////////////////////////////////////////////////////////////////
@@ -278,7 +280,7 @@ namespace Sentinel
 		// Used to chain upwards for storage counter.
 		//
 		FuncVars* parent;
-		
+
 		FuncVars()
 		{
 			// Defaulted for functions.
@@ -289,17 +291,18 @@ namespace Sentinel
 			parent = NULL;
 		}
 	};
-	typedef std::map< std::string, FuncVars >  FuncMap;
-	typedef std::pair< std::string, FuncVars > FuncPair;
+
+	typedef std::map<std::string, FuncVars>  FuncMap;
+	typedef std::pair<std::string, FuncVars> FuncPair;
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Native Function Calls.
 	//
-	typedef Value( *ScriptFuncPtr0 )();
-	typedef Value( *ScriptFuncPtr1 )( const Value& );
-	typedef Value( *ScriptFuncPtr2 )( const Value&, const Value& );
-	typedef Value( *ScriptFuncPtr3 )( const Value&, const Value&, const Value& );
-	typedef Value( *ScriptFuncPtr4 )( const Value&, const Value&, const Value&, const Value& );
+	typedef Value(*ScriptFuncPtr0)();
+	typedef Value(*ScriptFuncPtr1)(const Value&);
+	typedef Value(*ScriptFuncPtr2)(const Value&, const Value&);
+	typedef Value(*ScriptFuncPtr3)(const Value&, const Value&, const Value&);
+	typedef Value(*ScriptFuncPtr4)(const Value&, const Value&, const Value&, const Value&);
 
 	struct NativeFunction
 	{
@@ -315,25 +318,25 @@ namespace Sentinel
 			ScriptFuncPtr4 Func4;
 		};
 
-#define NATIVE_FUNC_HELPER( count )\
-	NativeFunction( const std::string& _name, ScriptFuncPtr##count _func, const std::string& _args )\
-	{\
-		name  = _name;\
-		Func##count = _func;\
-		args  = _args;\
-	}
+	#define NATIVE_FUNC_HELPER(count)\
+		NativeFunction(const std::string& _name, ScriptFuncPtr##count _func, const std::string& _args)\
+		{\
+			name = _name;\
+			Func##count = _func;\
+			args = _args;\
+		}
 
-		NATIVE_FUNC_HELPER( 0 )
-		NATIVE_FUNC_HELPER( 1 )
-		NATIVE_FUNC_HELPER( 2 )
-		NATIVE_FUNC_HELPER( 3 )
-		NATIVE_FUNC_HELPER( 4 )
+		NATIVE_FUNC_HELPER(0)
+		NATIVE_FUNC_HELPER(1)
+		NATIVE_FUNC_HELPER(2)
+		NATIVE_FUNC_HELPER(3)
+		NATIVE_FUNC_HELPER(4)
 
-		static int Find( const std::vector< NativeFunction >& funcs, const std::string& name )
+		static int Find(const std::vector<NativeFunction>& funcs, const std::string& name)
 		{
-			for( int x = 0; x < (int)funcs.size(); ++x )
+			for (int x = 0; x < (int)funcs.size(); ++x)
 			{
-				if( funcs[ x ].name.compare( name ) == 0 )
+				if (funcs[x].name.compare(name) == 0)
 				{
 					return x;
 				}
@@ -342,13 +345,13 @@ namespace Sentinel
 			return -1;
 		}
 
-		static int Find( const std::vector< NativeFunction >& funcs, const std::string& name, int count )
+		static int Find(const std::vector<NativeFunction>& funcs, const std::string& name, int count)
 		{
-			for( int x = 0; x < (int)funcs.size(); ++x )
+			for (int x = 0; x < (int)funcs.size(); ++x)
 			{
-				if( funcs[ x ].name.compare( name ) == 0 )
+				if (funcs[x].name.compare(name) == 0)
 				{
-					if( (int)funcs[ x ].args.size() == count )
+					if ((int)funcs[x].args.size() == count)
 					{
 						return x;
 					}
@@ -358,13 +361,13 @@ namespace Sentinel
 			return -1;
 		}
 
-		static int Find( const std::vector< NativeFunction >& funcs, const std::string& name, const std::string& args )
+		static int Find(const std::vector<NativeFunction>& funcs, const std::string& name, const std::string& args)
 		{
-			for( int x = 0; x < (int)funcs.size(); ++x )
+			for (int x = 0; x < (int)funcs.size(); ++x)
 			{
-				if( funcs[ x ].name.compare( name ) == 0 )
+				if (funcs[x].name.compare(name) == 0)
 				{
-					if( funcs[ x ].args.compare( args ) == 0 )
+					if (funcs[x].args.compare(args) == 0)
 					{
 						return x;
 					}
@@ -374,31 +377,31 @@ namespace Sentinel
 			return -1;
 		}
 	};
-	
+
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Analyze tokens for the ScriptParser.
 	//
 	class ScriptLexer
 	{
-		unsigned char	c;
-		char*			data;
-		char*			copy;
+		unsigned char c;
+		char* data;
+		char* copy;
 
 	public:
 
-		int				linenumber;
-		int				token;
-		Fixed16			numberData;
-		std::string		stringData;
+		int linenumber;
+		int token;
+		Fixed16 numberData;
+		std::string stringData;
 
 		//////////////////////////////////////
 
 		ScriptLexer();
-		ScriptLexer( const char* filename );
-		
+		ScriptLexer(const char* filename);
+
 		void Startup();
 
-		int  Load( const char* filename );
+		int  Load(const char* filename);
 
 		void Shutdown();
 
@@ -411,42 +414,42 @@ namespace Sentinel
 	class ScriptParser
 	{
 		ScriptLexer lex;
-		bool		didError;
+		bool didError;
 
 	public:
 
-		std::vector< NativeFunction > nativeFunc;
+		std::vector<NativeFunction> nativeFunc;
 
-		FuncVars	globals;
+		FuncVars globals;
 
-		FuncMap		funcs;
-		FuncVars*	currVars;
-		
-		std::vector< ScriptNode* > nodes;
+		FuncMap funcs;
+		FuncVars* currVars;
+
+		std::vector<ScriptNode*> nodes;
 
 		//////////////////////////////////////
 
 		ScriptParser();
-		ScriptParser( const char* filename );
+		ScriptParser(const char* filename);
 
 		void Startup();
 
-		int  Load( const char* filename );
+		int Load(const char* filename);
 
 		void Shutdown();
 
-		void Output( std::fstream& file );
+		void Output(std::fstream& file);
 
-		int  GetVarOffset( std::string name, FuncVars* vars );
+		int GetVarOffset(std::string name, FuncVars* vars);
 
 		// Determine if a variable exists within the scope.
 		// Returns location in vector; -1 = not found
 		//
-		int  FindVar( std::string name, FuncVars* vars );
+		int FindVar(std::string name, FuncVars* vars);
 
 	private:
 
-		void Expect( int token );
+		void Expect(int token);
 
 		ScriptNode* ParseStatement();
 
@@ -458,7 +461,7 @@ namespace Sentinel
 
 		// Parse a variable.
 		//
-		ScriptNode* ParseVariable( std::string name );
+		ScriptNode* ParseVariable(std::string name);
 		ScriptNode* ParseVector();
 
 		// Parse a function.
@@ -469,12 +472,12 @@ namespace Sentinel
 
 		// Set a node.
 		//
-		void SetNode( ScriptNode& node, ScriptNode* node_ptr );
-		void SetNode( ScriptNode* node, std::vector< ScriptNode* >& node_vec );
+		void SetNode(ScriptNode& node, ScriptNode* node_ptr);
+		void SetNode(ScriptNode* node, std::vector<ScriptNode*>& node_vec);
 
 		// Create a variable container.
 		//
-		void CreateFuncVars( std::string name );
+		void CreateFuncVars(std::string name);
 		void CreateFuncVars();
 	};
 
@@ -492,74 +495,74 @@ namespace Sentinel
 		// Useful for assigning variables by type.
 		//
 		int lastVar;
-		
+
 		// Storage for function calls that do not have a line number set.
 		//
-		typedef std::map< std::string, std::vector< int >>  CallMap;
-		typedef std::pair< std::string, std::vector< int >> CallPair;
-		
+		typedef std::map<std::string, std::vector<int>> CallMap;
+		typedef std::pair<std::string, std::vector<int>> CallPair;
+
 		CallMap funcCall;
 
-		std::vector< int >	 popCount;
+		std::vector<int> popCount;
 
 	public:
 
-		ScriptParser		 parser;
+		ScriptParser parser;
 
-		std::vector< UCHAR > data;
+		std::vector<UCHAR> data;
 
 		ScriptCompiler();
-		ScriptCompiler( const char* filename );
-		
+		ScriptCompiler(const char* filename);
+
 		void Startup();
 
-		int  Load( const char* filename );
+		int  Load(const char* filename);
 
 		void Shutdown();
 
-		void Output( std::fstream& file );
+		void Output(std::fstream& file);
 
 	private:
 
-		void Traverse( ScriptNode* node );
+		void Traverse(ScriptNode* node);
 
 		// Push back a value to the code byte.
 		//
-		void EmitC( UCHAR c );
-		void EmitC( UCHAR c0, UCHAR c1 );
-		void EmitCAt( UCHAR c, int index );
-		void EmitS( char* str );
+		void EmitC(UCHAR c);
+		void EmitC(UCHAR c0, UCHAR c1);
+		void EmitCAt(UCHAR c, int index);
+		void EmitS(char* str);
 
 		// float/int
 		//
-		template< typename Real >
-		void EmitN( Real n )
+		template <typename Real>
+		void EmitN(Real n)
 		{
-			UCHAR num[ 4 ];
-			NUMtoBYTES( num, n );
-					
-			for( int x = 0; x < 4; ++ x )
+			UCHAR num[4];
+			NUMtoBYTES(num, n);
+
+			for (int x = 0; x < 4; ++x)
 			{
-				EmitC( num[ x ] );
+				EmitC(num[x]);
 			}
 		}
 
-		template< typename Real >
-		void EmitN( UCHAR c, Real n )
+		template <typename Real>
+		void EmitN(UCHAR c, Real n)
 		{
-			EmitC( c );
-			EmitN( n );
+			EmitC(c);
+			EmitN(n);
 		}
 
-		template< typename Real >
-		void EmitNAt( Real n, int index )
+		template <typename Real>
+		void EmitNAt(Real n, int index)
 		{
-			UCHAR num[ 4 ];
-			NUMtoBYTES( num, n );
+			UCHAR num[4];
+			NUMtoBYTES(num, n);
 
-			for( int x = 0; x < 4; ++x )
+			for (int x = 0; x < 4; ++x)
 			{
-				data[ index + x ] = num[ x ];
+				data[index + x] = num[x];
 			}
 		}
 
@@ -568,11 +571,11 @@ namespace Sentinel
 		// is being called with the correct number of
 		// parameters.
 		//
-		int CountFuncVars( ScriptNode* node );
+		int CountFuncVars(ScriptNode* node);
 
-		void OutputLineNum( std::fstream& file, int linenum );
-		void OutputNumber(  std::fstream& file, int& index, int count = 1, bool isFloat = false );
-		void OutputString(  std::fstream& file, int& index );
+		void OutputLineNum(std::fstream& file, int linenum);
+		void OutputNumber(std::fstream& file, int& index, int count = 1, bool isFloat = false);
+		void OutputString(std::fstream& file, int& index);
 	};
 
 	////////////////////////////////////////////////////////////////////////////////////////
@@ -584,17 +587,17 @@ namespace Sentinel
 
 		// Stack values.
 		//
-		std::vector< Value > global;
-		std::vector< Value > stack;
+		std::vector<Value> global;
+		std::vector<Value> stack;
 
 		// Vector Access.
 		//
-		std::vector< int > vecA;
+		std::vector<int> vecA;
 
 		int IP;	// pointer in byte code
 		int FP; // pointer in stack
 
-		std::vector< int > funcPop;	// ensures the stack gets popped correctly
+		std::vector<int> funcPop; // ensures the stack gets popped correctly
 
 		// Used specifically for sleep.
 		//
@@ -605,67 +608,67 @@ namespace Sentinel
 	public:
 
 		Script();
-		Script( const char* filename );
+		Script(const char* filename);
 		~Script();
 
 		void Startup();
 
-		int  Load( const char* filename );
+		int  Load(const char* filename);
 
 		void Shutdown();
 
-		void Output( std::fstream& file );
-		void Output( char* filename );
+		void Output(std::fstream& file);
+		void Output(char* filename);
 
-		void  SetWaitTime( float _waitTime );
+		void  SetWaitTime(float _waitTime);
 		float WaitTime();
 
 		UINT NumGlobals();
 
-		void CopyStack( std::vector< Value >* globalCopy, std::vector< Value >* stackCopy );
-		void SetStack( std::vector< Value >* globalCopy, std::vector< Value >* stackCopy );
+		void CopyStack(std::vector<Value>* globalCopy, std::vector<Value>* stackCopy);
+		void SetStack(std::vector<Value>* globalCopy, std::vector<Value>* stackCopy);
 
 		// Returns next instruction location to be executed; SCRIPT_END = end of script
 		//
-		int  Execute( float deltaTime = 0, int _IP = SCRIPT_CONTINUE, std::vector< Value >* globalCopy = NULL, std::vector< Value >* stackCopy = NULL );
+		int Execute(float deltaTime = 0, int _IP = SCRIPT_CONTINUE, std::vector<Value>* globalCopy = NULL, std::vector<Value>* stackCopy = NULL);
 
-		void RegisterVar( const std::string& name, const Value& _value );
+		void RegisterVar(const std::string& name, const Value& _value);
 
-#define REGISTER_FUNC_HELPER( count )\
-	void RegisterFunc( const std::string& name, ScriptFuncPtr##count func, const std::string& args );
+	#define REGISTER_FUNC_HELPER(count)\
+		void RegisterFunc(const std::string& name, ScriptFuncPtr##count func, const std::string& args);
 
-		REGISTER_FUNC_HELPER( 0 )
-		REGISTER_FUNC_HELPER( 1 )
-		REGISTER_FUNC_HELPER( 2 )
-		REGISTER_FUNC_HELPER( 3 )
-		REGISTER_FUNC_HELPER( 4 )
-		
+		REGISTER_FUNC_HELPER(0)
+		REGISTER_FUNC_HELPER(1)
+		REGISTER_FUNC_HELPER(2)
+		REGISTER_FUNC_HELPER(3)
+		REGISTER_FUNC_HELPER(4)
+
 	private:
 
-		void PrintValue( const Value& v );
+		void PrintValue(const Value& v);
 	};
 
 
 	////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	class ScriptException : public std::exception
 	{
-		int				linenumber;
-		std::string		title;
-		std::string		msg;
+		int linenumber;
+		std::string title;
+		std::string msg;
 
 	public:
 
-		ScriptException( int linenumber, std::string title, std::string msg )
+		ScriptException(int linenumber, std::string title, std::string msg)
 		{
 			this->linenumber = linenumber;
-			this->title		 = title;
-			this->msg		 = msg;
+			this->title = title;
+			this->msg = msg;
 		}
 
 		virtual const char* what() const throw()
 		{
-			REPORT_SCRIPT_ERROR( linenumber, title, msg );
+			REPORT_SCRIPT_ERROR(linenumber, title, msg);
 			return "Ending Script...\n";
 		}
 	};

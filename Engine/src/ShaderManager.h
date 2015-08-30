@@ -8,7 +8,7 @@ namespace Sentinel
 	class Renderer;
 	class Archive;
 
-	class SENTINEL_DLL ShaderManager : public AssetManager< Shader >
+	class SENTINEL_DLL ShaderManager : public AssetManager <Shader>
 	{
 	public:
 
@@ -17,8 +17,8 @@ namespace Sentinel
 
 		/////////////////////////////////
 
-		void Save( Archive& archive );
+		void Save(Archive& archive);
 
-		void Load( Archive& archive, Renderer* renderer );
+		void Load(Archive& archive, Renderer* renderer);
 	};
 }

@@ -1,10 +1,8 @@
-#include "GameObject.h"
-#include "GameWorld.h"
-#include "Component/Camera.h"
 #include "Component/Drawable.h"
 #include "Component/Transform.h"
-#include "Shape.h"
+#include "GameObject.h"
 #include "Archive.h"
+#include "Exception.h"
 
 namespace Sentinel {
 namespace Component

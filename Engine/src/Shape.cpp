@@ -1,6 +1,6 @@
 #include <vector>
 
-#include "MathCommon.h"
+#include "MathUtil.h"
 #include "Shape.h"
 #include "Vector4f.h"
 

@@ -1,9 +1,10 @@
 #include <fstream>
 #include <vector>
+#include <windows.h>
 
 #include "Renderer.h"
 #include "Archive.h"
-
+#include "Debug.h"
 #include "CommonGL.h"
 #include "BufferGL.h"
 #include "TextureGL.h"
@@ -40,7 +41,7 @@ namespace Sentinel
 		{
 		public:
 
-			GLuint		mID;
+			GLuint mID;
 
 			RenderTextureGL(GLuint id, Texture* texture) :
 				mID(id),
@@ -298,7 +299,7 @@ namespace Sentinel
 
 			glewInit();
 
-			TRACE("Created OpenGL " << glGetString(GL_VERSION) << " Renderer");
+			Debug::Log(STREAM("Created OpenGL " << glGetString(GL_VERSION) << " Renderer"));
 
 			glEnable(GL_DEPTH_TEST);
 
@@ -435,7 +436,10 @@ namespace Sentinel
 
 			if (!pixels)
 			{
-				REPORT_ERROR(filename << TEXT(" failed to load."), TEXT("Texture Load Error"));
+				Debug::ShowError(
+					STREAM(filename << " failed to load."),
+					STREAM("Texture Load Error"));
+
 				return NULL;
 			}
 
@@ -585,7 +589,9 @@ namespace Sentinel
 
 			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			{
-				REPORT_ERROR("Failed to create Render Target", "OpenGL Render Target");
+				Debug::ShowError(
+					"Failed to create Render Target",
+					"OpenGL Render Target");
 
 				return NULL;
 			}

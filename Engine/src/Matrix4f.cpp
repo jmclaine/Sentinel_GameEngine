@@ -1,4 +1,4 @@
-#include "MathCommon.h"
+#include "MathUtil.h"
 #include "Matrix4f.h"
 #include "Vector2f.h"
 #include "Vector3f.h"
@@ -393,7 +393,8 @@ namespace Sentinel
 		float right5 = m[6] * m[15] - m[14] * m[7];
 		float right6 = m[10] * m[15] - m[14] * m[11];
 
-		return (left1 * right6 - left2 * right5 + \
+		return (
+			left1 * right6 - left2 * right5 + \
 			left3 * right4 + left4 * right3 - \
 			left5 * right2 + left6 * right1);
 	}
@@ -419,7 +420,8 @@ namespace Sentinel
 	{
 		Vector3f v(m[12], m[13], m[14]);
 
-		Vector3f w(v.Dot(Vector3f(m[0], m[1], m[2])),
+		Vector3f w(
+			v.Dot(Vector3f(m[0], m[1], m[2])),
 			v.Dot(Vector3f(m[4], m[5], m[6])),
 			v.Dot(Vector3f(m[8], m[9], m[10])));
 
@@ -438,17 +440,17 @@ namespace Sentinel
 		Matrix4f inv;
 
 		float m10_15 = m[10] * m[15];	float m11_14 = m[11] * m[14];	float m4_1 = m[4] * m[1];
-		float m4_9 = m[4] * m[9];	float m11_13 = m[11] * m[13];	float m2_15 = m[2] * m[15];
-		float m0_9 = m[0] * m[9];	float m10_13 = m[10] * m[13];	float m8_5 = m[8] * m[5];
-		float m6_15 = m[6] * m[15];	float m0_7 = m[0] * m[7];	float m8_1 = m[8] * m[1];
-		float m0_5 = m[0] * m[5];	float m1_7 = m[1] * m[7];	float m2_11 = m[2] * m[11];
-		float m6_11 = m[6] * m[11];	float m0_6 = m[0] * m[6];	float m8_13 = m[8] * m[13];
+		float m4_9 = m[4] * m[9];		float m11_13 = m[11] * m[13];	float m2_15 = m[2] * m[15];
+		float m0_9 = m[0] * m[9];		float m10_13 = m[10] * m[13];	float m8_5 = m[8] * m[5];
+		float m6_15 = m[6] * m[15];		float m0_7 = m[0] * m[7];		float m8_1 = m[8] * m[1];
+		float m0_5 = m[0] * m[5];		float m1_7 = m[1] * m[7];		float m2_11 = m[2] * m[11];
+		float m6_11 = m[6] * m[11];		float m0_6 = m[0] * m[6];		float m8_13 = m[8] * m[13];
 		float m8_3 = m[8] * m[3];
 
-		float m4_3 = m[4] * m[3];	float m12_5 = m[12] * m[5];	float m7_10 = m[7] * m[10];
-		float m9_14 = m[9] * m[14];	float m12_1 = m[12] * m[1];	float m12_9 = m[12] * m[9];
-		float m5_3 = m[5] * m[3];	float m2_7 = m[2] * m[7];	float m3_10 = m[3] * m[10];
-		float m4_2 = m[4] * m[2];								float m3_6 = m[3] * m[6];
+		float m4_3 = m[4] * m[3];		float m12_5 = m[12] * m[5];		float m7_10 = m[7] * m[10];
+		float m9_14 = m[9] * m[14];		float m12_1 = m[12] * m[1];		float m12_9 = m[12] * m[9];
+		float m5_3 = m[5] * m[3];		float m2_7 = m[2] * m[7];		float m3_10 = m[3] * m[10];
+		float m4_2 = m[4] * m[2];										float m3_6 = m[3] * m[6];
 		float m8_7 = m[8] * m[7];
 
 		inv.m[0] = m[5] * m10_15 - m[5] * m11_14 - m[9] * m6_15 + m9_14*m[7] + m[13] * m6_11 - m[13] * m7_10;
@@ -488,14 +490,16 @@ namespace Sentinel
 
 	Vector3f Matrix4f::Transform(const Vector3f& v, float w) const
 	{
-		return Vector3f(v.x*m[0] + v.y*m[4] + v.z*m[8] + w*m[12],
+		return Vector3f(
+			v.x*m[0] + v.y*m[4] + v.z*m[8] + w*m[12],
 			v.x*m[1] + v.y*m[5] + v.z*m[9] + w*m[13],
 			v.x*m[2] + v.y*m[6] + v.z*m[10] + w*m[14]);
 	}
 
 	Vector3f Matrix4f::Transform(const Vector4f& v) const
 	{
-		return Vector3f(v.x*m[0] + v.y*m[4] + v.z*m[8] + v.w*m[12],
+		return Vector3f(
+			v.x*m[0] + v.y*m[4] + v.z*m[8] + v.w*m[12],
 			v.x*m[1] + v.y*m[5] + v.z*m[9] + v.w*m[13],
 			v.x*m[2] + v.y*m[6] + v.z*m[10] + v.w*m[14]);
 	}
