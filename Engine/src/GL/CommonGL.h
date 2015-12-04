@@ -15,12 +15,19 @@
 #include "Types.h"
 
 #ifdef _DEBUG
-inline void HANDLE_GL_ERRORS()
-{
-	GLenum err = glGetError();
+#include "Debug.h"
 
-	if( err != GL_NO_ERROR )
-		REPORT_ERROR( gluErrorUnicodeStringEXT(err), "OpenGL Error" );
+namespace Sentinel
+{
+	inline void HANDLE_GL_ERRORS()
+	{
+		GLenum err = glGetError();
+
+		if (err != GL_NO_ERROR)
+		{
+			Debug::LogError(STREAM(gluErrorUnicodeStringEXT(err)));
+		}
+	}
 }
 #else
 #define HANDLE_GL_ERRORS();

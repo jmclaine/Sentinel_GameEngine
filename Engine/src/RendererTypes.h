@@ -4,7 +4,7 @@
 
 namespace Sentinel
 {
-	ENUM_CLASS( PrimitiveFormat )
+	ENUM_CLASS(PrimitiveFormat)
 
 		POINTS,
 		LINES,
@@ -16,7 +16,7 @@ namespace Sentinel
 
 	/////////////////////////////////
 
-	ENUM_CLASS( ImageFormat )
+	ENUM_CLASS(ImageFormat)
 
 		R,
 		RG,
@@ -29,7 +29,7 @@ namespace Sentinel
 
 	/////////////////////////////////
 
-	ENUM_CLASS( CullFormat )
+	ENUM_CLASS(CullFormat)
 
 		NONE,
 		CCW,
@@ -41,19 +41,19 @@ namespace Sentinel
 
 	/////////////////////////////////
 
-	ENUM_CLASS( FillFormat )
-		
+	ENUM_CLASS(FillFormat)
+
 		SOLID,
 		WIREFRAME,
 
 		COUNT
-	
+
 	ENUM_END
 
 	/////////////////////////////////
 
-	ENUM_CLASS( BlendFormat )
-	
+	ENUM_CLASS(BlendFormat)
+
 		ZERO,
 		ONE,
 
@@ -74,8 +74,8 @@ namespace Sentinel
 
 	/////////////////////////////////
 
-	ENUM_CLASS( BlendFunction )
-	
+	ENUM_CLASS(BlendFunction)
+
 		ADD,
 		SUBTRACT,
 		REVERSE_SUBTRACT,
@@ -89,7 +89,7 @@ namespace Sentinel
 
 	/////////////////////////////////
 
-	ENUM_CLASS( DepthFormat )
+	ENUM_CLASS(DepthFormat)
 
 		OFF,
 		LESS,
@@ -107,7 +107,7 @@ namespace Sentinel
 
 	/////////////////////////////////
 
-	ENUM_CLASS( BufferFormat )
+	ENUM_CLASS(BufferFormat)
 
 		UNKNOWN,
 
@@ -118,8 +118,8 @@ namespace Sentinel
 
 	/////////////////////////////////
 
-	ENUM_CLASS( BufferAccess )
-	
+	ENUM_CLASS(BufferAccess)
+
 		READ_WRITE,
 		WRITE,
 
@@ -127,7 +127,7 @@ namespace Sentinel
 
 	/////////////////////////////////
 
-	ENUM_CLASS( TextureIndex )
+	ENUM_CLASS(TextureIndex)
 
 		DIFFUSE,
 		NORMAL,
@@ -139,8 +139,8 @@ namespace Sentinel
 
 	/////////////////////////////////
 
-	ENUM_CLASS( VertexAttribute )
-	
+	ENUM_CLASS(VertexAttribute)
+
 		POSITION,
 		TEXCOORD0,
 		TEXCOORD1,
@@ -162,7 +162,7 @@ namespace Sentinel
 
 	/////////////////////////////////
 
-	ENUM_CLASS( ShaderUniform )
+	ENUM_CLASS(ShaderUniform)
 
 		WVP,
 		WORLD,
@@ -188,48 +188,48 @@ namespace Sentinel
 		CAMERA_POS,
 		BONES,
 		DELTA_TIME,
-	
-	ENUM_END
-
-	/////////////////////////////////
-
-	ENUM_CLASS( RenderQueue )
-
-		BACKGROUND		= 10000,
-		GEOMETRY		= 20000,
-		ALPHA_BLEND		= 30000,
-		FOREGROUND		= 40000,
-	
-	ENUM_END
-
-	/////////////////////////////////
-
-	ENUM_CLASS( RenderLayer )
-
-		LAYER0			= 0x0001,
-		LAYER1			= 0x0002,
-		LAYER2			= 0x0004,
-		LAYER3			= 0x0008,
-		LAYER4			= 0x0010,
-		LAYER5			= 0x0020,
-		LAYER6			= 0x0040,
-		LAYER7			= 0x0080,
-		LAYER8			= 0x0100,
-		LAYER9			= 0x0200,
-		LAYER10			= 0x0400,
-		LAYER11			= 0x0800,
-		LAYER12			= 0x1000,
-		LAYER13			= 0x2000,
-		LAYER14			= 0x4000,
-		LAYER15			= 0x8000,
-
-		LENGTH			= 16,
 
 	ENUM_END
 
 	/////////////////////////////////
 
-	ENUM_CLASS( SamplerMode )
+	ENUM_CLASS(RenderQueue)
+
+		BACKGROUND = 10000,
+		GEOMETRY = 20000,
+		ALPHA_BLEND = 30000,
+		FOREGROUND = 40000,
+
+	ENUM_END
+
+	/////////////////////////////////
+
+	ENUM_CLASS(RenderLayer)
+
+		LAYER0 = 0x0001,
+		LAYER1 = 0x0002,
+		LAYER2 = 0x0004,
+		LAYER3 = 0x0008,
+		LAYER4 = 0x0010,
+		LAYER5 = 0x0020,
+		LAYER6 = 0x0040,
+		LAYER7 = 0x0080,
+		LAYER8 = 0x0100,
+		LAYER9 = 0x0200,
+		LAYER10 = 0x0400,
+		LAYER11 = 0x0800,
+		LAYER12 = 0x1000,
+		LAYER13 = 0x2000,
+		LAYER14 = 0x4000,
+		LAYER15 = 0x8000,
+
+		LENGTH = 16,
+
+	ENUM_END
+
+	/////////////////////////////////
+
+	ENUM_CLASS(SamplerMode)
 
 		WRAP,
 		CLAMP,
@@ -242,12 +242,12 @@ namespace Sentinel
 
 	/////////////////////////////////
 
-	ENUM_CLASS( SamplerFilter )
+	ENUM_CLASS(SamplerFilter)
 
 		POINT,
 		LINEAR,
 
 		UNKNOWN
-	
+
 	ENUM_END
 }

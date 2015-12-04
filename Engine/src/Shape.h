@@ -36,8 +36,8 @@ namespace Sentinel
 
 		float Distance(const Vector3f& pos) const;
 
-		//bool Intersects( const Ray& ray ) const;
-		//bool Intersects( const BoundingBox& box ) const;
+		//bool Intersects(const Ray& ray) const;
+		//bool Intersects(const BoundingBox& box) const;
 	};
 
 	//////////////////////////////////////////////////////
@@ -55,7 +55,19 @@ namespace Sentinel
 
 	//////////////////////////////////////////////////////
 
-	class SENTINEL_DLL BoundingSphere
+	class BoundingShape
+	{
+	public:
+
+		virtual bool Intersects(const Vector3f& point) const = 0;
+		virtual bool Intersects(const Ray& ray, Vector3f* intersection = NULL) const = 0;
+		virtual bool Intersects(const BoundingSphere& sphere) const = 0;
+		virtual bool Intersects(const BoundingBox& box) const = 0;
+	};
+
+	//////////////////////////////////////////////////////
+
+	class SENTINEL_DLL BoundingSphere : public BoundingShape
 	{
 	public:
 
@@ -66,16 +78,17 @@ namespace Sentinel
 		BoundingSphere(const Vector3f& v0, const Vector3f& v1);
 		BoundingSphere(const Vector3f& v0, const Vector3f& v1, const Vector3f& v2);
 		BoundingSphere(const Vector3f& v0, const Vector3f& v1, const Vector3f& v2, const Vector3f& v3);
-		BoundingSphere(char* verts, UINT count, UINT stride = sizeof(Vector3f));	// Takes in a pointer to 3 float points.
+		BoundingSphere(const BYTE* verts, UINT count, UINT stride = sizeof(Vector3f));	// Takes in a pointer to 3 float points.
 
 		bool Intersects(const Vector3f& point) const;
+		bool Intersects(const Ray& ray, Vector3f* intersection = NULL) const;
 		bool Intersects(const BoundingSphere& sphere) const;
 		bool Intersects(const BoundingBox& box) const;
 	};
 
 	//////////////////////////////////////////////////////
 
-	class SENTINEL_DLL BoundingBox
+	class SENTINEL_DLL BoundingBox : public BoundingShape
 	{
 	private:
 
@@ -97,11 +110,12 @@ namespace Sentinel
 		bool Intersects(const Vector3f& point) const;
 		bool Intersects(const Ray& ray, Vector3f* intersection = NULL) const;
 		bool Intersects(const BoundingSphere& sphere) const;
+		bool Intersects(const BoundingBox& box) const;
 	};
 
 	//////////////////////////////////////////////////////
 
-	class SENTINEL_DLL BoundingFrustum
+	class SENTINEL_DLL BoundingFrustum : public BoundingShape
 	{
 	private:
 
@@ -129,6 +143,9 @@ namespace Sentinel
 			const Vector2f& nearExtent, const Vector2f& farExtent,
 			const Vector3f& forward, const Vector3f& right, const Vector3f& up);
 
+		bool Intersects(const Vector3f& point) const;
+		bool Intersects(const Ray& ray, Vector3f* intersection = NULL) const;
+		bool Intersects(const BoundingSphere& sphere) const;
 		bool Intersects(const BoundingBox& box) const;
 	};
 }

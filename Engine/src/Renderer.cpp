@@ -20,6 +20,9 @@ namespace Sentinel
 		mHeightRatio = 1.0f;
 	}
 
+	WindowInfo::~WindowInfo()
+	{}
+
 	bool WindowInfo::Fullscreen() const
 	{
 		return mFullscreen;
@@ -154,7 +157,7 @@ namespace Sentinel
 		TiXmlHandle	hDoc(&doc);
 
 		TiXmlElement* pElem = hDoc.FirstChild("Renderer").Element();
-		const char*   pName = pElem->Attribute("Type");
+		const char* pName = pElem->Attribute("Type");
 
 		Renderer* renderer = (strcmp("DIRECTX", pName) == 0) ? BuildRendererDX() : BuildRendererGL();
 

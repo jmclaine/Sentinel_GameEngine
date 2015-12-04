@@ -55,7 +55,7 @@ namespace Component
 
 	private:
 
-		// Adds Component::Drawables is they are dynamic,
+		// Adds Component::Drawables if they are dynamic,
 		// and within range of the light.
 		//
 		void AddDynamic(GameObject* obj);

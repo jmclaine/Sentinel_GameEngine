@@ -138,10 +138,10 @@ void main()
 	vWorldPos = (_World * vec4(Position, 1)).xyz;
 
 	// Light direction
-	vLightDir = _LightPos - vWorldPos.xyz;
+	vLightDir = _LightPos - vWorldPos;
 
 	// Camera direction
-	vCameraDir = _CameraPos - vWorldPos.xyz;
+	vCameraDir = _CameraPos - vWorldPos;
 
 	// Texture
 	vTexCoord0 = TexCoord0;
@@ -251,10 +251,11 @@ void main()
 
 	shadow *= blendFactor;
 
+	// Attenuation
 	vec3 color0 = GetColor(lightDir, cameraDir, normal, _LightColor, _LightAttn);
 
+	// Final fragment color
 	vFragColor = (_Ambient + vec4(color0 * shadow, 0)) * texture2D(_Texture0, vTexCoord0);
 }
-
 #endif
 #endif

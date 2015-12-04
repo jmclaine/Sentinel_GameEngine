@@ -305,12 +305,12 @@ namespace Sentinel
 
 			SetCull(CullFormat::CCW);
 
-			// Create NULL_TEXTURE.
+			// Create NULL_TEXTURE
 			//
 			if (!NULL_TEXTURE.get())
 				NULL_TEXTURE = std::shared_ptr<Texture>(new TextureGL(0, 0, ImageFormat::RGBA, 0));
 
-			// Create initial white texture as BASE_TEXTURE.
+			// Create white BASE_TEXTURE
 			//
 			if (!BASE_TEXTURE.get())
 			{
@@ -335,11 +335,14 @@ namespace Sentinel
 			// Create non-blending state.
 			//
 			if (!BLEND_OFF.get())
-				BLEND_OFF = std::shared_ptr<BlendState>(new BlendStateGL(false, BlendFormat::ZERO, BlendFormat::ZERO,
-				BlendFormat::ZERO, BlendFormat::ZERO,
-				BlendFunction::ADD, BlendFunction::ADD));
+				BLEND_OFF = std::shared_ptr<BlendState>(
+					new BlendStateGL(
+						false, 
+						BlendFormat::ZERO, BlendFormat::ZERO,
+						BlendFormat::ZERO, BlendFormat::ZERO,
+						BlendFunction::ADD, BlendFunction::ADD));
 
-			// Create default alpha-blending state.
+			// Create default alpha-blending state
 			//
 			if (!BLEND_ALPHA.get())
 				BLEND_ALPHA = std::shared_ptr<BlendState>(CreateBlendState());
@@ -363,7 +366,8 @@ namespace Sentinel
 			}
 		}
 
-		// Windows.
+		//
+		// Windows
 		//
 		void SetWindow(WindowInfo* info)
 		{
@@ -387,7 +391,8 @@ namespace Sentinel
 			return wglShareLists(((WindowInfoGL*)info0)->mContext, ((WindowInfoGL*)info1)->mContext) != 0;
 		}
 
-		// Buffers.
+		//
+		// Buffers
 		//
 		Buffer* CreateBuffer(void* data, UINT size, UINT stride, BufferFormat::Type type, BufferAccess::Type access)
 		{
@@ -418,7 +423,8 @@ namespace Sentinel
 			}
 		}
 
-		// Textures.
+		//
+		// Textures
 		//
 		Texture* CreateTextureFromFile(const char* filename, bool createMips = true)
 		{
@@ -577,7 +583,7 @@ namespace Sentinel
 		RenderTexture* CreateRenderTexture(Texture* texture)
 		{
 			_ASSERT(texture);
-
+			
 			GLuint id;
 			glGenFramebuffers(1, &id);
 			glBindFramebuffer(GL_FRAMEBUFFER, id);

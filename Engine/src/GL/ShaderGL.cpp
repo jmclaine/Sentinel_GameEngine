@@ -496,6 +496,8 @@ namespace Sentinel
 
 	void ShaderGL::SetTexture(UINT uniform, Texture* texture)
 	{
+		_ASSERT(texture != NULL);
+
 		glUniform1i(mUniformGL[uniform], mTextureLevel);
 
 		GLenum texID = GL_TEXTURE0 + mTextureLevel;
@@ -512,6 +514,7 @@ namespace Sentinel
 		static GLuint CURR_TEXTURE = -1;
 
 		GLuint id = ((TextureGL*)texture)->ID();
+
 		if (CURR_TEXTURE != id)
 		{
 			glBindTexture(GL_TEXTURE_2D, id);

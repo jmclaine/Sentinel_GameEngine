@@ -60,12 +60,12 @@ namespace Sentinel
 
 			//SetWindowLong(hWnd, GWL_STYLE, 0);	// borderless window
 
-			renderer->Startup(hWnd, info.Fullscreen(), info.Width(), info.Height());
+			mWindowInfo = renderer->Startup(hWnd, info.Fullscreen(), info.Width(), info.Height());
 
 			ShowWindow(hWnd, nCmdShow);
 			UpdateWindow(hWnd);
 
-			mWindowInfo = renderer->Startup(hWnd, info.Fullscreen(), info.Width(), info.Height());
+			//mWindowInfo = renderer->Startup(hWnd, info.Fullscreen(), info.Width(), info.Height());
 
 			if (!mWindowInfo)
 				throw AppException("Failed Renderer::Startup()");
@@ -87,8 +87,7 @@ namespace Sentinel
 
 		UnregisterClass(mWindowClass, mINST);
 
-		delete mWindowInfo;
-		mWindowInfo = NULL;
+		SAFE_DELETE(mWindowInfo);
 	}
 
 	///////////////////////////

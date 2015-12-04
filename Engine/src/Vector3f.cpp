@@ -1,5 +1,6 @@
 #include "MathUtil.h"
 #include "Vector3f.h"
+#include "StringStream.h"
 
 namespace Sentinel
 {
@@ -44,6 +45,11 @@ namespace Sentinel
 	float* Vector3f::Ptr() const
 	{
 		return const_cast<float*>(&x);
+	}
+
+	std::string Vector3f::ToString() const
+	{
+		return STREAM("(" << x << ", " << y << ", " << z << ")");
 	}
 
 	Vector3f Vector3f::operator - () const

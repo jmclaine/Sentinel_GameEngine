@@ -162,6 +162,7 @@ namespace Sentinel
 	public:
 
 		WindowInfo();
+		~WindowInfo();
 
 		bool Fullscreen() const;
 

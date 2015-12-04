@@ -65,8 +65,8 @@ namespace Sentinel
 
 			if (it != mData.end())
 				return it->second;
-			else
-				return NULL;
+
+			return NULL;
 		}
 
 		std::string Get(std::shared_ptr<Type> data)

@@ -15,28 +15,28 @@ namespace Sentinel
 	{
 	private:
 
-		POINT	mLastMousePos;
+		POINT mLastMousePos;
 
-		float	mLastWindowWidth;
-		float	mLastWindowHeight;
+		float mLastWindowWidth;
+		float mLastWindowHeight;
 
 	public:
 
-		float	mForwardSpeed;
-		float	mStrafeSpeed;
-		float	mAngularSpeed;
+		float mForwardSpeed;
+		float mStrafeSpeed;
+		float mAngularSpeed;
 
 		Component::OrthographicCamera* mEditorCamera;
-		Component::PerspectiveCamera*  mWorldCamera;
+		Component::PerspectiveCamera* mWorldCamera;
 
 		//////////////////////////////
-		
+
 		EditorControllerComponent();
 
-		void	Startup();
+		void Startup();
 
-		void	Update();
+		void Update();
 
-		void	Shutdown();
+		void Shutdown();
 	};
 }

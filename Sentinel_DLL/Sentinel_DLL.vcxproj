@@ -306,7 +306,10 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)Sentine
     <ClCompile Include="..\Engine\src\Sprite.cpp" />
     <ClCompile Include="..\Engine\src\SpriteManager.cpp" />
     <ClCompile Include="..\Engine\src\SpriteSystem.cpp" />
-    <ClCompile Include="..\Engine\src\stb_image.c" />
+    <ClCompile Include="..\Engine\src\stb_image.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\Engine\src\Texture.cpp" />
     <ClCompile Include="..\Engine\src\TextureManager.cpp" />
     <ClCompile Include="..\Engine\src\Timing.cpp" />

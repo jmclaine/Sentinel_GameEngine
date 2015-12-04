@@ -70,23 +70,19 @@ namespace Sentinel
 
 			int scroll = mouse.ScrollDistance();
 
-			// Forward.
-			//
+			// Forward
 			if (scroll > 0)
 				impulse += mTransform->GetMatrixWorld().Forward();
 
-			// Backward.
-			//
+			// Backward
 			if (scroll < 0)
 				impulse -= mTransform->GetMatrixWorld().Forward();
 
-			// Move in direction.
-			//
+			// Move
 			if (impulse.LengthSquared() > 0)
 				body->ApplyCentralImpulse(impulse.Normalize() * mForwardSpeed);
 
-			// Strafe.
-			//
+			// Strafe
 			if (mouse.IsDown(BUTTON_MIDDLE))
 			{
 				impulse = Vector3f(0, 0, 0);
@@ -97,8 +93,7 @@ namespace Sentinel
 				impulse -= mTransform->GetMatrixWorld().Right() * x;
 				impulse += mTransform->GetMatrixWorld().Up() * y;
 
-				// Move in direction.
-				//
+				// Move
 				if (impulse.LengthSquared() > 0)
 					body->ApplyCentralImpulse(impulse.Normalize() * mStrafeSpeed);
 
@@ -111,8 +106,7 @@ namespace Sentinel
 			{
 				Vector3f diff = Vector3f((float)(mLastMousePos.y - mousePos.y), (float)(mLastMousePos.x - mousePos.x), 0) * mAngularSpeed;
 
-				// Rotate in direction with spherical interpolation.
-				//
+				// Rotate
 				static Quatf qFinal = body->GetOrientation();
 
 				if (diff.LengthSquared() > 0)
@@ -125,7 +119,7 @@ namespace Sentinel
 
 				Quatf qResult = body->GetOrientation().Slerp(qFinal, CLAMP((mOwner->GetWorld()->mTiming->DeltaTime()*10.0f), 0.0f, 1.0f));
 
-				if (qResult.LengthSquared() > 0)	// slerp can end with an invalid rotation
+				if (qResult.LengthSquared() > 0) // slerp can end with an invalid rotation
 					body->SetOrientation(qResult);
 
 				impulse = Vector3f(0, 0, 0);
@@ -160,8 +154,7 @@ namespace Sentinel
 					impulse -= mTransform->GetMatrixWorld().Up();
 				}
 
-				// Move in direction.
-				//
+				// Move
 				if (impulse.LengthSquared() > 0)
 					body->ApplyCentralImpulse(impulse.Normalize() * mStrafeSpeed);
 

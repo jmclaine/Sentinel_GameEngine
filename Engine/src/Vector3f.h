@@ -28,6 +28,8 @@ namespace Sentinel
 
 		float* Ptr() const;
 
+		std::string ToString() const;
+
 		Vector3f operator - () const;
 
 		bool operator == (const Vector3f& v) const;

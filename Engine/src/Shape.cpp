@@ -3,6 +3,7 @@
 #include "MathUtil.h"
 #include "Shape.h"
 #include "Vector4f.h"
+#include "Debug.h"
 
 namespace Sentinel
 {
@@ -124,7 +125,11 @@ namespace Sentinel
 		m[0] = u1.x;	m[1] = u1.y;	m[2] = u1.z;
 		m[3] = u2.x;	m[4] = u2.y;	m[5] = u2.z;
 		m[6] = u3.x;	m[7] = u3.y;	m[8] = u3.z;
-		float det = 2.0f * m[0] * (m[4] * m[8] - m[5] * m[7]) - m[1] * (m[3] * m[8] - m[5] * m[6]) + m[2] * (m[3] * m[7] - m[4] * m[6]);
+
+		float det = 
+			2.0f * m[0] * (m[4] * m[8] - m[5] * m[7]) - 
+			m[1] * (m[3] * m[8] - m[5] * m[6]) + 
+			m[2] * (m[3] * m[7] - m[4] * m[6]);
 
 		// Guarantee a smallest sphere of three points.
 		//
@@ -166,9 +171,9 @@ namespace Sentinel
 	// Nicolas Capens @ www.flipcode.com/archives/Smallest_Enclosing_Spheres.html
 	// Guest @ pastebin.com/04b1GBA2
 	//
-	BoundingSphere::BoundingSphere(char* verts, UINT count, UINT stride)
+	BoundingSphere::BoundingSphere(const BYTE* verts, UINT count, UINT stride)
 	{
-		std::vector< Vector3f > points;		// points of interest
+		std::vector<Vector3f> points; // points of interest
 		mCenter = *(Vector3f*)verts;
 
 		points.push_back(mCenter);
@@ -539,6 +544,12 @@ namespace Sentinel
 		return (point - mCenter).LengthSquared() < (mRadius * mRadius);
 	}
 
+	bool BoundingSphere::Intersects(const Ray& ray, Vector3f* intersection) const
+	{
+		_ASSERT(0); // not implemented
+		return false;
+	}
+
 	bool BoundingSphere::Intersects(const BoundingSphere& sphere) const
 	{
 		float d = (mCenter - sphere.mCenter).LengthSquared();
@@ -629,16 +640,26 @@ namespace Sentinel
 
 	void BoundingBox::Set(const BYTE* verts, UINT count, UINT stride)
 	{
+		//Debug::Log(STREAM("verts count: " << count << "; stride: " << stride));
+
 		Vector3f minPos(FLT_MAX, FLT_MAX, FLT_MAX);
 		Vector3f maxPos(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
 		for (UINT x = 0; x < count; ++x)
 		{
-			minPos = minPos.Min(*(Vector3f*)verts);
-			maxPos = maxPos.Max(*(Vector3f*)verts);
+			const Vector3f& vert = *(Vector3f*)verts;
+
+			//Debug::Log(vert.ToString());
+
+			minPos = minPos.Min(vert);
+			maxPos = maxPos.Max(vert);
 
 			verts += stride;
 		}
+		
+		//Debug::Log("result");
+		//Debug::Log(minPos.ToString());
+		//Debug::Log(maxPos.ToString());
 
 		Set(minPos, maxPos);
 	}
@@ -705,6 +726,12 @@ namespace Sentinel
 		return sphere.Intersects(*this);
 	}
 
+	bool BoundingBox::Intersects(const BoundingBox& box) const
+	{
+		_ASSERT(0); // not implemented
+		return false;
+	}
+
 	//////////////////////////////////////////////////////
 
 	BoundingFrustum::BoundingFrustum()
@@ -716,14 +743,16 @@ namespace Sentinel
 		Set(nearCenter, farCenter, nearExtent, farExtent);
 	}
 
-	BoundingFrustum::BoundingFrustum(const Vector3f& nearCenter, const Vector3f& farCenter,
+	BoundingFrustum::BoundingFrustum(
+		const Vector3f& nearCenter, const Vector3f& farCenter,
 		const Vector2f& nearExtent, const Vector2f& farExtent,
 		const Vector3f& forward, const Vector3f& right, const Vector3f& up)
 	{
 		Set(nearCenter, farCenter, nearExtent, farExtent, forward, right, up);
 	}
 
-	void BoundingFrustum::Set(const Vector3f& nearCenter, const Vector3f& farCenter,
+	void BoundingFrustum::Set(
+		const Vector3f& nearCenter, const Vector3f& farCenter,
 		const Vector2f& nearExtent, const Vector2f& farExtent)
 	{
 		Vector3f forward = (farCenter - nearCenter).NormalizeFast();
@@ -733,7 +762,8 @@ namespace Sentinel
 		Set(nearCenter, farCenter, nearExtent, farExtent, forward, right, up);
 	}
 
-	void BoundingFrustum::Set(const Vector3f& nearCenter, const Vector3f& farCenter,
+	void BoundingFrustum::Set(
+		const Vector3f& nearCenter, const Vector3f& farCenter,
 		const Vector2f& nearExtent, const Vector2f& farExtent,
 		const Vector3f& forward, const Vector3f& right, const Vector3f& up)
 	{
@@ -770,6 +800,24 @@ namespace Sentinel
 		// FAR
 		mPlane[5].mPosition = ftl;
 		mPlane[5].mNormal = -forward;
+	}
+
+	bool BoundingFrustum::Intersects(const Vector3f& point) const
+	{
+		_ASSERT(0); // not implemented
+		return false;
+	}
+
+	bool BoundingFrustum::Intersects(const Ray& ray, Vector3f* intersection) const
+	{
+		_ASSERT(0); // not implemented
+		return false;
+	}
+
+	bool BoundingFrustum::Intersects(const BoundingSphere& sphere) const
+	{
+		_ASSERT(0); // not implemented
+		return false;
 	}
 
 	bool BoundingFrustum::Intersects(const BoundingBox& box) const

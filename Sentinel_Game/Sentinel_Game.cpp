@@ -73,15 +73,15 @@ using namespace Sentinel;
 //
 class MainApp
 {
-	HACCEL					mAccelTable;
+	HACCEL mAccelTable;
 
-	GameWindow*				mGameWindow;
-	Renderer*				mRenderer;
+	GameWindow* mGameWindow;
+	Renderer* mRenderer;
 
-	GameWorld*				mGameWorld;
+	GameWorld* mGameWorld;
 
-	RenderTexture*			mRTMain;
-	DepthStencil*			mDSMain;
+	RenderTexture* mRTMain;
+	DepthStencil* mDSMain;
 
 public:
 
@@ -271,10 +271,11 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-int APIENTRY _tWinMain(HINSTANCE hInstance,
+int APIENTRY _tWinMain(
+	HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
-	LPTSTR    lpCmdLine,
-	int       nCmdShow)
+	LPTSTR lpCmdLine,
+	int nCmdShow)
 {
 	// Check for memory leaks.
 	//

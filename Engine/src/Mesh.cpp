@@ -217,7 +217,6 @@ namespace Sentinel
 			if (mIndexBuffer)
 			{
 				renderer->SetIndexBuffer(mIndexBuffer);
-
 				renderer->DrawIndexed(mPrimitive, (count == UINT_MAX) ? mIndexBuffer->Count() : count, 0, 0);
 			}
 			else
