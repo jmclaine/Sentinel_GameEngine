@@ -503,19 +503,19 @@ namespace Sentinel
 
 		glUniform1i(mUniformsGL[uniform], mTextureLevel);
 
-		GLenum texID = GL_TEXTURE0 + mTextureLevel;
-
-		if (CURR_ACTIVE != texID)
-		{
-			glActiveTexture(texID);
-
-			CURR_ACTIVE = texID;
-		}
-
 		Texture*& currTex = CURR_TEXTURE[mTextureLevel];
 
 		if (currTex != texture)
 		{
+			GLenum texID = GL_TEXTURE0 + mTextureLevel;
+
+			if (CURR_ACTIVE != texID)
+			{
+				glActiveTexture(texID);
+
+				CURR_ACTIVE = texID;
+			}
+
 			TextureGL* tex = static_cast<TextureGL*>(texture);
 
 			glBindTexture(GL_TEXTURE_2D, tex->ID());
@@ -530,19 +530,17 @@ namespace Sentinel
 	{
 		glUniform1i(mUniformsGL[uniform], mTextureLevel);
 
-		// sufficient for now
-
 		static Texture* CURR_CUBE = NULL;
-
-		if (CURR_ACTIVE != GL_TEXTURE_CUBE_MAP)
-		{
-			glActiveTexture(GL_TEXTURE_CUBE_MAP);
-
-			CURR_ACTIVE = GL_TEXTURE_CUBE_MAP;
-		}
 
 		if (CURR_CUBE != texture)
 		{
+			if (CURR_ACTIVE != GL_TEXTURE_CUBE_MAP)
+			{
+				glActiveTexture(GL_TEXTURE_CUBE_MAP);
+
+				CURR_ACTIVE = GL_TEXTURE_CUBE_MAP;
+			}
+
 			TextureGL* tex = static_cast<TextureGL*>(texture);
 
 			glBindTexture(GL_TEXTURE_CUBE_MAP, tex->ID());

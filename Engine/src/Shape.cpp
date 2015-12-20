@@ -591,31 +591,31 @@ namespace Sentinel
 		Set(Vector3f(-1, -1, -1), Vector3f(1, 1, 1), matWorld);
 	}
 
+#define SET_MIN_MAX_POINT(offset)\
+	point = matWorld.Transform(center + offset);\
+	minPos = minPos.Min(point);\
+	maxPos = maxPos.Max(point);
+
 	void BoundingBox::Set(
 		const Vector3f& minBounds, 
 		const Vector3f& maxBounds, 
 		const Matrix4f& matWorld)
 	{
-		// AABB
-		//
 		Vector3f center((maxBounds - minBounds) * 0.5f);
 		Vector3f extent(maxBounds - center);
 
-		Vector3f posX = center + Vector3f(extent.x, 0, 0);
-		Vector3f posY = center + Vector3f(0, extent.y, 0);
-		Vector3f posZ = center + Vector3f(0, 0, extent.z);
+		Vector3f minPos(FLT_MAX, FLT_MAX, FLT_MAX);
+		Vector3f maxPos(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
-		Vector3f newCenter = matWorld.Transform(center);
-		Vector3f newExtent = matWorld.Transform(extent, 0);
-
-		Vector3f minPos(newCenter - newExtent);
-		Vector3f maxPos(newCenter + newExtent);
-
-		for (UINT x = 0; x < 3; ++x)
-		{
-			if (minPos[x] > maxPos[x])
-				std::swap(minPos[x], maxPos[x]);
-		}
+		Vector3f point;
+		SET_MIN_MAX_POINT(Vector3f(-extent.x, extent.y, -extent.z));
+		SET_MIN_MAX_POINT(Vector3f(extent.x, extent.y, -extent.z));
+		SET_MIN_MAX_POINT(Vector3f(extent.x, -extent.y, -extent.z));
+		SET_MIN_MAX_POINT(Vector3f(-extent.x, -extent.y, -extent.z));
+		SET_MIN_MAX_POINT(Vector3f(-extent.x, extent.y, extent.z));
+		SET_MIN_MAX_POINT(Vector3f(extent.x, extent.y, extent.z));
+		SET_MIN_MAX_POINT(Vector3f(extent.x, -extent.y, extent.z));
+		SET_MIN_MAX_POINT(Vector3f(-extent.x, -extent.y, extent.z));
 
 		// min
 		mPlane[0].mPosition = minPos;

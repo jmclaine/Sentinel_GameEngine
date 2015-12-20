@@ -454,7 +454,7 @@ public:
 		//
 		// Create World View Backbuffer
 		//
-		mRTGameWorld = mRenderer->CreateRenderTexture(mEditorWorld->mTextureManager->Add("Backbuffer", SHARED(mRenderer->CreateTexture(Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE, ImageFormat::RGBA))).get());
+		mRTGameWorld = mRenderer->CreateRenderTexture(mEditorWorld->mTextureManager->Add("Backbuffer", SHARED(mRenderer->CreateTexture(Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE, ImageFormat::RGB))).get());
 		mDSGameWorld = mRenderer->CreateDepthStencil(Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE);
 
 		material = mEditorWorld->mMaterialManager->Add("Backbuffer", std::shared_ptr< Material >(new Material()));
@@ -790,7 +790,8 @@ public:
 
 		////////////////////////////////////
 
-		// Main Camera.
+		//
+		// Main Camera
 		//
 		obj = mGameWorld->AddGameObject(new GameObject());
 		obj->mName = "Main Camera";
@@ -813,7 +814,8 @@ public:
 		camera->mViewportWidth = Renderer::WINDOW_WIDTH_BASE;
 		camera->mViewportHeight = Renderer::WINDOW_HEIGHT_BASE;
 
-		// Create color only box.
+		//
+		// Colored Box
 		//
 		meshBuilder.CreateCube(1.0f);
 		meshBuilder.mLayout = shaderColor->Layout();
@@ -827,7 +829,8 @@ public:
 		mesh = mGameWorld->mMeshManager->Add("Box", SHARED(meshBuilder.BuildMesh(mRenderer)));
 		mesh->mMaterial = material;
 
-		// Ground object - Bottom.
+		//
+		// Ground object - Bottom
 		//
 		obj = mGameWorld->AddGameObject(new GameObject());
 		obj->mName = "Ground_Bottom";
@@ -844,7 +847,8 @@ public:
 		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
 		meshComp->mIsDynamic = true;
 
-		// Ground object - Back.
+		//
+		// Ground object - Back
 		//
 		obj = mGameWorld->AddGameObject(new GameObject());
 		obj->mName = "Ground_Back";
@@ -861,7 +865,8 @@ public:
 		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
 		meshComp->mIsDynamic = true;
 
-		// Ground object - Right.
+		//
+		// Ground object - Right
 		//
 		obj = mGameWorld->AddGameObject(new GameObject());
 		obj->mName = "Ground_Right";
@@ -878,7 +883,8 @@ public:
 		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
 		meshComp->mIsDynamic = true;
 
-		// Ground object - Left.
+		//
+		// Ground object - Left
 		//
 		obj = mGameWorld->AddGameObject(new GameObject());
 		obj->mName = "Ground_Left";
@@ -896,7 +902,8 @@ public:
 		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
 		meshComp->mIsDynamic = true;
 
-		// Ground object - Top.
+		//
+		// Ground object - Top
 		//
 		obj = mGameWorld->AddGameObject(new GameObject());
 		obj->mName = "Ground_Top";
@@ -913,7 +920,8 @@ public:
 		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
 		meshComp->mIsDynamic = true;
 
-		// Box object - Right.
+		//
+		// Box object - Right
 		//
 		obj = mGameWorld->AddGameObject(new GameObject());
 		obj->mName = "Box_Right";
@@ -929,7 +937,8 @@ public:
 		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
 		meshComp->mIsDynamic = true;
 
-		// Box object - Left.
+		//
+		// Box object - Left
 		//
 		obj = mGameWorld->AddGameObject(new GameObject());
 		obj->mName = "Box_Left";
@@ -945,7 +954,8 @@ public:
 		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
 		meshComp->mIsDynamic = true;
 
-		// Box object - Top.
+		//
+		// Box object - Top
 		//
 		obj = mGameWorld->AddGameObject(new GameObject());
 		obj->mName = "Box_Top";
@@ -961,7 +971,8 @@ public:
 		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
 		meshComp->mIsDynamic = true;
 
-		// Box object - Back.
+		//
+		// Box object - Back
 		//
 		obj = mGameWorld->AddGameObject(new GameObject());
 		obj->mName = "Box_Back";
@@ -977,6 +988,7 @@ public:
 
 		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
 		meshComp->mIsDynamic = true;
+
 		//
 		// Dodecahedron
 		//
@@ -1010,6 +1022,7 @@ public:
 		meshVBO->Unlock();
 
 		mGameWorld->AddGameObject(obj);
+
 		//
 		// Sphere
 		//
@@ -1199,8 +1212,6 @@ public:
 		material->mDepthMode = DepthFormat::LEQUAL;
 		material->mCullMode = CullFormat::NONE;
 		material->mRenderQueue = RenderQueue::FOREGROUND;
-
-		//mDebug = new Debug( mRenderer, mGameWorld, material );
 	}
 
 	void CreateTranslateObject()
@@ -1228,7 +1239,8 @@ public:
 			material->mAmbient.a = 0.5f;
 		}
 
-		// Root Translate Object.
+		//
+		// Root Translate Object
 		//
 		mTranslateObject->Attach(new Transform());
 
