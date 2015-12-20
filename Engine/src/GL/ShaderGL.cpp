@@ -14,13 +14,16 @@ namespace Sentinel
 	glTexParameteri(target, pname, param);
 
 	/*
-	#define APPLY_SAMPLER( target, pname, param )\
-	if( CURR_STATE.param != param )\
+	#define APPLY_SAMPLER(target, pname, param)\
+	if (CURR_STATE.param != param)\
 	{\
-	glTexParameteri( target, pname, param );\
+	glTexParameteri(target, pname, param);\
 	CURR_STATE.param = param;\
 	}
 	*/
+
+	GLenum ShaderGL::CURR_ACTIVE = -1;
+	Texture* ShaderGL::CURR_TEXTURE[32] = {};
 
 	ShaderGL::SamplerGL::SamplerGL(
 		GLint wrapS, GLint wrapT,
@@ -199,7 +202,7 @@ namespace Sentinel
 
 		if (attrib != -1)
 		{
-			mAttribute.push_back(type);
+			mAttributes.push_back(type);
 
 			++mAttributeSize;
 
@@ -215,8 +218,8 @@ namespace Sentinel
 
 		if (uniform != -1)
 		{
-			mUniform.push_back(type);
-			mUniformGL.push_back(uniform);
+			mUniforms.push_back(type);
+			mUniformsGL.push_back(uniform);
 
 			return true;
 		}
@@ -346,10 +349,10 @@ namespace Sentinel
 		//
 		VertexLayoutGL* layout = new VertexLayoutGL();
 
-		UINT size = (UINT)mAttribute.size();
+		UINT size = (UINT)mAttributes.size();
 		for (UINT x = 0; x < size; ++x)
 		{
-			layout->AddAttribute(mAttribute[x]);
+			layout->AddAttribute(mAttributes[x]);
 		}
 
 		mLayout = std::shared_ptr< VertexLayout >(layout);
@@ -415,7 +418,7 @@ namespace Sentinel
 
 	///////////////////////////////////
 
-	int ShaderGL::Compile(const GLchar** source, GLuint& shader, GLenum type, GLsizei count)
+	bool ShaderGL::Compile(const GLchar** source, GLuint& shader, GLenum type, GLsizei count)
 	{
 		_ASSERT(type == GL_VERTEX_SHADER || type == GL_FRAGMENT_SHADER || type == GL_GEOMETRY_SHADER);
 
@@ -461,48 +464,46 @@ namespace Sentinel
 
 			glDeleteShader(shader);
 
-			return 0;
+			return false;
 		}
 
-		return 1;
+		return true;
 	}
 
 	///////////////////////////////////
 
 	void ShaderGL::SetFloat(UINT uniform, float* data, UINT count)
 	{
-		glUniform1fv(mUniformGL[uniform], count, data);
+		glUniform1fv(mUniformsGL[uniform], count, data);
 	}
 
 	void ShaderGL::SetFloat2(UINT uniform, float* data, UINT count)
 	{
-		glUniform2fv(mUniformGL[uniform], count, data);
+		glUniform2fv(mUniformsGL[uniform], count, data);
 	}
 
 	void ShaderGL::SetFloat3(UINT uniform, float* data, UINT count)
 	{
-		glUniform3fv(mUniformGL[uniform], count, data);
+		glUniform3fv(mUniformsGL[uniform], count, data);
 	}
 
 	void ShaderGL::SetFloat4(UINT uniform, float* data, UINT count)
 	{
-		glUniform4fv(mUniformGL[uniform], count, data);
+		glUniform4fv(mUniformsGL[uniform], count, data);
 	}
 
 	void ShaderGL::SetMatrix(UINT uniform, float* matrix, UINT count)
 	{
-		glUniformMatrix4fv(mUniformGL[uniform], count, false, matrix);
+		glUniformMatrix4fv(mUniformsGL[uniform], count, false, matrix);
 	}
 
 	void ShaderGL::SetTexture(UINT uniform, Texture* texture)
 	{
 		_ASSERT(texture != NULL);
 
-		glUniform1i(mUniformGL[uniform], mTextureLevel);
+		glUniform1i(mUniformsGL[uniform], mTextureLevel);
 
 		GLenum texID = GL_TEXTURE0 + mTextureLevel;
-
-		static GLenum CURR_ACTIVE = 0;
 
 		if (CURR_ACTIVE != texID)
 		{
@@ -511,48 +512,45 @@ namespace Sentinel
 			CURR_ACTIVE = texID;
 		}
 
-		static GLuint CURR_TEXTURE = -1;
+		Texture*& currTex = CURR_TEXTURE[mTextureLevel];
 
-		GLuint id = ((TextureGL*)texture)->ID();
-
-		if (CURR_TEXTURE != id)
+		if (currTex != texture)
 		{
-			glBindTexture(GL_TEXTURE_2D, id);
+			TextureGL* tex = static_cast<TextureGL*>(texture);
 
-			CURR_TEXTURE = id;
+			glBindTexture(GL_TEXTURE_2D, tex->ID());
+
+			currTex = texture;
 		}
 
-		static_cast<SamplerGL*>(mSampler[mTextureLevel])->Apply();
-
-		++mTextureLevel;
+		static_cast<SamplerGL*>(mSampler[mTextureLevel++])->Apply();
 	}
 
 	void ShaderGL::SetTextureCube(UINT uniform, Texture* texture)
 	{
-		glUniform1i(mUniformGL[uniform], mTextureLevel);
+		glUniform1i(mUniformsGL[uniform], mTextureLevel);
 
-		static bool IS_ACTIVE = false;
+		// sufficient for now
 
-		if (!IS_ACTIVE)
+		static Texture* CURR_CUBE = NULL;
+
+		if (CURR_ACTIVE != GL_TEXTURE_CUBE_MAP)
 		{
-			glClientActiveTexture(GL_TEXTURE_CUBE_MAP);
+			glActiveTexture(GL_TEXTURE_CUBE_MAP);
 
-			IS_ACTIVE = true;
+			CURR_ACTIVE = GL_TEXTURE_CUBE_MAP;
 		}
 
-		static GLuint CURR_TEXTURE = -1;
-
-		GLuint id = ((TextureGL*)texture)->ID();
-		if (CURR_TEXTURE != id)
+		if (CURR_CUBE != texture)
 		{
-			glBindTexture(GL_TEXTURE_CUBE_MAP, ((TextureGL*)texture)->ID());
+			TextureGL* tex = static_cast<TextureGL*>(texture);
 
-			CURR_TEXTURE = id;
+			glBindTexture(GL_TEXTURE_CUBE_MAP, tex->ID());
+
+			CURR_CUBE = texture;
 		}
 
-		static_cast<SamplerCubeGL*>(mSampler[mTextureLevel])->Apply();
-
-		++mTextureLevel;
+		static_cast<SamplerCubeGL*>(mSampler[mTextureLevel++])->Apply();
 	}
 
 	void ShaderGL::SetSampler(

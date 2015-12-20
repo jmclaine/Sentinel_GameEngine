@@ -62,7 +62,7 @@ namespace Sentinel
 			UINT lightCount = 0;
 			UINT uniformIndex = 0;
 
-			const std::vector<ShaderUniform::Type>& uniform = shader->Uniform();
+			const std::vector<ShaderUniform::Type>& uniform = shader->Uniforms();
 
 			for (UINT i = 0; i < uniform.size(); ++i)
 			{
@@ -108,7 +108,7 @@ namespace Sentinel
 
 				case ShaderUniform::TEXTURE:
 					_ASSERT(mMaterial.get());
-					_ASSERT(mMaterial->mTexture[texCount].get());	// no texture loaded
+					_ASSERT(mMaterial->mTexture[texCount].get()); // no texture loaded
 
 					shader->SetTexture(uniformIndex, mMaterial->mTexture[texCount].get());
 					++texCount;
@@ -183,7 +183,7 @@ namespace Sentinel
 					_ASSERT(world);
 					_ASSERT(world->GetLight(lightCount));
 
-					//shader->SetMatrix( uniformIndex, static_cast< DirectionalLightComponent* >(world->GetLight( lightCount ))->PtrMatrixFinal() );
+					//shader->SetMatrix(uniformIndex, static_cast<DirectionalLightComponent*>(world->GetLight(lightCount))->PtrMatrixFinal());
 					break;
 
 				case ShaderUniform::LIGHT_CUBE_MATRIX:

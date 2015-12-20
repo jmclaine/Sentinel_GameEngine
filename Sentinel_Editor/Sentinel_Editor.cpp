@@ -1043,7 +1043,7 @@ public:
 		//
 		// Texture
 		//
-		/*meshBuilder.ClearAll();
+		meshBuilder.ClearAll();
 		meshBuilder.CreateCube(1);
 		meshBuilder.mLayout = shaderTexture->Layout();
 
@@ -1069,7 +1069,7 @@ public:
 		physics = (Physics*)obj->Attach(new Physics());
 		physics->SetRigidBody(mGameWorld->mPhysicsSystem->CreateRigidBody(mGameWorld->mPhysicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
 		body = physics->GetRigidBody();
-		*/
+		
 		//
 		// Normal Map
 		//
@@ -1259,7 +1259,7 @@ public:
 		obj->Attach(transform);
 
 		modelComp = new ModelDrawable(model);
-		//modelComp->SetMaterial( mSelectedMaterialY );
+		//modelComp->SetMaterial(mSelectedMaterialY);
 		obj->Attach(modelComp);
 
 		mTranslateObject->AddChild(obj);

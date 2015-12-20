@@ -9,21 +9,21 @@ namespace Sentinel
 	{
 	private:
 
-		Renderer*	mRenderer;
-		GLuint		mID;
+		Renderer* mRenderer;
+		GLuint mID;
 
 	public:
 
-		BufferGL( Renderer* renderer, void* data, UINT size, UINT stride, BufferFormat::Type format, BufferAccess::Type access );
+		BufferGL(Renderer* renderer, void* data, UINT size, UINT stride, BufferFormat::Type format, BufferAccess::Type access);
 		~BufferGL();
 
-		void		Release();
+		void Release();
 
-		GLuint		ID();
+		GLuint ID();
 
 		//////////////////////////////////
 
-		void*		Lock();
-		void		Unlock();
+		void* Lock();
+		void Unlock();
 	};
 }

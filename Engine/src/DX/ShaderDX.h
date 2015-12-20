@@ -36,7 +36,7 @@ namespace Sentinel
 			~SamplerDX();
 
 			bool Create(
-				ID3D11Device* device, ID3D11DeviceContext*	context,
+				ID3D11Device* device, ID3D11DeviceContext* context,
 				SamplerMode::Type modeU, SamplerMode::Type modeV,
 				SamplerFilter::Type minFilter,
 				SamplerFilter::Type magFilter,
@@ -57,7 +57,7 @@ namespace Sentinel
 		ID3D11Buffer* mConstantBuffer;
 		BYTE* mConstantBufferData;
 
-		std::vector<UINT> mUniformDX; // stores offsets
+		std::vector<UINT> mUniformsDX; // stores offsets
 
 		UINT mTextureLevel;
 

@@ -6,29 +6,29 @@ namespace Sentinel
 {
 	Shader::Sampler::Sampler()
 	{}
-	
+
 	Shader::Sampler::~Sampler()
 	{}
 
 	////////////////////////////////////
 
 	Shader::Shader() :
-		mSource( NULL ),
-		mSampler( NULL ),
-		mNumSamplers( 0 )
+		mSource(NULL),
+		mSampler(NULL),
+		mNumSamplers(0)
 	{}
 
 	Shader::~Shader()
 	{
-		if( mSampler )
+		if (mSampler)
 		{
-			for( UINT x = 0; x < mNumSamplers; ++x )
-				delete mSampler[ x ];
+			for (UINT x = 0; x < mNumSamplers; ++x)
+				delete mSampler[x];
 
 			delete[] mSampler;
 		}
 
-		free( mSource );
+		free(mSource);
 	}
 
 	const char* Shader::Source()
@@ -36,17 +36,17 @@ namespace Sentinel
 		return mSource;
 	}
 
-	const std::vector< VertexAttribute::Type >& Shader::Attribute()
+	const std::vector<VertexAttribute::Type>& Shader::Attributes()
 	{
-		return mAttribute;
+		return mAttributes;
 	}
 
-	const std::vector< ShaderUniform::Type >& Shader::Uniform()
+	const std::vector<ShaderUniform::Type>& Shader::Uniforms()
 	{
-		return mUniform;
+		return mUniforms;
 	}
 
-	const std::shared_ptr< VertexLayout > Shader::Layout()
+	const std::shared_ptr<VertexLayout> Shader::Layout()
 	{
 		return mLayout;
 	}

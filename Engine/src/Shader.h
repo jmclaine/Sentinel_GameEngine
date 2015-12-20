@@ -11,9 +11,9 @@
 
 namespace Sentinel
 {
-	#define MAX_BONE_MATRICES		100
-	#define MAX_TEXTURES			4
-	#define MAX_LIGHTS				1
+#define MAX_BONE_MATRICES	100
+#define MAX_TEXTURES		4
+#define MAX_LIGHTS			1
 
 	class Texture;
 
@@ -36,8 +36,8 @@ namespace Sentinel
 
 		char* mSource;
 
-		std::vector<VertexAttribute::Type> mAttribute;
-		std::vector<ShaderUniform::Type> mUniform;
+		std::vector<VertexAttribute::Type> mAttributes;
+		std::vector<ShaderUniform::Type> mUniforms;
 
 		std::shared_ptr<VertexLayout> mLayout;
 
@@ -53,8 +53,8 @@ namespace Sentinel
 		virtual ~Shader();
 
 		const char* Source();
-		const std::vector<VertexAttribute::Type>& Attribute();
-		const std::vector<ShaderUniform::Type>& Uniform();
+		const std::vector<VertexAttribute::Type>& Attributes();
+		const std::vector<ShaderUniform::Type>& Uniforms();
 		const std::shared_ptr<VertexLayout> Layout();
 
 		virtual void Release() = 0;

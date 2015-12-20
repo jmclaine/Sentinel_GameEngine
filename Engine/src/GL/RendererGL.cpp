@@ -573,7 +573,7 @@ namespace Sentinel
 			return pixels;
 		}
 
-		// Special Rendering.
+		// Special Rendering
 		//
 		RenderTexture* CreateBackbuffer()
 		{

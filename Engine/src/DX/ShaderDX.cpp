@@ -144,7 +144,7 @@ namespace Sentinel
 
 		SAFE_RELEASE_PTR(mConstantBuffer);
 
-		mUniform.clear();
+		mUniforms.clear();
 	}
 
 	///////////////////////////////////
@@ -158,7 +158,7 @@ namespace Sentinel
 		if (var->GetDesc(&varDesc) == E_FAIL)
 			return false;
 
-		mUniformDX.push_back(varDesc.StartOffset);
+		mUniformsDX.push_back(varDesc.StartOffset);
 
 		return true;
 	}
@@ -252,66 +252,66 @@ namespace Sentinel
 
 			if (strcmp(varDesc.SemanticName, "POSITION") == 0)
 			{
-				mAttribute.push_back(VertexAttribute::POSITION);
+				mAttributes.push_back(VertexAttribute::POSITION);
 			}
 			else
 				if (strcmp(varDesc.SemanticName, "TEXCOORD") == 0)
 				{
 					if (varDesc.SemanticIndex == 0)
-						mAttribute.push_back(VertexAttribute::TEXCOORD0);
+						mAttributes.push_back(VertexAttribute::TEXCOORD0);
 					else
 						if (varDesc.SemanticIndex == 1)
-							mAttribute.push_back(VertexAttribute::TEXCOORD1);
+							mAttributes.push_back(VertexAttribute::TEXCOORD1);
 						else
 							if (varDesc.SemanticIndex == 2)
-								mAttribute.push_back(VertexAttribute::TEXCOORD2);
+								mAttributes.push_back(VertexAttribute::TEXCOORD2);
 				}
 				else
 					if (strcmp(varDesc.SemanticName, "QUADCOORD") == 0)
 					{
 						if (varDesc.SemanticIndex == 0)
-							mAttribute.push_back(VertexAttribute::QUADCOORD0);
+							mAttributes.push_back(VertexAttribute::QUADCOORD0);
 						else
 							if (varDesc.SemanticIndex == 1)
-								mAttribute.push_back(VertexAttribute::QUADCOORD1);
+								mAttributes.push_back(VertexAttribute::QUADCOORD1);
 							else
 								if (varDesc.SemanticIndex == 2)
-									mAttribute.push_back(VertexAttribute::QUADCOORD2);
+									mAttributes.push_back(VertexAttribute::QUADCOORD2);
 					}
 					else
 						if (strcmp(varDesc.SemanticName, "NORMAL") == 0)
 						{
-							mAttribute.push_back(VertexAttribute::NORMAL);
+							mAttributes.push_back(VertexAttribute::NORMAL);
 						}
 						else
 							if (strcmp(varDesc.SemanticName, "COLOR") == 0)
 							{
-								mAttribute.push_back(VertexAttribute::COLOR);
+								mAttributes.push_back(VertexAttribute::COLOR);
 							}
 							else
 								if (strcmp(varDesc.SemanticName, "TANGENT") == 0)
 								{
-									mAttribute.push_back(VertexAttribute::COLOR);
+									mAttributes.push_back(VertexAttribute::COLOR);
 								}
 								else
 									if (strcmp(varDesc.SemanticName, "BONE_COUNT") == 0)
 									{
-										mAttribute.push_back(VertexAttribute::BONE_COUNT);
+										mAttributes.push_back(VertexAttribute::BONE_COUNT);
 									}
 									else
 										if (strcmp(varDesc.SemanticName, "BONE_INDEX") == 0)
 										{
-											mAttribute.push_back(VertexAttribute::BONE_INDEX);
+											mAttributes.push_back(VertexAttribute::BONE_INDEX);
 										}
 										else
 											if (strcmp(varDesc.SemanticName, "BONE_WEIGHT") == 0)
 											{
-												mAttribute.push_back(VertexAttribute::BONE_WEIGHT);
+												mAttributes.push_back(VertexAttribute::BONE_WEIGHT);
 											}
 											else
 												if (strcmp(varDesc.SemanticName, "MATRIX") == 0)
 												{
-													mAttribute.push_back(VertexAttribute::MATRIX);
+													mAttributes.push_back(VertexAttribute::MATRIX);
 													x += 3;
 												}
 		}
@@ -320,11 +320,11 @@ namespace Sentinel
 		//
 		VertexLayoutDX* layout = new VertexLayoutDX();
 
-		UINT size = (UINT)mAttribute.size();
+		UINT size = (UINT)mAttributes.size();
 
 		for (UINT x = 0; x < size; ++x)
 		{
-			layout->AddAttribute(mAttribute[x]);
+			layout->AddAttribute(mAttributes[x]);
 		}
 
 		layout->Create(mDevice, blobVS);
@@ -378,64 +378,64 @@ namespace Sentinel
 		if (cbuffer)
 		{
 			if (CreateUniform("_WVP", cbuffer))
-				mUniform.push_back(ShaderUniform::WVP);
+				mUniforms.push_back(ShaderUniform::WVP);
 
 			if (CreateUniform("_World", cbuffer))
-				mUniform.push_back(ShaderUniform::WORLD);
+				mUniforms.push_back(ShaderUniform::WORLD);
 
 			if (CreateUniform("_InvWorld", cbuffer))
-				mUniform.push_back(ShaderUniform::INV_WORLD);
+				mUniforms.push_back(ShaderUniform::INV_WORLD);
 
 			if (CreateUniform("_View", cbuffer))
-				mUniform.push_back(ShaderUniform::VIEW);
+				mUniforms.push_back(ShaderUniform::VIEW);
 
 			if (CreateUniform("_InvView", cbuffer))
-				mUniform.push_back(ShaderUniform::INV_VIEW);
+				mUniforms.push_back(ShaderUniform::INV_VIEW);
 
 			if (CreateUniform("_Proj", cbuffer))
-				mUniform.push_back(ShaderUniform::PROJ);
+				mUniforms.push_back(ShaderUniform::PROJ);
 
 			if (CreateUniform("_InvProj", cbuffer))
-				mUniform.push_back(ShaderUniform::INV_PROJ);
+				mUniforms.push_back(ShaderUniform::INV_PROJ);
 
 			if (CreateUniform("_Ambient", cbuffer))
-				mUniform.push_back(ShaderUniform::AMBIENT);
+				mUniforms.push_back(ShaderUniform::AMBIENT);
 
 			if (CreateUniform("_Diffuse", cbuffer))
-				mUniform.push_back(ShaderUniform::DIFFUSE);
+				mUniforms.push_back(ShaderUniform::DIFFUSE);
 
 			if (CreateUniform("_Specular", cbuffer))
-				mUniform.push_back(ShaderUniform::SPECULAR);
+				mUniforms.push_back(ShaderUniform::SPECULAR);
 
 			if (CreateUniform("_SpecComp", cbuffer))
-				mUniform.push_back(ShaderUniform::SPEC_COMP);
+				mUniforms.push_back(ShaderUniform::SPEC_COMP);
 
 			if (CreateUniform("_LightPos", cbuffer))
-				mUniform.push_back(ShaderUniform::LIGHT_POS);
+				mUniforms.push_back(ShaderUniform::LIGHT_POS);
 
 			if (CreateUniform("_LightDir", cbuffer))
-				mUniform.push_back(ShaderUniform::LIGHT_DIR);
+				mUniforms.push_back(ShaderUniform::LIGHT_DIR);
 
 			if (CreateUniform("_LightColor", cbuffer))
-				mUniform.push_back(ShaderUniform::LIGHT_COLOR);
+				mUniforms.push_back(ShaderUniform::LIGHT_COLOR);
 
 			if (CreateUniform("_LightAttn", cbuffer))
-				mUniform.push_back(ShaderUniform::LIGHT_ATTN);
+				mUniforms.push_back(ShaderUniform::LIGHT_ATTN);
 
 			if (CreateUniform("_LightMatrix", cbuffer))
-				mUniform.push_back(ShaderUniform::LIGHT_MATRIX);
+				mUniforms.push_back(ShaderUniform::LIGHT_MATRIX);
 
 			if (CreateUniform("_LightCubeMatrix", cbuffer))
-				mUniform.push_back(ShaderUniform::LIGHT_CUBE_MATRIX);
+				mUniforms.push_back(ShaderUniform::LIGHT_CUBE_MATRIX);
 
 			if (CreateUniform("_CameraPos", cbuffer))
-				mUniform.push_back(ShaderUniform::CAMERA_POS);
+				mUniforms.push_back(ShaderUniform::CAMERA_POS);
 
 			if (CreateUniform("_Bones", cbuffer))
-				mUniform.push_back(ShaderUniform::BONES);
+				mUniforms.push_back(ShaderUniform::BONES);
 
 			if (CreateUniform("_DeltaTime", cbuffer))
-				mUniform.push_back(ShaderUniform::DELTA_TIME);
+				mUniforms.push_back(ShaderUniform::DELTA_TIME);
 		}
 
 		// Create texture uniforms.
@@ -460,7 +460,7 @@ namespace Sentinel
 
 			if (reflect->GetResourceBindingDescByName(texName, &bindDesc) == S_OK)
 			{
-				mUniform.push_back(ShaderUniform::TEXTURE);
+				mUniforms.push_back(ShaderUniform::TEXTURE);
 				++numTexture;
 			}
 		}
@@ -525,27 +525,27 @@ namespace Sentinel
 
 	void ShaderDX::SetFloat(UINT uniform, float* data, UINT count)
 	{
-		memcpy(mConstantBufferData + mUniformDX[uniform], &data, sizeof(float));
+		memcpy(mConstantBufferData + mUniformsDX[uniform], &data, sizeof(float));
 	}
 
 	void ShaderDX::SetFloat2(UINT uniform, float* data, UINT count)
 	{
-		memcpy(mConstantBufferData + mUniformDX[uniform], data, 2 * sizeof(float));
+		memcpy(mConstantBufferData + mUniformsDX[uniform], data, 2 * sizeof(float));
 	}
 
 	void ShaderDX::SetFloat3(UINT uniform, float* data, UINT count)
 	{
-		memcpy(mConstantBufferData + mUniformDX[uniform], data, 3 * sizeof(float));
+		memcpy(mConstantBufferData + mUniformsDX[uniform], data, 3 * sizeof(float));
 	}
 
 	void ShaderDX::SetFloat4(UINT uniform, float* data, UINT count)
 	{
-		memcpy(mConstantBufferData + mUniformDX[uniform], data, 4 * sizeof(float));
+		memcpy(mConstantBufferData + mUniformsDX[uniform], data, 4 * sizeof(float));
 	}
 
 	void ShaderDX::SetMatrix(UINT uniform, float* data, UINT count)
 	{
-		memcpy(mConstantBufferData + mUniformDX[uniform], data, 16 * sizeof(float));
+		memcpy(mConstantBufferData + mUniformsDX[uniform], data, 16 * sizeof(float));
 	}
 
 	void ShaderDX::SetTexture(UINT uniform, Texture* texture)

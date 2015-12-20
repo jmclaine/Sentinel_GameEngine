@@ -10,6 +10,13 @@ namespace Sentinel
 
 	class ShaderGL : public Shader
 	{
+	private:
+
+		// stores states to prevent setting values internal to OpenGL unncessarily
+
+		static GLenum CURR_ACTIVE;
+		static Texture* CURR_TEXTURE[32];
+
 	public:
 
 		class SamplerGL : public Sampler
@@ -82,7 +89,7 @@ namespace Sentinel
 
 		GLint mAttributeGL[VertexAttribute::COUNT];
 
-		std::vector<GLint> mUniformGL;
+		std::vector<GLint> mUniformsGL;
 
 		///////////////////////////////////
 
@@ -106,7 +113,7 @@ namespace Sentinel
 
 	private:
 
-		int Compile(const GLchar** source, GLuint& shader, GLenum type, GLsizei count);
+		bool Compile(const GLchar** source, GLuint& shader, GLenum type, GLsizei count);
 
 	public:
 
