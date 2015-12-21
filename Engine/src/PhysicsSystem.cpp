@@ -3,7 +3,7 @@
 namespace Sentinel
 {
 	RigidBody::RigidBody() :
-		mShape( NULL )
+		mShape(NULL)
 	{}
 
 	RigidBody::~RigidBody()
@@ -13,8 +13,8 @@ namespace Sentinel
 
 	////////////////////////////////////////////////////////////////////
 
-	DEFINE_SERIAL_MEMBER_FUNCTION( PhysicsSystem, CreateSphere );
-	DEFINE_SERIAL_MEMBER_FUNCTION( PhysicsSystem, CreateBox );
-	DEFINE_SERIAL_MEMBER_FUNCTION( PhysicsSystem, CreateCylinder );
-	DEFINE_SERIAL_MEMBER_FUNCTION( PhysicsSystem, CreateMesh );
+	DEFINE_SERIAL_MEMBER_FUNCTION(PhysicsSystem, CreateSphere);
+	DEFINE_SERIAL_MEMBER_FUNCTION(PhysicsSystem, CreateBox);
+	DEFINE_SERIAL_MEMBER_FUNCTION(PhysicsSystem, CreateCylinder);
+	DEFINE_SERIAL_MEMBER_FUNCTION(PhysicsSystem, CreateMesh);
 }

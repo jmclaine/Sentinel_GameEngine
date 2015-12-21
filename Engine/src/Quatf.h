@@ -25,7 +25,9 @@ namespace Sentinel
 		Quatf(const Vector3f& rotation);
 		Quatf(float _x, float _y, float _z, float _w);
 
-		float* Ptr();
+		float* Ptr() const;
+
+		std::string ToString() const;
 
 		Quatf operator - () const;
 

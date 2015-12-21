@@ -195,12 +195,12 @@ namespace Sentinel
 #define DEFINE_SERIAL_MEMBER_FUNCTION(clazz, func)\
 	SerialMemberFunctionRegister<clazz> clazz::SERIAL_##func(#func, &clazz::func);
 
-	template< class T >
+	template<class Type>
 	class SerialMemberFunctionFactory
 	{
 	public:
 
-		typedef Serializable* (T::*Func)();
+		typedef Serializable* (Type::*Func)();
 
 	private:
 
@@ -258,12 +258,12 @@ namespace Sentinel
 
 	// Automatically registers the class within the SerialMemberFunctionFactory.
 	//
-	template< class T >
+	template<class Type>
 	class SerialMemberFunctionRegister
 	{
 	public:
 
-		typedef Serializable* (T::*Func)();
+		typedef Serializable* (Type::*Func)();
 
 	private:
 
@@ -274,7 +274,10 @@ namespace Sentinel
 		SerialMemberFunctionRegister(const char* name, Func func)
 		{
 			mID = HashString(name);
-			if (!SerialMemberFunctionFactory<T>::Get().Register(mID, func))
+
+			//Debug::Log(STREAM(name << ": " << mID));
+
+			if (!SerialMemberFunctionFactory<Type>::Get().Register(mID, func))
 				throw AppException("Failed to register serial '" + std::string(name) + "'");
 		}
 
@@ -283,13 +286,16 @@ namespace Sentinel
 			archive.Write(&mID, 1, true);
 		}
 
-		static Serializable* Load(T* obj, Archive& archive)
+		static Serializable* Load(Type* obj, Archive& archive)
 		{
 			UINT id;
 			archive.Read(&id, 1, true);
 
 			if (id != 0)
-				return (obj->*SerialMemberFunctionFactory< T >::Get().Create(id))();
+			{
+				//Debug::Log(STREAM(id));
+				return (obj->*SerialMemberFunctionFactory<Type>::Get().Create(id))();
+			}
 
 			return NULL;
 		}

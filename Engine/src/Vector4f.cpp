@@ -1,5 +1,6 @@
 #include "MathUtil.h"
 #include "Vector4f.h"
+#include "StringStream.h"
 
 namespace Sentinel
 {
@@ -43,9 +44,14 @@ namespace Sentinel
 		return (&x)[i];
 	}
 
-	float* Vector4f::Ptr()
+	float* Vector4f::Ptr() const
 	{
-		return &x;
+		return const_cast<float*>(&x);
+	}
+
+	std::string Vector4f::ToString() const
+	{
+		return STREAM("(" << x << ", " << y << ", " << z << ", " << w << ")");
 	}
 
 	Vector4f Vector4f::operator - () const

@@ -19,30 +19,30 @@ namespace Sentinel
 	SpherePhysicsShape::~SpherePhysicsShape()
 	{}
 
-	void SpherePhysicsShape::Create( float radius )
+	void SpherePhysicsShape::Create(float radius)
 	{
-		SetRadius( radius );
+		SetRadius(radius);
 	}
 
-	void SpherePhysicsShape::Save( Archive& archive )
+	void SpherePhysicsShape::Save(Archive& archive)
 	{
-		PhysicsSystem::SERIAL_CreateSphere.Save( archive );
+		PhysicsSystem::SERIAL_CreateSphere.Save(archive);
 
 		float radius = GetRadius();
-		archive.Write( &radius );
+		archive.Write(&radius);
 	}
 
-	void SpherePhysicsShape::Load( Archive& archive )
+	void SpherePhysicsShape::Load(Archive& archive)
 	{
 		float radius;
-		archive.Read( &radius );
+		archive.Read(&radius);
 
-		SetRadius( radius );
+		SetRadius(radius);
 	}
 
-	PhysicsShape* SpherePhysicsShape::Copy( PhysicsSystem* physics )
+	PhysicsShape* SpherePhysicsShape::Copy(PhysicsSystem* physics)
 	{
-		return physics->CreateSphere( GetRadius() );
+		return physics->CreateSphere(GetRadius());
 	}
 
 	///////////////////////////////////////////////
@@ -53,30 +53,30 @@ namespace Sentinel
 	BoxPhysicsShape::~BoxPhysicsShape()
 	{}
 
-	void BoxPhysicsShape::Create( const Vector3f& scale )
+	void BoxPhysicsShape::Create(const Vector3f& scale)
 	{
-		SetScale( scale );
+		SetScale(scale);
 	}
 
-	void BoxPhysicsShape::Save( Archive& archive )
+	void BoxPhysicsShape::Save(Archive& archive)
 	{
-		PhysicsSystem::SERIAL_CreateBox.Save( archive );
+		PhysicsSystem::SERIAL_CreateBox.Save(archive);
 
-		Vector3f scale( GetScale() );
-		archive.Write( scale.Ptr(), ar_sizeof( scale ));
+		Vector3f scale(GetScale());
+		archive.Write(scale.Ptr(), ar_sizeof(scale));
 	}
 
-	void BoxPhysicsShape::Load( Archive& archive )
+	void BoxPhysicsShape::Load(Archive& archive)
 	{
 		Vector3f scale;
-		archive.Read( scale.Ptr(), ar_sizeof( scale ));
+		archive.Read(scale.Ptr(), ar_sizeof(scale));
 
-		SetScale( scale );
+		SetScale(scale);
 	}
 
-	PhysicsShape* BoxPhysicsShape::Copy( PhysicsSystem* physics )
+	PhysicsShape* BoxPhysicsShape::Copy(PhysicsSystem* physics)
 	{
-		return physics->CreateBox( GetScale() );
+		return physics->CreateBox(GetScale());
 	}
 
 	///////////////////////////////////////////////
@@ -87,30 +87,30 @@ namespace Sentinel
 	CylinderPhysicsShape::~CylinderPhysicsShape()
 	{}
 
-	void CylinderPhysicsShape::Create( const Vector3f& scale )
+	void CylinderPhysicsShape::Create(const Vector3f& scale)
 	{
-		SetScale( scale );
+		SetScale(scale);
 	}
 
-	void CylinderPhysicsShape::Save( Archive& archive )
+	void CylinderPhysicsShape::Save(Archive& archive)
 	{
-		PhysicsSystem::SERIAL_CreateCylinder.Save( archive );
+		PhysicsSystem::SERIAL_CreateCylinder.Save(archive);
 
-		Vector3f scale( GetScale() );
-		archive.Write( scale.Ptr(), ar_sizeof( scale ));
+		Vector3f scale(GetScale());
+		archive.Write(scale.Ptr(), ar_sizeof(scale));
 	}
 
-	void CylinderPhysicsShape::Load( Archive& archive )
+	void CylinderPhysicsShape::Load(Archive& archive)
 	{
 		Vector3f scale;
-		archive.Read( scale.Ptr(), ar_sizeof( scale ));
+		archive.Read(scale.Ptr(), ar_sizeof(scale));
 
-		SetScale( scale );
+		SetScale(scale);
 	}
 
-	PhysicsShape* CylinderPhysicsShape::Copy( PhysicsSystem* physics )
+	PhysicsShape* CylinderPhysicsShape::Copy(PhysicsSystem* physics)
 	{
-		return physics->CreateCylinder( GetScale() );
+		return physics->CreateCylinder(GetScale());
 	}
 
 	///////////////////////////////////////////////
@@ -121,58 +121,58 @@ namespace Sentinel
 	MeshPhysicsShape::~MeshPhysicsShape()
 	{}
 
-	void MeshPhysicsShape::Create( void* verts, UINT count, UINT stride, const Vector3f& scale )
+	void MeshPhysicsShape::Create(void* verts, UINT count, UINT stride, const Vector3f& scale)
 	{
 		BYTE* data = (BYTE*)verts;
 
-		for( UINT x = 0; x < count; ++x )
+		for (UINT x = 0; x < count; ++x)
 		{
-			AddPoint( *(Vector3f*)data );
+			AddPoint(*(Vector3f*)data);
 
 			data += stride;
 		}
 
-		SetScale( scale );
+		SetScale(scale);
 	}
 
-	void MeshPhysicsShape::Save( Archive& archive )
+	void MeshPhysicsShape::Save(Archive& archive)
 	{
-		PhysicsSystem::SERIAL_CreateMesh.Save( archive );
+		PhysicsSystem::SERIAL_CreateMesh.Save(archive);
 
 		int count = GetNumPoints();
-		archive.Write( &count );
+		archive.Write(&count);
 
 		Vector3f* verts = GetPoints();
-		for( int x = 0; x < count; ++x )
+		for (int x = 0; x < count; ++x)
 		{
-			archive.Write( &verts[ x ].x );
-			archive.Write( &verts[ x ].y );
-			archive.Write( &verts[ x ].z );
+			archive.Write(&verts[x].x);
+			archive.Write(&verts[x].y);
+			archive.Write(&verts[x].z);
 		}
 
 		Vector3f& scale = GetScale();
-		archive.Write( scale.Ptr(), ar_sizeof( scale ));
+		archive.Write(scale.Ptr(), ar_sizeof(scale));
 	}
 
-	void MeshPhysicsShape::Load( Archive& archive )
+	void MeshPhysicsShape::Load(Archive& archive)
 	{
 		int count;
-		archive.Read( &count );
+		archive.Read(&count);
 
 		Vector3f v;
-		for( int x = 0; x < count; ++x )
+		for (int x = 0; x < count; ++x)
 		{
-			archive.Read( v.Ptr(), ar_sizeof( v ));
-			AddPoint( v );
+			archive.Read(v.Ptr(), ar_sizeof(v));
+			AddPoint(v);
 		}
 
-		archive.Read( v.Ptr(), ar_sizeof( v ));
-		SetScale( v );
+		archive.Read(v.Ptr(), ar_sizeof(v));
+		SetScale(v);
 	}
 
-	PhysicsShape* MeshPhysicsShape::Copy( PhysicsSystem* physics )
+	PhysicsShape* MeshPhysicsShape::Copy(PhysicsSystem* physics)
 	{
-		return physics->CreateMesh( GetPoints(), GetNumPoints(), sizeof( Vector3f ), GetScale() );
+		return physics->CreateMesh(GetPoints(), GetNumPoints(), sizeof(Vector3f), GetScale());
 	}
 
 	///////////////////////////////////////////////
@@ -183,13 +183,13 @@ namespace Sentinel
 	CompoundPhysicsShape::~CompoundPhysicsShape()
 	{}
 
-	void CompoundPhysicsShape::Save( Archive& archive )
+	void CompoundPhysicsShape::Save(Archive& archive)
 	{}
 
-	void CompoundPhysicsShape::Load( Archive& archive )
+	void CompoundPhysicsShape::Load(Archive& archive)
 	{}
 
-	PhysicsShape* CompoundPhysicsShape::Copy( PhysicsSystem* physics )
+	PhysicsShape* CompoundPhysicsShape::Copy(PhysicsSystem* physics)
 	{
 		return NULL;
 	}

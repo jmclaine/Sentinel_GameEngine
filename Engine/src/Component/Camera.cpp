@@ -26,10 +26,19 @@ namespace Component
 
 	void Camera::Startup()
 	{
+		_ASSERT(mOwner);
+
 		mTransform = mOwner->mTransform;
 
 		if (mTransform == NULL)
-			throw AppException("Camera::Startup()\n" + std::string(mOwner->mName) + " does not contain TransformComponent");
+			throw AppException("Camera::Startup()\n" + std::string(mOwner->mName) + " does not contain Transform");
+
+		Sentinel::GameWorld* world = mOwner->GetWorld();
+
+		_ASSERT(world);
+
+		world->AddCamera(this);
+		world->mCurrentCamera = this;
 	}
 
 	void Camera::Shutdown()

@@ -1,5 +1,6 @@
 #include "MathUtil.h"
 #include "Quatf.h"
+#include "StringStream.h"
 
 namespace Sentinel
 {
@@ -25,9 +26,14 @@ namespace Sentinel
 		x(_x), y(_y), z(_z), w(_w)
 	{}
 
-	float* Quatf::Ptr()
+	float* Quatf::Ptr() const
 	{
-		return static_cast<float*>(&x);
+		return const_cast<float*>(&x);
+	}
+
+	std::string Quatf::ToString() const
+	{
+		return STREAM("(" << x << ", " << y << ", " << z << ", " << w << ")");
 	}
 
 	Quatf Quatf::operator - () const

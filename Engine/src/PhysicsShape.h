@@ -18,10 +18,10 @@ namespace Sentinel
 
 		virtual void* GetData();
 
-		virtual void Save( Archive& archive ) = 0;
-		virtual void Load( Archive& archive ) = 0;
+		virtual void Save(Archive& archive) = 0;
+		virtual void Load(Archive& archive) = 0;
 
-		virtual PhysicsShape* Copy( PhysicsSystem* physics ) = 0;
+		virtual PhysicsShape* Copy(PhysicsSystem* physics) = 0;
 	};
 
 	///////////////////////////////////////////////
@@ -38,17 +38,17 @@ namespace Sentinel
 
 	protected:
 
-		void Create( float radius );
+		void Create(float radius);
 
 	public:
 
 		virtual float GetRadius() = 0;
-		virtual void  SetRadius( float radius ) = 0;
+		virtual void SetRadius(float radius) = 0;
 
-		void Save( Archive& archive );
-		void Load( Archive& archive );
+		void Save(Archive& archive);
+		void Load(Archive& archive);
 
-		PhysicsShape* Copy( PhysicsSystem* physics );
+		PhysicsShape* Copy(PhysicsSystem* physics);
 	};
 
 	///////////////////////////////////////////////
@@ -65,17 +65,17 @@ namespace Sentinel
 
 	protected:
 
-		void Create( const Vector3f& scale );
+		void Create(const Vector3f& scale);
 
 	public:
 
 		virtual Vector3f GetScale() = 0;
-		virtual void     SetScale( const Vector3f& scale ) = 0;
+		virtual void SetScale(const Vector3f& scale) = 0;
 
-		void Save( Archive& archive );
-		void Load( Archive& archive );
+		void Save(Archive& archive);
+		void Load(Archive& archive);
 
-		PhysicsShape* Copy( PhysicsSystem* physics );
+		PhysicsShape* Copy(PhysicsSystem* physics);
 	};
 
 	///////////////////////////////////////////////
@@ -92,17 +92,17 @@ namespace Sentinel
 
 	protected:
 
-		void Create( const Vector3f& scale );
+		void Create(const Vector3f& scale);
 
 	public:
 
 		virtual Vector3f GetScale() = 0;
-		virtual void     SetScale( const Vector3f& scale ) = 0;
+		virtual void SetScale(const Vector3f& scale) = 0;
 
-		void Save( Archive& archive );
-		void Load( Archive& archive );
+		void Save(Archive& archive);
+		void Load(Archive& archive);
 
-		PhysicsShape* Copy( PhysicsSystem* physics );
+		PhysicsShape* Copy(PhysicsSystem* physics);
 	};
 
 	///////////////////////////////////////////////
@@ -119,21 +119,21 @@ namespace Sentinel
 
 	protected:
 
-		void Create( void* verts, UINT count, UINT stride, const Vector3f& scale );
+		void Create(void* verts, UINT count, UINT stride, const Vector3f& scale);
 
 	public:
 
-		virtual int       GetNumPoints() = 0;
-		virtual void      AddPoint( const Vector3f& point ) = 0;
+		virtual int GetNumPoints() = 0;
+		virtual void AddPoint(const Vector3f& point) = 0;
 		virtual Vector3f* GetPoints() = 0;
 
-		virtual Vector3f  GetScale() = 0;
-		virtual void      SetScale( const Vector3f& scale ) = 0;
+		virtual Vector3f GetScale() = 0;
+		virtual void SetScale(const Vector3f& scale) = 0;
 
-		void Save( Archive& archive );
-		void Load( Archive& archive );
+		void Save(Archive& archive);
+		void Load(Archive& archive);
 
-		PhysicsShape* Copy( PhysicsSystem* physics );
+		PhysicsShape* Copy(PhysicsSystem* physics);
 	};
 
 	///////////////////////////////////////////////
@@ -148,9 +148,9 @@ namespace Sentinel
 
 		virtual ~CompoundPhysicsShape();
 
-		virtual void Save( Archive& archive );
-		virtual void Load( Archive& archive );
+		virtual void Save(Archive& archive);
+		virtual void Load(Archive& archive);
 
-		PhysicsShape* Copy( PhysicsSystem* physics );
+		PhysicsShape* Copy(PhysicsSystem* physics);
 	};
 }

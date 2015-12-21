@@ -28,7 +28,7 @@ namespace Sentinel
 		if (mRegistry.find(value) != mRegistry.end())
 			return false;
 
-		mRegistry.insert(std::pair< UINT, CloneFunc >(value, func));
+		mRegistry.insert(std::pair<UINT, CloneFunc>(value, func));
 
 		return true;
 	}
@@ -49,6 +49,8 @@ namespace Sentinel
 	{
 		mID = HashString(clazz);
 
+		//Debug::Log(STREAM(clazz << ": " << mID));
+
 		if (!SerialFactory::Get().Register(mID, func))
 			throw AppException("Failed to register serial '" + std::string(clazz) + "'");
 	}
@@ -64,7 +66,10 @@ namespace Sentinel
 		archive.Read(&id, 1, true);
 
 		if (id != 0)
+		{
+			//Debug::Log(STREAM(id));
 			return SerialFactory::Get().Create(id);
+		}
 
 		return NULL;
 	}
@@ -95,12 +100,12 @@ namespace Sentinel
 		if (mRegistry.find(value) != mRegistry.end())
 			return false;
 
-		mRegistry.insert(std::pair< UINT, SerialFunctionFactory::Func >(value, func));
+		mRegistry.insert(std::pair<UINT, SerialFunctionFactory::Func>(value, func));
 
 		return true;
 	}
 
-	const std::function< void() >& SerialFunctionFactory::Create(UINT value)
+	const std::function<void()>& SerialFunctionFactory::Create(UINT value)
 	{
 		auto it = mRegistry.find(value);
 

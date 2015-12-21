@@ -69,8 +69,6 @@ upon compilation / linking.
 using namespace Sentinel;
 
 
-// Main Application.
-//
 class MainApp
 {
 	HACCEL mAccelTable;
@@ -127,7 +125,7 @@ public:
 		//ShowCursor(FALSE);
 
 		////////////////////////////////////
-		// Prepare GameWorld.
+		// Prepare GameWorld
 		//
 		mGameWorld = new GameWorld();
 
@@ -168,17 +166,19 @@ public:
 		////////////////////////////////////
 
 		mGameWorld->Startup();
+
+		// needs to create the depth stencil and render texture automatically
+		Component::Camera* camera = mGameWorld->mCurrentCamera;
+		camera->mDepthStencil = mDSMain;
+		camera->mRenderTexture = mRTMain;
+		camera->mClearColor = ColorRGBA(0.0f, 0.2f, 0.8f, 1.0f);
 	}
 
 	void Update()
 	{
-		// Enter main game loop.
-		//
 		MSG msg;
 		for (;;)
 		{
-			// Translate windows messages.
-			//
 			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 			{
 				if (msg.message == WM_QUIT)
@@ -190,8 +190,6 @@ public:
 					DispatchMessage(&msg);
 				}
 			}
-			// Update game.
-			//
 			else
 			{
 				static Timing* timing;
@@ -204,11 +202,6 @@ public:
 				BEGIN_PROFILE(timing);
 				if (Keyboard::Get().DidGoDown(VK_ESCAPE))
 					return;
-
-				//static float color[] = { 0.0f, 0.2f, 0.8f, 1.0f };
-
-				//UINT width = mGameWindow->GetInfo()->Width();
-				//UINT height = mGameWindow->GetInfo()->Height();
 
 				mGameWindow->Update();
 
@@ -226,13 +219,6 @@ public:
 				BEGIN_PROFILE(timing);
 				mGameWorld->UpdateLight();
 				END_PROFILE(timing, "Light");
-
-				//mRenderer->SetViewport(0, 0, width, height);
-				// mRenderer->SetViewport(((int)width - (int)Renderer::WINDOW_WIDTH_BASE) >> 1, ((int)height - (int)Renderer::WINDOW_HEIGHT_BASE) >> 1,
-				//						  Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE);
-				//mRenderer->SetDepthStencil(mDSMain);
-				//mRenderer->SetRenderTexture(mRTMain);
-				//mRenderer->Clear(color);
 
 				BEGIN_PROFILE(timing);
 				mGameWorld->UpdateDrawable();
@@ -277,11 +263,9 @@ int APIENTRY _tWinMain(
 	LPTSTR lpCmdLine,
 	int nCmdShow)
 {
-	// Check for memory leaks.
-	//
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
-	//_CrtSetBreakAlloc( 776 );
+	//_CrtSetBreakAlloc(776);
 
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);

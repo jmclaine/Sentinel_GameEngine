@@ -219,14 +219,10 @@ public:
 
 				BEGIN_PROFILE(timing);
 				if (Keyboard::Get().DidGoDown(VK_ESCAPE))
-				{
 					return;
-				}
 
 				if (Keyboard::Get().DidGoDown(VK_F9))
-				{
 					SaveMAP("Default.MAP");
-				}
 
 				mGameWindow->Update();
 
@@ -336,6 +332,8 @@ public:
 		mGameWorld->Save(archive);
 
 		archive.Close();
+
+		system("copy Default.MAP ..\\Sentinel_Game");
 	}
 
 	void PrepareEditorWorld()
@@ -746,11 +744,12 @@ public:
 		/////////////////////////////////////////////////////////////////////////
 
 		mGameWorld = new GameWorld();
+		PhysicsSystem* physicsSystem = BuildPhysicsSystemSE();
 
 		mGameWorld->mRenderer = mRenderer;
 
 		mGameWorld->mTiming = new Timing();
-		mGameWorld->mPhysicsSystem = BuildPhysicsSystemSE();
+		mGameWorld->mPhysicsSystem = physicsSystem;
 		mGameWorld->mAudioSystem = NULL;
 
 		mGameWorld->mTextureManager = new TextureManager(mRenderer);
@@ -762,7 +761,7 @@ public:
 		mGameWorld->mSoundManager = new SoundManager();
 		mGameWorld->mRenderManager = new RenderManager();
 
-		mGameWorld->mPhysicsSystem->Startup();
+		physicsSystem->Startup();
 
 		////////////////////////////////////
 
@@ -803,7 +802,9 @@ public:
 		obj->Attach(new PlayerController());
 
 		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(mGameWorld->mPhysicsSystem->CreateRigidBody(mGameWorld->mPhysicsSystem->CreateSphere(1.0f), transform->mPosition, transform->mOrientation, 1.0f));
+		physics->SetRigidBody(
+			physicsSystem->CreateRigidBody(
+			physicsSystem->CreateSphere(1.0f), transform->mPosition, transform->mOrientation, 1.0f));
 		body = physics->GetRigidBody();
 		body->SetFlags(DISABLE_GRAVITY);
 		body->SetRestitution(1.0f);
@@ -840,13 +841,15 @@ public:
 		transform->mScale = Vector3f(100, 1, 100);
 
 		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(mGameWorld->mPhysicsSystem->CreateRigidBody(mGameWorld->mPhysicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 0.0f));
+		physics->SetRigidBody(
+			physicsSystem->CreateRigidBody(
+			physicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 0.0f));
 		body = physics->GetRigidBody();
 		body->SetFlags(DISABLE_GRAVITY);
 
 		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
 		meshComp->mIsDynamic = true;
-
+		
 		//
 		// Ground object - Back
 		//
@@ -858,7 +861,9 @@ public:
 		transform->mScale = Vector3f(20, 20, 1);
 
 		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(mGameWorld->mPhysicsSystem->CreateRigidBody(mGameWorld->mPhysicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 0.0f));
+		physics->SetRigidBody(
+			physicsSystem->CreateRigidBody(
+			physicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 0.0f));
 		body = physics->GetRigidBody();
 		body->SetFlags(DISABLE_GRAVITY);
 
@@ -876,7 +881,9 @@ public:
 		transform->mScale = Vector3f(1, 20, 20);
 
 		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(mGameWorld->mPhysicsSystem->CreateRigidBody(mGameWorld->mPhysicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 0.0f));
+		physics->SetRigidBody(
+			physicsSystem->CreateRigidBody(
+			physicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 0.0f));
 		body = physics->GetRigidBody();
 		body->SetFlags(DISABLE_GRAVITY);
 
@@ -895,7 +902,9 @@ public:
 		transform->mOrientation = Quatf(0, 0, 0);
 
 		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(mGameWorld->mPhysicsSystem->CreateRigidBody(mGameWorld->mPhysicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 0.0f));
+		physics->SetRigidBody(
+			physicsSystem->CreateRigidBody(
+			physicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 0.0f));
 		body = physics->GetRigidBody();
 		body->SetFlags(DISABLE_GRAVITY);
 
@@ -913,13 +922,15 @@ public:
 		transform->mScale = Vector3f(20, 1, 20);
 
 		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(mGameWorld->mPhysicsSystem->CreateRigidBody(mGameWorld->mPhysicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 0.0f));
+		physics->SetRigidBody(
+			physicsSystem->CreateRigidBody(
+			physicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 0.0f));
 		body = physics->GetRigidBody();
 		body->SetFlags(DISABLE_GRAVITY);
 
 		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
 		meshComp->mIsDynamic = true;
-
+		
 		//
 		// Box object - Right
 		//
@@ -931,8 +942,9 @@ public:
 		transform->mScale = Vector3f(1, 1, 1);
 
 		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(mGameWorld->mPhysicsSystem->CreateRigidBody(mGameWorld->mPhysicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
-		body = physics->GetRigidBody();
+		physics->SetRigidBody(
+			physicsSystem->CreateRigidBody(
+			physicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
 
 		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
 		meshComp->mIsDynamic = true;
@@ -948,8 +960,9 @@ public:
 		transform->mScale = Vector3f(1, 2, 1);
 
 		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(mGameWorld->mPhysicsSystem->CreateRigidBody(mGameWorld->mPhysicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
-		body = physics->GetRigidBody();
+		physics->SetRigidBody(
+			physicsSystem->CreateRigidBody(
+			physicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
 
 		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
 		meshComp->mIsDynamic = true;
@@ -965,8 +978,9 @@ public:
 		transform->mScale = Vector3f(1, 1, 1);
 
 		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(mGameWorld->mPhysicsSystem->CreateRigidBody(mGameWorld->mPhysicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
-		body = physics->GetRigidBody();
+		physics->SetRigidBody(
+			physicsSystem->CreateRigidBody(
+			physicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
 
 		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
 		meshComp->mIsDynamic = true;
@@ -983,8 +997,9 @@ public:
 		transform->mOrientation = Quatf(45, 45, 45);
 
 		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(mGameWorld->mPhysicsSystem->CreateRigidBody(mGameWorld->mPhysicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
-		body = physics->GetRigidBody();
+		physics->SetRigidBody(
+			physicsSystem->CreateRigidBody(
+			physicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
 
 		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
 		meshComp->mIsDynamic = true;
@@ -1018,7 +1033,9 @@ public:
 
 		Buffer* meshVBO = mesh->mVertexBuffer;
 		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(mGameWorld->mPhysicsSystem->CreateRigidBody(mGameWorld->mPhysicsSystem->CreateMesh((Vector3f*)meshVBO->Lock(), meshVBO->Count(), meshVBO->Stride(), transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
+		physics->SetRigidBody(
+			physicsSystem->CreateRigidBody(
+			physicsSystem->CreateMesh((Vector3f*)meshVBO->Lock(), meshVBO->Count(), meshVBO->Stride(), transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
 		meshVBO->Unlock();
 
 		mGameWorld->AddGameObject(obj);
@@ -1050,8 +1067,9 @@ public:
 		meshComp->mIsDynamic = true;
 
 		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(mGameWorld->mPhysicsSystem->CreateRigidBody(mGameWorld->mPhysicsSystem->CreateSphere(transform->mScale.x), transform->mPosition, transform->mOrientation, 1.0f));
-		body = physics->GetRigidBody();
+		physics->SetRigidBody(
+			physicsSystem->CreateRigidBody(
+			physicsSystem->CreateSphere(transform->mScale.x), transform->mPosition, transform->mOrientation, 1.0f));
 
 		//
 		// Texture
@@ -1072,16 +1090,17 @@ public:
 		obj = mGameWorld->AddGameObject(new GameObject("Texture"));
 
 		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3f(-17, 5, 15);
+		transform->mPosition = Vector3f(-17, 5, 16);
 		transform->mOrientation = Quatf(Vector3f(0, 45, 0));
-		transform->mScale = Vector3f(4, 4, 4);
+		transform->mScale = Vector3f(3, 3, 3);
 
 		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
 		meshComp->mIsDynamic = true;
 
 		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(mGameWorld->mPhysicsSystem->CreateRigidBody(mGameWorld->mPhysicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
-		body = physics->GetRigidBody();
+		physics->SetRigidBody(
+			physicsSystem->CreateRigidBody(
+			physicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
 		
 		//
 		// Normal Map
@@ -1105,14 +1124,15 @@ public:
 		transform = (Transform*)obj->Attach(new Transform());
 		transform->mPosition = Vector3f(-17, 5, 5);
 		transform->mOrientation = Quatf(Vector3f(0, 45, 0));
-		transform->mScale = Vector3f(4, 4, 4);
+		transform->mScale = Vector3f(3, 3, 3);
 
 		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
 		meshComp->mIsDynamic = true;
 
 		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(mGameWorld->mPhysicsSystem->CreateRigidBody(mGameWorld->mPhysicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
-		body = physics->GetRigidBody();
+		physics->SetRigidBody(
+			physicsSystem->CreateRigidBody(
+			physicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
 
 		//
 		// Particles
@@ -1195,11 +1215,8 @@ public:
 		// CREATE EDITOR OBJECTS
 		//
 		CreateTranslateObject();
-
 		CreateRotateObject();
-
 		CreateScaleObject();
-
 		CreateBoundsObject();
 	}
 
@@ -1475,8 +1492,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	LPTSTR    lpCmdLine,
 	int       nCmdShow)
 {
-	// Check for memory leaks.
-	//
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
 	//_CrtSetBreakAlloc(242);

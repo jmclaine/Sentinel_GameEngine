@@ -35,6 +35,7 @@ namespace Sentinel
 	{
 		friend class GameObject;
 		friend class Component::Light;
+		friend class Component::Camera;
 
 	protected:
 

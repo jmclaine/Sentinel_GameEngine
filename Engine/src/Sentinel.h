@@ -13,6 +13,10 @@ template class __declspec(dllexport) std::basic_string<char, std::char_traits<ch
 
 #ifdef BUILD_DLL
 #define SENTINEL_DLL __declspec(dllexport)
+
+#ifdef _DEBUG
+#include "Debug.h"
+#endif
 #else
 #ifdef NBUILD_DLL
 #define SENTINEL_DLL

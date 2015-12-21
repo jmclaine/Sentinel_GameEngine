@@ -6,20 +6,16 @@ PhysicsSystem based on BulletPhysics.
 #include "btBulletDynamicsCommon.h"
 
 #ifdef NDEBUG
-#pragma comment (lib, "Release/BulletCollision.lib")
 #pragma comment (lib, "Release/BulletDynamics.lib")
+#pragma comment (lib, "Release/BulletCollision.lib")
 #pragma comment (lib, "Release/LinearMath.lib")
 #else
-#pragma comment (lib, "Debug/BulletCollision.lib")
-#pragma comment (lib, "Debug/BulletDynamics.lib")
-#pragma comment (lib, "Debug/LinearMath.lib")
+#pragma comment (lib, "Debug/BulletDynamics_Debug.lib")
+#pragma comment (lib, "Debug/BulletCollision_Debug.lib")
+#pragma comment (lib, "Debug/LinearMath_Debug.lib")
 #endif
 
 #include "PhysicsSystem.h"
-#include "Mesh.h"
-#include "Timing.h"
-#include "Util.h"
-#include "Buffer.h"
 #include "Vector3f.h"
 #include "Quatf.h"
 
@@ -125,6 +121,7 @@ namespace Sentinel
 
 		void SetScale(const Vector3f& scale)
 		{
+			Debug::Log(STREAM("shape scale: " << scale.ToString()));
 			mShape->setLocalScaling(btVector3(scale.x, scale.y, scale.z));
 		}
 	};
@@ -447,9 +444,9 @@ namespace Sentinel
 	{
 	private:
 
+		btBroadphaseInterface* mBroadphase;
 		btDefaultCollisionConfiguration* mConfig;
 		btCollisionDispatcher* mDispatcher;
-		btBroadphaseInterface* mCache;
 		btSequentialImpulseConstraintSolver* mSolver;
 		btDiscreteDynamicsWorld* mWorld;
 
@@ -459,36 +456,23 @@ namespace Sentinel
 
 		PhysicsSystemBT()
 		{
+			mBroadphase = new btDbvtBroadphase();
 			mConfig = new btDefaultCollisionConfiguration();
 			mDispatcher = new btCollisionDispatcher(mConfig);
-			mCache = new btDbvtBroadphase();
-
 			mSolver = new btSequentialImpulseConstraintSolver;
-			mWorld = new btDiscreteDynamicsWorld(mDispatcher, mCache, mSolver, mConfig);
 
-			mWorld->setGravity(btVector3(0, -9.81f, 0));
+			mWorld = new btDiscreteDynamicsWorld(mDispatcher, mBroadphase, mSolver, mConfig);
+			mWorld->setGravity(btVector3(0, -10, 0));
 
 			mIsActive = false;
 		}
 
 		~PhysicsSystemBT()
 		{
-			for (int i = mWorld->getNumCollisionObjects() - 1; i >= 0; --i)
-			{
-				btCollisionObject* obj = mWorld->getCollisionObjectArray()[i];
-				btRigidBody* body = btRigidBody::upcast(obj);
-
-				if (body && body->getMotionState())
-					delete body->getMotionState();
-
-				mWorld->removeCollisionObject(obj);
-				delete obj;
-			}
-
 			SAFE_DELETE(mWorld);
 			SAFE_DELETE(mDispatcher);
 			SAFE_DELETE(mConfig);
-			SAFE_DELETE(mCache);
+			SAFE_DELETE(mBroadphase);
 			SAFE_DELETE(mSolver);
 		}
 
@@ -557,38 +541,41 @@ namespace Sentinel
 		}
 
 		//////////////////////////////////
-
+		
 		RigidBody* CreateRigidBody(PhysicsShape* shape, const Vector3f& position, const Quatf& orientation, float mass)
 		{
-			btScalar  tMass(mass);
-			btVector3 localInertia(0, 0, 0);
+			btScalar btMass(mass);
+			btVector3 inertia(0, 10, 0);
 
-			btCollisionShape* btShape = (btCollisionShape*)shape->GetData();
+			btCollisionShape* btShape = static_cast<btCollisionShape*>(shape->GetData());
 
-			if (tMass != 0.0f)
-				btShape->calculateLocalInertia(tMass, localInertia);
+			if (btMass != 0.0f)
+				btShape->calculateLocalInertia(btMass, inertia);
 
-			btTransform transform;
-			transform.setIdentity();
-			transform.setOrigin(btVector3(position.x, position.y, position.z));
-			transform.setRotation(btQuaternion(orientation.x, orientation.y, orientation.z, orientation.w));
+			btMotionState* motion = new btDefaultMotionState(btTransform(
+				btQuaternion(orientation.x, orientation.y, orientation.z, orientation.w),
+				btVector3(position.x, position.y, position.z)));
+			
+			btRigidBody* body = new btRigidBody(btMass, motion, btShape, inertia);
 
-			btDefaultMotionState* myMotionState = new btDefaultMotionState(transform);
-
-			btRigidBody::btRigidBodyConstructionInfo rbInfo(tMass, myMotionState, btShape, localInertia);
-
-			return new RigidBodyBT(shape, new btRigidBody(rbInfo));
+			return new RigidBodyBT(shape, body);
 		}
 
 		void AddRigidBody(RigidBody* body)
 		{
-			mWorld->addRigidBody(((RigidBodyBT*)body)->mRigidBody);
+			btRigidBody* btBody = static_cast<RigidBodyBT*>(body)->mRigidBody;
+
+			btVector3 scale = btBody->getCollisionShape()->getLocalScaling();
+			Debug::Log(STREAM("scale: (" << scale.x() << ", " << scale.y() << ", " << scale.z() << ")"));
+
+			mWorld->addRigidBody(btBody);
 		}
 
 		void RemoveRigidBody(RigidBody* body)
 		{
-			mWorld->removeCollisionObject(((RigidBodyBT*)body)->mRigidBody);
-			mWorld->removeRigidBody(((RigidBodyBT*)body)->mRigidBody);
+			btRigidBody* btBody = static_cast<RigidBodyBT*>(body)->mRigidBody;
+
+			mWorld->removeRigidBody(btBody);
 		}
 	};
 

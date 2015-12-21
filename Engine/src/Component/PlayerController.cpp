@@ -70,12 +70,12 @@ namespace Component
 
 			// Up.
 			//
-			if (keyboard.IsDown(VK_SPACE))
+			if (keyboard.IsDown('E'))
 				impulse += mTransform->mOrientation.Up();
 
 			// Down.
 			//
-			if (keyboard.IsDown('C'))
+			if (keyboard.IsDown('Q'))
 				impulse -= mTransform->mOrientation.Up();
 
 			// Move in direction.

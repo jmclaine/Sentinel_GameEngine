@@ -62,10 +62,11 @@ namespace Component
 
 	void Physics::Execute()
 	{
-		if (mOwner->GetParent() == NULL)
+		//if (mOwner->GetParent() == NULL)
 		{
 			mTransform->mPosition = mRigidBody->GetPosition();
 			mTransform->mOrientation = mRigidBody->GetOrientation();
+			//mTransform->mScale = mRigidBody->GetScale();
 		}
 	}
 
@@ -85,8 +86,6 @@ namespace Component
 	{
 		_ASSERT(body);
 
-		// Remove old rigid body from PhysicsSystem.
-		//
 		if (mRigidBody)
 			mOwner->GetWorld()->mPhysicsSystem->RemoveRigidBody(mRigidBody);
 
@@ -109,9 +108,6 @@ namespace Component
 
 		Quatf rot = mRigidBody->GetOrientation();
 		archive.Write(rot.Ptr(), ar_sizeof(rot));
-
-		Vector3f scale = mRigidBody->GetScale();
-		archive.Write(scale.Ptr(), ar_sizeof(scale));
 
 		int flags = mRigidBody->GetFlags();
 		archive.Write(&flags);
@@ -141,23 +137,19 @@ namespace Component
 
 		PhysicsSystem* physics = mOwner->GetWorld()->mPhysicsSystem;
 
-		PhysicsShape* shape = (PhysicsShape*)SerialMemberFunctionRegister< PhysicsSystem >::Load(physics, archive);
+		PhysicsShape* shape = (PhysicsShape*)SerialMemberFunctionRegister<PhysicsSystem>::Load(physics, archive);
 		shape->Load(archive);
 
 		float mass;
 		archive.Read(&mass);
 
 		Vector3f pos;
-		Quatf    rot;
-		Vector3f scale;
-
 		archive.Read(pos.Ptr(), ar_sizeof(pos));
+
+		Quatf rot;
 		archive.Read(rot.Ptr(), ar_sizeof(rot));
-		archive.Read(scale.Ptr(), ar_sizeof(scale));
 
 		mRigidBody = physics->CreateRigidBody(shape, pos, rot, mass);
-
-		mRigidBody->SetScale(scale);
 
 		int flags;
 		archive.Read(&flags);
@@ -195,12 +187,9 @@ namespace Component
 		GameComponent::Copy(physics);
 
 		PhysicsSystem* phySys = mOwner->GetWorld()->mPhysicsSystem;
-
 		PhysicsShape* shape = mRigidBody->GetShape()->Copy(phySys);
-
 		RigidBody* body = phySys->CreateRigidBody(shape, mRigidBody->GetPosition(), mRigidBody->GetOrientation(), mRigidBody->GetMass());
 
-		body->SetScale(mRigidBody->GetScale());
 		body->SetFlags(mRigidBody->GetFlags());
 		body->SetDamping(mRigidBody->GetLinearDamping(), mRigidBody->GetAngularDamping());
 		body->SetRestitution(mRigidBody->GetRestitution());

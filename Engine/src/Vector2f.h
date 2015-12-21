@@ -24,7 +24,9 @@ namespace Sentinel
 		float operator [] (int i) const;
 		float& operator [] (int i);
 
-		float* Ptr();
+		float* Ptr() const;
+
+		std::string ToString() const;
 
 		Vector2f operator - () const;
 
