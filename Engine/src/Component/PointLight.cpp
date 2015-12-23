@@ -55,24 +55,24 @@ namespace Component
 			float resolution = static_cast<float>(mResolution);
 			mMatrixProjection.ProjectionPerspective(resolution, resolution, 0.0f, mAttenuation.w, 90.0f);
 
-			const Vector3f& pos = mTransform->GetMatrixWorld().Transform(Vector3f(0, 0, 0));
+			const Vector3& pos = mTransform->GetMatrixWorld().Transform(Vector3(0, 0, 0));
 
-			mMatrixView[CAMERA_AXIS_POS_X].LookAtView(pos, pos + Vector3f(1, 0, 0), Vector3f(0, -1, 0));
+			mMatrixView[CAMERA_AXIS_POS_X].LookAtView(pos, pos + Vector3(1, 0, 0), Vector3(0, -1, 0));
 			mMatrixFinal[CAMERA_AXIS_POS_X] = mMatrixProjection * mMatrixView[CAMERA_AXIS_POS_X];
 
-			mMatrixView[CAMERA_AXIS_NEG_X].LookAtView(pos, pos + Vector3f(-1, 0, 0), Vector3f(0, -1, 0));
+			mMatrixView[CAMERA_AXIS_NEG_X].LookAtView(pos, pos + Vector3(-1, 0, 0), Vector3(0, -1, 0));
 			mMatrixFinal[CAMERA_AXIS_NEG_X] = mMatrixProjection * mMatrixView[CAMERA_AXIS_NEG_X];
 
-			mMatrixView[CAMERA_AXIS_POS_Y].LookAtView(pos, pos + Vector3f(0, 1, 0), Vector3f(0, 0, 1));
+			mMatrixView[CAMERA_AXIS_POS_Y].LookAtView(pos, pos + Vector3(0, 1, 0), Vector3(0, 0, 1));
 			mMatrixFinal[CAMERA_AXIS_POS_Y] = mMatrixProjection * mMatrixView[CAMERA_AXIS_POS_Y];
 
-			mMatrixView[CAMERA_AXIS_NEG_Y].LookAtView(pos, pos + Vector3f(0, -1, 0), Vector3f(0, 0, -1));
+			mMatrixView[CAMERA_AXIS_NEG_Y].LookAtView(pos, pos + Vector3(0, -1, 0), Vector3(0, 0, -1));
 			mMatrixFinal[CAMERA_AXIS_NEG_Y] = mMatrixProjection * mMatrixView[CAMERA_AXIS_NEG_Y];
 
-			mMatrixView[CAMERA_AXIS_POS_Z].LookAtView(pos, pos + Vector3f(0, 0, 1), Vector3f(0, -1, 0));
+			mMatrixView[CAMERA_AXIS_POS_Z].LookAtView(pos, pos + Vector3(0, 0, 1), Vector3(0, -1, 0));
 			mMatrixFinal[CAMERA_AXIS_POS_Z] = mMatrixProjection * mMatrixView[CAMERA_AXIS_POS_Z];
 
-			mMatrixView[CAMERA_AXIS_NEG_Z].LookAtView(pos, pos + Vector3f(0, 0, -1), Vector3f(0, -1, 0));
+			mMatrixView[CAMERA_AXIS_NEG_Z].LookAtView(pos, pos + Vector3(0, 0, -1), Vector3(0, -1, 0));
 			mMatrixFinal[CAMERA_AXIS_NEG_Z] = mMatrixProjection * mMatrixView[CAMERA_AXIS_NEG_Z];
 
 			// Add all dynamic objects within range of the light.
@@ -120,7 +120,7 @@ namespace Component
 		Material::Unlock();
 	}
 
-	const Matrix4f& PointLight::GetMatrixFinal(CameraAxisType axis)
+	const Matrix4x4& PointLight::GetMatrixFinal(CameraAxisType axis)
 	{
 		return mMatrixFinal[axis];
 	}

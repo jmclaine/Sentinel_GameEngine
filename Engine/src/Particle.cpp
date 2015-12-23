@@ -6,7 +6,7 @@ namespace Sentinel
 		mEffectIndex( 0 ),
 		mLifetime( 0 ),
 		mElapsedTime( 0 ),
-		mScale( Vector3f( 1, 1, 1 ))
+		mScale( Vector3( 1, 1, 1 ))
 	{}
 
 	void Particle::Update( float DT )

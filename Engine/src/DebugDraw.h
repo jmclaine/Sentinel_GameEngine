@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Memory.h"
-#include "Vector3f.h"
+#include "Vector3.h"
 #include "Types.h"
 
 namespace Sentinel
@@ -50,7 +50,7 @@ namespace Sentinel
 
 		void Clear();
 
-		void Line(const Vector3f& start, const Vector3f& end);
+		void Line(const Vector3& start, const Vector3& end);
 
 		void Present();
 	};

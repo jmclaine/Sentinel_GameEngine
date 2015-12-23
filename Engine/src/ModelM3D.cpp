@@ -37,7 +37,7 @@ namespace Sentinel
 
 		struct Vertex
 		{
-			Vector3f mPosition;
+			Vector3 mPosition;
 
 			// Bones.
 			//
@@ -50,7 +50,7 @@ namespace Sentinel
 
 		struct KeyFrame
 		{
-			Matrix4f mMatrix;
+			Matrix4x4 mMatrix;
 			int mFrame;
 
 			KeyFrame()
@@ -71,8 +71,8 @@ namespace Sentinel
 			float mCurrTime;
 			int mCurrKey;
 
-			Matrix4f mMatrixWorld;
-			Matrix4f mInverseBone;
+			Matrix4x4 mMatrixWorld;
+			Matrix4x4 mInverseBone;
 
 			Object* mParent;
 
@@ -277,8 +277,8 @@ namespace Sentinel
 			MaterialManager* materialManager)
 		{
 			Vertex* vertices = NULL;
-			Vector3f* normals = NULL;
-			Vector2f* texCoords = NULL;
+			Vector3* normals = NULL;
+			Vector2* texCoords = NULL;
 
 			try
 			{
@@ -346,7 +346,7 @@ namespace Sentinel
 				//
 				int numNormals;
 				archive.Read(&numNormals, 1, bNorms32);
-				normals = new Vector3f[numNormals];
+				normals = new Vector3[numNormals];
 
 				for (int x = 0; x < numNormals; ++x)
 					archive.Read(normals[x].Ptr(), 3);
@@ -355,7 +355,7 @@ namespace Sentinel
 				//
 				int numTexCoords;
 				archive.Read(&numTexCoords, 1, bTexcs32);
-				texCoords = new Vector2f[numTexCoords];
+				texCoords = new Vector2[numTexCoords];
 
 				for (int x = 0; x < numTexCoords; ++x)
 				{
@@ -502,7 +502,7 @@ namespace Sentinel
 							}
 
 							meshVertex.mNormal = normals[normal];
-							meshVertex.mTexCoord[0] = Vector2f(texCoords[texCoord].x, texCoords[texCoord].y);
+							meshVertex.mTexCoord[0] = Vector2(texCoords[texCoord].x, texCoords[texCoord].y);
 
 							builder.mVertex.push_back(meshVertex);
 
@@ -591,13 +591,13 @@ namespace Sentinel
 		{
 			// Set the material.
 			//
-			Vector3f ambient;
+			Vector3 ambient;
 			archive.Read(ambient.Ptr(), ar_sizeof(ambient));
 
-			Vector3f diffuse;
+			Vector3 diffuse;
 			archive.Read(diffuse.Ptr(), ar_sizeof(diffuse));
 
-			Vector3f specular;
+			Vector3 specular;
 			archive.Read(specular.Ptr(), ar_sizeof(specular));
 
 			float spec_comp;
@@ -690,7 +690,7 @@ namespace Sentinel
 			/*
 			if( mIsWeighted )
 			{
-			static Matrix4f matBone;
+			static Matrix4x4 matBone;
 
 			std::shared_ptr< Shader > skin = ShaderManager::Inst()->Get( "Skinning" );
 
@@ -735,7 +735,7 @@ namespace Sentinel
 			//
 			for (UINT x = 0; x < mNumObjects; ++x)
 			{
-				static Matrix4f matWorldObject;
+				static Matrix4x4 matWorldObject;
 
 				if (mObject[x].mParent == NULL)
 					matWorldObject = mMatrixWorld * mObject[x].mKeyFrame[mObject[x].mCurrKey].mMatrix;

@@ -30,7 +30,7 @@ namespace Sentinel
 
 		for (UINT x = 0; x < maxSprites; ++x)
 		{
-			builder.mVertex.push_back(MeshBuilder::Vertex(Vector3f(0.0f, 0.0f, 0.0f)));
+			builder.mVertex.push_back(MeshBuilder::Vertex(Vector3(0.0f, 0.0f, 0.0f)));
 		}
 
 		builder.mPrimitive = PrimitiveFormat::POINTS;
@@ -60,7 +60,7 @@ namespace Sentinel
 		mNumSprites = 0;
 	}
 
-	void SpriteSystem::Draw(UINT frame, const ColorRGBA& color, const Matrix4f& matWorld)
+	void SpriteSystem::Draw(UINT frame, const ColorRGBA& color, const Matrix4x4& matWorld)
 	{
 		_ASSERT(mNumSprites < mMaxSprites);
 

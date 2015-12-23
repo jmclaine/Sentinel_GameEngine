@@ -5,7 +5,7 @@ as an abstract class to remove the core OpenAL source from
 the header in order for the Editor to use it.
 */
 #include "Sentinel.h"
-#include "Vector3f.h"
+#include "Vector3.h"
 
 namespace Sentinel
 {
@@ -38,9 +38,9 @@ namespace Sentinel
 		virtual Sound*	CreateSoundWAV( Archive& archive ) = 0;
 		virtual Sound*	CreateSoundOGG( Archive& archive ) = 0;
 
-		virtual void			SetListenerPosition( const Vector3f& position ) = 0;
-		virtual void			SetListenerVelocity( const Vector3f& velocity ) = 0;
-		virtual void			SetListenerOrientation( const Vector3f& direction, const Vector3f& up = Vector3f( 0, 1, 0 )) = 0;
+		virtual void			SetListenerPosition( const Vector3& position ) = 0;
+		virtual void			SetListenerVelocity( const Vector3& velocity ) = 0;
+		virtual void			SetListenerOrientation( const Vector3& direction, const Vector3& up = Vector3( 0, 1, 0 )) = 0;
 	};
 
 	extern SENTINEL_DLL AudioSystem* BuildAudioSystemAL();

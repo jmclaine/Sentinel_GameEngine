@@ -1,6 +1,6 @@
 #include "Sprite.h"
 #include "Texture.h"
-#include "Vector2f.h"
+#include "Vector2.h"
 #include "Point.h"
 
 namespace Sentinel

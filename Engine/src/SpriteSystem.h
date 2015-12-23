@@ -13,8 +13,8 @@ Use the current GameWorld camera to render sprites.
 */
 #include <memory>
 
-#include "Vector3f.h"
-#include "Matrix4f.h"
+#include "Vector3.h"
+#include "Matrix4x4.h"
 #include "ColorRGBA.h"
 #include "Point.h"
 
@@ -51,7 +51,7 @@ namespace Sentinel
 
 			Quad mFrame;
 			UINT mColor;
-			Matrix4f mMatrixWorld;
+			Matrix4x4 mMatrixWorld;
 		};
 
 	private:
@@ -74,7 +74,7 @@ namespace Sentinel
 
 		void Clear();
 
-		void Draw(UINT frame, const ColorRGBA& color, const Matrix4f& matWorld);
+		void Draw(UINT frame, const ColorRGBA& color, const Matrix4x4& matWorld);
 
 		void Present();
 	};

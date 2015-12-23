@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GUI\Controller2D.h"
-#include "Vector3f.h"
+#include "Vector3.h"
 #include "Point.h"
 
 namespace Sentinel {
@@ -17,8 +17,8 @@ namespace GUI
 
 	protected:
 
-		Vector3f mBasePosition;
-		Vector3f mBaseScale;
+		Vector3 mBasePosition;
+		Vector3 mBaseScale;
 
 	public:
 

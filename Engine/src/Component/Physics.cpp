@@ -5,8 +5,8 @@
 #include "GameObject.h"
 #include "GameWorld.h"
 #include "Archive.h"
-#include "Vector3f.h"
-#include "Quatf.h"
+#include "Vector3.h"
+#include "Quaternion.h"
 #include "Exception.h"
 
 namespace Sentinel {
@@ -103,10 +103,10 @@ namespace Component
 		float mass = mRigidBody->GetMass();
 		archive.Write(&mass);
 
-		Vector3f pos = mRigidBody->GetPosition();
+		Vector3 pos = mRigidBody->GetPosition();
 		archive.Write(pos.Ptr(), ar_sizeof(pos));
 
-		Quatf rot = mRigidBody->GetOrientation();
+		Quaternion rot = mRigidBody->GetOrientation();
 		archive.Write(rot.Ptr(), ar_sizeof(rot));
 
 		int flags = mRigidBody->GetFlags();
@@ -124,7 +124,7 @@ namespace Component
 		value = mRigidBody->GetFriction();
 		archive.Write(&value);
 
-		Vector3f v = mRigidBody->GetAngularFactor();
+		Vector3 v = mRigidBody->GetAngularFactor();
 		archive.Write(v.Ptr(), ar_sizeof(v));
 
 		v = mRigidBody->GetGravity();
@@ -143,10 +143,10 @@ namespace Component
 		float mass;
 		archive.Read(&mass);
 
-		Vector3f pos;
+		Vector3 pos;
 		archive.Read(pos.Ptr(), ar_sizeof(pos));
 
-		Quatf rot;
+		Quaternion rot;
 		archive.Read(rot.Ptr(), ar_sizeof(rot));
 
 		mRigidBody = physics->CreateRigidBody(shape, pos, rot, mass);
@@ -169,11 +169,11 @@ namespace Component
 		archive.Read(&friction);
 		mRigidBody->SetFriction(friction);
 
-		Vector3f angularFactor;
+		Vector3 angularFactor;
 		archive.Read(angularFactor.Ptr(), ar_sizeof(angularFactor));
 		mRigidBody->SetAngularFactor(angularFactor);
 
-		Vector3f gravity;
+		Vector3 gravity;
 		archive.Read(gravity.Ptr(), ar_sizeof(gravity));
 		mRigidBody->SetGravity(gravity);
 	}

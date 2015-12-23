@@ -12,9 +12,9 @@ in order to spawn outside the origin.
 #include "Particle.h"
 #include "ParticleEffect.h"
 #include "Serializable.h"
-#include "Vector3f.h"
-#include "Quatf.h"
-#include "Matrix4f.h"
+#include "Vector3.h"
+#include "Quaternion.h"
+#include "Matrix4x4.h"
 #include "ColorRGBA.h"
 
 namespace Sentinel
@@ -79,7 +79,7 @@ namespace Sentinel
 
 		virtual void		Draw() = 0;
 
-		void				SetMatrixWorld( const Matrix4f& matWorld );
+		void				SetMatrixWorld( const Matrix4x4& matWorld );
 
 	private:
 

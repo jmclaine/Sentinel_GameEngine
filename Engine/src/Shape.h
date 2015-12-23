@@ -2,9 +2,9 @@
 
 #include "Sentinel.h"
 #include "Types.h"
-#include "Vector2f.h"
-#include "Vector3f.h"
-#include "Matrix4f.h"
+#include "Vector2.h"
+#include "Vector3.h"
+#include "Matrix4x4.h"
 
 namespace Sentinel
 {
@@ -17,10 +17,10 @@ namespace Sentinel
 	{
 	public:
 
-		Vector3f mPosition;
-		Vector3f mDirection;
+		Vector3 mPosition;
+		Vector3 mDirection;
 
-		Ray(const Vector3f& pos, const Vector3f& dir);
+		Ray(const Vector3& pos, const Vector3& dir);
 	};
 
 	//////////////////////////////////////////////////////
@@ -29,12 +29,12 @@ namespace Sentinel
 	{
 	public:
 
-		Vector3f mPosition;
-		Vector3f mNormal;
+		Vector3 mPosition;
+		Vector3 mNormal;
 
-		Plane(const Vector3f& pos = Vector3f(), const Vector3f& normal = Vector3f());
+		Plane(const Vector3& pos = Vector3(), const Vector3& normal = Vector3());
 
-		float Distance(const Vector3f& pos) const;
+		float Distance(const Vector3& pos) const;
 
 		//bool Intersects(const Ray& ray) const;
 		//bool Intersects(const BoundingBox& box) const;
@@ -46,9 +46,9 @@ namespace Sentinel
 	{
 	public:
 
-		Vector3f mPosition[3];
+		Vector3 mPosition[3];
 
-		Triangle(const Vector3f& posA, const Vector3f& posB, const Vector3f& posC);
+		Triangle(const Vector3& posA, const Vector3& posB, const Vector3& posC);
 
 		float Area();
 	};
@@ -59,8 +59,8 @@ namespace Sentinel
 	{
 	public:
 
-		virtual bool Intersects(const Vector3f& point) const = 0;
-		virtual bool Intersects(const Ray& ray, Vector3f* intersection = NULL) const = 0;
+		virtual bool Intersects(const Vector3& point) const = 0;
+		virtual bool Intersects(const Ray& ray, Vector3* intersection = NULL) const = 0;
 		virtual bool Intersects(const BoundingSphere& sphere) const = 0;
 		virtual bool Intersects(const BoundingBox& box) const = 0;
 	};
@@ -71,17 +71,17 @@ namespace Sentinel
 	{
 	public:
 
-		Vector3f mCenter;
+		Vector3 mCenter;
 		float mRadius;
 
-		BoundingSphere(const Vector3f& center = Vector3f(), float radius = 0);
-		BoundingSphere(const Vector3f& v0, const Vector3f& v1);
-		BoundingSphere(const Vector3f& v0, const Vector3f& v1, const Vector3f& v2);
-		BoundingSphere(const Vector3f& v0, const Vector3f& v1, const Vector3f& v2, const Vector3f& v3);
-		BoundingSphere(const BYTE* verts, UINT count, UINT stride = sizeof(Vector3f));	// Takes in a pointer to 3 float points.
+		BoundingSphere(const Vector3& center = Vector3(), float radius = 0);
+		BoundingSphere(const Vector3& v0, const Vector3& v1);
+		BoundingSphere(const Vector3& v0, const Vector3& v1, const Vector3& v2);
+		BoundingSphere(const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3);
+		BoundingSphere(const BYTE* verts, UINT count, UINT stride = sizeof(Vector3));	// Takes in a pointer to 3 float points.
 
-		bool Intersects(const Vector3f& point) const;
-		bool Intersects(const Ray& ray, Vector3f* intersection = NULL) const;
+		bool Intersects(const Vector3& point) const;
+		bool Intersects(const Ray& ray, Vector3* intersection = NULL) const;
 		bool Intersects(const BoundingSphere& sphere) const;
 		bool Intersects(const BoundingBox& box) const;
 	};
@@ -97,18 +97,18 @@ namespace Sentinel
 	public:
 
 		BoundingBox();
-		BoundingBox(const Vector3f& minBounds, const Vector3f& maxBounds);
-		BoundingBox(const BYTE* verts, UINT count, UINT stride = sizeof(Vector3f));
+		BoundingBox(const Vector3& minBounds, const Vector3& maxBounds);
+		BoundingBox(const BYTE* verts, UINT count, UINT stride = sizeof(Vector3));
 
-		void Set(const Matrix4f& matWorld = Matrix4f::IDENTITY);
-		void Set(const Vector3f& minBounds, const Vector3f& maxBounds, const Matrix4f& matWorld = Matrix4f::IDENTITY);
-		void Set(const BYTE* verts, UINT count, UINT stride = sizeof(Vector3f));
+		void Set(const Matrix4x4& matWorld = Matrix4x4::IDENTITY);
+		void Set(const Vector3& minBounds, const Vector3& maxBounds, const Matrix4x4& matWorld = Matrix4x4::IDENTITY);
+		void Set(const BYTE* verts, UINT count, UINT stride = sizeof(Vector3));
 
-		const Vector3f& GetMinBounds() const;
-		const Vector3f& GetMaxBounds() const;
+		const Vector3& GetMinBounds() const;
+		const Vector3& GetMaxBounds() const;
 
-		bool Intersects(const Vector3f& point) const;
-		bool Intersects(const Ray& ray, Vector3f* intersection = NULL) const;
+		bool Intersects(const Vector3& point) const;
+		bool Intersects(const Ray& ray, Vector3* intersection = NULL) const;
 		bool Intersects(const BoundingSphere& sphere) const;
 		bool Intersects(const BoundingBox& box) const;
 	};
@@ -126,25 +126,25 @@ namespace Sentinel
 		BoundingFrustum();
 
 		BoundingFrustum(
-			const Vector3f& nearCenter, const Vector3f& farCenter,
-			const Vector2f& nearExtent, const Vector2f& farExtent);
+			const Vector3& nearCenter, const Vector3& farCenter,
+			const Vector2& nearExtent, const Vector2& farExtent);
 
 		BoundingFrustum(
-			const Vector3f& nearCenter, const Vector3f& farCenter,
-			const Vector2f& nearExtent, const Vector2f& farExtent,
-			const Vector3f& forward, const Vector3f& right, const Vector3f& up);
+			const Vector3& nearCenter, const Vector3& farCenter,
+			const Vector2& nearExtent, const Vector2& farExtent,
+			const Vector3& forward, const Vector3& right, const Vector3& up);
 
 		void Set(
-			const Vector3f& nearCenter, const Vector3f& farCenter,
-			const Vector2f& nearExtent, const Vector2f& farExtent);
+			const Vector3& nearCenter, const Vector3& farCenter,
+			const Vector2& nearExtent, const Vector2& farExtent);
 
 		void Set(
-			const Vector3f& nearCenter, const Vector3f& farCenter,
-			const Vector2f& nearExtent, const Vector2f& farExtent,
-			const Vector3f& forward, const Vector3f& right, const Vector3f& up);
+			const Vector3& nearCenter, const Vector3& farCenter,
+			const Vector2& nearExtent, const Vector2& farExtent,
+			const Vector3& forward, const Vector3& right, const Vector3& up);
 
-		bool Intersects(const Vector3f& point) const;
-		bool Intersects(const Ray& ray, Vector3f* intersection = NULL) const;
+		bool Intersects(const Vector3& point) const;
+		bool Intersects(const Ray& ray, Vector3* intersection = NULL) const;
 		bool Intersects(const BoundingSphere& sphere) const;
 		bool Intersects(const BoundingBox& box) const;
 	};

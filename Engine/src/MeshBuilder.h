@@ -22,10 +22,10 @@ the correct amount of memory before adding them to the list.
 #include "Sentinel.h"
 #include "Types.h"
 #include "RendererTypes.h"
-#include "Vector2f.h"
-#include "Vector3f.h"
-#include "Vector4f.h"
-#include "Matrix4f.h"
+#include "Vector2.h"
+#include "Vector3.h"
+#include "Vector4.h"
+#include "Matrix4x4.h"
 #include "ColorRGBA.h"
 
 namespace Sentinel
@@ -48,21 +48,21 @@ namespace Sentinel
 		//
 		struct Vertex
 		{
-			Vector3f mPosition;
+			Vector3 mPosition;
 
 			// Texture Coordinates are either uv / xy based,
 			// or xyzw / quad based depending on the shader
 			// attribute.
 			//
-			Vector2f mTexCoord[TextureIndex::COUNT];
-			Vector4f mQuadCoord[TextureIndex::COUNT];
+			Vector2 mTexCoord[TextureIndex::COUNT];
+			Vector4 mQuadCoord[TextureIndex::COUNT];
 
-			Vector3f mNormal;
+			Vector3 mNormal;
 			UINT mColor;
 
 			// Normal Mapping.
 			//
-			Vector4f mTangent;
+			Vector4 mTangent;
 
 			// Bones.
 			//
@@ -72,16 +72,16 @@ namespace Sentinel
 
 			// Vertex Matrix for Sprites
 			//
-			Matrix4f mMatrix;
+			Matrix4x4 mMatrix;
 
 			Vertex() :
-				mPosition(Vector3f(0, 0, 0)),
+				mPosition(Vector3(0, 0, 0)),
 				mColor(0xFFFFFFFF)
 			{
 				mMatrix.Identity();
 			}
 
-			Vertex(const Vector3f& pos, const ColorRGBA& color = ColorRGBA(1, 1, 1, 1)) :
+			Vertex(const Vector3& pos, const ColorRGBA& color = ColorRGBA(1, 1, 1, 1)) :
 				mPosition(pos)
 			{
 				mColor = color.ToUINT();
@@ -115,7 +115,7 @@ namespace Sentinel
 		// Returns UINT_MAX if not found.
 		// Helper function for model loaders.
 		//
-		UINT FindVertex(const Vector3f& pos, const Vector2f& tex, const Vector3f& normal);
+		UINT FindVertex(const Vector3& pos, const Vector2& tex, const Vector3& normal);
 
 		// Index helper functions.
 		//
@@ -133,8 +133,8 @@ namespace Sentinel
 		// Create objects.
 		// Based on geometry.h provided with OpenGL.
 		//
-		void CreateLine(const Vector3f& start, const Vector3f& end);
-		void CreateQuad(float size, const Vector3f& normal = Vector3f(0, 0, 1));
+		void CreateLine(const Vector3& start, const Vector3& end);
+		void CreateQuad(float size, const Vector3& normal = Vector3(0, 0, 1));
 		void CreateCube(float size);
 		void CreateWireCube(float size);
 		void CreateCylinder(float radius, float height, int slices, int stacks = 1);
@@ -146,7 +146,7 @@ namespace Sentinel
 
 		// Apply a matrix transform to a set a vertices.
 		//
-		void ApplyMatrix(const Matrix4f& mat, UINT startVertex = 0, UINT endVertex = UINT_MAX);
+		void ApplyMatrix(const Matrix4x4& mat, UINT startVertex = 0, UINT endVertex = UINT_MAX);
 
 	private:
 

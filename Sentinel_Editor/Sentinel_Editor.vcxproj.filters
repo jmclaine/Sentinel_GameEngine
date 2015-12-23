@@ -65,6 +65,9 @@
     <None Include="Assets\Shaders\Texture_Lit_Shadow.xsh">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Assets\Shaders\Normal_Map_Shadow.xsh">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">

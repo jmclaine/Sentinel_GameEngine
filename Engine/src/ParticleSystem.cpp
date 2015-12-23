@@ -122,7 +122,7 @@ namespace Sentinel
 		mIsActive = false;
 	}
 
-	void ParticleSystem::SetMatrixWorld( const Matrix4f& matWorld )
+	void ParticleSystem::SetMatrixWorld( const Matrix4x4& matWorld )
 	{
 		mMesh->mMatrixWorld = matWorld;
 	}

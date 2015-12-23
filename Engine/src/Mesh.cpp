@@ -1,10 +1,10 @@
 #include "Mesh.h"
 #include "Renderer.h"
 #include "GameWorld.h"
-#include "Vector2f.h"
-#include "Vector3f.h"
-#include "Vector4f.h"
-#include "Matrix4f.h"
+#include "Vector2.h"
+#include "Vector3.h"
+#include "Vector4.h"
+#include "Matrix4x4.h"
 #include "Buffer.h"
 #include "Texture.h"
 #include "Shader.h"
@@ -68,10 +68,16 @@ namespace Sentinel
 			{
 				switch (uniform[i])
 				{
-				case ShaderUniform::WVP:
+				case ShaderUniform::WORLD_VIEW_PROJ:
 					_ASSERT(camera);
 
 					shader->SetMatrix(uniformIndex, (camera->GetMatrixWVP() * mMatrixWorld).Ptr());
+					break;
+
+				case ShaderUniform::WORLD_VIEW:
+					_ASSERT(camera);
+
+					shader->SetMatrix(uniformIndex, (camera->GetMatrixView() * mMatrixWorld).Ptr());
 					break;
 
 				case ShaderUniform::WORLD:
@@ -85,25 +91,25 @@ namespace Sentinel
 				case ShaderUniform::VIEW:
 					_ASSERT(camera);
 
-					shader->SetFloat3(uniformIndex, const_cast<Matrix4f&>(camera->GetMatrixView()).Ptr());
+					shader->SetMatrix(uniformIndex, const_cast<Matrix4x4&>(camera->GetMatrixView()).Ptr());
 					break;
 
 				case ShaderUniform::INV_VIEW:
 					_ASSERT(camera);
 
-					shader->SetFloat3(uniformIndex, camera->GetMatrixView().Inverse().Ptr());
+					shader->SetMatrix(uniformIndex, camera->GetMatrixView().Inverse().Ptr());
 					break;
 
 				case ShaderUniform::PROJ:
 					_ASSERT(camera);
 
-					shader->SetFloat3(uniformIndex, const_cast<Matrix4f&>(camera->GetMatrixProjection()).Ptr());
+					shader->SetMatrix(uniformIndex, const_cast<Matrix4x4&>(camera->GetMatrixProjection()).Ptr());
 					break;
 
 				case ShaderUniform::INV_PROJ:
 					_ASSERT(camera);
 
-					shader->SetFloat3(uniformIndex, camera->GetMatrixProjection().Inverse().Ptr());
+					shader->SetMatrix(uniformIndex, camera->GetMatrixProjection().Inverse().Ptr());
 					break;
 
 				case ShaderUniform::TEXTURE:
@@ -134,7 +140,7 @@ namespace Sentinel
 				{
 					_ASSERT(camera);
 
-					Vector3f pos = camera->GetTransform()->mPosition;
+					Vector3 pos = camera->GetTransform()->mPosition;
 
 					shader->SetFloat3(uniformIndex, pos.Ptr());
 				}
@@ -145,7 +151,7 @@ namespace Sentinel
 					_ASSERT(world);
 					_ASSERT(world->GetLight(lightCount));
 
-					Vector3f pos = world->GetLight(lightCount)->GetTransform()->GetMatrixWorld().Transform(Vector3f(0, 0, 0));
+					Vector3 pos = world->GetLight(lightCount)->GetTransform()->GetMatrixWorld().Transform(Vector3(0, 0, 0));
 
 					shader->SetFloat3(uniformIndex, pos.Ptr());
 				}

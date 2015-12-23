@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Sentinel.h"
-#include "Vector3f.h"
+#include "Vector3.h"
 #include "ColorRGBA.h"
 
 namespace Sentinel
@@ -19,15 +19,15 @@ namespace Sentinel
 		float		mLifetime;
 		float		mElapsedTime;
 
-		Vector3f	mPosition;
-		Vector3f	mRotation;
-		Vector3f	mScale;
+		Vector3	mPosition;
+		Vector3	mRotation;
+		Vector3	mScale;
 
-		Vector3f	mVelocity;
-		Vector3f	mAngularVelocity;
+		Vector3	mVelocity;
+		Vector3	mAngularVelocity;
 
-		Vector3f	mAccel;
-		Vector3f	mAngularAccel;
+		Vector3	mAccel;
+		Vector3	mAngularAccel;
 
 	protected:
 

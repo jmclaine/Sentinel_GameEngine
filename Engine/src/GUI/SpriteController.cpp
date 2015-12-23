@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GUI/SpriteController.h"
-#include "Matrix4f.h"
+#include "Matrix4x4.h"
 #include "Renderer.h"
 #include "GameWorld.h"
 #include "GameObject.h"
@@ -39,7 +39,7 @@ namespace GUI
 
 		// Adjust position.
 		//
-		Vector3f* pos = &mTransform->mPosition;
+		Vector3* pos = &mTransform->mPosition;
 
 		*pos = mBasePosition;
 
@@ -54,7 +54,7 @@ namespace GUI
 
 		// Adjust scale.
 		//
-		Vector3f* scale = &mTransform->mScale;
+		Vector3* scale = &mTransform->mScale;
 
 		*scale = mBaseScale;
 
@@ -71,7 +71,7 @@ namespace GUI
 		//
 		POINT mousePos = Mouse::Get().GetPosition((HWND)info->Handle());
 
-		Vector3f v = mTransform->GetMatrixWorld().Inverse().Transform(Vector3f((float)mousePos.x, (float)mousePos.y, 0));
+		Vector3 v = mTransform->GetMatrixWorld().Inverse().Transform(Vector3((float)mousePos.x, (float)mousePos.y, 0));
 
 		if (v.x >= 0 && v.y >= 0 &&
 			v.x <= 1 && v.y <= 1)

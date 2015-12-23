@@ -38,8 +38,8 @@ namespace Sentinel
 		{
 			UINT index = x << 1;
 
-			builder.mVertex.push_back(MeshBuilder::Vertex(Vector3f(0.0f, 0.0f, 0.0f)));
-			builder.mVertex.push_back(MeshBuilder::Vertex(Vector3f(0.0f, 0.0f, 0.0f)));
+			builder.mVertex.push_back(MeshBuilder::Vertex(Vector3(0.0f, 0.0f, 0.0f)));
+			builder.mVertex.push_back(MeshBuilder::Vertex(Vector3(0.0f, 0.0f, 0.0f)));
 		}
 
 		builder.mPrimitive = PrimitiveFormat::LINES;
@@ -72,9 +72,9 @@ namespace Sentinel
 		mNumLines = 0;
 	}
 
-	void DebugDraw::Line(const Vector3f& start, const Vector3f& end)
+	void DebugDraw::Line(const Vector3& start, const Vector3& end)
 	{
-		Vector3f* data = (Vector3f*)mMesh->mVertexBuffer->Lock() + (mNumLines << 1);
+		Vector3* data = (Vector3*)mMesh->mVertexBuffer->Lock() + (mNumLines << 1);
 
 		*data = start;
 		*(data + 1) = end;

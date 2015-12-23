@@ -40,7 +40,7 @@ namespace Sentinel
 
 	//////////////////////////////////////////////////////////////////
 
-	UINT MeshBuilder::FindVertex(const Vector3f& pos, const Vector2f& tex, const Vector3f& normal)
+	UINT MeshBuilder::FindVertex(const Vector3& pos, const Vector2& tex, const Vector3& normal)
 	{
 		for (UINT i = 0; i < mVertex.size(); ++i)
 		{
@@ -92,22 +92,18 @@ namespace Sentinel
 
 	void MeshBuilder::CalculateTangents(bool doNormals)
 	{
-		Vector3f* tangent = new Vector3f[mVertex.size()];
-		Vector3f* binormal = new Vector3f[mVertex.size()];
-		Vector3f* normal = new Vector3f[mVertex.size()];
+		Vector3* tangent = new Vector3[mVertex.size()];
+		Vector3* bitangent = new Vector3[mVertex.size()];
+		Vector3* normal = new Vector3[mVertex.size()];
 
 		for (UINT i = 0; i < mIndex.size(); i += 3)
 		{
 			UINT j[3] = { mIndex[i], mIndex[i + 1], mIndex[i + 2] };
 
-			// Calculate texture coordinate directions.
-			//
-			Vector3f Q1 = mVertex[j[1]].mPosition - mVertex[j[0]].mPosition;
-			Vector3f Q2 = mVertex[j[2]].mPosition - mVertex[j[0]].mPosition;
+			Vector3 Q1 = mVertex[j[1]].mPosition - mVertex[j[0]].mPosition;
+			Vector3 Q2 = mVertex[j[2]].mPosition - mVertex[j[0]].mPosition;
 
-			// Get the normal.
-			//
-			Vector3f N;
+			Vector3 N;
 			if (doNormals)
 			{
 				N = (Q1.Cross(Q2)).Normalize();
@@ -131,56 +127,46 @@ namespace Sentinel
 
 			float det = 1.0f / (s1*t2 - s2*t1);
 
-			Vector3f T = Vector3f((Q1.x * t2 + Q2.x * -t1) * det, \
-				(Q1.y * t2 + Q2.y * -t1) * det, \
-				(Q1.z * t2 + Q2.z * -t1) * det).Normalize();
+			Vector3 T = Vector3(
+				(Q1.x * t2 - Q2.x * t1) * det,
+				(Q1.y * t2 - Q2.y * t1) * det,
+				(Q1.z * t2 - Q2.z * t1) * det);
 
-			Vector3f B = Vector3f((Q1.x * -s2 + Q2.x * s1) * det, \
-				(Q1.y * -s2 + Q2.y * s1) * det, \
-				(Q1.z * -s2 + Q2.z * s1) * det).Normalize();
+			Vector3 B = Vector3(
+				(Q2.x * s1 - Q1.x * s2) * det,
+				(Q2.y * s1 - Q1.y * s2) * det,
+				(Q2.z * s1 - Q1.z * s2) * det);
 
 			// Sum the tangents up by their vertex for averaging.
 			//
 			for (UINT k = 0; k < 3; ++k)
 			{
 				tangent[j[k]] += T;
-				binormal[j[k]] += B;
+				bitangent[j[k]] += B;
 				normal[j[k]] += N;
 			}
 		}
 
-		// Calculate the average tangent.
-		//
 		for (UINT i = 0; i < mVertex.size(); ++i)
 		{
-			// Find the tangent.
-			//
-			Vector3f Tn = (tangent[i] - normal[i] * normal[i].Dot(tangent[i])).Normalize();
+			Vector3 N(normal[i]);
+			Vector3 T(tangent[i]);
+			Vector3 B(bitangent[i]);
 
-			// Find the binormal.
-			//
-			Vector3f Bn = (binormal[i] - normal[i] * normal[i].Dot(binormal[i]) - Tn * Tn.Dot(binormal[i])).Normalize();
+			Vector3 Tn = (T - N * N.Dot(T)).Normalize();
+			float sign = ((N.Cross(T)).Dot(B) < 0) ? -1 : 1;
 
-			// Determine the sign.
-			//
-			Vector3f Bt = (normal[i].Cross(Tn)).Normalize();
-			float sign = (Bt.Dot(Bn) > 0.0f) ? 1.0f : -1.0f;
-
-			// Finalize the tangent as the average.
-			//
-			mVertex[i].mTangent = Vector4f(Tn.x, Tn.y, Tn.z, sign);
+			mVertex[i].mTangent = Vector4(Tn.x, Tn.y, Tn.z, sign);
 		}
 
 		delete[] tangent;
-		delete[] binormal;
+		delete[] bitangent;
 		delete[] normal;
 	}
 
 	//////////////////////////////////////////////////////////////////
 
-	// Create a simple line from start to end.
-	//
-	void MeshBuilder::CreateLine(const Vector3f& start, const Vector3f& end)
+	void MeshBuilder::CreateLine(const Vector3& start, const Vector3& end)
 	{
 		UINT startVert = mVertex.size();
 
@@ -197,43 +183,41 @@ namespace Sentinel
 		AddIndex(startVert, startVert + 1);
 	}
 
-	// Create a quad based on a normal and size.
-	//
-	void MeshBuilder::CreateQuad(float size, const Vector3f& normal)
+	void MeshBuilder::CreateQuad(float size, const Vector3& normal)
 	{
 		UINT startVert = mVertex.size();
 
-		Vector3f up = Vector3f(normal.y, normal.z, normal.x);
-		Vector3f right = normal.Cross(up);
+		Vector3 up = Vector3(normal.y, normal.z, normal.x);
+		Vector3 right = normal.Cross(up);
 
-		Vector3f cornerUR = right + up;
-		Vector3f cornerUL = up - right;
+		Vector3 cornerUR = right + up;
+		Vector3 cornerUL = up - right;
 
 		Vertex vertex;
 		vertex.mPosition = cornerUL * -size;
-		vertex.mTexCoord[0] = Vector2f(0, 1);
-		vertex.mTexCoord[1] = Vector2f(0, 1);
+		vertex.mTexCoord[0] = Vector2(0, 1);
+		vertex.mTexCoord[1] = Vector2(0, 1);
 		vertex.mNormal = normal;
 
 		mVertex.push_back(vertex);
 
 		vertex.mPosition = cornerUR * -size;
-		vertex.mTexCoord[0] = Vector2f(1, 1);
-		vertex.mTexCoord[1] = Vector2f(1, 1);
+		vertex.mTexCoord[0] = Vector2(1, 1);
+		vertex.mTexCoord[1] = Vector2(1, 1);
 		vertex.mNormal = normal;
 
 		mVertex.push_back(vertex);
 
 		vertex.mPosition = cornerUL * size;
-		vertex.mTexCoord[0] = Vector2f(1, 0);
-		vertex.mTexCoord[1] = Vector2f(1, 0);
+		vertex.mTexCoord[0] = Vector2(1, 0);
+		vertex.mTexCoord[1] = Vector2(1, 0);
 		vertex.mNormal = normal;
 
 		mVertex.push_back(vertex);
 
 		vertex.mPosition = cornerUR * size;
-		vertex.mTexCoord[0] = Vector2f(0, 0);
-		vertex.mTexCoord[1] = Vector2f(0, 0);
+		vertex.mTexCoord[0] = Vector2(0, 0);
+		vertex.mTexCoord[1] = Vector2(0, 0);
 		vertex.mNormal = normal;
 
 		mVertex.push_back(vertex);
@@ -252,27 +236,27 @@ namespace Sentinel
 
 	void MeshBuilder::CreateCube(float size)
 	{
-		Matrix4f matTrans;
-		Vector3f normal;
+		Matrix4x4 matTrans;
+		Vector3 normal;
 		UINT startVert;
 
 		// Front
-		CUBE_SIDE(Vector3f(0, 0, -1));
+		CUBE_SIDE(Vector3(0, 0, -1));
 
 		// Left
-		CUBE_SIDE(Vector3f(-1, 0, 0));
+		CUBE_SIDE(Vector3(-1, 0, 0));
 
 		// Bottom
-		CUBE_SIDE(Vector3f(0, -1, 0));
+		CUBE_SIDE(Vector3(0, -1, 0));
 
 		// Back
-		CUBE_SIDE(Vector3f(0, 0, 1));
+		CUBE_SIDE(Vector3(0, 0, 1));
 
 		// Right
-		CUBE_SIDE(Vector3f(1, 0, 0));
+		CUBE_SIDE(Vector3(1, 0, 0));
 
 		// Top
-		CUBE_SIDE(Vector3f(0, 1, 0));
+		CUBE_SIDE(Vector3(0, 1, 0));
 	}
 
 	void MeshBuilder::CreateWireCube(float size)
@@ -282,35 +266,35 @@ namespace Sentinel
 		Vertex vertex;
 
 		// Left Bottom Back (0)
-		vertex.mPosition = Vector3f(-size, -size, -size);
+		vertex.mPosition = Vector3(-size, -size, -size);
 		mVertex.push_back(vertex);
 
 		// Right Bottom Back (1)
-		vertex.mPosition = Vector3f(size, -size, -size);
+		vertex.mPosition = Vector3(size, -size, -size);
 		mVertex.push_back(vertex);
 
 		// Left Top Back (2)
-		vertex.mPosition = Vector3f(-size, size, -size);
+		vertex.mPosition = Vector3(-size, size, -size);
 		mVertex.push_back(vertex);
 
 		// Right Top Back (3)
-		vertex.mPosition = Vector3f(size, size, -size);
+		vertex.mPosition = Vector3(size, size, -size);
 		mVertex.push_back(vertex);
 
 		// Left Bottom Front (4)
-		vertex.mPosition = Vector3f(-size, -size, size);
+		vertex.mPosition = Vector3(-size, -size, size);
 		mVertex.push_back(vertex);
 
 		// Right Bottom Front (5)
-		vertex.mPosition = Vector3f(size, -size, size);
+		vertex.mPosition = Vector3(size, -size, size);
 		mVertex.push_back(vertex);
 
 		// Left Top Front (6)
-		vertex.mPosition = Vector3f(-size, size, size);
+		vertex.mPosition = Vector3(-size, size, size);
 		mVertex.push_back(vertex);
 
 		// Right Top Front (7)
-		vertex.mPosition = Vector3f(size, size, size);
+		vertex.mPosition = Vector3(size, size, size);
 		mVertex.push_back(vertex);
 
 		// Back
@@ -415,18 +399,18 @@ namespace Sentinel
 		int vertCount = (int)startVertex;
 
 		Vertex vertex;
-		vertex.mPosition = Vector3f(0.0f, -zHeight, 0.0f);
-		vertex.mTexCoord[0] = Vector2f(0.5f, 0.5f);
-		vertex.mTexCoord[1] = Vector2f(0.5f, 0.5f);
-		vertex.mNormal = Vector3f(0.0f, -1.0f, 0.0f);
+		vertex.mPosition = Vector3(0.0f, -zHeight, 0.0f);
+		vertex.mTexCoord[0] = Vector2(0.5f, 0.5f);
+		vertex.mTexCoord[1] = Vector2(0.5f, 0.5f);
+		vertex.mNormal = Vector3(0.0f, -1.0f, 0.0f);
 
 		mVertex.push_back(vertex);
 
 		for (j = 0; j <= slices; j++)
 		{
-			vertex.mPosition = Vector3f(cost[j] * radius, -zHeight, sint[j] * radius);
-			vertex.mTexCoord[0] = Vector2f(0.5f + cost[j] * 0.5f, 0.5f + sint[j] * 0.5f);
-			vertex.mTexCoord[1] = Vector2f(0.5f + cost[j] * 0.5f, 0.5f + sint[j] * 0.5f);
+			vertex.mPosition = Vector3(cost[j] * radius, -zHeight, sint[j] * radius);
+			vertex.mTexCoord[0] = Vector2(0.5f + cost[j] * 0.5f, 0.5f + sint[j] * 0.5f);
+			vertex.mTexCoord[1] = Vector2(0.5f + cost[j] * 0.5f, 0.5f + sint[j] * 0.5f);
 
 			mVertex.push_back(vertex);
 		}
@@ -440,18 +424,18 @@ namespace Sentinel
 
 		vertCount = (int)mVertex.size();
 
-		vertex.mPosition = Vector3f(0.0f, zHeight, 0.0f);
-		vertex.mTexCoord[0] = Vector2f(0.5f, 0.5f);
-		vertex.mTexCoord[1] = Vector2f(0.5f, 0.5f);
-		vertex.mNormal = Vector3f(0.0f, 1.0f, 0.0f);
+		vertex.mPosition = Vector3(0.0f, zHeight, 0.0f);
+		vertex.mTexCoord[0] = Vector2(0.5f, 0.5f);
+		vertex.mTexCoord[1] = Vector2(0.5f, 0.5f);
+		vertex.mNormal = Vector3(0.0f, 1.0f, 0.0f);
 
 		mVertex.push_back(vertex);
 
 		for (j = slices; j >= 0; j--)
 		{
-			vertex.mPosition = Vector3f(cost[j] * radius, zHeight, sint[j] * radius);
-			vertex.mTexCoord[0] = Vector2f(0.5f + cost[j] * 0.5f, 0.5f + sint[j] * 0.5f);
-			vertex.mTexCoord[1] = Vector2f(0.5f + cost[j] * 0.5f, 0.5f + sint[j] * 0.5f);
+			vertex.mPosition = Vector3(cost[j] * radius, zHeight, sint[j] * radius);
+			vertex.mTexCoord[0] = Vector2(0.5f + cost[j] * 0.5f, 0.5f + sint[j] * 0.5f);
+			vertex.mTexCoord[1] = Vector2(0.5f + cost[j] * 0.5f, 0.5f + sint[j] * 0.5f);
 
 			mVertex.push_back(vertex);
 		}
@@ -479,17 +463,17 @@ namespace Sentinel
 			{
 				float u = ((float)j / (float)slices * 2.0f);
 
-				vertex.mPosition = Vector3f(cost[j] * radius, z0, sint[j] * radius);
-				vertex.mTexCoord[0] = Vector2f(u, 0.0f);
-				vertex.mTexCoord[1] = Vector2f(u, 0.0f);
-				vertex.mNormal = Vector3f(cost[j], 0.0f, sint[j]);
+				vertex.mPosition = Vector3(cost[j] * radius, z0, sint[j] * radius);
+				vertex.mTexCoord[0] = Vector2(u, 0.0f);
+				vertex.mTexCoord[1] = Vector2(u, 0.0f);
+				vertex.mNormal = Vector3(cost[j], 0.0f, sint[j]);
 
 				mVertex.push_back(vertex);
 
-				vertex.mPosition = Vector3f(cost[j] * radius, z1, sint[j] * radius);
-				vertex.mTexCoord[0] = Vector2f(u, 1.0f);
-				vertex.mTexCoord[1] = Vector2f(u, 1.0f);
-				vertex.mNormal = Vector3f(cost[j], 0.0f, sint[j]);
+				vertex.mPosition = Vector3(cost[j] * radius, z1, sint[j] * radius);
+				vertex.mTexCoord[0] = Vector2(u, 1.0f);
+				vertex.mTexCoord[1] = Vector2(u, 1.0f);
+				vertex.mNormal = Vector3(cost[j], 0.0f, sint[j]);
 
 				mVertex.push_back(vertex);
 			}
@@ -523,10 +507,10 @@ namespace Sentinel
 		* Normals:  The unit normals are simply the negative of the coordinates of the point not on the surface.
 		*/
 
-		Vector3f r0(1.0f, 0.0f, 0.0f);
-		Vector3f r1(-0.333333333333f, 0.942809041582f, 0.0f);
-		Vector3f r2(-0.333333333333f, -0.471404520791f, 0.816496580928f);
-		Vector3f r3(-0.333333333333f, -0.471404520791f, -0.816496580928f);
+		Vector3 r0(1.0f, 0.0f, 0.0f);
+		Vector3 r1(-0.333333333333f, 0.942809041582f, 0.0f);
+		Vector3 r2(-0.333333333333f, -0.471404520791f, 0.816496580928f);
+		Vector3 r3(-0.333333333333f, -0.471404520791f, -0.816496580928f);
 
 		scale *= 1.25f;
 		r0 *= scale;
@@ -540,92 +524,92 @@ namespace Sentinel
 
 		Vertex vertex;
 		vertex.mPosition = r1;
-		vertex.mTexCoord[0] = Vector2f(0.5f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.5f, 1.0f);
-		vertex.mNormal = Vector3f(-1.0f, 0.0f, 0.0f);
+		vertex.mTexCoord[0] = Vector2(0.5f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.5f, 1.0f);
+		vertex.mNormal = Vector3(-1.0f, 0.0f, 0.0f);
 
 		mVertex.push_back(vertex);
 
 		vertex.mPosition = r3;
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.0f);
-		vertex.mNormal = Vector3f(-1.0f, 0.0f, 0.0f);
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.0f);
+		vertex.mNormal = Vector3(-1.0f, 0.0f, 0.0f);
 
 		mVertex.push_back(vertex);
 
 		vertex.mPosition = r2;
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.0f);
-		vertex.mNormal = Vector3f(-1.0f, 0.0f, 0.0f);
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.0f);
+		vertex.mNormal = Vector3(-1.0f, 0.0f, 0.0f);
 
 		mVertex.push_back(vertex);
 
 		////////////////////////////////////////
 
 		vertex.mPosition = r0;
-		vertex.mTexCoord[0] = Vector2f(0.5f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.5f, 1.0f);
-		vertex.mNormal = Vector3f(0.333333333333f, -0.942809041582f, 0.0f);
+		vertex.mTexCoord[0] = Vector2(0.5f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.5f, 1.0f);
+		vertex.mNormal = Vector3(0.333333333333f, -0.942809041582f, 0.0f);
 
 		mVertex.push_back(vertex);
 
 		vertex.mPosition = r2;
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.0f);
-		vertex.mNormal = Vector3f(0.333333333333f, -0.942809041582f, 0.0f);
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.0f);
+		vertex.mNormal = Vector3(0.333333333333f, -0.942809041582f, 0.0f);
 
 		mVertex.push_back(vertex);
 
 		vertex.mPosition = r3;
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.0f);
-		vertex.mNormal = Vector3f(0.333333333333f, -0.942809041582f, 0.0f);
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.0f);
+		vertex.mNormal = Vector3(0.333333333333f, -0.942809041582f, 0.0f);
 
 		mVertex.push_back(vertex);
 
 		////////////////////////////////////////
 
 		vertex.mPosition = r0;
-		vertex.mTexCoord[0] = Vector2f(0.5f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.5f, 1.0f);
-		vertex.mNormal = Vector3f(0.333333333333f, 0.471404520791f, -0.816496580928f);
+		vertex.mTexCoord[0] = Vector2(0.5f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.5f, 1.0f);
+		vertex.mNormal = Vector3(0.333333333333f, 0.471404520791f, -0.816496580928f);
 
 		mVertex.push_back(vertex);
 
 		vertex.mPosition = r3;
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.0f);
-		vertex.mNormal = Vector3f(0.333333333333f, 0.471404520791f, -0.816496580928f);
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.0f);
+		vertex.mNormal = Vector3(0.333333333333f, 0.471404520791f, -0.816496580928f);
 
 		mVertex.push_back(vertex);
 
 		vertex.mPosition = r1;
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.0f);
-		vertex.mNormal = Vector3f(0.333333333333f, 0.471404520791f, -0.816496580928f);
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.0f);
+		vertex.mNormal = Vector3(0.333333333333f, 0.471404520791f, -0.816496580928f);
 
 		mVertex.push_back(vertex);
 
 		////////////////////////////////////////
 
 		vertex.mPosition = r0;
-		vertex.mTexCoord[0] = Vector2f(0.5f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.5f, 1.0f);
-		vertex.mNormal = Vector3f(0.333333333333f, 0.471404520791f, 0.816496580928f);
+		vertex.mTexCoord[0] = Vector2(0.5f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.5f, 1.0f);
+		vertex.mNormal = Vector3(0.333333333333f, 0.471404520791f, 0.816496580928f);
 
 		mVertex.push_back(vertex);
 
 		vertex.mPosition = r1;
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.0f);
-		vertex.mNormal = Vector3f(0.333333333333f, 0.471404520791f, 0.816496580928f);
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.0f);
+		vertex.mNormal = Vector3(0.333333333333f, 0.471404520791f, 0.816496580928f);
 
 		mVertex.push_back(vertex);
 
 		vertex.mPosition = r2;
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.0f);
-		vertex.mNormal = Vector3f(0.333333333333f, 0.471404520791f, 0.816496580928f);
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.0f);
+		vertex.mNormal = Vector3(0.333333333333f, 0.471404520791f, 0.816496580928f);
 
 		mVertex.push_back(vertex);
 
@@ -646,185 +630,185 @@ namespace Sentinel
 		////////////////////////////////////////
 
 		Vertex vertex;
-		vertex.mPosition = Vector3f(radius, 0.0f, 0.0f);
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.0f);
-		vertex.mNormal = Vector3f(0.577350269189f, 0.577350269189f, 0.577350269189f);
+		vertex.mPosition = Vector3(radius, 0.0f, 0.0f);
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.0f);
+		vertex.mNormal = Vector3(0.577350269189f, 0.577350269189f, 0.577350269189f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(0.0f, radius, 0.0f);
-		vertex.mTexCoord[0] = Vector2f(0.0f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 1.0f);
-		vertex.mNormal = Vector3f(0.577350269189f, 0.577350269189f, 0.577350269189f);
+		vertex.mPosition = Vector3(0.0f, radius, 0.0f);
+		vertex.mTexCoord[0] = Vector2(0.0f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 1.0f);
+		vertex.mNormal = Vector3(0.577350269189f, 0.577350269189f, 0.577350269189f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(0.0f, 0.0f, radius);
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.0f);
-		vertex.mNormal = Vector3f(0.577350269189f, 0.577350269189f, 0.577350269189f);
+		vertex.mPosition = Vector3(0.0f, 0.0f, radius);
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.0f);
+		vertex.mNormal = Vector3(0.577350269189f, 0.577350269189f, 0.577350269189f);
 
 		mVertex.push_back(vertex);
 
 		////////////////////////////////////////
 
-		vertex.mPosition = Vector3f(radius, 0.0f, 0.0f);
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.0f);
-		vertex.mNormal = Vector3f(0.577350269189f, 0.577350269189f, -0.577350269189f);
+		vertex.mPosition = Vector3(radius, 0.0f, 0.0f);
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.0f);
+		vertex.mNormal = Vector3(0.577350269189f, 0.577350269189f, -0.577350269189f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(0.0f, 0.0f, -radius);
-		vertex.mTexCoord[0] = Vector2f(0.0f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 1.0f);
-		vertex.mNormal = Vector3f(0.577350269189f, 0.577350269189f, -0.577350269189f);
+		vertex.mPosition = Vector3(0.0f, 0.0f, -radius);
+		vertex.mTexCoord[0] = Vector2(0.0f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 1.0f);
+		vertex.mNormal = Vector3(0.577350269189f, 0.577350269189f, -0.577350269189f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(0.0f, radius, 0.0f);
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.0f);
-		vertex.mNormal = Vector3f(0.577350269189f, 0.577350269189f, -0.577350269189f);
-
-		mVertex.push_back(vertex);
-
-		//////////////////////////////////////////
-
-		vertex.mPosition = Vector3f(radius, 0.0f, 0.0f);
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.0f);
-		vertex.mNormal = Vector3f(0.577350269189f, -0.577350269189f, 0.577350269189f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(0.0f, 0.0f, radius);
-		vertex.mTexCoord[0] = Vector2f(0.0f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 1.0f);
-		vertex.mNormal = Vector3f(0.577350269189f, -0.577350269189f, 0.577350269189f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(0.0f, -radius, 0.0f);
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.0f);
-		vertex.mNormal = Vector3f(0.577350269189f, -0.577350269189f, 0.577350269189f);
+		vertex.mPosition = Vector3(0.0f, radius, 0.0f);
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.0f);
+		vertex.mNormal = Vector3(0.577350269189f, 0.577350269189f, -0.577350269189f);
 
 		mVertex.push_back(vertex);
 
 		//////////////////////////////////////////
 
-		vertex.mPosition = Vector3f(radius, 0.0f, 0.0f);
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.0f);
-		vertex.mNormal = Vector3f(0.577350269189f, -0.577350269189f, -0.577350269189f);
+		vertex.mPosition = Vector3(radius, 0.0f, 0.0f);
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.0f);
+		vertex.mNormal = Vector3(0.577350269189f, -0.577350269189f, 0.577350269189f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(0.0f, -radius, 0.0f);
-		vertex.mTexCoord[0] = Vector2f(0.0f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 1.0f);
-		vertex.mNormal = Vector3f(0.577350269189f, -0.577350269189f, -0.577350269189f);
+		vertex.mPosition = Vector3(0.0f, 0.0f, radius);
+		vertex.mTexCoord[0] = Vector2(0.0f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 1.0f);
+		vertex.mNormal = Vector3(0.577350269189f, -0.577350269189f, 0.577350269189f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(0.0f, 0.0f, -radius);
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.0f);
-		vertex.mNormal = Vector3f(0.577350269189f, -0.577350269189f, -0.577350269189f);
-
-		mVertex.push_back(vertex);
-
-		//////////////////////////////////////////
-
-		vertex.mPosition = Vector3f(-radius, 0.0f, 0.0f);
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.0f);
-		vertex.mNormal = Vector3f(-0.577350269189f, 0.577350269189f, 0.577350269189f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(0.0f, 0.0f, radius);
-		vertex.mTexCoord[0] = Vector2f(0.0f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 1.0f);
-		vertex.mNormal = Vector3f(-0.577350269189f, 0.577350269189f, 0.577350269189f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(0.0f, radius, 0.0f);
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.0f);
-		vertex.mNormal = Vector3f(-0.577350269189f, 0.577350269189f, 0.577350269189f);
+		vertex.mPosition = Vector3(0.0f, -radius, 0.0f);
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.0f);
+		vertex.mNormal = Vector3(0.577350269189f, -0.577350269189f, 0.577350269189f);
 
 		mVertex.push_back(vertex);
 
 		//////////////////////////////////////////
 
-		vertex.mPosition = Vector3f(-radius, 0.0f, 0.0f);
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.0f);
-		vertex.mNormal = Vector3f(-0.577350269189f, 0.577350269189f, -0.577350269189f);
+		vertex.mPosition = Vector3(radius, 0.0f, 0.0f);
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.0f);
+		vertex.mNormal = Vector3(0.577350269189f, -0.577350269189f, -0.577350269189f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(0.0f, radius, 0.0f);
-		vertex.mTexCoord[0] = Vector2f(0.0f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 1.0f);
-		vertex.mNormal = Vector3f(-0.577350269189f, 0.577350269189f, -0.577350269189f);
+		vertex.mPosition = Vector3(0.0f, -radius, 0.0f);
+		vertex.mTexCoord[0] = Vector2(0.0f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 1.0f);
+		vertex.mNormal = Vector3(0.577350269189f, -0.577350269189f, -0.577350269189f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(0.0f, 0.0f, -radius);
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.0f);
-		vertex.mNormal = Vector3f(-0.577350269189f, 0.577350269189f, -0.577350269189f);
-
-		mVertex.push_back(vertex);
-
-		//////////////////////////////////////////
-
-		vertex.mPosition = Vector3f(-radius, 0.0f, 0.0f);
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.0f);
-		vertex.mNormal = Vector3f(-0.577350269189f, -0.577350269189f, 0.577350269189f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(0.0f, -radius, 0.0f);
-		vertex.mTexCoord[0] = Vector2f(0.0f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 1.0f);
-		vertex.mNormal = Vector3f(-0.577350269189f, -0.577350269189f, 0.577350269189f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(0.0f, 0.0f, radius);
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.0f);
-		vertex.mNormal = Vector3f(-0.577350269189f, -0.577350269189f, 0.577350269189f);
+		vertex.mPosition = Vector3(0.0f, 0.0f, -radius);
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.0f);
+		vertex.mNormal = Vector3(0.577350269189f, -0.577350269189f, -0.577350269189f);
 
 		mVertex.push_back(vertex);
 
 		//////////////////////////////////////////
 
-		vertex.mPosition = Vector3f(-radius, 0.0f, 0.0f);
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.0f);
-		vertex.mNormal = Vector3f(-0.577350269189f, -0.577350269189f, -0.577350269189f);
+		vertex.mPosition = Vector3(-radius, 0.0f, 0.0f);
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.0f);
+		vertex.mNormal = Vector3(-0.577350269189f, 0.577350269189f, 0.577350269189f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(0.0f, 0.0f, -radius);
-		vertex.mTexCoord[0] = Vector2f(0.0f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 1.0f);
-		vertex.mNormal = Vector3f(-0.577350269189f, -0.577350269189f, -0.577350269189f);
+		vertex.mPosition = Vector3(0.0f, 0.0f, radius);
+		vertex.mTexCoord[0] = Vector2(0.0f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 1.0f);
+		vertex.mNormal = Vector3(-0.577350269189f, 0.577350269189f, 0.577350269189f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(0.0f, -radius, 0.0f);
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.0f);
-		vertex.mNormal = Vector3f(-0.577350269189f, -0.577350269189f, -0.577350269189f);
+		vertex.mPosition = Vector3(0.0f, radius, 0.0f);
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.0f);
+		vertex.mNormal = Vector3(-0.577350269189f, 0.577350269189f, 0.577350269189f);
+
+		mVertex.push_back(vertex);
+
+		//////////////////////////////////////////
+
+		vertex.mPosition = Vector3(-radius, 0.0f, 0.0f);
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.0f);
+		vertex.mNormal = Vector3(-0.577350269189f, 0.577350269189f, -0.577350269189f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(0.0f, radius, 0.0f);
+		vertex.mTexCoord[0] = Vector2(0.0f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 1.0f);
+		vertex.mNormal = Vector3(-0.577350269189f, 0.577350269189f, -0.577350269189f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(0.0f, 0.0f, -radius);
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.0f);
+		vertex.mNormal = Vector3(-0.577350269189f, 0.577350269189f, -0.577350269189f);
+
+		mVertex.push_back(vertex);
+
+		//////////////////////////////////////////
+
+		vertex.mPosition = Vector3(-radius, 0.0f, 0.0f);
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.0f);
+		vertex.mNormal = Vector3(-0.577350269189f, -0.577350269189f, 0.577350269189f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(0.0f, -radius, 0.0f);
+		vertex.mTexCoord[0] = Vector2(0.0f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 1.0f);
+		vertex.mNormal = Vector3(-0.577350269189f, -0.577350269189f, 0.577350269189f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(0.0f, 0.0f, radius);
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.0f);
+		vertex.mNormal = Vector3(-0.577350269189f, -0.577350269189f, 0.577350269189f);
+
+		mVertex.push_back(vertex);
+
+		//////////////////////////////////////////
+
+		vertex.mPosition = Vector3(-radius, 0.0f, 0.0f);
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.0f);
+		vertex.mNormal = Vector3(-0.577350269189f, -0.577350269189f, -0.577350269189f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(0.0f, 0.0f, -radius);
+		vertex.mTexCoord[0] = Vector2(0.0f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 1.0f);
+		vertex.mNormal = Vector3(-0.577350269189f, -0.577350269189f, -0.577350269189f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(0.0f, -radius, 0.0f);
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.0f);
+		vertex.mNormal = Vector3(-0.577350269189f, -0.577350269189f, -0.577350269189f);
 
 		mVertex.push_back(vertex);
 
@@ -845,447 +829,447 @@ namespace Sentinel
 		scale *= 0.625f;
 
 		Vertex vertex;
-		vertex.mPosition = Vector3f(0.0f, 1.61803398875f, 0.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.5f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.5f, 0.0f);
-		vertex.mNormal = Vector3f(0.0f, 0.525731112119f, 0.850650808354f);
+		vertex.mPosition = Vector3(0.0f, 1.61803398875f, 0.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.5f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.5f, 0.0f);
+		vertex.mNormal = Vector3(0.0f, 0.525731112119f, 0.850650808354f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(-1.0f, 1.0f, 1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.31f);
-		vertex.mNormal = Vector3f(0.0f, 0.525731112119f, 0.850650808354f);
+		vertex.mPosition = Vector3(-1.0f, 1.0f, 1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.31f);
+		vertex.mNormal = Vector3(0.0f, 0.525731112119f, 0.850650808354f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(-0.61803398875f, 0.0f, 1.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.31f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.31f, 1.0f);
-		vertex.mNormal = Vector3f(0.0f, 0.525731112119f, 0.850650808354f);
+		vertex.mPosition = Vector3(-0.61803398875f, 0.0f, 1.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.31f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.31f, 1.0f);
+		vertex.mNormal = Vector3(0.0f, 0.525731112119f, 0.850650808354f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(0.61803398875f, 0.0f, 1.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.69f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.69f, 1.0f);
-		vertex.mNormal = Vector3f(0.0f, 0.525731112119f, 0.850650808354f);
+		vertex.mPosition = Vector3(0.61803398875f, 0.0f, 1.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.69f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.69f, 1.0f);
+		vertex.mNormal = Vector3(0.0f, 0.525731112119f, 0.850650808354f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(1.0f, 1.0f, 1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.31f);
-		vertex.mNormal = Vector3f(0.0f, 0.525731112119f, 0.850650808354f);
-
-		mVertex.push_back(vertex);
-
-		/////////////////////////////////////////////////////////////////
-
-		vertex.mPosition = Vector3f(0.0f, 1.61803398875f, -0.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.5f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.5f, 0.0f);
-		vertex.mNormal = Vector3f(0.0f, 0.525731112119f, -0.850650808354f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(1.0f, 1.0f, -1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.31f);
-		vertex.mNormal = Vector3f(0.0f, 0.525731112119f, -0.850650808354f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(0.61803398875f, 0.0f, -1.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.31f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.31f, 1.0f);
-		vertex.mNormal = Vector3f(0.0f, 0.525731112119f, -0.850650808354f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(-0.61803398875f, 0.0f, -1.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.69f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.69f, 1.0f);
-		vertex.mNormal = Vector3f(0.0f, 0.525731112119f, -0.850650808354f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(-1.0f, 1.0f, -1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.31f);
-		vertex.mNormal = Vector3f(0.0f, 0.525731112119f, -0.850650808354f);
+		vertex.mPosition = Vector3(1.0f, 1.0f, 1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.31f);
+		vertex.mNormal = Vector3(0.0f, 0.525731112119f, 0.850650808354f);
 
 		mVertex.push_back(vertex);
 
 		/////////////////////////////////////////////////////////////////
 
-		vertex.mPosition = Vector3f(0.0f, -1.61803398875f, 0.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.5f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.5f, 0.0f);
-		vertex.mNormal = Vector3f(0.0f, -0.525731112119f, 0.850650808354f);
+		vertex.mPosition = Vector3(0.0f, 1.61803398875f, -0.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.5f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.5f, 0.0f);
+		vertex.mNormal = Vector3(0.0f, 0.525731112119f, -0.850650808354f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(1.0f, -1.0f, 1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.31f);
-		vertex.mNormal = Vector3f(0.0f, -0.525731112119f, 0.850650808354f);
+		vertex.mPosition = Vector3(1.0f, 1.0f, -1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.31f);
+		vertex.mNormal = Vector3(0.0f, 0.525731112119f, -0.850650808354f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(0.61803398875f, 0.0f, 1.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.31f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.31f, 1.0f);
-		vertex.mNormal = Vector3f(0.0f, -0.525731112119f, 0.850650808354f);
+		vertex.mPosition = Vector3(0.61803398875f, 0.0f, -1.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.31f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.31f, 1.0f);
+		vertex.mNormal = Vector3(0.0f, 0.525731112119f, -0.850650808354f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(-0.61803398875f, 0.0f, 1.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.69f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.69f, 1.0f);
-		vertex.mNormal = Vector3f(0.0f, -0.525731112119f, 0.850650808354f);
+		vertex.mPosition = Vector3(-0.61803398875f, 0.0f, -1.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.69f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.69f, 1.0f);
+		vertex.mNormal = Vector3(0.0f, 0.525731112119f, -0.850650808354f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(-1.0f, -1.0f, 1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.31f);
-		vertex.mNormal = Vector3f(0.0f, -0.525731112119f, 0.850650808354f);
-
-		mVertex.push_back(vertex);
-
-		/////////////////////////////////////////////////////////////////
-
-		vertex.mPosition = Vector3f(0.0f, -1.61803398875f, -0.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.5f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.5f, 0.0f);
-		vertex.mNormal = Vector3f(0.0f, -0.525731112119f, -0.850650808354f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(-1.0f, -1.0f, -1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.31f);
-		vertex.mNormal = Vector3f(0.0f, -0.525731112119f, -0.850650808354f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(-0.61803398875f, 0.0f, -1.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.31f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.31f, 1.0f);
-		vertex.mNormal = Vector3f(0.0f, -0.525731112119f, -0.850650808354f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(0.61803398875f, 0.0f, -1.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.69f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.69f, 1.0f);
-		vertex.mNormal = Vector3f(0.0f, -0.525731112119f, -0.850650808354f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(1.0f, -1.0f, -1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.31f);
-		vertex.mNormal = Vector3f(0.0f, -0.525731112119f, -0.850650808354f);
-
-		mVertex.push_back(vertex);
-
-		/////////////////////////////////////////////////////////////////
-		/////////////////////////////////////////////////////////////////
-
-		vertex.mPosition = Vector3f(0.61803398875f, 0.0f, 1.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.5f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.5f, 0.0f);
-		vertex.mNormal = Vector3f(0.850650808354f, 0.0f, 0.525731112119f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(1.0f, -1.0f, 1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.31f);
-		vertex.mNormal = Vector3f(0.850650808354f, 0.0f, 0.525731112119f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(1.61803398875f, -0.61803398875f, 0.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.31f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.31f, 1.0f);
-		vertex.mNormal = Vector3f(0.850650808354f, 0.0f, 0.525731112119f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(1.61803398875f, 0.61803398875f, 0.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.69f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.69f, 1.0f);
-		vertex.mNormal = Vector3f(0.850650808354f, 0.0f, 0.525731112119f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(1.0f, 1.0f, 1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.31f);
-		vertex.mNormal = Vector3f(0.850650808354f, 0.0f, 0.525731112119f);
+		vertex.mPosition = Vector3(-1.0f, 1.0f, -1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.31f);
+		vertex.mNormal = Vector3(0.0f, 0.525731112119f, -0.850650808354f);
 
 		mVertex.push_back(vertex);
 
 		/////////////////////////////////////////////////////////////////
 
-		vertex.mPosition = Vector3f(-0.61803398875f, 0.0f, 1.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.5f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.5f, 0.0f);
-		vertex.mNormal = Vector3f(-0.850650808354f, 0.0f, 0.525731112119f);
+		vertex.mPosition = Vector3(0.0f, -1.61803398875f, 0.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.5f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.5f, 0.0f);
+		vertex.mNormal = Vector3(0.0f, -0.525731112119f, 0.850650808354f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(-1.0f, 1.0f, 1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.31f);
-		vertex.mNormal = Vector3f(-0.850650808354f, 0.0f, 0.525731112119f);
+		vertex.mPosition = Vector3(1.0f, -1.0f, 1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.31f);
+		vertex.mNormal = Vector3(0.0f, -0.525731112119f, 0.850650808354f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(-1.61803398875f, 0.61803398875f, 0.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.31f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.31f, 1.0f);
-		vertex.mNormal = Vector3f(-0.850650808354f, 0.0f, 0.525731112119f);
+		vertex.mPosition = Vector3(0.61803398875f, 0.0f, 1.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.31f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.31f, 1.0f);
+		vertex.mNormal = Vector3(0.0f, -0.525731112119f, 0.850650808354f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(-1.61803398875f, -0.61803398875f, 0.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.69f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.69f, 1.0f);
-		vertex.mNormal = Vector3f(-0.850650808354f, 0.0f, 0.525731112119f);
+		vertex.mPosition = Vector3(-0.61803398875f, 0.0f, 1.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.69f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.69f, 1.0f);
+		vertex.mNormal = Vector3(0.0f, -0.525731112119f, 0.850650808354f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(-1.0f, -1.0f, 1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.31f);
-		vertex.mNormal = Vector3f(-0.850650808354f, 0.0f, 0.525731112119f);
-
-		mVertex.push_back(vertex);
-
-		/////////////////////////////////////////////////////////////////
-
-		vertex.mPosition = Vector3f(0.61803398875f, 0.0f, -1.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.5f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.5f, 0.0f);
-		vertex.mNormal = Vector3f(0.850650808354f, 0.0f, -0.525731112119f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(1.0f, 1.0f, -1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.31f);
-		vertex.mNormal = Vector3f(0.850650808354f, 0.0f, -0.525731112119f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(1.61803398875f, 0.61803398875f, 0.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.31f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.31f, 1.0f);
-		vertex.mNormal = Vector3f(0.850650808354f, 0.0f, -0.525731112119f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(1.61803398875f, -0.61803398875f, 0.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.69f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.69f, 1.0f);
-		vertex.mNormal = Vector3f(0.850650808354f, 0.0f, -0.525731112119f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(1.0f, -1.0f, -1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.31f);
-		vertex.mNormal = Vector3f(0.850650808354f, 0.0f, -0.525731112119f);
+		vertex.mPosition = Vector3(-1.0f, -1.0f, 1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.31f);
+		vertex.mNormal = Vector3(0.0f, -0.525731112119f, 0.850650808354f);
 
 		mVertex.push_back(vertex);
 
 		/////////////////////////////////////////////////////////////////
 
-		vertex.mPosition = Vector3f(-0.61803398875f, 0.0f, -1.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.5f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.5f, 0.0f);
-		vertex.mNormal = Vector3f(-0.850650808354f, 0.0f, -0.525731112119f);
+		vertex.mPosition = Vector3(0.0f, -1.61803398875f, -0.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.5f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.5f, 0.0f);
+		vertex.mNormal = Vector3(0.0f, -0.525731112119f, -0.850650808354f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(-1.0f, -1.0f, -1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.31f);
-		vertex.mNormal = Vector3f(-0.850650808354f, 0.0f, -0.525731112119f);
+		vertex.mPosition = Vector3(-1.0f, -1.0f, -1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.31f);
+		vertex.mNormal = Vector3(0.0f, -0.525731112119f, -0.850650808354f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(-1.61803398875f, -0.61803398875f, 0.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.31f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.31f, 1.0f);
-		vertex.mNormal = Vector3f(-0.850650808354f, 0.0f, -0.525731112119f);
+		vertex.mPosition = Vector3(-0.61803398875f, 0.0f, -1.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.31f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.31f, 1.0f);
+		vertex.mNormal = Vector3(0.0f, -0.525731112119f, -0.850650808354f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(-1.61803398875f, 0.61803398875f, 0.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.69f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.69f, 1.0f);
-		vertex.mNormal = Vector3f(-0.850650808354f, 0.0f, -0.525731112119f);
+		vertex.mPosition = Vector3(0.61803398875f, 0.0f, -1.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.69f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.69f, 1.0f);
+		vertex.mNormal = Vector3(0.0f, -0.525731112119f, -0.850650808354f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(-1.0f, 1.0f, -1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.31f);
-		vertex.mNormal = Vector3f(-0.850650808354f, 0.0f, -0.525731112119f);
+		vertex.mPosition = Vector3(1.0f, -1.0f, -1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.31f);
+		vertex.mNormal = Vector3(0.0f, -0.525731112119f, -0.850650808354f);
 
 		mVertex.push_back(vertex);
 
 		/////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////
 
-		vertex.mPosition = Vector3f(1.61803398875f, 0.61803398875f, 0.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.5f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.5f, 0.0f);
-		vertex.mNormal = Vector3f(0.525731112119f, 0.850650808354f, 0.0f);
+		vertex.mPosition = Vector3(0.61803398875f, 0.0f, 1.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.5f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.5f, 0.0f);
+		vertex.mNormal = Vector3(0.850650808354f, 0.0f, 0.525731112119f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(1.0f, 1.0f, -1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.31f);
-		vertex.mNormal = Vector3f(0.525731112119f, 0.850650808354f, 0.0f);
+		vertex.mPosition = Vector3(1.0f, -1.0f, 1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.31f);
+		vertex.mNormal = Vector3(0.850650808354f, 0.0f, 0.525731112119f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(0.0f, 1.61803398875f, -0.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.31f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.31f, 1.0f);
-		vertex.mNormal = Vector3f(0.525731112119f, 0.850650808354f, 0.0f);
+		vertex.mPosition = Vector3(1.61803398875f, -0.61803398875f, 0.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.31f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.31f, 1.0f);
+		vertex.mNormal = Vector3(0.850650808354f, 0.0f, 0.525731112119f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(0.0f, 1.61803398875f, 0.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.69f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.69f, 1.0f);
-		vertex.mNormal = Vector3f(0.525731112119f, 0.850650808354f, 0.0f);
+		vertex.mPosition = Vector3(1.61803398875f, 0.61803398875f, 0.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.69f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.69f, 1.0f);
+		vertex.mNormal = Vector3(0.850650808354f, 0.0f, 0.525731112119f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(1.0f, 1.0f, 1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.31f);
-		vertex.mNormal = Vector3f(0.525731112119f, 0.850650808354f, 0.0f);
-
-		mVertex.push_back(vertex);
-
-		/////////////////////////////////////////////////////////////////
-
-		vertex.mPosition = Vector3f(1.61803398875f, -0.61803398875f, 0.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.5f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.5f, 0.0f);
-		vertex.mNormal = Vector3f(0.525731112119f, -0.850650808354f, 0.0f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(1.0f, -1.0f, 1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.31f);
-		vertex.mNormal = Vector3f(0.525731112119f, -0.850650808354f, 0.0f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(0.0f, -1.61803398875f, 0.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.31f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.31f, 1.0f);
-		vertex.mNormal = Vector3f(0.525731112119f, -0.850650808354f, 0.0f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(0.0f, -1.61803398875f, -0.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.69f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.69f, 1.0f);
-		vertex.mNormal = Vector3f(0.525731112119f, -0.850650808354f, 0.0f);
-
-		mVertex.push_back(vertex);
-
-		vertex.mPosition = Vector3f(1.0f, -1.0f, -1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.31f);
-		vertex.mNormal = Vector3f(0.525731112119f, -0.850650808354f, 0.0f);
+		vertex.mPosition = Vector3(1.0f, 1.0f, 1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.31f);
+		vertex.mNormal = Vector3(0.850650808354f, 0.0f, 0.525731112119f);
 
 		mVertex.push_back(vertex);
 
 		/////////////////////////////////////////////////////////////////
 
-		vertex.mPosition = Vector3f(-1.61803398875f, 0.61803398875f, 0.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.5f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.5f, 0.0f);
-		vertex.mNormal = Vector3f(-0.525731112119f, 0.850650808354f, 0.0f);
+		vertex.mPosition = Vector3(-0.61803398875f, 0.0f, 1.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.5f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.5f, 0.0f);
+		vertex.mNormal = Vector3(-0.850650808354f, 0.0f, 0.525731112119f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(-1.0f, 1.0f, 1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.31f);
-		vertex.mNormal = Vector3f(-0.525731112119f, 0.850650808354f, 0.0f);
+		vertex.mPosition = Vector3(-1.0f, 1.0f, 1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.31f);
+		vertex.mNormal = Vector3(-0.850650808354f, 0.0f, 0.525731112119f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(0.0f, 1.61803398875f, 0.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.31f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.31f, 1.0f);
-		vertex.mNormal = Vector3f(-0.525731112119f, 0.850650808354f, 0.0f);
+		vertex.mPosition = Vector3(-1.61803398875f, 0.61803398875f, 0.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.31f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.31f, 1.0f);
+		vertex.mNormal = Vector3(-0.850650808354f, 0.0f, 0.525731112119f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(0.0f, 1.61803398875f, -0.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.69f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.69f, 1.0f);
-		vertex.mNormal = Vector3f(-0.525731112119f, 0.850650808354f, 0.0f);
+		vertex.mPosition = Vector3(-1.61803398875f, -0.61803398875f, 0.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.69f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.69f, 1.0f);
+		vertex.mNormal = Vector3(-0.850650808354f, 0.0f, 0.525731112119f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(-1.0f, 1.0f, -1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.31f);
-		vertex.mNormal = Vector3f(-0.525731112119f, 0.850650808354f, 0.0f);
+		vertex.mPosition = Vector3(-1.0f, -1.0f, 1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.31f);
+		vertex.mNormal = Vector3(-0.850650808354f, 0.0f, 0.525731112119f);
 
 		mVertex.push_back(vertex);
 
 		/////////////////////////////////////////////////////////////////
 
-		vertex.mPosition = Vector3f(-1.61803398875f, -0.61803398875f, 0.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.5f, 0.0f);
-		vertex.mTexCoord[1] = Vector2f(0.5f, 0.0f);
-		vertex.mNormal = Vector3f(-0.525731112119f, -0.850650808354f, 0.0f);
+		vertex.mPosition = Vector3(0.61803398875f, 0.0f, -1.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.5f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.5f, 0.0f);
+		vertex.mNormal = Vector3(0.850650808354f, 0.0f, -0.525731112119f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(-1.0f, -1.0f, -1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(0.0f, 0.31f);
-		vertex.mNormal = Vector3f(-0.525731112119f, -0.850650808354f, 0.0f);
+		vertex.mPosition = Vector3(1.0f, 1.0f, -1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.31f);
+		vertex.mNormal = Vector3(0.850650808354f, 0.0f, -0.525731112119f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(0.0f, -1.61803398875f, -0.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.31f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.31f, 1.0f);
-		vertex.mNormal = Vector3f(-0.525731112119f, -0.850650808354f, 0.0f);
+		vertex.mPosition = Vector3(1.61803398875f, 0.61803398875f, 0.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.31f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.31f, 1.0f);
+		vertex.mNormal = Vector3(0.850650808354f, 0.0f, -0.525731112119f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(0.0f, -1.61803398875f, 0.61803398875f) * scale;
-		vertex.mTexCoord[0] = Vector2f(0.69f, 1.0f);
-		vertex.mTexCoord[1] = Vector2f(0.69f, 1.0f);
-		vertex.mNormal = Vector3f(-0.525731112119f, -0.850650808354f, 0.0f);
+		vertex.mPosition = Vector3(1.61803398875f, -0.61803398875f, 0.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.69f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.69f, 1.0f);
+		vertex.mNormal = Vector3(0.850650808354f, 0.0f, -0.525731112119f);
 
 		mVertex.push_back(vertex);
 
-		vertex.mPosition = Vector3f(-1.0f, -1.0f, 1.0f) * scale;
-		vertex.mTexCoord[0] = Vector2f(1.0f, 0.31f);
-		vertex.mTexCoord[1] = Vector2f(1.0f, 0.31f);
-		vertex.mNormal = Vector3f(-0.525731112119f, -0.850650808354f, 0.0f);
+		vertex.mPosition = Vector3(1.0f, -1.0f, -1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.31f);
+		vertex.mNormal = Vector3(0.850650808354f, 0.0f, -0.525731112119f);
+
+		mVertex.push_back(vertex);
+
+		/////////////////////////////////////////////////////////////////
+
+		vertex.mPosition = Vector3(-0.61803398875f, 0.0f, -1.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.5f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.5f, 0.0f);
+		vertex.mNormal = Vector3(-0.850650808354f, 0.0f, -0.525731112119f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(-1.0f, -1.0f, -1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.31f);
+		vertex.mNormal = Vector3(-0.850650808354f, 0.0f, -0.525731112119f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(-1.61803398875f, -0.61803398875f, 0.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.31f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.31f, 1.0f);
+		vertex.mNormal = Vector3(-0.850650808354f, 0.0f, -0.525731112119f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(-1.61803398875f, 0.61803398875f, 0.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.69f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.69f, 1.0f);
+		vertex.mNormal = Vector3(-0.850650808354f, 0.0f, -0.525731112119f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(-1.0f, 1.0f, -1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.31f);
+		vertex.mNormal = Vector3(-0.850650808354f, 0.0f, -0.525731112119f);
+
+		mVertex.push_back(vertex);
+
+		/////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////
+
+		vertex.mPosition = Vector3(1.61803398875f, 0.61803398875f, 0.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.5f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.5f, 0.0f);
+		vertex.mNormal = Vector3(0.525731112119f, 0.850650808354f, 0.0f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(1.0f, 1.0f, -1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.31f);
+		vertex.mNormal = Vector3(0.525731112119f, 0.850650808354f, 0.0f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(0.0f, 1.61803398875f, -0.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.31f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.31f, 1.0f);
+		vertex.mNormal = Vector3(0.525731112119f, 0.850650808354f, 0.0f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(0.0f, 1.61803398875f, 0.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.69f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.69f, 1.0f);
+		vertex.mNormal = Vector3(0.525731112119f, 0.850650808354f, 0.0f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(1.0f, 1.0f, 1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.31f);
+		vertex.mNormal = Vector3(0.525731112119f, 0.850650808354f, 0.0f);
+
+		mVertex.push_back(vertex);
+
+		/////////////////////////////////////////////////////////////////
+
+		vertex.mPosition = Vector3(1.61803398875f, -0.61803398875f, 0.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.5f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.5f, 0.0f);
+		vertex.mNormal = Vector3(0.525731112119f, -0.850650808354f, 0.0f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(1.0f, -1.0f, 1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.31f);
+		vertex.mNormal = Vector3(0.525731112119f, -0.850650808354f, 0.0f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(0.0f, -1.61803398875f, 0.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.31f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.31f, 1.0f);
+		vertex.mNormal = Vector3(0.525731112119f, -0.850650808354f, 0.0f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(0.0f, -1.61803398875f, -0.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.69f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.69f, 1.0f);
+		vertex.mNormal = Vector3(0.525731112119f, -0.850650808354f, 0.0f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(1.0f, -1.0f, -1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.31f);
+		vertex.mNormal = Vector3(0.525731112119f, -0.850650808354f, 0.0f);
+
+		mVertex.push_back(vertex);
+
+		/////////////////////////////////////////////////////////////////
+
+		vertex.mPosition = Vector3(-1.61803398875f, 0.61803398875f, 0.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.5f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.5f, 0.0f);
+		vertex.mNormal = Vector3(-0.525731112119f, 0.850650808354f, 0.0f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(-1.0f, 1.0f, 1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.31f);
+		vertex.mNormal = Vector3(-0.525731112119f, 0.850650808354f, 0.0f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(0.0f, 1.61803398875f, 0.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.31f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.31f, 1.0f);
+		vertex.mNormal = Vector3(-0.525731112119f, 0.850650808354f, 0.0f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(0.0f, 1.61803398875f, -0.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.69f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.69f, 1.0f);
+		vertex.mNormal = Vector3(-0.525731112119f, 0.850650808354f, 0.0f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(-1.0f, 1.0f, -1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.31f);
+		vertex.mNormal = Vector3(-0.525731112119f, 0.850650808354f, 0.0f);
+
+		mVertex.push_back(vertex);
+
+		/////////////////////////////////////////////////////////////////
+
+		vertex.mPosition = Vector3(-1.61803398875f, -0.61803398875f, 0.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.5f, 0.0f);
+		vertex.mTexCoord[1] = Vector2(0.5f, 0.0f);
+		vertex.mNormal = Vector3(-0.525731112119f, -0.850650808354f, 0.0f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(-1.0f, -1.0f, -1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(0.0f, 0.31f);
+		vertex.mNormal = Vector3(-0.525731112119f, -0.850650808354f, 0.0f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(0.0f, -1.61803398875f, -0.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.31f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.31f, 1.0f);
+		vertex.mNormal = Vector3(-0.525731112119f, -0.850650808354f, 0.0f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(0.0f, -1.61803398875f, 0.61803398875f) * scale;
+		vertex.mTexCoord[0] = Vector2(0.69f, 1.0f);
+		vertex.mTexCoord[1] = Vector2(0.69f, 1.0f);
+		vertex.mNormal = Vector3(-0.525731112119f, -0.850650808354f, 0.0f);
+
+		mVertex.push_back(vertex);
+
+		vertex.mPosition = Vector3(-1.0f, -1.0f, 1.0f) * scale;
+		vertex.mTexCoord[0] = Vector2(1.0f, 0.31f);
+		vertex.mTexCoord[1] = Vector2(1.0f, 0.31f);
+		vertex.mNormal = Vector3(-0.525731112119f, -0.850650808354f, 0.0f);
 
 		mVertex.push_back(vertex);
 
@@ -1330,8 +1314,8 @@ namespace Sentinel
 				x = cost1[j];
 				y = sint1[j];
 
-				vertex.mPosition = Vector3f(x*r*radius, y*r*radius, z*radius);
-				vertex.mNormal = Vector3f(x, y, z);
+				vertex.mPosition = Vector3(x*r*radius, y*r*radius, z*radius);
+				vertex.mNormal = Vector3(x, y, z);
 
 				mVertex.push_back(vertex);
 			}
@@ -1358,8 +1342,8 @@ namespace Sentinel
 				y = sint1[i] * sint2[j];
 				z = cost2[j];
 
-				vertex.mPosition = Vector3f(x*radius, y*radius, z*radius);
-				vertex.mNormal = Vector3f(x, y, z);
+				vertex.mPosition = Vector3(x*radius, y*radius, z*radius);
+				vertex.mNormal = Vector3(x, y, z);
 
 				mVertex.push_back(vertex);
 			}
@@ -1408,13 +1392,13 @@ namespace Sentinel
 		int vertCount = (int)mVertex.size();
 
 		Vertex vertex;
-		vertex.mPosition = Vector3f(0.0f, 0.0f, radius);
-		vertex.mNormal = Vector3f(0.0f, 0.0f, 1.0f);
+		vertex.mPosition = Vector3(0.0f, 0.0f, radius);
+		vertex.mNormal = Vector3(0.0f, 0.0f, 1.0f);
 
 		tx1 = 0.0f; //(atan2(0.0f, 1.0f) / (2.0f * (float)PI) + 0.5f) * texWrap;
 		ty1 = 0.0f; //(acos(0.0f) / (float)PI + 0.5f) * texWrap;
-		vertex.mTexCoord[0] = Vector2f(tx1, ty1);
-		vertex.mTexCoord[1] = Vector2f(tx1, ty1);
+		vertex.mTexCoord[0] = Vector2(tx1, ty1);
+		vertex.mTexCoord[1] = Vector2(tx1, ty1);
 
 		mVertex.push_back(vertex);
 
@@ -1422,13 +1406,13 @@ namespace Sentinel
 		{
 			u = cost1[j] * r1;
 			v = sint1[j] * r1;
-			vertex.mPosition = Vector3f(u*radius, v*radius, z1*radius);
-			vertex.mNormal = Vector3f(u, v, z1);
+			vertex.mPosition = Vector3(u*radius, v*radius, z1*radius);
+			vertex.mNormal = Vector3(u, v, z1);
 
 			tx1 = u * texWrap; //(atan2(u, z1) / (2.0f * (float)PI) + 0.5f) * texWrap;
 			ty1 = v * texWrap; //(acos(v) / (float)PI + 0.5f) * texWrap;
-			vertex.mTexCoord[0] = Vector2f(tx1, ty1);
-			vertex.mTexCoord[1] = Vector2f(tx1, ty1);
+			vertex.mTexCoord[0] = Vector2(tx1, ty1);
+			vertex.mTexCoord[1] = Vector2(tx1, ty1);
 
 			mVertex.push_back(vertex);
 		}
@@ -1452,15 +1436,15 @@ namespace Sentinel
 				u = cost1[j] * r1;
 				v = sint1[j] * r1;
 
-				vertex.mPosition = Vector3f(u*radius, v*radius, z1*radius);
-				vertex.mNormal = Vector3f(u, v, z1);
+				vertex.mPosition = Vector3(u*radius, v*radius, z1*radius);
+				vertex.mNormal = Vector3(u, v, z1);
 
 				tx = u * texWrap; //(atan2(u, z1) / (2.0f * (float)PI) + 0.5f) * texWrap;
 				ty = v * texWrap; //(acos(v) / (float)PI + 0.5f) * texWrap;
 				//clamp( tx, -2.0f*(float)PI, 2.0f*(float)PI );
 				//clamp( ty, -2.0f*(float)PI, 2.0f*(float)PI );
-				vertex.mTexCoord[0] = Vector2f(tx, ty);
-				vertex.mTexCoord[1] = Vector2f(tx, ty);
+				vertex.mTexCoord[0] = Vector2(tx, ty);
+				vertex.mTexCoord[1] = Vector2(tx, ty);
 
 				mVertex.push_back(vertex);
 
@@ -1468,15 +1452,15 @@ namespace Sentinel
 
 				u = cost1[j] * r0;
 				v = sint1[j] * r0;
-				vertex.mPosition = Vector3f(u*radius, v*radius, z0*radius);
-				vertex.mNormal = Vector3f(u, v, z0);
+				vertex.mPosition = Vector3(u*radius, v*radius, z0*radius);
+				vertex.mNormal = Vector3(u, v, z0);
 
 				tx = u * texWrap; //(atan2(u, z1) / (2.0f * (float)PI) + 0.5f) * texWrap;
 				ty = v * texWrap; //(acos(v) / (float)PI + 0.5f) * texWrap;
 				//clamp( tx, -2.0f*(float)PI, 2.0f*(float)PI );
 				//clamp( ty, -2.0f*(float)PI, 2.0f*(float)PI );
-				vertex.mTexCoord[0] = Vector2f(tx, ty);
-				vertex.mTexCoord[1] = Vector2f(tx, ty);
+				vertex.mTexCoord[0] = Vector2(tx, ty);
+				vertex.mTexCoord[1] = Vector2(tx, ty);
 
 				mVertex.push_back(vertex);
 			}
@@ -1494,13 +1478,13 @@ namespace Sentinel
 
 		vertCount = (int)mVertex.size();
 
-		vertex.mPosition = Vector3f(0.0f, 0.0f, -radius);
-		vertex.mNormal = Vector3f(0.0f, 0.0f, -1.0f);
+		vertex.mPosition = Vector3(0.0f, 0.0f, -radius);
+		vertex.mNormal = Vector3(0.0f, 0.0f, -1.0f);
 
 		tx1 = 0.0f; //(atan2(0.0f, -1.0f) / (2.0f * (float)PI) + 0.5f) * texWrap;
 		ty1 = 0.0f; //(acos(0.0f) / (float)PI + 0.5f) * texWrap;
-		vertex.mTexCoord[0] = Vector2f(tx1, ty1);
-		vertex.mTexCoord[1] = Vector2f(tx1, ty1);
+		vertex.mTexCoord[0] = Vector2(tx1, ty1);
+		vertex.mTexCoord[1] = Vector2(tx1, ty1);
 
 		mVertex.push_back(vertex);
 
@@ -1508,13 +1492,13 @@ namespace Sentinel
 		{
 			u = cost1[j] * r0;
 			v = sint1[j] * r0;
-			vertex.mPosition = Vector3f(u*radius, v*radius, z0*radius);
-			vertex.mNormal = Vector3f(u, v, z0);
+			vertex.mPosition = Vector3(u*radius, v*radius, z0*radius);
+			vertex.mNormal = Vector3(u, v, z0);
 
 			tx1 = u * texWrap; //(atan2(u, z1) / (2.0f * (float)PI) + 0.5f) * texWrap;
 			ty1 = v * texWrap; //(acos(v) / (float)PI + 0.5f) * texWrap;
-			vertex.mTexCoord[0] = Vector2f(tx1, ty1);
-			vertex.mTexCoord[1] = Vector2f(tx1, ty1);
+			vertex.mTexCoord[0] = Vector2(tx1, ty1);
+			vertex.mTexCoord[1] = Vector2(tx1, ty1);
 
 			mVertex.push_back(vertex);
 		}
@@ -1536,7 +1520,7 @@ namespace Sentinel
 
 	// Apply a matrix transform to a set a vertices.
 	//
-	void MeshBuilder::ApplyMatrix(const Matrix4f& mat, UINT startVertex, UINT endVertex)
+	void MeshBuilder::ApplyMatrix(const Matrix4x4& mat, UINT startVertex, UINT endVertex)
 	{
 		if (endVertex == UINT_MAX)
 			endVertex = mVertex.size();
@@ -1554,7 +1538,7 @@ namespace Sentinel
 		_ASSERT(mLayout);
 		_ASSERT(mVertex.size() > 0);
 
-		std::vector< VertexAttribute::Type > layout = mLayout->Layout();
+		std::vector<VertexAttribute::Type> layout = mLayout->Layout();
 
 		UINT vertexSize = mLayout->VertexSize();
 		UINT numVerts = mVertex.size();
@@ -1711,11 +1695,11 @@ namespace Sentinel
 	{
 		MeshBuilder builder;
 
-		builder.CreateQuad(0.5f, Vector3f(0, 0, -1));
+		builder.CreateQuad(0.5f, Vector3(0, 0, -1));
 		builder.mLayout = layout;
 
-		Matrix4f matTrans;
-		matTrans.Translate(Vector3f(0.5f, 0.5f, 0));
+		Matrix4x4 matTrans;
+		matTrans.Translate(Vector3(0.5f, 0.5f, 0));
 		builder.ApplyMatrix(matTrans);
 
 		Mesh* mesh = builder.BuildMesh(renderer);

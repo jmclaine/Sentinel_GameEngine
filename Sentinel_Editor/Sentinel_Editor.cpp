@@ -116,6 +116,8 @@ class MainApp
 	OrthographicCamera* mEditorCamera;
 	PerspectiveCamera* mWorldCamera;
 
+	Transform* normalMapTrans;
+
 public:
 
 	MainApp() :
@@ -138,7 +140,7 @@ public:
 		mSelectedColorZ(0, 0, 1, 0.5f),
 		mSelectedColorAxis(1, 1, 0, 0.5f),
 		mDebug(NULL),
-		mMouseToWorldRay(Vector3f(), Vector3f())
+		mMouseToWorldRay(Vector3(), Vector3())
 	{
 		srand((UINT)time((time_t*)0));
 	}
@@ -226,9 +228,13 @@ public:
 
 				mGameWindow->Update();
 
-				BEGIN_PROFILE(timing);
-				mGameWorld->UpdatePhysics();
-				END_PROFILE(timing, "Physics");
+				static float rotY = 0;
+				rotY += 0.25f;
+				normalMapTrans->mOrientation = Quaternion(Vector3(0, rotY, 0));
+
+				//BEGIN_PROFILE(timing);
+				//mGameWorld->UpdatePhysics();
+				//END_PROFILE(timing, "Physics");
 
 				mGameWorld->UpdateTransform();
 
@@ -498,8 +504,8 @@ public:
 		widget->mName = "Menu Bar";
 
 		transform = (Transform*)widget->Attach(new Transform());
-		transform->mPosition = Vector3f(0, 0, 1);
-		transform->mScale = Vector3f((float)Renderer::WINDOW_WIDTH_BASE, 0, 1);
+		transform->mPosition = Vector3(0, 0, 1);
+		transform->mScale = Vector3((float)Renderer::WINDOW_WIDTH_BASE, 0, 1);
 
 		view = (SpriteDrawable*)widget->Attach(new SpriteDrawable(sprite));
 		view->mFrame = 0;
@@ -516,8 +522,8 @@ public:
 		menu->mName = "Menu Transform";
 
 		transform = (Transform*)menu->Attach(new Transform());
-		transform->mPosition = Vector3f(0, 0, 0.9f);
-		transform->mScale = Vector3f(1, 1, 1);
+		transform->mPosition = Vector3(0, 0, 0.9f);
+		transform->mScale = Vector3(1, 1, 1);
 
 		//
 		// Menu Labels
@@ -526,8 +532,8 @@ public:
 		widget->mName = "Menu Labels";
 
 		transform = (Transform*)widget->Attach(new Transform());
-		transform->mPosition = Vector3f(10, 20, 0);
-		transform->mScale = Vector3f(12, 12, 1);
+		transform->mPosition = Vector3(10, 20, 0);
+		transform->mScale = Vector3(12, 12, 1);
 
 		//label = (GUI::Label*)widget->Attach( new GUI::Label( "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ{}[]!@#$%^&*()1234567890" ));
 		label = (GUI::Label*)widget->Attach(new GUI::Label("File"));
@@ -543,8 +549,8 @@ public:
 		widget->mName = "Edit";
 
 		transform = (Transform*)widget->Attach(new Transform());
-		transform->mPosition = Vector3f(110, 20, 0);
-		transform->mScale = Vector3f(12, 12, 1);
+		transform->mPosition = Vector3(110, 20, 0);
+		transform->mScale = Vector3(12, 12, 1);
 
 		label = (GUI::Label*)widget->Attach(new GUI::Label("Edit"));
 		label->mColor = ColorRGBA(0, 0, 0, 1);
@@ -559,8 +565,8 @@ public:
 		widget->mName = "Help";
 
 		transform = (Transform*)widget->Attach(new Transform());
-		transform->mPosition = Vector3f(210, 20, 0);
-		transform->mScale = Vector3f(12, 12, 1);
+		transform->mPosition = Vector3(210, 20, 0);
+		transform->mScale = Vector3(12, 12, 1);
 
 		label = (GUI::Label*)widget->Attach(new GUI::Label("Help"));
 		label->mColor = ColorRGBA(0, 0, 0, 1);
@@ -575,8 +581,8 @@ public:
 		widget->mName = "Debug";
 
 		transform = (Transform*)widget->Attach(new Transform());
-		transform->mPosition = Vector3f(0, 40, 0.9f);
-		transform->mScale = Vector3f(10, 10, 1);
+		transform->mPosition = Vector3(0, 40, 0.9f);
+		transform->mScale = Vector3(10, 10, 1);
 
 		mDebugText = new GUI::Label();
 		mDebugText->mColor = ColorRGBA(0, 0, 0, 1);
@@ -591,8 +597,8 @@ public:
 		widget->mName = "Toolbar";
 
 		transform = (Transform*)widget->Attach(new Transform());
-		transform->mPosition = Vector3f(0, 0, 1);
-		transform->mScale = Vector3f((float)Renderer::WINDOW_WIDTH_BASE, 0, 1);
+		transform->mPosition = Vector3(0, 0, 1);
+		transform->mScale = Vector3((float)Renderer::WINDOW_WIDTH_BASE, 0, 1);
 
 		view = (SpriteDrawable*)widget->Attach(new SpriteDrawable(sprite));
 		view->mFrame = 0;
@@ -609,8 +615,8 @@ public:
 		widget->mName = "Status Bar";
 
 		transform = (Transform*)widget->Attach(new Transform());
-		transform->mPosition = Vector3f(0, (float)Renderer::WINDOW_HEIGHT_BASE, 0.1f);
-		transform->mScale = Vector3f((float)Renderer::WINDOW_WIDTH_BASE, 0, 1);
+		transform->mPosition = Vector3(0, (float)Renderer::WINDOW_HEIGHT_BASE, 0.1f);
+		transform->mScale = Vector3((float)Renderer::WINDOW_WIDTH_BASE, 0, 1);
 
 		view = (SpriteDrawable*)widget->Attach(new SpriteDrawable(sprite));
 		view->mFrame = 0;
@@ -628,9 +634,9 @@ public:
 		testButton->mName = "Test Button";
 
 		transform = (Transform*)testButton->Attach(new Transform());
-		transform->mPosition = Vector3f(200, 30, 0.7f);
-		transform->mOrientation = Quatf(0, 0, 45);
-		transform->mScale = Vector3f(1, 1, 1);
+		transform->mPosition = Vector3(200, 30, 0.7f);
+		transform->mOrientation = Quaternion(0, 0, 45);
+		transform->mScale = Vector3(1, 1, 1);
 
 		//////////////////////////////////
 
@@ -638,9 +644,9 @@ public:
 		widget->mName = "Button";
 
 		transform = (Transform*)widget->Attach(new Transform());
-		transform->mPosition = Vector3f(0, 0, 0);
-		transform->mOrientation = Quatf(0, 0, 0);
-		transform->mScale = Vector3f(128, 64, 1);
+		transform->mPosition = Vector3(0, 0, 0);
+		transform->mOrientation = Quaternion(0, 0, 0);
+		transform->mScale = Vector3(128, 64, 1);
 
 		view = (SpriteDrawable*)widget->Attach(new SpriteDrawable(sprite));
 
@@ -656,9 +662,9 @@ public:
 		widget->mName = "Label";
 
 		transform = (Transform*)widget->Attach(new Transform());
-		transform->mPosition = Vector3f(48, 32, 0);
-		transform->mOrientation = Quatf(0, 0, 0);
-		transform->mScale = Vector3f(16, 16, 1);
+		transform->mPosition = Vector3(48, 32, 0);
+		transform->mOrientation = Quaternion(0, 0, 0);
+		transform->mScale = Vector3(16, 16, 1);
 
 		label = (GUI::Label*)widget->Attach(new GUI::Label("Ok"));
 		label->mColor = ColorRGBA(0, 0, 0, 1);
@@ -676,8 +682,8 @@ public:
 		obj->mName = "Main Camera";
 
 		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3f(0, 15, 40);
-		transform->mOrientation = Quatf(-15, 0, 0);
+		transform->mPosition = Vector3(0, 15, 40);
+		transform->mOrientation = Quaternion(-15, 0, 0);
 
 		physics = (Physics*)obj->Attach(new Physics());
 		physics->SetRigidBody(mEditorWorld->mPhysicsSystem->CreateRigidBody(mEditorWorld->mPhysicsSystem->CreateSphere(1.0f), transform->mPosition, transform->mOrientation, 1.0f));
@@ -704,8 +710,8 @@ public:
 		mGameWorldWidget->mName = "World Drawable";
 
 		transform = (Transform*)mGameWorldWidget->Attach(new Transform());
-		transform->mPosition = Vector3f(0.0f, 0.0f, 1.0f);
-		transform->mScale = Vector3f((float)(Renderer::WINDOW_WIDTH_BASE - 500), (float)Renderer::WINDOW_HEIGHT_BASE, 1.0f);
+		transform->mPosition = Vector3(0.0f, 0.0f, 1.0f);
+		transform->mScale = Vector3((float)(Renderer::WINDOW_WIDTH_BASE - 500), (float)Renderer::WINDOW_HEIGHT_BASE, 1.0f);
 
 		material = mEditorWorld->mMaterialManager->Add("World", SHARED(new Material()));
 		material->mShader = mEditorWorld->mShaderManager->Get("GUI_Mesh");
@@ -771,10 +777,16 @@ public:
 
 		////////////////////////////////////
 
-		mGameWorld->mTextureManager->Add("default-alpha.png", SHARED(mRenderer->CreateTextureFromFile("Textures\\default-alpha.png")));
-		mGameWorld->mTextureManager->Add("wall.png", SHARED(mRenderer->CreateTextureFromFile("Textures\\wall.png")));
-		mGameWorld->mTextureManager->Add("wall-normal.png", SHARED(mRenderer->CreateTextureFromFile("Textures\\wall-normal.png")));
-
+		mGameWorld->mTextureManager->Add("default-alpha", SHARED(mRenderer->CreateTextureFromFile("Textures\\default-alpha.png")));
+		mGameWorld->mTextureManager->Add("wall", SHARED(mRenderer->CreateTextureFromFile("Textures\\wall.png")));
+		mGameWorld->mTextureManager->Add("wall-normal", SHARED(mRenderer->CreateTextureFromFile("Textures\\wall-normal.png")));
+		mGameWorld->mTextureManager->Add("cobblestones", SHARED(mRenderer->CreateTextureFromFile("Textures\\cobblestones.bmp")));
+		mGameWorld->mTextureManager->Add("cobblestones-normal", SHARED(mRenderer->CreateTextureFromFile("Textures\\cobblestones-normal.bmp")));
+		mGameWorld->mTextureManager->Add("001-normal", SHARED(mRenderer->CreateTextureFromFile("Textures\\001-normal.png")));
+		mGameWorld->mTextureManager->Add("test-normal", SHARED(mRenderer->CreateTextureFromFile("Textures\\test-normal.jpg")));
+		mGameWorld->mTextureManager->Add("stone", SHARED(mRenderer->CreateTextureFromFile("Textures\\stone.jpg")));
+		mGameWorld->mTextureManager->Add("stone-normal", SHARED(mRenderer->CreateTextureFromFile("Textures\\stone-normal.jpg")));
+		
 		mGameWorld->mShaderManager->Add("Color_Lit", mEditorWorld->mShaderManager->Get("Color_Lit"));
 		mGameWorld->mShaderManager->Add("Color_Lit_Shadow", mEditorWorld->mShaderManager->Get("Color_Lit_Shadow"));
 		mGameWorld->mShaderManager->Add("Texture_Lit", mEditorWorld->mShaderManager->Get("Texture_Lit"));
@@ -796,8 +808,8 @@ public:
 		obj->mName = "Main Camera";
 
 		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3f(0, 15, 40);
-		transform->mOrientation = Quatf(-15, 0, 0);
+		transform->mPosition = Vector3(0, 15, 40);
+		transform->mOrientation = Quaternion(-15, 0, 0);
 
 		obj->Attach(new PlayerController());
 
@@ -809,7 +821,7 @@ public:
 		body->SetFlags(DISABLE_GRAVITY);
 		body->SetRestitution(1.0f);
 		body->SetDamping(0.9f, 0.9f);
-		body->SetAngularFactor(Vector3f(0, 0, 0));
+		body->SetAngularFactor(Vector3(0, 0, 0));
 
 		camera = (Camera*)obj->Attach(new PerspectiveCamera(Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE));
 		camera->mViewportWidth = Renderer::WINDOW_WIDTH_BASE;
@@ -837,8 +849,8 @@ public:
 		obj->mName = "Ground_Bottom";
 
 		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3f(0, 0, 0);
-		transform->mScale = Vector3f(100, 1, 100);
+		transform->mPosition = Vector3(0, 0, 0);
+		transform->mScale = Vector3(100, 1, 100);
 
 		physics = (Physics*)obj->Attach(new Physics());
 		physics->SetRigidBody(
@@ -857,8 +869,8 @@ public:
 		obj->mName = "Ground_Back";
 
 		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3f(0, 20, -20);
-		transform->mScale = Vector3f(20, 20, 1);
+		transform->mPosition = Vector3(0, 20, -20);
+		transform->mScale = Vector3(20, 20, 1);
 
 		physics = (Physics*)obj->Attach(new Physics());
 		physics->SetRigidBody(
@@ -877,8 +889,8 @@ public:
 		obj->mName = "Ground_Right";
 
 		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3f(20, 20, 0);
-		transform->mScale = Vector3f(1, 20, 20);
+		transform->mPosition = Vector3(20, 20, 0);
+		transform->mScale = Vector3(1, 20, 20);
 
 		physics = (Physics*)obj->Attach(new Physics());
 		physics->SetRigidBody(
@@ -897,9 +909,9 @@ public:
 		obj->mName = "Ground_Left";
 
 		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3f(-22, 10, 0);
-		transform->mScale = Vector3f(20, 1, 20);
-		transform->mOrientation = Quatf(0, 0, 0);
+		transform->mPosition = Vector3(-22, 10, 0);
+		transform->mScale = Vector3(20, 1, 20);
+		transform->mOrientation = Quaternion(0, 0, 0);
 
 		physics = (Physics*)obj->Attach(new Physics());
 		physics->SetRigidBody(
@@ -918,8 +930,8 @@ public:
 		obj->mName = "Ground_Top";
 
 		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3f(0, 20, 0);
-		transform->mScale = Vector3f(20, 1, 20);
+		transform->mPosition = Vector3(0, 20, 0);
+		transform->mScale = Vector3(20, 1, 20);
 
 		physics = (Physics*)obj->Attach(new Physics());
 		physics->SetRigidBody(
@@ -938,8 +950,8 @@ public:
 		obj->mName = "Box_Right";
 
 		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3f(10, 2, 5);
-		transform->mScale = Vector3f(1, 1, 1);
+		transform->mPosition = Vector3(10, 2, 5);
+		transform->mScale = Vector3(1, 1, 1);
 
 		physics = (Physics*)obj->Attach(new Physics());
 		physics->SetRigidBody(
@@ -956,8 +968,8 @@ public:
 		obj->mName = "Box_Left";
 
 		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3f(10, 5, 5);
-		transform->mScale = Vector3f(1, 2, 1);
+		transform->mPosition = Vector3(10, 5, 5);
+		transform->mScale = Vector3(1, 2, 1);
 
 		physics = (Physics*)obj->Attach(new Physics());
 		physics->SetRigidBody(
@@ -974,8 +986,8 @@ public:
 		obj->mName = "Box_Top";
 
 		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3f(0, 8, 5);
-		transform->mScale = Vector3f(1, 1, 1);
+		transform->mPosition = Vector3(0, 8, 5);
+		transform->mScale = Vector3(1, 1, 1);
 
 		physics = (Physics*)obj->Attach(new Physics());
 		physics->SetRigidBody(
@@ -992,9 +1004,9 @@ public:
 		obj->mName = "Box_Back";
 
 		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3f(0, 3, -10);
-		transform->mScale = Vector3f(1, 1, 1);
-		transform->mOrientation = Quatf(45, 45, 45);
+		transform->mPosition = Vector3(0, 3, -10);
+		transform->mScale = Vector3(1, 1, 1);
+		transform->mOrientation = Quaternion(45, 45, 45);
 
 		physics = (Physics*)obj->Attach(new Physics());
 		physics->SetRigidBody(
@@ -1014,7 +1026,7 @@ public:
 		material = mGameWorld->mMaterialManager->Add("Dodecahedron", SHARED(new Material()));
 		material->mShader = shaderColor; // intentionally set wrong shader to demonstrate vertex layout compatibility
 		material->mBlendState = mRenderer->BLEND_ALPHA;
-		material->mTexture[TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("default-alpha.png");
+		material->mTexture[TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("default-alpha");
 		material->mRenderQueue = RenderQueue::ALPHA_BLEND;
 
 		mesh = mGameWorld->mMeshManager->Add("Dodecahedron", SHARED(meshBuilder.BuildMesh(mRenderer)));
@@ -1024,9 +1036,9 @@ public:
 		obj->mName = "Dodecahedron";
 
 		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3f(10, 2, -10);
-		transform->mScale = Vector3f(1, 1, 1);
-		transform->mOrientation = Quatf(0, 0, 0);
+		transform->mPosition = Vector3(10, 2, -10);
+		transform->mScale = Vector3(1, 1, 1);
+		transform->mOrientation = Quaternion(0, 0, 0);
 
 		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
 		meshComp->mIsDynamic = true;
@@ -1035,7 +1047,7 @@ public:
 		physics = (Physics*)obj->Attach(new Physics());
 		physics->SetRigidBody(
 			physicsSystem->CreateRigidBody(
-			physicsSystem->CreateMesh((Vector3f*)meshVBO->Lock(), meshVBO->Count(), meshVBO->Stride(), transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
+			physicsSystem->CreateMesh((Vector3*)meshVBO->Lock(), meshVBO->Count(), meshVBO->Stride(), transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
 		meshVBO->Unlock();
 
 		mGameWorld->AddGameObject(obj);
@@ -1050,7 +1062,7 @@ public:
 		material = mGameWorld->mMaterialManager->Add("Sphere", SHARED(new Material()));
 		material->mShader = shaderTexture;
 		material->mBlendState = mRenderer->BLEND_ALPHA;
-		material->mTexture[TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("default-alpha.png");
+		material->mTexture[TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("default-alpha");
 		material->mRenderQueue = RenderQueue::ALPHA_BLEND;
 
 		mesh = mGameWorld->mMeshManager->Add("Sphere", SHARED(meshBuilder.BuildMesh(mRenderer)));
@@ -1060,8 +1072,8 @@ public:
 		obj->mName = "Sphere";
 
 		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3f(15, 2, 10);
-		transform->mScale = Vector3f(1, 1, 1);
+		transform->mPosition = Vector3(15, 2, 10);
+		transform->mScale = Vector3(1, 1, 1);
 
 		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
 		meshComp->mIsDynamic = true;
@@ -1081,7 +1093,7 @@ public:
 		material = mGameWorld->mMaterialManager->Add("Texture", SHARED(new Material()));
 		material->mShader = shaderTexture;
 		material->mBlendState = mRenderer->BLEND_ALPHA;
-		material->mTexture[TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("wall.png");
+		material->mTexture[TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("wall");
 		material->mRenderQueue = RenderQueue::GEOMETRY;
 
 		mesh = mGameWorld->mMeshManager->Add("Texture", SHARED(meshBuilder.BuildMesh(mRenderer)));
@@ -1090,9 +1102,9 @@ public:
 		obj = mGameWorld->AddGameObject(new GameObject("Texture"));
 
 		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3f(-17, 5, 16);
-		transform->mOrientation = Quatf(Vector3f(0, 45, 0));
-		transform->mScale = Vector3f(3, 3, 3);
+		transform->mPosition = Vector3(-17, 5, 16);
+		transform->mOrientation = Quaternion(Vector3(0, 45, 0));
+		transform->mScale = Vector3(3, 3, 3);
 
 		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
 		meshComp->mIsDynamic = true;
@@ -1107,14 +1119,23 @@ public:
 		//
 		meshBuilder.ClearAll();
 		meshBuilder.CreateCube(1);
+		meshBuilder.CalculateTangents(true);
 		meshBuilder.mLayout = shaderNormalMap->Layout();
 
 		material = mGameWorld->mMaterialManager->Add("Normals", SHARED(new Material()));
 		material->mShader = shaderNormalMap;
 		material->mBlendState = mRenderer->BLEND_ALPHA;
-		material->mTexture[TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("wall.png");
-		material->mTexture[TextureIndex::NORMAL] = mGameWorld->mTextureManager->Get("wall-normal.png");
+		//material->mTexture[TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("wall");
+		//material->mTexture[TextureIndex::NORMAL] = mGameWorld->mTextureManager->Get("wall-normal");
+		//material->mTexture[TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("cobblestones");
+		//material->mTexture[TextureIndex::NORMAL] = mGameWorld->mTextureManager->Get("cobblestones-normal");
+		material->mTexture[TextureIndex::DIFFUSE] = mRenderer->BASE_TEXTURE;
+		material->mTexture[TextureIndex::NORMAL] = mGameWorld->mTextureManager->Get("test-normal");
+		//material->mTexture[TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("stone");
+		//material->mTexture[TextureIndex::NORMAL] = mGameWorld->mTextureManager->Get("stone-normal");
 		material->mRenderQueue = RenderQueue::GEOMETRY;
+		//material->mSpecular = ColorRGBA(1, 1, 1, 1);
+		//material->mSpecularComponent = 32;
 
 		mesh = mGameWorld->mMeshManager->Add("Normals", SHARED(meshBuilder.BuildMesh(mRenderer)));
 		mesh->mMaterial = material;
@@ -1122,9 +1143,10 @@ public:
 		obj = mGameWorld->AddGameObject(new GameObject("Normals"));
 
 		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3f(-17, 5, 5);
-		transform->mOrientation = Quatf(Vector3f(0, 45, 0));
-		transform->mScale = Vector3f(3, 3, 3);
+		transform->mPosition = Vector3(10, 1, 0);
+		transform->mOrientation = Quaternion(Vector3(90, 45, 0));
+		transform->mScale = Vector3(3,3,3);
+		normalMapTrans = transform;
 
 		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
 		meshComp->mIsDynamic = true;
@@ -1137,7 +1159,7 @@ public:
 		//
 		// Particles
 		//
-		std::shared_ptr< Texture > texture = mGameWorld->mTextureManager->Add("fire.png", SHARED(mRenderer->CreateTextureFromFile("Textures\\fire.png")));
+		std::shared_ptr<Texture> texture = mGameWorld->mTextureManager->Add("fire", SHARED(mRenderer->CreateTextureFromFile("Textures\\fire.png")));
 
 		material = mGameWorld->mMaterialManager->Add("Fire", SHARED(new Material()));
 		material->mShader = mGameWorld->mShaderManager->Get("Sprite");
@@ -1156,10 +1178,10 @@ public:
 		particleSystem->mMinLifetime = 3.0f;
 		particleSystem->mMaxLifetime = 5.0f;
 		particleSystem->mEffect.push_back(new TextureEffect(0, 0));
-		particleSystem->mEffect.push_back(new AreaPositionEffect(0, Vector3f(-0.125f, 1, 0), Vector3f(0.125f, 1, 0)));
-		particleSystem->mEffect.push_back(new RandomRotationEffect(0, Vector3f(0, 0, -10), Vector3f(0, 0, 10)));
-		particleSystem->mEffect.push_back(new ScaleEffect(0, Vector3f(1, 1, 1)));
-		particleSystem->mEffect.push_back(new RandomVelocityEffect(0, Vector3f(0, 2.0f, 0), Vector3f(0, 2.8f, 0)));
+		particleSystem->mEffect.push_back(new AreaPositionEffect(0, Vector3(-0.125f, 1, 0), Vector3(0.125f, 1, 0)));
+		particleSystem->mEffect.push_back(new RandomRotationEffect(0, Vector3(0, 0, -10), Vector3(0, 0, 10)));
+		particleSystem->mEffect.push_back(new ScaleEffect(0, Vector3(1, 1, 1)));
+		particleSystem->mEffect.push_back(new RandomVelocityEffect(0, Vector3(0, 2.0f, 0), Vector3(0, 2.8f, 0)));
 		particleSystem->mEffect.push_back(new RandomColorEffect(0, ColorRGBA(0.75f, 0.25f, 0, 0.125f), ColorRGBA(0.75f, 0.75f, 0, 0.125f)));
 		particleSystem->mEffect.push_back(new FadeToScaleEffect(0, 0.25f, 0.666f));
 		particleSystem->mEffect.push_back(new FadeToScaleEffect(0.5f, 1.0f, 0.1f));
@@ -1167,14 +1189,14 @@ public:
 		particleSystem->mEffect.push_back(new FadeToScaleEffect(1.0f, 2.0f, 1.0f));
 		particleSystem->mEffect.push_back(new RandomColorEffect(1.0f, ColorRGBA(1, 1, 1, 0.125f), ColorRGBA(0.9f, 0.9f, 0.9f, 0.125f)));
 		particleSystem->mEffect.push_back(new FadeToColorEffect(1.0f, 5.0f, ColorRGBA(0.9f, 0.9f, 0.9f, 0.025f)));
-		particleSystem->mEffect.push_back(new RandomVelocityEffect(1.0f, Vector3f(-0.5f, 1.4f, -0.5f), Vector3f(0.5f, 3.0f, 0.5f)));
+		particleSystem->mEffect.push_back(new RandomVelocityEffect(1.0f, Vector3(-0.5f, 1.4f, -0.5f), Vector3(0.5f, 3.0f, 0.5f)));
 
 		obj = mGameWorld->AddGameObject(new GameObject());
 		obj->mName = "Particle Emitter";
 
 		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3f(8, 1, 0);
-		transform->mScale = Vector3f(1, 1, 1);
+		transform->mPosition = Vector3(8, 1, 0);
+		transform->mScale = Vector3(1, 1, 1);
 
 		obj->Attach(new ParticleEmitter(particleSystem));
 
@@ -1187,11 +1209,11 @@ public:
 		obj->mName = "Point Light";
 
 		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3f(0, 4, 0);
+		transform->mPosition = Vector3(0, 4, 0);
 
 		PointLight* light = (PointLight*)obj->Attach(new PointLight(512));
 		light->mColor = ColorRGBA(0.8f, 0.6f, 0.0f, 1.0f);
-		light->mAttenuation = Vector4f(1.0f, 0.0f, 0.0f, 40.0f);
+		light->mAttenuation = Vector4(1.0f, 0.0f, 0.0f, 40.0f);
 
 		material = mGameWorld->mMaterialManager->Add("Point Light", SHARED(new Material()));
 		material->mShader = mGameWorld->mShaderManager->Get("RT_Cube_Depth");
@@ -1267,8 +1289,8 @@ public:
 		obj->mName = "X-Axis";
 
 		Transform* transform = new Transform();
-		transform->mPosition = Vector3f(tileSize, 0, 0);
-		transform->mOrientation = Quatf(Vector3f(0, 0, -90));
+		transform->mPosition = Vector3(tileSize, 0, 0);
+		transform->mOrientation = Quaternion(Vector3(0, 0, -90));
 		obj->Attach(transform);
 
 		ModelDrawable* modelComp = new ModelDrawable(model);
@@ -1283,8 +1305,8 @@ public:
 		obj->mName = "Y-Axis";
 
 		transform = new Transform();
-		transform->mPosition = Vector3f(0, tileSize, 0);
-		transform->mOrientation = Quatf(Vector3f(0, 0, 0));
+		transform->mPosition = Vector3(0, tileSize, 0);
+		transform->mOrientation = Quaternion(Vector3(0, 0, 0));
 		obj->Attach(transform);
 
 		modelComp = new ModelDrawable(model);
@@ -1299,8 +1321,8 @@ public:
 		obj->mName = "Z-Axis";
 
 		transform = new Transform();
-		transform->mPosition = Vector3f(0, 0, tileSize);
-		transform->mOrientation = Quatf(Vector3f(90, 0, 0));
+		transform->mPosition = Vector3(0, 0, tileSize);
+		transform->mOrientation = Quaternion(Vector3(90, 0, 0));
 		obj->Attach(transform);
 
 		modelComp = new ModelDrawable(model);
@@ -1325,7 +1347,7 @@ public:
 			Transform* transformSelect = mSelectedObject->GetComponent<Transform>();
 
 			transformObject->mPosition = transformSelect->mPosition;
-			transformObject->mScale = Vector3f::ONE * (mWorldCamera->GetTransform()->mPosition - transformSelect->mPosition).Length() * 0.005f;
+			transformObject->mScale = Vector3::ONE * (mWorldCamera->GetTransform()->mPosition - transformSelect->mPosition).Length() * 0.005f;
 
 			mTranslateObject->UpdateTransform();
 			mTranslateObject->UpdateDrawable();
@@ -1376,9 +1398,9 @@ public:
 		{
 			const BoundingBox& box = drawable->mBounds;
 
-			Vector3f center = (box.GetMaxBounds() + box.GetMinBounds()) * 0.5f;
-			Vector3f scale = (box.GetMaxBounds() - center);
-			Vector3f intersection;
+			Vector3 center = (box.GetMaxBounds() + box.GetMinBounds()) * 0.5f;
+			Vector3 scale = (box.GetMaxBounds() - center);
+			Vector3 intersection;
 
 			if (box.Intersects(mMouseToWorldRay, &intersection))
 			{
@@ -1408,8 +1430,8 @@ public:
 		{
 			const BoundingBox& box = drawable->mBounds;
 
-			Vector3f center = (box.GetMaxBounds() + box.GetMinBounds()) * 0.5f;
-			Vector3f scale = (box.GetMaxBounds() - center);
+			Vector3 center = (box.GetMaxBounds() + box.GetMinBounds()) * 0.5f;
+			Vector3 scale = (box.GetMaxBounds() - center);
 
 			MeshDrawable* mesh = mBoundsObject->GetComponent<MeshDrawable>();
 			std::shared_ptr< Material > material = mesh->mMesh->mMaterial;
@@ -1425,7 +1447,7 @@ public:
 
 			Transform* transform = mBoundsObject->GetComponent<Transform>();
 			transform->mPosition = center;
-			transform->mOrientation = Quatf::IDENTITY;
+			transform->mOrientation = Quaternion::IDENTITY;
 			transform->mScale = scale;
 
 			mesh->mMesh->mBounds = BoundingBox();
@@ -1463,8 +1485,8 @@ public:
 		POINT mousePos = Mouse::Get().GetPosition((HWND)mGameWindow->GetInfo()->Handle());
 
 		Transform* transform = mGameWorldWidget->GetComponent<Transform>();
-		const Vector3f& worldPos = transform->mPosition;
-		const Vector3f& worldScale = transform->mScale;
+		const Vector3& worldPos = transform->mPosition;
+		const Vector3& worldScale = transform->mScale;
 
 		mMouseToWorldRay = mWorldCamera->ScreenPointToRay(mousePos.x - (UINT)worldPos.x, mousePos.y - (UINT)worldPos.y, (UINT)worldScale.x, (UINT)worldScale.y);
 
@@ -1505,7 +1527,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	try
 	{
 		mainApp = new MainApp();
-		mainApp->Startup(hInstance, nCmdShow);
+		mainApp->Startup(hInstance, SW_MAXIMIZE);
 		mainApp->Update();
 	}
 	catch (AppException e)

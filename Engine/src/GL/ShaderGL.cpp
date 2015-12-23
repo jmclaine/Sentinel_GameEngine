@@ -359,7 +359,8 @@ namespace Sentinel
 
 		// Create uniforms.
 		//
-		CreateUniform("_WVP", ShaderUniform::WVP);
+		CreateUniform("_WorldViewProj", ShaderUniform::WORLD_VIEW_PROJ);
+		CreateUniform("_WorldView", ShaderUniform::WORLD_VIEW);
 		CreateUniform("_World", ShaderUniform::WORLD);
 		CreateUniform("_InvWorld", ShaderUniform::INV_WORLD);
 		CreateUniform("_View", ShaderUniform::VIEW);

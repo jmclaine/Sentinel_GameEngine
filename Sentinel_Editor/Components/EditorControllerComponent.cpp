@@ -5,9 +5,9 @@
 #include "GameObject.h"
 #include "GameWorld.h"
 #include "Timing.h"
-#include "Vector3f.h"
-#include "Quatf.h"
-#include "Matrix4f.h"
+#include "Vector3.h"
+#include "Quaternion.h"
+#include "Matrix4x4.h"
 #include "Archive.h"
 #include "PhysicsSystem.h"
 #include "Renderer.h"
@@ -66,7 +66,7 @@ namespace Sentinel
 				mLastMousePos = mouse.GetPosition();
 			}
 
-			Vector3f impulse(0, 0, 0);
+			Vector3 impulse(0, 0, 0);
 
 			int scroll = mouse.ScrollDistance();
 
@@ -85,7 +85,7 @@ namespace Sentinel
 			// Strafe
 			if (mouse.IsDown(BUTTON_MIDDLE))
 			{
-				impulse = Vector3f(0, 0, 0);
+				impulse = Vector3(0, 0, 0);
 
 				float x = (float)(mLastMousePos.x - mousePos.x);
 				float y = (float)(mLastMousePos.y - mousePos.y);
@@ -104,25 +104,25 @@ namespace Sentinel
 
 			if (mouse.IsDown(BUTTON_RIGHT))
 			{
-				Vector3f diff = Vector3f((float)(mLastMousePos.y - mousePos.y), (float)(mLastMousePos.x - mousePos.x), 0) * mAngularSpeed;
+				Vector3 diff = Vector3((float)(mLastMousePos.y - mousePos.y), (float)(mLastMousePos.x - mousePos.x), 0) * mAngularSpeed;
 
 				// Rotate
-				static Quatf qFinal = body->GetOrientation();
+				static Quaternion qFinal = body->GetOrientation();
 
 				if (diff.LengthSquared() > 0)
 				{
-					static Vector3f rot = qFinal.ToEuler();
+					static Vector3 rot = qFinal.ToEuler();
 					rot += diff;
 
-					qFinal = Quatf(rot);
+					qFinal = Quaternion(rot);
 				}
 
-				Quatf qResult = body->GetOrientation().Slerp(qFinal, CLAMP((mOwner->GetWorld()->mTiming->DeltaTime()*10.0f), 0.0f, 1.0f));
+				Quaternion qResult = body->GetOrientation().Slerp(qFinal, CLAMP((mOwner->GetWorld()->mTiming->DeltaTime()*10.0f), 0.0f, 1.0f));
 
 				if (qResult.LengthSquared() > 0) // slerp can end with an invalid rotation
 					body->SetOrientation(qResult);
 
-				impulse = Vector3f(0, 0, 0);
+				impulse = Vector3(0, 0, 0);
 
 				if (keyboard.IsDown('W'))
 				{

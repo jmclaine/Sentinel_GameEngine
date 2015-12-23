@@ -4,7 +4,7 @@
 
 #include "GameComponent.h"
 #include "ColorRGBA.h"
-#include "Vector4f.h"
+#include "Vector4.h"
 
 namespace Sentinel
 {
@@ -33,7 +33,7 @@ namespace Component
 	public:
 
 		ColorRGBA mColor;
-		Vector4f mAttenuation; // radius = w
+		Vector4 mAttenuation; // radius = w
 
 	protected:
 

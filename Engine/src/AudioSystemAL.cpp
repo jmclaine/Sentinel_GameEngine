@@ -385,17 +385,17 @@ namespace Sentinel
 			return NULL;
 		}
 
-		void SetListenerPosition(const Vector3f& position)
+		void SetListenerPosition(const Vector3& position)
 		{
 			alListenerfv(AL_POSITION, position.Ptr());
 		}
 
-		void SetListenerVelocity(const Vector3f& velocity)
+		void SetListenerVelocity(const Vector3& velocity)
 		{
 			alListenerfv(AL_VELOCITY, velocity.Ptr());
 		}
 
-		void SetListenerOrientation(const Vector3f& direction, const Vector3f& up)
+		void SetListenerOrientation(const Vector3& direction, const Vector3& up)
 		{
 			float orientation[] = { direction.x, direction.y, direction.z, up.x, up.y, up.z };
 

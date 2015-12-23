@@ -4,7 +4,7 @@ Create and set the SpriteSystem before calling Build()
 */
 #include "Sentinel.h"
 #include "SpriteSystem.h"
-#include "Vector2f.h"
+#include "Vector2.h"
 
 #define NUM_CHARS 256
 
@@ -17,7 +17,7 @@ namespace Sentinel
 		std::shared_ptr<Sprite> mSprite;
 		std::shared_ptr<Material> mMaterial;
 
-		Vector2f mSize;
+		Vector2 mSize;
 		float mOffsetX[NUM_CHARS];	// image offset
 		float mOffsetY[NUM_CHARS];
 		float mAdvance[NUM_CHARS];	// next character starting position (x-axis)
@@ -36,7 +36,7 @@ namespace Sentinel
 
 		std::shared_ptr<SpriteSystem> mSpriteSystem;
 
-		Matrix4f mMatrixWVP;
+		Matrix4x4 mMatrixWVP;
 
 		std::shared_ptr<Font> mFont;
 
@@ -53,7 +53,7 @@ namespace Sentinel
 
 		////////////////////////
 
-		virtual void Draw(char text, const ColorRGBA& color, const Matrix4f& matWorld) = 0;
+		virtual void Draw(char text, const ColorRGBA& color, const Matrix4x4& matWorld) = 0;
 
 		void Clear()
 		{

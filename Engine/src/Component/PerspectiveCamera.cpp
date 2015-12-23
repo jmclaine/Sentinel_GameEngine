@@ -39,9 +39,9 @@ namespace Component
 	{
 		Camera::Execute();
 
-		const Matrix4f& cameraMatrix = GetMatrixWorld();
-		Vector3f nearCenter, farCenter;
-		Vector2f nearSize, farSize;
+		const Matrix4x4& cameraMatrix = GetMatrixWorld();
+		Vector3 nearCenter, farCenter;
+		Vector2 nearSize, farSize;
 
 		GetFrustumSize(nearCenter, farCenter, nearSize, farSize);
 		mFrustum.Set(nearCenter, farCenter, nearSize, farSize, cameraMatrix.Forward(), cameraMatrix.Right(), cameraMatrix.Up());
@@ -90,19 +90,19 @@ namespace Component
 		return mAngle;
 	}
 
-	const Vector3f& PerspectiveCamera::LookAt()
+	const Vector3& PerspectiveCamera::LookAt()
 	{
 		return mLookAt;
 	}
 
 	void PerspectiveCamera::GetFrustumSize(
-		Vector3f& nearCenter, Vector3f& farCenter,
-		Vector2f& nearSize, Vector2f& farSize)
+		Vector3& nearCenter, Vector3& farCenter,
+		Vector2& nearSize, Vector2& farSize)
 	{
-		const Matrix4f& mat = GetMatrixWorld();
+		const Matrix4x4& mat = GetMatrixWorld();
 
-		Vector3f pos = GetTransform()->mPosition;
-		Vector3f dir = mat.Forward();
+		Vector3 pos = GetTransform()->mPosition;
+		Vector3 dir = mat.Forward();
 
 		nearCenter = pos + dir * NearZ();
 		farCenter = pos + dir * FarZ();
@@ -110,16 +110,16 @@ namespace Component
 		float nearHeight = NearZ() * Angle();
 		float farHeight = FarZ()  * Angle();
 
-		nearSize = Vector2f(nearHeight * AspectRatio(), nearHeight);
-		farSize = Vector2f(farHeight * AspectRatio(), farHeight);
+		nearSize = Vector2(nearHeight * AspectRatio(), nearHeight);
+		farSize = Vector2(farHeight * AspectRatio(), farHeight);
 	}
 
 	Ray PerspectiveCamera::ScreenPointToRay(UINT mouseX, UINT mouseY, UINT screenWidth, UINT screenHeight)
 	{
-		const Matrix4f& cameraMatrix = GetMatrixWorld();
+		const Matrix4x4& cameraMatrix = GetMatrixWorld();
 
-		Vector3f nearCenter, farCenter;
-		Vector2f nearSize, farSize;
+		Vector3 nearCenter, farCenter;
+		Vector2 nearSize, farSize;
 
 		if (screenWidth == 0)
 			screenWidth = Renderer::WINDOW_WIDTH_BASE;
@@ -132,7 +132,7 @@ namespace Component
 		float ratioX = -2.0f * (0.5f - (mouseX / static_cast<float>(screenWidth)));
 		float ratioY = 2.0f * (0.5f - (mouseY / static_cast<float>(screenHeight)));
 
-		Vector3f nearPos(nearCenter + cameraMatrix.Right() * ratioX * nearSize.x + cameraMatrix.Up() * ratioY * nearSize.y);
+		Vector3 nearPos(nearCenter + cameraMatrix.Right() * ratioX * nearSize.x + cameraMatrix.Up() * ratioY * nearSize.y);
 
 		return Ray(nearPos, nearPos - GetTransform()->mPosition);
 	}

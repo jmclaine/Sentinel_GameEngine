@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Component/Camera.h"
-#include "Vector3f.h"
-#include "Vector2f.h"
+#include "Vector3.h"
+#include "Vector2.h"
 
 namespace Sentinel {
 namespace Component
@@ -40,11 +40,11 @@ namespace Component
 
 		float Angle();
 
-		const Vector3f& LookAt();
+		const Vector3& LookAt();
 
 		void GetFrustumSize(
-			Vector3f& nearCenter, Vector3f& farCenter,
-			Vector2f& nearSize, Vector2f& farSize);
+			Vector3& nearCenter, Vector3& farCenter,
+			Vector2& nearSize, Vector2& farSize);
 
 		Ray ScreenPointToRay(UINT mouseX, UINT mouseY, UINT screenWidth = 0, UINT screenHeight = 0);
 

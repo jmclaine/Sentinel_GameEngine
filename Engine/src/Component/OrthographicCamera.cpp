@@ -28,7 +28,7 @@ namespace Component
 
 	Ray OrthographicCamera::ScreenPointToRay(UINT mouseX, UINT mouseY, UINT screenWidth, UINT screenHeight)
 	{
-		return Ray(Vector3f((float)mouseX, (float)mouseY, 0), Vector3f(0, 0, -1));
+		return Ray(Vector3((float)mouseX, (float)mouseY, 0), Vector3(0, 0, -1));
 	}
 
 	//////////////////////////////

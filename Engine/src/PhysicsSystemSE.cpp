@@ -1,8 +1,8 @@
 #include <vector>
 
 #include "PhysicsSystem.h"
-#include "Vector3f.h"
-#include "Quatf.h"
+#include "Vector3.h"
+#include "Quaternion.h"
 #include "Util.h"
 
 namespace Sentinel
@@ -46,14 +46,14 @@ namespace Sentinel
 	{
 	private:
 
-		Vector3f mScale;
+		Vector3 mScale;
 
 	public:
 
 		BoxPhysicsShapeSE()
 		{}
 
-		BoxPhysicsShapeSE(const Vector3f& scale)
+		BoxPhysicsShapeSE(const Vector3& scale)
 		{
 			Create(scale);
 		}
@@ -63,12 +63,12 @@ namespace Sentinel
 
 	public:
 
-		Vector3f GetScale()
+		Vector3 GetScale()
 		{
 			return mScale;
 		}
 
-		void SetScale(const Vector3f& scale)
+		void SetScale(const Vector3& scale)
 		{
 			mScale = scale;
 		}
@@ -80,14 +80,14 @@ namespace Sentinel
 	{
 	private:
 
-		Vector3f mScale;
+		Vector3 mScale;
 
 	public:
 
 		CylinderPhysicsShapeSE()
 		{}
 
-		CylinderPhysicsShapeSE(const Vector3f& scale)
+		CylinderPhysicsShapeSE(const Vector3& scale)
 		{
 			Create(scale);
 		}
@@ -97,12 +97,12 @@ namespace Sentinel
 
 	public:
 
-		Vector3f GetScale()
+		Vector3 GetScale()
 		{
 			return mScale;
 		}
 
-		void SetScale(const Vector3f& scale)
+		void SetScale(const Vector3& scale)
 		{
 			mScale = scale;
 		}
@@ -114,15 +114,15 @@ namespace Sentinel
 	{
 	private:
 
-		std::vector<Vector3f> mVert;
-		Vector3f mScale;
+		std::vector<Vector3> mVert;
+		Vector3 mScale;
 
 	public:
 
 		MeshPhysicsShapeSE()
 		{}
 
-		MeshPhysicsShapeSE(void* verts, UINT count, UINT stride, const Vector3f& scale)
+		MeshPhysicsShapeSE(void* verts, UINT count, UINT stride, const Vector3& scale)
 		{
 			Create(verts, count, stride, scale);
 		}
@@ -137,22 +137,22 @@ namespace Sentinel
 			return (int)mVert.size();
 		}
 
-		void AddPoint(const Vector3f& point)
+		void AddPoint(const Vector3& point)
 		{
 			mVert.push_back(point);
 		}
 
-		Vector3f* GetPoints()
+		Vector3* GetPoints()
 		{
 			return mVert.data();
 		}
 
-		Vector3f GetScale()
+		Vector3 GetScale()
 		{
 			return mScale;
 		}
 
-		void SetScale(const Vector3f& scale)
+		void SetScale(const Vector3& scale)
 		{
 			mScale = scale;
 		}
@@ -177,9 +177,8 @@ namespace Sentinel
 	{
 	private:
 
-		Vector3f mPosition;
-		Quatf mOrientation;
-		Vector3f mScale;
+		Vector3 mPosition;
+		Quaternion mOrientation;
 
 		float mMass;
 		int mFlags;
@@ -189,8 +188,8 @@ namespace Sentinel
 		float mRestitution;
 
 		float mFriction;
-		Vector3f mAngularFactor;
-		Vector3f mGravity;
+		Vector3 mAngularFactor;
+		Vector3 mGravity;
 
 	public:
 
@@ -202,40 +201,30 @@ namespace Sentinel
 			mAngularDamping = 0.2f;
 			mRestitution = 0.8f;
 			mFriction = 0.8f;
-			mAngularFactor = Vector3f(0.8f, 0.8f, 0.8f);
+			mAngularFactor = Vector3(0.8f, 0.8f, 0.8f);
 		}
 
 		~RigidBodySE()
 		{}
 
-		Vector3f GetPosition()
+		Vector3 GetPosition()
 		{
 			return mPosition;
 		}
 
-		void SetPosition(const Vector3f& position)
+		void SetPosition(const Vector3& position)
 		{
 			mPosition = position;
 		}
 
-		Quatf GetOrientation()
+		Quaternion GetOrientation()
 		{
 			return mOrientation;
 		}
 
-		void SetOrientation(const Quatf& orientation)
+		void SetOrientation(const Quaternion& orientation)
 		{
 			mOrientation = orientation;
-		}
-
-		Vector3f GetScale()
-		{
-			return mScale;
-		}
-
-		void SetScale(const Vector3f& scale)
-		{
-			mScale = scale;
 		}
 
 		//////////////////////////////////
@@ -306,29 +295,29 @@ namespace Sentinel
 			mFriction = friction;
 		}
 
-		Vector3f GetAngularFactor()
+		Vector3 GetAngularFactor()
 		{
 			return mAngularFactor;
 		}
 
-		void SetAngularFactor(const Vector3f& factor)
+		void SetAngularFactor(const Vector3& factor)
 		{
 			mAngularFactor = factor;
 		}
 
-		Vector3f GetGravity()
+		Vector3 GetGravity()
 		{
 			return mGravity;
 		}
 
-		void SetGravity(const Vector3f& gravity)
+		void SetGravity(const Vector3& gravity)
 		{
 			mGravity = gravity;
 		}
 
 		//////////////////////////////////
 
-		void ApplyCentralImpulse(const Vector3f& impulse)
+		void ApplyCentralImpulse(const Vector3& impulse)
 		{
 			_ASSERT(0); // unsupported
 		}
@@ -390,24 +379,24 @@ namespace Sentinel
 			return new SpherePhysicsShapeSE(radius);
 		}
 
-		BoxPhysicsShape* CreateBox(const Vector3f& scale)
+		BoxPhysicsShape* CreateBox(const Vector3& scale)
 		{
 			return new BoxPhysicsShapeSE(scale);
 		}
 
-		CylinderPhysicsShape* CreateCylinder(const Vector3f& scale)
+		CylinderPhysicsShape* CreateCylinder(const Vector3& scale)
 		{
 			return new CylinderPhysicsShapeSE(scale);
 		}
 
-		MeshPhysicsShape* CreateMesh(Vector3f* verts, UINT count, UINT stride, const Vector3f& scale)
+		MeshPhysicsShape* CreateMesh(Vector3* verts, UINT count, UINT stride, const Vector3& scale)
 		{
 			return new MeshPhysicsShapeSE(verts, count, stride, scale);
 		}
 
 		//////////////////////////////////
 
-		RigidBody* CreateRigidBody(PhysicsShape* shape, const Vector3f& position, const Quatf& orientation, float mass)
+		RigidBody* CreateRigidBody(PhysicsShape* shape, const Vector3& position, const Quaternion& orientation, float mass)
 		{
 			RigidBodySE* body = new RigidBodySE();
 

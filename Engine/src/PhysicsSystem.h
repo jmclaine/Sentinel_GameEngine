@@ -18,8 +18,8 @@ ensure a smooth transition between them.
 namespace Sentinel
 {
 	class Mesh;
-	class Quatf;
-	class Vector3f;
+	class Quaternion;
+	class Vector3;
 
 	enum PhysicsFlag
 	{
@@ -42,14 +42,11 @@ namespace Sentinel
 
 		virtual ~RigidBody();
 
-		virtual Vector3f GetPosition() = 0;
-		virtual void SetPosition(const Vector3f& position) = 0;
+		virtual Vector3 GetPosition() = 0;
+		virtual void SetPosition(const Vector3& position) = 0;
 
-		virtual Quatf GetOrientation() = 0;
-		virtual void SetOrientation(const Quatf& orientation) = 0;
-
-		virtual Vector3f GetScale() = 0;
-		virtual void SetScale(const Vector3f& scale) = 0;
+		virtual Quaternion GetOrientation() = 0;
+		virtual void SetOrientation(const Quaternion& orientation) = 0;
 
 		//////////////////////////////////
 
@@ -72,15 +69,15 @@ namespace Sentinel
 		virtual float GetFriction() = 0;
 		virtual void SetFriction(float friction) = 0;
 
-		virtual Vector3f GetAngularFactor() = 0;
-		virtual void SetAngularFactor(const Vector3f& factor) = 0;
+		virtual Vector3 GetAngularFactor() = 0;
+		virtual void SetAngularFactor(const Vector3& factor) = 0;
 
-		virtual Vector3f GetGravity() = 0;
-		virtual void SetGravity(const Vector3f& gravity) = 0;
+		virtual Vector3 GetGravity() = 0;
+		virtual void SetGravity(const Vector3& gravity) = 0;
 
 		//////////////////////////////////
 
-		virtual void ApplyCentralImpulse(const Vector3f& impulse) = 0;
+		virtual void ApplyCentralImpulse(const Vector3& impulse) = 0;
 	};
 
 	////////////////////////////////////////////////////////////////////
@@ -126,13 +123,13 @@ namespace Sentinel
 		// Shapes are created.
 		//
 		virtual SpherePhysicsShape* CreateSphere(float radius) = 0;
-		virtual BoxPhysicsShape* CreateBox(const Vector3f& scale) = 0;
-		virtual CylinderPhysicsShape* CreateCylinder(const Vector3f& scale) = 0;
-		virtual MeshPhysicsShape* CreateMesh(Vector3f* verts, UINT count, UINT stride, const Vector3f& scale) = 0;
+		virtual BoxPhysicsShape* CreateBox(const Vector3& scale) = 0;
+		virtual CylinderPhysicsShape* CreateCylinder(const Vector3& scale) = 0;
+		virtual MeshPhysicsShape* CreateMesh(Vector3* verts, UINT count, UINT stride, const Vector3& scale) = 0;
 
 		//////////////////////////////////
 
-		virtual RigidBody* CreateRigidBody(PhysicsShape* shape, const Vector3f& position, const Quatf& orientation, float mass) = 0;
+		virtual RigidBody* CreateRigidBody(PhysicsShape* shape, const Vector3& position, const Quaternion& orientation, float mass) = 0;
 
 		virtual void AddRigidBody(RigidBody* body) = 0;
 

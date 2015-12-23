@@ -47,25 +47,23 @@ namespace Sentinel
 
 			RECT rect = { 0, 0, info.Width(), info.Height() };
 			DWORD exStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
-			DWORD dwStyle = (!info.Fullscreen()) ? WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN : WS_POPUP;
+			DWORD dwStyle = (!info.Fullscreen()) ? WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN: WS_POPUP;
 			AdjustWindowRectEx(&rect, dwStyle, FALSE, WS_EX_APPWINDOW | WS_EX_WINDOWEDGE);
 
-			hWnd = CreateWindowEx(exStyle, mWindowClass, mTitle,
-				dwStyle,
+			hWnd = CreateWindowEx(
+				exStyle, mWindowClass, mTitle, dwStyle,
 				0, 0, rect.right - rect.left, rect.bottom - rect.top,
 				NULL, NULL, mINST, NULL);
 
 			if (!hWnd)
 				throw AppException("Failed to initialize window: " + std::string(mTitle));
 
-			//SetWindowLong(hWnd, GWL_STYLE, 0);	// borderless window
+			//SetWindowLong(hWnd, GWL_STYLE, 0); // borderless window
 
 			mWindowInfo = renderer->Startup(hWnd, info.Fullscreen(), info.Width(), info.Height());
 
 			ShowWindow(hWnd, nCmdShow);
 			UpdateWindow(hWnd);
-
-			//mWindowInfo = renderer->Startup(hWnd, info.Fullscreen(), info.Width(), info.Height());
 
 			if (!mWindowInfo)
 				throw AppException("Failed Renderer::Startup()");

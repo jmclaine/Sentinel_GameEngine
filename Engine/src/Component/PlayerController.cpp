@@ -6,9 +6,9 @@
 #include "GameObject.h"
 #include "GameWorld.h"
 #include "Timing.h"
-#include "Vector3f.h"
-#include "Quatf.h"
-#include "Matrix4f.h"
+#include "Vector3.h"
+#include "Quaternion.h"
+#include "Matrix4x4.h"
 #include "Archive.h"
 #include "PhysicsSystem.h"
 #include "Renderer.h"
@@ -44,7 +44,7 @@ namespace Component
 		{
 			Keyboard& keyboard = Keyboard::Get();
 
-			Vector3f impulse(0, 0, 0);
+			Vector3 impulse(0, 0, 0);
 
 			// Should have the keys mapped to an input handler.
 
@@ -90,7 +90,7 @@ namespace Component
 			POINT mousePos = Mouse::Get().GetPosition();
 
 			POINT center = CenterHandle((HWND)(mOwner->GetWorld()->mRenderer->GetWindow()->Handle()));
-			Vector3f diff = Vector3f((float)(center.y - mousePos.y), (float)(center.x - mousePos.x), 0) * mAngularSpeed;
+			Vector3 diff = Vector3((float)(center.y - mousePos.y), (float)(center.x - mousePos.x), 0) * mAngularSpeed;
 
 			if (keyboard.IsDown(VK_UP))
 				diff.z += 1.0f;
@@ -102,17 +102,17 @@ namespace Component
 
 			// Rotate in direction with spherical interpolation.
 			//
-			static Quatf qFinal = body->GetOrientation();
+			static Quaternion qFinal = body->GetOrientation();
 
 			if (diff.LengthSquared() > 0)
 			{
-				static Vector3f rot = qFinal.ToEuler();
+				static Vector3 rot = qFinal.ToEuler();
 				rot += diff;
 
-				qFinal = Quatf(rot);
+				qFinal = Quaternion(rot);
 			}
 
-			Quatf qResult = body->GetOrientation().Slerp(qFinal, CLAMP(mOwner->GetWorld()->mTiming->DeltaTime()*10.0f, 0.0f, 1.0f));
+			Quaternion qResult = body->GetOrientation().Slerp(qFinal, CLAMP(mOwner->GetWorld()->mTiming->DeltaTime()*10.0f, 0.0f, 1.0f));
 
 			if (qResult.LengthSquared() > 0)	// slerp can end with an invalid rotation
 				body->SetOrientation(qResult);

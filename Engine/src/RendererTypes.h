@@ -164,7 +164,8 @@ namespace Sentinel
 
 	ENUM_CLASS(ShaderUniform)
 
-		WVP,
+		WORLD_VIEW_PROJ,
+		WORLD_VIEW,
 		WORLD,
 		INV_WORLD,
 		VIEW,

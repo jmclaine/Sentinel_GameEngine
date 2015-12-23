@@ -53,7 +53,7 @@ float4 PS_Main(VSOutput input) :SV_Target
 #ifdef VERSION_GL
 #ifdef VERTEX_SHADER
 
-uniform mat4 _WVP;
+uniform mat4 _WorldViewProj;
 
 in vec4 Position;
 in vec2 TexCoord0;
@@ -62,7 +62,7 @@ out vec2 gvTexCoord0;
 
 void main()
 {
-	gl_Position = _WVP * Position;
+	gl_Position = _WorldViewProj * Position;
 
 	gvTexCoord0 = vec2(TexCoord0.x, 1.0 - TexCoord0.y);
 }

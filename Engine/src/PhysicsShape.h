@@ -3,8 +3,8 @@
 #include "Sentinel.h"
 #include "Archive.h"
 #include "Serializable.h"
-#include "Vector3f.h"
-#include "Vector4f.h"
+#include "Vector3.h"
+#include "Vector4.h"
 
 namespace Sentinel
 {
@@ -65,12 +65,12 @@ namespace Sentinel
 
 	protected:
 
-		void Create(const Vector3f& scale);
+		void Create(const Vector3& scale);
 
 	public:
 
-		virtual Vector3f GetScale() = 0;
-		virtual void SetScale(const Vector3f& scale) = 0;
+		virtual Vector3 GetScale() = 0;
+		virtual void SetScale(const Vector3& scale) = 0;
 
 		void Save(Archive& archive);
 		void Load(Archive& archive);
@@ -92,12 +92,12 @@ namespace Sentinel
 
 	protected:
 
-		void Create(const Vector3f& scale);
+		void Create(const Vector3& scale);
 
 	public:
 
-		virtual Vector3f GetScale() = 0;
-		virtual void SetScale(const Vector3f& scale) = 0;
+		virtual Vector3 GetScale() = 0;
+		virtual void SetScale(const Vector3& scale) = 0;
 
 		void Save(Archive& archive);
 		void Load(Archive& archive);
@@ -119,16 +119,16 @@ namespace Sentinel
 
 	protected:
 
-		void Create(void* verts, UINT count, UINT stride, const Vector3f& scale);
+		void Create(void* verts, UINT count, UINT stride, const Vector3& scale);
 
 	public:
 
 		virtual int GetNumPoints() = 0;
-		virtual void AddPoint(const Vector3f& point) = 0;
-		virtual Vector3f* GetPoints() = 0;
+		virtual void AddPoint(const Vector3& point) = 0;
+		virtual Vector3* GetPoints() = 0;
 
-		virtual Vector3f GetScale() = 0;
-		virtual void SetScale(const Vector3f& scale) = 0;
+		virtual Vector3 GetScale() = 0;
+		virtual void SetScale(const Vector3& scale) = 0;
 
 		void Save(Archive& archive);
 		void Load(Archive& archive);

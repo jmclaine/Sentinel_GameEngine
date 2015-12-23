@@ -276,7 +276,7 @@ int APIENTRY _tWinMain(
 	try
 	{
 		mainApp = new MainApp();
-		mainApp->Startup(hInstance, nCmdShow);
+		mainApp->Startup(hInstance, SW_MAXIMIZE);
 		mainApp->Update();
 	}
 	catch (AppException e)

@@ -231,7 +231,7 @@ namespace Sentinel
 	PositionEffect::PositionEffect()
 	{}
 
-	PositionEffect::PositionEffect(float startTime, const Vector3f& position) :
+	PositionEffect::PositionEffect(float startTime, const Vector3& position) :
 		ParticleEffect(startTime),
 		mPosition(position)
 	{}
@@ -265,7 +265,7 @@ namespace Sentinel
 	AreaPositionEffect::AreaPositionEffect()
 	{}
 
-	AreaPositionEffect::AreaPositionEffect(float startTime, const Vector3f& minPosition, const Vector3f& maxPosition) :
+	AreaPositionEffect::AreaPositionEffect(float startTime, const Vector3& minPosition, const Vector3& maxPosition) :
 		PositionEffect(startTime, minPosition),
 		mMaxPosition(maxPosition)
 	{}
@@ -300,14 +300,14 @@ namespace Sentinel
 	SpherePositionEffect::SpherePositionEffect()
 	{}
 
-	SpherePositionEffect::SpherePositionEffect(float startTime, const Vector3f& position, float radius) :
+	SpherePositionEffect::SpherePositionEffect(float startTime, const Vector3& position, float radius) :
 		PositionEffect(startTime, position),
 		mRadius(radius)
 	{}
 
 	void SpherePositionEffect::Startup(Particle& particle)
 	{
-		particle.mPosition = mPosition + RandomValue(Vector3f(-mRadius, -mRadius, -mRadius), Vector3f(mRadius, mRadius, mRadius));
+		particle.mPosition = mPosition + RandomValue(Vector3(-mRadius, -mRadius, -mRadius), Vector3(mRadius, mRadius, mRadius));
 	}
 
 	void SpherePositionEffect::Save(Archive& archive)
@@ -336,7 +336,7 @@ namespace Sentinel
 	RotationEffect::RotationEffect()
 	{}
 
-	RotationEffect::RotationEffect(float startTime, const Vector3f& rotation) :
+	RotationEffect::RotationEffect(float startTime, const Vector3& rotation) :
 		ParticleEffect(startTime),
 		mRotation(rotation)
 	{}
@@ -370,7 +370,7 @@ namespace Sentinel
 	RandomRotationEffect::RandomRotationEffect()
 	{}
 
-	RandomRotationEffect::RandomRotationEffect(float startTime, const Vector3f& minRotation, const Vector3f& maxRotation) :
+	RandomRotationEffect::RandomRotationEffect(float startTime, const Vector3& minRotation, const Vector3& maxRotation) :
 		RotationEffect(startTime, minRotation),
 		mMaxRotation(maxRotation)
 	{}
@@ -406,7 +406,7 @@ namespace Sentinel
 	ScaleEffect::ScaleEffect()
 	{}
 
-	ScaleEffect::ScaleEffect(float startTime, const Vector3f& scale) :
+	ScaleEffect::ScaleEffect(float startTime, const Vector3& scale) :
 		ParticleEffect(startTime),
 		mScale(scale)
 	{}
@@ -440,7 +440,7 @@ namespace Sentinel
 	RandomScaleEffect::RandomScaleEffect()
 	{}
 
-	RandomScaleEffect::RandomScaleEffect(float startTime, const Vector3f& minScale, const Vector3f& maxScale) :
+	RandomScaleEffect::RandomScaleEffect(float startTime, const Vector3& minScale, const Vector3& maxScale) :
 		ScaleEffect(startTime, minScale),
 		mMaxScale(maxScale)
 	{}
@@ -476,14 +476,14 @@ namespace Sentinel
 	{}
 
 	FadeToScaleEffect::FadeToScaleEffect(float startTime, float endTime, float scale) :
-		ScaleEffect(startTime, Vector3f(scale, scale, scale)),
+		ScaleEffect(startTime, Vector3(scale, scale, scale)),
 		mEndTime(endTime)
 	{
 		_ASSERT(endTime > 0);
 		_ASSERT(startTime < endTime);
 	}
 
-	FadeToScaleEffect::FadeToScaleEffect(float startTime, float endTime, const Vector3f& scale) :
+	FadeToScaleEffect::FadeToScaleEffect(float startTime, float endTime, const Vector3& scale) :
 		ScaleEffect(startTime, scale),
 		mEndTime(endTime)
 	{
@@ -529,7 +529,7 @@ namespace Sentinel
 	VelocityEffect::VelocityEffect()
 	{}
 
-	VelocityEffect::VelocityEffect(float startTime, const Vector3f& velocity) :
+	VelocityEffect::VelocityEffect(float startTime, const Vector3& velocity) :
 		ParticleEffect(startTime),
 		mVelocity(velocity)
 	{}
@@ -563,7 +563,7 @@ namespace Sentinel
 	RandomVelocityEffect::RandomVelocityEffect()
 	{}
 
-	RandomVelocityEffect::RandomVelocityEffect(float startTime, const Vector3f& minVelocity, const Vector3f& maxVelocity) :
+	RandomVelocityEffect::RandomVelocityEffect(float startTime, const Vector3& minVelocity, const Vector3& maxVelocity) :
 		VelocityEffect(startTime, minVelocity),
 		mMaxVelocity(maxVelocity)
 	{}
@@ -599,7 +599,7 @@ namespace Sentinel
 	AngularVelocityEffect::AngularVelocityEffect()
 	{}
 
-	AngularVelocityEffect::AngularVelocityEffect(float startTime, const Vector3f& angularVelocity) :
+	AngularVelocityEffect::AngularVelocityEffect(float startTime, const Vector3& angularVelocity) :
 		ParticleEffect(startTime),
 		mAngularVelocity(angularVelocity)
 	{}
@@ -633,7 +633,7 @@ namespace Sentinel
 	RandomAngularVelocityEffect::RandomAngularVelocityEffect()
 	{}
 
-	RandomAngularVelocityEffect::RandomAngularVelocityEffect(float startTime, const Vector3f& minAngularVelocity, const Vector3f& maxAngularVelocity) :
+	RandomAngularVelocityEffect::RandomAngularVelocityEffect(float startTime, const Vector3& minAngularVelocity, const Vector3& maxAngularVelocity) :
 		AngularVelocityEffect(startTime, minAngularVelocity),
 		mMaxAngularVelocity(maxAngularVelocity)
 	{}
@@ -669,7 +669,7 @@ namespace Sentinel
 	AccelEffect::AccelEffect()
 	{}
 
-	AccelEffect::AccelEffect(float startTime, const Vector3f& accel) :
+	AccelEffect::AccelEffect(float startTime, const Vector3& accel) :
 		ParticleEffect(startTime),
 		mAccel(accel)
 	{}
@@ -703,7 +703,7 @@ namespace Sentinel
 	RandomAccelEffect::RandomAccelEffect()
 	{}
 
-	RandomAccelEffect::RandomAccelEffect(float startTime, const Vector3f& minAccel, const Vector3f& maxAccel) :
+	RandomAccelEffect::RandomAccelEffect(float startTime, const Vector3& minAccel, const Vector3& maxAccel) :
 		AccelEffect(startTime, minAccel),
 		mMaxAccel(maxAccel)
 	{}
@@ -739,7 +739,7 @@ namespace Sentinel
 	AngularAccelEffect::AngularAccelEffect()
 	{}
 
-	AngularAccelEffect::AngularAccelEffect(float startTime, const Vector3f& angularAccel) :
+	AngularAccelEffect::AngularAccelEffect(float startTime, const Vector3& angularAccel) :
 		ParticleEffect(startTime),
 		mAngularAccel(angularAccel)
 	{}
@@ -773,7 +773,7 @@ namespace Sentinel
 	RandomAngularAccelEffect::RandomAngularAccelEffect()
 	{}
 
-	RandomAngularAccelEffect::RandomAngularAccelEffect(float startTime, const Vector3f& minAngularAccel, const Vector3f& maxAngularAccel) :
+	RandomAngularAccelEffect::RandomAngularAccelEffect(float startTime, const Vector3& minAngularAccel, const Vector3& maxAngularAccel) :
 		AngularAccelEffect(startTime, minAngularAccel),
 		mMaxAngularAccel(maxAngularAccel)
 	{}

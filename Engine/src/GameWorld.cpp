@@ -126,7 +126,7 @@ namespace Sentinel
 		// TODO: Raycast from center screen to AABB for more accuracy.
 		//
 		/*
-		Vector3f camPos = mCurrentCamera->GetTransform()->mPosition;
+		Vector3 camPos = mCurrentCamera->GetTransform()->mPosition;
 
 		mAlphaOrder.clear();
 		TRAVERSE_VECTOR( x, mGameObject )

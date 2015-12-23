@@ -91,14 +91,14 @@ namespace Sentinel
 			// OBJ files start with the first index as 1,
 			// so push a dummy into the vectors to align.
 			//
-			std::vector<Vector3f> positions(1);
-			std::vector<Vector2f> texCoords(1);
-			std::vector<Vector3f> normals(1);
+			std::vector<Vector3> positions(1);
+			std::vector<Vector2> texCoords(1);
+			std::vector<Vector3> normals(1);
 
 			// Initialize the minimum and maximum vertex positions for the bounding sphere.
 			//
-			Vector3f minPosition(FLT_MAX, FLT_MAX, FLT_MAX);
-			Vector3f maxPosition(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+			Vector3 minPosition(FLT_MAX, FLT_MAX, FLT_MAX);
+			Vector3 maxPosition(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
 			// Create a default material.
 			//
@@ -140,7 +140,7 @@ namespace Sentinel
 					//
 					else if (token == "v")
 					{
-						Vector3f p;
+						Vector3 p;
 						parsehelper >> p.x >> p.y >> p.z;
 						positions.push_back(p);
 
@@ -154,7 +154,7 @@ namespace Sentinel
 					//
 					else if (token == "vt")
 					{
-						Vector2f p;
+						Vector2 p;
 						parsehelper >> p.x >> p.y;
 						p.y = 1 - p.y;				// Texture is reverse y-axis.
 						texCoords.push_back(p);
@@ -163,7 +163,7 @@ namespace Sentinel
 					//
 					else if (token == "vn")
 					{
-						Vector3f p;
+						Vector3 p;
 						parsehelper >> p.x >> p.y >> p.z;
 						normals.push_back(p);
 					}

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GameComponent.h"
-#include "Matrix4f.h"
+#include "Matrix4x4.h"
 #include "Shape.h"
 #include "ColorRGBA.h"
 #include "Renderer.h"
@@ -30,11 +30,11 @@ namespace Component
 
 		Transform* mTransform;
 
-		Matrix4f mMatrixView;
-		Matrix4f mMatrixProjection;
-		Matrix4f mMatrixWVP;
+		Matrix4x4 mMatrixView;
+		Matrix4x4 mMatrixProjection;
+		Matrix4x4 mMatrixWVP;
 
-		Vector3f mLookAt;
+		Vector3 mLookAt;
 
 		BoundingFrustum mFrustum;
 
@@ -71,10 +71,10 @@ namespace Component
 
 		const Transform* GetTransform();
 
-		const Matrix4f& GetMatrixWorld();
-		const Matrix4f& GetMatrixView();
-		const Matrix4f& GetMatrixProjection();
-		const Matrix4f& GetMatrixWVP();
+		const Matrix4x4& GetMatrixWorld();
+		const Matrix4x4& GetMatrixView();
+		const Matrix4x4& GetMatrixProjection();
+		const Matrix4x4& GetMatrixWVP();
 
 		const BoundingFrustum& GetFrustum();
 

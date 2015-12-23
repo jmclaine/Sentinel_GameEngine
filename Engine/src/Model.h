@@ -39,7 +39,7 @@ Each Model has self contained Materials.
 #include <vector>
 
 #include "Types.h"
-#include "Matrix4f.h"
+#include "Matrix4x4.h"
 
 namespace Sentinel
 {
@@ -70,7 +70,7 @@ namespace Sentinel
 
 	public:
 
-		Matrix4f mMatrixWorld;
+		Matrix4x4 mMatrixWorld;
 
 		/////////////////////////////////////
 

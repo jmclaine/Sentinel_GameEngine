@@ -9,8 +9,8 @@ Mesh creation helpers are in MeshBuilder.h or Model.h
 #include "Sentinel.h"
 #include "Types.h"
 #include "RendererTypes.h"
-#include "Matrix4f.h"
-#include "Vector4f.h"
+#include "Matrix4x4.h"
+#include "Vector4.h"
 #include "Shape.h"
 
 namespace Sentinel
@@ -46,7 +46,7 @@ namespace Sentinel
 		std::shared_ptr<VertexLayout> mLayout;
 		std::shared_ptr<Material> mMaterial;
 
-		Matrix4f mMatrixWorld;
+		Matrix4x4 mMatrixWorld;
 
 		BoundingBox mBounds;
 

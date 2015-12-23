@@ -2,24 +2,24 @@
 
 #include "MathUtil.h"
 #include "Shape.h"
-#include "Vector4f.h"
+#include "Vector4.h"
 #include "Debug.h"
 
 namespace Sentinel
 {
-	Ray::Ray(const Vector3f& pos, const Vector3f& dir) :
+	Ray::Ray(const Vector3& pos, const Vector3& dir) :
 		mPosition(pos),
 		mDirection(dir)
 	{}
 
 	/////////////////////////////////////////////////////////////////////////////////////
 
-	Plane::Plane(const Vector3f& pos, const Vector3f& normal) :
+	Plane::Plane(const Vector3& pos, const Vector3& normal) :
 		mPosition(pos),
 		mNormal(normal)
 	{}
 
-	float Plane::Distance(const Vector3f& pos) const
+	float Plane::Distance(const Vector3& pos) const
 	{
 		return mNormal.Dot(pos) - mPosition.Dot(mNormal);
 	}
@@ -27,9 +27,9 @@ namespace Sentinel
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	Triangle::Triangle(
-		const Vector3f& posA, 
-		const Vector3f& posB, 
-		const Vector3f& posC)
+		const Vector3& posA, 
+		const Vector3& posB, 
+		const Vector3& posC)
 	{
 		mPosition[0] = posA;
 		mPosition[1] = posB;
@@ -50,7 +50,7 @@ namespace Sentinel
 
 	/////////////////////////////////////////////////////////////////////////////////////
 
-	BoundingSphere::BoundingSphere(const Vector3f& center, float radius) :
+	BoundingSphere::BoundingSphere(const Vector3& center, float radius) :
 		mCenter(center),
 		mRadius(radius)
 	{}
@@ -60,23 +60,23 @@ namespace Sentinel
 	// Nicolas Capens @ www.flipcode.com/archives/Smallest_Enclosing_Spheres.html
 	//
 	BoundingSphere::BoundingSphere(
-		const Vector3f& v0, 
-		const Vector3f& v1)
+		const Vector3& v0, 
+		const Vector3& v1)
 	{
-		Vector3f u1 = v1 - v0;
-		Vector3f u0 = u1 * 0.5f;
+		Vector3 u1 = v1 - v0;
+		Vector3 u0 = u1 * 0.5f;
 
 		mRadius = u0.Length() + (float)EPSILON;
 		mCenter = v0 + u0;
 	}
 
 	BoundingSphere::BoundingSphere(
-		const Vector3f& v0, 
-		const Vector3f& v1, 
-		const Vector3f& v2)
+		const Vector3& v0, 
+		const Vector3& v1, 
+		const Vector3& v2)
 	{
-		Vector3f u1 = v1 - v0;
-		Vector3f u2 = v2 - v0;
+		Vector3 u1 = v1 - v0;
+		Vector3 u2 = v2 - v0;
 
 		float det = 2.0f * u1.Cross(u2).Dot(u1.Cross(u2));
 
@@ -104,7 +104,7 @@ namespace Sentinel
 			return;
 		}
 
-		Vector3f u0 = (u1.Cross(u2).Cross(u1) * u2.LengthSquared() + \
+		Vector3 u0 = (u1.Cross(u2).Cross(u1) * u2.LengthSquared() + \
 			u2.Cross(u1.Cross(u2)) * u1.LengthSquared()) * (1.0f / det);
 
 		mRadius = u0.Length() + (float)EPSILON;
@@ -112,14 +112,14 @@ namespace Sentinel
 	}
 
 	BoundingSphere::BoundingSphere(
-		const Vector3f& v0, 
-		const Vector3f& v1, 
-		const Vector3f& v2, 
-		const Vector3f& v3)
+		const Vector3& v0, 
+		const Vector3& v1, 
+		const Vector3& v2, 
+		const Vector3& v3)
 	{
-		Vector3f u1 = v1 - v0;
-		Vector3f u2 = v2 - v0;
-		Vector3f u3 = v3 - v0;
+		Vector3 u1 = v1 - v0;
+		Vector3 u2 = v2 - v0;
+		Vector3 u3 = v3 - v0;
 
 		float m[9];
 		m[0] = u1.x;	m[1] = u1.y;	m[2] = u1.z;
@@ -158,7 +158,7 @@ namespace Sentinel
 			return;
 		}
 
-		Vector3f u0 = (u1.Cross(u2) * u3.LengthSquared() + \
+		Vector3 u0 = (u1.Cross(u2) * u3.LengthSquared() + \
 			u3.Cross(u1) * u2.LengthSquared() + \
 			u2.Cross(u3) * u1.LengthSquared()) * (1.0f / det);
 
@@ -173,17 +173,17 @@ namespace Sentinel
 	//
 	BoundingSphere::BoundingSphere(const BYTE* verts, UINT count, UINT stride)
 	{
-		std::vector<Vector3f> points; // points of interest
-		mCenter = *(Vector3f*)verts;
+		std::vector<Vector3> points; // points of interest
+		mCenter = *(Vector3*)verts;
 
 		points.push_back(mCenter);
 
-		Vector3f pos;
+		Vector3 pos;
 		UINT currIndex = 0;
 
 		while (currIndex < count)
 		{
-			pos = *(Vector3f*)(verts + currIndex * stride);
+			pos = *(Vector3*)(verts + currIndex * stride);
 
 			if (!Intersects(pos))
 			{
@@ -539,12 +539,12 @@ namespace Sentinel
 		}
 	}
 
-	bool BoundingSphere::Intersects(const Vector3f& point) const
+	bool BoundingSphere::Intersects(const Vector3& point) const
 	{
 		return (point - mCenter).LengthSquared() < (mRadius * mRadius);
 	}
 
-	bool BoundingSphere::Intersects(const Ray& ray, Vector3f* intersection) const
+	bool BoundingSphere::Intersects(const Ray& ray, Vector3* intersection) const
 	{
 		_ASSERT(0); // not implemented
 		return false;
@@ -560,7 +560,7 @@ namespace Sentinel
 
 	bool BoundingSphere::Intersects(const BoundingBox& box) const
 	{
-		Vector3f closestPointInAabb = mCenter.Max(box.GetMinBounds()).Min(box.GetMaxBounds());
+		Vector3 closestPointInAabb = mCenter.Max(box.GetMinBounds()).Min(box.GetMaxBounds());
 
 		float distanceSquared = (closestPointInAabb - mCenter).LengthSquared();
 
@@ -575,8 +575,8 @@ namespace Sentinel
 	}
 
 	BoundingBox::BoundingBox(
-		const Vector3f& minBounds, 
-		const Vector3f& maxBounds)
+		const Vector3& minBounds, 
+		const Vector3& maxBounds)
 	{
 		Set(minBounds, maxBounds);
 	}
@@ -586,9 +586,9 @@ namespace Sentinel
 		Set(verts, count, stride);
 	}
 
-	void BoundingBox::Set(const Matrix4f& matWorld)
+	void BoundingBox::Set(const Matrix4x4& matWorld)
 	{
-		Set(Vector3f(-1, -1, -1), Vector3f(1, 1, 1), matWorld);
+		Set(Vector3(-1, -1, -1), Vector3(1, 1, 1), matWorld);
 	}
 
 #define SET_MIN_MAX_POINT(offset)\
@@ -597,57 +597,57 @@ namespace Sentinel
 	maxPos = maxPos.Max(point);
 
 	void BoundingBox::Set(
-		const Vector3f& minBounds, 
-		const Vector3f& maxBounds, 
-		const Matrix4f& matWorld)
+		const Vector3& minBounds, 
+		const Vector3& maxBounds, 
+		const Matrix4x4& matWorld)
 	{
-		Vector3f center((maxBounds - minBounds) * 0.5f);
-		Vector3f extent(maxBounds - center);
+		Vector3 center((maxBounds - minBounds) * 0.5f);
+		Vector3 extent(maxBounds - center);
 
-		Vector3f minPos(FLT_MAX, FLT_MAX, FLT_MAX);
-		Vector3f maxPos(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+		Vector3 minPos(FLT_MAX, FLT_MAX, FLT_MAX);
+		Vector3 maxPos(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
-		Vector3f point;
-		SET_MIN_MAX_POINT(Vector3f(-extent.x, extent.y, -extent.z));
-		SET_MIN_MAX_POINT(Vector3f(extent.x, extent.y, -extent.z));
-		SET_MIN_MAX_POINT(Vector3f(extent.x, -extent.y, -extent.z));
-		SET_MIN_MAX_POINT(Vector3f(-extent.x, -extent.y, -extent.z));
-		SET_MIN_MAX_POINT(Vector3f(-extent.x, extent.y, extent.z));
-		SET_MIN_MAX_POINT(Vector3f(extent.x, extent.y, extent.z));
-		SET_MIN_MAX_POINT(Vector3f(extent.x, -extent.y, extent.z));
-		SET_MIN_MAX_POINT(Vector3f(-extent.x, -extent.y, extent.z));
+		Vector3 point;
+		SET_MIN_MAX_POINT(Vector3(-extent.x, extent.y, -extent.z));
+		SET_MIN_MAX_POINT(Vector3(extent.x, extent.y, -extent.z));
+		SET_MIN_MAX_POINT(Vector3(extent.x, -extent.y, -extent.z));
+		SET_MIN_MAX_POINT(Vector3(-extent.x, -extent.y, -extent.z));
+		SET_MIN_MAX_POINT(Vector3(-extent.x, extent.y, extent.z));
+		SET_MIN_MAX_POINT(Vector3(extent.x, extent.y, extent.z));
+		SET_MIN_MAX_POINT(Vector3(extent.x, -extent.y, extent.z));
+		SET_MIN_MAX_POINT(Vector3(-extent.x, -extent.y, extent.z));
 
 		// min
 		mPlane[0].mPosition = minPos;
-		mPlane[0].mNormal = Vector3f(1, 0, 0);
+		mPlane[0].mNormal = Vector3(1, 0, 0);
 
 		mPlane[1].mPosition = minPos;
-		mPlane[1].mNormal = Vector3f(0, 1, 0);
+		mPlane[1].mNormal = Vector3(0, 1, 0);
 
 		mPlane[2].mPosition = minPos;
-		mPlane[2].mNormal = Vector3f(0, 0, 1);
+		mPlane[2].mNormal = Vector3(0, 0, 1);
 
 		// max
 		mPlane[3].mPosition = maxPos;
-		mPlane[3].mNormal = Vector3f(-1, 0, 0);
+		mPlane[3].mNormal = Vector3(-1, 0, 0);
 
 		mPlane[4].mPosition = maxPos;
-		mPlane[4].mNormal = Vector3f(0, -1, 0);
+		mPlane[4].mNormal = Vector3(0, -1, 0);
 
 		mPlane[5].mPosition = maxPos;
-		mPlane[5].mNormal = Vector3f(0, 0, -1);
+		mPlane[5].mNormal = Vector3(0, 0, -1);
 	}
 
 	void BoundingBox::Set(const BYTE* verts, UINT count, UINT stride)
 	{
 		//Debug::Log(STREAM("verts count: " << count << "; stride: " << stride));
 
-		Vector3f minPos(FLT_MAX, FLT_MAX, FLT_MAX);
-		Vector3f maxPos(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+		Vector3 minPos(FLT_MAX, FLT_MAX, FLT_MAX);
+		Vector3 maxPos(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
 		for (UINT x = 0; x < count; ++x)
 		{
-			const Vector3f& vert = *(Vector3f*)verts;
+			const Vector3& vert = *(Vector3*)verts;
 
 			//Debug::Log(vert.ToString());
 
@@ -664,17 +664,17 @@ namespace Sentinel
 		Set(minPos, maxPos);
 	}
 
-	const Vector3f& BoundingBox::GetMinBounds() const
+	const Vector3& BoundingBox::GetMinBounds() const
 	{
 		return mPlane[0].mPosition;
 	}
 
-	const Vector3f& BoundingBox::GetMaxBounds() const
+	const Vector3& BoundingBox::GetMaxBounds() const
 	{
 		return mPlane[3].mPosition;
 	}
 
-	bool BoundingBox::Intersects(const Vector3f& point) const
+	bool BoundingBox::Intersects(const Vector3& point) const
 	{
 		for (UINT x = 0; x < 3; ++x)
 			if (point[x] < GetMinBounds()[x] || point[x] > GetMaxBounds()[x])
@@ -688,10 +688,10 @@ namespace Sentinel
 	// Based on code by tavianator
 	// http://tavianator.com/2011/05/fast-branchless-raybounding-box-intersections/
 	//
-	bool BoundingBox::Intersects(const Ray& ray, Vector3f* intersection) const
+	bool BoundingBox::Intersects(const Ray& ray, Vector3* intersection) const
 	{
-		const Vector3f& minBounds = GetMinBounds();
-		const Vector3f& maxBounds = GetMaxBounds();
+		const Vector3& minBounds = GetMinBounds();
+		const Vector3& maxBounds = GetMaxBounds();
 
 		float dx = 1.0f / ray.mDirection.x;
 		float dy = 1.0f / ray.mDirection.y;
@@ -737,45 +737,45 @@ namespace Sentinel
 	BoundingFrustum::BoundingFrustum()
 	{}
 
-	BoundingFrustum::BoundingFrustum(const Vector3f& nearCenter, const Vector3f& farCenter,
-		const Vector2f& nearExtent, const Vector2f& farExtent)
+	BoundingFrustum::BoundingFrustum(const Vector3& nearCenter, const Vector3& farCenter,
+		const Vector2& nearExtent, const Vector2& farExtent)
 	{
 		Set(nearCenter, farCenter, nearExtent, farExtent);
 	}
 
 	BoundingFrustum::BoundingFrustum(
-		const Vector3f& nearCenter, const Vector3f& farCenter,
-		const Vector2f& nearExtent, const Vector2f& farExtent,
-		const Vector3f& forward, const Vector3f& right, const Vector3f& up)
+		const Vector3& nearCenter, const Vector3& farCenter,
+		const Vector2& nearExtent, const Vector2& farExtent,
+		const Vector3& forward, const Vector3& right, const Vector3& up)
 	{
 		Set(nearCenter, farCenter, nearExtent, farExtent, forward, right, up);
 	}
 
 	void BoundingFrustum::Set(
-		const Vector3f& nearCenter, const Vector3f& farCenter,
-		const Vector2f& nearExtent, const Vector2f& farExtent)
+		const Vector3& nearCenter, const Vector3& farCenter,
+		const Vector2& nearExtent, const Vector2& farExtent)
 	{
-		Vector3f forward = (farCenter - nearCenter).NormalizeFast();
-		Vector3f right = (forward.Cross(Vector3f(0, 1, 0))).NormalizeFast();
-		Vector3f up = (forward.Cross(right)).NormalizeFast();
+		Vector3 forward = (farCenter - nearCenter).NormalizeFast();
+		Vector3 right = (forward.Cross(Vector3(0, 1, 0))).NormalizeFast();
+		Vector3 up = (forward.Cross(right)).NormalizeFast();
 
 		Set(nearCenter, farCenter, nearExtent, farExtent, forward, right, up);
 	}
 
 	void BoundingFrustum::Set(
-		const Vector3f& nearCenter, const Vector3f& farCenter,
-		const Vector2f& nearExtent, const Vector2f& farExtent,
-		const Vector3f& forward, const Vector3f& right, const Vector3f& up)
+		const Vector3& nearCenter, const Vector3& farCenter,
+		const Vector2& nearExtent, const Vector2& farExtent,
+		const Vector3& forward, const Vector3& right, const Vector3& up)
 	{
-		Vector3f ntl = nearCenter + up * nearExtent.y - right * nearExtent.x;
-		Vector3f ntr = nearCenter + up * nearExtent.y + right * nearExtent.x;
-		Vector3f nbl = nearCenter - up * nearExtent.y - right * nearExtent.x;
-		Vector3f nbr = nearCenter - up * nearExtent.y + right * nearExtent.x;
+		Vector3 ntl = nearCenter + up * nearExtent.y - right * nearExtent.x;
+		Vector3 ntr = nearCenter + up * nearExtent.y + right * nearExtent.x;
+		Vector3 nbl = nearCenter - up * nearExtent.y - right * nearExtent.x;
+		Vector3 nbr = nearCenter - up * nearExtent.y + right * nearExtent.x;
 
-		Vector3f ftl = farCenter + up * farExtent.y - right * farExtent.x;
-		Vector3f ftr = farCenter + up * farExtent.y + right * farExtent.x;
-		Vector3f fbl = farCenter - up * farExtent.y - right * farExtent.x;
-		Vector3f fbr = farCenter - up * farExtent.y + right * farExtent.x;
+		Vector3 ftl = farCenter + up * farExtent.y - right * farExtent.x;
+		Vector3 ftr = farCenter + up * farExtent.y + right * farExtent.x;
+		Vector3 fbl = farCenter - up * farExtent.y - right * farExtent.x;
+		Vector3 fbr = farCenter - up * farExtent.y + right * farExtent.x;
 
 		// TOP
 		mPlane[0].mPosition = ntl;
@@ -802,13 +802,13 @@ namespace Sentinel
 		mPlane[5].mNormal = -forward;
 	}
 
-	bool BoundingFrustum::Intersects(const Vector3f& point) const
+	bool BoundingFrustum::Intersects(const Vector3& point) const
 	{
 		_ASSERT(0); // not implemented
 		return false;
 	}
 
-	bool BoundingFrustum::Intersects(const Ray& ray, Vector3f* intersection) const
+	bool BoundingFrustum::Intersects(const Ray& ray, Vector3* intersection) const
 	{
 		_ASSERT(0); // not implemented
 		return false;
@@ -822,14 +822,14 @@ namespace Sentinel
 
 	bool BoundingFrustum::Intersects(const BoundingBox& box) const
 	{
-		const Vector3f& vmin = box.GetMinBounds();
-		const Vector3f& vmax = box.GetMaxBounds();
+		const Vector3& vmin = box.GetMinBounds();
+		const Vector3& vmax = box.GetMaxBounds();
 
 		for (int i = 0; i < 6; ++i)
 		{
-			Vector3f pv(vmax);	// positive vertex
+			Vector3 pv(vmax);	// positive vertex
 
-			const Vector3f& normal = mPlane[i].mNormal;
+			const Vector3& normal = mPlane[i].mNormal;
 
 			// X axis
 			if (normal.x < 0)

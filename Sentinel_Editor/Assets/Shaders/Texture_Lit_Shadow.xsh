@@ -4,7 +4,7 @@
 //
 cbuffer Uniforms
 {
-	matrix _WVP;
+	matrix _WorldViewProj;
 	matrix _World;
 
 	float3 _LightPos;
@@ -49,7 +49,7 @@ VSOutput VS_Main(VSInput input)
 	VSOutput output;
 
 	// Position
-	output.Position = mul(_WVP, input.Position);
+	output.Position = mul(_WorldViewProj, input.Position);
 	float3 worldPos = mul(_World, input.Position).xyz;
 
 	// Light direction
@@ -116,7 +116,7 @@ float4 PS_Main(VSOutput input) :SV_Target
 #ifdef VERSION_GL
 #ifdef VERTEX_SHADER
 
-uniform mat4 _WVP;
+uniform mat4 _WorldViewProj;
 uniform mat4 _World;
 
 uniform vec3 _LightPos;
@@ -134,7 +134,7 @@ out vec3 vLightDir;
 
 void main()
 {
-	gl_Position = _WVP * vec4(Position, 1);
+	gl_Position = _WorldViewProj * vec4(Position, 1);
 	vWorldPos = (_World * vec4(Position, 1)).xyz;
 
 	// Light direction

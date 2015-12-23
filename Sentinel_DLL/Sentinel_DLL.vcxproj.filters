@@ -87,21 +87,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Engine\src\Vector4f.h">
-      <Filter>Source Files\Sentinel_Engine\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\Matrix4f.h">
-      <Filter>Source Files\Sentinel_Engine\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\Quatf.h">
-      <Filter>Source Files\Sentinel_Engine\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\Vector2f.h">
-      <Filter>Source Files\Sentinel_Engine\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\src\Vector3f.h">
-      <Filter>Source Files\Sentinel_Engine\Math</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\src\Util.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClInclude>
@@ -408,23 +393,23 @@
     <ClInclude Include="..\Engine\src\Profile.h">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\src\Vector4.h">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Vector3.h">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Vector2.h">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Quaternion.h">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\src\Matrix4x4.h">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Engine\src\Matrix4f.cpp">
-      <Filter>Source Files\Sentinel_Engine\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\Quatf.cpp">
-      <Filter>Source Files\Sentinel_Engine\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\Vector2f.cpp">
-      <Filter>Source Files\Sentinel_Engine\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\Vector3f.cpp">
-      <Filter>Source Files\Sentinel_Engine\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\src\Vector4f.cpp">
-      <Filter>Source Files\Sentinel_Engine\Math</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\src\Util.cpp">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
     </ClCompile>
@@ -745,6 +730,21 @@
     </ClCompile>
     <ClCompile Include="..\Engine\src\Hash.cpp">
       <Filter>Source Files\Sentinel_Engine\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Vector4.cpp">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Vector3.cpp">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Vector2.cpp">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Quaternion.cpp">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\src\Matrix4x4.cpp">
+      <Filter>Source Files\Sentinel_Engine\Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

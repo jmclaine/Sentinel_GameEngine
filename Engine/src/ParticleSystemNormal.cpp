@@ -82,7 +82,7 @@ namespace Sentinel
 
 			for( UINT x = 0; x < maxParticles; ++x )
 			{
-				builder.mVertex.push_back( MeshBuilder::Vertex( Vector3f( 0.0f, 0.0f, 0.0f )));
+				builder.mVertex.push_back( MeshBuilder::Vertex( Vector3( 0.0f, 0.0f, 0.0f )));
 			}
 
 			builder.mPrimitive = PrimitiveFormat::POINTS;
@@ -120,14 +120,14 @@ namespace Sentinel
 				*(UINT*)verts = particle.mColor.ToUINT();
 				verts += sizeof( UINT );
 
-				static Matrix4f matrixParticle;
-				matrixParticle.World( particle.mPosition, Quatf( particle.mRotation ), particle.mScale );
+				static Matrix4x4 matrixParticle;
+				matrixParticle.World( particle.mPosition, Quaternion( particle.mRotation ), particle.mScale );
 				
-				static Matrix4f matrixBillboard;
-				matrixBillboard.BillboardAxis( mMesh->mMatrixWorld.Transform( particle.mPosition ), transform->mPosition, Vector3f( 0, 1, 0 ));
+				static Matrix4x4 matrixBillboard;
+				matrixBillboard.BillboardAxis( mMesh->mMatrixWorld.Transform( particle.mPosition ), transform->mPosition, Vector3( 0, 1, 0 ));
 
-				*(Matrix4f*)verts = mGameWorld->mCurrentCamera->GetMatrixWVP() * mMesh->mMatrixWorld * matrixParticle * matrixBillboard;
-				verts += sizeof( Matrix4f );
+				*(Matrix4x4*)verts = mGameWorld->mCurrentCamera->GetMatrixWVP() * mMesh->mMatrixWorld * matrixParticle * matrixBillboard;
+				verts += sizeof( Matrix4x4 );
 			}
 
 			mMesh->mVertexBuffer->Unlock();

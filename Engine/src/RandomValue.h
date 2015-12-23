@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Vector2f.h"
-#include "Vector3f.h"
-#include "Vector4f.h"
+#include "Vector2.h"
+#include "Vector3.h"
+#include "Vector4.h"
 #include "ColorRGBA.h"
 
 namespace Sentinel
@@ -39,24 +39,24 @@ namespace Sentinel
 		return minValue + (maxValue - minValue) * (rand() / static_cast<double>(RAND_MAX));
 	}
 
-	inline Vector2f RandomValue(const Vector2f& minValue, const Vector2f& maxValue)
+	inline Vector2 RandomValue(const Vector2& minValue, const Vector2& maxValue)
 	{
-		return Vector2f(
+		return Vector2(
 			RandomValue(minValue.x, maxValue.x), \
 			RandomValue(minValue.y, maxValue.y));
 	}
 
-	inline Vector3f RandomValue(const Vector3f& minValue, const Vector3f& maxValue)
+	inline Vector3 RandomValue(const Vector3& minValue, const Vector3& maxValue)
 	{
-		return Vector3f(
+		return Vector3(
 			RandomValue(minValue.x, maxValue.x), \
 			RandomValue(minValue.y, maxValue.y), \
 			RandomValue(minValue.z, maxValue.z));
 	}
 
-	inline Vector4f RandomValue(const Vector4f& minValue, const Vector4f& maxValue)
+	inline Vector4 RandomValue(const Vector4& minValue, const Vector4& maxValue)
 	{
-		return Vector4f(
+		return Vector4(
 			RandomValue(minValue.x, maxValue.x), \
 			RandomValue(minValue.y, maxValue.y), \
 			RandomValue(minValue.z, maxValue.z),

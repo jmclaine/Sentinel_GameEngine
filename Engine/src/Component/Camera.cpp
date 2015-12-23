@@ -69,22 +69,22 @@ namespace Component
 		return mTransform;
 	}
 
-	const Matrix4f& Camera::GetMatrixWorld()
+	const Matrix4x4& Camera::GetMatrixWorld()
 	{
 		return mTransform->GetMatrixWorld();
 	}
 
-	const Matrix4f& Camera::GetMatrixView()
+	const Matrix4x4& Camera::GetMatrixView()
 	{
 		return mMatrixView;
 	}
 
-	const Matrix4f& Camera::GetMatrixProjection()
+	const Matrix4x4& Camera::GetMatrixProjection()
 	{
 		return mMatrixProjection;
 	}
 
-	const Matrix4f& Camera::GetMatrixWVP()
+	const Matrix4x4& Camera::GetMatrixWVP()
 	{
 		return mMatrixWVP;
 	}

@@ -4,7 +4,7 @@
 //
 cbuffer Uniforms
 {
-	matrix _WVP;
+	matrix _WorldViewProj;
 	matrix _World;
 
 	float3 _LightPos;
@@ -52,7 +52,7 @@ VSOutput VS_Main(VSInput input)
 {
 	VSOutput output;
 
-	output.Position = mul(_WVP, input.Position);
+	output.Position = mul(_WorldViewProj, input.Position);
 	float3 worldPos = mul(_World, input.Position).xyz;
 
 	// Transform light direction into tangent space.
@@ -129,7 +129,7 @@ float4 PS_Main(VSOutput input) :SV_Target
 #ifdef VERSION_GL
 #ifdef VERTEX_SHADER
 
-uniform mat4 _WVP;
+uniform mat4 _WorldViewProj;
 uniform mat4 _World;
 
 uniform vec3 _LightPos;
@@ -144,30 +144,23 @@ out vec2 vTexCoord0;
 out vec3 vWorldPos;
 out vec3 vCameraDir;
 out vec3 vLightDir;
+out mat3 vTBN;
 
 void main()
 {
-	gl_Position = _WVP * vec4(Position, 1);
+	gl_Position = _WorldViewProj * vec4(Position, 1);
 	vWorldPos = (_World * vec4(Position, 1)).xyz;
 
-	// Transform light direction into tangent space.
-	vec3 normal = (_World * vec4(Normal.xyz, 0)).xyz;
-	vec3 tangent = (_World * vec4(Tangent.xyz, 0)).xyz;
-	vec3 binormal = cross(normal, tangent.xyz) * Tangent.w;
+	vec3 normal = normalize((_World * vec4(Normal.xyz, 0)).xyz);
+	vec3 tangent = normalize((_World * vec4(Tangent.xyz, 0)).xyz);
+	vec3 bitangent = normalize(cross(normal, tangent.xyz) * Tangent.w);
 
-	mat3 matTBN = mat3(
-		tangent.x, binormal.x, normal.x,
-		tangent.y, binormal.y, normal.y,
-		tangent.z, binormal.z, normal.z);
+	vTBN = (mat3(tangent, bitangent, normal));
 
-	// Light Position
-	vLightDir = matTBN * (_LightPos - vWorldPos);
+	vLightDir = (_LightPos - vWorldPos);
+	vCameraDir = (_CameraPos - vWorldPos);
 
-	// Camera direction
-	vCameraDir = matTBN * (_CameraPos - vWorldPos);
-
-	// Texture color
-	vTexCoord0 = TexCoord0;
+	vTexCoord0 = vec2(TexCoord0.x, TexCoord0.y);
 }
 
 #endif
@@ -184,10 +177,14 @@ uniform float _SpecComp;
 uniform vec3 _LightColor;
 uniform vec4 _LightAttn;
 
+//uniform vec3 _LightPos;
+//uniform vec3 _CameraPos;
+
 in vec2 vTexCoord0;
 in vec3 vWorldPos;
 in vec3 vCameraDir;
 in vec3 vLightDir;
+in mat3 vTBN;
 
 out vec4 vFragColor;
 
@@ -209,10 +206,9 @@ vec3 GetColor(vec3 lightDir, vec3 cameraDir, vec3 normal, vec3 color, vec4 attn)
 		float attenuation = clamp(1.0 - d*d / (r*r), 0.0, 1.0);
 		attenuation *= attenuation;
 
-		// Specular
-		vec3 specularFinal = max(_Specular.rgb * pow(clamp(dot(normal, normalize(lightDir + cameraDir)), 0.0, 1.0), _SpecComp), 0.0);
+		vec3 specular = max(_Specular.rgb * pow(clamp(dot(normal, normalize(lightDir + cameraDir)), 0.0, 1.0), _SpecComp), 0.0);
 
-		return clamp((_Diffuse.rgb * intensity + specularFinal.rgb) * attenuation * color, 0.0, 1.0);
+		return clamp((_Diffuse.rgb * intensity + specular.rgb) * attenuation * color, 0.0, 1.0);
 	}
 	else return vec3(0, 0, 0);
 }
@@ -220,19 +216,13 @@ vec3 GetColor(vec3 lightDir, vec3 cameraDir, vec3 normal, vec3 color, vec4 attn)
 void main()
 {
 	vec3 lightDir = normalize(vLightDir);
-
-	// Camera Direction
 	vec3 cameraDir = normalize(vCameraDir);
 
-	// Normal
-	vec3 normal = normalize(texture2D(_Texture1, vTexCoord0).xyz * 2.0 - 1.0);
+	vec3 normal = vTBN * normalize((texture2D(_Texture1, vTexCoord0.xy).rgb * 2.0 - 1.0));
 
-	// Attenuation
 	vec3 color0 = GetColor(lightDir, cameraDir, normal, _LightColor, _LightAttn);
 
-	// Final fragment color
 	vFragColor = (_Ambient + vec4(color0, 0)) * texture2D(_Texture0, vTexCoord0);
 }
-
 #endif
 #endif

@@ -377,8 +377,11 @@ namespace Sentinel
 		//
 		if (cbuffer)
 		{
-			if (CreateUniform("_WVP", cbuffer))
-				mUniforms.push_back(ShaderUniform::WVP);
+			if (CreateUniform("_WorldViewProj", cbuffer))
+				mUniforms.push_back(ShaderUniform::WORLD_VIEW_PROJ);
+
+			if (CreateUniform("_WorldView", cbuffer))
+				mUniforms.push_back(ShaderUniform::WORLD_VIEW);
 
 			if (CreateUniform("_World", cbuffer))
 				mUniforms.push_back(ShaderUniform::WORLD);

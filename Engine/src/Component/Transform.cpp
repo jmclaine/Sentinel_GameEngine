@@ -10,7 +10,7 @@ namespace Component
 
 	Transform::Transform() :
 		mParentTransform(NULL),
-		mScale(Vector3f(1, 1, 1))
+		mScale(Vector3(1, 1, 1))
 	{}
 
 	Transform::~Transform()
@@ -54,12 +54,12 @@ namespace Component
 			owner->mTransform = this;
 	}
 
-	const Matrix4f& Transform::GetMatrixWorld() const
+	const Matrix4x4& Transform::GetMatrixWorld() const
 	{
 		return mMatrixWorld;
 	}
 
-	const Matrix4f& Transform::GetMatrixWorld(const Vector3f& offset)
+	const Matrix4x4& Transform::GetMatrixWorld(const Vector3& offset)
 	{
 		mMatrixWorld.World(mPosition, mOrientation, mScale, offset);
 

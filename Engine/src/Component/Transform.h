@@ -1,9 +1,9 @@
 #pragma once
 
 #include "GameComponent.h"
-#include "Matrix4f.h"
-#include "Vector3f.h"
-#include "Quatf.h"
+#include "Matrix4x4.h"
+#include "Vector3.h"
+#include "Quaternion.h"
 
 namespace Sentinel {
 namespace Component
@@ -16,13 +16,13 @@ namespace Component
 
 		Transform* mParentTransform;
 
-		Matrix4f mMatrixWorld;
+		Matrix4x4 mMatrixWorld;
 
 	public:
 
-		Vector3f mPosition;
-		Quatf mOrientation;
-		Vector3f mScale;
+		Vector3 mPosition;
+		Quaternion mOrientation;
+		Vector3 mScale;
 
 		///////////////////////////////////
 
@@ -41,8 +41,8 @@ namespace Component
 
 		virtual void SetOwner(GameObject* owner);
 
-		const Matrix4f&	GetMatrixWorld() const;
-		const Matrix4f&	GetMatrixWorld(const Vector3f& offset);
+		const Matrix4x4&	GetMatrixWorld() const;
+		const Matrix4x4&	GetMatrixWorld(const Vector3& offset);
 
 		///////////////////////////////////
 

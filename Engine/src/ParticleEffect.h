@@ -3,7 +3,7 @@
 #include "Sentinel.h"
 #include "Serializable.h"
 #include "ColorRGBA.h"
-#include "Vector3f.h"
+#include "Vector3.h"
 
 namespace Sentinel
 {
@@ -162,7 +162,7 @@ namespace Sentinel
 
 	protected:
 
-		Vector3f mPosition;
+		Vector3 mPosition;
 
 		//////////////////////////////////////
 
@@ -170,7 +170,7 @@ namespace Sentinel
 
 	public:
 
-		PositionEffect(float startTime, const Vector3f& position);
+		PositionEffect(float startTime, const Vector3& position);
 
 		//////////////////////////////////////
 
@@ -184,7 +184,7 @@ namespace Sentinel
 	protected:
 
 		// uses mPosition as min
-		Vector3f mMaxPosition;
+		Vector3 mMaxPosition;
 
 		//////////////////////////////////////
 
@@ -192,7 +192,7 @@ namespace Sentinel
 
 	public:
 
-		AreaPositionEffect(float startTime, const Vector3f& minPosition, const Vector3f& maxPosition);
+		AreaPositionEffect(float startTime, const Vector3& minPosition, const Vector3& maxPosition);
 
 		//////////////////////////////////////
 
@@ -213,7 +213,7 @@ namespace Sentinel
 
 	public:
 
-		SpherePositionEffect(float startTime, const Vector3f& position, float radius);
+		SpherePositionEffect(float startTime, const Vector3& position, float radius);
 
 		//////////////////////////////////////
 
@@ -229,7 +229,7 @@ namespace Sentinel
 
 	protected:
 
-		Vector3f mRotation;
+		Vector3 mRotation;
 
 		//////////////////////////////////////
 
@@ -237,7 +237,7 @@ namespace Sentinel
 
 	public:
 
-		RotationEffect(float startTime, const Vector3f& rotation);
+		RotationEffect(float startTime, const Vector3& rotation);
 
 		//////////////////////////////////////
 
@@ -251,7 +251,7 @@ namespace Sentinel
 	protected:
 
 		// uses mRotation as min
-		Vector3f mMaxRotation;
+		Vector3 mMaxRotation;
 
 		//////////////////////////////////////
 
@@ -259,7 +259,7 @@ namespace Sentinel
 
 	public:
 
-		RandomRotationEffect(float startTime, const Vector3f& minRotation, const Vector3f& maxRotation);
+		RandomRotationEffect(float startTime, const Vector3& minRotation, const Vector3& maxRotation);
 
 		//////////////////////////////////////
 
@@ -275,7 +275,7 @@ namespace Sentinel
 
 	protected:
 
-		Vector3f mScale;
+		Vector3 mScale;
 
 		//////////////////////////////////////
 
@@ -283,7 +283,7 @@ namespace Sentinel
 
 	public:
 
-		ScaleEffect(float startTime, const Vector3f& scale);
+		ScaleEffect(float startTime, const Vector3& scale);
 
 		//////////////////////////////////////
 
@@ -296,7 +296,7 @@ namespace Sentinel
 
 	protected:
 
-		Vector3f mMaxScale;
+		Vector3 mMaxScale;
 
 		//////////////////////////////////////
 
@@ -304,7 +304,7 @@ namespace Sentinel
 
 	public:
 
-		RandomScaleEffect(float startTime, const Vector3f& minScale, const Vector3f& maxScale);
+		RandomScaleEffect(float startTime, const Vector3& minScale, const Vector3& maxScale);
 
 		//////////////////////////////////////
 
@@ -326,7 +326,7 @@ namespace Sentinel
 	public:
 
 		FadeToScaleEffect(float startTime, float endTime, float scale);
-		FadeToScaleEffect(float startTime, float endTime, const Vector3f& scale);
+		FadeToScaleEffect(float startTime, float endTime, const Vector3& scale);
 
 		//////////////////////////////////////
 
@@ -344,7 +344,7 @@ namespace Sentinel
 
 	protected:
 
-		Vector3f mVelocity;
+		Vector3 mVelocity;
 
 		//////////////////////////////////////
 
@@ -352,7 +352,7 @@ namespace Sentinel
 
 	public:
 
-		VelocityEffect(float startTime, const Vector3f& velocity);
+		VelocityEffect(float startTime, const Vector3& velocity);
 
 		//////////////////////////////////////
 
@@ -366,7 +366,7 @@ namespace Sentinel
 	protected:
 
 		// uses mVelocity as min
-		Vector3f mMaxVelocity;
+		Vector3 mMaxVelocity;
 
 		//////////////////////////////////////
 
@@ -374,7 +374,7 @@ namespace Sentinel
 
 	public:
 
-		RandomVelocityEffect(float startTime, const Vector3f& minVelocity, const Vector3f& maxVelocity);
+		RandomVelocityEffect(float startTime, const Vector3& minVelocity, const Vector3& maxVelocity);
 
 		//////////////////////////////////////
 
@@ -390,7 +390,7 @@ namespace Sentinel
 
 	protected:
 
-		Vector3f mAngularVelocity;
+		Vector3 mAngularVelocity;
 
 		//////////////////////////////////////
 
@@ -398,7 +398,7 @@ namespace Sentinel
 
 	public:
 
-		AngularVelocityEffect(float startTime, const Vector3f& angularVelocity);
+		AngularVelocityEffect(float startTime, const Vector3& angularVelocity);
 
 		//////////////////////////////////////
 
@@ -412,7 +412,7 @@ namespace Sentinel
 	protected:
 
 		// uses mAngularVelocity as min
-		Vector3f mMaxAngularVelocity;
+		Vector3 mMaxAngularVelocity;
 
 		//////////////////////////////////////
 
@@ -420,7 +420,7 @@ namespace Sentinel
 
 	public:
 
-		RandomAngularVelocityEffect(float startTime, const Vector3f& minAngularVelocity, const Vector3f& maxAngularVelocity);
+		RandomAngularVelocityEffect(float startTime, const Vector3& minAngularVelocity, const Vector3& maxAngularVelocity);
 
 		//////////////////////////////////////
 
@@ -436,7 +436,7 @@ namespace Sentinel
 
 	protected:
 
-		Vector3f mAccel;
+		Vector3 mAccel;
 
 		//////////////////////////////////////
 
@@ -444,7 +444,7 @@ namespace Sentinel
 
 	public:
 
-		AccelEffect(float startTime, const Vector3f& accel);
+		AccelEffect(float startTime, const Vector3& accel);
 
 		//////////////////////////////////////
 
@@ -458,7 +458,7 @@ namespace Sentinel
 	protected:
 
 		// uses mAccel as min
-		Vector3f mMaxAccel;
+		Vector3 mMaxAccel;
 
 		//////////////////////////////////////
 
@@ -466,7 +466,7 @@ namespace Sentinel
 
 	public:
 
-		RandomAccelEffect(float startTime, const Vector3f& minAccel, const Vector3f& maxAccel);
+		RandomAccelEffect(float startTime, const Vector3& minAccel, const Vector3& maxAccel);
 
 		//////////////////////////////////////
 
@@ -482,7 +482,7 @@ namespace Sentinel
 
 	protected:
 
-		Vector3f mAngularAccel;
+		Vector3 mAngularAccel;
 
 		//////////////////////////////////////
 
@@ -490,7 +490,7 @@ namespace Sentinel
 
 	public:
 
-		AngularAccelEffect(float startTime, const Vector3f& angularAccel);
+		AngularAccelEffect(float startTime, const Vector3& angularAccel);
 
 		//////////////////////////////////////
 
@@ -504,7 +504,7 @@ namespace Sentinel
 	protected:
 
 		// uses mAngularAccel as min
-		Vector3f mMaxAngularAccel;
+		Vector3 mMaxAngularAccel;
 
 		//////////////////////////////////////
 
@@ -512,7 +512,7 @@ namespace Sentinel
 
 	public:
 
-		RandomAngularAccelEffect(float startTime, const Vector3f& minAngularAccel, const Vector3f& maxAngularAccel);
+		RandomAngularAccelEffect(float startTime, const Vector3& minAngularAccel, const Vector3& maxAngularAccel);
 
 		//////////////////////////////////////
 

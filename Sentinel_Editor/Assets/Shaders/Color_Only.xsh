@@ -4,7 +4,7 @@
 //
 cbuffer Uniforms
 {
-    matrix _WVP;
+    matrix _WorldViewProj;
 
 	float4 _Ambient;
 }
@@ -26,7 +26,7 @@ VSOutput VS_Main(VSInput input)
 {
 	VSOutput output;
 
-	output.Position = mul(_WVP, float4(input.Position, 1));
+	output.Position = mul(_WorldViewProj, float4(input.Position, 1));
 	
 	return output;
 }
@@ -46,13 +46,13 @@ float4 PS_Main(VSOutput input):SV_Target
 #ifdef VERSION_GL
 #ifdef VERTEX_SHADER
 
-uniform mat4 _WVP;
+uniform mat4 _WorldViewProj;
 
 in vec4 Position;
 
 void main()
 {
-	gl_Position = _WVP * Position;
+	gl_Position = _WorldViewProj * Position;
 }
 
 #endif

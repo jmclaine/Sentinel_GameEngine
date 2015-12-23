@@ -78,7 +78,7 @@ namespace Sentinel
 			std::shared_ptr<Font> font(new Font());
 
 			font->mSprite = sprite;
-			font->mSize = Vector2f((float)glyphWidth, (float)glyphHeight);
+			font->mSize = Vector2((float)glyphWidth, (float)glyphHeight);
 
 			// 16x16 cells.
 			//
@@ -190,7 +190,7 @@ namespace Sentinel
 			return font;
 		}
 
-		void Draw(char text, const ColorRGBA& color, const Matrix4f& matWorld)
+		void Draw(char text, const ColorRGBA& color, const Matrix4x4& matWorld)
 		{
 			mSpriteSystem->mSprite = mFont->mSprite;
 			mSpriteSystem->mMaterial = mFont->mMaterial;

@@ -85,6 +85,7 @@
     <None Include="Assets\Shaders\GUI_Mesh.xsh" />
     <None Include="Assets\Shaders\Line.xsh" />
     <None Include="Assets\Shaders\Normal_Map.xsh" />
+    <None Include="Assets\Shaders\Normal_Map_Shadow.xsh" />
     <None Include="Assets\Shaders\RT_Color.xsh" />
     <None Include="Assets\Shaders\RT_Cube_Depth.xsh" />
     <None Include="Assets\Shaders\Sprite.xsh" />

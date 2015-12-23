@@ -1,53 +1,53 @@
 #include "MathUtil.h"
-#include "Matrix4f.h"
-#include "Vector2f.h"
-#include "Vector3f.h"
-#include "Vector4f.h"
-#include "Quatf.h"
+#include "Matrix4x4.h"
+#include "Vector2.h"
+#include "Vector3.h"
+#include "Vector4.h"
+#include "Quaternion.h"
 
 namespace Sentinel
 {
-	const Matrix4f Matrix4f::IDENTITY = Matrix4f();
+	const Matrix4x4 Matrix4x4::IDENTITY = Matrix4x4();
 
-	Matrix4f::Matrix4f()
+	Matrix4x4::Matrix4x4()
 	{
 		Identity();
 	}
 
-	Matrix4f::Matrix4f(float* arr)
+	Matrix4x4::Matrix4x4(float* arr)
 	{
 		for (int x = 0; x < 16; ++x)
 			m[x] = arr[x];
 	}
 
-	Matrix4f::Matrix4f(const Quatf& q)
+	Matrix4x4::Matrix4x4(const Quaternion& q)
 	{
 		Rotate(q);
 	}
 
-	float Matrix4f::operator [] (int i) const
+	float Matrix4x4::operator [] (int i) const
 	{
 		return m[i];
 	}
 
-	float& Matrix4f::operator [] (int i)
+	float& Matrix4x4::operator [] (int i)
 	{
 		return m[i];
 	}
 
-	float* Matrix4f::Ptr()
+	float* Matrix4x4::Ptr()
 	{
 		return static_cast<float*>(m);
 	}
 
-	Matrix4f Matrix4f::operator + (const Matrix4f& mat) const
+	Matrix4x4 Matrix4x4::operator + (const Matrix4x4& mat) const
 	{
 		return Add(mat);
 	}
 
-	Matrix4f Matrix4f::Add(const Matrix4f& mat) const
+	Matrix4x4 Matrix4x4::Add(const Matrix4x4& mat) const
 	{
-		Matrix4f result;
+		Matrix4x4 result;
 
 		for (int x = 0; x < 16; ++x)
 		{
@@ -57,14 +57,14 @@ namespace Sentinel
 		return result;
 	}
 
-	Matrix4f Matrix4f::operator * (const Matrix4f& mat) const
+	Matrix4x4 Matrix4x4::operator * (const Matrix4x4& mat) const
 	{
 		return Mul(mat);
 	}
 
-	Matrix4f Matrix4f::Mul(const Matrix4f& mat) const
+	Matrix4x4 Matrix4x4::Mul(const Matrix4x4& mat) const
 	{
-		Matrix4f result;
+		Matrix4x4 result;
 
 		result.m[0] = m[0] * mat.m[0] + m[4] * mat.m[1] + m[8] * mat.m[2] + m[12] * mat.m[3];
 		result.m[1] = m[1] * mat.m[0] + m[5] * mat.m[1] + m[9] * mat.m[2] + m[13] * mat.m[3];
@@ -89,12 +89,12 @@ namespace Sentinel
 		return result;
 	}
 
-	void Matrix4f::Zero()
+	void Matrix4x4::Zero()
 	{
 		memset(m, 0, sizeof(float) * 16);
 	}
 
-	void Matrix4f::Identity()
+	void Matrix4x4::Identity()
 	{
 		Zero();
 
@@ -104,7 +104,7 @@ namespace Sentinel
 		m[15] = 1.0f;
 	};
 
-	void Matrix4f::Translate(const Vector3f& v)
+	void Matrix4x4::Translate(const Vector3& v)
 	{
 		Identity();
 
@@ -113,7 +113,7 @@ namespace Sentinel
 		m[14] = v.z;
 	}
 
-	void Matrix4f::Rotate(const Quatf& q)
+	void Matrix4x4::Rotate(const Quaternion& q)
 	{
 		Zero();
 
@@ -146,14 +146,14 @@ namespace Sentinel
 		m[15] = 1.0f;
 	}
 
-	void Matrix4f::Rotate(const Vector3f& v)
+	void Matrix4x4::Rotate(const Vector3& v)
 	{
-		Rotate(Quatf(0, 1, 0, v.y).AxisAngle() * Quatf(1, 0, 0, v.x).AxisAngle() * Quatf(0, 0, 1, v.z).AxisAngle());
+		Rotate(Quaternion(0, 1, 0, v.y).AxisAngle() * Quaternion(1, 0, 0, v.x).AxisAngle() * Quaternion(0, 0, 1, v.z).AxisAngle());
 	}
 
-	void Matrix4f::RotateX(float degrees)
+	void Matrix4x4::RotateX(float degrees)
 	{
-		Rotate(Quatf(1, 0, 0, degrees).AxisAngle());
+		Rotate(Quaternion(1, 0, 0, degrees).AxisAngle());
 
 		/*
 		degrees *= (Real)DEGREES_TO_RADIANS;
@@ -170,9 +170,9 @@ namespace Sentinel
 		*/
 	}
 
-	void Matrix4f::RotateY(float degrees)
+	void Matrix4x4::RotateY(float degrees)
 	{
-		Rotate(Quatf(0, 1, 0, degrees).AxisAngle());
+		Rotate(Quaternion(0, 1, 0, degrees).AxisAngle());
 
 		/*
 		degrees *= (Real)DEGREES_TO_RADIANS;
@@ -189,9 +189,9 @@ namespace Sentinel
 		*/
 	}
 
-	void Matrix4f::RotateZ(float degrees)
+	void Matrix4x4::RotateZ(float degrees)
 	{
-		Rotate(Quatf(0, 0, 1, degrees).AxisAngle());
+		Rotate(Quaternion(0, 0, 1, degrees).AxisAngle());
 
 		/*
 		degrees *= (Real)DEGREES_TO_RADIANS;
@@ -208,12 +208,12 @@ namespace Sentinel
 		*/
 	}
 
-	void Matrix4f::Scale(float _scale)
+	void Matrix4x4::Scale(float _scale)
 	{
-		Scale(Vector3f(_scale, _scale, _scale));
+		Scale(Vector3(_scale, _scale, _scale));
 	}
 
-	void Matrix4f::Scale(const Vector3f& _scale)
+	void Matrix4x4::Scale(const Vector3& _scale)
 	{
 		Zero();
 
@@ -223,7 +223,7 @@ namespace Sentinel
 		m[15] = 1.0f;
 	}
 
-	void Matrix4f::Billboard(const Vector3f& i, const Vector3f& j, const Vector3f& k, const Vector3f& pos, bool transpose)
+	void Matrix4x4::Billboard(const Vector3& i, const Vector3& j, const Vector3& k, const Vector3& pos, bool transpose)
 	{
 		m[0] = i.x;
 		m[1] = i.y;
@@ -249,9 +249,9 @@ namespace Sentinel
 			Transpose();
 	}
 
-	void Matrix4f::LookAtView(const Vector3f& pos, const Vector3f& lookAt, const Vector3f& up)
+	void Matrix4x4::LookAtView(const Vector3& pos, const Vector3& lookAt, const Vector3& up)
 	{
-		Vector3f i, j, k;
+		Vector3 i, j, k;
 
 		// Forward
 		k = (pos - lookAt).Normalize();
@@ -263,7 +263,7 @@ namespace Sentinel
 		// Up
 		j = k.Cross(i);
 
-		Matrix4f matTrans;
+		Matrix4x4 matTrans;
 		matTrans.Translate(-pos);
 
 		Billboard(i, j, k, -pos, true);
@@ -271,9 +271,9 @@ namespace Sentinel
 		*this = *this * matTrans;
 	}
 
-	void Matrix4f::BillboardAxis(const Vector3f& posBB, const Vector3f& posCamera, const Vector3f& up)
+	void Matrix4x4::BillboardAxis(const Vector3& posBB, const Vector3& posCamera, const Vector3& up)
 	{
-		Vector3f i, j, k;
+		Vector3 i, j, k;
 
 		j = up.Normalize();
 
@@ -284,9 +284,9 @@ namespace Sentinel
 		Billboard(i, j, k, posBB, false);
 	}
 
-	void Matrix4f::BillboardWorld(const Vector3f& posBB, const Vector3f& posCamera, const Vector3f& up)
+	void Matrix4x4::BillboardWorld(const Vector3& posBB, const Vector3& posCamera, const Vector3& up)
 	{
-		Vector3f i, j, k;
+		Vector3 i, j, k;
 
 		// Forward
 		k = (posCamera - posBB).Normalize();
@@ -301,7 +301,7 @@ namespace Sentinel
 		Billboard(i, j, k, posBB, false);
 	}
 
-	void Matrix4f::ProjectionOrthographic(float windowWidth, float windowHeight)
+	void Matrix4x4::ProjectionOrthographic(float windowWidth, float windowHeight)
 	{
 		Zero();
 
@@ -315,7 +315,7 @@ namespace Sentinel
 		m[15] = 1.0f;
 	}
 
-	void Matrix4f::ProjectionPerspective(float windowWidth, float windowHeight, float nearZ, float farZ, float FOV)
+	void Matrix4x4::ProjectionPerspective(float windowWidth, float windowHeight, float nearZ, float farZ, float FOV)
 	{
 		Zero();
 
@@ -330,13 +330,13 @@ namespace Sentinel
 		m[15] = 0.0f;
 	}
 
-	void Matrix4f::World(const Vector3f& position, const Quatf& orientation, const Vector3f& scale)
+	void Matrix4x4::World(const Vector3& position, const Quaternion& orientation, const Vector3& scale)
 	{
 		// TODO: Do all matrix math without using matrices.
 		//
-		static Matrix4f TRANSLATION;
-		static Matrix4f ROTATION;
-		static Matrix4f SCALE;
+		static Matrix4x4 TRANSLATION;
+		static Matrix4x4 ROTATION;
+		static Matrix4x4 SCALE;
 
 		TRANSLATION.Translate(position);
 		ROTATION.Rotate(orientation);
@@ -345,14 +345,14 @@ namespace Sentinel
 		*this = TRANSLATION * ROTATION * SCALE;
 	}
 
-	void Matrix4f::World(const Vector3f& position, const Quatf& orientation, const Vector3f& scale, const Vector3f& offset)
+	void Matrix4x4::World(const Vector3& position, const Quaternion& orientation, const Vector3& scale, const Vector3& offset)
 	{
 		// TODO: Do all matrix math without using matrices.
 		//
-		static Matrix4f TRANSLATION;
-		static Matrix4f ROTATION;
-		static Matrix4f SCALE;
-		static Matrix4f OFFSET;
+		static Matrix4x4 TRANSLATION;
+		static Matrix4x4 ROTATION;
+		static Matrix4x4 SCALE;
+		static Matrix4x4 OFFSET;
 
 		TRANSLATION.Translate(position);
 		ROTATION.Rotate(orientation);
@@ -362,22 +362,22 @@ namespace Sentinel
 		*this = TRANSLATION * ROTATION * OFFSET * SCALE;
 	}
 
-	void Matrix4f::World(const Vector2f& position, float degrees, const Vector2f& scale)
+	void Matrix4x4::World(const Vector2& position, float degrees, const Vector2& scale)
 	{
 		// TODO: Do all matrix math without using matrices.
 		//
-		static Matrix4f TRANSLATION;
-		static Matrix4f ROTATION;
-		static Matrix4f SCALE;
+		static Matrix4x4 TRANSLATION;
+		static Matrix4x4 ROTATION;
+		static Matrix4x4 SCALE;
 
-		TRANSLATION.Translate(Vector3f(position.x, position.y, 0));
-		ROTATION.Rotate(Quatf(0, 0, 1, degrees).AxisAngle());
-		SCALE.Scale(Vector3f(scale.x, scale.y, 1));
+		TRANSLATION.Translate(Vector3(position.x, position.y, 0));
+		ROTATION.Rotate(Quaternion(0, 0, 1, degrees).AxisAngle());
+		SCALE.Scale(Vector3(scale.x, scale.y, 1));
 
 		*this = TRANSLATION * ROTATION * SCALE;
 	}
 
-	float Matrix4f::Det()
+	float Matrix4x4::Det()
 	{
 		float left1 = m[0] * m[5] - m[4] * m[1];
 		float left2 = m[0] * m[9] - m[8] * m[1];
@@ -399,7 +399,7 @@ namespace Sentinel
 			left5 * right2 + left6 * right1);
 	}
 
-	void Matrix4f::Transpose()
+	void Matrix4x4::Transpose()
 	{
 		std::swap(m[1], m[4]);
 		std::swap(m[2], m[8]);
@@ -409,23 +409,23 @@ namespace Sentinel
 		std::swap(m[11], m[14]);
 	}
 
-	void Matrix4f::InverseTrans()
+	void Matrix4x4::InverseTrans()
 	{
 		m[12] *= -1;
 		m[13] *= -1;
 		m[14] *= -1;
 	}
 
-	Matrix4f Matrix4f::InverseView()
+	Matrix4x4 Matrix4x4::InverseView()
 	{
-		Vector3f v(m[12], m[13], m[14]);
+		Vector3 v(m[12], m[13], m[14]);
 
-		Vector3f w(
-			v.Dot(Vector3f(m[0], m[1], m[2])),
-			v.Dot(Vector3f(m[4], m[5], m[6])),
-			v.Dot(Vector3f(m[8], m[9], m[10])));
+		Vector3 w(
+			v.Dot(Vector3(m[0], m[1], m[2])),
+			v.Dot(Vector3(m[4], m[5], m[6])),
+			v.Dot(Vector3(m[8], m[9], m[10])));
 
-		Matrix4f temp;
+		Matrix4x4 temp;
 
 		temp.m[0] = m[0];		temp.m[1] = m[4];		temp.m[2] = m[8];		temp.m[3] = 0;
 		temp.m[4] = m[1];		temp.m[5] = m[5];		temp.m[6] = m[9];		temp.m[7] = 0;
@@ -435,9 +435,9 @@ namespace Sentinel
 		return temp;
 	}
 
-	Matrix4f Matrix4f::Inverse() const
+	Matrix4x4 Matrix4x4::Inverse() const
 	{
-		Matrix4f inv;
+		Matrix4x4 inv;
 
 		float m10_15 = m[10] * m[15];	float m11_14 = m[11] * m[14];	float m4_1 = m[4] * m[1];
 		float m4_9 = m[4] * m[9];		float m11_13 = m[11] * m[13];	float m2_15 = m[2] * m[15];
@@ -488,34 +488,34 @@ namespace Sentinel
 		return inv;
 	}
 
-	Vector3f Matrix4f::Transform(const Vector3f& v, float w) const
+	Vector3 Matrix4x4::Transform(const Vector3& v, float w) const
 	{
-		return Vector3f(
+		return Vector3(
 			v.x*m[0] + v.y*m[4] + v.z*m[8] + w*m[12],
 			v.x*m[1] + v.y*m[5] + v.z*m[9] + w*m[13],
 			v.x*m[2] + v.y*m[6] + v.z*m[10] + w*m[14]);
 	}
 
-	Vector3f Matrix4f::Transform(const Vector4f& v) const
+	Vector3 Matrix4x4::Transform(const Vector4& v) const
 	{
-		return Vector3f(
+		return Vector3(
 			v.x*m[0] + v.y*m[4] + v.z*m[8] + v.w*m[12],
 			v.x*m[1] + v.y*m[5] + v.z*m[9] + v.w*m[13],
 			v.x*m[2] + v.y*m[6] + v.z*m[10] + v.w*m[14]);
 	}
 
-	Vector3f Matrix4f::Right() const
+	Vector3 Matrix4x4::Right() const
 	{
-		return Vector3f(m[0], m[1], m[2]).NormalizeFast();
+		return Vector3(m[0], m[1], m[2]).NormalizeFast();
 	}
 
-	Vector3f Matrix4f::Up() const
+	Vector3 Matrix4x4::Up() const
 	{
-		return Vector3f(m[4], m[5], m[6]).NormalizeFast();
+		return Vector3(m[4], m[5], m[6]).NormalizeFast();
 	}
 
-	Vector3f Matrix4f::Forward() const
+	Vector3 Matrix4x4::Forward() const
 	{
-		return Vector3f(-m[8], -m[9], -m[10]).NormalizeFast();
+		return Vector3(-m[8], -m[9], -m[10]).NormalizeFast();
 	}
 }

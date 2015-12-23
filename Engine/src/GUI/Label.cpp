@@ -59,11 +59,11 @@ namespace GUI
 
 			std::shared_ptr< Font > font = mFontSystem->mFont;
 
-			Vector2f scale(mTransform->mScale.x / font->mSize.x, mTransform->mScale.y / font->mSize.y);
+			Vector2 scale(mTransform->mScale.x / font->mSize.x, mTransform->mScale.y / font->mSize.y);
 
-			Matrix4f matWVP = mOwner->GetWorld()->mCurrentCamera->GetMatrixWVP();
+			Matrix4x4 matWVP = mOwner->GetWorld()->mCurrentCamera->GetMatrixWVP();
 
-			Vector3f offset;
+			Vector3 offset;
 
 			for (UINT i = 0; i < mText.size(); ++i)
 			{

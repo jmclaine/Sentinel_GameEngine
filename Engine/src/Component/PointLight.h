@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Component/Light.h"
-#include "Matrix4f.h"
+#include "Matrix4x4.h"
 #include "Material.h"
 
 namespace Sentinel {
@@ -27,9 +27,9 @@ namespace Component
 
 		UINT mResolution;
 
-		Matrix4f mMatrixProjection;
-		Matrix4f mMatrixView[NUM_CAMERA_AXIS];
-		Matrix4f mMatrixFinal[NUM_CAMERA_AXIS];
+		Matrix4x4 mMatrixProjection;
+		Matrix4x4 mMatrixView[NUM_CAMERA_AXIS];
+		Matrix4x4 mMatrixFinal[NUM_CAMERA_AXIS];
 
 	public:
 
@@ -49,7 +49,7 @@ namespace Component
 
 		void Present();
 
-		const Matrix4f& GetMatrixFinal(CameraAxisType axis);
+		const Matrix4x4& GetMatrixFinal(CameraAxisType axis);
 
 		float* PtrMatrixFinal();
 
