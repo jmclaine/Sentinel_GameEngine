@@ -793,11 +793,11 @@ public:
 		mGameWorld->mShaderManager->Add("Texture_Lit_Shadow", mEditorWorld->mShaderManager->Get("Texture_Lit_Shadow"));
 		mGameWorld->mShaderManager->Add("Sprite", mEditorWorld->mShaderManager->Get("Sprite"));
 		mGameWorld->mShaderManager->Add("RT_Cube_Depth", mEditorWorld->mShaderManager->Get("RT_Cube_Depth"));
-		mGameWorld->mShaderManager->Add("Normal_Map", mEditorWorld->mShaderManager->Get("Normal_Map"));
+		mGameWorld->mShaderManager->Add("Normal_Map_Shadow", mEditorWorld->mShaderManager->Get("Normal_Map_Shadow"));
 
 		std::shared_ptr<Shader> shaderColor = mGameWorld->mShaderManager->Get("Color_Lit_Shadow");
 		std::shared_ptr<Shader> shaderTexture = mGameWorld->mShaderManager->Get("Texture_Lit_Shadow");
-		std::shared_ptr<Shader> shaderNormalMap = mGameWorld->mShaderManager->Get("Normal_Map");
+		std::shared_ptr<Shader> shaderNormalMap = mGameWorld->mShaderManager->Get("Normal_Map_Shadow");
 
 		////////////////////////////////////
 
@@ -1129,10 +1129,10 @@ public:
 		//material->mTexture[TextureIndex::NORMAL] = mGameWorld->mTextureManager->Get("wall-normal");
 		//material->mTexture[TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("cobblestones");
 		//material->mTexture[TextureIndex::NORMAL] = mGameWorld->mTextureManager->Get("cobblestones-normal");
-		material->mTexture[TextureIndex::DIFFUSE] = mRenderer->BASE_TEXTURE;
-		material->mTexture[TextureIndex::NORMAL] = mGameWorld->mTextureManager->Get("test-normal");
-		//material->mTexture[TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("stone");
-		//material->mTexture[TextureIndex::NORMAL] = mGameWorld->mTextureManager->Get("stone-normal");
+		//material->mTexture[TextureIndex::DIFFUSE] = mRenderer->BASE_TEXTURE;
+		//material->mTexture[TextureIndex::NORMAL] = mGameWorld->mTextureManager->Get("test-normal");
+		material->mTexture[TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("stone");
+		material->mTexture[TextureIndex::NORMAL] = mGameWorld->mTextureManager->Get("stone-normal");
 		material->mRenderQueue = RenderQueue::GEOMETRY;
 		//material->mSpecular = ColorRGBA(1, 1, 1, 1);
 		//material->mSpecularComponent = 32;
@@ -1143,7 +1143,7 @@ public:
 		obj = mGameWorld->AddGameObject(new GameObject("Normals"));
 
 		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3(10, 1, 0);
+		transform->mPosition = Vector3(-15, 5, 5);
 		transform->mOrientation = Quaternion(Vector3(90, 45, 0));
 		transform->mScale = Vector3(3,3,3);
 		normalMapTrans = transform;

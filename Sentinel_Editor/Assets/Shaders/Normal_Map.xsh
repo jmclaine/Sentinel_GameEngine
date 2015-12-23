@@ -130,7 +130,9 @@ float4 PS_Main(VSOutput input) :SV_Target
 #ifdef VERTEX_SHADER
 
 uniform mat4 _WorldViewProj;
+uniform mat4 _WorldView;
 uniform mat4 _World;
+uniform mat4 _View;
 
 uniform vec3 _LightPos;
 uniform vec3 _CameraPos;
@@ -144,23 +146,22 @@ out vec2 vTexCoord0;
 out vec3 vWorldPos;
 out vec3 vCameraDir;
 out vec3 vLightDir;
-out mat3 vTBN;
 
 void main()
 {
 	gl_Position = _WorldViewProj * vec4(Position, 1);
 	vWorldPos = (_World * vec4(Position, 1)).xyz;
 
-	vec3 normal = normalize((_World * vec4(Normal.xyz, 0)).xyz);
-	vec3 tangent = normalize((_World * vec4(Tangent.xyz, 0)).xyz);
+	vec3 normal = normalize((_WorldView * vec4(Normal.xyz, 0)).xyz);
+	vec3 tangent = normalize((_WorldView * vec4(Tangent.xyz, 0)).xyz);
 	vec3 bitangent = normalize(cross(normal, tangent.xyz) * Tangent.w);
 
-	vTBN = (mat3(tangent, bitangent, normal));
+	mat3 TBN = transpose(mat3(tangent, bitangent, normal));
 
-	vLightDir = (_LightPos - vWorldPos);
-	vCameraDir = (_CameraPos - vWorldPos);
+	vLightDir = TBN * (_View * vec4(_LightPos - vWorldPos, 0)).xyz;
+	vCameraDir = TBN * (_View * vec4(_CameraPos - vWorldPos, 0)).xyz;
 
-	vTexCoord0 = vec2(TexCoord0.x, TexCoord0.y);
+	vTexCoord0 = TexCoord0;
 }
 
 #endif
@@ -177,14 +178,10 @@ uniform float _SpecComp;
 uniform vec3 _LightColor;
 uniform vec4 _LightAttn;
 
-//uniform vec3 _LightPos;
-//uniform vec3 _CameraPos;
-
 in vec2 vTexCoord0;
 in vec3 vWorldPos;
 in vec3 vCameraDir;
 in vec3 vLightDir;
-in mat3 vTBN;
 
 out vec4 vFragColor;
 
@@ -218,7 +215,7 @@ void main()
 	vec3 lightDir = normalize(vLightDir);
 	vec3 cameraDir = normalize(vCameraDir);
 
-	vec3 normal = vTBN * normalize((texture2D(_Texture1, vTexCoord0.xy).rgb * 2.0 - 1.0));
+	vec3 normal = texture2D(_Texture1, vTexCoord0.xy).rgb * 2.0 - 1.0;
 
 	vec3 color0 = GetColor(lightDir, cameraDir, normal, _LightColor, _LightAttn);
 
