@@ -17,9 +17,6 @@ cbuffer Uniforms
 	float  _SpecComp;
 }
 
-
-// Vertex Shader.
-//
 struct VSInput
 {
 	float4 Position : POSITION;
@@ -38,25 +35,18 @@ VSOutput VS_Main(VSInput input)
 {
 	VSOutput output;
 
-	// Position
 	output.Position = mul(_WorldViewProj, input.Position);
 	float3 worldPos = mul(_World, input.Position).xyz;
 
-	// Light direction
 	output.LightPos = _LightPos - worldPos;
-
-	// Camera direction
 	output.CameraPos = _CameraPos - worldPos;
 
-	// Normal
 	output.Normal = mul(_World, float4(input.Normal, 0)).xyz;
 
 	return output;
 }
 
 
-// Pixel Shader.
-//
 float4 GetColor(float3 LPos, float3 camPos, float3 N, float3 color, float4 attn)
 {
 	if (dot(-LPos, N) < 0)
@@ -66,18 +56,14 @@ float4 GetColor(float3 LPos, float3 camPos, float3 N, float3 color, float4 attn)
 		LPos = normalize(LPos);
 		float3 H = normalize(LPos + camPos);
 
-		// Attenuation
 		float den = attn.x + (attn.y*2.0*dist) / attn.w + (attn.z*dist*dist) / (attn.w*attn.w);
 		float attnFinal = clamp(1.0 / (den*den), 0.0, 1.0);
 
-		// Ambient
 		float4 ambientFinal = _Ambient;
 
-		// Diffuse
 		float intensity = max(0.0, dot(N, LPos));
 		float4 diffuseFinal = _Diffuse * intensity;
 
-		// Specular
 		float4 specularFinal = max(_Specular * pow(saturate(dot(N, H)), _SpecComp), 0.0);
 
 		return saturate(float4(ambientFinal.rgb + (diffuseFinal.rgb + specularFinal.rgb) * attnFinal * color,
@@ -88,16 +74,12 @@ float4 GetColor(float3 LPos, float3 camPos, float3 N, float3 color, float4 attn)
 
 float4 PS_Main(VSOutput input) : SV_Target
 {
-	// Camera Direction
 	float3 camPos = normalize(input.CameraPos);
 
-	// Normal
 	float3 N = normalize(input.Normal);
 
-	// Attenuation
 	float4 color0 = GetColor(input.LightPos, camPos, N, _LightColor, _LightAttn);
 
-	// Final fragment color
 	return color0;
 }
 

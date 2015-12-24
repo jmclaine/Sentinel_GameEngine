@@ -145,7 +145,8 @@ namespace Sentinel
 	UINT Renderer::WINDOW_WIDTH_BASE = 1920;
 	UINT Renderer::WINDOW_HEIGHT_BASE = 1080;
 
-	Renderer::Renderer()
+	Renderer::Renderer() :
+		mCurrShader(NULL)
 	{}
 
 	Renderer* Renderer::Create(const char* filename, WindowInfo& info)
@@ -177,11 +178,6 @@ namespace Sentinel
 		return renderer;
 	}
 
-	Texture* Renderer::CreateTexture(UINT width, UINT height, ImageFormat::Type format, bool createMips)
-	{
-		return CreateTextureFromMemory(0, width, height, format, createMips);
-	}
-
 	Texture* Renderer::CreateTextureFromResource(void* data, UINT length)
 	{
 		int width, height;
@@ -192,7 +188,7 @@ namespace Sentinel
 		if (pixels == NULL)
 			return NULL;
 
-		return CreateTextureFromMemory(pixels, (UINT)width, (UINT)height, ImageFormat::RGBA);
+		return CreateTexture(pixels, (UINT)width, (UINT)height, ImageFormat::RGBA);
 	}
 
 	void Renderer::SetShader(Shader* shader)

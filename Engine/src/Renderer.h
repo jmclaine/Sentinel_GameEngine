@@ -295,33 +295,44 @@ namespace Sentinel
 
 		virtual void Shutdown() = 0;
 
-		// Windows.
+
 		//
+		// Windows
+		//
+
 		virtual void SetWindow(WindowInfo* info) = 0;
 		virtual WindowInfo* GetWindow() = 0;
 
 		virtual bool ShareResources(WindowInfo* info0, WindowInfo* info1) = 0;
 
-		// Buffers.
+
 		//
+		// Buffers
+		//
+
 		virtual Buffer* CreateBuffer(void* data, UINT size, UINT stride, BufferFormat::Type type, BufferAccess::Type access = BufferAccess::READ_WRITE) = 0;
 
 		virtual void SetVertexBuffer(Buffer* buffer) = 0;
 		virtual void SetIndexBuffer(Buffer* buffer) = 0;
 
-		// Textures.
+
 		//
-		Texture* CreateTexture(UINT width, UINT height, ImageFormat::Type format = ImageFormat::RGBA, bool createMips = false);
-		Texture* CreateTextureFromResource(void* data, UINT length);
+		// Textures
+		//
+
+		Texture* CreateTextureFromResource(void* data, UINT length); // used for deserialization
 
 		virtual Texture* CreateTextureFromFile(const char* filename, bool createMips = true) = 0;
-		virtual Texture* CreateTextureFromMemory(void* data, UINT width, UINT height, ImageFormat::Type format, bool createMips = true) = 0;
-		virtual Texture* CreateTextureCube(UINT width, UINT height, ImageFormat::Type format) = 0;
+		virtual Texture* CreateTexture(void* data, UINT width, UINT height, ImageFormat::Type format, bool createMips = true) = 0;
+		virtual Texture* CreateTextureCube(void* data, UINT width, UINT height, ImageFormat::Type format) = 0;
 
 		virtual void* GetTexturePixels(Texture* texture) = 0;
 
-		// Special Rendering.
+
 		//
+		// Special Rendering
+		//
+
 		virtual RenderTexture* CreateBackbuffer() = 0;
 		virtual RenderTexture* CreateRenderTexture(Texture* texture) = 0;
 		virtual DepthStencil* CreateDepthStencil(UINT width, UINT height) = 0;
@@ -341,22 +352,31 @@ namespace Sentinel
 		virtual UINT SetCull(CullFormat::Type type) = 0;
 		virtual UINT SetFill(FillFormat::Type type) = 0;
 
-		// Shaders.
+
 		//
+		// Shaders
+		//
+
 		virtual Shader* CreateShaderFromFile(const char* filename) = 0;
 		virtual Shader* CreateShaderFromMemory(const char* source) = 0;
 
 		void SetShader(Shader* shader);
 		Shader* GetShader();
 
-		// Vertex Layout.
+
 		//
+		// Vertex Layout
+		//
+
 		virtual VertexLayout* CreateVertexLayout(const std::vector< VertexAttribute::Type >& attrib) = 0;
 
 		virtual void SetVertexLayout(VertexLayout* vertexLayout) = 0;
 
-		// Rendering.
+
 		//
+		// Rendering
+		//
+
 		virtual void Clear(float* color, float depth = 1.0f) = 0;
 		virtual void ClearColor(float* color) = 0;
 		virtual void ClearDepth(float depth) = 0;
@@ -368,7 +388,7 @@ namespace Sentinel
 	};
 
 	////////////////////////////////////////////////////////////////////
-	// Dual-Renderer
+	// Renderer-type Selection
 	//
 	extern SENTINEL_DLL Renderer* BuildRendererDX();
 	extern SENTINEL_DLL Renderer* BuildRendererGL();

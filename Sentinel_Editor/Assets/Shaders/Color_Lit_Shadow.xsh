@@ -221,21 +221,23 @@ void main()
 	vec3 normal = normalize(vNormal);
 
 	// Shadow with PCF blend
-	vec3 right = vLightDir.yzx*invShadowSize;
-	vec3 up = vLightDir.zxy*invShadowSize;
+	float shadow = 1.0;
 
-	float shadow = 0.0;
-
-	for (float offsetU = -blend; offsetU <= blend; offsetU += blendInc)
+	if (dot(normal, lightDir) > 0)
 	{
-		for (float offsetV = -blend; offsetV <= blend; offsetV += blendInc)
-		{
-			shadow += CalculateShadow(lightDepth, -vLightDir + right*offsetU + up*offsetV);
-		}
-	}
-	shadow += CalculateShadow(lightDepth, -vLightDir);
+		vec3 right = vLightDir.yzx*invShadowSize;
+		vec3 up = vLightDir.zxy*invShadowSize;
 
-	shadow *= blendFactor;
+		for (float offsetU = -blend; offsetU <= blend; offsetU += blendInc)
+		{
+			for (float offsetV = -blend; offsetV <= blend; offsetV += blendInc)
+			{
+				shadow += CalculateShadow(lightDepth, -vLightDir + right*offsetU + up*offsetV);
+			}
+		}
+		shadow += CalculateShadow(lightDepth, -vLightDir);
+		shadow *= blendFactor;
+	}
 
 	vec3 color0 = GetColor(lightDir, cameraDir, normal, _LightColor, _LightAttn);
 

@@ -56,8 +56,6 @@ namespace Sentinel
 
 			Shader* shader = renderer->GetShader();
 
-			// Set Uniforms.
-			//
 			UINT texCount = 0;
 			UINT lightCount = 0;
 			UINT uniformIndex = 0;

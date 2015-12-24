@@ -19,4 +19,19 @@ namespace Sentinel
 
 		void Release();
 	};
+
+	class TextureCubeDX : public Texture
+	{
+	public:
+
+		ID3D11Texture3D*			mTexture;
+		ID3D11ShaderResourceView*	mResource;
+
+		//////////////////////////////////////
+
+		TextureCubeDX(UINT width, UINT height, ImageFormat::Type format, ID3D11Texture3D* texture, ID3D11ShaderResourceView* resource);
+		~TextureCubeDX();
+
+		void Release();
+	};
 }

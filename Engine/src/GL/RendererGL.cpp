@@ -321,7 +321,7 @@ namespace Sentinel
 				newTex[2] = 255;
 				newTex[3] = 255;
 
-				BASE_TEXTURE = std::shared_ptr<Texture>(CreateTextureFromMemory(newTex, 1, 1, ImageFormat::RGBA, false));
+				BASE_TEXTURE = std::shared_ptr<Texture>(CreateTexture(newTex, 1, 1, ImageFormat::RGBA, false));
 
 				if (!BASE_TEXTURE)
 				{
@@ -436,7 +436,8 @@ namespace Sentinel
 			//
 			int width, height;
 			int nChannels;
-			unsigned char *pixels = stbi_load(filename,
+			unsigned char *pixels = stbi_load(
+				filename,
 				&width, &height,
 				&nChannels, 4);
 
@@ -449,14 +450,14 @@ namespace Sentinel
 				return NULL;
 			}
 
-			Texture* texture = CreateTextureFromMemory(pixels, width, height, ImageFormat::RGBA, createMips);
+			Texture* texture = CreateTexture(pixels, width, height, ImageFormat::RGBA, createMips);
 
 			stbi_image_free(pixels);
 
 			return texture;
 		}
 
-		Texture* CreateTextureFromMemory(void* data, UINT width, UINT height, ImageFormat::Type format, bool createMips = true)
+		Texture* CreateTexture(void* data, UINT width, UINT height, ImageFormat::Type format, bool createMips = true)
 		{
 			GLuint texID;
 			glGenTextures(1, &texID);
@@ -510,7 +511,7 @@ namespace Sentinel
 			return new TextureGL(width, height, format, texID);
 		}
 
-		Texture* CreateTextureCube(UINT width, UINT height, ImageFormat::Type format)
+		Texture* CreateTextureCube(void* data, UINT width, UINT height, ImageFormat::Type format)
 		{
 			GLuint texID;
 			glGenTextures(1, &texID);
@@ -523,36 +524,105 @@ namespace Sentinel
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
+			UCHAR* dataPtr = (UCHAR*)data;
+			UINT size = width * height;
+
 			switch (format)
 			{
 			case ImageFormat::R:
-				for (UINT x = 0; x < 6; ++x)
-					glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_R32F, width, height, 0, GL_RED, GL_FLOAT, NULL);
+				if (data)
+				{
+					for (UINT x = 0; x < 6; ++x)
+					{
+						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_R32F, width, height, 0, GL_RED, GL_FLOAT, dataPtr);
+						dataPtr += (size * sizeof(float));
+					}
+				}
+				else
+				{
+					for (UINT x = 0; x < 6; ++x)
+						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_R32F, width, height, 0, GL_RED, GL_FLOAT, NULL);
+				}
 				break;
 
 			case ImageFormat::RG:
-				for (UINT x = 0; x < 6; ++x)
-					glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RG32F, width, height, 0, GL_RG, GL_FLOAT, NULL);
+				if (data)
+				{
+					for (UINT x = 0; x < 6; ++x)
+					{
+						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RG32F, width, height, 0, GL_RG, GL_FLOAT, dataPtr);
+						dataPtr += (size * sizeof(float));
+					}
+				}
+				else
+				{
+					for (UINT x = 0; x < 6; ++x)
+						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RG32F, width, height, 0, GL_RG, GL_FLOAT, NULL);
+				}
 				break;
 
 			case ImageFormat::RGB:
-				for (UINT x = 0; x < 6; ++x)
-					glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+				if (data)
+				{
+					for (UINT x = 0; x < 6; ++x)
+					{
+						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, dataPtr);
+						dataPtr += (size * sizeof(float));
+					}
+				}
+				else
+				{
+					for (UINT x = 0; x < 6; ++x)
+						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+				}
 				break;
 
 			case ImageFormat::RGBA:
-				for (UINT x = 0; x < 6; ++x)
-					glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+				if (data)
+				{
+					for (UINT x = 0; x < 6; ++x)
+					{
+						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, dataPtr);
+						dataPtr += (size * sizeof(float));
+					}
+				}
+				else
+				{
+					for (UINT x = 0; x < 6; ++x)
+						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+				}
 				break;
 
 			case ImageFormat::HDR:
-				for (UINT x = 0; x < 6; ++x)
-					glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+				if (data)
+				{
+					for (UINT x = 0; x < 6; ++x)
+					{
+						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, dataPtr);
+						dataPtr += (size * sizeof(float));
+					}
+				}
+				else
+				{
+					for (UINT x = 0; x < 6; ++x)
+						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+				}
 				break;
 
 			case ImageFormat::DEPTH:
-				for (UINT x = 0; x < 6; ++x)
-					glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+				if (data)
+				{
+					for (UINT x = 0; x < 6; ++x)
+					{
+						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, dataPtr);
+						dataPtr += (size * sizeof(float));
+					}
+				}
+				else
+				{
+					for (UINT x = 0; x < 6; ++x)
+						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+				}
 				break;
 
 			default:

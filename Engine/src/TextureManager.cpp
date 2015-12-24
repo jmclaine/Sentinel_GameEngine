@@ -95,7 +95,7 @@ namespace Sentinel
 
 			// Create the texture resource.
 			//
-			std::shared_ptr<Texture> texture(renderer->CreateTextureFromMemory(pixels, width, height, ImageFormat::RGBA));
+			std::shared_ptr<Texture> texture(renderer->CreateTexture(pixels, width, height, ImageFormat::RGBA));
 
 			delete[] comp_pixels;
 			delete[] pixels;

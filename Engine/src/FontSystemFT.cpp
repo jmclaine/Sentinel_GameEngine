@@ -169,7 +169,7 @@ namespace Sentinel
 				FT_Done_Glyph(glyph);
 			}
 
-			std::shared_ptr<Texture> texture(mSpriteSystem->GetRenderer()->CreateTextureFromMemory(pixels, textureWidth, textureHeight, ImageFormat::RGBA));
+			std::shared_ptr<Texture> texture(mSpriteSystem->GetRenderer()->CreateTexture(pixels, textureWidth, textureHeight, ImageFormat::RGBA));
 
 			free(pixels);
 

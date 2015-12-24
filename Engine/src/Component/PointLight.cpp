@@ -40,7 +40,7 @@ namespace Component
 		_ASSERT(renderer);
 
 		if (!mTexture)
-			mTexture = renderer->CreateTextureCube(mResolution, mResolution, ImageFormat::RG);
+			mTexture = renderer->CreateTextureCube(NULL, mResolution, mResolution, ImageFormat::RG);
 
 		if (!mRenderTexture)
 			mRenderTexture = renderer->CreateRenderTexture(mTexture);

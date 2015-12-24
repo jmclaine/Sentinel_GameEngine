@@ -254,66 +254,53 @@ namespace Sentinel
 			{
 				mAttributes.push_back(VertexAttribute::POSITION);
 			}
-			else
-				if (strcmp(varDesc.SemanticName, "TEXCOORD") == 0)
-				{
-					if (varDesc.SemanticIndex == 0)
-						mAttributes.push_back(VertexAttribute::TEXCOORD0);
-					else
-						if (varDesc.SemanticIndex == 1)
-							mAttributes.push_back(VertexAttribute::TEXCOORD1);
-						else
-							if (varDesc.SemanticIndex == 2)
-								mAttributes.push_back(VertexAttribute::TEXCOORD2);
-				}
-				else
-					if (strcmp(varDesc.SemanticName, "QUADCOORD") == 0)
-					{
-						if (varDesc.SemanticIndex == 0)
-							mAttributes.push_back(VertexAttribute::QUADCOORD0);
-						else
-							if (varDesc.SemanticIndex == 1)
-								mAttributes.push_back(VertexAttribute::QUADCOORD1);
-							else
-								if (varDesc.SemanticIndex == 2)
-									mAttributes.push_back(VertexAttribute::QUADCOORD2);
-					}
-					else
-						if (strcmp(varDesc.SemanticName, "NORMAL") == 0)
-						{
-							mAttributes.push_back(VertexAttribute::NORMAL);
-						}
-						else
-							if (strcmp(varDesc.SemanticName, "COLOR") == 0)
-							{
-								mAttributes.push_back(VertexAttribute::COLOR);
-							}
-							else
-								if (strcmp(varDesc.SemanticName, "TANGENT") == 0)
-								{
-									mAttributes.push_back(VertexAttribute::COLOR);
-								}
-								else
-									if (strcmp(varDesc.SemanticName, "BONE_COUNT") == 0)
-									{
-										mAttributes.push_back(VertexAttribute::BONE_COUNT);
-									}
-									else
-										if (strcmp(varDesc.SemanticName, "BONE_INDEX") == 0)
-										{
-											mAttributes.push_back(VertexAttribute::BONE_INDEX);
-										}
-										else
-											if (strcmp(varDesc.SemanticName, "BONE_WEIGHT") == 0)
-											{
-												mAttributes.push_back(VertexAttribute::BONE_WEIGHT);
-											}
-											else
-												if (strcmp(varDesc.SemanticName, "MATRIX") == 0)
-												{
-													mAttributes.push_back(VertexAttribute::MATRIX);
-													x += 3;
-												}
+			else if (strcmp(varDesc.SemanticName, "TEXCOORD") == 0)
+			{
+				if (varDesc.SemanticIndex == 0)
+					mAttributes.push_back(VertexAttribute::TEXCOORD0);
+				else if (varDesc.SemanticIndex == 1)
+					mAttributes.push_back(VertexAttribute::TEXCOORD1);
+				else if (varDesc.SemanticIndex == 2)
+					mAttributes.push_back(VertexAttribute::TEXCOORD2);
+			}
+			else if (strcmp(varDesc.SemanticName, "QUADCOORD") == 0)
+			{
+				if (varDesc.SemanticIndex == 0)
+					mAttributes.push_back(VertexAttribute::QUADCOORD0);
+				else if (varDesc.SemanticIndex == 1)
+					mAttributes.push_back(VertexAttribute::QUADCOORD1);
+				else if (varDesc.SemanticIndex == 2)
+					mAttributes.push_back(VertexAttribute::QUADCOORD2);
+			}
+			else if (strcmp(varDesc.SemanticName, "NORMAL") == 0)
+			{
+				mAttributes.push_back(VertexAttribute::NORMAL);
+			}
+			else if (strcmp(varDesc.SemanticName, "COLOR") == 0)
+			{
+				mAttributes.push_back(VertexAttribute::COLOR);
+			}
+			else if (strcmp(varDesc.SemanticName, "TANGENT") == 0)
+			{
+				mAttributes.push_back(VertexAttribute::COLOR);
+			}
+			else if (strcmp(varDesc.SemanticName, "BONE_COUNT") == 0)
+			{
+				mAttributes.push_back(VertexAttribute::BONE_COUNT);
+			}
+			else if (strcmp(varDesc.SemanticName, "BONE_INDEX") == 0)
+			{
+				mAttributes.push_back(VertexAttribute::BONE_INDEX);
+			}
+			else if (strcmp(varDesc.SemanticName, "BONE_WEIGHT") == 0)
+			{
+				mAttributes.push_back(VertexAttribute::BONE_WEIGHT);
+			}
+			else if (strcmp(varDesc.SemanticName, "MATRIX") == 0)
+			{
+				mAttributes.push_back(VertexAttribute::MATRIX);
+				x += 3;
+			}
 		}
 
 		// Create layout.
@@ -572,7 +559,8 @@ namespace Sentinel
 		_ASSERT(0); // not implemented
 	}
 
-	void ShaderDX::SetSampler(UINT index,
+	void ShaderDX::SetSampler(
+		UINT index,
 		SamplerMode::Type modeU, SamplerMode::Type modeV,
 		SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter)
 	{
@@ -589,7 +577,8 @@ namespace Sentinel
 		sampler->mStartSlot = index;
 	}
 
-	void ShaderDX::SetSamplerCube(UINT index,
+	void ShaderDX::SetSamplerCube(
+		UINT index,
 		SamplerMode::Type modeU, SamplerMode::Type modeV, SamplerMode::Type modeW,
 		SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter)
 	{

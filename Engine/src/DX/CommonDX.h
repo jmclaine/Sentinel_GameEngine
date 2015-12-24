@@ -10,6 +10,12 @@
 #pragma comment (lib, "d3dx11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
 
+#ifdef _DEBUG
+#include <Windows.h>
+#pragma comment (lib, "DxErr.lib")
+#include <DxErr.h>
+#endif
+
 #include <d3d11.h>
 #include <dxgi.h>
 #include <d3dx11.h>

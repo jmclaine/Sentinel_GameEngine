@@ -10,15 +10,29 @@
 #include "ShaderDX.h"
 #include "VertexLayoutDX.h"
 
+#ifdef _DEBUG
+#include <comdef.h>
+#endif
+
 namespace Sentinel
 {
 #define HV(func)\
-		if ((func) != S_OK)\
-			return S_FALSE;
+	if ((func) != S_OK)\
+		return S_FALSE;
 
+#ifndef _DEBUG
 #define HV_PTR(func)\
-		if ((func) != S_OK)\
-			return NULL;
+	if ((func) != S_OK)\
+		return NULL;
+#else
+#define HV_PTR(func) {\
+	HRESULT result = func;\
+	if ((result) != S_OK) {\
+		_com_error err(result);\
+		Debug::LogError(STREAM(TRACE << DXGetErrorString(result) << ": " << err.ErrorMessage()));\
+		return NULL;\
+	}}
+#endif
 
 	////////////////////////////////////////////////////////////////////////////////////
 	// DirectX11 Renderer.
@@ -210,10 +224,10 @@ namespace Sentinel
 			mCurrWindow->mContext->RSSetState(mCurrWindow->mRasterizerState);
 
 		#ifndef NDEBUG
-			SET_DEBUG_NAME( mCurrWindow->mSwapChain );
-			SET_DEBUG_NAME( mCurrWindow->mDevice );
-			SET_DEBUG_NAME( mCurrWindow->mContext );
-			SET_DEBUG_NAME( mCurrWindow->mRasterizerState );
+			SET_DEBUG_NAME(mCurrWindow->mSwapChain);
+			SET_DEBUG_NAME(mCurrWindow->mDevice);
+			SET_DEBUG_NAME(mCurrWindow->mContext);
+			SET_DEBUG_NAME(mCurrWindow->mRasterizerState);
 		#endif
 
 			// Create NULL_TEXTURE (Black).
@@ -227,7 +241,7 @@ namespace Sentinel
 				newTex[2] = 0;
 				newTex[3] = 255;
 
-				NULL_TEXTURE = std::shared_ptr< Texture >(CreateTextureFromMemory(newTex, 1, 1, ImageFormat::RGBA));
+				NULL_TEXTURE = std::shared_ptr< Texture >(CreateTexture(newTex, 1, 1, ImageFormat::RGBA));
 
 				delete newTex;
 			}
@@ -243,7 +257,7 @@ namespace Sentinel
 				newTex[2] = 255;
 				newTex[3] = 255;
 
-				BASE_TEXTURE = std::shared_ptr< Texture >(CreateTextureFromMemory(newTex, 1, 1, ImageFormat::RGBA));
+				BASE_TEXTURE = std::shared_ptr< Texture >(CreateTexture(newTex, 1, 1, ImageFormat::RGBA));
 
 				delete newTex;
 			}
@@ -440,7 +454,7 @@ namespace Sentinel
 				}
 			}
 
-			// Load texture for 32-bits.
+			// Texture must be 32-bit aligned
 			//
 			int width, height;
 			int nChannels;
@@ -455,61 +469,110 @@ namespace Sentinel
 				return NULL;
 			}
 
-			Texture* texture = CreateTextureFromMemory(pixels, width, height, ImageFormat::RGBA, createMips);
+			Texture* texture = CreateTexture(pixels, width, height, ImageFormat::RGBA, createMips);
 
 			stbi_image_free(pixels);
 
 			return texture;
 		}
 
-		Texture* CreateTextureFromMemory(void* data, UINT width, UINT height, ImageFormat::Type format, bool createMips = true)
+		Texture* CreateTexture(void* data, UINT width, UINT height, ImageFormat::Type format, bool createMips = true)
 		{
 			UCHAR* newData = NULL;
+			UINT size = width * height;
 
 			DXGI_FORMAT newFormat;
 			switch (format)
 			{
-				// The texture must be converted to RGBA.
-				//
+			case ImageFormat::R:
+				if (data)
+				{
+					newData = (UCHAR*)data;
+				}
+				else
+				{
+					newData = (UCHAR*)malloc(size << 2);
+					memset(newData, 0, size << 2);
+				}
+				newFormat = DXGI_FORMAT_R32_FLOAT;
+				break;
+
+			case ImageFormat::RG:
+				if (data)
+				{
+					newData = (UCHAR*)data;
+				}
+				else
+				{
+					newData = (UCHAR*)malloc(size << 2);
+					memset(newData, 0, size << 2);
+				}
+				newFormat = DXGI_FORMAT_R16G16_FLOAT;
+				break;
+
 			case ImageFormat::RGB:
 			{
-				UINT prevSize = width * height;
-				newData = (UCHAR*)malloc((width * height) << 2);
+				// The texture must be converted to RGBA
 
-				for (UINT i = 0; i < prevSize; ++i)
+				newData = (UCHAR*)malloc(size << 2);
+
+				if (data)
 				{
-					for (UINT j = 0; j < 3; ++j)
-						newData[(i << 2) + j] = reinterpret_cast<UCHAR*>(data)[i * 3 + j];
+					for (UINT i = 0; i < size; ++i)
+					{
+						for (UINT j = 0; j < 3; ++j)
+							newData[(i << 2) + j] = reinterpret_cast<UCHAR*>(data)[i * 3 + j];
 
-					newData[(i << 2) + 3] = (UCHAR)(255);
+						newData[(i << 2) + 3] = (UCHAR)(255);
+					}
 				}
+				else memset(newData, 0, size << 2);
 
 				newFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 			}
 			break;
 
 			case ImageFormat::RGBA:
-				newData = (UCHAR*)data;
+				if (data)
+				{
+					newData = (UCHAR*)data;
+				}
+				else
+				{
+					newData = (UCHAR*)malloc(size << 2);
+					memset(newData, 0, size << 2);
+				}
 				newFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 				break;
 
-			case ImageFormat::R:
-				newData = (UCHAR*)data;
-				newFormat = DXGI_FORMAT_R32_FLOAT;
-				break;
-
 			case ImageFormat::HDR:
-				newData = (UCHAR*)data;
+				if (data)
+				{
+					newData = (UCHAR*)data;
+				}
+				else
+				{
+					newData = (UCHAR*)malloc(size << 8);
+					memset(newData, 0, size << 8);
+				}
 				newFormat = DXGI_FORMAT_R32G32B32A32_FLOAT;
 				break;
 
 			case ImageFormat::DEPTH:
-				newData = (UCHAR*)data;
+				if (data)
+				{
+					newData = (UCHAR*)data;
+				}
+				else
+				{
+					newData = (UCHAR*)malloc(size << 2);
+					memset(newData, 0, size << 2);
+				}
 				newFormat = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
 				break;
 
 			default:
-				_ASSERT(false);	// Invalid image format.
+				_ASSERT(false);	// Invalid image format
 				break;
 			}
 
@@ -536,8 +599,6 @@ namespace Sentinel
 			rsv.Texture2D.MipLevels = 1;
 			rsv.Texture2D.MostDetailedMip = 0;
 
-			// Create mipmaps.
-			//
 			if (createMips)
 			{
 				D3D11_SUBRESOURCE_DATA res =
@@ -572,7 +633,7 @@ namespace Sentinel
 			HV_PTR(mCurrWindow->mDevice->CreateShaderResourceView(tex0, &rsv, &resource));
 			mCurrWindow->mContext->GenerateMips(resource);
 
-			if (format == ImageFormat::RGB)
+			if (!data || format == ImageFormat::RGB)
 				free(newData);
 
 		#ifndef NDEBUG
@@ -583,10 +644,126 @@ namespace Sentinel
 			return new TextureDX(width, height, format, tex0, resource);
 		}
 
-		Texture* CreateTextureCube(UINT width, UINT height, ImageFormat::Type format)
+		Texture* CreateTextureCube(void* data, UINT width, UINT height, ImageFormat::Type format)
 		{
-			_ASSERT(0);
-			return 0;
+			UCHAR* newData = (UCHAR*)data;
+			UINT size = width * height;
+
+			DXGI_FORMAT newFormat;
+			switch (format)
+			{
+			case ImageFormat::R:
+				if (!newData)
+				{
+					UINT dataSize = (size << 2) * 6;
+					newData = (UCHAR*)malloc(dataSize);
+					memset(newData, 0, dataSize);
+				}
+				newFormat = DXGI_FORMAT_R32_FLOAT;
+				break;
+
+			case ImageFormat::RG:
+				if (!newData)
+				{
+					UINT dataSize = (size << 2) * 6;
+					newData = (UCHAR*)malloc(dataSize);
+					memset(newData, 0, dataSize);
+				}
+				newFormat = DXGI_FORMAT_R16G16_FLOAT;
+				break;
+
+			case ImageFormat::RGB:
+			{
+				// The texture must be converted to RGBA
+
+				UINT dataSize = (size << 2) * 6;
+				newData = (UCHAR*)malloc(dataSize);
+
+				if (data)
+				{
+					for (UINT i = 0; i < size; ++i)
+					{
+						for (UINT j = 0; j < 3; ++j)
+							newData[(i << 2) + j] = reinterpret_cast<UCHAR*>(data)[i * 3 + j];
+
+						newData[(i << 2) + 3] = (UCHAR)(255);
+					}
+				}
+				else memset(newData, 0, dataSize);
+
+				newFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+			}
+			break;
+
+			case ImageFormat::RGBA:
+				if (!newData)
+				{
+					UINT dataSize = (size << 2) * 6;
+					newData = (UCHAR*)malloc(dataSize);
+					memset(newData, 0, dataSize);
+				}
+				newFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+				break;
+
+			case ImageFormat::HDR:
+				if (!newData)
+				{
+					UINT dataSize = (size << 8) * 6;
+					newData = (UCHAR*)malloc(dataSize);
+					memset(newData, 0, dataSize);
+				}
+				newFormat = DXGI_FORMAT_R32G32B32A32_FLOAT;
+				break;
+
+			case ImageFormat::DEPTH:
+				if (!newData)
+				{
+					UINT dataSize = (size << 2) * 6;
+					newData = (UCHAR*)malloc(dataSize);
+					memset(newData, 0, dataSize);
+				}
+				newFormat = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+				break;
+
+			default:
+				_ASSERT(false);	// Invalid image format
+				break;
+			}
+
+			D3D11_TEXTURE3D_DESC desc;
+			desc.Width = width;
+			desc.Height = height;
+			desc.Depth = 6; // cube
+			desc.MipLevels = 1;
+			desc.Format = newFormat;
+			desc.Usage = D3D11_USAGE_DEFAULT;
+			desc.BindFlags = ((format != ImageFormat::DEPTH) ? D3D11_BIND_RENDER_TARGET : D3D11_BIND_DEPTH_STENCIL) | D3D11_BIND_SHADER_RESOURCE;
+			desc.CPUAccessFlags = D3D11_USAGE_DEFAULT;
+
+			D3D11_SUBRESOURCE_DATA resData;
+			memset(&resData, 0, sizeof(D3D11_SUBRESOURCE_DATA));
+			resData.pSysMem = newData;
+			resData.SysMemPitch = width << 4;
+			resData.SysMemSlicePitch = size << 4;
+
+			ID3D11Texture3D* texture = NULL;
+			HV_PTR(mCurrWindow->mDevice->CreateTexture3D(&desc, &resData, &texture));
+
+			D3D11_SHADER_RESOURCE_VIEW_DESC rsv;
+			memset(&rsv, 0, sizeof(rsv));
+			rsv.Format = desc.Format;
+			rsv.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
+			rsv.Texture3D.MipLevels = desc.MipLevels;
+
+			ID3D11ShaderResourceView* resource = NULL;
+			HV_PTR(mCurrWindow->mDevice->CreateShaderResourceView(texture, &rsv, &resource));
+
+		#ifndef NDEBUG
+			SET_DEBUG_NAME(texture);
+			SET_DEBUG_NAME(resource);
+		#endif
+
+			return new TextureCubeDX(width, height, format, texture, resource);
 		}
 
 		void* GetTexturePixels(Texture* texture)

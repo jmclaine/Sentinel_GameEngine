@@ -458,7 +458,7 @@ public:
 		//
 		// Create World View Backbuffer
 		//
-		mRTGameWorld = mRenderer->CreateRenderTexture(mEditorWorld->mTextureManager->Add("Backbuffer", SHARED(mRenderer->CreateTexture(Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE, ImageFormat::RGB))).get());
+		mRTGameWorld = mRenderer->CreateRenderTexture(mEditorWorld->mTextureManager->Add("Backbuffer", SHARED(mRenderer->CreateTexture(NULL, Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE, ImageFormat::RGB))).get());
 		mDSGameWorld = mRenderer->CreateDepthStencil(Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE);
 
 		material = mEditorWorld->mMaterialManager->Add("Backbuffer", std::shared_ptr< Material >(new Material()));

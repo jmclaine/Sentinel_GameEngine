@@ -251,21 +251,23 @@ void main()
 	vec3 normal = texture2D(_Texture1, vTexCoord0).rgb * 2.0 - 1.0;
 
 	// Shadow with PCF blend
-	vec3 right = vShadowDir.yzx*invShadowSize;
-	vec3 up = vShadowDir.zxy*invShadowSize;
+	float shadow = 1.0;
 
-	float shadow = 0.0;
-
-	for (float offsetU = -blend; offsetU <= blend; offsetU += blendInc)
+	if (dot(normal, lightDir) > 0)
 	{
-		for (float offsetV = -blend; offsetV <= blend; offsetV += blendInc)
-		{
-			shadow += CalculateShadow(lightDepth, -vShadowDir + right*offsetU + up*offsetV);
-		}
-	}
-	shadow += CalculateShadow(lightDepth, -vShadowDir);
+		vec3 right = vShadowDir.yzx*invShadowSize;
+		vec3 up = vShadowDir.zxy*invShadowSize;
 
-	shadow *= blendFactor;
+		for (float offsetU = -blend; offsetU <= blend; offsetU += blendInc)
+		{
+			for (float offsetV = -blend; offsetV <= blend; offsetV += blendInc)
+			{
+				shadow += CalculateShadow(lightDepth, -vShadowDir + right*offsetU + up*offsetV);
+			}
+		}
+		shadow += CalculateShadow(lightDepth, -vShadowDir);
+		shadow *= blendFactor;
+	}
 
 	vec3 color0 = GetColor(lightDir, cameraDir, normal, _LightColor, _LightAttn);
 

@@ -6,7 +6,7 @@
 namespace Sentinel
 {
 #define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
-#define TRACE __FILENAME__ << "(" << __LINE__ << ") "
+#define TRACE __FILENAME__ << " (" << __LINE__ << "): "
 
 	class SENTINEL_DLL Debug
 	{

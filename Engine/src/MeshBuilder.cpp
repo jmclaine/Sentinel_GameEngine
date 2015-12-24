@@ -149,12 +149,13 @@ namespace Sentinel
 
 		for (UINT i = 0; i < mVertex.size(); ++i)
 		{
-			Vector3 N(normal[i]);
-			Vector3 T(tangent[i]);
-			Vector3 B(bitangent[i]);
+			// normalize only for vertex correctness
+			Vector3 N(normal[i].Normalize());
+			Vector3 T(tangent[i].Normalize());
+			Vector3 B(bitangent[i].Normalize());
 
 			Vector3 Tn = (T - N * N.Dot(T)).Normalize();
-			float sign = ((N.Cross(T)).Dot(B) < 0) ? -1 : 1;
+			float sign = ((N.Cross(T)).Dot(B) < 0.0f) ? -1.0f : 1.0f;
 
 			mVertex[i].mTangent = Vector4(Tn.x, Tn.y, Tn.z, sign);
 		}
