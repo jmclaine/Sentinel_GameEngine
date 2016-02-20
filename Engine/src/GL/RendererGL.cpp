@@ -710,11 +710,9 @@ namespace Sentinel
 
 		void SetRenderTexture(RenderTexture* target)
 		{
-			_ASSERT(target);
-
 			if (mCurrRenderTexture != target)
 			{
-				glBindFramebuffer(GL_FRAMEBUFFER, static_cast<RenderTextureGL*>(target)->mID);
+				glBindFramebuffer(GL_FRAMEBUFFER, (target) ? static_cast<RenderTextureGL*>(target)->mID : NULL);
 
 				mCurrRenderTexture = target;
 			}
@@ -722,12 +720,12 @@ namespace Sentinel
 
 		void SetDepthStencil(DepthStencil* stencil)
 		{
-			//_ASSERT(stencil);
+			if (mCurrDepthStencil != stencil)
+			{
+				glBindRenderbuffer(GL_RENDERBUFFER, (stencil) ? static_cast<DepthStencilGL*>(stencil)->mID : NULL);
 
-			if (stencil && mCurrDepthStencil != stencil)
-				glBindRenderbuffer(GL_RENDERBUFFER, static_cast<DepthStencilGL*>(stencil)->mID);
-
-			mCurrDepthStencil = stencil;
+				mCurrDepthStencil = stencil;
+			}
 		}
 
 		void SetDepthStencilType(DepthFormat::Type depth)

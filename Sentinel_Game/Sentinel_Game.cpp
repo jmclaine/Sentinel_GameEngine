@@ -171,6 +171,8 @@ public:
 		Component::Camera* camera = mGameWorld->mCurrentCamera;
 		camera->mDepthStencil = mDSMain;
 		camera->mRenderTexture = mRTMain;
+		camera->mViewportWidth = mGameWindow->GetInfo()->Width();
+		camera->mViewportHeight = mGameWindow->GetInfo()->Height();
 		camera->mClearColor = ColorRGBA(0.0f, 0.2f, 0.8f, 1.0f);
 	}
 
