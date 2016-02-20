@@ -28,6 +28,8 @@ namespace Component
 
 		///////////////////////////////////
 
+		void Execute();
+
 		void CalculateBounds();
 
 		bool CheckVisible(Camera* camera);

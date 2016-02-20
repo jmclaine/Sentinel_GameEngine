@@ -143,6 +143,7 @@ namespace Sentinel
 		mPixelShader = NULL;
 
 		SAFE_RELEASE_PTR(mConstantBuffer);
+		SAFE_DELETE_MAP(mSamplers);
 
 		mUniforms.clear();
 	}
@@ -566,15 +567,22 @@ namespace Sentinel
 	{
 		_ASSERT(index < mNumSamplers);
 
-		SamplerDX* sampler = new SamplerDX();
+		SamplerDX* sampler = NULL;
+
+		auto it = mSamplers.find(index);
+		if (it == mSamplers.end())
+			sampler = new SamplerDX();
+		else
+			sampler = it->second;
 
 		if (!sampler->Create(mDevice, mContext, modeU, modeV, minFilter, magFilter, mipFilter))
 		{
 			delete sampler;
 			return;
 		}
-
+		
 		sampler->mStartSlot = index;
+		mSamplers[index] = sampler;
 	}
 
 	void ShaderDX::SetSamplerCube(

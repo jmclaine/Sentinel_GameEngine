@@ -104,6 +104,7 @@ namespace Component
 		static float color[4] = { 1, 1, 1, 1 };
 
 		renderer->SetViewport(0, 0, mResolution, mResolution);
+		renderer->SetDepthStencil(NULL);
 		renderer->SetRenderTexture(mRenderTexture);
 		renderer->ClearColor(color);
 

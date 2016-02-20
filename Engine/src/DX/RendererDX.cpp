@@ -739,12 +739,13 @@ namespace Sentinel
 			desc.Usage = D3D11_USAGE_DEFAULT;
 			desc.BindFlags = ((format != ImageFormat::DEPTH) ? D3D11_BIND_RENDER_TARGET : D3D11_BIND_DEPTH_STENCIL) | D3D11_BIND_SHADER_RESOURCE;
 			desc.CPUAccessFlags = D3D11_USAGE_DEFAULT;
+			desc.MiscFlags = 0;
+			//desc.MiscFlags = createMips ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
 
 			D3D11_SUBRESOURCE_DATA resData;
-			memset(&resData, 0, sizeof(D3D11_SUBRESOURCE_DATA));
 			resData.pSysMem = newData;
-			resData.SysMemPitch = width << 4;
-			resData.SysMemSlicePitch = size << 4;
+			resData.SysMemPitch = width << 2;
+			resData.SysMemSlicePitch = size << 2;
 
 			ID3D11Texture3D* texture = NULL;
 			HV_PTR(mCurrWindow->mDevice->CreateTexture3D(&desc, &resData, &texture));
@@ -762,6 +763,8 @@ namespace Sentinel
 			SET_DEBUG_NAME(texture);
 			SET_DEBUG_NAME(resource);
 		#endif
+
+			free(newData);
 
 			return new TextureCubeDX(width, height, format, texture, resource);
 		}
@@ -923,7 +926,7 @@ namespace Sentinel
 		void SetRenderTexture(RenderTexture* target)
 		{
 			_ASSERT(mCurrWindow);
-			_ASSERT(mCurrStencil);
+			//_ASSERT(mCurrStencil);
 			_ASSERT(target);
 
 			//mCurrWindow->mContext->OMSetRenderTextures( 0, 0, 0 );
@@ -938,9 +941,12 @@ namespace Sentinel
 
 		void SetDepthStencil(DepthStencil* stencil)
 		{
-			_ASSERT(stencil);
+			//_ASSERT(stencil);
 
-			mCurrStencil = static_cast<DepthStencilDX*>(stencil)->mView;
+			if (stencil)
+				mCurrStencil = static_cast<DepthStencilDX*>(stencil)->mView;
+			else
+				mCurrStencil = NULL;
 		}
 
 		void SetDepthStencilType(DepthFormat::Type state)

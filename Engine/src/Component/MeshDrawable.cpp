@@ -36,6 +36,11 @@ namespace Component
 
 	///////////////////////////////////
 
+	void MeshDrawable::Execute()
+	{
+		Drawable::Execute();
+	}
+
 	void MeshDrawable::CalculateBounds()
 	{
 		const BoundingBox& bounds = mMesh->mBounds;

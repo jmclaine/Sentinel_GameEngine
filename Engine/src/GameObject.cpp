@@ -227,16 +227,6 @@ namespace Sentinel
 			mChild[x]->Save(archive);
 	}
 
-#define LOAD_COMPONENT()\
-{\
-	component = (GameComponent*)SerialRegister::Load(archive);\
-	if (component)\
-	{\
-		Attach(component);\
-		component->Load(archive);\
-	}\
-}
-
 	void GameObject::Load(Archive& archive)
 	{
 		archive.Read(&mName);
@@ -248,7 +238,14 @@ namespace Sentinel
 		archive.Read(&size);
 
 		for (BYTE x = 0; x < size; ++x)
-			LOAD_COMPONENT();
+		{
+			component = (GameComponent*)SerialRegister::Load(archive);
+			if (component)
+			{
+				Attach(component);
+				component->Load(archive);
+			}
+		}
 
 		archive.Read(&size);
 

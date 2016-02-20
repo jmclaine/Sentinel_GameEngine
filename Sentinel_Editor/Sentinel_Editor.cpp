@@ -986,7 +986,7 @@ public:
 		obj->mName = "Box_Top";
 
 		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3(0, 8, 5);
+		transform->mPosition = Vector3(-2, 7, 3);
 		transform->mScale = Vector3(1, 1, 1);
 
 		physics = (Physics*)obj->Attach(new Physics());
@@ -1509,14 +1509,15 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-int APIENTRY _tWinMain(HINSTANCE hInstance,
+int APIENTRY _tWinMain(
+	HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
 	LPTSTR    lpCmdLine,
 	int       nCmdShow)
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
-	//_CrtSetBreakAlloc(242);
+	//_CrtSetBreakAlloc(3760);
 
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);

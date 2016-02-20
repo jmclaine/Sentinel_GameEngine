@@ -722,14 +722,12 @@ namespace Sentinel
 
 		void SetDepthStencil(DepthStencil* stencil)
 		{
-			_ASSERT(stencil);
+			//_ASSERT(stencil);
 
-			if (mCurrDepthStencil != stencil)
-			{
+			if (stencil && mCurrDepthStencil != stencil)
 				glBindRenderbuffer(GL_RENDERBUFFER, static_cast<DepthStencilGL*>(stencil)->mID);
 
-				mCurrDepthStencil = stencil;
-			}
+			mCurrDepthStencil = stencil;
 		}
 
 		void SetDepthStencilType(DepthFormat::Type depth)

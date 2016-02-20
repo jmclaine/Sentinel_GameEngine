@@ -12,6 +12,16 @@ namespace Sentinel
 	#define SAFE_DELETE_ARRAY(var)\
 		if (var) { delete[] (var); (var) = NULL; }
 
+	#define SAFE_DELETE_LIST(var)\
+		TRAVERSE_LIST(it, var)\
+			SAFE_DELETE(it);\
+		var.clear();
+
+	#define SAFE_DELETE_MAP(var)\
+		TRAVERSE_LIST(it, var)\
+			SAFE_DELETE((it->second));\
+		var.clear();
+
 	#define SAFE_RELEASE_DELETE(var)\
 		if (var) { var->Release(); delete (var); (var) = NULL; }
 
@@ -43,7 +53,7 @@ namespace Sentinel
 		}\
 		if (count > 0) { delete[] var; }
 
-	template< class Type >
+	template <class Type>
 	std::shared_ptr<Type> SHARED(Type* ptr)
 	{
 		return std::shared_ptr<Type>(ptr);

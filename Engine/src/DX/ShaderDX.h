@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_map>
 #include "CommonDX.h"
 #include "Shader.h"
 
@@ -58,6 +59,7 @@ namespace Sentinel
 		BYTE* mConstantBufferData;
 
 		std::vector<UINT> mUniformsDX; // stores offsets
+		std::unordered_map<UINT, SamplerDX*> mSamplers;
 
 		UINT mTextureLevel;
 

@@ -96,7 +96,8 @@ namespace Component
 
 	void Camera::Apply(Renderer* renderer)
 	{
-		renderer->SetViewport(mViewportOffsetX, mViewportOffsetY,
+		renderer->SetViewport(
+			mViewportOffsetX, mViewportOffsetY,
 			mViewportWidth, mViewportHeight);
 
 		renderer->SetDepthStencil(mDepthStencil);

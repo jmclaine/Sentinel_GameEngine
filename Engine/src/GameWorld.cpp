@@ -187,8 +187,10 @@ namespace Sentinel
 				return obj;
 		}
 
-		if (obj->GetParent())
-			obj->GetParent()->RemoveChild(obj);
+		GameObject* parent = obj->GetParent();
+
+		if (parent)
+			parent->RemoveChild(obj);
 
 		obj->SetWorld(this);
 
