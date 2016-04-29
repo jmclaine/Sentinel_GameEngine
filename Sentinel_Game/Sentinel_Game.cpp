@@ -18,12 +18,12 @@ upon compilation / linking.
 
 #include "Renderer.h"
 #include "PhysicsSystem.h"
-#include "ParticleSystem.h"
 #include "SpriteSystem.h"
 #include "Network/Socket.h"
 #include "AudioSystem.h"
 
 #include "GameWindow.h"
+#include "WindowInfo.h"
 
 #include "Archive.h"
 
@@ -35,6 +35,9 @@ upon compilation / linking.
 #include "ModelManager.h"
 #include "SoundManager.h"
 #include "RenderManager.h"
+#include "BlendStateManager.h"
+
+#include "RenderTexture.h"
 
 #include "Input.h"
 #include "Timing.h"
@@ -84,15 +87,15 @@ class MainApp
 public:
 
 	MainApp() :
-		mGameWindow(NULL),
-		mRenderer(NULL),
-		mGameWorld(NULL)
+		mGameWindow(nullptr),
+		mRenderer(nullptr),
+		mGameWorld(nullptr)
 	{
 		srand((UINT)time((time_t*)0));
 	}
 
 	~MainApp()
-	{}
+	{ }
 
 	void Startup(HINSTANCE hInstance, int nCmdShow)
 	{
@@ -117,7 +120,7 @@ public:
 		mGameWindow->Startup(mRenderer, hInstance, nCmdShow, "Sentinel Game", "SentinelClass", info);
 
 		mRTMain = mRenderer->CreateBackbuffer();
-		mDSMain = mRenderer->CreateDepthStencil(Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE);
+		mDSMain = mRenderer->CreateDepthStencil(WindowInfo::BASE_WIDTH, WindowInfo::BASE_HEIGHT);
 
 		////////////////////////////////////
 
@@ -130,18 +133,19 @@ public:
 		mGameWorld = new GameWorld();
 
 		mGameWorld->mRenderer = mRenderer;
-		mGameWorld->mTiming = new Timing();
-		mGameWorld->mPhysicsSystem = BuildPhysicsSystemBT();
-		mGameWorld->mAudioSystem = BuildAudioSystemAL();
+		mGameWorld->mTiming = std::unique_ptr<Timing>(new Timing());
+		mGameWorld->mPhysicsSystem = std::unique_ptr<PhysicsSystem>(BuildPhysicsSystemBT());
+		mGameWorld->mAudioSystem = std::unique_ptr<AudioSystem>(BuildAudioSystemAL());
 
-		mGameWorld->mTextureManager = new TextureManager(mRenderer);
-		mGameWorld->mShaderManager = new ShaderManager();
-		mGameWorld->mMaterialManager = new MaterialManager();
-		mGameWorld->mSpriteManager = new SpriteManager();
-		mGameWorld->mMeshManager = new MeshManager();
-		mGameWorld->mModelManager = new ModelManager();
-		mGameWorld->mSoundManager = new SoundManager();
-		mGameWorld->mRenderManager = new RenderManager();
+		mGameWorld->mTextureManager = std::unique_ptr<TextureManager>(new TextureManager(mRenderer));
+		mGameWorld->mShaderManager = std::unique_ptr<ShaderManager>(new ShaderManager());
+		mGameWorld->mMaterialManager = std::unique_ptr<MaterialManager>(new MaterialManager());
+		mGameWorld->mSpriteManager = std::unique_ptr<SpriteManager>(new SpriteManager());
+		mGameWorld->mMeshManager = std::unique_ptr<MeshManager>(new MeshManager());
+		mGameWorld->mModelManager = std::unique_ptr<ModelManager>(new ModelManager());
+		mGameWorld->mSoundManager = std::unique_ptr<SoundManager>(new SoundManager());
+		mGameWorld->mRenderManager = std::unique_ptr<RenderManager>(new RenderManager());
+		mGameWorld->mBlendStateManager = std::unique_ptr<BlendStateManager>(new BlendStateManager());
 
 		mGameWorld->mPhysicsSystem->Startup();
 
@@ -151,13 +155,13 @@ public:
 
 		mGameWorld->mTextureManager->Load(archive, mRenderer);
 		mGameWorld->mShaderManager->Load(archive, mRenderer);
-		mGameWorld->mMaterialManager->Load(archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager);
+		mGameWorld->mMaterialManager->Load(archive, mGameWorld->mShaderManager.get(), mGameWorld->mTextureManager.get(), mGameWorld->mBlendStateManager.get());
 		mGameWorld->mSpriteManager->Load(archive);
-		mGameWorld->mMeshManager->Load(archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager, mGameWorld->mMaterialManager);
-		mGameWorld->mModelManager->Load(archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager, mGameWorld->mMaterialManager);
-		mGameWorld->mSoundManager->Load(archive, mGameWorld->mAudioSystem);
+		mGameWorld->mMeshManager->Load(archive, mRenderer, mGameWorld->mMaterialManager.get());
+		mGameWorld->mModelManager->Load(archive, mRenderer, mGameWorld->mShaderManager.get(), mGameWorld->mTextureManager.get(), mGameWorld->mMaterialManager.get(), mGameWorld->mBlendStateManager.get());
+		mGameWorld->mSoundManager->Load(archive, mGameWorld->mAudioSystem.get());
 
-		mGameWorld->mSpriteSystem = new SpriteSystem(mRenderer, mGameWorld->mShaderManager->Get("GUI")->Layout(), 256);
+		mGameWorld->mSpriteSystem = std::unique_ptr<SpriteSystem>(new SpriteSystem(mRenderer, mGameWorld->mShaderManager->Get("GUI").lock()->Layout(), 256));
 
 		mGameWorld->Load(archive);
 
@@ -181,7 +185,7 @@ public:
 		MSG msg;
 		for (;;)
 		{
-			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+			if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 			{
 				if (msg.message == WM_QUIT)
 					return;
@@ -195,7 +199,7 @@ public:
 			else
 			{
 				static Timing* timing;
-				timing = mGameWorld->mTiming;
+				timing = mGameWorld->mTiming.get();
 
 				timing->Update();
 
@@ -223,7 +227,6 @@ public:
 				END_PROFILE(timing, "Light");
 
 				BEGIN_PROFILE(timing);
-				mGameWorld->UpdateDrawable();
 				mGameWorld->Present();
 				END_PROFILE(timing, "Drawable");
 

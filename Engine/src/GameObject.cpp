@@ -10,73 +10,61 @@
 #include "Component/Controller3D.h"
 #include "Component/Physics.h"
 
+#include <algorithm>
+
 namespace Sentinel
 {
-	DEFINE_SERIAL_REGISTER(GameObject);
+	SerialRegister GameObject::SERIAL_REGISTER("GameObject", GameObject::Clone);
+	Serializable* GameObject::Clone() { return new GameObject(); }
 
 	GameObject::GameObject(const std::string& name) :
-		mTransform(NULL),
-		mController(NULL),
-		mPhysics(NULL),
-		mDrawable(NULL),
-		mCamera(NULL),
-		mWorld(NULL),
+		mTransform(nullptr),
+		mController(nullptr),
+		mPhysics(nullptr),
+		mDrawable(nullptr),
+		mCamera(nullptr),
+		mWorld(nullptr),
 		mName(name),
 		mLayer(0x0001),
 		mEnabled(true)
-	{}
+	{ }
 
 	GameObject::~GameObject()
-	{
-		TRAVERSE_VECTOR(x, mComponent)
-			delete mComponent[x];
-	}
-
-	DEFINE_SERIAL_CLONE(GameObject);
+	{ }
 
 	////////////////////////////////////////////////////////////
 
-	GameComponent* GameObject::Attach(GameComponent* component)
-	{
-		if (!component)
-			return NULL;
-
-		component->SetOwner(this);
-
-		mComponent.push_back(component);
-
-		return component;
-	}
-
-	GameComponent* GameObject::Detach(GameComponent* component)
+	void GameObject::AddComponent(GameComponent* component)
 	{
 		_ASSERT(component);
 
-		TRAVERSE_VECTOR(x, mComponent)
+		component->SetOwner(this);
+
+		mComponents.push_back(std::move(std::unique_ptr<GameComponent>(component)));
+	}
+
+	void GameObject::RemoveComponent(GameComponent* component)
+	{
+		_ASSERT(component);
+
+		for (auto& it = mComponents.begin(); it != mComponents.end(); ++it)
 		{
-			if (component == mComponent[x])
+			if ((*it).get() == component)
 			{
-				mComponent.erase(mComponent.begin() + x);
-				break;
+				mComponents.erase(std::remove(mComponents.begin(), mComponents.end(), *it));
+				return;
 			}
 		}
-
-		return component;
 	}
 
 	////////////////////////////////////////////////////////////
 
-	GameObject* GameObject::AddChild(GameObject* obj)
+	void GameObject::AddChild(GameObject* obj)
 	{
-		if (mWorld)
-		{
-			mWorld->RemoveGameObject(obj);
+		obj->SetWorld(mWorld);
+		obj->SetParent(this);
 
-			obj->SetWorld(mWorld);
-			obj->SetParent(this);
-		}
-
-		return ListNode<GameObject>::AddChild(obj);
+		ListNode<GameObject>::AddChild(obj);
 	}
 
 	////////////////////////////////////////////////////////////
@@ -90,10 +78,8 @@ namespace Sentinel
 	{
 		mWorld = world;
 
-		TRAVERSE_VECTOR(x, mChild)
-		{
-			mChild[x]->SetWorld(world);
-		}
+		for (const auto& child : mChild)
+			child->SetWorld(world);
 	}
 
 	void GameObject::SetActive(bool active)
@@ -103,19 +89,19 @@ namespace Sentinel
 		if (mDrawable)
 			mDrawable->mEnabled = active;
 
-		TRAVERSE_VECTOR(x, mChild)
-			mChild[x]->SetActive(active);
+		for (const auto& child : mChild)
+			child->SetActive(active);
 	}
 
 	////////////////////////////////////////////////////////////
 
 	void GameObject::Startup()
 	{
-		TRAVERSE_VECTOR(x, mComponent)
-			mComponent[x]->Startup();
+		for (const auto& component : mComponents)
+			component->Startup();
 
-		TRAVERSE_VECTOR(x, mChild)
-			mChild[x]->Startup();
+		for (const auto& child : mChild)
+			child->Startup();
 	}
 
 	void GameObject::UpdateController()
@@ -125,8 +111,8 @@ namespace Sentinel
 			if (mController)
 				mController->Execute();
 
-			TRAVERSE_VECTOR(x, mChild)
-				mChild[x]->UpdateController();
+			for (const auto& child : mChild)
+				child->UpdateController();
 		}
 	}
 
@@ -137,8 +123,8 @@ namespace Sentinel
 			if (mPhysics)
 				mPhysics->Execute();
 
-			TRAVERSE_VECTOR(x, mChild)
-				mChild[x]->UpdatePhysics();
+			for (const auto& child : mChild)
+				child->UpdatePhysics();
 		}
 	}
 
@@ -149,8 +135,8 @@ namespace Sentinel
 			if (mTransform)
 				mTransform->Execute();
 
-			TRAVERSE_VECTOR(x, mChild)
-				mChild[x]->UpdateTransform();
+			for (const auto& child : mChild)
+				child->UpdateTransform();
 		}
 	}
 
@@ -158,18 +144,14 @@ namespace Sentinel
 	{
 		if (mEnabled)
 		{
-			GameComponent* component;
-
-			TRAVERSE_VECTOR(x, mComponent)
+			for (const auto& component : mComponents)
 			{
-				component = mComponent[x];
-
 				if (component->mEnabled)
 					component->Update();
 			}
 
-			TRAVERSE_VECTOR(x, mChild)
-				mChild[x]->UpdateComponents();
+			for (const auto& child : mChild)
+				child->UpdateComponents();
 		}
 	}
 
@@ -180,30 +162,18 @@ namespace Sentinel
 			if (mCamera)
 				mCamera->Execute();
 
-			TRAVERSE_VECTOR(x, mChild)
-				mChild[x]->UpdateCamera();
-		}
-	}
-
-	void GameObject::UpdateDrawable()
-	{
-		if (mEnabled)
-		{
-			if (mDrawable)
-				mDrawable->Execute();
-
-			TRAVERSE_VECTOR(x, mChild)
-				mChild[x]->UpdateDrawable();
+			for (auto child : mChild)
+				child->UpdateCamera();
 		}
 	}
 
 	void GameObject::Shutdown()
 	{
-		TRAVERSE_VECTOR(x, mComponent)
-			mComponent[x]->Shutdown();
+		for (const auto& component : mComponents)
+			component->Shutdown();
 
-		TRAVERSE_VECTOR(x, mChild)
-			mChild[x]->Shutdown();
+		for (const auto& child : mChild)
+			child->Shutdown();
 	}
 
 	////////////////////////////////////////////////////////////
@@ -214,17 +184,17 @@ namespace Sentinel
 
 		archive.Write(&mName);
 
-		BYTE size = (BYTE)mComponent.size();
+		BYTE size = (BYTE)mComponents.size();
 		archive.Write(&size);
 
-		TRAVERSE_VECTOR(x, mComponent)
-			mComponent[x]->Save(archive);
+		for (const auto& component : mComponents)
+			component->Save(archive);
 
 		size = (BYTE)mChild.size();
 		archive.Write(&size);
 
-		TRAVERSE_VECTOR(x, mChild)
-			mChild[x]->Save(archive);
+		for (const auto& child : mChild)
+			child->Save(archive);
 	}
 
 	void GameObject::Load(Archive& archive)
@@ -242,7 +212,7 @@ namespace Sentinel
 			component = (GameComponent*)SerialRegister::Load(archive);
 			if (component)
 			{
-				Attach(component);
+				AddComponent(component);
 				component->Load(archive);
 			}
 		}
@@ -266,11 +236,11 @@ namespace Sentinel
 	{
 		GameObject* obj = new GameObject(mName);
 
-		TRAVERSE_VECTOR(x, mComponent)
-			obj->Attach(mComponent[x]->Copy());
+		for (const auto& component : mComponents)
+			obj->AddComponent(component->Copy());
 
-		TRAVERSE_VECTOR(x, mChild)
-			obj->AddChild(mChild[x]->Copy());
+		for (const auto& child : mChild)
+			obj->AddChild(child->Copy());
 
 		return obj;
 	}

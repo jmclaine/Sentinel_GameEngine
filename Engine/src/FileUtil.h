@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include "Sentinel.h"
-#include "Types.h"
 
 namespace Sentinel
 {

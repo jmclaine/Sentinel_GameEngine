@@ -5,14 +5,14 @@ namespace Sentinel
 {
 	TextureDX::TextureDX(
 		UINT width, UINT height, 
-		ImageFormat::Type format, 
+		ImageFormat format, 
 		ID3D11Texture2D* texture, 
 		ID3D11ShaderResourceView* resource) :
 
 		Texture(width, height, format),
 		mTexture(texture),
 		mResource(resource)
-	{}
+	{ }
 
 	TextureDX::~TextureDX()
 	{
@@ -29,14 +29,14 @@ namespace Sentinel
 
 	TextureCubeDX::TextureCubeDX(
 		UINT width, UINT height,
-		ImageFormat::Type format,
+		ImageFormat format,
 		ID3D11Texture3D* texture,
 		ID3D11ShaderResourceView* resource) :
 
 		Texture(width, height, format),
 		mTexture(texture),
 		mResource(resource)
-	{}
+	{ }
 
 	TextureCubeDX::~TextureCubeDX()
 	{

@@ -2,26 +2,39 @@
 
 #include "GameComponent.h"
 
-namespace Sentinel {
-namespace Component
+namespace Sentinel
 {
-	class Physics;
-
-	class SENTINEL_DLL Trigger : public GameComponent
+	namespace Component
 	{
-		DECLARE_SERIAL();
+		class Physics;
 
-		Physics* mPhysics;
+		class SENTINEL_DLL Trigger : public GameComponent
+		{
+		private:
+			static SerialRegister SERIAL_REGISTER;
+			static Serializable* Clone();
 
-	public:
+			Physics* mPhysics;
 
-		Trigger();
-		~Trigger();
+		public:
+			Trigger();
+			~Trigger();
 
-		void Startup();
+			void Startup();
+			void Update();
+			void Shutdown();
 
-		void Update();
+			/////////////////////////////////
 
-		void Shutdown();
-	};
-}}
+			void Save(Archive& archive);
+			void Load(Archive& archive);
+
+			/////////////////////////////////
+
+			GameComponent* Copy();
+
+		protected:
+			void Copy(GameComponent* component);
+		};
+	}
+}

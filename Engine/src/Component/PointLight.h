@@ -4,64 +4,71 @@
 #include "Matrix4x4.h"
 #include "Material.h"
 
-namespace Sentinel {
-namespace Component
+namespace Sentinel
 {
-	enum CameraAxisType
+	namespace Component
 	{
-		CAMERA_AXIS_POS_X,
-		CAMERA_AXIS_NEG_X,
-		CAMERA_AXIS_POS_Y,
-		CAMERA_AXIS_NEG_Y,
-		CAMERA_AXIS_POS_Z,
-		CAMERA_AXIS_NEG_Z,
+		class Camera;
 
-		NUM_CAMERA_AXIS
-	};
+		enum CameraAxisType
+		{
+			CAMERA_AXIS_POS_X,
+			CAMERA_AXIS_NEG_X,
+			CAMERA_AXIS_POS_Y,
+			CAMERA_AXIS_NEG_Y,
+			CAMERA_AXIS_POS_Z,
+			CAMERA_AXIS_NEG_Z,
 
-	class SENTINEL_DLL PointLight : public Light
-	{
-		DECLARE_SERIAL();
+			NUM_CAMERA_AXIS
+		};
 
-	protected:
+		class SENTINEL_DLL PointLight : public Light
+		{
+			static SerialRegister SERIAL_REGISTER;
+			static Serializable* Clone();
 
-		UINT mResolution;
+		protected:
+			UINT mResolution;
 
-		Matrix4x4 mMatrixProjection;
-		Matrix4x4 mMatrixView[NUM_CAMERA_AXIS];
-		Matrix4x4 mMatrixFinal[NUM_CAMERA_AXIS];
+			Matrix4x4 mMatrixProjection;
+			Matrix4x4 mMatrixView[NUM_CAMERA_AXIS];
+			Matrix4x4 mMatrixFinal[NUM_CAMERA_AXIS];
 
-	public:
+		public:
+			std::weak_ptr<Material> mMaterial;
 
-		std::shared_ptr<Material> mMaterial;
+			///////////////////////////////////////
 
-		///////////////////////////////////////
+			PointLight();
+			PointLight(UINT resolution);	// creates a cube texture with dimensions of resolution^3
+			~PointLight();
 
-		PointLight();
-		PointLight(UINT resolution);	// creates a cube texture with dimensions of resolution^3
-		~PointLight();
+			void Startup();
+			void Update();
+			void Shutdown();
 
-		void Startup();
-		void Update();
-		void Shutdown();
+			///////////////////////////////////////
 
-		///////////////////////////////////////
+			void Draw(Camera* camera);
 
-		void Present();
+			const Matrix4x4& GetMatrixFinal(CameraAxisType axis);
 
-		const Matrix4x4& GetMatrixFinal(CameraAxisType axis);
+			float* PtrMatrixFinal();
 
-		float* PtrMatrixFinal();
+		private:
+			void AddDynamic(GameObject* obj);
 
-	private:
+			//////////////////////////////
 
-		// Adds Component::Drawables if they are dynamic,
-		// and within range of the light.
-		//
-		void AddDynamic(GameObject* obj);
+			void Save(Archive& archive);
+			void Load(Archive& archive);
 
-		///////////////////////////////////////
+			//////////////////////////////
 
-		GameComponent* Copy();
-	};
-}}
+			GameComponent* Copy();
+
+		protected:
+			void Copy(GameComponent* component);
+		};
+	}
+}

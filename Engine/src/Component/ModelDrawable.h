@@ -11,37 +11,43 @@ namespace Sentinel
 	class Material;
 	class Model;
 
-namespace Component
-{
-	class SENTINEL_DLL ModelDrawable : public Drawable
+	namespace Component
 	{
-		DECLARE_SERIAL();
+		class SENTINEL_DLL ModelDrawable : public Drawable
+		{
+			static SerialRegister SERIAL_REGISTER;
+			static Serializable* Clone();
 
-	public:
+		public:
+			std::weak_ptr<Model> mModel;
 
-		std::shared_ptr<Model> mModel;
+			///////////////////////////////////
 
-		///////////////////////////////////
+			ModelDrawable();
+			ModelDrawable(std::weak_ptr<Model>& model);
+			ModelDrawable(std::weak_ptr<Model>&& model);
 
-		ModelDrawable();
-		ModelDrawable(std::shared_ptr<Model> model);
+			void Startup();
+			void Update();
+			void Shutdown();
 
-		void Set(std::shared_ptr<Model> model);
+			///////////////////////////////////
 
-		void Startup();
+			void CalculateBounds();
+			bool CheckVisible(Camera* camera);
+			void Draw(Camera* camera);
 
-		///////////////////////////////////
+			///////////////////////////////////
 
-		void Execute();
+			void Save(Archive& archive);
+			void Load(Archive& archive);
 
-		void CalculateBounds();
+			///////////////////////////////////
 
-		bool CheckVisible(Camera* camera);
+			GameComponent* Copy();
 
-		void Draw();
-
-		///////////////////////////////////
-
-		GameComponent* Copy();
-	};
-}}
+		protected:
+			void Copy(GameComponent* component);
+		};
+	}
+}

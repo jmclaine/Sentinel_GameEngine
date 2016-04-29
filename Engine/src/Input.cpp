@@ -2,7 +2,7 @@
 #include <conio.h>
 
 #include "Input.h"
-#include "Renderer.h"
+#include "WindowInfo.h"
 
 namespace Sentinel
 {
@@ -61,8 +61,8 @@ namespace Sentinel
 
 			if (scaleToWindow)
 			{
-				mousePos.x = (LONG)((float)(mousePos.x) * (float)Renderer::WINDOW_WIDTH_BASE / (float)(rect.right));
-				mousePos.y = (LONG)((float)(mousePos.y) * (float)Renderer::WINDOW_HEIGHT_BASE / (float)(rect.bottom));
+				mousePos.x = (LONG)((float)(mousePos.x) * (float)WindowInfo::BASE_WIDTH / (float)(rect.right));
+				mousePos.y = (LONG)((float)(mousePos.y) * (float)WindowInfo::BASE_HEIGHT / (float)(rect.bottom));
 			}
 			else
 			{
@@ -172,7 +172,7 @@ namespace Sentinel
 	//////////////////////////////////////////////////////////////////////////
 
 	Keyboard::Keyboard()
-	{}
+	{ }
 
 	Keyboard& Keyboard::Get()
 	{

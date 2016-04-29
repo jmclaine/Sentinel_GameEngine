@@ -19,76 +19,73 @@ struct RECT
 };
 #endif
 
-namespace Sentinel {
-namespace Component
+namespace Sentinel
 {
-	class Transform;
-
-	class SENTINEL_DLL Camera : public GameComponent
+	namespace Component
 	{
-	protected:
+		class Transform;
 
-		Transform* mTransform;
+		class SENTINEL_DLL Camera : public GameComponent
+		{
+		protected:
+			Transform* mTransform;
 
-		Matrix4x4 mMatrixView;
-		Matrix4x4 mMatrixProjection;
-		Matrix4x4 mMatrixWVP;
+			Matrix4x4 mMatrixView;
+			Matrix4x4 mMatrixProjection;
+			Matrix4x4 mMatrixWVP;
 
-		Vector3 mLookAt;
+			Vector3 mLookAt;
 
-		BoundingFrustum mFrustum;
+			BoundingFrustum mFrustum;
 
-	public:
+		public:
+			WORD mRenderLayer;
 
-		WORD mRenderLayer;
+			ColorRGBA mClearColor;
+			float mClearDepth;
 
-		ColorRGBA mClearColor;
-		float mClearDepth;
+			int mViewportOffsetX;
+			int mViewportOffsetY;
 
-		int mViewportOffsetX;
-		int mViewportOffsetY;
+			UINT mViewportWidth;
+			UINT mViewportHeight;
 
-		UINT mViewportWidth;
-		UINT mViewportHeight;
+			DepthStencil* mDepthStencil;
+			RenderTexture* mRenderTexture;
 
-		DepthStencil* mDepthStencil;
-		RenderTexture* mRenderTexture;
+		protected:
+			Camera();
 
-	protected:
+		public:
+			virtual void Startup();
+			virtual void Shutdown();
 
-		Camera();
+			////////////////////////////////
 
-	public:
+			virtual void Execute();
 
-		virtual void Startup();
-		virtual void Shutdown();
+			virtual void SetOwner(GameObject* owner);
 
-		////////////////////////////////
+			const Transform* GetTransform();
 
-		virtual void Execute();
+			const Matrix4x4& GetMatrixWorld();
+			const Matrix4x4& GetMatrixView();
+			const Matrix4x4& GetMatrixProjection();
+			const Matrix4x4& GetMatrixWVP();
 
-		virtual void SetOwner(GameObject* owner);
+			const BoundingFrustum& GetFrustum();
 
-		const Transform* GetTransform();
+			virtual Ray ScreenPointToRay(UINT mouseX, UINT mouseY, UINT screenWidth = 0, UINT screenHeight = 0) = 0;
 
-		const Matrix4x4& GetMatrixWorld();
-		const Matrix4x4& GetMatrixView();
-		const Matrix4x4& GetMatrixProjection();
-		const Matrix4x4& GetMatrixWVP();
+			void Apply(Renderer* renderer);
 
-		const BoundingFrustum& GetFrustum();
+			////////////////////////////////
 
-		virtual Ray ScreenPointToRay(UINT mouseX, UINT mouseY, UINT screenWidth = 0, UINT screenHeight = 0) = 0;
+			virtual void Save(Archive& archive);
+			virtual void Load(Archive& archive);
 
-		void Apply(Renderer* renderer);
-
-		////////////////////////////////
-
-		virtual void Save(Archive& archive);
-		virtual void Load(Archive& archive);
-
-		////////////////////////////////
-
-		void Copy(GameComponent* component);
-	};
-}}
+		protected:
+			void Copy(GameComponent* component);
+		};
+	}
+}

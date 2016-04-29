@@ -13,15 +13,14 @@ Edits levels for a game created with the Sentinel Engine.
 
 #include "Renderer.h"
 #include "PhysicsSystem.h"
-#include "ParticleSystem.h"
 #include "SpriteSystem.h"
 #include "Network/Socket.h"
 #include "AudioSystem.h"
 #include "FontSystem.h"
 
-#include "GameWindow.h"
-
 #include "Archive.h"
+#include "WindowInfo.h"
+#include "RenderTexture.h"
 
 #include "TextureManager.h"
 #include "ShaderManager.h"
@@ -30,7 +29,9 @@ Edits levels for a game created with the Sentinel Engine.
 #include "MeshManager.h"
 #include "ModelManager.h"
 #include "SoundManager.h"
+#include "FontManager.h"
 #include "RenderManager.h"
+#include "BlendStateManager.h"
 
 #include "Input.h"
 #include "Timing.h"
@@ -38,9 +39,7 @@ Edits levels for a game created with the Sentinel Engine.
 #include "FileUtil.h"
 #include "Profile.h"
 
-#include "MeshBuilder.h"
-#include "Model.h"
-
+#include "GameWindow.h"
 #include "GameWorld.h"
 #include "GameObject.h"
 
@@ -51,13 +50,18 @@ Edits levels for a game created with the Sentinel Engine.
 #include "Component/PerspectiveCamera.h"
 #include "Component/OrthographicCamera.h"
 #include "Component/PlayerController.h"
-#include "Component/ParticleEmitter.h"
+#include "Component/SpriteParticleEmitter.h"
 #include "Component/SpriteDrawable.h"
 #include "Component/MeshDrawable.h"
 #include "Component/ModelDrawable.h"
 
+#include "Particle.h"
+#include "ParticleEffect.h"
+
 #include "EditorControllerComponent.h"
 
+#include "MeshBuilder.h"
+#include "Model.h"
 #include "Sound.h"
 #include "Sprite.h"
 #include "Shape.h"
@@ -74,8 +78,7 @@ Edits levels for a game created with the Sentinel Engine.
 using namespace Sentinel;
 using namespace Sentinel::Component;
 
-// Main Application.
-//
+
 class MainApp
 {
 	HACCEL mAccelTable;
@@ -121,32 +124,32 @@ class MainApp
 public:
 
 	MainApp() :
-		mGameWindow(NULL),
-		mRenderer(NULL),
-		mGameWorld(NULL),
-		mEditorWorld(NULL),
-		mRTMain(NULL),
-		mDSMain(NULL),
-		mRTGameWorld(NULL),
-		mDSGameWorld(NULL),
-		mRTBackbufferMesh(NULL),
-		mSelectedObject(NULL),
-		mHoverObject(NULL),
+		mGameWindow(nullptr),
+		mRenderer(nullptr),
+		mGameWorld(nullptr),
+		mEditorWorld(nullptr),
+		mRTMain(nullptr),
+		mDSMain(nullptr),
+		mRTGameWorld(nullptr),
+		mDSGameWorld(nullptr),
+		mRTBackbufferMesh(nullptr),
+		mSelectedObject(nullptr),
+		mHoverObject(nullptr),
 		mHoverDist(0),
-		mTranslateObject(NULL),
-		mBoundsObject(NULL),
+		mTranslateObject(nullptr),
+		mBoundsObject(nullptr),
 		mSelectedColorX(1, 0, 0, 0.5f),
 		mSelectedColorY(0, 1, 0, 0.5f),
 		mSelectedColorZ(0, 0, 1, 0.5f),
 		mSelectedColorAxis(1, 1, 0, 0.5f),
-		mDebug(NULL),
+		mDebug(nullptr),
 		mMouseToWorldRay(Vector3(), Vector3())
 	{
 		srand((UINT)time((time_t*)0));
 	}
 
 	~MainApp()
-	{}
+	{ }
 
 	void Startup(HINSTANCE hInstance, int nCmdShow)
 	{
@@ -154,8 +157,6 @@ public:
 
 		mAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_SENTINEL_EDITOR));
 
-		// Load config file to setup windows for the renderer.
-		//
 		WindowInfo info;
 		mRenderer = Renderer::Create("config.xml", info);
 
@@ -169,16 +170,11 @@ public:
 				throw AppException("Failed to create OpenGL Renderer");
 		}
 
-		// Prepare main window.
-		//
 		mGameWindow->Startup(mRenderer, hInstance, nCmdShow, "Sentinel Editor", "SentinelClass", info);
 
 		mRTMain = mRenderer->CreateBackbuffer();
-		mDSMain = mRenderer->CreateDepthStencil(Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE);
+		mDSMain = mRenderer->CreateDepthStencil(WindowInfo::BASE_WIDTH, WindowInfo::BASE_HEIGHT);
 
-		////////////////////////////////////
-		// Prepare Editor and World View.
-		//
 		SetDirectory("Assets");
 
 		PrepareEditorWorld();
@@ -196,7 +192,7 @@ public:
 		MSG msg;
 		for (;;)
 		{
-			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+			if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 			{
 				if (msg.message == WM_QUIT)
 					return;
@@ -212,7 +208,7 @@ public:
 				static char drawnText[256];
 				static Timing* timing;
 
-				timing = mEditorWorld->mTiming;
+				timing = mEditorWorld->mTiming.get();
 
 				timing->Update();
 				mGameWorld->mTiming->Update();
@@ -243,12 +239,11 @@ public:
 				END_PROFILE(timing, "Light");
 
 				BEGIN_PROFILE(timing);
-				mGameWorld->UpdateDrawable();
+				mGameWorld->UpdateComponents();
 				mGameWorld->Present(mWorldCamera);
 
 				DrawBounds();
 				DrawTranslateObject();
-
 				END_PROFILE(timing, "Drawable");
 
 				////////////////////////////////////
@@ -266,7 +261,6 @@ public:
 				mEditorCamera->mViewportHeight = info->Height();
 
 				mEditorWorld->UpdateCamera();
-				mEditorWorld->UpdateDrawable();
 				mEditorWorld->Present(mEditorCamera);
 				END_PROFILE(timing, "Editor");
 
@@ -327,12 +321,17 @@ public:
 			return;
 		}
 
+		auto shaderManager = mGameWorld->mShaderManager.get();
+		auto textureManager = mGameWorld->mTextureManager.get();
+		auto materialManager = mGameWorld->mMaterialManager.get();
+		auto blendManager = mGameWorld->mBlendStateManager.get();
+
 		mGameWorld->mTextureManager->Save(archive, mRenderer);
 		mGameWorld->mShaderManager->Save(archive);
-		mGameWorld->mMaterialManager->Save(archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager);
+		mGameWorld->mMaterialManager->Save(archive, shaderManager, textureManager, blendManager);
 		mGameWorld->mSpriteManager->Save(archive);
-		mGameWorld->mMeshManager->Save(archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager, mGameWorld->mMaterialManager);
-		mGameWorld->mModelManager->Save(archive, mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager, mGameWorld->mMaterialManager);
+		mGameWorld->mMeshManager->Save(archive, mRenderer, materialManager);
+		mGameWorld->mModelManager->Save(archive, mRenderer, shaderManager, textureManager, materialManager, blendManager);
 		mGameWorld->mSoundManager->Save(archive);
 
 		mGameWorld->Save(archive);
@@ -342,393 +341,414 @@ public:
 		system("copy Default.MAP ..\\Sentinel_Game");
 	}
 
+	void CreateDefaultBlend(GameWorld* world)
+	{
+		{
+			auto state = std::shared_ptr<BlendState>(
+				mRenderer->CreateBlendState(
+					BlendFormat::ONE, BlendFormat::ZERO, BlendFunction::ADD,
+					BlendFormat::ONE, BlendFormat::ZERO, BlendFunction::ADD));
+			world->mBlendStateManager->Add("DEFAULT", state);
+		}
+		{
+			auto state = std::shared_ptr<BlendState>(
+				mRenderer->CreateBlendState(
+					BlendFormat::SRC_ALPHA, BlendFormat::ONE_MINUS_SRC_ALPHA, BlendFunction::ADD,
+					BlendFormat::SRC_ALPHA, BlendFormat::ONE_MINUS_SRC_ALPHA, BlendFunction::ADD));
+			world->mBlendStateManager->Add("ALPHA", state);
+		}
+	}
+
+	void CreateDefaultTexture(GameWorld* world)
+	{
+		UCHAR* newTex = new UCHAR[4];
+
+		newTex[0] = 255;
+		newTex[1] = 255;
+		newTex[2] = 255;
+		newTex[3] = 255;
+
+		auto texture = std::shared_ptr<Texture>(
+			mRenderer->CreateTexture(newTex, 1, 1, ImageFormat::RGBA, false));
+
+		delete newTex;
+
+		world->mTextureManager->Add("NULL", texture);
+	}
+
 	void PrepareEditorWorld()
 	{
-		MeshBuilder meshBuilder;
-		std::shared_ptr<Mesh> mesh;
-		std::shared_ptr<Material> material;
-		std::shared_ptr<Texture> texture;
-		std::shared_ptr<Shader> shader;
-		std::shared_ptr<Sprite> sprite;
-
-		GameObject* obj;
-		Transform* transform;
-		Physics* physics;
-		RigidBody* body;
-
-		/////////////////////////////////////////////////////////////////////////
-
 		mEditorWorld = new GameWorld();
+
 		mEditorWorld->mRenderer = mRenderer;
-		mEditorWorld->mTiming = new Timing();
-		mEditorWorld->mPhysicsSystem = BuildPhysicsSystemBT();
-		mEditorWorld->mAudioSystem = BuildAudioSystemAL();
-		mEditorWorld->mFontSystem = BuildFontSystemFT();
+		mEditorWorld->mRenderManager = std::unique_ptr<RenderManager>(new RenderManager());
+
+		mEditorWorld->mTiming = std::unique_ptr<Timing>(new Timing());
+		mEditorWorld->mPhysicsSystem = std::unique_ptr<PhysicsSystem>(BuildPhysicsSystemBT());
+
+		mEditorWorld->mAudioSystem = std::unique_ptr<AudioSystem>(BuildAudioSystemAL());
+		mEditorWorld->mSoundManager = std::unique_ptr<SoundManager>(new SoundManager());
+
+		mEditorWorld->mFontSystem = std::unique_ptr<FontSystem>(BuildFontSystemFT());
+		mEditorWorld->mFontManager = std::unique_ptr<FontManager>(new FontManager());
+
+		mEditorWorld->mShaderManager = std::unique_ptr<ShaderManager>(new ShaderManager());
+		mEditorWorld->mTextureManager = std::unique_ptr<TextureManager>(new TextureManager(mRenderer));
+		
+		mEditorWorld->mMaterialManager = std::unique_ptr<MaterialManager>(new MaterialManager());
+		mEditorWorld->mSpriteManager = std::unique_ptr<SpriteManager>(new SpriteManager());
+		mEditorWorld->mMeshManager = std::unique_ptr<MeshManager>(new MeshManager());
+		mEditorWorld->mModelManager = std::unique_ptr<ModelManager>(new ModelManager());
+		mEditorWorld->mBlendStateManager = std::unique_ptr<BlendStateManager>(new BlendStateManager());
 
 		mEditorWorld->mPhysicsSystem->Startup();
 
-		mEditorWorld->mTextureManager = new TextureManager(mRenderer);
-		mEditorWorld->mShaderManager = new ShaderManager();
-		mEditorWorld->mMaterialManager = new MaterialManager();
-		mEditorWorld->mSpriteManager = new SpriteManager();
-		mEditorWorld->mMeshManager = new MeshManager();
-		mEditorWorld->mModelManager = new ModelManager();
-		mEditorWorld->mSoundManager = new SoundManager();
-		mEditorWorld->mRenderManager = new RenderManager();
+		// Create Default Blend
+		CreateDefaultBlend(mEditorWorld);
 
-		SetDirectory("Shaders");
-
-		DIR *dir;
-		struct dirent *ent;
-		if ((dir = opendir(GetDirectory().c_str())) != NULL)
+		// Create Default Texture
+		CreateDefaultTexture(mEditorWorld);
+		
+		// Create Shaders
 		{
-			while ((ent = readdir(dir)) != NULL)
+			SetDirectory("Shaders");
+
+			DIR *dir;
+			struct dirent *ent;
+			if ((dir = opendir(GetDirectory().c_str())) != nullptr)
 			{
-				std::string name(ent->d_name);
-				size_t len = name.size();
-
-				if (name.find(".xsh") != std::string::npos)
+				while ((ent = readdir(dir)) != nullptr)
 				{
-					Shader* shader = mRenderer->CreateShaderFromFile(name.c_str());
+					std::string name(ent->d_name);
+					size_t len = name.size();
 
-					if (!shader)
+					if (name.find(".xsh") != std::string::npos)
 					{
-						closedir(dir);
-						throw AppException("Failed to load 'Assets\\Shaders\\" + name);
+						Shader* shader = mRenderer->CreateShaderFromFile(name.c_str());
+
+						if (!shader)
+						{
+							closedir(dir);
+							throw AppException("Failed to load 'Assets\\Shaders\\" + name);
+						}
+
+						mEditorWorld->mShaderManager->Add(name.substr(0, name.find_first_of('.')), std::shared_ptr<Shader>(shader));
 					}
-
-					mEditorWorld->mShaderManager->Add(name.substr(0, len - 4), SHARED(shader));
 				}
+				closedir(dir);
 			}
-			closedir(dir);
+			else
+			{
+				throw AppException("Failed to open 'Assets\\Shaders' directory.");
+			}
+
+			SetDirectory("..");
 		}
-		else
+		// Create Font
 		{
-			throw AppException("Failed to open 'Assets\\Shaders' directory.");
+			auto shader = mEditorWorld->mShaderManager->Get("GUI").lock();
+
+			auto fontSystem = mEditorWorld->mFontSystem.get();
+			fontSystem->mSpriteSystem = std::unique_ptr<SpriteSystem>(new SpriteSystem(mRenderer, shader->Layout(), 256));
+			fontSystem->Load("Font\\courbd.ttf");
+
+			auto font = fontSystem->Build(12, 12);
+			auto material = font->mMaterial;
+			material->mShader = shader;
+			material->mBlendState = mEditorWorld->mBlendStateManager->Get("ALPHA");
+			material->mCullMode = CullFormat::NONE;
+			material->mDepthMode = DepthFormat::OFF;
+
+			mEditorWorld->mFontManager->Add("courbd.ttf", std::shared_ptr<Font>(font));
+
+			fontSystem->mSpriteSystem->mMaterial = material;
 		}
-
-		/*
-		std::vector<std::string> names;
-		std::vector<std::shared_ptr<Shader>> shaders;
-
-		mShaderManager->GetAll(names, shaders);
-
-		for (int x = 0; x < (int)names.size(); ++x)
+		// Create GUI
 		{
-		mAssetShader->addChild(new AssetTreeItem<Shader>(names[x].c_str(), shaders[x]));
+			auto shader = mEditorWorld->mShaderManager->Get("GUI").lock();
+			mEditorWorld->mSpriteSystem = std::unique_ptr<SpriteSystem>(new SpriteSystem(mRenderer, shader->Layout(), 256));
+
+			auto texture = std::shared_ptr<Texture>(mRenderer->CreateTextureFromFile("Textures\\GUI.png"));
+			mEditorWorld->mTextureManager->Add("GUI", texture);
+
+			auto material = std::shared_ptr<Material>(new Material());
+			mEditorWorld->mMaterialManager->Add("GUI", material);
+
+			material->mShader = mEditorWorld->mShaderManager->Get("GUI");
+			material->mBlendState = mEditorWorld->mBlendStateManager->Get("ALPHA");
+			material->mTexture[(BYTE)TextureIndex::DIFFUSE] = texture;
+			material->mRenderQueue = (WORD)RenderQueue::FOREGROUND;
+			material->mCullMode = CullFormat::NONE;
+			material->mDepthMode = DepthFormat::OFF;
+
+			mEditorWorld->mSpriteSystem->mMaterial = material;
+
+			mEditorWorld->mShaderManager->Get("GUI").lock()->SetSampler(0, SamplerMode::WRAP, SamplerMode::WRAP, SamplerFilter::POINT, SamplerFilter::POINT);
+			mEditorWorld->mShaderManager->Get("GUI_Mesh").lock()->SetSampler(0, SamplerMode::WRAP, SamplerMode::WRAP, SamplerFilter::POINT, SamplerFilter::POINT);
+			mEditorWorld->mShaderManager->Get("RT_Color").lock()->SetSampler(0, SamplerMode::WRAP, SamplerMode::WRAP, SamplerFilter::POINT, SamplerFilter::POINT);
+			mEditorWorld->mShaderManager->Get("Normal_Map").lock()->SetSampler(0, SamplerMode::WRAP, SamplerMode::WRAP, SamplerFilter::POINT, SamplerFilter::POINT, SamplerFilter::LINEAR);
 		}
-		*/
-		SetDirectory("..");
-
-		shader = mEditorWorld->mShaderManager->Get("GUI");
-
-		FontSystem* fontSystem = mEditorWorld->mFontSystem;
-		fontSystem->mSpriteSystem = SHARED(new SpriteSystem(mRenderer, shader->Layout(), 256));
-		fontSystem->Load("Font\\courbd.ttf");
-		fontSystem->mFont = fontSystem->Build(12, 12);
-
-		material = fontSystem->mFont->mMaterial;
-		material->mShader = shader;
-		material->mBlendState = mRenderer->BLEND_ALPHA;
-		material->mCullMode = CullFormat::NONE;
-		material->mDepthMode = DepthFormat::OFF;
-
-		fontSystem->mSpriteSystem->mMaterial = material;
-
-
-		mEditorWorld->mSpriteSystem = new SpriteSystem(mRenderer, shader->Layout(), 256);
-
-		texture = mEditorWorld->mTextureManager->Add("GUI.png", SHARED(mRenderer->CreateTextureFromFile("Textures\\GUI.png")));
-
-		material = mEditorWorld->mMaterialManager->Add("GUI", SHARED(new Material()));
-		material->mShader = mEditorWorld->mShaderManager->Get("GUI");
-		material->mBlendState = mRenderer->BLEND_ALPHA;
-		material->mTexture[TextureIndex::DIFFUSE] = texture;
-		material->mRenderQueue = RenderQueue::FOREGROUND;
-		material->mCullMode = CullFormat::NONE;
-		material->mDepthMode = DepthFormat::OFF;
-
-		mEditorWorld->mSpriteSystem->mMaterial = material;
-
-		mEditorWorld->mShaderManager->Get("GUI")->SetSampler(0, SamplerMode::WRAP, SamplerMode::WRAP, SamplerFilter::POINT, SamplerFilter::POINT);
-		mEditorWorld->mShaderManager->Get("GUI_Mesh")->SetSampler(0, SamplerMode::WRAP, SamplerMode::WRAP, SamplerFilter::POINT, SamplerFilter::POINT);
-		mEditorWorld->mShaderManager->Get("RT_Color")->SetSampler(0, SamplerMode::WRAP, SamplerMode::WRAP, SamplerFilter::POINT, SamplerFilter::POINT);
-		mEditorWorld->mShaderManager->Get("Normal_Map")->SetSampler(0, SamplerMode::WRAP, SamplerMode::WRAP, SamplerFilter::POINT, SamplerFilter::POINT, SamplerFilter::LINEAR);
-
-		//
 		// Create World View Backbuffer
-		//
-		mRTGameWorld = mRenderer->CreateRenderTexture(mEditorWorld->mTextureManager->Add("Backbuffer", SHARED(mRenderer->CreateTexture(NULL, Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE, ImageFormat::RGB))).get());
-		mDSGameWorld = mRenderer->CreateDepthStencil(Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE);
+		{
+			auto texture = std::shared_ptr<Texture>(mRenderer->CreateTexture(nullptr, WindowInfo::BASE_WIDTH, WindowInfo::BASE_HEIGHT, ImageFormat::RGB, false));
+			mEditorWorld->mTextureManager->Add("Backbuffer", texture);
 
-		material = mEditorWorld->mMaterialManager->Add("Backbuffer", std::shared_ptr< Material >(new Material()));
-		material->mShader = mEditorWorld->mShaderManager->Get("RT_Color");
-		material->mBlendState = mRenderer->BLEND_OFF;
-		material->mTexture[TextureIndex::DIFFUSE] = mEditorWorld->mTextureManager->Get("Backbuffer");
-		material->mRenderQueue = RenderQueue::FOREGROUND;
+			mRTGameWorld = mRenderer->CreateRenderTexture(texture.get());
+			mDSGameWorld = mRenderer->CreateDepthStencil(WindowInfo::BASE_WIDTH, WindowInfo::BASE_HEIGHT);
 
-		mRTBackbufferMesh = MeshBuilder::BuildRenderTextureMesh(mRenderer, material->mShader->Layout());
-		mRTBackbufferMesh->mMaterial = material;
-		
-		//
+			auto shader = mEditorWorld->mShaderManager->Get("RT_Color");
+			auto material = std::shared_ptr<Material>(new Material());
+			material->mShader = shader;
+			material->mBlendState = mEditorWorld->mBlendStateManager->Get("DEFAULT");
+			material->mTexture[(BYTE)TextureIndex::DIFFUSE] = texture;
+			material->mRenderQueue = (WORD)RenderQueue::FOREGROUND;
+			mEditorWorld->mMaterialManager->Add("Backbuffer", material);
+
+			mRTBackbufferMesh = MeshBuilder::BuildRenderTextureMesh(mRenderer, shader.lock()->Layout());
+			mRTBackbufferMesh->mMaterial = material;
+		}
 		// GUI Camera
-		//
-		GameObject* cameraGUI = mEditorWorld->AddGameObject(new GameObject());
-		cameraGUI->mName = "GUI Camera";
+		{
+			auto cameraGUI = new GameObject("GUI Camera");
 
-		transform = (Transform*)cameraGUI->Attach(new Transform());
+			cameraGUI->AddComponent(new Transform());
 
-		mEditorCamera = (OrthographicCamera*)cameraGUI->Attach(new OrthographicCamera(Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE));
-		mEditorCamera->mDepthStencil = mDSMain;
-		mEditorCamera->mRenderTexture = mRTMain;
-		mEditorCamera->mClearColor = ColorRGBA(0.2f, 0.2f, 0.2f, 1.0f);
-		
-		//
+			mEditorCamera = new OrthographicCamera(WindowInfo::BASE_WIDTH, WindowInfo::BASE_HEIGHT);
+			mEditorCamera->mDepthStencil = mDSMain;
+			mEditorCamera->mRenderTexture = mRTMain;
+			mEditorCamera->mClearColor = ColorRGBA(0.2f, 0.2f, 0.2f, 1.0f);
+
+			cameraGUI->AddComponent(mEditorCamera);
+
+			mEditorWorld->AddGameObject(cameraGUI);
+		}
 		// GUI Widgets
-		//
-		sprite = mEditorWorld->mSpriteManager->Add("GUI", SHARED(new Sprite()));
-		sprite->AddFrame(Sprite::QUADtoTEXCOORD(Quad(0, 0, 1, 1), texture->Width(), texture->Height()));
-		sprite->AddFrame(Sprite::QUADtoTEXCOORD(Quad(1, 0, 2, 1), texture->Width(), texture->Height()));
-		sprite->AddFrame(Sprite::QUADtoTEXCOORD(Quad(2, 0, 3, 1), texture->Width(), texture->Height()));
+		{
+			auto texture = mEditorWorld->mTextureManager->Get("Backbuffer").lock();
 
-		GameObject* widget;
-		GUI::Label* label;
-		GUI::SpriteController* controller;
-		//GUI::SpriteButton* button;
-		SpriteDrawable* view;
+			auto sprite = std::shared_ptr<Sprite>(new Sprite());
+			sprite->AddFrame(Sprite::QUADtoTEXCOORD(Quad(0, 0, 1, 1), texture->Width(), texture->Height()));
+			sprite->AddFrame(Sprite::QUADtoTEXCOORD(Quad(1, 0, 2, 1), texture->Width(), texture->Height()));
+			sprite->AddFrame(Sprite::QUADtoTEXCOORD(Quad(2, 0, 3, 1), texture->Width(), texture->Height()));
 
-		//
+			mEditorWorld->mSpriteManager->Add("GUI", sprite);
+		}
 		// Menu Bar
-		//
-		widget = mEditorWorld->AddGameObject(new GameObject());
-		widget->mName = "Menu Bar";
+		{
+			auto widget = new GameObject("Menu Bar");
 
-		transform = (Transform*)widget->Attach(new Transform());
-		transform->mPosition = Vector3(0, 0, 1);
-		transform->mScale = Vector3((float)Renderer::WINDOW_WIDTH_BASE, 0, 1);
+			auto transform = new Transform();
+			transform->mPosition = Vector3(0, 0, 1);
+			transform->mScale = Vector3((float)WindowInfo::BASE_WIDTH, 0, 1);
+			widget->AddComponent(transform);
 
-		view = (SpriteDrawable*)widget->Attach(new SpriteDrawable(sprite));
-		view->mFrame = 0;
-		view->mColor = ColorRGBA(0.7f, 0.7f, 0.7f, 1);
+			auto view = new SpriteDrawable(mEditorWorld->mSpriteManager->Get("GUI"));
+			view->mFrame = 0;
+			view->mColor = ColorRGBA(0.7f, 0.7f, 0.7f, 1);
+			widget->AddComponent(view);
 
-		controller = (GUI::SpriteController*)widget->Attach(new GUI::SpriteController());
-		controller->mMargin.bottom = 30;
-		controller->mScaleToWindowX = true;
+			auto controller = new GUI::SpriteController();
+			controller->mMargin.bottom = 30;
+			controller->mScaleToWindowX = true;
+			widget->AddComponent(controller);
 
-		//
+			mEditorWorld->AddGameObject(widget);
+		}
 		// Menu Transform
-		//
-		GameObject* menu = mEditorWorld->AddGameObject(new GameObject());
-		menu->mName = "Menu Transform";
+		{
+			auto menu = new GameObject("Menu Transform");
+			{
+				auto transform = new Transform();
+				transform->mPosition = Vector3(0, 0, 0.9f);
+				transform->mScale = Vector3(1, 1, 1);
+				menu->AddComponent(transform);
+			}
+			// Menu Labels
+			{
+				auto widget = new GameObject("Menu Labels");
 
-		transform = (Transform*)menu->Attach(new Transform());
-		transform->mPosition = Vector3(0, 0, 0.9f);
-		transform->mScale = Vector3(1, 1, 1);
+				auto transform = new Transform();
+				transform->mPosition = Vector3(10, 20, 0);
+				transform->mScale = Vector3(12, 12, 1);
+				widget->AddComponent(transform);
 
-		//
-		// Menu Labels
-		//
-		widget = mEditorWorld->AddGameObject(new GameObject());
-		widget->mName = "Menu Labels";
+				//label = (GUI::Label*)widget->AddComponent( new GUI::Label( "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ{ }[]!@#$%^&*()1234567890" ));
+				auto label = new GUI::Label("File");
+				label->mColor = ColorRGBA(0, 0, 0, 1);
+				label->mFont = mEditorWorld->mFontManager->Get("courbd.ttf");
+				widget->AddComponent(label);
 
-		transform = (Transform*)widget->Attach(new Transform());
-		transform->mPosition = Vector3(10, 20, 0);
-		transform->mScale = Vector3(12, 12, 1);
+				auto controller = new GUI::SpriteController();
+				widget->AddComponent(controller);
 
-		//label = (GUI::Label*)widget->Attach( new GUI::Label( "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ{}[]!@#$%^&*()1234567890" ));
-		label = (GUI::Label*)widget->Attach(new GUI::Label("File"));
-		label->mColor = ColorRGBA(0, 0, 0, 1);
+				menu->AddChild(widget);
+			}
+			//////////////////////////////////////
+			{
+				auto widget = new GameObject("Edit");
 
-		controller = (GUI::SpriteController*)widget->Attach(new GUI::SpriteController());
+				auto transform = new Transform();
+				transform->mPosition = Vector3(110, 20, 0);
+				transform->mScale = Vector3(12, 12, 1);
+				widget->AddComponent(transform);
 
-		menu->AddChild(widget);
+				auto label = new GUI::Label("Edit");
+				label->mColor = ColorRGBA(0, 0, 0, 1);
+				label->mFont = mEditorWorld->mFontManager->Get("courbd.ttf");
+				widget->AddComponent(label);
 
+				auto controller = new GUI::SpriteController();
+				widget->AddComponent(controller);
+
+				menu->AddChild(widget);
+			}
+			//////////////////////////////////////
+			{
+				auto widget = new GameObject("Help");
+
+				auto transform = new Transform();
+				transform->mPosition = Vector3(210, 20, 0);
+				transform->mScale = Vector3(12, 12, 1);
+				widget->AddComponent(transform);
+
+				auto label = new GUI::Label("Help");
+				label->mColor = ColorRGBA(0, 0, 0, 1);
+				label->mFont = mEditorWorld->mFontManager->Get("courbd.ttf");
+				widget->AddComponent(label);
+
+				auto controller = new GUI::SpriteController();
+				widget->AddComponent(controller);
+
+				menu->AddChild(widget);
+			}
+			mEditorWorld->AddGameObject(menu);
+		}
 		//////////////////////////////////////
+		{
+			auto widget = new GameObject("Debug");
 
-		widget = mEditorWorld->AddGameObject(new GameObject());
-		widget->mName = "Edit";
+			auto transform = new Transform();
+			transform->mPosition = Vector3(0, 40, 0.9f);
+			transform->mScale = Vector3(10, 10, 1);
+			widget->AddComponent(transform);
 
-		transform = (Transform*)widget->Attach(new Transform());
-		transform->mPosition = Vector3(110, 20, 0);
-		transform->mScale = Vector3(12, 12, 1);
+			mDebugText = new GUI::Label();
+			mDebugText->mColor = ColorRGBA(0, 0, 0, 1);
+			mDebugText->mFont = mEditorWorld->mFontManager->Get("courbd.ttf");
+			widget->AddComponent(mDebugText);
 
-		label = (GUI::Label*)widget->Attach(new GUI::Label("Edit"));
-		label->mColor = ColorRGBA(0, 0, 0, 1);
+			auto controller = new GUI::SpriteController();
+			widget->AddComponent(controller);
 
-		controller = (GUI::SpriteController*)widget->Attach(new GUI::SpriteController());
-
-		menu->AddChild(widget);
-
-		//////////////////////////////////////
-
-		widget = mEditorWorld->AddGameObject(new GameObject());
-		widget->mName = "Help";
-
-		transform = (Transform*)widget->Attach(new Transform());
-		transform->mPosition = Vector3(210, 20, 0);
-		transform->mScale = Vector3(12, 12, 1);
-
-		label = (GUI::Label*)widget->Attach(new GUI::Label("Help"));
-		label->mColor = ColorRGBA(0, 0, 0, 1);
-
-		controller = (GUI::SpriteController*)widget->Attach(new GUI::SpriteController());
-
-		menu->AddChild(widget);
-
-		//////////////////////////////////////
-
-		widget = mEditorWorld->AddGameObject(new GameObject());
-		widget->mName = "Debug";
-
-		transform = (Transform*)widget->Attach(new Transform());
-		transform->mPosition = Vector3(0, 40, 0.9f);
-		transform->mScale = Vector3(10, 10, 1);
-
-		mDebugText = new GUI::Label();
-		mDebugText->mColor = ColorRGBA(0, 0, 0, 1);
-		widget->Attach(mDebugText);
-
-		controller = (GUI::SpriteController*)widget->Attach(new GUI::SpriteController());
-		
-		//
+			mEditorWorld->AddGameObject(widget);
+		}
 		// Toolbar
-		//
-		widget = mEditorWorld->AddGameObject(new GameObject());
-		widget->mName = "Toolbar";
+		{
+			auto widget = new GameObject("Toolbar");
 
-		transform = (Transform*)widget->Attach(new Transform());
-		transform->mPosition = Vector3(0, 0, 1);
-		transform->mScale = Vector3((float)Renderer::WINDOW_WIDTH_BASE, 0, 1);
+			auto transform = new Transform();
+			transform->mPosition = Vector3(0, 0, 1);
+			transform->mScale = Vector3((float)WindowInfo::BASE_WIDTH, 0, 1);
+			widget->AddComponent(transform);
 
-		view = (SpriteDrawable*)widget->Attach(new SpriteDrawable(sprite));
-		view->mFrame = 0;
-		view->mColor = ColorRGBA(0.9f, 0.9f, 0.9f, 1);
+			auto view = new SpriteDrawable(mEditorWorld->mSpriteManager->Get("GUI"));
+			view->mFrame = 0;
+			view->mColor = ColorRGBA(0.9f, 0.9f, 0.9f, 1);
+			widget->AddComponent(view);
 
-		controller = (GUI::SpriteController*)widget->Attach(new GUI::SpriteController());
-		controller->mMargin = Quad(0, 30, 0, 30);
-		controller->mScaleToWindowX = true;
+			auto controller = new GUI::SpriteController();
+			controller->mMargin = Quad(0, 30, 0, 30);
+			controller->mScaleToWindowX = true;
+			widget->AddComponent(controller);
 
-		//
+			mEditorWorld->AddGameObject(widget);
+		}
 		// Status Bar
-		//
-		widget = mEditorWorld->AddGameObject(new GameObject());
-		widget->mName = "Status Bar";
+		{
+			auto widget = new GameObject("Status Bar");
 
-		transform = (Transform*)widget->Attach(new Transform());
-		transform->mPosition = Vector3(0, (float)Renderer::WINDOW_HEIGHT_BASE, 0.1f);
-		transform->mScale = Vector3((float)Renderer::WINDOW_WIDTH_BASE, 0, 1);
+			auto transform = new Transform();
+			transform->mPosition = Vector3(0, (float)WindowInfo::BASE_HEIGHT, 0.1f);
+			transform->mScale = Vector3((float)WindowInfo::BASE_WIDTH, 0, 1);
+			widget->AddComponent(transform);
 
-		view = (SpriteDrawable*)widget->Attach(new SpriteDrawable(sprite));
-		view->mFrame = 0;
-		view->mColor = ColorRGBA(0.7f, 0.7f, 0.7f, 1);
+			auto view = new SpriteDrawable(mEditorWorld->mSpriteManager->Get("GUI"));
+			view->mFrame = 0;
+			view->mColor = ColorRGBA(0.7f, 0.7f, 0.7f, 1);
+			widget->AddComponent(view);
 
-		controller = (GUI::SpriteController*)widget->Attach(new GUI::SpriteController());
-		controller->mMargin = Quad(0, -30, 0, 30);
-		controller->mScaleToWindowX = true;
-		controller->mPositionToWindowY = true;
+			auto controller = new GUI::SpriteController();
+			controller->mMargin = Quad(0, -30, 0, 30);
+			controller->mScaleToWindowX = true;
+			controller->mPositionToWindowY = true;
+			widget->AddComponent(controller);
 
-		//
-		// Label Button
-		//
-		/*GameObject* testButton = mEditorWorld->AddGameObject(new GameObject());
-		testButton->mName = "Test Button";
-
-		transform = (Transform*)testButton->Attach(new Transform());
-		transform->mPosition = Vector3(200, 30, 0.7f);
-		transform->mOrientation = Quaternion(0, 0, 45);
-		transform->mScale = Vector3(1, 1, 1);
-
-		//////////////////////////////////
-
-		widget = testButton->AddChild(new GameObject());
-		widget->mName = "Button";
-
-		transform = (Transform*)widget->Attach(new Transform());
-		transform->mPosition = Vector3(0, 0, 0);
-		transform->mOrientation = Quaternion(0, 0, 0);
-		transform->mScale = Vector3(128, 64, 1);
-
-		view = (SpriteDrawable*)widget->Attach(new SpriteDrawable(sprite));
-
-		button = (GUI::SpriteButton*)widget->Attach(new GUI::SpriteButton());
-		button->mPositionToWindowX = true;
-		button->mPositionToWindowY = true;
-		button->mScaleToWindowX = true;
-		button->mScaleToWindowY = true;
-
-		//////////////////////////////////
-
-		widget = testButton->AddChild(new GameObject());
-		widget->mName = "Label";
-
-		transform = (Transform*)widget->Attach(new Transform());
-		transform->mPosition = Vector3(48, 32, 0);
-		transform->mOrientation = Quaternion(0, 0, 0);
-		transform->mScale = Vector3(16, 16, 1);
-
-		label = (GUI::Label*)widget->Attach(new GUI::Label("Ok"));
-		label->mColor = ColorRGBA(0, 0, 0, 1);
-
-		controller = (GUI::SpriteController*)widget->Attach(new GUI::SpriteController());
-		//controller->mPositionToWindowX	= true;
-		//controller->mPositionToWindowY	= true;
-		//controller->mScaleToWindowX		= true;
-		//controller->mScaleToWindowY		= true;*/
-
-		//
+			mEditorWorld->AddGameObject(widget);
+		}
 		// World View Camera
-		//
-		obj = mEditorWorld->AddGameObject(new GameObject());
-		obj->mName = "Main Camera";
+		{
+			auto obj = new GameObject("Main Camera");
 
-		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3(0, 15, 40);
-		transform->mOrientation = Quaternion(-15, 0, 0);
+			auto transform = new Transform();
+			transform->mPosition = Vector3(0, 15, 40);
+			transform->mOrientation = Quaternion(-15, 0, 0);
+			obj->AddComponent(transform);
 
-		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(mEditorWorld->mPhysicsSystem->CreateRigidBody(mEditorWorld->mPhysicsSystem->CreateSphere(1.0f), transform->mPosition, transform->mOrientation, 1.0f));
-		body = physics->GetRigidBody();
-		body->SetFlags(DISABLE_GRAVITY);
-		body->SetRestitution(1.0f);
-		body->SetDamping(0.999f, 0.999f);
+			auto physicsSystem = mEditorWorld->mPhysicsSystem.get();
+			auto body = physicsSystem->CreateRigidBody(
+				physicsSystem->CreateSphere(1.0f), 
+				transform->mPosition, transform->mOrientation, 1.0f);
+			body->SetFlags(DISABLE_GRAVITY);
+			body->SetRestitution(1.0f);
+			body->SetDamping(0.999f, 0.999f);
+			obj->AddComponent(new Physics(body));
 
-		mWorldCamera = (PerspectiveCamera*)obj->Attach(new PerspectiveCamera(Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE));
-		mWorldCamera->mClearColor = ColorRGBA(0.0f, 0.2f, 0.8f, 1.0f);
-		mWorldCamera->mViewportWidth = Renderer::WINDOW_WIDTH_BASE;
-		mWorldCamera->mViewportHeight = Renderer::WINDOW_HEIGHT_BASE;
-		mWorldCamera->mDepthStencil = mDSGameWorld;
-		mWorldCamera->mRenderTexture = mRTGameWorld;
+			mWorldCamera = new PerspectiveCamera(WindowInfo::BASE_WIDTH, WindowInfo::BASE_HEIGHT);
+			mWorldCamera->mClearColor = ColorRGBA(0.0f, 0.2f, 0.8f, 1.0f);
+			mWorldCamera->mViewportWidth = WindowInfo::BASE_WIDTH;
+			mWorldCamera->mViewportHeight = WindowInfo::BASE_HEIGHT;
+			mWorldCamera->mDepthStencil = mDSGameWorld;
+			mWorldCamera->mRenderTexture = mRTGameWorld;
+			obj->AddComponent(mWorldCamera);
 
-		EditorControllerComponent* editorController = (EditorControllerComponent*)obj->Attach(new EditorControllerComponent());
-		editorController->mEditorCamera = mEditorCamera;
-		editorController->mWorldCamera = mWorldCamera;
+			auto editorController = new EditorControllerComponent();
+			editorController->mEditorCamera = mEditorCamera;
+			editorController->mWorldCamera = mWorldCamera;
+			obj->AddComponent(editorController);
 
-		//
+			mEditorWorld->AddGameObject(obj);
+		}
 		// World Drawable
-		//
-		mGameWorldWidget = mEditorWorld->AddGameObject(new GameObject());
-		mGameWorldWidget->mName = "World Drawable";
+		{
+			mGameWorldWidget = new GameObject("World Drawable");
 
-		transform = (Transform*)mGameWorldWidget->Attach(new Transform());
-		transform->mPosition = Vector3(0.0f, 0.0f, 1.0f);
-		transform->mScale = Vector3((float)(Renderer::WINDOW_WIDTH_BASE - 500), (float)Renderer::WINDOW_HEIGHT_BASE, 1.0f);
+			auto transform = new Transform();
+			transform->mPosition = Vector3(0.0f, 0.0f, 1.0f);
+			transform->mScale = Vector3((float)(WindowInfo::BASE_WIDTH - 500), (float)WindowInfo::BASE_HEIGHT, 1.0f);
+			mGameWorldWidget->AddComponent(transform);
 
-		material = mEditorWorld->mMaterialManager->Add("World", SHARED(new Material()));
-		material->mShader = mEditorWorld->mShaderManager->Get("GUI_Mesh");
-		material->mBlendState = mRenderer->BLEND_OFF;
-		material->mCullMode = CullFormat::NONE;
-		material->mTexture[TextureIndex::DIFFUSE] = mEditorWorld->mTextureManager->Get("Backbuffer");
-		material->mRenderQueue = RenderQueue::GEOMETRY;
+			auto material = std::shared_ptr<Material>(new Material());
+			material->mShader = mEditorWorld->mShaderManager->Get("GUI_Mesh");
+			material->mBlendState = mEditorWorld->mBlendStateManager->Get("DEFAULT");
+			material->mCullMode = CullFormat::NONE;
+			material->mTexture[(BYTE)TextureIndex::DIFFUSE] = mEditorWorld->mTextureManager->Get("Backbuffer");
+			material->mRenderQueue = (WORD)RenderQueue::GEOMETRY;
+			mEditorWorld->mMaterialManager->Add("World", material);
 
-		mesh = mEditorWorld->mMeshManager->Add("World", SHARED(MeshBuilder::BuildGUIMesh(mRenderer, material->mShader->Layout())));
-		mesh->mMaterial = material;
-		mGameWorldWidget->Attach(new MeshDrawable(mesh));
+			auto mesh = std::shared_ptr<Mesh>(MeshBuilder::BuildGUIMesh(mRenderer, material->mShader.lock()->Layout()));
+			mesh->mMaterial = material;
+			mEditorWorld->mMeshManager->Add("World", mesh);
 
-		controller = (GUI::SpriteController*)mGameWorldWidget->Attach(new GUI::SpriteController());
-		controller->mScaleToWindowX = true;
-		controller->mScaleToWindowY = true;
-		controller->mMargin = Quad(0, 60, 0, -90);
+			mGameWorldWidget->AddComponent(new MeshDrawable(std::weak_ptr<Mesh>(mesh)));
 
+			auto controller = new GUI::SpriteController();
+			controller->mScaleToWindowX = true;
+			controller->mScaleToWindowY = true;
+			controller->mMargin = Quad(0, 60, 0, -90);
+			mGameWorldWidget->AddComponent(controller);
+
+			mEditorWorld->AddGameObject(mGameWorldWidget);
+		}
 		///////////////////////////////
 
 		mEditorWorld->Startup();
@@ -736,499 +756,559 @@ public:
 
 	void PrepareGameWorld()
 	{
-		MeshBuilder meshBuilder;
-		std::shared_ptr<Mesh> mesh;
-		std::shared_ptr<Material> material;
-
-		GameObject* obj;
-		Transform* transform;
-		Physics* physics;
-		RigidBody* body;
-		MeshDrawable* meshComp;
-		Camera* camera;
-
-		/////////////////////////////////////////////////////////////////////////
-
 		mGameWorld = new GameWorld();
-		PhysicsSystem* physicsSystem = BuildPhysicsSystemSE();
 
 		mGameWorld->mRenderer = mRenderer;
+		mGameWorld->mTiming = std::unique_ptr<Timing>(new Timing());
+		mGameWorld->mPhysicsSystem = std::unique_ptr<PhysicsSystem>(BuildPhysicsSystemSE());
+		mGameWorld->mAudioSystem = nullptr;
 
-		mGameWorld->mTiming = new Timing();
-		mGameWorld->mPhysicsSystem = physicsSystem;
-		mGameWorld->mAudioSystem = NULL;
+		mGameWorld->mTextureManager = std::unique_ptr<TextureManager>(new TextureManager(mRenderer));
+		mGameWorld->mShaderManager = std::unique_ptr<ShaderManager>(new ShaderManager());
+		mGameWorld->mMaterialManager = std::unique_ptr<MaterialManager>(new MaterialManager());
+		mGameWorld->mSpriteManager = std::unique_ptr<SpriteManager>(new SpriteManager());
+		mGameWorld->mMeshManager = std::unique_ptr<MeshManager>(new MeshManager());
+		mGameWorld->mModelManager = std::unique_ptr<ModelManager>(new ModelManager());
+		mGameWorld->mSoundManager = std::unique_ptr<SoundManager>(new SoundManager());
+		mGameWorld->mRenderManager = std::unique_ptr<RenderManager>(new RenderManager());
+		mGameWorld->mBlendStateManager = std::unique_ptr<BlendStateManager>(new BlendStateManager());
 
-		mGameWorld->mTextureManager = new TextureManager(mRenderer);
-		mGameWorld->mShaderManager = new ShaderManager();
-		mGameWorld->mMaterialManager = new MaterialManager();
-		mGameWorld->mSpriteManager = new SpriteManager();
-		mGameWorld->mMeshManager = new MeshManager();
-		mGameWorld->mModelManager = new ModelManager();
-		mGameWorld->mSoundManager = new SoundManager();
-		mGameWorld->mRenderManager = new RenderManager();
-
-		physicsSystem->Startup();
-
-		////////////////////////////////////
-
-		std::shared_ptr<Shader> shaderGUI = mGameWorld->mShaderManager->Add("GUI", mEditorWorld->mShaderManager->Get("GUI"));
-
-		mGameWorld->mSpriteSystem = new SpriteSystem(mRenderer, shaderGUI->Layout(), 256);
+		mGameWorld->mPhysicsSystem->Startup();
 
 		////////////////////////////////////
 
-		mGameWorld->mTextureManager->Add("default-alpha", SHARED(mRenderer->CreateTextureFromFile("Textures\\default-alpha.png")));
-		mGameWorld->mTextureManager->Add("wall", SHARED(mRenderer->CreateTextureFromFile("Textures\\wall.png")));
-		mGameWorld->mTextureManager->Add("wall-normal", SHARED(mRenderer->CreateTextureFromFile("Textures\\wall-normal.png")));
-		mGameWorld->mTextureManager->Add("cobblestones", SHARED(mRenderer->CreateTextureFromFile("Textures\\cobblestones.bmp")));
-		mGameWorld->mTextureManager->Add("cobblestones-normal", SHARED(mRenderer->CreateTextureFromFile("Textures\\cobblestones-normal.bmp")));
-		mGameWorld->mTextureManager->Add("001-normal", SHARED(mRenderer->CreateTextureFromFile("Textures\\001-normal.png")));
-		mGameWorld->mTextureManager->Add("test-normal", SHARED(mRenderer->CreateTextureFromFile("Textures\\test-normal.jpg")));
-		mGameWorld->mTextureManager->Add("stone", SHARED(mRenderer->CreateTextureFromFile("Textures\\stone.jpg")));
-		mGameWorld->mTextureManager->Add("stone-normal", SHARED(mRenderer->CreateTextureFromFile("Textures\\stone-normal.jpg")));
-		
-		mGameWorld->mShaderManager->Add("Color_Lit", mEditorWorld->mShaderManager->Get("Color_Lit"));
-		mGameWorld->mShaderManager->Add("Color_Lit_Shadow", mEditorWorld->mShaderManager->Get("Color_Lit_Shadow"));
-		mGameWorld->mShaderManager->Add("Texture_Lit", mEditorWorld->mShaderManager->Get("Texture_Lit"));
-		mGameWorld->mShaderManager->Add("Texture_Lit_Shadow", mEditorWorld->mShaderManager->Get("Texture_Lit_Shadow"));
-		mGameWorld->mShaderManager->Add("Sprite", mEditorWorld->mShaderManager->Get("Sprite"));
-		mGameWorld->mShaderManager->Add("RT_Cube_Depth", mEditorWorld->mShaderManager->Get("RT_Cube_Depth"));
-		mGameWorld->mShaderManager->Add("Normal_Map_Shadow", mEditorWorld->mShaderManager->Get("Normal_Map_Shadow"));
+		mGameWorld->mTextureManager->Add("default-alpha", std::shared_ptr<Texture>(mRenderer->CreateTextureFromFile("Textures\\default-alpha.png")));
+		mGameWorld->mTextureManager->Add("wall", std::shared_ptr<Texture>(mRenderer->CreateTextureFromFile("Textures\\wall.png")));
+		mGameWorld->mTextureManager->Add("wall-normal", std::shared_ptr<Texture>(mRenderer->CreateTextureFromFile("Textures\\wall-normal.png")));
+		mGameWorld->mTextureManager->Add("cobblestones", std::shared_ptr<Texture>(mRenderer->CreateTextureFromFile("Textures\\cobblestones.bmp")));
+		mGameWorld->mTextureManager->Add("cobblestones-normal", std::shared_ptr<Texture>(mRenderer->CreateTextureFromFile("Textures\\cobblestones-normal.bmp")));
+		mGameWorld->mTextureManager->Add("001-normal", std::shared_ptr<Texture>(mRenderer->CreateTextureFromFile("Textures\\001-normal.png")));
+		mGameWorld->mTextureManager->Add("test-normal", std::shared_ptr<Texture>(mRenderer->CreateTextureFromFile("Textures\\test-normal.jpg")));
+		mGameWorld->mTextureManager->Add("stone", std::shared_ptr<Texture>(mRenderer->CreateTextureFromFile("Textures\\stone.jpg")));
+		mGameWorld->mTextureManager->Add("stone-normal", std::shared_ptr<Texture>(mRenderer->CreateTextureFromFile("Textures\\stone-normal.jpg")));
 
-		std::shared_ptr<Shader> shaderColor = mGameWorld->mShaderManager->Get("Color_Lit_Shadow");
-		std::shared_ptr<Shader> shaderTexture = mGameWorld->mShaderManager->Get("Texture_Lit_Shadow");
-		std::shared_ptr<Shader> shaderNormalMap = mGameWorld->mShaderManager->Get("Normal_Map_Shadow");
+		mGameWorld->mShaderManager->Add("Color_Lit", mEditorWorld->mShaderManager->Get("Color_Lit").lock());
+		mGameWorld->mShaderManager->Add("Color_Lit_Shadow", mEditorWorld->mShaderManager->Get("Color_Lit_Shadow").lock());
+		mGameWorld->mShaderManager->Add("Texture_Lit", mEditorWorld->mShaderManager->Get("Texture_Lit").lock());
+		mGameWorld->mShaderManager->Add("Texture_Lit_Shadow", mEditorWorld->mShaderManager->Get("Texture_Lit_Shadow").lock());
+		mGameWorld->mShaderManager->Add("Sprite", mEditorWorld->mShaderManager->Get("Sprite").lock());
+		mGameWorld->mShaderManager->Add("RT_Cube_Depth", mEditorWorld->mShaderManager->Get("RT_Cube_Depth").lock());
+		mGameWorld->mShaderManager->Add("Normal_Map_Shadow", mEditorWorld->mShaderManager->Get("Normal_Map_Shadow").lock());
+		{
+			auto shaderGUI = mEditorWorld->mShaderManager->Get("GUI").lock();
+			mGameWorld->mShaderManager->Add("GUI", shaderGUI);
+			mGameWorld->mSpriteSystem = std::unique_ptr<SpriteSystem>(new SpriteSystem(mRenderer, shaderGUI->Layout(), 256));
+		}
 
-		////////////////////////////////////
+		// Create Default Blend
+		CreateDefaultBlend(mGameWorld);
 
-		//
+		// Create Default Texture
+		CreateDefaultTexture(mGameWorld);
+
 		// Main Camera
-		//
-		obj = mGameWorld->AddGameObject(new GameObject());
-		obj->mName = "Main Camera";
+		{
+			auto obj = new GameObject("Main Camera");
 
-		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3(0, 15, 40);
-		transform->mOrientation = Quaternion(-15, 0, 0);
+			auto transform = new Transform();
+			transform->mPosition = Vector3(0, 15, 40);
+			transform->mOrientation = Quaternion(-15, 0, 0);
+			obj->AddComponent(transform);
 
-		obj->Attach(new PlayerController());
+			obj->AddComponent(new PlayerController());
 
-		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(
-			physicsSystem->CreateRigidBody(
-			physicsSystem->CreateSphere(1.0f), transform->mPosition, transform->mOrientation, 1.0f));
-		body = physics->GetRigidBody();
-		body->SetFlags(DISABLE_GRAVITY);
-		body->SetRestitution(1.0f);
-		body->SetDamping(0.9f, 0.9f);
-		body->SetAngularFactor(Vector3(0, 0, 0));
+			auto physicsSystem = mGameWorld->mPhysicsSystem.get();
+			auto body = physicsSystem->CreateRigidBody(
+				physicsSystem->CreateSphere(1.0f), 
+				transform->mPosition, transform->mOrientation, 1.0f);
+			body->SetFlags(DISABLE_GRAVITY);
+			body->SetRestitution(1.0f);
+			body->SetDamping(0.9f, 0.9f);
+			body->SetAngularFactor(Vector3(0, 0, 0));
+			obj->AddComponent(new Physics(body));
 
-		camera = (Camera*)obj->Attach(new PerspectiveCamera(Renderer::WINDOW_WIDTH_BASE, Renderer::WINDOW_HEIGHT_BASE));
-		camera->mViewportWidth = Renderer::WINDOW_WIDTH_BASE;
-		camera->mViewportHeight = Renderer::WINDOW_HEIGHT_BASE;
+			auto camera = new PerspectiveCamera(WindowInfo::BASE_WIDTH, WindowInfo::BASE_HEIGHT);
+			camera->mViewportWidth = WindowInfo::BASE_WIDTH;
+			camera->mViewportHeight = WindowInfo::BASE_HEIGHT;
+			obj->AddComponent(camera);
 
-		//
-		// Colored Box
-		//
-		meshBuilder.CreateCube(1.0f);
-		meshBuilder.mLayout = shaderColor->Layout();
-		meshBuilder.mPrimitive = PrimitiveFormat::TRIANGLES;
+			mGameWorld->AddGameObject(obj);
+		}
+		// Colored Box Prefab
+		{
+			auto shader = mGameWorld->mShaderManager->Get("Color_Lit_Shadow");
 
-		material = mGameWorld->mMaterialManager->Add("Box", SHARED(new Material()));
-		material->mShader = shaderColor;
-		material->mBlendState = mRenderer->BLEND_OFF;
-		material->mRenderQueue = RenderQueue::GEOMETRY;
+			MeshBuilder builder;
+			builder.CreateCube(1.0f);
+			builder.mLayout = shader.lock()->Layout();
+			builder.mPrimitive = PrimitiveFormat::TRIANGLES;
 
-		mesh = mGameWorld->mMeshManager->Add("Box", SHARED(meshBuilder.BuildMesh(mRenderer)));
-		mesh->mMaterial = material;
+			auto material = std::shared_ptr<Material>(new Material());
+			material->mShader = shader;
+			material->mBlendState = mEditorWorld->mBlendStateManager->Get("DEFAULT");
+			material->mRenderQueue = (WORD)RenderQueue::GEOMETRY;
+			mGameWorld->mMaterialManager->Add("Box", material);
 
-		//
+			auto mesh = std::shared_ptr<Mesh>(builder.BuildMesh(mRenderer));
+			mesh->mMaterial = material;
+			mGameWorld->mMeshManager->Add("Box", mesh);
+		}
 		// Ground object - Bottom
-		//
-		obj = mGameWorld->AddGameObject(new GameObject());
-		obj->mName = "Ground_Bottom";
+		{
+			auto obj = new GameObject("Ground_Bottom");
 
-		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3(0, 0, 0);
-		transform->mScale = Vector3(100, 1, 100);
+			auto transform = new Transform();
+			transform->mPosition = Vector3(0, 0, 0);
+			transform->mScale = Vector3(100, 1, 100);
+			obj->AddComponent(transform);
 
-		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(
-			physicsSystem->CreateRigidBody(
-			physicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 0.0f));
-		body = physics->GetRigidBody();
-		body->SetFlags(DISABLE_GRAVITY);
+			auto physicsSystem = mGameWorld->mPhysicsSystem.get();
+			auto body = physicsSystem->CreateRigidBody(
+				physicsSystem->CreateBox(transform->mScale), 
+				transform->mPosition, transform->mOrientation, 0.0f);
+			body->SetFlags(DISABLE_GRAVITY);
+			obj->AddComponent(new Physics(body));
 
-		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
-		meshComp->mIsDynamic = true;
-		
-		//
+			auto meshComp = new MeshDrawable(mGameWorld->mMeshManager->Get("Box"));
+			meshComp->mIsDynamic = true;
+			obj->AddComponent(meshComp);
+
+			mGameWorld->AddGameObject(obj);
+		}
 		// Ground object - Back
-		//
-		obj = mGameWorld->AddGameObject(new GameObject());
-		obj->mName = "Ground_Back";
+		{
+			auto obj = new GameObject("Ground_Back");
 
-		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3(0, 20, -20);
-		transform->mScale = Vector3(20, 20, 1);
+			auto transform = new Transform();
+			transform->mPosition = Vector3(0, 20, -20);
+			transform->mScale = Vector3(20, 20, 1);
+			obj->AddComponent(transform);
 
-		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(
-			physicsSystem->CreateRigidBody(
-			physicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 0.0f));
-		body = physics->GetRigidBody();
-		body->SetFlags(DISABLE_GRAVITY);
+			auto physicsSystem = mGameWorld->mPhysicsSystem.get();
+			auto body = physicsSystem->CreateRigidBody(
+				physicsSystem->CreateBox(transform->mScale), 
+				transform->mPosition, transform->mOrientation, 0.0f);
+			body->SetFlags(DISABLE_GRAVITY);
+			obj->AddComponent(new Physics(body));
 
-		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
-		meshComp->mIsDynamic = true;
+			auto meshComp = new MeshDrawable(mGameWorld->mMeshManager->Get("Box"));
+			meshComp->mIsDynamic = true;
+			obj->AddComponent(meshComp);
 
-		//
+			mGameWorld->AddGameObject(obj);
+		}
 		// Ground object - Right
-		//
-		obj = mGameWorld->AddGameObject(new GameObject());
-		obj->mName = "Ground_Right";
+		{
+			auto obj = new GameObject("Ground_Right");
 
-		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3(20, 20, 0);
-		transform->mScale = Vector3(1, 20, 20);
+			auto transform = new Transform();
+			transform->mPosition = Vector3(20, 20, 0);
+			transform->mScale = Vector3(1, 20, 20);
+			obj->AddComponent(transform);
 
-		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(
-			physicsSystem->CreateRigidBody(
-			physicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 0.0f));
-		body = physics->GetRigidBody();
-		body->SetFlags(DISABLE_GRAVITY);
+			auto physicsSystem = mGameWorld->mPhysicsSystem.get();
+			auto body = physicsSystem->CreateRigidBody(
+				physicsSystem->CreateBox(transform->mScale), 
+				transform->mPosition, transform->mOrientation, 0.0f);
+			body->SetFlags(DISABLE_GRAVITY);
+			obj->AddComponent(new Physics(body));
 
-		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
-		meshComp->mIsDynamic = true;
+			auto meshComp = new MeshDrawable(mGameWorld->mMeshManager->Get("Box"));
+			meshComp->mIsDynamic = true;
+			obj->AddComponent(meshComp);
 
-		//
+			mGameWorld->AddGameObject(obj);
+		}
 		// Ground object - Left
-		//
-		obj = mGameWorld->AddGameObject(new GameObject());
-		obj->mName = "Ground_Left";
+		{
+			auto obj = new GameObject("Ground_Left");
 
-		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3(-22, 10, 0);
-		transform->mScale = Vector3(20, 1, 20);
-		transform->mOrientation = Quaternion(0, 0, 0);
+			auto transform = new Transform();
+			transform->mPosition = Vector3(-22, 10, 0);
+			transform->mScale = Vector3(20, 1, 20);
+			transform->mOrientation = Quaternion(0, 0, 0);
+			obj->AddComponent(transform);
 
-		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(
-			physicsSystem->CreateRigidBody(
-			physicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 0.0f));
-		body = physics->GetRigidBody();
-		body->SetFlags(DISABLE_GRAVITY);
+			auto physicsSystem = mGameWorld->mPhysicsSystem.get();
+			auto body = physicsSystem->CreateRigidBody(
+				physicsSystem->CreateBox(transform->mScale), 
+				transform->mPosition, transform->mOrientation, 0.0f);
+			body->SetFlags(DISABLE_GRAVITY);
+			obj->AddComponent(new Physics(body));
 
-		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
-		meshComp->mIsDynamic = true;
+			auto meshComp = new MeshDrawable(mGameWorld->mMeshManager->Get("Box"));
+			meshComp->mIsDynamic = true;
+			obj->AddComponent(meshComp);
 
-		//
+			mGameWorld->AddGameObject(obj);
+		}
 		// Ground object - Top
-		//
-		obj = mGameWorld->AddGameObject(new GameObject());
-		obj->mName = "Ground_Top";
+		{
+			auto obj = new GameObject("Ground_Top");
 
-		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3(0, 20, 0);
-		transform->mScale = Vector3(20, 1, 20);
+			auto transform = new Transform();
+			transform->mPosition = Vector3(0, 20, 0);
+			transform->mScale = Vector3(20, 1, 20);
+			obj->AddComponent(transform);
 
-		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(
-			physicsSystem->CreateRigidBody(
-			physicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 0.0f));
-		body = physics->GetRigidBody();
-		body->SetFlags(DISABLE_GRAVITY);
+			auto physicsSystem = mGameWorld->mPhysicsSystem.get();
+			auto body = physicsSystem->CreateRigidBody(
+				physicsSystem->CreateBox(transform->mScale), 
+				transform->mPosition, transform->mOrientation, 0.0f);
+			body->SetFlags(DISABLE_GRAVITY);
+			obj->AddComponent(new Physics(body));
 
-		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
-		meshComp->mIsDynamic = true;
-		
-		//
+			auto meshComp = new MeshDrawable(mGameWorld->mMeshManager->Get("Box"));
+			meshComp->mIsDynamic = true;
+			obj->AddComponent(meshComp);
+
+			mGameWorld->AddGameObject(obj);
+		}
 		// Box object - Right
-		//
-		obj = mGameWorld->AddGameObject(new GameObject());
-		obj->mName = "Box_Right";
+		{
+			auto obj = new GameObject("Box_Right");
 
-		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3(10, 2, 5);
-		transform->mScale = Vector3(1, 1, 1);
+			auto transform = new Transform();
+			transform->mPosition = Vector3(10, 2, 5);
+			transform->mScale = Vector3(1, 1, 1);
+			obj->AddComponent(transform);
 
-		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(
-			physicsSystem->CreateRigidBody(
-			physicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
+			auto physicsSystem = mGameWorld->mPhysicsSystem.get();
+			auto body = physicsSystem->CreateRigidBody(
+				physicsSystem->CreateBox(transform->mScale), 
+				transform->mPosition, transform->mOrientation, 0.0f);
+			obj->AddComponent(new Physics(body));
 
-		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
-		meshComp->mIsDynamic = true;
+			auto meshComp = new MeshDrawable(mGameWorld->mMeshManager->Get("Box"));
+			meshComp->mIsDynamic = true;
+			obj->AddComponent(meshComp);
 
-		//
+			mGameWorld->AddGameObject(obj);
+		}
 		// Box object - Left
-		//
-		obj = mGameWorld->AddGameObject(new GameObject());
-		obj->mName = "Box_Left";
+		{
+			auto obj = new GameObject("Box_Left");
 
-		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3(10, 5, 5);
-		transform->mScale = Vector3(1, 2, 1);
+			auto transform = new Transform();
+			transform->mPosition = Vector3(10, 5, 5);
+			transform->mScale = Vector3(1, 2, 1);
+			obj->AddComponent(transform);
 
-		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(
-			physicsSystem->CreateRigidBody(
-			physicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
+			auto physicsSystem = mGameWorld->mPhysicsSystem.get();
+			auto body = physicsSystem->CreateRigidBody(
+				physicsSystem->CreateBox(transform->mScale), 
+				transform->mPosition, transform->mOrientation, 0.0f);
+			obj->AddComponent(new Physics(body));
 
-		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
-		meshComp->mIsDynamic = true;
+			auto meshComp = new MeshDrawable(mGameWorld->mMeshManager->Get("Box"));
+			meshComp->mIsDynamic = true;
+			obj->AddComponent(meshComp);
 
-		//
+			mGameWorld->AddGameObject(obj);
+		}
 		// Box object - Top
-		//
-		obj = mGameWorld->AddGameObject(new GameObject());
-		obj->mName = "Box_Top";
+		{
+			auto obj = new GameObject("Box_Top");
 
-		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3(-2, 7, 3);
-		transform->mScale = Vector3(1, 1, 1);
+			auto transform = new Transform();
+			transform->mPosition = Vector3(-2, 7, 3);
+			transform->mScale = Vector3(1, 1, 1);
+			obj->AddComponent(transform);
 
-		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(
-			physicsSystem->CreateRigidBody(
-			physicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
+			auto physicsSystem = mGameWorld->mPhysicsSystem.get();
+			auto body = physicsSystem->CreateRigidBody(
+				physicsSystem->CreateBox(transform->mScale), 
+				transform->mPosition, transform->mOrientation, 0.0f);
+			obj->AddComponent(new Physics(body));
 
-		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
-		meshComp->mIsDynamic = true;
+			auto meshComp = new MeshDrawable(mGameWorld->mMeshManager->Get("Box"));
+			meshComp->mIsDynamic = true;
+			obj->AddComponent(meshComp);
 
-		//
+			mGameWorld->AddGameObject(obj);
+		}
 		// Box object - Back
-		//
-		obj = mGameWorld->AddGameObject(new GameObject());
-		obj->mName = "Box_Back";
+		{
+			auto obj = new GameObject("Box_Back");
 
-		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3(0, 3, -10);
-		transform->mScale = Vector3(1, 1, 1);
-		transform->mOrientation = Quaternion(45, 45, 45);
+			auto transform = new Transform();
+			transform->mPosition = Vector3(0, 3, -10);
+			transform->mScale = Vector3(1, 1, 1);
+			transform->mOrientation = Quaternion(45, 45, 45);
+			obj->AddComponent(transform);
 
-		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(
-			physicsSystem->CreateRigidBody(
-			physicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
+			auto physicsSystem = mGameWorld->mPhysicsSystem.get();
+			auto body = physicsSystem->CreateRigidBody(
+				physicsSystem->CreateBox(transform->mScale), 
+				transform->mPosition, transform->mOrientation, 0.0f);
+			obj->AddComponent(new Physics(body));
 
-		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
-		meshComp->mIsDynamic = true;
+			auto meshComp = new MeshDrawable(mGameWorld->mMeshManager->Get("Box"));
+			meshComp->mIsDynamic = true;
+			obj->AddComponent(meshComp);
 
-		//
+			mGameWorld->AddGameObject(obj);
+		}
 		// Dodecahedron
-		//
-		meshBuilder.ClearGeometry();
-		meshBuilder.CreateDodecahedron(1.0f);
-		meshBuilder.mLayout = shaderTexture->Layout();
+		{
+			MeshBuilder builder;
+			builder.CreateDodecahedron(1.0f);
+			builder.mLayout = mGameWorld->mShaderManager->Get("Texture_Lit_Shadow").lock()->Layout();
 
-		material = mGameWorld->mMaterialManager->Add("Dodecahedron", SHARED(new Material()));
-		material->mShader = shaderColor; // intentionally set wrong shader to demonstrate vertex layout compatibility
-		material->mBlendState = mRenderer->BLEND_ALPHA;
-		material->mTexture[TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("default-alpha");
-		material->mRenderQueue = RenderQueue::ALPHA_BLEND;
+			auto material = std::shared_ptr<Material>(new Material());
+			material->mShader = mGameWorld->mShaderManager->Get("Color_Lit_Shadow"); // intentionally set wrong shader to demonstrate vertex layout compatibility
+			material->mBlendState = mEditorWorld->mBlendStateManager->Get("ALPHA");
+			material->mTexture[(BYTE)TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("default-alpha");
+			material->mRenderQueue = (WORD)RenderQueue::TRANSPARENCY;
+			mGameWorld->mMaterialManager->Add("Dodecahedron", material);
 
-		mesh = mGameWorld->mMeshManager->Add("Dodecahedron", SHARED(meshBuilder.BuildMesh(mRenderer)));
-		mesh->mMaterial = material;
+			auto mesh = std::shared_ptr<Mesh>(builder.BuildMesh(mRenderer));
+			mesh->mMaterial = material;
+			mGameWorld->mMeshManager->Add("Dodecahedron", mesh);
 
-		obj = new GameObject();
-		obj->mName = "Dodecahedron";
 
-		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3(10, 2, -10);
-		transform->mScale = Vector3(1, 1, 1);
-		transform->mOrientation = Quaternion(0, 0, 0);
+			auto obj = new GameObject("Dodecahedron");
 
-		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
-		meshComp->mIsDynamic = true;
+			auto transform = new Transform();
+			transform->mPosition = Vector3(10, 2, -10);
+			transform->mScale = Vector3(1, 1, 1);
+			transform->mOrientation = Quaternion(0, 0, 0);
+			obj->AddComponent(transform);
 
-		Buffer* meshVBO = mesh->mVertexBuffer;
-		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(
-			physicsSystem->CreateRigidBody(
-			physicsSystem->CreateMesh((Vector3*)meshVBO->Lock(), meshVBO->Count(), meshVBO->Stride(), transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
-		meshVBO->Unlock();
+			auto meshComp = new MeshDrawable(std::weak_ptr<Mesh>(mesh));
+			meshComp->mIsDynamic = true;
+			obj->AddComponent(meshComp);
 
-		mGameWorld->AddGameObject(obj);
+			auto meshVBO = mesh->mVertexBuffer;
 
-		//
+			auto physicsSystem = mGameWorld->mPhysicsSystem.get();
+			auto body = physicsSystem->CreateRigidBody(
+				physicsSystem->CreateMesh((Vector3*)meshVBO->Lock(), meshVBO->Count(), meshVBO->Stride(), transform->mScale),
+				transform->mPosition, transform->mOrientation, 1.0f);
+			meshVBO->Unlock();
+			obj->AddComponent(new Physics(body));
+
+			mGameWorld->AddGameObject(obj);
+		}
 		// Sphere
-		//
-		meshBuilder.ClearGeometry();
-		meshBuilder.CreateSphere(1.0f, 50, 50);
-		meshBuilder.mLayout = shaderTexture->Layout();
+		{
+			auto shader = mGameWorld->mShaderManager->Get("Texture_Lit_Shadow");
 
-		material = mGameWorld->mMaterialManager->Add("Sphere", SHARED(new Material()));
-		material->mShader = shaderTexture;
-		material->mBlendState = mRenderer->BLEND_ALPHA;
-		material->mTexture[TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("default-alpha");
-		material->mRenderQueue = RenderQueue::ALPHA_BLEND;
+			MeshBuilder builder;
+			builder.CreateSphere(1.0f, 50, 50);
+			builder.mLayout = shader.lock()->Layout();
 
-		mesh = mGameWorld->mMeshManager->Add("Sphere", SHARED(meshBuilder.BuildMesh(mRenderer)));
-		mesh->mMaterial = material;
+			auto material = std::shared_ptr<Material>(new Material());
+			material->mShader = shader;
+			material->mBlendState = mEditorWorld->mBlendStateManager->Get("ALPHA");
+			material->mTexture[(BYTE)TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("default-alpha");
+			material->mRenderQueue = (WORD)RenderQueue::TRANSPARENCY;
+			mGameWorld->mMaterialManager->Add("Sphere", material);
 
-		obj = mGameWorld->AddGameObject(new GameObject());
-		obj->mName = "Sphere";
+			auto mesh = std::shared_ptr<Mesh>(builder.BuildMesh(mRenderer));
+			mesh->mMaterial = material;
+			mGameWorld->mMeshManager->Add("Sphere", mesh);
 
-		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3(15, 2, 10);
-		transform->mScale = Vector3(1, 1, 1);
 
-		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
-		meshComp->mIsDynamic = true;
+			auto obj = new GameObject();
+			obj->mName = "Sphere";
 
-		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(
-			physicsSystem->CreateRigidBody(
-			physicsSystem->CreateSphere(transform->mScale.x), transform->mPosition, transform->mOrientation, 1.0f));
+			auto transform = new Transform();
+			transform->mPosition = Vector3(15, 2, 10);
+			transform->mScale = Vector3(1, 1, 1);
+			obj->AddComponent(transform);
 
-		//
+			auto meshComp = new MeshDrawable(std::weak_ptr<Mesh>(mesh));
+			meshComp->mIsDynamic = true;
+			obj->AddComponent(meshComp);
+
+			auto physicsSystem = mGameWorld->mPhysicsSystem.get();
+			auto body = physicsSystem->CreateRigidBody(
+				physicsSystem->CreateSphere(transform->mScale.x), 
+				transform->mPosition, transform->mOrientation, 1.0f);
+			obj->AddComponent(new Physics(body));
+
+			mGameWorld->AddGameObject(obj);
+		}
 		// Texture
-		//
-		meshBuilder.ClearAll();
-		meshBuilder.CreateCube(1);
-		meshBuilder.mLayout = shaderTexture->Layout();
+		{
+			auto shader = mGameWorld->mShaderManager->Get("Texture_Lit_Shadow");
 
-		material = mGameWorld->mMaterialManager->Add("Texture", SHARED(new Material()));
-		material->mShader = shaderTexture;
-		material->mBlendState = mRenderer->BLEND_ALPHA;
-		material->mTexture[TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("wall");
-		material->mRenderQueue = RenderQueue::GEOMETRY;
+			MeshBuilder builder;
+			builder.CreateCube(1);
+			builder.mLayout = shader.lock()->Layout();
 
-		mesh = mGameWorld->mMeshManager->Add("Texture", SHARED(meshBuilder.BuildMesh(mRenderer)));
-		mesh->mMaterial = material;
+			auto material = std::shared_ptr<Material>(new Material());
+			material->mShader = shader;
+			material->mBlendState = mEditorWorld->mBlendStateManager->Get("ALPHA");
+			material->mTexture[(BYTE)TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("wall");
+			material->mRenderQueue = (WORD)RenderQueue::GEOMETRY;
 
-		obj = mGameWorld->AddGameObject(new GameObject("Texture"));
+			mGameWorld->mMaterialManager->Add("Texture", material);
 
-		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3(-17, 5, 16);
-		transform->mOrientation = Quaternion(Vector3(0, 45, 0));
-		transform->mScale = Vector3(3, 3, 3);
+			auto mesh = std::shared_ptr<Mesh>(builder.BuildMesh(mRenderer));
+			mesh->mMaterial = material;
+			mGameWorld->mMeshManager->Add("Texture", mesh);
 
-		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
-		meshComp->mIsDynamic = true;
 
-		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(
-			physicsSystem->CreateRigidBody(
-			physicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
-		
-		//
+			auto obj = new GameObject("Texture");
+
+			auto transform = new Transform();
+			transform->mPosition = Vector3(-17, 5, 16);
+			transform->mOrientation = Quaternion(Vector3(0, 45, 0));
+			transform->mScale = Vector3(3, 3, 3);
+			obj->AddComponent(transform);
+
+			auto meshComp = new MeshDrawable(std::weak_ptr<Mesh>(mesh));
+			meshComp->mIsDynamic = true;
+			obj->AddComponent(meshComp);
+
+			auto physicsSystem = mGameWorld->mPhysicsSystem.get();
+			auto body = physicsSystem->CreateRigidBody(
+				physicsSystem->CreateBox(transform->mScale),
+				transform->mPosition, transform->mOrientation, 1.0f);
+			obj->AddComponent(new Physics(body));
+
+			mGameWorld->AddGameObject(obj);
+		}
 		// Normal Map
-		//
-		meshBuilder.ClearAll();
-		meshBuilder.CreateCube(1);
-		meshBuilder.CalculateTangents(true);
-		meshBuilder.mLayout = shaderNormalMap->Layout();
+		{
+			auto shader = mGameWorld->mShaderManager->Get("Normal_Map_Shadow");
 
-		material = mGameWorld->mMaterialManager->Add("Normals", SHARED(new Material()));
-		material->mShader = shaderNormalMap;
-		material->mBlendState = mRenderer->BLEND_ALPHA;
-		//material->mTexture[TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("wall");
-		//material->mTexture[TextureIndex::NORMAL] = mGameWorld->mTextureManager->Get("wall-normal");
-		//material->mTexture[TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("cobblestones");
-		//material->mTexture[TextureIndex::NORMAL] = mGameWorld->mTextureManager->Get("cobblestones-normal");
-		//material->mTexture[TextureIndex::DIFFUSE] = mRenderer->BASE_TEXTURE;
-		//material->mTexture[TextureIndex::NORMAL] = mGameWorld->mTextureManager->Get("test-normal");
-		material->mTexture[TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("stone");
-		material->mTexture[TextureIndex::NORMAL] = mGameWorld->mTextureManager->Get("stone-normal");
-		material->mRenderQueue = RenderQueue::GEOMETRY;
-		//material->mSpecular = ColorRGBA(1, 1, 1, 1);
-		//material->mSpecularComponent = 32;
+			MeshBuilder builder;
+			builder.CreateCube(1);
+			builder.CalculateTangents(true);
+			builder.mLayout = shader.lock()->Layout();
 
-		mesh = mGameWorld->mMeshManager->Add("Normals", SHARED(meshBuilder.BuildMesh(mRenderer)));
-		mesh->mMaterial = material;
+			auto material = std::shared_ptr<Material>(new Material());
+			material->mShader = shader;
+			material->mBlendState = mEditorWorld->mBlendStateManager->Get("ALPHA");
+			//material->mTexture[TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("wall");
+			//material->mTexture[TextureIndex::NORMAL] = mGameWorld->mTextureManager->Get("wall-normal");
+			//material->mTexture[TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("cobblestones");
+			//material->mTexture[TextureIndex::NORMAL] = mGameWorld->mTextureManager->Get("cobblestones-normal");
+			//material->mTexture[TextureIndex::DIFFUSE] = mRenderer->BASE_TEXTURE;
+			//material->mTexture[TextureIndex::NORMAL] = mGameWorld->mTextureManager->Get("test-normal");
+			material->mTexture[(BYTE)TextureIndex::DIFFUSE] = mGameWorld->mTextureManager->Get("stone");
+			material->mTexture[(BYTE)TextureIndex::NORMAL] = mGameWorld->mTextureManager->Get("stone-normal");
+			material->mRenderQueue = (WORD)RenderQueue::GEOMETRY;
+			//material->mSpecular = ColorRGBA(1, 1, 1, 1);
+			//material->mSpecularComponent = 32;
 
-		obj = mGameWorld->AddGameObject(new GameObject("Normals"));
+			mGameWorld->mMaterialManager->Add("Normals", material);
 
-		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3(-15, 5, 5);
-		transform->mOrientation = Quaternion(Vector3(90, 45, 0));
-		transform->mScale = Vector3(3,3,3);
-		normalMapTrans = transform;
+			auto mesh = std::shared_ptr<Mesh>(builder.BuildMesh(mRenderer));
+			mesh->mMaterial = material;
+			mGameWorld->mMeshManager->Add("Normals", mesh);
 
-		meshComp = (MeshDrawable*)obj->Attach(new MeshDrawable(mesh));
-		meshComp->mIsDynamic = true;
+			
+			auto obj = new GameObject("Normals");
 
-		physics = (Physics*)obj->Attach(new Physics());
-		physics->SetRigidBody(
-			physicsSystem->CreateRigidBody(
-			physicsSystem->CreateBox(transform->mScale), transform->mPosition, transform->mOrientation, 1.0f));
+			auto transform = new Transform();
+			transform->mPosition = Vector3(-15, 5, 5);
+			transform->mOrientation = Quaternion(Vector3(90, 45, 0));
+			transform->mScale = Vector3(3, 3, 3);
+			obj->AddComponent(transform);
 
-		//
+			normalMapTrans = transform;
+
+			auto meshComp = new MeshDrawable(mesh);
+			meshComp->mIsDynamic = true;
+			obj->AddComponent(meshComp);
+
+			auto physicsSystem = mGameWorld->mPhysicsSystem.get();
+			auto body = physicsSystem->CreateRigidBody(
+				physicsSystem->CreateBox(transform->mScale), 
+				transform->mPosition, transform->mOrientation, 1.0f);
+			obj->AddComponent(new Physics(body));
+
+			mGameWorld->AddGameObject(obj);
+		}
 		// Particles
-		//
-		std::shared_ptr<Texture> texture = mGameWorld->mTextureManager->Add("fire", SHARED(mRenderer->CreateTextureFromFile("Textures\\fire.png")));
+		{
+			auto particleObject = new GameObject("Particle_Emitter");
+			{
+				auto texture = std::shared_ptr<Texture>(mRenderer->CreateTextureFromFile("Textures\\fire.png"));
+				mGameWorld->mTextureManager->Add("fire", texture);
 
-		material = mGameWorld->mMaterialManager->Add("Fire", SHARED(new Material()));
-		material->mShader = mGameWorld->mShaderManager->Get("Sprite");
-		material->mBlendState = SHARED(mRenderer->CreateBlendState(BlendFormat::SRC_ALPHA, BlendFormat::ONE, BlendFormat::SRC_ALPHA, BlendFormat::ONE));
-		material->mTexture[TextureIndex::DIFFUSE] = texture;
-		material->mCullMode = CullFormat::NONE;
-		material->mDepthMode = DepthFormat::OFF;
-		material->mRenderQueue = RenderQueue::ALPHA_BLEND;
+				auto state = std::shared_ptr<BlendState>(mRenderer->CreateBlendState(
+					BlendFormat::SRC_ALPHA, BlendFormat::ONE, BlendFunction::ADD,
+					BlendFormat::SRC_ALPHA, BlendFormat::ONE, BlendFunction::ADD));
+				mEditorWorld->mBlendStateManager->Add("PARTICLE", state);
 
-		std::shared_ptr< Sprite > sprite = mGameWorld->mSpriteManager->Add("Fire", SHARED(new Sprite()));
-		sprite->AddFrame(Sprite::QUADtoTEXCOORD(Quad(0, 0, 64, 64), texture->Width(), texture->Height()));
-		sprite->AddFrame(Sprite::QUADtoTEXCOORD(Quad(64, 0, 128, 64), texture->Width(), texture->Height()));
+				auto material = std::shared_ptr<Material>(new Material());
+				material->mShader = mGameWorld->mShaderManager->Get("Sprite");
+				material->mBlendState = mEditorWorld->mBlendStateManager->Get("PARTICLE");
+				material->mTexture[(BYTE)TextureIndex::DIFFUSE] = texture;
+				material->mCullMode = CullFormat::NONE;
+				material->mDepthMode = DepthFormat::OFF;
+				material->mRenderQueue = (WORD)RenderQueue::TRANSPARENCY;
+				mGameWorld->mMaterialManager->Add("Fire", material);
 
-		ParticleSystem* particleSystem = BuildParticleSystemNormal(mRenderer, mGameWorld, material, sprite, 300);
-		particleSystem->mSpawnRate = 0.025f;
-		particleSystem->mMinLifetime = 3.0f;
-		particleSystem->mMaxLifetime = 5.0f;
-		particleSystem->mEffect.push_back(new TextureEffect(0, 0));
-		particleSystem->mEffect.push_back(new AreaPositionEffect(0, Vector3(-0.125f, 1, 0), Vector3(0.125f, 1, 0)));
-		particleSystem->mEffect.push_back(new RandomRotationEffect(0, Vector3(0, 0, -10), Vector3(0, 0, 10)));
-		particleSystem->mEffect.push_back(new ScaleEffect(0, Vector3(1, 1, 1)));
-		particleSystem->mEffect.push_back(new RandomVelocityEffect(0, Vector3(0, 2.0f, 0), Vector3(0, 2.8f, 0)));
-		particleSystem->mEffect.push_back(new RandomColorEffect(0, ColorRGBA(0.75f, 0.25f, 0, 0.125f), ColorRGBA(0.75f, 0.75f, 0, 0.125f)));
-		particleSystem->mEffect.push_back(new FadeToScaleEffect(0, 0.25f, 0.666f));
-		particleSystem->mEffect.push_back(new FadeToScaleEffect(0.5f, 1.0f, 0.1f));
-		particleSystem->mEffect.push_back(new TextureEffect(1.0f, 1));
-		particleSystem->mEffect.push_back(new FadeToScaleEffect(1.0f, 2.0f, 1.0f));
-		particleSystem->mEffect.push_back(new RandomColorEffect(1.0f, ColorRGBA(1, 1, 1, 0.125f), ColorRGBA(0.9f, 0.9f, 0.9f, 0.125f)));
-		particleSystem->mEffect.push_back(new FadeToColorEffect(1.0f, 5.0f, ColorRGBA(0.9f, 0.9f, 0.9f, 0.025f)));
-		particleSystem->mEffect.push_back(new RandomVelocityEffect(1.0f, Vector3(-0.5f, 1.4f, -0.5f), Vector3(0.5f, 3.0f, 0.5f)));
+				auto sprite = std::shared_ptr<Sprite>(new Sprite());
+				sprite->AddFrame(Sprite::QUADtoTEXCOORD(Quad(0, 0, 64, 64), texture->Width(), texture->Height()));
+				sprite->AddFrame(Sprite::QUADtoTEXCOORD(Quad(64, 0, 128, 64), texture->Width(), texture->Height()));
+				mGameWorld->mSpriteManager->Add("Fire", sprite);
 
-		obj = mGameWorld->AddGameObject(new GameObject());
-		obj->mName = "Particle Emitter";
 
-		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3(8, 1, 0);
-		transform->mScale = Vector3(1, 1, 1);
+				auto transform = new Transform();
+				transform->mPosition = Vector3(8, 1, 0);
+				transform->mScale = Vector3(1, 1, 1);
+				particleObject->AddComponent(transform);
 
-		obj->Attach(new ParticleEmitter(particleSystem));
+				auto particles = new SpriteParticleEmitter(300);
+				particles->mMaterial = material;
+				particles->mSprite = sprite;
+				particles->mSpawnRate = 0.025f;
+				particles->mMinLifetime = 3.0f;
+				particles->mMaxLifetime = 5.0f;
+				particles->mEffects.push_back(new TextureEffect(0, 0));
+				particles->mEffects.push_back(new AreaPositionEffect(0, Vector3(-0.125f, 1, 0), Vector3(0.125f, 1, 0)));
+				particles->mEffects.push_back(new RandomRotationEffect(0, Vector3(0, 0, -10), Vector3(0, 0, 10)));
+				particles->mEffects.push_back(new ScaleEffect(0, Vector3(1, 1, 1)));
+				particles->mEffects.push_back(new RandomVelocityEffect(0, Vector3(0, 2.0f, 0), Vector3(0, 2.8f, 0)));
+				particles->mEffects.push_back(new RandomColorEffect(0, ColorRGBA(0.75f, 0.25f, 0, 0.125f), ColorRGBA(0.75f, 0.75f, 0, 0.125f)));
+				particles->mEffects.push_back(new FadeToScaleEffect(0, 0.25f, 0.666f));
+				particles->mEffects.push_back(new FadeToScaleEffect(0.5f, 1.0f, 0.1f));
+				particles->mEffects.push_back(new TextureEffect(1.0f, 1));
+				particles->mEffects.push_back(new FadeToScaleEffect(1.0f, 2.0f, 1.0f));
+				particles->mEffects.push_back(new RandomColorEffect(1.0f, ColorRGBA(1, 1, 1, 0.125f), ColorRGBA(0.9f, 0.9f, 0.9f, 0.125f)));
+				particles->mEffects.push_back(new FadeToColorEffect(1.0f, 5.0f, ColorRGBA(0.9f, 0.9f, 0.9f, 0.025f)));
+				particles->mEffects.push_back(new RandomVelocityEffect(1.0f, Vector3(-0.5f, 1.4f, -0.5f), Vector3(0.5f, 3.0f, 0.5f)));
+				particleObject->AddComponent(particles);
+			}
+			// Point Light
+			{
+				auto state = std::shared_ptr<BlendState>(mRenderer->CreateBlendState(
+					BlendFormat::DST_COLOR, BlendFormat::SRC_COLOR, BlendFunction::MIN,
+					BlendFormat::ZERO, BlendFormat::ZERO, BlendFunction::ADD));
+				mEditorWorld->mBlendStateManager->Add("SHADOW", state);
 
-		//
-		// Point Light attached to particle emitter
-		//
-		GameObject* peObject = obj;
+				auto material = std::shared_ptr<Material>(new Material());
+				material->mShader = mGameWorld->mShaderManager->Get("RT_Cube_Depth");
+				material->mBlendState = mEditorWorld->mBlendStateManager->Get("SHADOW");
+				material->mCullMode = CullFormat::CCW;
+				material->mDepthMode = DepthFormat::ALWAYS;
+				material->mRenderQueue = (WORD)RenderQueue::BACKGROUND;
+				mGameWorld->mMaterialManager->Add("Point Light", material);
 
-		obj = new GameObject();
-		obj->mName = "Point Light";
 
-		transform = (Transform*)obj->Attach(new Transform());
-		transform->mPosition = Vector3(0, 4, 0);
+				auto obj = new GameObject("Point Light");
 
-		PointLight* light = (PointLight*)obj->Attach(new PointLight(512));
-		light->mColor = ColorRGBA(0.8f, 0.6f, 0.0f, 1.0f);
-		light->mAttenuation = Vector4(1.0f, 0.0f, 0.0f, 40.0f);
+				auto transform = new Transform();
+				transform->mPosition = Vector3(0, 4, 0);
+				obj->AddComponent(transform);
 
-		material = mGameWorld->mMaterialManager->Add("Point Light", SHARED(new Material()));
-		material->mShader = mGameWorld->mShaderManager->Get("RT_Cube_Depth");
-		material->mBlendState = SHARED(mRenderer->CreateBlendState(
-			BlendFormat::DST_COLOR, BlendFormat::SRC_COLOR,
-			BlendFormat::ZERO, BlendFormat::ZERO,
-			BlendFunction::MIN, BlendFunction::ADD));
-		material->mCullMode = CullFormat::CCW;
-		material->mDepthMode = DepthFormat::ALWAYS;
-		material->mRenderQueue = RenderQueue::BACKGROUND;
+				auto light = new PointLight(512);
+				light->mColor = ColorRGBA(0.8f, 0.6f, 0.0f, 1.0f);
+				light->mAttenuation = Vector4(1.0f, 0.0f, 0.0f, 40.0f);
+				light->mMaterial = material;
+				obj->AddComponent(light);
 
-		light->mMaterial = material;
-
-		peObject->AddChild(obj);
-
+				particleObject->AddChild(obj);
+			}
+			mGameWorld->AddGameObject(particleObject);
+		}
 		///////////////////////////////
 
 		mGameWorld->Startup();
@@ -1244,99 +1324,99 @@ public:
 
 	void PrepareDebug()
 	{
-		std::shared_ptr<Shader> shaderLine = mEditorWorld->mShaderManager->Get("Color_Only");
-		std::shared_ptr<Material> material = mEditorWorld->mMaterialManager->Add("Debug", SHARED(new Material()));
-		material->mShader = shaderLine;
-		material->mBlendState = mRenderer->BLEND_OFF;
+		auto material = std::shared_ptr<Material>(new Material());
+		material->mShader = mEditorWorld->mShaderManager->Get("Color_Only").lock();
+		material->mBlendState = mEditorWorld->mBlendStateManager->Get("DEFAULT");
 		material->mDepthMode = DepthFormat::LEQUAL;
 		material->mCullMode = CullFormat::NONE;
-		material->mRenderQueue = RenderQueue::FOREGROUND;
+		material->mRenderQueue = (WORD)RenderQueue::FOREGROUND;
+
+		mEditorWorld->mMaterialManager->Add("Debug", material);
 	}
 
 	void CreateTranslateObject()
 	{
-		mTranslateObject = new GameObject();
-		mTranslateObject->mName = "Translate Object";
 		const float tileSize = 5;
 
-		std::shared_ptr<Model> model = SHARED(LoadModelM3DFromFile("Editor\\Translate.M3D", mRenderer, mGameWorld->mShaderManager, mGameWorld->mTextureManager, mGameWorld->mMaterialManager));
+		auto model = std::shared_ptr<Model>(LoadModelM3DFromFile("Editor\\Translate.M3D",
+			mRenderer,
+			mGameWorld->mShaderManager.get(),
+			mGameWorld->mTextureManager.get(),
+			mGameWorld->mMaterialManager.get(),
+			mGameWorld->mBlendStateManager.get()));
+		mEditorWorld->mModelManager->Add("Translate", model);
 
 		std::vector<Mesh*> meshList;
 		model->GetMeshList(&meshList);
 
-		std::shared_ptr<BlendState> blend = SHARED(mRenderer->CreateBlendState(BlendFormat::SRC_ALPHA, BlendFormat::ONE_MINUS_SRC_ALPHA, BlendFormat::SRC_ALPHA, BlendFormat::ONE));
+		auto state = std::shared_ptr<BlendState>(mRenderer->CreateBlendState(
+			BlendFormat::SRC_ALPHA, BlendFormat::ONE_MINUS_SRC_ALPHA, BlendFunction::ADD,
+			BlendFormat::SRC_ALPHA, BlendFormat::ONE, BlendFunction::ADD));
+		mEditorWorld->mBlendStateManager->Add("TRANSLATE", state);
 
-		TRAVERSE_VECTOR(x, meshList)
+		for (auto mesh : meshList)
 		{
-			std::shared_ptr<Material> material = meshList[x]->mMaterial;
-
+			auto material = mesh->mMaterial.lock();
 			material->mShader = mEditorWorld->mShaderManager->Get("Color_Only");
 			material->mCullMode = CullFormat::NONE;
-			material->mBlendState = blend;
+			material->mBlendState = mEditorWorld->mBlendStateManager->Get("TRANSLATE");
 			material->mDepthMode = DepthFormat::ALWAYS;
-			material->mRenderQueue = RenderQueue::FOREGROUND;
+			material->mRenderQueue = (WORD)RenderQueue::FOREGROUND;
 			material->mAmbient.a = 0.5f;
 		}
 
-		//
+		
 		// Root Translate Object
-		//
-		mTranslateObject->Attach(new Transform());
+		{
+			mTranslateObject = new GameObject("Translate Object");
+			mTranslateObject->AddComponent(new Transform());
+			{
+				auto obj = new GameObject();
+				obj->mName = "X-Axis";
 
-		///////////////////////////////
+				Transform* transform = new Transform();
+				transform->mPosition = Vector3(tileSize, 0, 0);
+				transform->mOrientation = Quaternion(Vector3(0, 0, -90));
+				obj->AddComponent(transform);
 
-		GameObject* obj = new GameObject();
-		obj->mName = "X-Axis";
+				auto modelComp = new ModelDrawable(model);
+				//modelComp->SetMaterial(mSelectedMaterialX);
+				obj->AddComponent(modelComp);
 
-		Transform* transform = new Transform();
-		transform->mPosition = Vector3(tileSize, 0, 0);
-		transform->mOrientation = Quaternion(Vector3(0, 0, -90));
-		obj->Attach(transform);
+				mTranslateObject->AddChild(obj);
+			}
+			{
+				auto obj = new GameObject("Y-Axis");
 
-		ModelDrawable* modelComp = new ModelDrawable(model);
-		//modelComp->SetMaterial(mSelectedMaterialX);
-		obj->Attach(modelComp);
+				auto transform = new Transform();
+				transform->mPosition = Vector3(0, tileSize, 0);
+				transform->mOrientation = Quaternion(Vector3(0, 0, 0));
+				obj->AddComponent(transform);
 
-		mTranslateObject->AddChild(obj);
+				auto modelComp = new ModelDrawable(model);
+				//modelComp->SetMaterial(mSelectedMaterialY);
+				obj->AddComponent(modelComp);
 
-		///////////////////////////////
+				mTranslateObject->AddChild(obj);
+			}
+			{
+				auto obj = new GameObject("Z-Axis");
 
-		obj = new GameObject();
-		obj->mName = "Y-Axis";
+				auto transform = new Transform();
+				transform->mPosition = Vector3(0, 0, tileSize);
+				transform->mOrientation = Quaternion(Vector3(90, 0, 0));
+				obj->AddComponent(transform);
 
-		transform = new Transform();
-		transform->mPosition = Vector3(0, tileSize, 0);
-		transform->mOrientation = Quaternion(Vector3(0, 0, 0));
-		obj->Attach(transform);
+				auto modelComp = new ModelDrawable(model);
+				//modelComp->SetMaterial(mSelectedMaterialZ);
+				obj->AddComponent(modelComp);
 
-		modelComp = new ModelDrawable(model);
-		//modelComp->SetMaterial(mSelectedMaterialY);
-		obj->Attach(modelComp);
-
-		mTranslateObject->AddChild(obj);
-
-		///////////////////////////////
-
-		obj = new GameObject();
-		obj->mName = "Z-Axis";
-
-		transform = new Transform();
-		transform->mPosition = Vector3(0, 0, tileSize);
-		transform->mOrientation = Quaternion(Vector3(90, 0, 0));
-		obj->Attach(transform);
-
-		modelComp = new ModelDrawable(model);
-		//modelComp->SetMaterial(mSelectedMaterialZ);
-		obj->Attach(modelComp);
-
-		mTranslateObject->AddChild(obj);
-
-		///////////////////////////////
-
-		mTranslateObject->Startup();
-		mTranslateObject->SetWorld(mGameWorld);
-
-		mTranslateObject->SetActive(false);
+				mTranslateObject->AddChild(obj);
+			}
+			mTranslateObject->SetWorld(mGameWorld);
+			mTranslateObject->Startup();
+			mTranslateObject->SetActive(false);
+		}
 	}
 
 	void DrawTranslateObject()
@@ -1350,44 +1430,41 @@ public:
 			transformObject->mScale = Vector3::ONE * (mWorldCamera->GetTransform()->mPosition - transformSelect->mPosition).Length() * 0.005f;
 
 			mTranslateObject->UpdateTransform();
-			mTranslateObject->UpdateDrawable();
 		}
 	}
 
 	void CreateRotateObject()
-	{}
+	{ }
 
 	void CreateScaleObject()
-	{}
+	{ }
 
 	void CreateBoundsObject()
 	{
+		auto shaderLine = mEditorWorld->mShaderManager->Get("Color_Only").lock();
+
 		MeshBuilder builder;
-
-		std::shared_ptr< Shader > shaderLine = mEditorWorld->mShaderManager->Get("Color_Only");
-
 		builder.mLayout = shaderLine->Layout();
 		builder.CreateWireCube(1);
 
-		Mesh* mesh = builder.BuildMesh(mRenderer);
-
-		std::shared_ptr< Material > material = mEditorWorld->mMaterialManager->Add("Bounds", SHARED(new Material()));
+		auto material = std::shared_ptr<Material>(new Material());
 		material->mShader = shaderLine;
-		material->mBlendState = mRenderer->BLEND_OFF;
+		material->mBlendState = mEditorWorld->mBlendStateManager->Get("DEFAULT");
 		material->mDepthMode = DepthFormat::LEQUAL;
 		material->mCullMode = CullFormat::NONE;
-		material->mRenderQueue = RenderQueue::FOREGROUND;
+		material->mRenderQueue = (WORD)RenderQueue::FOREGROUND;
+		mEditorWorld->mMaterialManager->Add("Bounds", material);
 
+		auto mesh = std::shared_ptr<Mesh>(builder.BuildMesh(mRenderer));
 		mesh->mMaterial = material;
+		mEditorWorld->mMeshManager->Add("Bounds", mesh);
 
-		mBoundsObject = new GameObject();
-		mBoundsObject->mName = "Bounds";
-
-		mBoundsObject->Attach(new Transform());
-		mBoundsObject->Attach(new MeshDrawable(SHARED(mesh)));
-
-		mBoundsObject->Startup();
+		mBoundsObject = new GameObject("Bounds");
+		mBoundsObject->AddComponent(new Transform());
+		mBoundsObject->AddComponent(new MeshDrawable(mesh));
+		
 		mBoundsObject->SetWorld(mGameWorld);
+		mBoundsObject->Startup();
 	}
 
 	void CheckBounds(GameObject* obj)
@@ -1433,8 +1510,10 @@ public:
 			Vector3 center = (box.GetMaxBounds() + box.GetMinBounds()) * 0.5f;
 			Vector3 scale = (box.GetMaxBounds() - center);
 
-			MeshDrawable* mesh = mBoundsObject->GetComponent<MeshDrawable>();
-			std::shared_ptr< Material > material = mesh->mMesh->mMaterial;
+			MeshDrawable* drawable = mBoundsObject->GetComponent<MeshDrawable>();
+
+			auto mesh = drawable->mMesh.lock();
+			auto material = mesh->mMaterial.lock();
 
 			if (obj != mHoverObject)
 			{
@@ -1450,13 +1529,12 @@ public:
 			transform->mOrientation = Quaternion::IDENTITY;
 			transform->mScale = scale;
 
-			mesh->mMesh->mBounds = BoundingBox();
+			mesh->mBounds = BoundingBox();
 
 			mBoundsObject->UpdateTransform();
-			mBoundsObject->UpdateDrawable();
 
-			if (mesh->CheckVisible(mWorldCamera))
-				mesh->Draw();
+			if (drawable->CheckVisible(mWorldCamera))
+				drawable->Draw(mWorldCamera);
 		}
 
 		UINT count = obj->NumChildren();
@@ -1476,7 +1554,7 @@ public:
 			DrawBounds(mGameWorld->GetGameObject(x));
 		}
 
-		mHoverObject = NULL;
+		mHoverObject = nullptr;
 		mHoverDist = FLT_MAX;
 	}
 
@@ -1501,7 +1579,7 @@ public:
 		{
 			mSelectedObject = mHoverObject;
 
-			mTranslateObject->SetActive((mSelectedObject != NULL) ? true : false);
+			mTranslateObject->SetActive((mSelectedObject != nullptr) ? true : false);
 		}
 	}
 };
@@ -1517,7 +1595,7 @@ int APIENTRY _tWinMain(
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
-	//_CrtSetBreakAlloc(3760);
+	//_CrtSetBreakAlloc(4679);
 
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);

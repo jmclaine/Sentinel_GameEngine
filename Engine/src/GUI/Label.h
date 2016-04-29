@@ -5,19 +5,19 @@
 
 namespace Sentinel
 {
+	class Font;
 	class FontSystem;
 
 namespace GUI
 {
 	class SENTINEL_DLL Label : public Component::Drawable
 	{
-		DECLARE_SERIAL();
+	private:
+		static SerialRegister SERIAL_REGISTER;
+		static Serializable* Clone();
 
 	public:
-
-		DECLARE_SERIAL_REGISTER_SAVE();
-
-		FontSystem* mFontSystem;
+		std::weak_ptr<Font> mFont;
 
 		std::string mText;
 		ColorRGBA mColor;
@@ -31,21 +31,24 @@ namespace GUI
 		//////////////////////////////////
 
 		void Startup();
-
 		void Update();
-
 		void Shutdown();
 
 		//////////////////////////////////
 
 		void CalculateBounds();
-
 		bool CheckVisible(Component::Camera* camera);
-
-		void Draw();
+		void Draw(Component::Camera* camera);
 
 		//////////////////////////////////
 
 		GameComponent* Copy();
+
+		//////////////////////////////////
+
+		void SerialSave(Archive& archive);
+
+		void Save(Archive& archive);
+		void Load(Archive& archive);
 	};
 }}

@@ -6,63 +6,40 @@ Create and set the SpriteSystem before calling Build()
 #include "SpriteSystem.h"
 #include "Vector2.h"
 
-#define NUM_CHARS 256
-
 namespace Sentinel
 {
-	class Font
-	{
-	public:
-
-		std::shared_ptr<Sprite> mSprite;
-		std::shared_ptr<Material> mMaterial;
-
-		Vector2 mSize;
-		float mOffsetX[NUM_CHARS];	// image offset
-		float mOffsetY[NUM_CHARS];
-		float mAdvance[NUM_CHARS];	// next character starting position (x-axis)
-
-		/////////////////////
-
-		Font() {}
-		virtual ~Font() {}
-	};
-
-	//////////////////////////////////////////
+	class Font;
 
 	class SENTINEL_DLL FontSystem
 	{
 	public:
-
-		std::shared_ptr<SpriteSystem> mSpriteSystem;
-
-		Matrix4x4 mMatrixWVP;
-
-		std::shared_ptr<Font> mFont;
+		std::unique_ptr<SpriteSystem> mSpriteSystem;
 
 		////////////////////////
 
-		virtual ~FontSystem()
-		{}
+		FontSystem() { }
+		FontSystem(const FontSystem&) = delete;
+		FontSystem& operator = (const FontSystem&) = delete;
+		virtual ~FontSystem() { }
 
 		////////////////////////
 
 		virtual void Load(const char* filename) = 0;
 
-		virtual std::shared_ptr<Font> Build(UINT glyphWidth, UINT glyphHeight) = 0;
+		virtual Font* Build(UINT glyphWidth, UINT glyphHeight) = 0;
 
 		////////////////////////
 
-		virtual void Draw(char text, const ColorRGBA& color, const Matrix4x4& matWorld) = 0;
+		virtual void Draw(const Font* font, char text, const ColorRGBA& color, const Matrix4x4& matWorld) = 0;
 
 		void Clear()
 		{
 			mSpriteSystem->Clear();
 		}
 
-		void Present()
+		void Present(Component::Camera* camera)
 		{
-			mSpriteSystem->Present();
+			mSpriteSystem->Present(camera);
 		}
 	};
 

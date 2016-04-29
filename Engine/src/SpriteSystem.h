@@ -34,7 +34,6 @@ namespace Sentinel
 	class SENTINEL_DLL SpriteSystem
 	{
 	private:
-
 		Renderer* mRenderer;
 		Mesh* mMesh;
 
@@ -42,40 +41,34 @@ namespace Sentinel
 		UINT mMaxSprites;
 
 	public:
-
-		Component::Camera* mCamera;
-
 		struct Storage
 		{
-		public:
-
 			Quad mFrame;
 			UINT mColor;
 			Matrix4x4 mMatrixWorld;
 		};
 
 	private:
-
 		Storage* mStorage;
 
 	public:
-
-		std::shared_ptr<Sprite> mSprite;
-		std::shared_ptr<Material> mMaterial;
+		std::weak_ptr<Sprite> mSprite;
+		std::weak_ptr<Material> mMaterial;
 
 		/////////////////////////////////////
 
-		SpriteSystem(Renderer* renderer, std::shared_ptr<VertexLayout> layout, UINT maxSprites);
+		SpriteSystem(Renderer* renderer, std::weak_ptr<VertexLayout>& layout, UINT maxSprites);
 		~SpriteSystem();
+
+		SpriteSystem(const SpriteSystem&) = delete;
+		SpriteSystem& operator = (const SpriteSystem&) = delete;
 
 		Renderer* GetRenderer();
 
 		/////////////////////////////////////
 
 		void Clear();
-
 		void Draw(UINT frame, const ColorRGBA& color, const Matrix4x4& matWorld);
-
-		void Present();
+		void Present(Component::Camera* camera);
 	};
 }

@@ -25,7 +25,7 @@ namespace Network
 		mACK(ack),
 		mResendTimer(0),
 		mTotalTime(0)
-	{}
+	{ }
 
 	bool Packet::GuaranteedSender::operator < (GuaranteedSender* sender)
 	{
@@ -119,7 +119,7 @@ namespace Network
 
 	PacketSender::PacketSender(Socket* socket) :
 		Packet(socket)
-	{}
+	{ }
 
 	void PacketSender::AddHeader(UCHAR header, float advTimer)
 	{
@@ -246,7 +246,7 @@ namespace Network
 
 	PacketReceiver::PacketReceiver(Socket* socket, PacketSender* sender) :
 		Packet(socket), mSender(sender)
-	{}
+	{ }
 
 	const Packet::Header& PacketReceiver::GetHeader()
 	{
@@ -279,15 +279,15 @@ namespace Network
 		{
 			mStart = mData;
 
-			while (*mStart != NULL)
+			while (*mStart != 0)
 			{
 				mPosition = mStart;
 
-				Socket::Connection* connection = NULL;
+				Socket::Connection* connection = nullptr;
 				Packet::Header* pHeader = (Packet::Header*)(mPosition);
 				mPosition += sizeof(Packet::Header);
 
-				if (pHeader->mType != HEADER_NULL)
+				if (pHeader->mType != HEADER_nullptr)
 				{
 					// Ensure the packet received is valid.
 					//
@@ -305,7 +305,7 @@ namespace Network
 
 					// Offset data for guaranteed message.
 					//
-					GuaranteedHeader* gHeader = NULL;
+					GuaranteedHeader* gHeader = nullptr;
 					if (pHeader->mType & HEADER_GUARANTEED)
 					{
 						gHeader = (GuaranteedHeader*)(mPosition);

@@ -9,28 +9,25 @@ namespace Sentinel
 	class Renderer;
 	class ShaderManager;
 	class TextureManager;
+	class BlendStateManager;
 
-	class SENTINEL_DLL MeshManager : public AssetManager <Mesh>
+	class SENTINEL_DLL MeshManager : public AssetManager<Mesh>
 	{
 	public:
-
 		MeshManager();
-		~MeshManager();
+		MeshManager(const MeshManager&) = delete;
+		MeshManager& operator = (const MeshManager&) = delete;
 
 		/////////////////////////////////
 
 		void Save(
 			Archive& archive,
 			Renderer* renderer,
-			ShaderManager* shaderManager,
-			TextureManager* textureManager,
 			MaterialManager* materialManager);
 
 		void Load(
 			Archive& archive,
 			Renderer* renderer,
-			ShaderManager* shaderManager,
-			TextureManager* textureManager,
 			MaterialManager* materialManager);
 	};
 }

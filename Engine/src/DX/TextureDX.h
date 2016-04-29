@@ -14,7 +14,7 @@ namespace Sentinel
 
 		//////////////////////////////////////
 
-		TextureDX( UINT width, UINT height, ImageFormat::Type format, ID3D11Texture2D* texture, ID3D11ShaderResourceView* resource );
+		TextureDX( UINT width, UINT height, ImageFormat format, ID3D11Texture2D* texture, ID3D11ShaderResourceView* resource );
 		~TextureDX();
 
 		void Release();
@@ -29,7 +29,7 @@ namespace Sentinel
 
 		//////////////////////////////////////
 
-		TextureCubeDX(UINT width, UINT height, ImageFormat::Type format, ID3D11Texture3D* texture, ID3D11ShaderResourceView* resource);
+		TextureCubeDX(UINT width, UINT height, ImageFormat format, ID3D11Texture3D* texture, ID3D11ShaderResourceView* resource);
 		~TextureCubeDX();
 
 		void Release();

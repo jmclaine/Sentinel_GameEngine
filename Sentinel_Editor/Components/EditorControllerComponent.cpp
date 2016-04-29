@@ -12,6 +12,7 @@
 #include "PhysicsSystem.h"
 #include "Renderer.h"
 #include "GameWindow.h"
+#include "WindowInfo.h"
 #include "Component/PerspectiveCamera.h"
 #include "Component/OrthographicCamera.h"
 

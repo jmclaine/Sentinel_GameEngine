@@ -20,13 +20,12 @@ the correct amount of memory before adding them to the list.
 #include <vector>
 
 #include "Sentinel.h"
-#include "Types.h"
-#include "RendererTypes.h"
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
 #include "Matrix4x4.h"
 #include "ColorRGBA.h"
+#include "Material.h"
 
 namespace Sentinel
 {
@@ -42,7 +41,6 @@ namespace Sentinel
 		friend class Mesh;
 
 	public:
-
 		// TODO: Create a FVF style Vertex instead of allocating
 		//       the maximum amount of memory each time.
 		//
@@ -50,29 +48,21 @@ namespace Sentinel
 		{
 			Vector3 mPosition;
 
-			// Texture Coordinates are either uv / xy based,
-			// or xyzw / quad based depending on the shader
-			// attribute.
-			//
-			Vector2 mTexCoord[TextureIndex::COUNT];
-			Vector4 mQuadCoord[TextureIndex::COUNT];
+			Vector2 mTexCoord[(WORD)TextureIndex::COUNT];
+			Vector4 mQuadCoord[(WORD)TextureIndex::COUNT];
 
 			Vector3 mNormal;
 			UINT mColor;
 
-			// Normal Mapping.
-			//
 			Vector4 mTangent;
 
-			// Bones.
-			//
 			int mBoneCount;
 			int mBoneIndex[4];
 			float mBoneWeight[4];
 
-			// Vertex Matrix for Sprites
-			//
 			Matrix4x4 mMatrix;
+
+			//////////////////////////////
 
 			Vertex() :
 				mPosition(Vector3(0, 0, 0)),
@@ -91,15 +81,13 @@ namespace Sentinel
 		};
 
 	private:
-
 		Buffer* mVertexBuffer;
 		Buffer* mIndexBuffer;
 
 	public:
+		std::weak_ptr<VertexLayout> mLayout;
 
-		std::shared_ptr<VertexLayout> mLayout;
-
-		PrimitiveFormat::Type mPrimitive;
+		PrimitiveFormat mPrimitive;
 
 		std::vector<Vertex> mVertex;
 		std::vector<UINT> mIndex;
@@ -117,8 +105,6 @@ namespace Sentinel
 		//
 		UINT FindVertex(const Vector3& pos, const Vector2& tex, const Vector3& normal);
 
-		// Index helper functions.
-		//
 		void AddIndex(UINT i0); // Point
 		void AddIndex(UINT i0, UINT i1); // Line
 		void AddIndex(UINT i0, UINT i1, UINT i2); // Triangle
@@ -144,8 +130,6 @@ namespace Sentinel
 		void CreateWireSphere(float radius, int slices, int stacks);
 		void CreateSphere(float radius, int slices, int stacks, int texWrap = 1);
 
-		// Apply a matrix transform to a set a vertices.
-		//
 		void ApplyMatrix(const Matrix4x4& mat, UINT startVertex = 0, UINT endVertex = UINT_MAX);
 
 	private:
@@ -166,7 +150,7 @@ namespace Sentinel
 		// Helper functions to build quads for both
 		// RenderTextures and GUIs.
 		//
-		static Mesh* BuildRenderTextureMesh(Renderer* renderer, std::shared_ptr<VertexLayout> layout);
-		static Mesh* BuildGUIMesh(Renderer* renderer, std::shared_ptr<VertexLayout> layout);
+		static Mesh* BuildRenderTextureMesh(Renderer* renderer, std::weak_ptr<VertexLayout>& layout);
+		static Mesh* BuildGUIMesh(Renderer* renderer, std::weak_ptr<VertexLayout>& layout);
 	};
 }

@@ -1,11 +1,11 @@
 #pragma once
-/*
-All attached GameComponent(s) are freed on Shutdown()
-*/
-#include <set>
+
 #include <vector>
 #include <typeinfo>
 #include <iostream>
+#include <algorithm>
+#include <memory>
+#include <typeindex>
 
 #include "Util.h"
 #include "GameComponent.h"
@@ -27,17 +27,18 @@ namespace Sentinel
 	class SENTINEL_DLL GameObject : public Serializable, public ListNode<GameObject>
 	{
 	private:
+		static SerialRegister SERIAL_REGISTER;
+		static Serializable* Clone();
 
-		DECLARE_SERIAL();
-
-		std::vector<GameComponent*> mComponent;
+		// It is impossible to search for the type of component
+		// without iterating over the entire data structure.
+		std::vector<std::unique_ptr<GameComponent>> mComponents;
 
 		GameWorld* mWorld;
 
 		bool mEnabled;
 
 	public:
-
 		Component::Controller* mController;
 		Component::Physics* mPhysics;
 		Component::Transform* mTransform;
@@ -50,16 +51,18 @@ namespace Sentinel
 		//////////////////////////////
 
 		GameObject(const std::string& name = "GameObject");
+		GameObject(const GameObject&) = delete;
+		GameObject& operator = (const GameObject&) = delete;
 		~GameObject();
 
 		//////////////////////////////
 
-		GameComponent* Attach(GameComponent* component);
-		GameComponent* Detach(GameComponent* component);
+		void AddComponent(GameComponent* component);
+		void RemoveComponent(GameComponent* component);
 
 		//////////////////////////////
 
-		GameObject* AddChild(GameObject* obj);	// override
+		void AddChild(GameObject* obj);
 
 		//////////////////////////////
 
@@ -77,52 +80,43 @@ namespace Sentinel
 		void UpdateTransform();
 		void UpdateComponents();
 		void UpdateCamera();
-		void UpdateDrawable();
 
 		void Shutdown();
 
 		//////////////////////////////
 
-		// Find the first occurrence of a component by type.
-		//
 		template <typename Component = GameComponent>
-		Component* GetComponent()
+		Component* GetComponent() const
 		{
-			_ASSERT((std::is_base_of<GameComponent, Component>::value));
-
-			GameComponent* component;
-
-			TRAVERSE_VECTOR(x, mComponent)
+			for (const auto& item : mComponents)
 			{
-				component = mComponent[x];
-
-				if (dynamic_cast<Component*>(component))
-					return (Component*)component;
+				auto component = dynamic_cast<Component*>(item.get());
+				if (component)
+					return component;
 			}
-
-			return NULL;
+			
+			return nullptr;
 		}
 
 		template <typename Component = GameComponent>
-		std::vector<Component*> GetComponents()
+		std::vector<Component*> GetComponents() const
 		{
-			_ASSERT((std::is_base_of<GameComponent, Component>::value));
+			std::vector<Component*> componentList;
 
-			std::vector<GameComponent*> componentList;
-			GameComponent* component;
-
-			TRAVERSE_VECTOR(x, mComponent)
+			for (const auto& item : mComponents)
 			{
-				component = mComponent[x];
-
-				if (dynamic_cast<Component*>(component))
-					componentList.push_back((Component*)component);
+				auto component = dynamic_cast<Component*>(item.get());
+				if (component)
+					componentList.push_back(component);
 			}
 
-			return componentList;
+			return std::move(componentList);
 		}
 
 		//////////////////////////////
+
+		void Save(Archive& archive);
+		void Load(Archive& archive);
 
 		GameObject* Copy();
 	};

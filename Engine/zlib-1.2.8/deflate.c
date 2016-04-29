@@ -1228,7 +1228,7 @@ local uInt longest_match(s, cur_match)
                  *(ushf*)(scan+=2) == *(ushf*)(match+=2) &&
                  *(ushf*)(scan+=2) == *(ushf*)(match+=2) &&
                  scan < strend);
-        /* The funny "do {}" generates better code on most compilers */
+        /* The funny "do { }" generates better code on most compilers */
 
         /* Here, scan <= window+strstart+257 */
         Assert(scan <= s->window+(unsigned)(s->window_size-1), "wild scan");

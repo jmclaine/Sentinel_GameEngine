@@ -2,29 +2,41 @@
 
 #include "Component/Controller3D.h"
 
-namespace Sentinel {
-namespace Component
+namespace Sentinel
 {
-	class SENTINEL_DLL PlayerController : public Controller3D
+	namespace Component
 	{
-		DECLARE_SERIAL();
+		class SENTINEL_DLL PlayerController final : public Controller3D
+		{
+			static SerialRegister SERIAL_REGISTER;
+			static Serializable* Clone();
 
-	public:
+		public:
+			float mSpeed;
+			float mAngularSpeed;
 
-		float mSpeed;
-		float mAngularSpeed;
+			//////////////////////////////
 
-		//////////////////////////////
+			PlayerController();
 
-		PlayerController();
+			void Startup();
+			void Shutdown();
 
-		void Startup();
-		void Shutdown();
+			//////////////////////////////
 
-		//////////////////////////////
+			void Execute();
 
-		void Execute();
+			//////////////////////////////
 
-		GameComponent* Copy();
-	};
-}}
+			void Save(Archive& archive);
+			void Load(Archive& archive);
+
+			//////////////////////////////
+
+			GameComponent* Copy();
+
+		private:
+			void Copy(GameComponent* component);
+		};
+	}
+}

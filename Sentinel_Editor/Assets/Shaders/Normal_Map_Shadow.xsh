@@ -218,7 +218,7 @@ vec3 GetColor(vec3 normal, vec3 lightDir, vec3 cameraDir, vec3 shadowDir, vec3 l
 {
 	vec3 result;
 	vec3 lightNormal = normalize(lightDir);
-	float intensity = clamp(dot(normal, lightNormal), 0.0, 1.0);
+	float intensity = max(dot(normal, lightNormal), 0.0);
 
 	if (intensity > 0)
 	{
@@ -235,7 +235,7 @@ vec3 GetColor(vec3 normal, vec3 lightDir, vec3 cameraDir, vec3 shadowDir, vec3 l
 		attenuation *= attenuation;
 
 		// Specular
-		vec3 specularFinal = max(_Specular.rgb * pow(clamp(dot(normal, normalize(lightDir + cameraDir)), 0.0, 1.0), _SpecComp), 0.0);
+		vec3 specularFinal = max(_Specular.rgb * pow(max(dot(normal, normalize(lightNormal + cameraDir)), 0.0), _SpecComp), 0.0);
 
 		// Shadow with PCF blend
 		float lightDepth = length(shadowDir) / r;
@@ -254,7 +254,7 @@ vec3 GetColor(vec3 normal, vec3 lightDir, vec3 cameraDir, vec3 shadowDir, vec3 l
 		}
 
 		// Result
-		result = clamp((_Diffuse.rgb * intensity + specularFinal.rgb) * attenuation * lightColor, 0.0, 1.0) * clamp(shadow * BLEND_FACTOR, 0.0, 1.0);
+		result = clamp((_Diffuse.rgb * intensity + specularFinal.rgb) * attenuation * lightColor * max(shadow * BLEND_FACTOR, 0.0), 0.0, 1.0);
 	}
 
 	return result;

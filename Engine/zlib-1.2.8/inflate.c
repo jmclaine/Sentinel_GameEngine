@@ -62,7 +62,7 @@
  * 1.2.beta6    4 Jan 2003
  * - Added comments in inffast.c on effectiveness of POSTINC
  * - Typecasting all around to reduce compiler warnings
- * - Changed loops from while (1) or do {} while (1) to for (;;), again to
+ * - Changed loops from while (1) or do { } while (1) to for (;;), again to
  *   make compilers happy
  * - Changed type of window in inflateBackInit() to unsigned char *
  *

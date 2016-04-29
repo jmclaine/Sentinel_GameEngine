@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Sentinel.h"
-#include "Types.h"
 
 namespace Sentinel
 {

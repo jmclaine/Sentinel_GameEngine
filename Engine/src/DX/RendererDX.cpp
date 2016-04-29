@@ -9,6 +9,8 @@
 #include "TextureDX.h"
 #include "ShaderDX.h"
 #include "VertexLayoutDX.h"
+#include "WindowInfo.h"
+#include "RenderTexture.h"
 
 #ifdef _DEBUG
 #include <comdef.h>
@@ -23,14 +25,14 @@ namespace Sentinel
 #ifndef _DEBUG
 #define HV_PTR(func)\
 	if ((func) != S_OK)\
-		return NULL;
+		return nullptr;
 #else
 #define HV_PTR(func) {\
 	HRESULT result = func;\
 	if ((result) != S_OK) {\
 		_com_error err(result);\
 		Debug::LogError(STREAM(TRACE << DXGetErrorString(result) << ": " << err.ErrorMessage()));\
-		return NULL;\
+		return nullptr;\
 	}}
 #endif
 
@@ -43,19 +45,17 @@ namespace Sentinel
 		friend class ShaderDX;
 
 	private:
-
-		static const D3D11_PRIMITIVE_TOPOLOGY PRIMITIVE[PrimitiveFormat::COUNT];
-		static const D3D11_CULL_MODE CULL_TYPE[CullFormat::COUNT];
-		static const D3D11_FILL_MODE FILL_TYPE[FillFormat::COUNT];
-		static const D3D11_BLEND BLEND_TYPE[BlendFormat::COUNT];
-		static const D3D11_BLEND_OP BLEND_FUNC_TYPE[BlendFunction::COUNT];
+		static const D3D11_PRIMITIVE_TOPOLOGY PRIMITIVE[(BYTE)PrimitiveFormat::COUNT];
+		static const D3D11_CULL_MODE CULL_TYPE[(BYTE)CullFormat::COUNT];
+		static const D3D11_FILL_MODE FILL_TYPE[(BYTE)FillFormat::COUNT];
+		static const D3D11_BLEND BLEND_TYPE[(BYTE)BlendFormat::COUNT];
+		static const D3D11_BLEND_OP BLEND_FUNC_TYPE[(BYTE)BlendFunction::COUNT];
 
 		class WindowInfoDX : public WindowInfo
 		{
 			friend class RendererDX;
 
 		public:
-
 			ID3D11Device* mDevice;
 			ID3D11DeviceContext* mContext;
 			IDXGISwapChain* mSwapChain;
@@ -67,13 +67,12 @@ namespace Sentinel
 		class RenderTextureDX : public RenderTexture
 		{
 		public:
-
 			ID3D11RenderTargetView* mView;
 
 			RenderTextureDX(ID3D11RenderTargetView* view, Texture* texture) :
 				mView(view),
 				RenderTexture(texture)
-			{}
+			{ }
 
 			~RenderTextureDX()
 			{
@@ -92,7 +91,7 @@ namespace Sentinel
 			DepthStencilDX(ID3D11DepthStencilView* view, UINT width, UINT height) :
 				mView(view),
 				DepthStencil(width, height)
-			{}
+			{ }
 
 			~DepthStencilDX()
 			{
@@ -114,14 +113,13 @@ namespace Sentinel
 
 			BlendStateDX(
 				ID3D11BlendState* blendState,
-				BlendFormat::Type srcBlendColor, BlendFormat::Type dstBlendColor,
-				BlendFormat::Type srcBlendAlpha, BlendFormat::Type dstBlendAlpha,
-				BlendFunction::Type blendFuncColor, BlendFunction::Type blendFuncAlpha) :
+				BlendFormat srcBlendColor, BlendFormat dstBlendColor, BlendFunction blendFuncColor,
+				BlendFormat srcBlendAlpha, BlendFormat dstBlendAlpha, BlendFunction blendFuncAlpha) :
 				mBlendState(blendState),
-				BlendState(srcBlendColor, dstBlendColor,
-				srcBlendAlpha, dstBlendAlpha,
-				blendFuncColor, blendFuncAlpha)
-			{}
+				BlendState(
+					srcBlendColor, dstBlendColor, blendFuncColor,
+					srcBlendAlpha, dstBlendAlpha, blendFuncAlpha)
+			{ }
 
 			~BlendStateDX()
 			{
@@ -144,16 +142,16 @@ namespace Sentinel
 			mSampleDesc.Count = 1;
 			mSampleDesc.Quality = 0;
 
-			mCurrWindow = NULL;
-			mCurrStencil = NULL;
-			mCurrTarget = NULL;
+			mCurrWindow = nullptr;
+			mCurrStencil = nullptr;
+			mCurrTarget = nullptr;
 
-			mDepthStencilState = new ID3D11DepthStencilState*[DepthFormat::COUNT];
+			mDepthStencilState = new ID3D11DepthStencilState*[(BYTE)DepthFormat::COUNT];
 		}
 
 		~RendererDX()
 		{
-			for (UINT x = 0; x < DepthFormat::COUNT; ++x)
+			for (BYTE x = 0; x < (BYTE)DepthFormat::COUNT; ++x)
 			{
 				SAFE_RELEASE_PTR(mDepthStencilState[x]);
 			}
@@ -202,11 +200,11 @@ namespace Sentinel
 			mCurrWindow->mFullscreen = fullscreen;
 			mCurrWindow->mWidth = width;
 			mCurrWindow->mHeight = height;
-			mCurrWindow->mWidthRatio = (float)width / (float)WINDOW_WIDTH_BASE;
-			mCurrWindow->mHeightRatio = (float)height / (float)WINDOW_HEIGHT_BASE;
+			mCurrWindow->mWidthRatio = (float)width / (float)WindowInfo::BASE_WIDTH;
+			mCurrWindow->mHeightRatio = (float)height / (float)WindowInfo::BASE_HEIGHT;
 
 			HV_PTR(D3D11CreateDeviceAndSwapChain(
-				NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createdeviceflags,
+				nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, createdeviceflags,
 				featurelevels, sizeof(featurelevels) / sizeof(D3D_FEATURE_LEVEL),
 				D3D11_SDK_VERSION, &sd, &mCurrWindow->mSwapChain,
 				&mCurrWindow->mDevice, 0, &mCurrWindow->mContext));
@@ -216,7 +214,7 @@ namespace Sentinel
 			if (fullscreen)
 			{
 				HV_PTR(mCurrWindow->mSwapChain->ResizeBuffers(1, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH));
-				HV_PTR(mCurrWindow->mSwapChain->SetFullscreenState(TRUE, NULL));
+				HV_PTR(mCurrWindow->mSwapChain->SetFullscreenState(TRUE, nullptr));
 			}
 
 			D3D11_RASTERIZER_DESC rasterizerstate = { D3D11_FILL_SOLID, D3D11_CULL_BACK, true, 0, 0, 0, true, false, false, false };
@@ -230,38 +228,6 @@ namespace Sentinel
 			SET_DEBUG_NAME(mCurrWindow->mRasterizerState);
 		#endif
 
-			// Create NULL_TEXTURE (Black).
-			//
-			if (!NULL_TEXTURE)
-			{
-				UCHAR* newTex = new UCHAR[4];
-
-				newTex[0] = 0;
-				newTex[1] = 0;
-				newTex[2] = 0;
-				newTex[3] = 255;
-
-				NULL_TEXTURE = std::shared_ptr< Texture >(CreateTexture(newTex, 1, 1, ImageFormat::RGBA));
-
-				delete newTex;
-			}
-
-			// Create BASE_TEXTURE (White).
-			//
-			if (!BASE_TEXTURE)
-			{
-				UCHAR* newTex = new UCHAR[4];
-
-				newTex[0] = 255;
-				newTex[1] = 255;
-				newTex[2] = 255;
-				newTex[3] = 255;
-
-				BASE_TEXTURE = std::shared_ptr< Texture >(CreateTexture(newTex, 1, 1, ImageFormat::RGBA));
-
-				delete newTex;
-			}
-
 			// Create BLEND_OFF.
 			//
 			D3D11_BLEND_DESC blendDesc;
@@ -271,28 +237,16 @@ namespace Sentinel
 			{
 				blendDesc.RenderTarget[x].BlendEnable = FALSE;
 
-				blendDesc.RenderTarget[x].SrcBlend = BLEND_TYPE[BlendFormat::SRC_ALPHA];
-				blendDesc.RenderTarget[x].DestBlend = BLEND_TYPE[BlendFormat::ONE_MINUS_SRC_ALPHA];
-				blendDesc.RenderTarget[x].BlendOp = BLEND_FUNC_TYPE[BlendFunction::ADD];
+				blendDesc.RenderTarget[x].SrcBlend = BLEND_TYPE[(BYTE)BlendFormat::SRC_ALPHA];
+				blendDesc.RenderTarget[x].DestBlend = BLEND_TYPE[(BYTE)BlendFormat::ONE_MINUS_SRC_ALPHA];
+				blendDesc.RenderTarget[x].BlendOp = BLEND_FUNC_TYPE[(BYTE)BlendFunction::ADD];
 
-				blendDesc.RenderTarget[x].SrcBlendAlpha = BLEND_TYPE[BlendFormat::SRC_ALPHA];
-				blendDesc.RenderTarget[x].DestBlendAlpha = BLEND_TYPE[BlendFormat::ONE_MINUS_SRC_ALPHA];
-				blendDesc.RenderTarget[x].BlendOpAlpha = BLEND_FUNC_TYPE[BlendFunction::ADD];
+				blendDesc.RenderTarget[x].SrcBlendAlpha = BLEND_TYPE[(BYTE)BlendFormat::SRC_ALPHA];
+				blendDesc.RenderTarget[x].DestBlendAlpha = BLEND_TYPE[(BYTE)BlendFormat::ONE_MINUS_SRC_ALPHA];
+				blendDesc.RenderTarget[x].BlendOpAlpha = BLEND_FUNC_TYPE[(BYTE)BlendFunction::ADD];
 
 				blendDesc.RenderTarget[x].RenderTargetWriteMask = 0x0F;
 			}
-
-			ID3D11BlendState* blendState = NULL;
-			HV_PTR(mCurrWindow->mDevice->CreateBlendState(&blendDesc, &blendState));
-			BLEND_OFF = std::shared_ptr< BlendState >(new BlendStateDX(blendState, BlendFormat::ZERO, BlendFormat::ZERO,
-				BlendFormat::ZERO, BlendFormat::ZERO,
-				BlendFunction::ADD, BlendFunction::ADD));
-
-			// Create BLEND_ALPHA.
-			//
-			BLEND_ALPHA = std::shared_ptr< BlendState >(CreateBlendState());
-
-			SetBlendState(BLEND_OFF.get());
 
 			// Create depth stencils.
 			//
@@ -314,39 +268,39 @@ namespace Sentinel
 			stencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 			stencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-			ID3D11DepthStencilState* stencilState = NULL;
+			ID3D11DepthStencilState* stencilState = nullptr;
 
 			stencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
 			HV_PTR(mCurrWindow->mDevice->CreateDepthStencilState(&stencilDesc, &stencilState));
-			mDepthStencilState[DepthFormat::LESS] = stencilState;
+			mDepthStencilState[(BYTE)DepthFormat::LESS] = stencilState;
 
 			stencilDesc.DepthFunc = D3D11_COMPARISON_EQUAL;
 			HV_PTR(mCurrWindow->mDevice->CreateDepthStencilState(&stencilDesc, &stencilState));
-			mDepthStencilState[DepthFormat::EQUAL] = stencilState;
+			mDepthStencilState[(BYTE)DepthFormat::EQUAL] = stencilState;
 
 			stencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 			HV_PTR(mCurrWindow->mDevice->CreateDepthStencilState(&stencilDesc, &stencilState));
-			mDepthStencilState[DepthFormat::LEQUAL] = stencilState;
+			mDepthStencilState[(BYTE)DepthFormat::LEQUAL] = stencilState;
 
 			stencilDesc.DepthFunc = D3D11_COMPARISON_GREATER;
 			HV_PTR(mCurrWindow->mDevice->CreateDepthStencilState(&stencilDesc, &stencilState));
-			mDepthStencilState[DepthFormat::GREATER] = stencilState;
+			mDepthStencilState[(BYTE)DepthFormat::GREATER] = stencilState;
 
 			stencilDesc.DepthFunc = D3D11_COMPARISON_NOT_EQUAL;
 			HV_PTR(mCurrWindow->mDevice->CreateDepthStencilState(&stencilDesc, &stencilState));
-			mDepthStencilState[DepthFormat::NOTEQUAL] = stencilState;
+			mDepthStencilState[(BYTE)DepthFormat::NOTEQUAL] = stencilState;
 
 			stencilDesc.DepthFunc = D3D11_COMPARISON_GREATER_EQUAL;
 			HV_PTR(mCurrWindow->mDevice->CreateDepthStencilState(&stencilDesc, &stencilState));
-			mDepthStencilState[DepthFormat::GEQUAL] = stencilState;
+			mDepthStencilState[(BYTE)DepthFormat::GEQUAL] = stencilState;
 
 			stencilDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
 			HV_PTR(mCurrWindow->mDevice->CreateDepthStencilState(&stencilDesc, &stencilState));
-			mDepthStencilState[DepthFormat::ALWAYS] = stencilState;
+			mDepthStencilState[(BYTE)DepthFormat::ALWAYS] = stencilState;
 
 			stencilDesc.DepthEnable = FALSE;
 			HV_PTR(mCurrWindow->mDevice->CreateDepthStencilState(&stencilDesc, &stencilState));
-			mDepthStencilState[DepthFormat::OFF] = stencilState;
+			mDepthStencilState[(BYTE)DepthFormat::OFF] = stencilState;
 
 			SetDepthStencilType(DepthFormat::LEQUAL);
 
@@ -357,9 +311,9 @@ namespace Sentinel
 		{
 			if (mCurrWindow)
 			{
-				if (mCurrWindow->mSwapChain != NULL)
+				if (mCurrWindow->mSwapChain != nullptr)
 				{
-					mCurrWindow->mSwapChain->SetFullscreenState(FALSE, NULL);
+					mCurrWindow->mSwapChain->SetFullscreenState(FALSE, nullptr);
 
 					SAFE_RELEASE_PTR(mCurrWindow->mSwapChain);
 					SAFE_RELEASE_PTR(mCurrWindow->mRasterizerState);
@@ -385,7 +339,7 @@ namespace Sentinel
 		bool ShareResources(WindowInfo* info0, WindowInfo* info1)
 		{
 			//((WindowInfoDX*)info0)->
-			/*IDXGIResource* res = NULL;
+			/*IDXGIResource* res = nullptr;
 
 			if( ((WindowInfoDX*)info0)->mContext->QueryInterface( __uuidof(IDXGIResource), (void**)&res ) != S_OK )
 			return false;
@@ -397,7 +351,7 @@ namespace Sentinel
 
 		// Buffers.
 		//
-		Buffer* CreateBuffer(void* data, UINT size, UINT stride, BufferFormat::Type type, BufferAccess::Type access)
+		Buffer* CreateBuffer(void* data, UINT size, UINT stride, BufferFormat type, BufferAccess access)
 		{
 			return new BufferDX(mCurrWindow->mDevice, mCurrWindow->mContext, data, size, stride, type, access);
 		}
@@ -440,7 +394,7 @@ namespace Sentinel
 				D3DX11_IMAGE_LOAD_INFO info;
 				ID3D11ShaderResourceView* image;
 
-				if (D3DX11CreateShaderResourceViewFromFileA(mCurrWindow->mDevice, filename, &info, NULL, &image, NULL) == S_OK)
+				if (D3DX11CreateShaderResourceViewFromFileA(mCurrWindow->mDevice, filename, &info, nullptr, &image, nullptr) == S_OK)
 				{
 					return new TextureDX(info.Width, info.Height, ImageFormat::RGBA, 0, image);
 				}
@@ -450,7 +404,7 @@ namespace Sentinel
 						STREAM("Failed to load " << filename),
 						STREAM("Texture Load Failure"));
 
-					return NULL;
+					return nullptr;
 				}
 			}
 
@@ -460,13 +414,13 @@ namespace Sentinel
 			int nChannels;
 			unsigned char* pixels = stbi_load(filename, &width, &height, &nChannels, 4);
 
-			if (pixels == NULL)
+			if (pixels == nullptr)
 			{
 				Debug::ShowError(
 					STREAM(filename << " failed to load."),
 					STREAM("Texture load failure."));
 
-				return NULL;
+				return nullptr;
 			}
 
 			Texture* texture = CreateTexture(pixels, width, height, ImageFormat::RGBA, createMips);
@@ -476,9 +430,9 @@ namespace Sentinel
 			return texture;
 		}
 
-		Texture* CreateTexture(void* data, UINT width, UINT height, ImageFormat::Type format, bool createMips = true)
+		Texture* CreateTexture(void* data, UINT width, UINT height, ImageFormat format, bool createMips = true)
 		{
-			UCHAR* newData = NULL;
+			UCHAR* newData = nullptr;
 			UINT size = width * height;
 
 			DXGI_FORMAT newFormat;
@@ -589,7 +543,7 @@ namespace Sentinel
 			desc.MiscFlags = createMips ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
 
 			ID3D11Texture2D* tex0;
-			HV_PTR(mCurrWindow->mDevice->CreateTexture2D(&desc, NULL, &tex0));
+			HV_PTR(mCurrWindow->mDevice->CreateTexture2D(&desc, nullptr, &tex0));
 
 			D3D11_SHADER_RESOURCE_VIEW_DESC rsv =
 			{
@@ -644,7 +598,7 @@ namespace Sentinel
 			return new TextureDX(width, height, format, tex0, resource);
 		}
 
-		Texture* CreateTextureCube(void* data, UINT width, UINT height, ImageFormat::Type format)
+		Texture* CreateTextureCube(void* data, UINT width, UINT height, ImageFormat format)
 		{
 			UCHAR* newData = (UCHAR*)data;
 			UINT size = width * height;
@@ -747,7 +701,7 @@ namespace Sentinel
 			resData.SysMemPitch = width << 2;
 			resData.SysMemSlicePitch = size << 2;
 
-			ID3D11Texture3D* texture = NULL;
+			ID3D11Texture3D* texture = nullptr;
 			HV_PTR(mCurrWindow->mDevice->CreateTexture3D(&desc, &resData, &texture));
 
 			D3D11_SHADER_RESOURCE_VIEW_DESC rsv;
@@ -756,7 +710,7 @@ namespace Sentinel
 			rsv.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
 			rsv.Texture3D.MipLevels = desc.MipLevels;
 
-			ID3D11ShaderResourceView* resource = NULL;
+			ID3D11ShaderResourceView* resource = nullptr;
 			HV_PTR(mCurrWindow->mDevice->CreateShaderResourceView(texture, &rsv, &resource));
 
 		#ifndef NDEBUG
@@ -775,7 +729,7 @@ namespace Sentinel
 
 			TextureDX* texDX = static_cast<TextureDX*>(texture);
 
-			ID3D11Texture2D* texCopy = NULL;
+			ID3D11Texture2D* texCopy = nullptr;
 
 			D3D11_TEXTURE2D_DESC desc;
 			texDX->mTexture->GetDesc(&desc);
@@ -785,7 +739,7 @@ namespace Sentinel
 			desc.Usage = D3D11_USAGE_STAGING;
 			desc.MiscFlags = D3D11_USAGE_DEFAULT;
 
-			HRESULT hr = mCurrWindow->mDevice->CreateTexture2D(&desc, NULL, &texCopy);
+			HRESULT hr = mCurrWindow->mDevice->CreateTexture2D(&desc, nullptr, &texCopy);
 			if (texCopy)
 			{
 				mCurrWindow->mContext->CopyResource(texCopy, texDX->mTexture);
@@ -805,7 +759,7 @@ namespace Sentinel
 				return data;
 			}
 
-			return NULL;
+			return nullptr;
 		}
 
 		// Special Rendering.
@@ -814,20 +768,20 @@ namespace Sentinel
 		{
 			_ASSERT(mCurrWindow);
 
-			ID3D11Texture2D *tex = NULL;
+			ID3D11Texture2D *tex = nullptr;
 
 			HV_PTR(mCurrWindow->mSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&tex));
 
-			return CreateRenderTexture(tex, NULL);
+			return CreateRenderTexture(tex, nullptr);
 		}
 
 		RenderTexture* CreateRenderTexture(ID3D11Texture2D* backbuffer, Texture* texture)
 		{
 			_ASSERT(mCurrWindow);
 
-			ID3D11RenderTargetView* view = NULL;
+			ID3D11RenderTargetView* view = nullptr;
 
-			HV_PTR(mCurrWindow->mDevice->CreateRenderTargetView(backbuffer, NULL, &view));
+			HV_PTR(mCurrWindow->mDevice->CreateRenderTargetView(backbuffer, nullptr, &view));
 
 			return new RenderTextureDX(view, texture);
 		}
@@ -854,11 +808,11 @@ namespace Sentinel
 				0, 0
 			};
 
-			ID3D11Texture2D *stencil = NULL;
-			ID3D11DepthStencilView* view = NULL;
+			ID3D11Texture2D *stencil = nullptr;
+			ID3D11DepthStencilView* view = nullptr;
 
-			HV_PTR(mCurrWindow->mDevice->CreateTexture2D(&texDesc, NULL, &stencil));
-			HV_PTR(mCurrWindow->mDevice->CreateDepthStencilView(stencil, NULL, &view));
+			HV_PTR(mCurrWindow->mDevice->CreateTexture2D(&texDesc, nullptr, &stencil));
+			HV_PTR(mCurrWindow->mDevice->CreateDepthStencilView(stencil, nullptr, &view));
 
 			SAFE_RELEASE_PTR(stencil);
 
@@ -869,9 +823,9 @@ namespace Sentinel
 			return new DepthStencilDX(view, width, height);
 		}
 
-		BlendState* CreateBlendState(BlendFormat::Type srcBlendColor = BlendFormat::SRC_ALPHA, BlendFormat::Type dstBlendColor = BlendFormat::ONE_MINUS_SRC_ALPHA,
-			BlendFormat::Type srcBlendAlpha = BlendFormat::SRC_ALPHA, BlendFormat::Type dstBlendAlpha = BlendFormat::ONE_MINUS_SRC_ALPHA,
-			BlendFunction::Type blendFuncColor = BlendFunction::ADD, BlendFunction::Type blendFuncAlpha = BlendFunction::ADD)
+		BlendState* CreateBlendState(
+			BlendFormat srcBlendColor, BlendFormat dstBlendColor, BlendFunction blendFuncColor,
+			BlendFormat srcBlendAlpha, BlendFormat dstBlendAlpha, BlendFunction blendFuncAlpha)
 		{
 			D3D11_BLEND_DESC blendDesc;
 			ZeroMemory(&blendDesc, sizeof(D3D11_BLEND_DESC));
@@ -880,25 +834,24 @@ namespace Sentinel
 			{
 				blendDesc.RenderTarget[x].BlendEnable = TRUE;
 
-				blendDesc.RenderTarget[x].SrcBlend = BLEND_TYPE[srcBlendColor];
-				blendDesc.RenderTarget[x].DestBlend = BLEND_TYPE[dstBlendColor];
-				blendDesc.RenderTarget[x].BlendOp = BLEND_FUNC_TYPE[blendFuncColor];
+				blendDesc.RenderTarget[x].SrcBlend = BLEND_TYPE[(BYTE)srcBlendColor];
+				blendDesc.RenderTarget[x].DestBlend = BLEND_TYPE[(BYTE)dstBlendColor];
+				blendDesc.RenderTarget[x].BlendOp = BLEND_FUNC_TYPE[(BYTE)blendFuncColor];
 
-				blendDesc.RenderTarget[x].SrcBlendAlpha = BLEND_TYPE[srcBlendAlpha];
-				blendDesc.RenderTarget[x].DestBlendAlpha = BLEND_TYPE[dstBlendAlpha];
-				blendDesc.RenderTarget[x].BlendOpAlpha = BLEND_FUNC_TYPE[blendFuncAlpha];
+				blendDesc.RenderTarget[x].SrcBlendAlpha = BLEND_TYPE[(BYTE)srcBlendAlpha];
+				blendDesc.RenderTarget[x].DestBlendAlpha = BLEND_TYPE[(BYTE)dstBlendAlpha];
+				blendDesc.RenderTarget[x].BlendOpAlpha = BLEND_FUNC_TYPE[(BYTE)blendFuncAlpha];
 
 				blendDesc.RenderTarget[x].RenderTargetWriteMask = 0x0F;
 			}
 
-			ID3D11BlendState* blendState = NULL;
+			ID3D11BlendState* blendState = nullptr;
 			HV_PTR(mCurrWindow->mDevice->CreateBlendState(&blendDesc, &blendState));
 
 			return new BlendStateDX(
-				blendState, \
-				srcBlendColor, dstBlendColor, \
-				srcBlendAlpha, dstBlendAlpha, \
-				blendFuncColor, blendFuncAlpha);
+				blendState,
+				srcBlendColor, dstBlendColor, blendFuncColor,
+				srcBlendAlpha, dstBlendAlpha, blendFuncAlpha);
 		}
 
 		UINT ResizeBuffers(UINT width, UINT height)
@@ -906,8 +859,8 @@ namespace Sentinel
 			mCurrWindow->mWidth = width;
 			mCurrWindow->mHeight = height;
 
-			mCurrWindow->mWidthRatio = (float)width / (float)WINDOW_WIDTH_BASE;
-			mCurrWindow->mHeightRatio = (float)height / (float)WINDOW_HEIGHT_BASE;
+			mCurrWindow->mWidthRatio = width / static_cast<float>(WindowInfo::BASE_WIDTH);
+			mCurrWindow->mHeightRatio = height / static_cast<float>(WindowInfo::BASE_HEIGHT);
 
 			/*
 			mCurrWindow->mContext->OMSetRenderTextures( 0, 0, 0 );
@@ -931,8 +884,8 @@ namespace Sentinel
 
 			//mCurrWindow->mContext->OMSetRenderTextures( 0, 0, 0 );
 
-			//ID3D11ShaderResourceView* nullViews[ 8 ] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-			//mCurrWindow->mContext->PSSetShaderResources( 0, 8, nullViews );
+			//ID3D11ShaderResourceView* nullptrViews[ 8 ] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+			//mCurrWindow->mContext->PSSetShaderResources( 0, 8, nullptrViews );
 
 			mCurrTarget = static_cast<RenderTextureDX*>(target)->mView;
 
@@ -946,14 +899,14 @@ namespace Sentinel
 			if (stencil)
 				mCurrStencil = static_cast<DepthStencilDX*>(stencil)->mView;
 			else
-				mCurrStencil = NULL;
+				mCurrStencil = nullptr;
 		}
 
-		void SetDepthStencilType(DepthFormat::Type state)
+		void SetDepthStencilType(DepthFormat state)
 		{
 			_ASSERT(mCurrWindow);
 
-			mCurrWindow->mContext->OMSetDepthStencilState(mDepthStencilState[state], 0);
+			mCurrWindow->mContext->OMSetDepthStencilState(mDepthStencilState[(BYTE)state], 0);
 		}
 
 		void SetViewport(int x, int y, UINT width, UINT height)
@@ -966,15 +919,15 @@ namespace Sentinel
 			D3D11_VIEWPORT vp =
 			{
 				static_cast<FLOAT>(x), static_cast<FLOAT>(y),
-				(width != Renderer::WINDOW_WIDTH_BASE) ? static_cast<FLOAT>(Renderer::WINDOW_WIDTH_BASE) * (static_cast<FLOAT>(rect.right) / static_cast<FLOAT>(width)) : static_cast<FLOAT>(Renderer::WINDOW_WIDTH_BASE),
-				(height != Renderer::WINDOW_HEIGHT_BASE) ? static_cast<FLOAT>(Renderer::WINDOW_HEIGHT_BASE) * (static_cast<FLOAT>(rect.bottom) / static_cast<FLOAT>(height)) : static_cast<FLOAT>(Renderer::WINDOW_HEIGHT_BASE),
+				(width != WindowInfo::BASE_WIDTH) ? static_cast<FLOAT>(WindowInfo::BASE_WIDTH) * (static_cast<FLOAT>(rect.right) / static_cast<FLOAT>(width)) : static_cast<FLOAT>(WindowInfo::BASE_WIDTH),
+				(height != WindowInfo::BASE_HEIGHT) ? static_cast<FLOAT>(WindowInfo::BASE_HEIGHT) * (static_cast<FLOAT>(rect.bottom) / static_cast<FLOAT>(height)) : static_cast<FLOAT>(WindowInfo::BASE_HEIGHT),
 				0.0f, 1.0f
 			};
 
 			mCurrWindow->mContext->RSSetViewports(1, &vp);
 		}
 
-		UINT SetCull(CullFormat::Type type)
+		UINT SetCull(CullFormat type)
 		{
 			_ASSERT(mCurrWindow);
 			_ASSERT(type < CullFormat::COUNT);
@@ -983,7 +936,7 @@ namespace Sentinel
 			mCurrWindow->mRasterizerState->GetDesc(&rasterizerstate);
 
 			SAFE_RELEASE_PTR(mCurrWindow->mRasterizerState);
-			rasterizerstate.CullMode = CULL_TYPE[type];
+			rasterizerstate.CullMode = CULL_TYPE[(BYTE)type];
 
 			HV(mCurrWindow->mDevice->CreateRasterizerState(&rasterizerstate, &mCurrWindow->mRasterizerState));
 			mCurrWindow->mContext->RSSetState(mCurrWindow->mRasterizerState);
@@ -991,7 +944,7 @@ namespace Sentinel
 			return S_OK;
 		}
 
-		UINT SetFill(FillFormat::Type type)
+		UINT SetFill(FillFormat type)
 		{
 			_ASSERT(mCurrWindow);
 			_ASSERT(type < FillFormat::COUNT);
@@ -1000,7 +953,7 @@ namespace Sentinel
 			mCurrWindow->mRasterizerState->GetDesc(&rasterizerstate);
 
 			SAFE_RELEASE_PTR(mCurrWindow->mRasterizerState);
-			rasterizerstate.FillMode = FILL_TYPE[type];
+			rasterizerstate.FillMode = FILL_TYPE[(BYTE)type];
 
 			HV(mCurrWindow->mDevice->CreateRasterizerState(&rasterizerstate, &mCurrWindow->mRasterizerState));
 			mCurrWindow->mContext->RSSetState(mCurrWindow->mRasterizerState);
@@ -1028,7 +981,7 @@ namespace Sentinel
 			if (shader->CreateFromFile(filename) != S_OK)
 			{
 				delete shader;
-				return NULL;
+				return nullptr;
 			}
 
 			return shader;
@@ -1041,7 +994,7 @@ namespace Sentinel
 			if (shader->CreateFromMemory(const_cast<char*>(source)) != S_OK)
 			{
 				delete shader;
-				return NULL;
+				return nullptr;
 			}
 
 			return shader;
@@ -1049,7 +1002,7 @@ namespace Sentinel
 
 		// Vertex Layout.
 		//
-		VertexLayout* CreateVertexLayout(const std::vector<VertexAttribute::Type>& attrib)
+		VertexLayout* CreateVertexLayout(const std::vector<VertexAttribute>& attrib)
 		{
 			VertexLayoutDX* layout = new VertexLayoutDX();
 
@@ -1064,7 +1017,7 @@ namespace Sentinel
 			if (layout->Create(mCurrWindow->mDevice) == S_FALSE)
 			{
 				delete layout;
-				return NULL;
+				return nullptr;
 			}
 
 			return layout;
@@ -1100,23 +1053,23 @@ namespace Sentinel
 			mCurrWindow->mContext->ClearDepthStencilView(mCurrStencil, D3D11_CLEAR_DEPTH, depth, 0);
 		}
 
-		void Draw(PrimitiveFormat::Type primitive, UINT count, UINT baseVertex)
+		void Draw(PrimitiveFormat primitive, UINT count, UINT baseVertex)
 		{
 			_ASSERT(mCurrWindow);
 			_ASSERT(mCurrWindow->mContext);
 			_ASSERT(mCurrShader);
 
-			mCurrWindow->mContext->IASetPrimitiveTopology(PRIMITIVE[primitive]);
+			mCurrWindow->mContext->IASetPrimitiveTopology(PRIMITIVE[(BYTE)primitive]);
 			mCurrWindow->mContext->Draw(count, baseVertex);
 		}
 
-		void DrawIndexed(PrimitiveFormat::Type primitive, UINT count, UINT startIndex, UINT baseVertex)
+		void DrawIndexed(PrimitiveFormat primitive, UINT count, UINT startIndex, UINT baseVertex)
 		{
 			_ASSERT(mCurrWindow);
 			_ASSERT(mCurrWindow->mContext);
 			_ASSERT(mCurrShader);
 
-			mCurrWindow->mContext->IASetPrimitiveTopology(PRIMITIVE[primitive]);
+			mCurrWindow->mContext->IASetPrimitiveTopology(PRIMITIVE[(BYTE)primitive]);
 			mCurrWindow->mContext->DrawIndexed(count, startIndex, baseVertex);
 		}
 

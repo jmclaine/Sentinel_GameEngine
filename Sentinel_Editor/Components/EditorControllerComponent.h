@@ -14,14 +14,12 @@ namespace Sentinel
 	class EditorControllerComponent : public Component::Controller3D
 	{
 	private:
-
 		POINT mLastMousePos;
 
 		float mLastWindowWidth;
 		float mLastWindowHeight;
 
 	public:
-
 		float mForwardSpeed;
 		float mStrafeSpeed;
 		float mAngularSpeed;
@@ -34,9 +32,7 @@ namespace Sentinel
 		EditorControllerComponent();
 
 		void Startup();
-
 		void Update();
-
 		void Shutdown();
 	};
 }

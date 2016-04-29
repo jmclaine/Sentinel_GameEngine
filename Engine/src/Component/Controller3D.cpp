@@ -3,22 +3,11 @@
 #include "Component/Physics.h"
 #include "Component/Transform.h"
 
-namespace Sentinel {
-namespace Component
+namespace Sentinel
 {
-	Controller3D::Controller3D()
-	{}
-
-	void Controller3D::Startup()
+	namespace Component
 	{
-		Controller::Startup();
+		Controller3D::Controller3D()
+		{ }
 	}
-
-	void Controller3D::Update()
-	{}
-
-	void Controller3D::Shutdown()
-	{
-		Controller::Shutdown();
-	}
-}}
+}

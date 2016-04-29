@@ -1,11 +1,12 @@
 #pragma once
 
-#include <exception>
-#include <typeinfo>
-
 #include "Sentinel.h"
 #include "Serializable.h"
 #include "Archive.h"
+#include "RenderLayer.h"
+
+#include <memory>
+#include <typeindex>
 
 namespace Sentinel
 {
@@ -14,34 +15,31 @@ namespace Sentinel
 	class SENTINEL_DLL GameComponent : public Serializable
 	{
 	protected:
-
+		UINT mID;
 		GameObject* mOwner;
 
 	public:
-
 		bool mEnabled;
 
 	protected:
-
-		GameComponent();
+		explicit GameComponent();
+		GameComponent(const GameComponent&) = delete;
+		GameComponent& operator = (const GameComponent&) = delete;
 
 	public:
-
 		virtual ~GameComponent();
 
 		////////////////////////////////
 
-		virtual void Startup();
-
-		virtual void Update();
-
-		virtual void Shutdown();
-
-		////////////////////////////////
+		UINT ID();
 
 		const GameObject* GetOwner();
-
 		virtual void SetOwner(GameObject* owner);
+
+	public:
+		virtual void Startup();
+		virtual void Update();
+		virtual void Shutdown();
 
 		////////////////////////////////
 
@@ -51,7 +49,6 @@ namespace Sentinel
 		virtual GameComponent* Copy();
 
 	protected:
-
 		virtual void Copy(GameComponent* component);
 	};
 }

@@ -66,14 +66,14 @@ namespace Sentinel
 		{
 			free( copy );
 		}
-		copy = NULL;
+		copy = nullptr;
 	}
 
 	void ScriptLexer::Startup()
 	{
 		linenumber = 1;
-		copy = NULL;
-		data = NULL;
+		copy = nullptr;
+		data = nullptr;
 	}
 
 	int ScriptLexer::Next()
@@ -290,7 +290,7 @@ namespace Sentinel
 					else
 					SET_STRING( TOKEN_RETURN, "return" )
 					else
-					SET_STRING_NUMBER( TOKEN_NUMBER, "null", 0 )
+					SET_STRING_NUMBER( TOKEN_NUMBER, "nullptr", 0 )
 					else
 					SET_STRING_NUMBER( TOKEN_BOOL, "true", 1 )
 					else

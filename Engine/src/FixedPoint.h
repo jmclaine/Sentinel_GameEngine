@@ -24,7 +24,7 @@ namespace Sentinel
 		FixedPoint(float num) { *this = num; }
 		FixedPoint(double num) { *this = num; }
 
-		~FixedPoint() {}
+		~FixedPoint() { }
 
 		FixedPoint& operator = (int num) { value = num << p; return *this; }
 		FixedPoint& operator = (unsigned int num) { value = (int)num << p; return *this; }

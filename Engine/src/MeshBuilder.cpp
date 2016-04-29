@@ -18,21 +18,19 @@ namespace Sentinel
 	}
 
 	MeshBuilder::~MeshBuilder()
-	{}
+	{ }
 
 	void MeshBuilder::ClearAll()
 	{
 		mPrimitive = PrimitiveFormat::TRIANGLES;
-
-		mLayout = NULL;
 
 		ClearGeometry();
 	}
 
 	void MeshBuilder::ClearGeometry()
 	{
-		mVertexBuffer = NULL;
-		mIndexBuffer = NULL;
+		mVertexBuffer = nullptr;
+		mIndexBuffer = nullptr;
 
 		mVertex.clear();
 		mIndex.clear();
@@ -1536,12 +1534,13 @@ namespace Sentinel
 	//
 	void MeshBuilder::CreateVertexBuffer(Renderer* renderer)
 	{
-		_ASSERT(mLayout);
 		_ASSERT(mVertex.size() > 0);
 
-		std::vector<VertexAttribute::Type> layout = mLayout->Layout();
+		auto vertexLayout = mLayout.lock();
 
-		UINT vertexSize = mLayout->VertexSize();
+		std::vector<VertexAttribute> layout = vertexLayout->Layout();
+
+		UINT vertexSize = vertexLayout->VertexSize();
 		UINT numVerts = mVertex.size();
 		UINT totalSize = vertexSize * numVerts;
 
@@ -1656,7 +1655,7 @@ namespace Sentinel
 		mIndexBuffer = renderer->CreateBuffer(&mIndex.front(), mIndex.size()*sizeof(UINT), sizeof(UINT), BufferFormat::INDEX);
 	}
 
-	// Returns the mesh created from the buffers; otherwise, NULL.
+	// Returns the mesh created from the buffers; otherwise, nullptr.
 	//
 	Mesh* MeshBuilder::BuildMesh(Renderer* renderer, bool createIndexBuffer)
 	{
@@ -1680,7 +1679,7 @@ namespace Sentinel
 	// Helper functions to build quads for both
 	// RenderTextures and GUIs.
 	//
-	Mesh* MeshBuilder::BuildRenderTextureMesh(Renderer* renderer, std::shared_ptr<VertexLayout> layout)
+	Mesh* MeshBuilder::BuildRenderTextureMesh(Renderer* renderer, std::weak_ptr<VertexLayout>& layout)
 	{
 		MeshBuilder builder;
 
@@ -1692,7 +1691,7 @@ namespace Sentinel
 		return mesh;
 	}
 
-	Mesh* MeshBuilder::BuildGUIMesh(Renderer* renderer, std::shared_ptr<VertexLayout> layout)
+	Mesh* MeshBuilder::BuildGUIMesh(Renderer* renderer, std::weak_ptr<VertexLayout>& layout)
 	{
 		MeshBuilder builder;
 

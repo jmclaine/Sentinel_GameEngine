@@ -2,7 +2,6 @@
 
 #include "CommonGL.h"
 #include "Shader.h"
-#include "Types.h"
 
 namespace Sentinel
 {
@@ -11,26 +10,20 @@ namespace Sentinel
 	class ShaderGL : public Shader
 	{
 	private:
-
 		// stores states to prevent setting values internal to OpenGL unncessarily
-
 		static GLenum CURR_ACTIVE;
 		static Texture* CURR_TEXTURE[32];
 
 	public:
-
 		class SamplerGL : public Sampler
 		{
 		private:
-
 			static SamplerGL CURR_STATE;
 
 		public:
-
-			static GLint SAMPLER_MODE[SamplerMode::COUNT];
+			static GLint SAMPLER_MODE[(BYTE)SamplerMode::COUNT];
 
 		protected:
-
 			GLint mWrapS;
 			GLint mWrapT;
 
@@ -38,14 +31,13 @@ namespace Sentinel
 			GLint mMagFilter;
 
 		public:
-
 			SamplerGL(
 				GLint wrapS = GL_REPEAT, GLint wrapT = GL_REPEAT,
 				GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR);
 
 			void Create(
-				SamplerMode::Type modeU, SamplerMode::Type modeV,
-				SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter);
+				SamplerMode modeU, SamplerMode modeV,
+				SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter);
 
 			void Apply();
 		};
@@ -53,28 +45,24 @@ namespace Sentinel
 		class SamplerCubeGL : public SamplerGL
 		{
 		private:
-
 			static SamplerCubeGL CURR_STATE;
 
 		protected:
-
 			GLint mWrapR;
 
 		public:
-
 			SamplerCubeGL(
 				GLint wrapS = GL_CLAMP_TO_EDGE, GLint wrapT = GL_CLAMP_TO_EDGE, GLint wrapR = GL_CLAMP_TO_EDGE,
 				GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR);
 
 			void Create(
-				SamplerMode::Type modeU, SamplerMode::Type modeV, SamplerMode::Type modeW,
-				SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter);
+				SamplerMode modeU, SamplerMode modeV, SamplerMode modeW,
+				SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter);
 
 			void Apply();
 		};
 
 	private:
-
 		GLuint mProgram;
 
 		GLuint mVertexShader;
@@ -86,8 +74,7 @@ namespace Sentinel
 		UINT mAttributeSize;
 
 	public:
-
-		GLint mAttributeGL[VertexAttribute::COUNT];
+		GLint mAttributeGL[(BYTE)VertexAttribute::COUNT];
 
 		std::vector<GLint> mUniformsGL;
 
@@ -102,21 +89,17 @@ namespace Sentinel
 		UINT AttributeSize();
 
 	private:
-
-		bool CreateAttribute(char* name, VertexAttribute::Type type);
-		bool CreateUniform(char* name, ShaderUniform::Type type);
+		bool CreateAttribute(char* name, VertexAttribute type);
+		bool CreateUniform(char* name, ShaderUniform type);
 
 	public:
-
 		UINT CreateFromFile(std::string filename);
 		UINT CreateFromMemory(char* source);
 
 	private:
-
 		bool Compile(const GLchar** source, GLuint& shader, GLenum type, GLsizei count);
 
 	public:
-
 		void SetFloat(UINT uniform, float* data, UINT count = 1);
 		void SetFloat2(UINT uniform, float* data, UINT count = 1);
 		void SetFloat3(UINT uniform, float* data, UINT count = 1);
@@ -127,13 +110,13 @@ namespace Sentinel
 
 		void SetSampler(
 			UINT index,
-			SamplerMode::Type modeU, SamplerMode::Type modeV,
-			SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter);
+			SamplerMode modeU, SamplerMode modeV,
+			SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter);
 
 		void SetSamplerCube(
 			UINT index,
-			SamplerMode::Type modeU, SamplerMode::Type modeV, SamplerMode::Type modeW,
-			SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter);
+			SamplerMode modeU, SamplerMode modeV, SamplerMode modeW,
+			SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter);
 
 		///////////////////////////////////
 

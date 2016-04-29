@@ -6,7 +6,7 @@
 
 namespace Sentinel
 {
-	SENTINEL_DLL POINT CenterHandle(HWND hWnd = NULL);
+	SENTINEL_DLL POINT CenterHandle(HWND hWnd = nullptr);
 
 	enum MouseButtonStatus
 	{
@@ -44,7 +44,7 @@ namespace Sentinel
 		int Show(bool visiblity);
 
 		void SetPosition(const POINT& pos);
-		POINT GetPosition(HWND hWnd = NULL, bool scaleToWindow = false) const;
+		POINT GetPosition(HWND hWnd = nullptr, bool scaleToWindow = false) const;
 
 		bool IsDown(MouseButton button) const;
 

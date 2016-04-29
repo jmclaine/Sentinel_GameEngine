@@ -29,7 +29,7 @@ namespace Sentinel
 
 	void ScriptParser::Startup()
 	{
-		currVars = NULL;
+		currVars = nullptr;
 		didError = false;
 	}
 
@@ -48,7 +48,7 @@ namespace Sentinel
 			{
 				ScriptNode* node = ParseStatement();
 				
-				if( node != NULL )
+				if( node != nullptr )
 				{
 					nodes.push_back( node );
 				}
@@ -62,7 +62,7 @@ namespace Sentinel
 					throw( ScriptException( lex.linenumber, "PARSER_ERROR", "Failed to parse script." ));
 				}
 
-				currVars = NULL;
+				currVars = nullptr;
 			}
 		}
 		catch( ScriptException& e )
@@ -73,7 +73,7 @@ namespace Sentinel
 		}
 
 		lex.Shutdown();
-		currVars = NULL;
+		currVars = nullptr;
 
 		return 1;
 	}
@@ -108,8 +108,8 @@ namespace Sentinel
 
 	ScriptNode* ScriptParser::ParseStatement()
 	{
-		ScriptNode* tempNode = NULL;
-		ScriptNode* currNode = NULL;
+		ScriptNode* tempNode = nullptr;
+		ScriptNode* currNode = nullptr;
 		int token;
 
 		switch( lex.token )
@@ -181,7 +181,7 @@ namespace Sentinel
 						//
 						Expect( TOKEN_LPAR );
 						tempNode = new ScriptNode( TOKEN_NATIVE_FUNC, ParseFuncValues(), SetData( new Fixed16( index )));
-						return new ScriptNode( TOKEN_VOID, NULL, SetData( tempNode ));
+						return new ScriptNode( TOKEN_VOID, nullptr, SetData( tempNode ));
 					}
 
 					// Add this function to the temporary map.
@@ -192,7 +192,7 @@ namespace Sentinel
 						CreateFuncVars( name );
 					}
 
-					tempNode = new ScriptNode( TOKEN_FUNCTION, NULL, SetData( name.c_str() ));
+					tempNode = new ScriptNode( TOKEN_FUNCTION, nullptr, SetData( name.c_str() ));
 
 					tempNode->sibling = new ScriptNode[ 2 ];	// vars/statement
 
@@ -218,7 +218,7 @@ namespace Sentinel
 						//
 						else
 						{
-							currNode = new ScriptNode( TOKEN_VOID, NULL, SetData( tempNode ));
+							currNode = new ScriptNode( TOKEN_VOID, nullptr, SetData( tempNode ));
 
 							return currNode;
 						}
@@ -230,7 +230,7 @@ namespace Sentinel
 					{
 						// Ensure this function is not being declared within another function.
 						//
-						if( currVars->parent != NULL )
+						if( currVars->parent != nullptr )
 						{
 							REPORT_PARSER_ERROR( lex.linenumber, "SYNTAX_ERROR", "Function '%s' cannot be declared within a function.", it0->first.c_str() )
 						}
@@ -269,7 +269,7 @@ namespace Sentinel
 					else
 					{
 						SetNode( tempNode->sibling[ 0 ], ParseFuncValues() );
-						currNode = new ScriptNode( TOKEN_VOID, NULL, SetData( tempNode ));
+						currNode = new ScriptNode( TOKEN_VOID, nullptr, SetData( tempNode ));
 
 						return currNode;
 					}
@@ -281,12 +281,12 @@ namespace Sentinel
 					// Add this variable to the map.
 					//
 					int isGlobal = FindVar( name, &globals );
-					if( isGlobal == -1 && currVars == NULL )
+					if( isGlobal == -1 && currVars == nullptr )
 					{
 						globals.vars.push_back( name );
 					}
 					else
-					if( FindVar( name, currVars ) == -1 && currVars != NULL && isGlobal == -1 )
+					if( FindVar( name, currVars ) == -1 && currVars != nullptr && isGlobal == -1 )
 					{
 						currVars->vars.push_back( name );
 					}
@@ -348,7 +348,7 @@ namespace Sentinel
 				return new ScriptNode( TOKEN_PAUSE );
 
 			default:
-				return new ScriptNode( TOKEN_VOID, NULL, SetData( ParsePlusExp() ));
+				return new ScriptNode( TOKEN_VOID, nullptr, SetData( ParsePlusExp() ));
 		};
 	}
 
@@ -382,7 +382,7 @@ namespace Sentinel
 
 	ScriptNode* ScriptParser::ParseFactorExp()
 	{
-		ScriptNode* node = NULL;
+		ScriptNode* node = nullptr;
 		
 		switch( lex.token )
 		{
@@ -396,7 +396,7 @@ namespace Sentinel
 				if( lex.token == TOKEN_LPAR )
 				{
 					Expect( TOKEN_LPAR );
-					node = new ScriptNode( TOKEN_FUNC_CALL, NULL );
+					node = new ScriptNode( TOKEN_FUNC_CALL, nullptr );
 
 					// Determine if this function has a registered name.
 					//
@@ -404,11 +404,11 @@ namespace Sentinel
 					int index = NativeFunction::Find( nativeFunc, name );
 					if( index != -1 )
 					{
-						tempNode = new ScriptNode( TOKEN_NATIVE_FUNC, NULL, SetData( new Fixed16( index )));
+						tempNode = new ScriptNode( TOKEN_NATIVE_FUNC, nullptr, SetData( new Fixed16( index )));
 					}
 					else
 					{
-						tempNode = new ScriptNode( TOKEN_FUNCTION, NULL, SetData( name.c_str() ));
+						tempNode = new ScriptNode( TOKEN_FUNCTION, nullptr, SetData( name.c_str() ));
 					}
 
 					tempNode->sibling = new ScriptNode[ 2 ];
@@ -429,19 +429,19 @@ namespace Sentinel
 				break;
 
 			case TOKEN_STRING:
-				node = new ScriptNode( TOKEN_STRING, NULL, SetData( lex.stringData.c_str() ));
+				node = new ScriptNode( TOKEN_STRING, nullptr, SetData( lex.stringData.c_str() ));
 				lex.Next();
 				break;
 
 			case TOKEN_BOOL:
 			case TOKEN_NUMBER:
-				node = new ScriptNode( TOKEN_NUMBER, NULL, SetData( new Fixed16( lex.numberData )));
+				node = new ScriptNode( TOKEN_NUMBER, nullptr, SetData( new Fixed16( lex.numberData )));
 				lex.Next();
 				break;
 
 			case TOKEN_SUB:
 				lex.Next();
-				node = new ScriptNode( TOKEN_NUMBER, NULL, SetData( new Fixed16( -lex.numberData )));
+				node = new ScriptNode( TOKEN_NUMBER, nullptr, SetData( new Fixed16( -lex.numberData )));
 				lex.Next();
 				break;
 
@@ -469,13 +469,13 @@ namespace Sentinel
 
 	ScriptNode* ScriptParser::ParseVariable( std::string name )
 	{
-		ScriptNode* node = new ScriptNode( TOKEN_VAR, NULL, SetData( name.c_str() ));
+		ScriptNode* node = new ScriptNode( TOKEN_VAR, nullptr, SetData( name.c_str() ));
 
 		ScriptNode* tempNode = node;
 		while( lex.token == TOKEN_LBRACKET && !didError )
 		{
 			lex.Next();
-			tempNode->sibling = new ScriptNode( TOKEN_VECTOR_ACCESS, NULL, SetData( ParsePlusExp() ));
+			tempNode->sibling = new ScriptNode( TOKEN_VECTOR_ACCESS, nullptr, SetData( ParsePlusExp() ));
 			tempNode = tempNode->sibling;
 			Expect( TOKEN_RBRACKET );
 		}
@@ -523,24 +523,24 @@ namespace Sentinel
 			if( FindVar( lex.stringData, &globals ) == -1 && FindVar( lex.stringData, currVars ) == -1 )
 			{
 				currVars->vars.push_back( lex.stringData );
-				return new ScriptNode( TOKEN_VAR, NULL, SetData( lex.stringData.c_str() ));
+				return new ScriptNode( TOKEN_VAR, nullptr, SetData( lex.stringData.c_str() ));
 			}
 			else
 			{
 				REPORT_PARSER_ERROR( lex.linenumber, "SYNTAX_ERROR", "Variable '%s' has already been declared.", lex.stringData.c_str() );
-				return NULL;
+				return nullptr;
 			}
 		}
 		else
 		{
 			REPORT_PARSER_ERROR( lex.linenumber, "SYNTAX_ERROR", "Expected Variable" );
-			return NULL;
+			return nullptr;
 		}
 	}
 
 	ScriptNode* ScriptParser::ParseFuncParams()
 	{
-		ScriptNode* node = NULL;
+		ScriptNode* node = nullptr;
 		if( lex.token != TOKEN_RPAR )
 		{
 			node = ParseFuncParams_INTERNAL();
@@ -563,14 +563,14 @@ namespace Sentinel
 
 	ScriptNode* ScriptParser::ParseFuncValues()
 	{
-		ScriptNode* node = NULL;
+		ScriptNode* node = nullptr;
 		if( lex.token != TOKEN_RPAR )
 		{
-			node = new ScriptNode( TOKEN_FUNC_CALL, NULL, SetData( ParsePlusExp() ));
+			node = new ScriptNode( TOKEN_FUNC_CALL, nullptr, SetData( ParsePlusExp() ));
 		}
 
 		ScriptNode* tempNode = node;
-		while( node->sibling != NULL )
+		while( node->sibling != nullptr )
 		{
 			node = node->sibling;
 		}
@@ -579,7 +579,7 @@ namespace Sentinel
 		{
 			Expect( TOKEN_COMMA );
 
-			node->sibling = new ScriptNode( TOKEN_FUNC_CALL, NULL, SetData( ParsePlusExp() ));
+			node->sibling = new ScriptNode( TOKEN_FUNC_CALL, nullptr, SetData( ParsePlusExp() ));
 			node = node->sibling;
 		}
 
@@ -590,7 +590,7 @@ namespace Sentinel
 
 	void ScriptParser::SetNode( ScriptNode& node, ScriptNode* node_ptr )
 	{
-		if( node_ptr != NULL )
+		if( node_ptr != nullptr )
 		{
 			node = ScriptNode( node_ptr->type, node_ptr->sibling, node_ptr->child );
 			delete node_ptr;
@@ -615,7 +615,7 @@ namespace Sentinel
 
 	int ScriptParser::FindVar( std::string name, FuncVars* vars )
 	{
-		if( vars != NULL )
+		if( vars != nullptr )
 		{
 			int count = (int)vars->vars.size();
 			for( int x = 0; x < count; ++x )
@@ -634,9 +634,9 @@ namespace Sentinel
 
 	int ScriptParser::GetVarOffset( std::string name, FuncVars* vars )
 	{
-		_ASSERT( vars != NULL );
+		_ASSERT( vars != nullptr );
 
-		while( vars != NULL )
+		while( vars != nullptr )
 		{
 			int count = (int)vars->vars.size();
 			for( int x = 0; x < count; ++x )
@@ -645,7 +645,7 @@ namespace Sentinel
 				{
 					// Function declaration.
 					//
-					if( vars->parent == NULL )
+					if( vars->parent == nullptr )
 					{
 						return -2 - x;
 					}
@@ -653,7 +653,7 @@ namespace Sentinel
 					// Statement.
 					//
 					vars = vars->parent;
-					while( vars->parent != NULL )
+					while( vars->parent != nullptr )
 					{
 						x += vars->vars.size();
 						vars = vars->parent;

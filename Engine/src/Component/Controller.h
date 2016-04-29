@@ -2,35 +2,32 @@
 
 #include "GameComponent.h"
 
-namespace Sentinel {
-namespace Component
+namespace Sentinel
 {
-	class Physics;
-	class Transform;
-
-	class SENTINEL_DLL Controller : public GameComponent
+	namespace Component
 	{
-	protected:
+		class Physics;
+		class Transform;
 
-		Physics* mPhysics;
-		Transform* mTransform;
+		class SENTINEL_DLL Controller : public GameComponent
+		{
+		protected:
+			Physics* mPhysics;
+			Transform* mTransform;
 
-		//////////////////////////////
+			//////////////////////////////
 
-		Controller();
+			Controller();
 
-	public:
+		public:
+			virtual void Startup();
+			virtual void Shutdown();
 
-		virtual void Startup();
+			//////////////////////////////
 
-		virtual void Update();
+			virtual void Execute();
 
-		virtual void Shutdown();
-
-		//////////////////////////////
-
-		virtual void Execute();
-
-		virtual void SetOwner(GameObject* owner);
-	};
-}}
+			virtual void SetOwner(GameObject* owner);
+		};
+	}
+}

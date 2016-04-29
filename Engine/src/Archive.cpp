@@ -1,5 +1,4 @@
 #include "Archive.h"
-#include "Types.h"
 #include "FloatCompressor.h"
 
 #include <memory.h>
@@ -9,15 +8,15 @@ namespace Sentinel
 {
 	Archive::Archive()
 	{
-		mFile = NULL;
+		mFile = nullptr;
 	}
 
 	Archive::~Archive()
 	{
-		if (mFile != NULL)
+		if (mFile != nullptr)
 		{
 			fclose(mFile);
-			mFile = NULL;
+			mFile = nullptr;
 		}
 	}
 
@@ -25,7 +24,7 @@ namespace Sentinel
 	{
 		mFile = fopen(filename, mode);
 
-		return (mFile != NULL);
+		return (mFile != nullptr);
 	}
 
 	void Archive::Close()
@@ -33,129 +32,7 @@ namespace Sentinel
 		fclose(mFile);
 	}
 
-#define READ_DATA( var, type, len )\
-	if( fread( var, sizeof( type ), len, mFile ) != len )\
-		throw std::exception( "Failed to read from file." );
-
-	void Archive::Read(char* data, unsigned int length)
-	{
-		READ_DATA(data, char, length);
-	}
-
-	void Archive::Read(unsigned char* data, unsigned int length)
-	{
-		READ_DATA(data, unsigned char, length);
-	}
-
-	void Archive::Read(short* data, unsigned int length)
-	{
-		READ_DATA(data, short, length);
-	}
-
-	void Archive::Read(unsigned short* data, unsigned int length)
-	{
-		READ_DATA(data, unsigned short, length);
-	}
-
-	void Archive::Read(int* data, unsigned int length, bool is32bit)
-	{
-		if (is32bit)
-		{
-			READ_DATA(data, int, length);
-		}
-		else
-		{
-			for (unsigned int x = 0; x < length; ++x)
-			{
-				short d;
-				READ_DATA(&d, short, 1);
-				data[x] = d;
-			}
-		}
-	}
-
-	void Archive::Read(unsigned int* data, unsigned int length, bool is32bit)
-	{
-		if (is32bit)
-		{
-			READ_DATA(data, unsigned int, length);
-		}
-		else
-		{
-			for (unsigned int x = 0; x < length; ++x)
-			{
-				unsigned short d;
-				READ_DATA(&d, unsigned short, 1);
-				data[x] = d;
-			}
-		}
-	}
-
-	void Archive::Read(long* data, unsigned int length, bool is32bit)
-	{
-		if (is32bit)
-		{
-			READ_DATA(data, long, length);
-		}
-		else
-		{
-			for (unsigned long x = 0; x < length; ++x)
-			{
-				short d;
-				READ_DATA(&d, short, 1);
-				data[x] = d;
-			}
-		}
-	}
-
-	void Archive::Read(unsigned long* data, unsigned int length, bool is32bit)
-	{
-		if (is32bit)
-		{
-			READ_DATA(data, unsigned long, length);
-		}
-		else
-		{
-			for (unsigned long x = 0; x < length; ++x)
-			{
-				unsigned short d;
-				READ_DATA(&d, unsigned short, 1);
-				data[x] = d;
-			}
-		}
-	}
-
-	void Archive::Read(float* data, unsigned int length, bool is32bit)
-	{
-		if (is32bit)
-		{
-			READ_DATA(data, float, length);
-		}
-		else
-		{
-			for (unsigned int x = 0; x < length; ++x)
-			{
-				short d;
-				READ_DATA(&d, short, 1);
-				data[x] = FloatCompressor::Decompress(d);
-			}
-		}
-	}
-
-	void Archive::Read(double* data, unsigned int length)
-	{
-		READ_DATA(data, double, length);
-	}
-
-	void Archive::Read(bool* data, unsigned int length)
-	{
-		for (unsigned int x = 0; x < length; ++x)
-		{
-			BYTE b;
-			READ_DATA(&b, BYTE, 1);
-			data[x] = (b == 1) ? true : false;
-		}
-	}
+	////////////////////////////////////////////////////////////////////////////////
 
 	void Archive::Read(std::string* data)
 	{
@@ -174,124 +51,6 @@ namespace Sentinel
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
-
-#define WRITE_DATA( var, type, len )\
-	if( fwrite( var, sizeof( type ), len, mFile ) != len )\
-		throw std::exception( "Failed to write to file." );
-
-	void Archive::Write(const char* data, unsigned int length)
-	{
-		WRITE_DATA(data, char, length);
-	}
-
-	void Archive::Write(const unsigned char* data, unsigned int length)
-	{
-		WRITE_DATA(data, unsigned char, length);
-	}
-
-	void Archive::Write(const short* data, unsigned int length)
-	{
-		WRITE_DATA(data, short, length);
-	}
-
-	void Archive::Write(const unsigned short* data, unsigned int length)
-	{
-		WRITE_DATA(data, unsigned short, length);
-	}
-
-	void Archive::Write(const int* data, unsigned int length, bool is32bit)
-	{
-		if (is32bit)
-		{
-			WRITE_DATA(data, int, length);
-		}
-		else
-		{
-			for (unsigned int x = 0; x < length; ++x)
-			{
-				short d = (short)data[x];
-				WRITE_DATA(&d, short, 1);
-			}
-		}
-	}
-
-	void Archive::Write(const unsigned int* data, unsigned int length, bool is32bit)
-	{
-		if (is32bit)
-		{
-			WRITE_DATA(data, unsigned int, length);
-		}
-		else
-		{
-			for (unsigned int x = 0; x < length; ++x)
-			{
-				unsigned short d = (unsigned short)data[x];
-				WRITE_DATA(&d, unsigned short, 1);
-			}
-		}
-	}
-
-	void Archive::Write(const long* data, unsigned int length, bool is32bit)
-	{
-		if (is32bit)
-		{
-			WRITE_DATA(data, long, length);
-		}
-		else
-		{
-			for (unsigned long x = 0; x < length; ++x)
-			{
-				short d = (short)data[x];
-				WRITE_DATA(&d, short, 1);
-			}
-		}
-	}
-
-	void Archive::Write(const unsigned long* data, unsigned int length, bool is32bit)
-	{
-		if (is32bit)
-		{
-			WRITE_DATA(data, unsigned long, length);
-		}
-		else
-		{
-			for (unsigned long x = 0; x < length; ++x)
-			{
-				unsigned short d = (unsigned short)data[x];
-				WRITE_DATA(&d, unsigned short, 1);
-			}
-		}
-	}
-
-	void Archive::Write(const float* data, unsigned int length, bool is32bit)
-	{
-		if (is32bit)
-		{
-			WRITE_DATA(data, float, length);
-		}
-		else
-		{
-			for (unsigned int x = 0; x < length; ++x)
-			{
-				short d = FloatCompressor::Compress(data[x]);
-				WRITE_DATA(&d, short, 1);
-			}
-		}
-	}
-
-	void Archive::Write(const double* data, unsigned int length)
-	{
-		WRITE_DATA(data, double, length);
-	}
-
-	void Archive::Write(const bool* data, unsigned int length)
-	{
-		for (unsigned int x = 0; x < length; ++x)
-		{
-			BYTE b = (data[x]) ? 1 : 0;
-			WRITE_DATA(&b, BYTE, 1);
-		}
-	}
 
 	void Archive::Write(const std::string* data)
 	{

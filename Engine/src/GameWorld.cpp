@@ -5,64 +5,43 @@
 #include "Component/Light.h"
 #include "Archive.h"
 #include "Timing.h"
+
 #include "PhysicsSystem.h"
-#include "AudioSystem.h"
-#include "SpriteSystem.h"
-#include "FontSystem.h"
-#include "SoundManager.h"
+
 #include "TextureManager.h"
 #include "ShaderManager.h"
 #include "MaterialManager.h"
+
+#include "SpriteSystem.h"
 #include "SpriteManager.h"
 #include "MeshManager.h"
 #include "ModelManager.h"
+
+#include "FontSystem.h"
+#include "FontManager.h"
+
 #include "RenderManager.h"
+#include "BlendStateManager.h"
+
+#include "AudioSystem.h"
+#include "SoundManager.h"
 
 namespace Sentinel
 {
 	GameWorld::GameWorld() :
-		mRenderer(NULL),
-		mTiming(NULL),
-		mPhysicsSystem(NULL),
-		mAudioSystem(NULL),
-		mSpriteSystem(NULL),
-		mFontSystem(NULL),
-		mTextureManager(NULL),
-		mShaderManager(NULL),
-		mMaterialManager(NULL),
-		mSpriteManager(NULL),
-		mMeshManager(NULL),
-		mModelManager(NULL),
-		mSoundManager(NULL),
-		mRenderManager(NULL),
-		mCurrentCamera(NULL)
-	{}
+		mRenderer(nullptr),
+		mCurrentCamera(nullptr)
+	{ }
 
 	GameWorld::~GameWorld()
 	{
 		Release();
-
-		SAFE_DELETE(mTiming);
-		SAFE_DELETE(mPhysicsSystem);
-		SAFE_DELETE(mAudioSystem);
-		SAFE_DELETE(mSpriteSystem);
-		SAFE_DELETE(mFontSystem);
-
-		SAFE_DELETE(mTextureManager);
-		SAFE_DELETE(mShaderManager);
-		SAFE_DELETE(mMaterialManager);
-		SAFE_DELETE(mSpriteManager);
-		SAFE_DELETE(mMeshManager);
-		SAFE_DELETE(mModelManager);
-		SAFE_DELETE(mSoundManager);
-
-		SAFE_DELETE(mRenderManager);
 	}
 
 	void GameWorld::Release()
 	{
-		TRAVERSE_VECTOR(x, mGameObject)
-			delete mGameObject[x];
+		for (auto gameObject : mGameObject)
+			delete gameObject;
 
 		mGameObject.clear();
 		mLight.clear();
@@ -70,82 +49,52 @@ namespace Sentinel
 
 	void GameWorld::Startup()
 	{
-		TRAVERSE_VECTOR(x, mGameObject)
-			mGameObject[x]->Startup();
+		for (auto gameObject : mGameObject)
+			gameObject->Startup();
 	}
 
 	void GameWorld::UpdateController()
 	{
-		TRAVERSE_VECTOR(x, mGameObject)
-			mGameObject[x]->UpdateController();
+		for (auto gameObject : mGameObject)
+			gameObject->UpdateController();
 	}
 
 	void GameWorld::UpdatePhysics()
 	{
-		_ASSERT(mPhysicsSystem);
-		_ASSERT(mTiming);
+		mPhysicsSystem.get()->Update(mTiming.get()->DeltaTime());
 
-		mPhysicsSystem->Update(mTiming->DeltaTime());
-
-		TRAVERSE_VECTOR(x, mGameObject)
-			mGameObject[x]->UpdatePhysics();
+		for (auto gameObject : mGameObject)
+			gameObject->UpdatePhysics();
 	}
 
 	void GameWorld::UpdateTransform()
 	{
-		TRAVERSE_VECTOR(x, mGameObject)
-			mGameObject[x]->UpdateTransform();
+		for (auto gameObject : mGameObject)
+			gameObject->UpdateTransform();
 	}
 
 	void GameWorld::UpdateComponents()
 	{
-		TRAVERSE_VECTOR(x, mGameObject)
-			mGameObject[x]->UpdateComponents();
+		for (auto gameObject : mGameObject)
+			gameObject->UpdateComponents();
 	}
 
 	void GameWorld::UpdateCamera()
 	{
-		TRAVERSE_VECTOR(x, mGameObject)
-			mGameObject[x]->UpdateCamera();
+		for (auto gameObject : mGameObject)
+			gameObject->UpdateCamera();
 	}
 
 	void GameWorld::UpdateLight()
 	{
-		TRAVERSE_VECTOR(x, mLight)
-			mLight[x]->Update();
-	}
-
-	void GameWorld::UpdateDrawable()
-	{
-		// Meshes may contain alpha values.
-		// Put them in order.
-		//
-		// Use distance from camera to center.
-		// This will not be 100% accurate, but is faster than trying to be perfect.
-		//
-		// TODO: Raycast from center screen to AABB for more accuracy.
-		//
-		/*
-		Vector3 camPos = mCurrentCamera->GetTransform()->mPosition;
-
-		mAlphaOrder.clear();
-		TRAVERSE_VECTOR( x, mGameObject )
-		{
-		TransformComponent* transform = (TransformComponent*)mGameObject[ x ]->FindComponent( GameComponent::TRANSFORM );
-
-		if( transform )
-		mAlphaOrder.insert( std::pair< float, GameObject* >( -(camPos - transform->mPosition).LengthSquared(), mGameObject[ x ] ));
-		}
-		//*/
-
-		TRAVERSE_VECTOR(x, mGameObject)
-			mGameObject[x]->UpdateDrawable();
+		for (auto light : mLight)
+			light->Update();
 	}
 
 	void GameWorld::Shutdown()
 	{
-		TRAVERSE_VECTOR(x, mGameObject)
-			mGameObject[x]->Shutdown();
+		for (auto gameObject : mGameObject)
+			gameObject->Shutdown();
 	}
 
 	/////////////////////////////////////////////////////
@@ -154,10 +103,8 @@ namespace Sentinel
 	{
 		if (!camera)
 		{
-			TRAVERSE_VECTOR(x, mCamera)
-			{
-				PresentCamera(mCamera[x]);
-			}
+			for (auto worldCamera : mCamera)
+				PresentCamera(worldCamera);
 		}
 		else PresentCamera(camera);
 	}
@@ -166,10 +113,8 @@ namespace Sentinel
 	{
 		mCurrentCamera = camera;
 
-		TRAVERSE_VECTOR(x, mLight)
-		{
-			mLight[x]->Present();
-		}
+		for (auto light : mLight)
+			light->Draw(camera);
 
 		camera->Apply(mRenderer);
 		mRenderManager->Present(camera);
@@ -177,14 +122,14 @@ namespace Sentinel
 
 	/////////////////////////////////////////////////////
 
-	GameObject* GameWorld::AddGameObject(GameObject* obj)
+	void GameWorld::AddGameObject(GameObject* obj)
 	{
 		_ASSERT(obj);
 
-		TRAVERSE_VECTOR(x, mGameObject)
+		for (auto gameObject : mGameObject)
 		{
-			if (mGameObject[x] == obj)
-				return obj;
+			if (gameObject == obj)
+				return;
 		}
 
 		GameObject* parent = obj->GetParent();
@@ -195,25 +140,28 @@ namespace Sentinel
 		obj->SetWorld(this);
 
 		mGameObject.push_back(obj);
-
-		return obj;
 	}
 
-	GameObject* GameWorld::RemoveGameObject(GameObject* obj)
+	void GameWorld::RemoveGameObject(GameObject* obj)
 	{
-		TRAVERSE_LIST(it, mGameObject)
+		auto it = std::remove(mGameObject.begin(), mGameObject.end(), obj);
+
+		if (it != mGameObject.end())
+			(*it)->SetWorld(nullptr);
+
+		mGameObject.erase(it, mGameObject.end());
+
+		for (auto gameObject : mGameObject)
 		{
 			if ((*it) == obj)
 			{
 				mGameObject.erase(it);
 
-				obj->SetWorld(NULL);
+				obj->SetWorld(nullptr);
 
-				return obj;
+				return;
 			}
 		}
-
-		return obj;
 	}
 
 	GameObject* GameWorld::GetGameObject(UINT index)
@@ -230,7 +178,7 @@ namespace Sentinel
 		GetGameObject( name, mGameObject[ x ] );
 		}*/
 		_ASSERT(0);	// unsupported
-		return NULL;
+		return nullptr;
 	}
 
 	GameObject* GameWorld::FindGameObject(const std::string& name, GameObject* parent)
@@ -248,7 +196,7 @@ namespace Sentinel
 		GetGameObject( name, child );
 		}*/
 		_ASSERT(0);	// unsupported
-		return NULL;
+		return nullptr;
 	}
 
 	UINT GameWorld::NumGameObjects()
@@ -258,13 +206,13 @@ namespace Sentinel
 
 	/////////////////////////////////////////////////////
 
-	Component::Camera* GameWorld::AddCamera(Component::Camera* camera)
+	void GameWorld::AddCamera(Component::Camera* camera)
 	{
 		bool isDup = false;
 
-		TRAVERSE_VECTOR(x, mCamera)
+		for (auto item : mCamera)
 		{
-			if (mCamera[x] == camera)
+			if (item == camera)
 			{
 				isDup = true;
 				break;
@@ -273,17 +221,15 @@ namespace Sentinel
 
 		if (!isDup)
 			mCamera.push_back(camera);
-
-		return camera;
 	}
 
-	Component::Light* GameWorld::AddLight(Component::Light* light)
+	void GameWorld::AddLight(Component::Light* light)
 	{
 		bool isDup = false;
 
-		TRAVERSE_VECTOR(x, mLight)
+		for (auto item : mLight)
 		{
-			if (mLight[x] == light)
+			if (item == light)
 			{
 				isDup = true;
 				break;
@@ -292,8 +238,6 @@ namespace Sentinel
 
 		if (!isDup)
 			mLight.push_back(light);
-
-		return light;
 	}
 
 	Component::Light* GameWorld::GetLight(UINT index)
@@ -315,10 +259,8 @@ namespace Sentinel
 		UINT size = mGameObject.size();
 		archive.Write(&size);
 
-		TRAVERSE_VECTOR(x, mGameObject)
-		{
-			mGameObject[x]->Save(archive);
-		}
+		for (auto gameObject : mGameObject)
+			gameObject->Save(archive);
 	}
 
 	void GameWorld::Load(Archive& archive)

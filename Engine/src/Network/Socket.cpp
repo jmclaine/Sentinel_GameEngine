@@ -41,13 +41,13 @@ namespace Network
 	}
 
 	Socket::Connection::~Connection()
-	{}
+	{ }
 
 	///////////////////////////////////////////
 
 	Socket::Socket()
 	{
-		mCurrConnection = NULL;
+		mCurrConnection = nullptr;
 
 		mNextID = 1;
 
@@ -77,7 +77,7 @@ namespace Network
 	//
 	bool Socket::Startup(WORD flags)
 	{
-		_ASSERT(flags != NULL);
+		_ASSERT(flags != 0);
 
 		Debug::Log("Initializing...");
 
@@ -208,7 +208,7 @@ namespace Network
 						timeout.tv_sec = 5;
 						timeout.tv_usec = 0;
 
-						connectResult = select(0, NULL, &socket_write, &socket_error, &timeout);
+						connectResult = select(0, nullptr, &socket_write, &socket_error, &timeout);
 
 						if (connectResult == 0)
 						{
@@ -267,7 +267,7 @@ namespace Network
 
 	bool Socket::Send(char* data, int size, int index)
 	{
-		_ASSERT(data != NULL);
+		_ASSERT(data != nullptr);
 
 		bool result = true;
 
@@ -288,7 +288,7 @@ namespace Network
 				// Ensure the socket is available to send.
 				//
 				mNetworkSocketSet.fd_array[0] = it->second->mNetworkSocket;
-				int rv = select(0, NULL, &mNetworkSocketSet, NULL, &mTimeout);
+				int rv = select(0, nullptr, &mNetworkSocketSet, nullptr, &mTimeout);
 
 				if (rv < 0)
 				{
@@ -371,7 +371,7 @@ namespace Network
 			if (readSize > 0)
 			{
 				mNetworkSocketSet.fd_array[0] = client;
-				int rv = select(0, &mNetworkSocketSet, NULL, NULL, &mTimeout);
+				int rv = select(0, &mNetworkSocketSet, nullptr, nullptr, &mTimeout);
 
 				if (rv < 0)
 				{
@@ -429,7 +429,7 @@ namespace Network
 					if (readSize > 0)
 					{
 						mNetworkSocketSet.fd_array[0] = client;
-						int rv = select(0, &mNetworkSocketSet, NULL, NULL, &mTimeout);
+						int rv = select(0, &mNetworkSocketSet, nullptr, nullptr, &mTimeout);
 
 						if (rv < 0)
 						{

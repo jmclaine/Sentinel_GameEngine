@@ -4,12 +4,12 @@ namespace Sentinel
 {
 	VertexLayout::VertexLayout() :
 		mVertexSize( 0 )
-	{}
+	{ }
 
 	VertexLayout::~VertexLayout()
-	{}
+	{ }
 
-	const std::vector< VertexAttribute::Type >& VertexLayout::Layout() const
+	const std::vector< VertexAttribute >& VertexLayout::Layout() const
 	{
 		return mLayout;
 	}

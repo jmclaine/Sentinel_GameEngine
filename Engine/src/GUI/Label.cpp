@@ -2,116 +2,128 @@
 #include "GameWorld.h"
 #include "GameObject.h"
 #include "FontSystem.h"
+#include "Font.h"
 #include "SpriteSystem.h"
 #include "RenderManager.h"
 #include "Material.h"
 #include "Component/Transform.h"
 
-namespace Sentinel {
-namespace GUI
+namespace Sentinel
 {
-	DEFINE_SERIAL_REGISTER(Label);
-	DEFINE_SERIAL_CLONE(Label);
-
-	Label::Label()
-	{}
-
-	Label::Label(const std::string& text) :
-		mText(text),
-		mColor(1, 1, 1, 1)
-	{}
-
-	Label::~Label()
-	{}
-
-	//////////////////////////////////
-
-	void Label::Startup()
+	namespace GUI
 	{
-		Component::Drawable::Startup();
+		SerialRegister Label::SERIAL_REGISTER("Label", Label::Clone);
+		Serializable* Label::Clone() { return new Label(); }
 
-		mFontSystem = mOwner->GetWorld()->mFontSystem;
+		Label::Label()
+		{ }
 
-		mOwner->GetWorld()->mRenderManager->Draw(this, mFontSystem->mSpriteSystem->mMaterial->mRenderQueue, mOwner->mLayer);
-	}
+		Label::Label(const std::string& text) :
+			mText(text),
+			mColor(1, 1, 1, 1)
+		{ }
 
-	void Label::Update()
-	{}
+		Label::~Label()
+		{ }
 
-	void Label::Shutdown()
-	{}
+		//////////////////////////////////
 
-	//////////////////////////////////
-
-	void Label::CalculateBounds()
-	{}
-
-	bool Label::CheckVisible(Component::Camera* camera)
-	{
-		return true;
-	}
-
-	void Label::Draw()
-	{
-		if (mEnabled)
+		void Label::Startup()
 		{
-			mFontSystem->Clear();
+			Component::Drawable::Startup();
 
-			std::shared_ptr< Font > font = mFontSystem->mFont;
+			auto world = mOwner->GetWorld();
+			auto font = mFont.lock();
+			world->mRenderManager->Add(this, font->mMaterial->mRenderQueue);
+		}
 
-			Vector2 scale(mTransform->mScale.x / font->mSize.x, mTransform->mScale.y / font->mSize.y);
+		void Label::Update()
+		{ }
 
-			Matrix4x4 matWVP = mOwner->GetWorld()->mCurrentCamera->GetMatrixWVP();
+		void Label::Shutdown()
+		{
+			auto world = mOwner->GetWorld();
+			auto font = mFont.lock();
+			world->mRenderManager->Remove(this, font->mMaterial->mRenderQueue);
+		}
 
-			Vector3 offset;
+		//////////////////////////////////
 
-			for (UINT i = 0; i < mText.size(); ++i)
+		void Label::CalculateBounds()
+		{ }
+
+		bool Label::CheckVisible(Component::Camera* camera)
+		{
+			return true;
+		}
+
+		void Label::Draw(Component::Camera* camera)
+		{
+			if (mEnabled)
 			{
-				char& c = mText[i];
+				auto world = mOwner->GetWorld();
+				world->mFontSystem->Clear();
 
-				offset.x += font->mOffsetX[c] * scale.x;
-				offset.y = -font->mOffsetY[c] * scale.y;
+				const auto font = mFont.lock();
+				
+				Vector2 scale(mTransform->mScale.x / font->mSize.x, mTransform->mScale.y / font->mSize.y);
 
-				mFontSystem->Draw(c, mColor, matWVP * mTransform->GetMatrixWorld(offset));
+				Matrix4x4 matWVP = camera->GetMatrixWVP();
 
-				offset.x += font->mAdvance[c] * scale.x;
-				offset.z -= 0.0001f;
+				Vector3 offset;
+
+				for (UINT i = 0; i < mText.size(); ++i)
+				{
+					char& c = mText[i];
+
+					offset.x += font->mOffsetX[c] * scale.x;
+					offset.y = -font->mOffsetY[c] * scale.y;
+
+					world->mFontSystem->Draw(font.get(), c, mColor, matWVP * mTransform->GetMatrixWorld(offset));
+
+					offset.x += font->mAdvance[c] * scale.x;
+					offset.z -= 0.0001f;
+				}
+
+				world->mFontSystem->Present(camera);
 			}
+		}
 
-			mFontSystem->Present();
+		//////////////////////////////////
+
+		void Label::SerialSave(Archive& archive)
+		{
+			SERIAL_REGISTER.Save(archive);
+			Save(archive);
+		}
+
+		void Label::Save(Archive& archive)
+		{
+			Component::Drawable::Save(archive);
+
+			archive.Write(&mText);
+			archive.Write(&mColor);
+		}
+
+		void Label::Load(Archive& archive)
+		{
+			Component::Drawable::Load(archive);
+
+			archive.Read(&mText);
+			archive.Read(&mColor);
+		}
+
+		//////////////////////////////////
+
+		GameComponent* Label::Copy()
+		{
+			Label* label = new Label(mText);
+
+			Component::Drawable::Copy(label);
+
+			label->mColor = mColor;
+
+			return label;
 		}
 	}
-
-	//////////////////////////////////
-
-	DEFINE_SERIAL_REGISTER_SAVE(Label);
-
-	void Label::Save(Archive& archive)
-	{
-		Component::Drawable::Save(archive);
-
-		archive.Write(&mText);
-		archive.Write(mColor.Ptr(), ar_sizeof(mColor));
-	}
-
-	void Label::Load(Archive& archive)
-	{
-		Component::Drawable::Load(archive);
-
-		archive.Read(&mText);
-		archive.Read(mColor.Ptr(), ar_sizeof(mColor));
-	}
-
-	//////////////////////////////////
-
-	GameComponent* Label::Copy()
-	{
-		Label* label = new Label(mText);
-
-		Component::Drawable::Copy(label);
-
-		label->mColor = mColor;
-
-		return label;
-	}
-}}
+}

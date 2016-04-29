@@ -12,16 +12,13 @@ namespace GUI
 		DECLARE_SERIAL();
 
 	public:
-
 		DECLARE_SERIAL_REGISTER_SAVE();
 
 	protected:
-
 		Vector3 mBasePosition;
 		Vector3 mBaseScale;
 
 	public:
-
 		bool mPositionToWindowX;
 		bool mPositionToWindowY;
 
@@ -31,22 +28,20 @@ namespace GUI
 		Quad mMargin;
 
 	public:
-
 		SpriteController();
 		virtual ~SpriteController();
 
 		///////////////////////////////////
 
 		virtual void Startup();
-
 		virtual void Update();
-
 		virtual void Shutdown();
 
 		///////////////////////////////////
 
 		virtual GameComponent* Copy();
 
+	protected:
 		virtual void Copy(GameComponent* component);
 	};
 }}

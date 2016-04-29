@@ -16,21 +16,17 @@ namespace GUI
 		Component::Transform* mTransform;
 
 	protected:
-
 		bool mIsOver;
 
 	public:
-
 		Event mActionEnter;
 		Event mActionOver;
 		Event mActionExit;
 
 	protected:
-
 		Controller2D();
 
 	public:
-
 		virtual ~Controller2D();
 
 		virtual void Startup();

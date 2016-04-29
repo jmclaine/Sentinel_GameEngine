@@ -13,31 +13,37 @@ namespace Component
 
 	class SENTINEL_DLL MeshDrawable : public Drawable
 	{
-		DECLARE_SERIAL();
+		static SerialRegister SERIAL_REGISTER;
+		static Serializable* Clone();
 
 	public:
-
-		std::shared_ptr<Mesh> mMesh;
+		std::weak_ptr<Mesh> mMesh;
 
 		///////////////////////////////////
 
 		MeshDrawable();
-		MeshDrawable(std::shared_ptr<Mesh> mesh);
+		MeshDrawable(std::weak_ptr<Mesh>& mesh);
+		MeshDrawable(std::weak_ptr<Mesh>&& mesh);
 
 		void Startup();
+		void Update();
+		void Shutdown();
 
 		///////////////////////////////////
 
-		void Execute();
-
 		void CalculateBounds();
+		void Draw(Camera* camera);
 
-		bool CheckVisible(Camera* camera);
+		///////////////////////////////////
 
-		void Draw();
+		void Save(Archive& archive);
+		void Load(Archive& archive);
 
 		///////////////////////////////////
 
 		GameComponent* Copy();
+
+	protected:
+		void Copy(GameComponent* component);
 	};
 }}

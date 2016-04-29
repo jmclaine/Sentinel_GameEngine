@@ -2,7 +2,7 @@
 
 namespace Sentinel
 {
-	class InitFailed {};
+	class InitFailed { };
 
 	#define RV(func) if (!func) return 0;
 	#define TV(func) if (!func) throw InitFailed();

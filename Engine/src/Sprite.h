@@ -10,7 +10,6 @@ sprite->AddFrame(Sprite::QUADtoTEXCOORD(Quad(0, 0, 64, 64), texture->Width(), te
 #include <vector>
 
 #include "Sentinel.h"
-#include "Types.h"
 #include "Point.h"
 
 namespace Sentinel
@@ -21,19 +20,14 @@ namespace Sentinel
 	class SENTINEL_DLL Sprite
 	{
 	protected:
-
 		std::vector<Quad> mFrame;
 
 	public:
-
 		Sprite();
 		~Sprite();
 
 		//////////////////////////////////////
 
-		// Set frame texture coordinates.
-		// Use GetTextureCoords() for easy conversion.
-		//
 		void AddFrame(const Quad& coords);
 		void RemoveFrame(UINT index);
 		Quad& GetFrame(UINT index);
@@ -41,8 +35,6 @@ namespace Sentinel
 
 		//////////////////////////////////////
 
-		// Convert pixel coordinates to texture coordinates.
-		//
 		static Quad QUADtoTEXCOORD(const Quad& coords, UINT textureWidth, UINT textureHeight);
 	};
 }

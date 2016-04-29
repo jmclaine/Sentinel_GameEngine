@@ -3,8 +3,8 @@
 namespace Sentinel
 {
 	RigidBody::RigidBody() :
-		mShape(NULL)
-	{}
+		mShape(nullptr)
+	{ }
 
 	RigidBody::~RigidBody()
 	{

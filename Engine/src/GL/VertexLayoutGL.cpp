@@ -1,14 +1,13 @@
 #include "VertexLayoutGL.h"
-#include "Types.h"
 #include "Debug.h"
 
 namespace Sentinel
 {
 	VertexLayoutGL::VertexLayoutGL()
-	{}
+	{ }
 
 	VertexLayoutGL::~VertexLayoutGL()
-	{}
+	{ }
 
 	//////////////////////////////////////
 
@@ -49,7 +48,7 @@ namespace Sentinel
 
 	//////////////////////////////////////
 
-	void VertexLayoutGL::AddAttribute(VertexAttribute::Type type)
+	void VertexLayoutGL::AddAttribute(VertexAttribute type)
 	{
 		switch (type)
 		{

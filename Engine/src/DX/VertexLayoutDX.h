@@ -24,7 +24,7 @@ namespace Sentinel
 
 	public:
 
-		void AddAttribute( VertexAttribute::Type type );
+		void AddAttribute( VertexAttribute type );
 
 		HRESULT Create( ID3D11Device* device );
 		HRESULT Create( ID3D11Device* device, ID3D10Blob* shaderBlob );

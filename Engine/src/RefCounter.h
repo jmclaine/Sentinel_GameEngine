@@ -10,7 +10,7 @@ namespace Sentinel
 
 		RefCounter() :
 			refc(0)
-		{}
+		{ }
 
 		void incRef()
 		{

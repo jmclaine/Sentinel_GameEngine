@@ -33,13 +33,11 @@ namespace Sentinel
 	class RigidBody
 	{
 	protected:
-
 		PhysicsShape* mShape;
 
 		RigidBody();
 
 	public:
-
 		virtual ~RigidBody();
 
 		virtual Vector3 GetPosition() = 0;
@@ -95,20 +93,21 @@ namespace Sentinel
 		friend class MeshPhysicsShape;
 
 	private:
-
 		DECLARE_SERIAL_MEMBER_FUNCTION(PhysicsSystem, CreateSphere);
 		DECLARE_SERIAL_MEMBER_FUNCTION(PhysicsSystem, CreateBox);
 		DECLARE_SERIAL_MEMBER_FUNCTION(PhysicsSystem, CreateCylinder);
 		DECLARE_SERIAL_MEMBER_FUNCTION(PhysicsSystem, CreateMesh);
 
-	public:
+	protected:
+		explicit PhysicsSystem() { }
+		PhysicsSystem(const PhysicsSystem&) = delete;
+		PhysicsSystem& operator = (const PhysicsSystem&) = delete;
 
-		virtual ~PhysicsSystem() {}
+	public:
+		virtual ~PhysicsSystem() { }
 
 		virtual void Startup() = 0;
-
 		virtual void Update(float DT) = 0;
-
 		virtual void Shutdown() = 0;
 
 		//////////////////////////////////
@@ -132,7 +131,6 @@ namespace Sentinel
 		virtual RigidBody* CreateRigidBody(PhysicsShape* shape, const Vector3& position, const Quaternion& orientation, float mass) = 0;
 
 		virtual void AddRigidBody(RigidBody* body) = 0;
-
 		virtual void RemoveRigidBody(RigidBody* body) = 0;
 	};
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Sentinel.h"
-#include "Types.h"
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Matrix4x4.h"
@@ -16,7 +15,6 @@ namespace Sentinel
 	class SENTINEL_DLL Ray
 	{
 	public:
-
 		Vector3 mPosition;
 		Vector3 mDirection;
 
@@ -28,7 +26,6 @@ namespace Sentinel
 	class SENTINEL_DLL Plane
 	{
 	public:
-
 		Vector3 mPosition;
 		Vector3 mNormal;
 
@@ -45,7 +42,6 @@ namespace Sentinel
 	class SENTINEL_DLL Triangle
 	{
 	public:
-
 		Vector3 mPosition[3];
 
 		Triangle(const Vector3& posA, const Vector3& posB, const Vector3& posC);
@@ -58,9 +54,8 @@ namespace Sentinel
 	class BoundingShape
 	{
 	public:
-
 		virtual bool Intersects(const Vector3& point) const = 0;
-		virtual bool Intersects(const Ray& ray, Vector3* intersection = NULL) const = 0;
+		virtual bool Intersects(const Ray& ray, Vector3* intersection = nullptr) const = 0;
 		virtual bool Intersects(const BoundingSphere& sphere) const = 0;
 		virtual bool Intersects(const BoundingBox& box) const = 0;
 	};
@@ -70,7 +65,6 @@ namespace Sentinel
 	class SENTINEL_DLL BoundingSphere : public BoundingShape
 	{
 	public:
-
 		Vector3 mCenter;
 		float mRadius;
 
@@ -81,7 +75,7 @@ namespace Sentinel
 		BoundingSphere(const BYTE* verts, UINT count, UINT stride = sizeof(Vector3));	// Takes in a pointer to 3 float points.
 
 		bool Intersects(const Vector3& point) const;
-		bool Intersects(const Ray& ray, Vector3* intersection = NULL) const;
+		bool Intersects(const Ray& ray, Vector3* intersection = nullptr) const;
 		bool Intersects(const BoundingSphere& sphere) const;
 		bool Intersects(const BoundingBox& box) const;
 	};
@@ -91,11 +85,9 @@ namespace Sentinel
 	class SENTINEL_DLL BoundingBox : public BoundingShape
 	{
 	private:
-
 		Plane mPlane[6];
 
 	public:
-
 		BoundingBox();
 		BoundingBox(const Vector3& minBounds, const Vector3& maxBounds);
 		BoundingBox(const BYTE* verts, UINT count, UINT stride = sizeof(Vector3));
@@ -108,7 +100,7 @@ namespace Sentinel
 		const Vector3& GetMaxBounds() const;
 
 		bool Intersects(const Vector3& point) const;
-		bool Intersects(const Ray& ray, Vector3* intersection = NULL) const;
+		bool Intersects(const Ray& ray, Vector3* intersection = nullptr) const;
 		bool Intersects(const BoundingSphere& sphere) const;
 		bool Intersects(const BoundingBox& box) const;
 	};
@@ -118,11 +110,9 @@ namespace Sentinel
 	class SENTINEL_DLL BoundingFrustum : public BoundingShape
 	{
 	private:
-
 		Plane mPlane[6];
 
 	public:
-
 		BoundingFrustum();
 
 		BoundingFrustum(
@@ -144,7 +134,7 @@ namespace Sentinel
 			const Vector3& forward, const Vector3& right, const Vector3& up);
 
 		bool Intersects(const Vector3& point) const;
-		bool Intersects(const Ray& ray, Vector3* intersection = NULL) const;
+		bool Intersects(const Ray& ray, Vector3* intersection = nullptr) const;
 		bool Intersects(const BoundingSphere& sphere) const;
 		bool Intersects(const BoundingBox& box) const;
 	};

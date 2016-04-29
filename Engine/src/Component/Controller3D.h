@@ -2,21 +2,14 @@
 
 #include "Controller.h"
 
-namespace Sentinel {
-namespace Component
+namespace Sentinel
 {
-	class SENTINEL_DLL Controller3D : public Controller
+	namespace Component
 	{
-	protected:
-
-		Controller3D();
-
-	public:
-
-		virtual void Startup();
-
-		virtual void Update();
-
-		virtual void Shutdown();
-	};
-}}
+		class SENTINEL_DLL Controller3D : public Controller
+		{
+		protected:
+			Controller3D();
+		};
+	}
+}

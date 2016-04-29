@@ -25,11 +25,8 @@ namespace Sentinel
 	{
 		mPrimitive = PrimitiveFormat::TRIANGLES;
 
-		mVertexBuffer = NULL;
-		mIndexBuffer = NULL;
-
-		mLayout = NULL;
-		mMaterial = NULL;
+		mVertexBuffer = nullptr;
+		mIndexBuffer = nullptr;
 
 		mMatrixWorld.Identity();
 	}
@@ -45,22 +42,27 @@ namespace Sentinel
 		if (count == 0)
 			return;
 
-		if (mVertexBuffer != NULL || mIndexBuffer != NULL)
+		if (mVertexBuffer != nullptr || mIndexBuffer != nullptr)
 		{
 			_ASSERT(renderer);
-			_ASSERT(mLayout);
-			_ASSERT(mMaterial);
-			_ASSERT(mMaterial->mShader);
 
-			mMaterial->Apply(renderer);
+			auto material = mMaterial.lock();
+			auto layout = mLayout.lock();
 
-			Shader* shader = renderer->GetShader();
+			_ASSERT(layout);
+			_ASSERT(material);
+
+			material->Apply(renderer);
+
+			auto shader = renderer->GetShader();
+
+			_ASSERT(shader);
 
 			UINT texCount = 0;
 			UINT lightCount = 0;
 			UINT uniformIndex = 0;
 
-			const std::vector<ShaderUniform::Type>& uniform = shader->Uniforms();
+			const std::vector<ShaderUniform>& uniform = shader->Uniforms();
 
 			for (UINT i = 0; i < uniform.size(); ++i)
 			{
@@ -111,27 +113,27 @@ namespace Sentinel
 					break;
 
 				case ShaderUniform::TEXTURE:
-					_ASSERT(mMaterial.get());
-					_ASSERT(mMaterial->mTexture[texCount].get()); // no texture loaded
+					_ASSERT(material.get());
+					_ASSERT(material->mTexture[texCount].lock()); // no texture loaded
 
-					shader->SetTexture(uniformIndex, mMaterial->mTexture[texCount].get());
+					shader->SetTexture(uniformIndex, material->mTexture[texCount].lock().get());
 					++texCount;
 					break;
 
 				case ShaderUniform::AMBIENT:
-					shader->SetFloat4(uniformIndex, mMaterial->mAmbient.Ptr());
+					shader->SetFloat4(uniformIndex, mMaterial.lock()->mAmbient.Ptr());
 					break;
 
 				case ShaderUniform::DIFFUSE:
-					shader->SetFloat4(uniformIndex, mMaterial->mDiffuse.Ptr());
+					shader->SetFloat4(uniformIndex, material->mDiffuse.Ptr());
 					break;
 
 				case ShaderUniform::SPECULAR:
-					shader->SetFloat4(uniformIndex, mMaterial->mSpecular.Ptr());
+					shader->SetFloat4(uniformIndex, material->mSpecular.Ptr());
 					break;
 
 				case ShaderUniform::SPEC_COMP:
-					shader->SetFloat(uniformIndex, &mMaterial->mSpecularComponent);
+					shader->SetFloat(uniformIndex, &material->mSpecularComponent);
 					break;
 
 				case ShaderUniform::CAMERA_POS:
@@ -216,7 +218,7 @@ namespace Sentinel
 			}
 
 			renderer->SetVertexBuffer(mVertexBuffer);
-			renderer->SetVertexLayout(mLayout.get());
+			renderer->SetVertexLayout(layout.get());
 
 			if (mIndexBuffer)
 			{
@@ -260,22 +262,20 @@ namespace Sentinel
 		Archive& archive,
 		Mesh* mesh,
 		Renderer* renderer,
-		ShaderManager* shaderManager,
-		TextureManager* textureManager,
 		MaterialManager* materialManager)
 	{
-		BYTE primitive = mesh->mPrimitive;
+		BYTE primitive = (BYTE)mesh->mPrimitive;
 		archive.Write(&primitive);
 
-		const std::vector<VertexAttribute::Type>& layout = mesh->mLayout->Layout();
+		const auto& layout = mesh->mLayout.lock()->Layout();
 
 		UINT count = (UINT)layout.size();
 		archive.Write(&count);
 
 		BYTE data;
-		TRAVERSE_VECTOR(x, layout)
+		for (const auto& x : layout)
 		{
-			data = layout[x];
+			data = (BYTE)x;
 			archive.Write(&data);
 		}
 
@@ -289,17 +289,15 @@ namespace Sentinel
 	Mesh* Mesh::Load(
 		Archive& archive,
 		Renderer* renderer,
-		ShaderManager* shaderManager,
-		TextureManager* textureManager,
 		MaterialManager* materialManager)
 	{
 		Mesh* mesh = new Mesh();
 
 		BYTE primitive;
 		archive.Read(&primitive);
-		mesh->mPrimitive = (PrimitiveFormat::Type)primitive;
+		mesh->mPrimitive = (PrimitiveFormat)primitive;
 
-		std::vector<VertexAttribute::Type> layout;
+		std::vector<VertexAttribute> layout;
 
 		UINT count;
 		archive.Read(&count);
@@ -308,10 +306,10 @@ namespace Sentinel
 		for (UINT x = 0; x < count; ++x)
 		{
 			archive.Read(&data);
-			layout.push_back((VertexAttribute::Type)data);
+			layout.push_back((VertexAttribute)data);
 		}
 
-		mesh->mLayout = SHARED(renderer->CreateVertexLayout(layout));
+		mesh->mLayout = std::shared_ptr<VertexLayout>(renderer->CreateVertexLayout(layout));
 
 		mesh->mVertexBuffer = Buffer::Load(archive, renderer);
 		mesh->mIndexBuffer = Buffer::Load(archive, renderer);

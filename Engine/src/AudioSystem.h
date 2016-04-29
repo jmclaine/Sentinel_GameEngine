@@ -20,27 +20,22 @@ namespace Sentinel
 	class SENTINEL_DLL AudioSystem
 	{
 	public:
-
-		virtual ~AudioSystem() {}
+		AudioSystem() { }
+		AudioSystem(const AudioSystem&) = delete;
+		AudioSystem& operator = (const AudioSystem&) = delete;
+		virtual ~AudioSystem() { }
 
 		//////////////////////////////////
 
-		// Determines the type and loads automatically.
-		//
-		virtual Sound*	CreateSound( const char* filename ) = 0;
+		virtual Sound* CreateSound(const char* filename) = 0;
+		virtual Sound* CreateSound(Archive& archive) = 0;
 
-		// Loads from file location into a data buffer directly.
-		//
-		virtual Sound*	CreateSound( Archive& archive ) = 0;
+		virtual Sound* CreateSoundWAV(Archive& archive) = 0;
+		virtual Sound* CreateSoundOGG(Archive& archive) = 0;
 
-		// Loads sound by file type.
-		//
-		virtual Sound*	CreateSoundWAV( Archive& archive ) = 0;
-		virtual Sound*	CreateSoundOGG( Archive& archive ) = 0;
-
-		virtual void			SetListenerPosition( const Vector3& position ) = 0;
-		virtual void			SetListenerVelocity( const Vector3& velocity ) = 0;
-		virtual void			SetListenerOrientation( const Vector3& direction, const Vector3& up = Vector3( 0, 1, 0 )) = 0;
+		virtual void SetListenerPosition(const Vector3& position) = 0;
+		virtual void SetListenerVelocity(const Vector3& velocity) = 0;
+		virtual void SetListenerOrientation(const Vector3& direction, const Vector3& up = Vector3(0, 1, 0)) = 0;
 	};
 
 	extern SENTINEL_DLL AudioSystem* BuildAudioSystemAL();

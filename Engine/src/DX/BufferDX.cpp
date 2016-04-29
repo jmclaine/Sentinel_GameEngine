@@ -11,8 +11,8 @@ namespace Sentinel
 		void* data, 
 		UINT size, 
 		UINT stride, 
-		BufferFormat::Type format, 
-		BufferAccess::Type access)
+		BufferFormat format, 
+		BufferAccess access)
 	{
 		_ASSERT(device);
 		_ASSERT(context);

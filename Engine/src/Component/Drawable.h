@@ -12,41 +12,33 @@ namespace Component
 	class SENTINEL_DLL Drawable : public GameComponent
 	{
 	protected:
-
 		Transform* mTransform;
 
 	public:
-
 		BoundingBox mBounds;
 
 		bool mIsDynamic;
 
 	protected:
-
 		Drawable();
 
 	public:
-
 		virtual void Startup();
 		virtual void Update();
 		virtual void Shutdown();
 
 		/////////////////////////////
 
-		virtual void Execute();
-
 		void SetOwner(GameObject* owner);
 
-		virtual void CalculateBounds() = 0;
+		virtual void CalculateBounds();
+		virtual bool CheckVisible(Camera* camera);
 
-		virtual bool CheckVisible(Camera* camera) = 0;
-
-		virtual void Draw() = 0;
+		virtual void Draw(Camera* camera) = 0;
 
 	protected:
-
-		virtual DECLARE_SERIAL_SAVE();
-		virtual DECLARE_SERIAL_LOAD();
+		virtual void Save(Archive& archive);
+		virtual void Load(Archive& archive);
 
 		virtual void Copy(GameComponent* component);
 	};

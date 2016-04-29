@@ -13,7 +13,7 @@ namespace Sentinel
 
 	public:
 
-		TextureGL(UINT width, UINT height, ImageFormat::Type format, GLuint id);
+		TextureGL(UINT width, UINT height, ImageFormat format, GLuint id);
 		~TextureGL();
 
 		void Release();

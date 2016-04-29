@@ -8,13 +8,13 @@ namespace Sentinel
 		mString(s),
 		mOffset(0),
 		mDelimiters(DELIMITERS)
-	{}
+	{ }
 
 	Tokenizer::Tokenizer(const std::string& s, const std::string& delimiters) :
 		mString(s),
 		mOffset(0),
 		mDelimiters(delimiters)
-	{}
+	{ }
 
 	bool Tokenizer::NextToken()
 	{

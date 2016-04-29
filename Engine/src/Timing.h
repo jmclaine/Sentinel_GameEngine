@@ -23,13 +23,11 @@ namespace Sentinel
 	class SENTINEL_DLL Timing
 	{
 	public:
-
 		static const double DESIRED_FRAME_RATE;
 		static const double INVERSE_FRAME_RATE;
 		static const double THRESHOLD_FRAME_RATE;
 
 	private:
-
 		LARGE_INTEGER mCounter;
 		LARGE_INTEGER mFrequency;
 
@@ -39,17 +37,16 @@ namespace Sentinel
 		float mDeltaTime;
 
 	public:
-
 		Timing();
+
+		Timing(const Timing&) = delete;
+		Timing& operator = (const Timing&) = delete;
 
 		///////////////////////////////////
 
 		double QueryCounter();
-
 		void Update();
-
 		void Limit(double frameRate = DESIRED_FRAME_RATE);
-
 		float DeltaTime();
 	};
 }

@@ -13,6 +13,7 @@
 #include "ShaderManager.h"
 #include "TextureManager.h"
 #include "Material.h"
+#include "BlendStateManager.h"
 
 namespace Sentinel
 {
@@ -39,13 +40,11 @@ namespace Sentinel
 		{
 			Vector3 mPosition;
 
-			// Bones.
-			//
 			int mBoneCount;
 			int mBoneIndex[4];
 			float mBoneWeight[4];
 
-			Vertex() : mBoneCount(0) {}
+			Vertex() : mBoneCount(0) { }
 		};
 
 		struct KeyFrame
@@ -78,7 +77,7 @@ namespace Sentinel
 
 			Object()
 			{
-				mParent = NULL;
+				mParent = nullptr;
 
 				mCurrTime = 0.0f;
 				mCurrKey = 0;
@@ -108,10 +107,10 @@ namespace Sentinel
 
 		ModelM3D()
 		{
-			mObject = NULL;
+			mObject = nullptr;
 			mNumObjects = 0;
 
-			mMaterials = NULL;
+			mMaterials = nullptr;
 			mNumMaterials = 0;
 
 			mIsWeighted = false;
@@ -147,51 +146,38 @@ namespace Sentinel
 			Renderer* renderer,
 			ShaderManager* shaderManager,
 			TextureManager* textureManager,
-			MaterialManager* materialManager)
+			MaterialManager* materialManager,
+			BlendStateManager* blendManager)
 		{
-			// Save the format type.
-			//
 			BYTE format = M3D;
 			archive.Write(&format);
 
-			// Save if the model has weighted vertices.
-			//
 			BYTE weighted = mIsWeighted;
 			archive.Write(&weighted);
 
-			// Write the materials.
-			//
 			archive.Write(&mNumMaterials);
 
 			for (UINT x = 0; x < mNumMaterials; ++x)
 				WriteMaterial(archive, mMaterials[x], textureManager);
 
-			// Write the objects.
-			//
 			archive.Write(&mNumObjects);
 
 			for (UINT x = 0; x < mNumObjects; ++x)
 			{
-				// Write the meshes.
-				//
 				archive.Write(&mObject[x].mNumMeshes);
 
 				for (UINT y = 0; y < mObject[x].mNumMeshes; ++y)
-					Mesh::Save(archive, mObject[x].mMesh[y], renderer, shaderManager, textureManager, materialManager);
+					Mesh::Save(archive, mObject[x].mMesh[y], renderer, materialManager);
 
-				// Write the keyframes.
-				//
 				archive.Write(&mObject[x].mNumKeyFrames);
 
 				for (UINT y = 0; y < mObject[x].mNumKeyFrames; ++y)
 				{
-					archive.Write(mObject[x].mKeyFrame[y].mMatrix.Ptr(), 16);
+					archive.Write(&mObject[x].mKeyFrame[y].mMatrix);
 					archive.Write(&mObject[x].mKeyFrame[y].mFrame);
 				}
 
-				// Write the hierarchy.
-				//
-				if (mObject[x].mParent == NULL)
+				if (mObject[x].mParent == nullptr)
 				{
 					int hierarchy = -1;
 					archive.Write(&hierarchy);
@@ -215,55 +201,44 @@ namespace Sentinel
 			Renderer* renderer,
 			ShaderManager* shaderManager,
 			TextureManager* textureManager,
-			MaterialManager* materialManager)
+			MaterialManager* materialManager,
+			BlendStateManager* blendManager)
 		{
-			// Read if the model has weighted vertices.
-			//
 			BYTE weighted;
 			archive.Read(&weighted);
 			mIsWeighted = (weighted == 1);
 
-			// Read the materials.
-			//
 			archive.Read(&mNumMaterials);
-			mMaterials = new std::shared_ptr< Material >[mNumMaterials];
+			mMaterials = new std::shared_ptr<Material>[mNumMaterials];
 
 			for (UINT x = 0; x < mNumMaterials; ++x)
-				ReadMaterial(archive, mMaterials[x], renderer, textureManager);
+				ReadMaterial(archive, mMaterials[x], renderer, textureManager, blendManager);
 
-			// Read the objects.
-			//
 			archive.Read(&mNumObjects);
 			mObject = new Object[mNumObjects];
 
 			for (UINT x = 0; x < mNumObjects; ++x)
 			{
-				// Read the meshes.
-				//
 				archive.Read(&mObject[x].mNumMeshes);
 				mObject[x].mMesh = new Mesh*[mObject[x].mNumMeshes];
 
 				for (UINT y = 0; y < mObject[x].mNumMeshes; ++y)
-					mObject[x].mMesh[y] = Mesh::Load(archive, renderer, shaderManager, textureManager, materialManager);
+					mObject[x].mMesh[y] = Mesh::Load(archive, renderer, materialManager);
 
-				// Read the keyframes.
-				//
 				archive.Read(&mObject[x].mNumKeyFrames);
 				mObject[x].mKeyFrame = new KeyFrame[mObject[x].mNumKeyFrames];
 
 				for (UINT y = 0; y < mObject[x].mNumKeyFrames; ++y)
 				{
-					archive.Read(mObject[x].mKeyFrame[y].mMatrix.Ptr(), 16);
+					archive.Read(&mObject[x].mKeyFrame[y].mMatrix);
 					archive.Read(&mObject[x].mKeyFrame[y].mFrame);
 				}
 
-				// Read the hierarchy.
-				//
 				int hierarchy;
 				archive.Read(&hierarchy);
 
 				if (hierarchy == -1)
-					mObject[x].mParent = NULL;
+					mObject[x].mParent = nullptr;
 				else
 					mObject[x].mParent = &mObject[hierarchy];
 			}
@@ -274,11 +249,12 @@ namespace Sentinel
 			Renderer* renderer,
 			ShaderManager* shaderManager,
 			TextureManager* textureManager,
-			MaterialManager* materialManager)
+			MaterialManager* materialManager,
+			BlendStateManager* blendManager)
 		{
-			Vertex* vertices = NULL;
-			Vector3* normals = NULL;
-			Vector2* texCoords = NULL;
+			Vertex* vertices = nullptr;
+			Vector3* normals = nullptr;
+			Vector2* texCoords = nullptr;
 
 			try
 			{
@@ -286,49 +262,37 @@ namespace Sentinel
 				if (!archive.Open(filename, "rb"))
 					throw AppException("Failed to load " + std::string(filename));
 
-				// Read version.
-				//
 				archive.Read(&mVersion);
 
-				// Read the materials and create meshes.
-				//
 				archive.Read(&mNumMaterials);
-				mMaterials = new std::shared_ptr< Material >[mNumMaterials];
+				mMaterials = new std::shared_ptr<Material>[mNumMaterials];
 
 				for (UINT x = 0; x < mNumMaterials; ++x)
 				{
-					mMaterials[x] = std::shared_ptr< Material >(new Material());
+					mMaterials[x] = std::shared_ptr<Material>(new Material());
 
-					ReadMaterial(archive, mMaterials[x], renderer, textureManager);
+					ReadMaterial(archive, mMaterials[x], renderer, textureManager, blendManager);
 				}
 
-				// Read whether any data was exported using 32-bit.
-				//
-				const BYTE WEIGHTED = 0x01;
-				const BYTE VERTS_32 = 0x02;
-				const BYTE NORMS_32 = 0x04;
-				const BYTE TEXCS_32 = 0x08;
-				const BYTE INDEX_32 = 0x10;
+				BYTE import;
+				archive.Read(&import);
 
-				BYTE export32;
-				archive.Read(&export32);
+				mIsWeighted = (import & 0x01) ? true : false;
+				bool bVerts32 = ((import & 0x02) == 0);
+				bool bNorms32 = ((import & 0x04) == 0);
+				bool bTexcs32 = ((import & 0x08) == 0);
+				bool bIndex32 = ((import & 0x10) == 0);
 
-				bool bVerts32 = (export32 & VERTS_32) ? true : false;
-				bool bNorms32 = (export32 & NORMS_32) ? true : false;
-				bool bTexcs32 = (export32 & TEXCS_32) ? true : false;
-				bool bIndex32 = (export32 & INDEX_32) ? true : false;
-
-				mIsWeighted = (export32 & WEIGHTED) ? true : false;
-
-				// Read vertices.
-				//
 				int numVerts;
-				archive.Read(&numVerts, 1, bVerts32);
+				if (bVerts32)
+					archive.ReadConvert<int, short>(&numVerts);
+				else
+					archive.Read(&numVerts);
 				vertices = new Vertex[numVerts];
 
 				for (int x = 0; x < numVerts; ++x)
 				{
-					archive.Read(vertices[x].mPosition.Ptr(), 3);
+					archive.Read(&vertices[x].mPosition);
 
 					if (mIsWeighted)
 					{
@@ -342,37 +306,38 @@ namespace Sentinel
 					}
 				}
 
-				// Read normals.
-				//
+
 				int numNormals;
-				archive.Read(&numNormals, 1, bNorms32);
+				if (bNorms32)
+					archive.ReadConvert<int, short>(&numNormals);
+				else
+					archive.Read(&numNormals);
 				normals = new Vector3[numNormals];
 
 				for (int x = 0; x < numNormals; ++x)
-					archive.Read(normals[x].Ptr(), 3);
+					archive.Read(&normals[x]);
 
-				// Read texture coordinates.
-				//
+				
 				int numTexCoords;
-				archive.Read(&numTexCoords, 1, bTexcs32);
+				if (bTexcs32)
+					archive.ReadConvert<int, short>(&numTexCoords);
+				else
+					archive.Read(&numTexCoords);
 				texCoords = new Vector2[numTexCoords];
 
 				for (int x = 0; x < numTexCoords; ++x)
 				{
-					archive.Read(texCoords[x].Ptr(), 2);
+					archive.Read(&texCoords[x]);
 					texCoords[x].y = 1.0f - texCoords[x].y;
 				}
 
-				// Read fat indices.
-				//
+
 				archive.Read(&mNumObjects);
 				mObject = new Object[mNumObjects];
 				int currHierarchy = 0;
 
 				for (UINT x = 0; x < mNumObjects; ++x)
 				{
-					// Read the hierarchy number.
-					//
 					int hierarchy;
 					archive.Read(&hierarchy);
 
@@ -381,13 +346,11 @@ namespace Sentinel
 					else
 						currHierarchy = x;
 
-					// Read if this object is skinned.
-					//
+					
 					BYTE isSkinned;
 					archive.Read(&isSkinned);
 
-					// Read the keyframe animations.
-					//
+					
 					archive.Read(&mObject[x].mNumKeyFrames);
 					mObject[x].mKeyFrame = new KeyFrame[mObject[x].mNumKeyFrames];
 
@@ -395,41 +358,27 @@ namespace Sentinel
 					{
 						KeyFrame* currKey = &mObject[x].mKeyFrame[y];
 
-						// Read matrix.
-						//
-						archive.Read(currKey->mMatrix.Ptr(), 16);
-
-						// Read frame timestamp.
-						//
+						archive.Read(&currKey->mMatrix);
 						archive.Read(&currKey->mFrame);
 					}
 
-					// Prepare keyframes for skinned animation if necessary.
-					//
 					if (mIsWeighted)
 						mObject[x].mInverseBone = mObject[x].mKeyFrame[0].mMatrix.Inverse();
 
-					// Read indices.
-					//
 					archive.Read(&mObject[x].mNumMeshes);
 					mObject[x].mMesh = new Mesh*[mObject[x].mNumMeshes];
 
 					for (UINT y = 0; y < mObject[x].mNumMeshes; ++y)
-						mObject[x].mMesh[y] = NULL;
+						mObject[x].mMesh[y] = nullptr;
 
 					MeshBuilder builder;
-
 					for (UINT y = 0; y < mObject[x].mNumMeshes; ++y)
 					{
 						builder.ClearAll();
 
-						// Count the number of textures used.
-						//
-						UINT numTextures = 0;
+						BYTE numTextures = 0;
 
-						// Read the material ID for this object.
-						//
-						std::shared_ptr< Material > material;
+						std::shared_ptr<Material> material;
 
 						int matID;
 						archive.Read(&matID);
@@ -438,59 +387,66 @@ namespace Sentinel
 						{
 							material = mMaterials[matID];
 
-							for (UINT z = 0; z < TextureIndex::COUNT; ++z)
-								if (material->mTexture[z].get() != NULL)
+							for (UINT z = 0; z < (UINT)TextureIndex::COUNT; ++z)
+								if (material->mTexture[z].lock() != nullptr)
 									++numTextures;
 						}
 						else
 						{
-							material = std::shared_ptr< Material >(new Material());
+							material = std::shared_ptr<Material>(new Material());
 						}
-
-						std::shared_ptr< Shader > shader;
 
 						if (numTextures == 0)
 						{
-							shader = shaderManager->Get("Color_Lit");
+							material->mShader = shaderManager->Get("Color_Lit");
 						}
 						else if (isSkinned)
 						{
-							shader = shaderManager->Get("Skinned");
+							material->mShader = shaderManager->Get("Skinned");
 						}
 						else if (numTextures == 1)
 						{
-							shader = shaderManager->Get("Texture_Lit");
+							material->mShader = shaderManager->Get("Texture_Lit");
 						}
 						else if (numTextures == 2)
 						{
-							shader = shaderManager->Get("Normal_Map");
+							material->mShader = shaderManager->Get("Normal_Map");
 						}
 						else
 						{
-							shader = shaderManager->Get("Parallax");
+							material->mShader = shaderManager->Get("Parallax");
 						}
 
-						material->mShader = shader;
+						builder.mLayout = material->mShader.lock()->Layout();
 
-						builder.mLayout = shader->Layout();
-
-						// Read faces.
-						//
+						
 						MeshBuilder::Vertex meshVertex;
 
 						int count;
-						archive.Read(&count, 1, bIndex32);
+						if (bIndex32)
+							archive.ReadConvert<int, short>(&count);
+						else
+							archive.Read(&count);
 
 						for (int z = 0; z < count; ++z)
 						{
 							int vertex;
-							archive.Read(&vertex, 1, bVerts32);
+							if (bVerts32)
+								archive.ReadConvert<int, short>(&vertex);
+							else
+								archive.Read(&vertex);
 
 							int normal;
-							archive.Read(&normal, 1, bNorms32);
+							if (bNorms32)
+								archive.ReadConvert<int, short>(&normal);
+							else
+								archive.Read(&normal);
 
 							int texCoord;
-							archive.Read(&texCoord, 1, bTexcs32);
+							if (bTexcs32)
+								archive.ReadConvert<int, short>(&texCoord);
+							else
+								archive.Read(&texCoord);
 
 							meshVertex.mPosition = vertices[vertex].mPosition;
 
@@ -549,11 +505,9 @@ namespace Sentinel
 			std::shared_ptr<Material> material,
 			TextureManager* textureManager)
 		{
-			// Write base material.
-			//
-			archive.Write(material->mAmbient.Ptr(), 3);
-			archive.Write(material->mDiffuse.Ptr(), 3);
-			archive.Write(material->mSpecular.Ptr(), 3);
+			archive.Write(&material->mAmbient);
+			archive.Write(&material->mDiffuse);
+			archive.Write(&material->mSpecular);
 
 			float spec_comp = material->mSpecularComponent / 100.0f;
 			archive.Write(&spec_comp);
@@ -561,18 +515,17 @@ namespace Sentinel
 			float alpha = material->mAmbient.a + material->mDiffuse.a + material->mSpecular.a;
 			archive.Write(&alpha);
 
-			// Write filenames of each texture.
-			//
-			UINT numTextures = 0;
-			for (UINT x = 0; x < NUM_AUTODESK_TYPES; ++x)
-				if (material->mTexture[x] != NULL)
+			
+			USHORT numTextures = 0;
+			for (UINT x = 0; x < (UINT)NUM_AUTODESK_TYPES; ++x)
+				if (material->mTexture[x].lock() != nullptr)
 					++numTextures;
 
-			archive.Write(&numTextures, 1, false);
+			archive.Write(&numTextures);
 
-			for (BYTE x = 0; x < NUM_AUTODESK_TYPES; ++x)
+			for (BYTE x = 0; x < (BYTE)NUM_AUTODESK_TYPES; ++x)
 			{
-				if (material->mTexture[x] != NULL)
+				if (material->mTexture[x].lock() != nullptr)
 				{
 					archive.Write(&x);
 
@@ -585,20 +538,19 @@ namespace Sentinel
 
 		void ReadMaterial(
 			Archive& archive,
-			std::shared_ptr<Material> material,
+			std::shared_ptr<Material>& material,
 			Renderer* renderer,
-			TextureManager* textureManager)
+			TextureManager* textureManager,
+			BlendStateManager* blendManager)
 		{
-			// Set the material.
-			//
 			Vector3 ambient;
-			archive.Read(ambient.Ptr(), ar_sizeof(ambient));
+			archive.Read(&ambient);
 
 			Vector3 diffuse;
-			archive.Read(diffuse.Ptr(), ar_sizeof(diffuse));
+			archive.Read(&diffuse);
 
 			Vector3 specular;
-			archive.Read(specular.Ptr(), ar_sizeof(specular));
+			archive.Read(&specular);
 
 			float spec_comp;
 			archive.Read(&spec_comp);
@@ -613,16 +565,15 @@ namespace Sentinel
 			material->mSpecularComponent = spec_comp;
 
 			if (alpha < 0.98f) // close enough
-				material->mBlendState = renderer->BLEND_ALPHA;
+				material->mBlendState = blendManager->Get("ALPHA");
 			else
-				material->mBlendState = renderer->BLEND_OFF;
+				material->mBlendState = blendManager->Get("DEFAULT");
 
-			// Read filenames of each texture.
-			//
-			UINT numTextures;
-			archive.Read(&numTextures, 1, false);
+			
+			USHORT numTextures;
+			archive.Read(&numTextures);
 
-			for (UINT x = 0; x < numTextures; ++x)
+			for (USHORT x = 0; x < numTextures; ++x)
 			{
 				BYTE type;
 				archive.Read(&type);
@@ -630,28 +581,40 @@ namespace Sentinel
 				switch (type)
 				{
 				case AUTODESK_BUMP:
-					type = TextureIndex::NORMAL;
+					type = (BYTE)TextureIndex::NORMAL;
 					break;
 
 				case AUTODESK_PARALLAX:
-					type = TextureIndex::DEPTH;
+					type = (BYTE)TextureIndex::DEPTH;
 					break;
 
 				default:
-					type = TextureIndex::DIFFUSE;
+					type = (BYTE)TextureIndex::DIFFUSE;
 					break;
 				}
 
 				std::string name;
 				archive.Read(&name);
 
-				material->mTexture[type] = textureManager->Add(name, std::shared_ptr< Texture >(renderer->CreateTextureFromFile(name.c_str())));
+				auto texture = std::shared_ptr<Texture>(renderer->CreateTextureFromFile(name.c_str()));
+
+				if (texture.get() == nullptr)
+				{
+					Debug::ShowError(
+						STREAM("Failed to load image '" << name << "'"),
+						STREAM("Load Model Error"));
+
+					return;
+				}
+				textureManager->Add(name, texture);
+
+				material->mTexture[type] = textureManager->Get(name);
 			}
 		}
 
 	public:
 
-		void GetMeshList(std::vector< Mesh* >* meshList)
+		void GetMeshList(std::vector<Mesh*>* meshList)
 		{
 			meshList->clear();
 
@@ -685,88 +648,96 @@ namespace Sentinel
 
 		void Update(float DT)
 		{
-			// Setup Bone Matrix.
-			//
 			/*
-			if( mIsWeighted )
+			if (mIsWeighted)
 			{
-			static Matrix4x4 matBone;
+				static Matrix4x4 matBone;
 
-			std::shared_ptr< Shader > skin = ShaderManager::Inst()->Get( "Skinning" );
+				std::shared_ptr<Shader> skin = ShaderManager::Inst()->Get("Skinning");
 
-			Renderer::Inst()->SetShader( skin );
+				Renderer::Inst()->SetShader(skin);
 
-			for( UINT x = 0; x < mNumObjects; ++x )
-			{
-			matBone = mObject[ x ].mKeyFrame[ mObject[ x ].mCurrKey ].mMatrix * mObject[ x ].mInverseBone;
+				for (UINT x = 0; x < mNumObjects; ++x)
+				{
+					matBone = mObject[x].mKeyFrame[mObject[x].mCurrKey].mMatrix * mObject[x].mInverseBone;
 
-			// Set the B designation first to ensure this works correctly.
-			//
-			skin->SetMatrix( skin->Uniform().find( 'B' ), matBone.Ptr(), x, 1 );
-			}
+					// Set the B designation first to ensure this works correctly.
+					//
+					skin->SetMatrix(skin->Uniform().find('B'), matBone.Ptr(), x, 1);
+				}
 			}
 			*/
 
+			static Object* obj;
+
 			for (UINT x = 0; x < mNumObjects; ++x)
 			{
-				// Adjust keyframe for animation times.
-				//
-				if (mObject[x].mNumKeyFrames > 0)
+				obj = &mObject[x];
+
+				if (obj->mNumKeyFrames > 0)
 				{
-					mObject[x].mCurrTime += DT * 30.0f;
+					obj->mCurrTime += DT * 30.0f;
 
-					if (mObject[x].mKeyFrame[mObject[x].mCurrKey].mFrame <= (int)mObject[x].mCurrTime)
+					if (obj->mKeyFrame[obj->mCurrKey].mFrame <= (int)obj->mCurrTime)
 					{
-						++mObject[x].mCurrKey;
+						++obj->mCurrKey;
 
-						if ((int)mObject[x].mCurrKey >= (int)mObject[x].mNumKeyFrames)
+						if (obj->mCurrKey >= (int)obj->mNumKeyFrames)
 						{
-							mObject[x].mCurrTime = 0;
-							mObject[x].mCurrKey = 0;
+							obj->mCurrTime = 0;
+							obj->mCurrKey = 0;
 						}
 					}
+				}
+			}
+
+			for (UINT x = 0; x < mNumObjects; ++x)
+			{
+				static Matrix4x4 matWorldObject;
+				
+				obj = &mObject[x];
+
+				if (obj->mParent == nullptr)
+					matWorldObject = mMatrixWorld * obj->mKeyFrame[obj->mCurrKey].mMatrix;
+				else
+					matWorldObject = obj->mParent->mMatrixWorld * obj->mKeyFrame[obj->mCurrKey].mMatrix;
+
+				obj->mMatrixWorld = matWorldObject;
+
+				for (UINT y = 0; y < mObject[x].mNumMeshes; ++y)
+				{
+					obj->mMesh[y]->mMatrixWorld = matWorldObject;
 				}
 			}
 		}
 
 		void Draw(Renderer* renderer, GameWorld* world, Component::Camera* camera)
 		{
-			// Set up model transforms.
-			//
+			static Object* obj;
+
 			for (UINT x = 0; x < mNumObjects; ++x)
 			{
-				static Matrix4x4 matWorldObject;
+				obj = &mObject[x];
 
-				if (mObject[x].mParent == NULL)
-					matWorldObject = mMatrixWorld * mObject[x].mKeyFrame[mObject[x].mCurrKey].mMatrix;
-				else
-					matWorldObject = mObject[x].mParent->mMatrixWorld * mObject[x].mKeyFrame[mObject[x].mCurrKey].mMatrix;
-
-				mObject[x].mMatrixWorld = matWorldObject;
-
-				// Render each mesh by material.
-				//
-				for (UINT y = 0; y < mObject[x].mNumMeshes; ++y)
+				for (UINT y = 0; y < obj->mNumMeshes; ++y)
 				{
-					mObject[x].mMesh[y]->mMatrixWorld = matWorldObject;
-					mObject[x].mMesh[y]->Draw(renderer, world, camera);
+					obj->mMesh[y]->Draw(renderer, world, camera);
 				}
 			}
 		}
 	};
 
-	// Create an M3D Model.
-	//
 	Model* LoadModelM3DFromFile(
 		const char* filename,
 		Renderer* renderer,
 		ShaderManager* shaderManager,
 		TextureManager* textureManager,
-		MaterialManager* materialManager)
+		MaterialManager* materialManager,
+		BlendStateManager* blendManager)
 	{
 		ModelM3D* model = new ModelM3D();
 
-		model->CreateFromFile(filename, renderer, shaderManager, textureManager, materialManager);
+		model->CreateFromFile(filename, renderer, shaderManager, textureManager, materialManager, blendManager);
 
 		return model;
 	}
@@ -776,11 +747,12 @@ namespace Sentinel
 		Renderer* renderer,
 		ShaderManager* shaderManager,
 		TextureManager* textureManager,
-		MaterialManager* materialManager)
+		MaterialManager* materialManager,
+		BlendStateManager* blendManager)
 	{
 		ModelM3D* model = new ModelM3D();
 
-		model->CreateFromArchive(archive, renderer, shaderManager, textureManager, materialManager);
+		model->CreateFromArchive(archive, renderer, shaderManager, textureManager, materialManager, blendManager);
 
 		return model;
 	}

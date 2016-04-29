@@ -5,18 +5,18 @@
 namespace Sentinel
 {
 	Shader::Sampler::Sampler()
-	{}
+	{ }
 
 	Shader::Sampler::~Sampler()
-	{}
+	{ }
 
 	////////////////////////////////////
 
 	Shader::Shader() :
-		mSource(NULL),
-		mSampler(NULL),
+		mSource(nullptr),
+		mSampler(nullptr),
 		mNumSamplers(0)
-	{}
+	{ }
 
 	Shader::~Shader()
 	{
@@ -36,18 +36,18 @@ namespace Sentinel
 		return mSource;
 	}
 
-	const std::vector<VertexAttribute::Type>& Shader::Attributes()
+	const std::vector<VertexAttribute>& Shader::Attributes()
 	{
 		return mAttributes;
 	}
 
-	const std::vector<ShaderUniform::Type>& Shader::Uniforms()
+	const std::vector<ShaderUniform>& Shader::Uniforms()
 	{
 		return mUniforms;
 	}
 
-	const std::shared_ptr<VertexLayout> Shader::Layout()
+	std::weak_ptr<VertexLayout> Shader::Layout()
 	{
-		return mLayout;
+		return std::move(std::weak_ptr<VertexLayout>(mLayout));
 	}
 }

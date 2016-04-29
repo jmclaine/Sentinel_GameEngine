@@ -12,7 +12,6 @@
 #include <vector>
 
 #include "Util.h"
-#include "Types.h"
 
 #ifdef _DEBUG
 #include "Debug.h"

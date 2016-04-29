@@ -9,17 +9,17 @@ namespace Sentinel
 	class Renderer;
 	class TextureManager;
 
-	class SENTINEL_DLL SpriteManager : public AssetManager <Sprite>
+	class SENTINEL_DLL SpriteManager : public AssetManager<Sprite>
 	{
 	public:
-
 		SpriteManager();
-		~SpriteManager();
+
+		SpriteManager(const SpriteManager&) = delete;
+		SpriteManager& operator = (const SpriteManager&) = delete;
 
 		/////////////////////////////////
 
 		void Save(Archive& archive);
-
 		void Load(Archive& archive);
 	};
 }

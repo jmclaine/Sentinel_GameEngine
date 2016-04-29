@@ -6,43 +6,48 @@ namespace Sentinel
 {
 	class RigidBody;
 
-namespace Component
-{
-	class Transform;
-
-	class SENTINEL_DLL Physics : public GameComponent
+	namespace Component
 	{
-		DECLARE_SERIAL();
+		class Transform;
 
-	protected:
+		class SENTINEL_DLL Physics final : public GameComponent
+		{
+			static SerialRegister SERIAL_REGISTER;
+			static Serializable* Clone();
 
-		Transform* mTransform;
-		RigidBody* mRigidBody;
+		private:
+			Transform* mTransform;
+			RigidBody* mRigidBody;
 
-	public:
+		public:
+			Physics();
+			Physics(RigidBody* body);
+			~Physics();
 
-		Physics();
-		Physics(RigidBody* body);
-		~Physics();
+			void Startup();
+			void Update();
+			void Shutdown();
 
-		void Startup();
-		void Shutdown();
+			/////////////////////////////////
 
-		/////////////////////////////////
+			void Execute();
 
-		void Execute();
+			void SetOwner(GameObject* owner);
 
-		void SetOwner(GameObject* owner);
+			RigidBody* GetRigidBody();
+			void SetRigidBody(RigidBody* body);
 
-		RigidBody* GetRigidBody();
+			///////////////////////////////////
 
-		// Startup must be called to add the RigidBody
-		// to the PhysicsSystem within GameWorld.
-		//
-		void SetRigidBody(RigidBody* body);
+			void Save(Archive& archive);
+			void Load(Archive& archive);
 
-		/////////////////////////////////
+			/////////////////////////////////
 
-		GameComponent* Copy();
-	};
-}}
+			GameComponent* Copy();
+
+		private:
+			void Copy(GameComponent* component);
+		};
+	}
+}

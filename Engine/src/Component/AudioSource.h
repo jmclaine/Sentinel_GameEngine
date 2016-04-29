@@ -10,7 +10,6 @@ namespace Component
 		DECLARE_SERIAL();
 
 	public:
-
 		AudioSource();
 		~AudioSource();
 

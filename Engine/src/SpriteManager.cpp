@@ -6,21 +6,18 @@
 namespace Sentinel
 {
 	SpriteManager::SpriteManager()
-	{}
-
-	SpriteManager::~SpriteManager()
-	{}
+	{ }
 
 	void SpriteManager::Save(Archive& archive)
 	{
 		UINT count = mData.size();
 		archive.Write(&count);
 
-		TRAVERSE_LIST(it, mData)
+		for (auto it : mData)
 		{
-			archive.Write(&it->first);
+			archive.Write(&it.first);
 
-			std::shared_ptr<Sprite> sprite = it->second;
+			std::shared_ptr<Sprite> sprite = it.second;
 
 			UINT size = sprite->NumFrames();
 			archive.Write(&size);
@@ -57,8 +54,7 @@ namespace Sentinel
 				sprite->AddFrame(q);
 			}
 
-			if (!Add(name, sprite))
-				throw std::exception("Failed to load Sprite.");
+			Add(name, sprite);
 		}
 	}
 }

@@ -128,7 +128,7 @@ struct TiXmlCursor
 class TiXmlVisitor
 {
 public:
-	virtual ~TiXmlVisitor() {}
+	virtual ~TiXmlVisitor() { }
 
 	/// Visit a document.
 	virtual bool VisitEnter( const TiXmlDocument& /*doc*/ )			{ return true; }
@@ -198,12 +198,12 @@ class TiXmlBase
 	friend class TiXmlDocument;
 
 public:
-	TiXmlBase()	:	userData(0)		{}
-	virtual ~TiXmlBase()			{}
+	TiXmlBase()	:	userData(0)		{ }
+	virtual ~TiXmlBase()			{ }
 
 	/**	All TinyXml classes can print themselves to a filestream
 		or the string class (TiXmlString in non-STL mode, std::string
-		in STL mode.) Either or both cfile and str can be null.
+		in STL mode.) Either or both cfile and str can be nullptr.
 		
 		This is a formatted print, and will insert 
 		tabs and newlines.
@@ -276,7 +276,7 @@ public:
 		TIXML_ERROR_PARSING_COMMENT,
 		TIXML_ERROR_PARSING_DECLARATION,
 		TIXML_ERROR_DOCUMENT_EMPTY,
-		TIXML_ERROR_EMBEDDED_NULL,
+		TIXML_ERROR_EMBEDDED_nullptr,
 		TIXML_ERROR_PARSING_CDATA,
 		TIXML_ERROR_DOCUMENT_TOP_ONLY,
 
@@ -347,7 +347,7 @@ protected:
 		else if ( *length )
 		{
 			//strncpy( _value, p, *length );	// lots of compilers don't like this function (unsafe),
-												// and the null terminator isn't needed
+												// and the nullptr terminator isn't needed
 			for( int i=0; p[i] && i<*length; ++i ) {
 				_value[i] = p[i];
 			}
@@ -519,19 +519,19 @@ public:
 	TiXmlNode* Parent()							{ return parent; }
 	const TiXmlNode* Parent() const				{ return parent; }
 
-	const TiXmlNode* FirstChild()	const		{ return firstChild; }	///< The first child of this node. Will be null if there are no children.
+	const TiXmlNode* FirstChild()	const		{ return firstChild; }	///< The first child of this node. Will be nullptr if there are no children.
 	TiXmlNode* FirstChild()						{ return firstChild; }
-	const TiXmlNode* FirstChild( const char * value ) const;			///< The first child of this node with the matching 'value'. Will be null if none found.
-	/// The first child of this node with the matching 'value'. Will be null if none found.
+	const TiXmlNode* FirstChild( const char * value ) const;			///< The first child of this node with the matching 'value'. Will be nullptr if none found.
+	/// The first child of this node with the matching 'value'. Will be nullptr if none found.
 	TiXmlNode* FirstChild( const char * _value ) {
 		// Call through to the const version - safe since nothing is changed. Exiting syntax: cast this to a const (always safe)
 		// call the method, cast the return back to non-const.
 		return const_cast< TiXmlNode* > ((const_cast< const TiXmlNode* >(this))->FirstChild( _value ));
 	}
-	const TiXmlNode* LastChild() const	{ return lastChild; }		/// The last child of this node. Will be null if there are no children.
+	const TiXmlNode* LastChild() const	{ return lastChild; }		/// The last child of this node. Will be nullptr if there are no children.
 	TiXmlNode* LastChild()	{ return lastChild; }
 	
-	const TiXmlNode* LastChild( const char * value ) const;			/// The last child of this node matching 'value'. Will be null if there are no children.
+	const TiXmlNode* LastChild( const char * value ) const;			/// The last child of this node matching 'value'. Will be nullptr if there are no children.
 	TiXmlNode* LastChild( const char * _value ) {
 		return const_cast< TiXmlNode* > ((const_cast< const TiXmlNode* >(this))->LastChild( _value ));
 	}
@@ -556,8 +556,8 @@ public:
 		@endverbatim
 
 		IterateChildren takes the previous child as input and finds
-		the next one. If the previous child is null, it returns the
-		first. IterateChildren will return null when done.
+		the next one. If the previous child is nullptr, it returns the
+		first. IterateChildren will return nullptr when done.
 	*/
 	const TiXmlNode* IterateChildren( const TiXmlNode* previous ) const;
 	TiXmlNode* IterateChildren( const TiXmlNode* previous ) {
@@ -576,7 +576,7 @@ public:
 	#endif
 
 	/** Add a new node related to this. Adds a child past the LastChild.
-		Returns a pointer to the new object or NULL if an error occured.
+		Returns a pointer to the new object or nullptr if an error occured.
 	*/
 	TiXmlNode* InsertEndChild( const TiXmlNode& addThis );
 
@@ -593,17 +593,17 @@ public:
 	TiXmlNode* LinkEndChild( TiXmlNode* addThis );
 
 	/** Add a new node related to this. Adds a child before the specified child.
-		Returns a pointer to the new object or NULL if an error occured.
+		Returns a pointer to the new object or nullptr if an error occured.
 	*/
 	TiXmlNode* InsertBeforeChild( TiXmlNode* beforeThis, const TiXmlNode& addThis );
 
 	/** Add a new node related to this. Adds a child after the specified child.
-		Returns a pointer to the new object or NULL if an error occured.
+		Returns a pointer to the new object or nullptr if an error occured.
 	*/
 	TiXmlNode* InsertAfterChild(  TiXmlNode* afterThis, const TiXmlNode& addThis );
 
 	/** Replace a child of this node.
-		Returns a pointer to the new object or NULL if an error occured.
+		Returns a pointer to the new object or nullptr if an error occured.
 	*/
 	TiXmlNode* ReplaceChild( TiXmlNode* replaceThis, const TiXmlNode& withThis );
 
@@ -684,7 +684,7 @@ public:
 	int Type() const	{ return type; }
 
 	/** Return a pointer to the Document this node lives in.
-		Returns null if not in a document.
+		Returns nullptr if not in a document.
 	*/
 	const TiXmlDocument* GetDocument() const;
 	TiXmlDocument* GetDocument() {
@@ -694,19 +694,19 @@ public:
 	/// Returns true if this node has no children.
 	bool NoChildren() const						{ return !firstChild; }
 
-	virtual const TiXmlDocument*    ToDocument()    const { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
-	virtual const TiXmlElement*     ToElement()     const { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
-	virtual const TiXmlComment*     ToComment()     const { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
-	virtual const TiXmlUnknown*     ToUnknown()     const { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
-	virtual const TiXmlText*        ToText()        const { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
-	virtual const TiXmlDeclaration* ToDeclaration() const { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
+	virtual const TiXmlDocument*    ToDocument()    const { return 0; } ///< Cast to a more defined type. Will return nullptr if not of the requested type.
+	virtual const TiXmlElement*     ToElement()     const { return 0; } ///< Cast to a more defined type. Will return nullptr if not of the requested type.
+	virtual const TiXmlComment*     ToComment()     const { return 0; } ///< Cast to a more defined type. Will return nullptr if not of the requested type.
+	virtual const TiXmlUnknown*     ToUnknown()     const { return 0; } ///< Cast to a more defined type. Will return nullptr if not of the requested type.
+	virtual const TiXmlText*        ToText()        const { return 0; } ///< Cast to a more defined type. Will return nullptr if not of the requested type.
+	virtual const TiXmlDeclaration* ToDeclaration() const { return 0; } ///< Cast to a more defined type. Will return nullptr if not of the requested type.
 
-	virtual TiXmlDocument*          ToDocument()    { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
-	virtual TiXmlElement*           ToElement()	    { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
-	virtual TiXmlComment*           ToComment()     { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
-	virtual TiXmlUnknown*           ToUnknown()	    { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
-	virtual TiXmlText*	            ToText()        { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
-	virtual TiXmlDeclaration*       ToDeclaration() { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
+	virtual TiXmlDocument*          ToDocument()    { return 0; } ///< Cast to a more defined type. Will return nullptr if not of the requested type.
+	virtual TiXmlElement*           ToElement()	    { return 0; } ///< Cast to a more defined type. Will return nullptr if not of the requested type.
+	virtual TiXmlComment*           ToComment()     { return 0; } ///< Cast to a more defined type. Will return nullptr if not of the requested type.
+	virtual TiXmlUnknown*           ToUnknown()	    { return 0; } ///< Cast to a more defined type. Will return nullptr if not of the requested type.
+	virtual TiXmlText*	            ToText()        { return 0; } ///< Cast to a more defined type. Will return nullptr if not of the requested type.
+	virtual TiXmlDeclaration*       ToDeclaration() { return 0; } ///< Cast to a more defined type. Will return nullptr if not of the requested type.
 
 	/** Create an exact duplicate of this node and return it. The memory must be deleted
 		by the caller. 
@@ -749,7 +749,7 @@ protected:
 	virtual void StreamIn( std::istream* in, TIXML_STRING* tag ) = 0;
 	#endif
 
-	// Figure out what is at *p, and parse it. Returns null if it is not an xml node.
+	// Figure out what is at *p, and parse it. Returns nullptr if it is not an xml node.
 	TiXmlNode* Identify( const char* start, TiXmlEncoding encoding );
 
 	TiXmlNode*		parent;
@@ -845,13 +845,13 @@ public:
 	void SetValue( const std::string& _value )	{ value = _value; }
 	#endif
 
-	/// Get the next sibling attribute in the DOM. Returns null at end.
+	/// Get the next sibling attribute in the DOM. Returns nullptr at end.
 	const TiXmlAttribute* Next() const;
 	TiXmlAttribute* Next() {
 		return const_cast< TiXmlAttribute* >( (const_cast< const TiXmlAttribute* >(this))->Next() ); 
 	}
 
-	/// Get the previous sibling attribute in the DOM. Returns null at beginning.
+	/// Get the previous sibling attribute in the DOM. Returns nullptr at beginning.
 	const TiXmlAttribute* Previous() const;
 	TiXmlAttribute* Previous() {
 		return const_cast< TiXmlAttribute* >( (const_cast< const TiXmlAttribute* >(this))->Previous() ); 
@@ -955,23 +955,23 @@ public:
 	virtual ~TiXmlElement();
 
 	/** Given an attribute name, Attribute() returns the value
-		for the attribute of that name, or null if none exists.
+		for the attribute of that name, or nullptr if none exists.
 	*/
 	const char* Attribute( const char* name ) const;
 
 	/** Given an attribute name, Attribute() returns the value
-		for the attribute of that name, or null if none exists.
+		for the attribute of that name, or nullptr if none exists.
 		If the attribute exists and can be converted to an integer,
 		the integer value will be put in the return 'i', if 'i'
-		is non-null.
+		is non-nullptr.
 	*/
 	const char* Attribute( const char* name, int* i ) const;
 
 	/** Given an attribute name, Attribute() returns the value
-		for the attribute of that name, or null if none exists.
+		for the attribute of that name, or nullptr if none exists.
 		If the attribute exists and can be converted to an double,
 		the double value will be put in the return 'd', if 'd'
-		is non-null.
+		is non-nullptr.
 	*/
 	const char* Attribute( const char* name, double* d ) const;
 
@@ -1091,7 +1091,7 @@ public:
 		and accessing it directly.
 	
 		If the first child of 'this' is a TiXmlText, the GetText()
-		returns the character string of the Text node, else null is returned.
+		returns the character string of the Text node, else nullptr is returned.
 
 		This is a convenient method for getting the text of simple contained text:
 		@verbatim
@@ -1107,7 +1107,7 @@ public:
 		<foo><b>This is text</b></foo> 
 		@endverbatim
 
-		then the value of str would be null. The first child node isn't a text node, it is
+		then the value of str would be nullptr. The first child node isn't a text node, it is
 		another element. From this XML:
 		@verbatim
 		<foo>This is <b>text</b></foo> 
@@ -1130,8 +1130,8 @@ public:
 	*/
 	virtual const char* Parse( const char* p, TiXmlParsingData* data, TiXmlEncoding encoding );
 
-	virtual const TiXmlElement*     ToElement()     const { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
-	virtual TiXmlElement*           ToElement()	          { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
+	virtual const TiXmlElement*     ToElement()     const { return this; } ///< Cast to a more defined type. Will return nullptr not of the requested type.
+	virtual TiXmlElement*           ToElement()	          { return this; } ///< Cast to a more defined type. Will return nullptr not of the requested type.
 
 	/** Walk the XML tree visiting this node and all of its children. 
 	*/
@@ -1163,7 +1163,7 @@ class TiXmlComment : public TiXmlNode
 {
 public:
 	/// Constructs an empty comment.
-	TiXmlComment() : TiXmlNode( TiXmlNode::TINYXML_COMMENT ) {}
+	TiXmlComment() : TiXmlNode( TiXmlNode::TINYXML_COMMENT ) { }
 	/// Construct a comment from text.
 	TiXmlComment( const char* _value ) : TiXmlNode( TiXmlNode::TINYXML_COMMENT ) {
 		SetValue( _value );
@@ -1171,7 +1171,7 @@ public:
 	TiXmlComment( const TiXmlComment& );
 	TiXmlComment& operator=( const TiXmlComment& base );
 
-	virtual ~TiXmlComment()	{}
+	virtual ~TiXmlComment()	{ }
 
 	/// Returns a copy of this Comment.
 	virtual TiXmlNode* Clone() const;
@@ -1183,8 +1183,8 @@ public:
 	*/
 	virtual const char* Parse( const char* p, TiXmlParsingData* data, TiXmlEncoding encoding );
 
-	virtual const TiXmlComment*  ToComment() const	{ return this; } ///< Cast to a more defined type. Will return null not of the requested type.
-	virtual		  TiXmlComment*  ToComment()		{ return this; } ///< Cast to a more defined type. Will return null not of the requested type.
+	virtual const TiXmlComment*  ToComment() const	{ return this; } ///< Cast to a more defined type. Will return nullptr not of the requested type.
+	virtual		  TiXmlComment*  ToComment()		{ return this; } ///< Cast to a more defined type. Will return nullptr not of the requested type.
 
 	/** Walk the XML tree visiting this node and all of its children. 
 	*/
@@ -1222,7 +1222,7 @@ public:
 		SetValue( initValue );
 		cdata = false;
 	}
-	virtual ~TiXmlText() {}
+	virtual ~TiXmlText() { }
 
 	#ifdef TIXML_USE_STL
 	/// Constructor.
@@ -1246,8 +1246,8 @@ public:
 
 	virtual const char* Parse( const char* p, TiXmlParsingData* data, TiXmlEncoding encoding );
 
-	virtual const TiXmlText* ToText() const { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
-	virtual TiXmlText*       ToText()       { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
+	virtual const TiXmlText* ToText() const { return this; } ///< Cast to a more defined type. Will return nullptr not of the requested type.
+	virtual TiXmlText*       ToText()       { return this; } ///< Cast to a more defined type. Will return nullptr not of the requested type.
 
 	/** Walk the XML tree visiting this node and all of its children. 
 	*/
@@ -1286,7 +1286,7 @@ class TiXmlDeclaration : public TiXmlNode
 {
 public:
 	/// Construct an empty declaration.
-	TiXmlDeclaration()   : TiXmlNode( TiXmlNode::TINYXML_DECLARATION ) {}
+	TiXmlDeclaration()   : TiXmlNode( TiXmlNode::TINYXML_DECLARATION ) { }
 
 #ifdef TIXML_USE_STL
 	/// Constructor.
@@ -1303,7 +1303,7 @@ public:
 	TiXmlDeclaration( const TiXmlDeclaration& copy );
 	TiXmlDeclaration& operator=( const TiXmlDeclaration& copy );
 
-	virtual ~TiXmlDeclaration()	{}
+	virtual ~TiXmlDeclaration()	{ }
 
 	/// Version. Will return an empty string if none was found.
 	const char *Version() const			{ return version.c_str (); }
@@ -1322,8 +1322,8 @@ public:
 
 	virtual const char* Parse( const char* p, TiXmlParsingData* data, TiXmlEncoding encoding );
 
-	virtual const TiXmlDeclaration* ToDeclaration() const { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
-	virtual TiXmlDeclaration*       ToDeclaration()       { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
+	virtual const TiXmlDeclaration* ToDeclaration() const { return this; } ///< Cast to a more defined type. Will return nullptr not of the requested type.
+	virtual TiXmlDeclaration*       ToDeclaration()       { return this; } ///< Cast to a more defined type. Will return nullptr not of the requested type.
 
 	/** Walk the XML tree visiting this node and all of its children. 
 	*/
@@ -1354,8 +1354,8 @@ private:
 class TiXmlUnknown : public TiXmlNode
 {
 public:
-	TiXmlUnknown() : TiXmlNode( TiXmlNode::TINYXML_UNKNOWN )	{}
-	virtual ~TiXmlUnknown() {}
+	TiXmlUnknown() : TiXmlNode( TiXmlNode::TINYXML_UNKNOWN )	{ }
+	virtual ~TiXmlUnknown() { }
 
 	TiXmlUnknown( const TiXmlUnknown& copy ) : TiXmlNode( TiXmlNode::TINYXML_UNKNOWN )		{ copy.CopyTo( this ); }
 	TiXmlUnknown& operator=( const TiXmlUnknown& copy )										{ copy.CopyTo( this ); return *this; }
@@ -1367,8 +1367,8 @@ public:
 
 	virtual const char* Parse( const char* p, TiXmlParsingData* data, TiXmlEncoding encoding );
 
-	virtual const TiXmlUnknown*     ToUnknown()     const	{ return this; } ///< Cast to a more defined type. Will return null not of the requested type.
-	virtual TiXmlUnknown*           ToUnknown()				{ return this; } ///< Cast to a more defined type. Will return null not of the requested type.
+	virtual const TiXmlUnknown*     ToUnknown()     const	{ return this; } ///< Cast to a more defined type. Will return nullptr not of the requested type.
+	virtual TiXmlUnknown*           ToUnknown()				{ return this; } ///< Cast to a more defined type. Will return nullptr not of the requested type.
 
 	/** Walk the XML tree visiting this node and all of its children. 
 	*/
@@ -1406,7 +1406,7 @@ public:
 	TiXmlDocument( const TiXmlDocument& copy );
 	TiXmlDocument& operator=( const TiXmlDocument& copy );
 
-	virtual ~TiXmlDocument() {}
+	virtual ~TiXmlDocument() { }
 
 	/** Load a file using the current document value.
 		Returns true if successful. Will delete any existing
@@ -1439,7 +1439,7 @@ public:
 	}
 	#endif
 
-	/** Parse the given null terminated block of xml data. Passing in an encoding to this
+	/** Parse the given nullptr terminated block of xml data. Passing in an encoding to this
 		method (either TIXML_ENCODING_LEGACY or TIXML_ENCODING_UTF8 will force TinyXml
 		to use that encoding, regardless of what TinyXml might otherwise try to detect.
 	*/
@@ -1529,8 +1529,8 @@ public:
 	// [internal use]
 	void SetError( int err, const char* errorLocation, TiXmlParsingData* prevData, TiXmlEncoding encoding );
 
-	virtual const TiXmlDocument*    ToDocument()    const { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
-	virtual TiXmlDocument*          ToDocument()          { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
+	virtual const TiXmlDocument*    ToDocument()    const { return this; } ///< Cast to a more defined type. Will return nullptr not of the requested type.
+	virtual TiXmlDocument*          ToDocument()          { return this; } ///< Cast to a more defined type. Will return nullptr not of the requested type.
 
 	/** Walk the XML tree visiting this node and all of its children. 
 	*/
@@ -1556,7 +1556,7 @@ private:
 
 
 /**
-	A TiXmlHandle is a class that wraps a node pointer with null checks; this is
+	A TiXmlHandle is a class that wraps a node pointer with nullptr checks; this is
 	an incredibly useful thing. Note that TiXmlHandle is not part of the TinyXml
 	DOM structure. It is a separate utility class.
 
@@ -1590,7 +1590,7 @@ private:
 	@endverbatim
 
 	And that doesn't even cover "else" cases. TiXmlHandle addresses the verbosity
-	of such code. A TiXmlHandle checks for null	pointers so it is perfectly safe 
+	of such code. A TiXmlHandle checks for nullptr	pointers so it is perfectly safe 
 	and correct to use:
 
 	@verbatim
@@ -1638,7 +1638,7 @@ private:
 class TiXmlHandle
 {
 public:
-	/// Create a handle from any node (at any depth of the tree.) This can be a null pointer.
+	/// Create a handle from any node (at any depth of the tree.) This can be a nullptr pointer.
 	TiXmlHandle( TiXmlNode* _node )					{ this->node = _node; }
 	/// Copy constructor
 	TiXmlHandle( const TiXmlHandle& ref )			{ this->node = ref.node; }
@@ -1680,33 +1680,33 @@ public:
 	TiXmlHandle ChildElement( const std::string& _value, int index ) const	{ return ChildElement( _value.c_str(), index ); }
 	#endif
 
-	/** Return the handle as a TiXmlNode. This may return null.
+	/** Return the handle as a TiXmlNode. This may return nullptr.
 	*/
 	TiXmlNode* ToNode() const			{ return node; } 
-	/** Return the handle as a TiXmlElement. This may return null.
+	/** Return the handle as a TiXmlElement. This may return nullptr.
 	*/
 	TiXmlElement* ToElement() const		{ return ( ( node && node->ToElement() ) ? node->ToElement() : 0 ); }
-	/**	Return the handle as a TiXmlText. This may return null.
+	/**	Return the handle as a TiXmlText. This may return nullptr.
 	*/
 	TiXmlText* ToText() const			{ return ( ( node && node->ToText() ) ? node->ToText() : 0 ); }
-	/** Return the handle as a TiXmlUnknown. This may return null.
+	/** Return the handle as a TiXmlUnknown. This may return nullptr.
 	*/
 	TiXmlUnknown* ToUnknown() const		{ return ( ( node && node->ToUnknown() ) ? node->ToUnknown() : 0 ); }
 
 	/** @deprecated use ToNode. 
-		Return the handle as a TiXmlNode. This may return null.
+		Return the handle as a TiXmlNode. This may return nullptr.
 	*/
 	TiXmlNode* Node() const			{ return ToNode(); } 
 	/** @deprecated use ToElement. 
-		Return the handle as a TiXmlElement. This may return null.
+		Return the handle as a TiXmlElement. This may return nullptr.
 	*/
 	TiXmlElement* Element() const	{ return ToElement(); }
 	/**	@deprecated use ToText()
-		Return the handle as a TiXmlText. This may return null.
+		Return the handle as a TiXmlText. This may return nullptr.
 	*/
 	TiXmlText* Text() const			{ return ToText(); }
 	/** @deprecated use ToUnknown()
-		Return the handle as a TiXmlUnknown. This may return null.
+		Return the handle as a TiXmlUnknown. This may return nullptr.
 	*/
 	TiXmlUnknown* Unknown() const	{ return ToUnknown(); }
 
@@ -1738,7 +1738,7 @@ class TiXmlPrinter : public TiXmlVisitor
 {
 public:
 	TiXmlPrinter() : depth( 0 ), simpleTextPrint( false ),
-					 buffer(), indent( "    " ), lineBreak( "\n" ) {}
+					 buffer(), indent( "    " ), lineBreak( "\n" ) { }
 
 	virtual bool VisitEnter( const TiXmlDocument& doc );
 	virtual bool VisitExit( const TiXmlDocument& doc );
@@ -1752,14 +1752,14 @@ public:
 	virtual bool Visit( const TiXmlUnknown& unknown );
 
 	/** Set the indent characters for printing. By default 4 spaces
-		but tab (\t) is also useful, or null/empty string for no indentation.
+		but tab (\t) is also useful, or nullptr/empty string for no indentation.
 	*/
 	void SetIndent( const char* _indent )			{ indent = _indent ? _indent : "" ; }
 	/// Query the indention string.
 	const char* Indent()							{ return indent.c_str(); }
 	/** Set the line breaking string. By default set to newline (\n). 
 		Some operating systems prefer other characters, or can be
-		set to the null/empty string for no indenation.
+		set to the nullptr/empty string for no indenation.
 	*/
 	void SetLineBreak( const char* _lineBreak )		{ lineBreak = _lineBreak ? _lineBreak : ""; }
 	/// Query the current line breaking string.

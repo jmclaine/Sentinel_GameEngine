@@ -2,13 +2,9 @@
 
 #include <cmath>
 #include "Sentinel.h"
-#include "Types.h"
 
 namespace Sentinel
 {
-	#define MAX(a,b) (((a) > (b)) ? (a) : (b))
-	#define MIN(a,b) (((a) < (b)) ? (a) : (b))
-
 	#define PI						3.1415926535897932384626433832795
 	#define PI_HALF					1.5707963267948966192313216916398
 	#define RADIANS_TO_DEGREES		57.295779513082320876798154814105

@@ -3,7 +3,7 @@
 
 namespace Sentinel
 {
-	BufferGL::BufferGL(Renderer* renderer, void* data, UINT size, UINT stride, BufferFormat::Type format, BufferAccess::Type access)
+	BufferGL::BufferGL(Renderer* renderer, void* data, UINT size, UINT stride, BufferFormat format, BufferAccess access)
 	{
 		mRenderer = renderer;
 		mAccess = access;

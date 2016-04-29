@@ -9,26 +9,19 @@
 namespace Sentinel
 {
 	ShaderManager::ShaderManager()
-	{}
-
-	ShaderManager::~ShaderManager()
-	{}
+	{ }
 
 	void ShaderManager::Save(Archive& archive)
 	{
 		UINT count = mData.size();
 		archive.Write(&count);
 
-		TRAVERSE_LIST(it, mData)
+		for (auto it : mData)
 		{
-			std::shared_ptr<Shader> shader = it->second;
+			std::shared_ptr<Shader> shader = it.second;
 
-			// Store shader info.
-			//
-			archive.Write(&it->first);
+			archive.Write(&it.first);
 
-			// Store the compressed shader source.
-			//
 			char* source = (char*)shader->Source();
 			ULONG  size = (ULONG)strlen(source);
 			ULONG bound = compressBound(size);
@@ -37,8 +30,8 @@ namespace Sentinel
 
 			compress(comp_source, &bound, reinterpret_cast<const Bytef*>(source), size);
 
-			archive.Write(&size, 1, true);
-			archive.Write(&bound, 1, true);
+			archive.Write(&size);
+			archive.Write(&bound);
 			archive.Write(comp_source, bound);
 
 			free(comp_source);
@@ -57,13 +50,11 @@ namespace Sentinel
 			std::string name;
 			archive.Read(&name);
 
-			// Uncompress shader source.
-			//
 			ULONG size;
-			archive.Read(&size, 1, true);
+			archive.Read(&size);
 
 			ULONG bound;
-			archive.Read(&bound, 1, true);
+			archive.Read(&bound);
 
 			char* comp_source = (char*)malloc(bound);
 			archive.Read(comp_source, bound);
@@ -75,8 +66,7 @@ namespace Sentinel
 
 			Debug::Log(STREAM("Compiling '" << name << "'..."));
 
-			if (!Add(name, SHARED(renderer->CreateShaderFromMemory(source))))
-				throw std::exception("Failed to read shader.");
+			Add(name, std::shared_ptr<Shader>(renderer->CreateShaderFromMemory(source)));
 
 			free(comp_source);
 		}

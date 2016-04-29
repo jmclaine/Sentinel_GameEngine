@@ -10,7 +10,7 @@ namespace Network
 {
 	enum HeaderType
 	{
-		HEADER_NULL			= 0x00,		// undefined header
+		HEADER_nullptr			= 0x00,		// undefined header
 
 		HEADER_CLIENT		= 0x01,		// from client (for init)
 		HEADER_SERVER		= 0x02,		// from server (for init)
@@ -42,7 +42,7 @@ namespace Network
 				mType((UCHAR)_type),
 				mSenderID(_senderID),
 				mSize(_size)
-			{}
+			{ }
 		};
 
 		// Begins after NetworkPacket::Header()
@@ -55,7 +55,7 @@ namespace Network
 			GuaranteedHeader(UINT _ack, float _advTimer) :
 				mACK(_ack),
 				mAdvanceTimer(_advTimer)
-			{}
+			{ }
 		};
 
 		struct SENTINEL_DLL GuaranteedMessage
@@ -162,7 +162,7 @@ namespace Network
 
 	// Receives packets for processing.
 	// Packets should start with a header,
-	// and end with NULL (0) termination.
+	// and end with nullptr (0) termination.
 	//
 	// Example:
 	//

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -19,14 +19,14 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>NotSet</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -51,16 +51,17 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Engine\bullet\src;$(SolutionDir)\Engine\freetype-2.5.1\include;$(SolutionDir)\Engine\libvorbis-1.3.3\include;$(SolutionDir)\Engine\openal-soft-1.15.1\include;$(SolutionDir)\Engine\zlib-1.2.8;$(SolutionDir)\Engine\tinyxml;$(SolutionDir)\Engine\glew\include;$(SolutionDir)\Engine\src\;$(SolutionDir)\Engine\DirectX11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Engine\bullet\src;$(SolutionDir)\Engine\freetype\include;$(SolutionDir)\Engine\libvorbis-1.3.3\include;$(SolutionDir)\Engine\openal-soft-1.15.1\include;$(SolutionDir)\Engine\zlib-1.2.8;$(SolutionDir)\Engine\tinyxml;$(SolutionDir)\Engine\glew\include;$(SolutionDir)\Engine\src\;$(SolutionDir)\Engine\DirectX11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAsManaged>false</CompileAsManaged>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_WINDLL;BUILD_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Engine\freetype-2.5.1;$(SolutionDir)\Engine\libvorbis-1.3.3\$(Configuration);$(SolutionDir)\Engine\openal-soft-1.15.1\$(Configuration);$(SolutionDir)\Engine\lib\$(Configuration);$(SolutionDir)\Engine\bullet\lib;$(SolutionDir)\Engine\glew\lib;$(SolutionDir)\Engine\DirectX11\$(Configuration);C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Engine\freetype\lib\;$(SolutionDir)\Engine\libvorbis-1.3.3\$(Configuration);$(SolutionDir)\Engine\openal-soft-1.15.1\$(Configuration);$(SolutionDir)\Engine\lib\$(Configuration);$(SolutionDir)\Engine\bullet\lib;$(SolutionDir)\Engine\glew\lib;$(SolutionDir)\Engine\DirectX11\$(Configuration);C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <AdditionalOptions>/NODEFAULTLIB:libc.lib /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib %(AdditionalOptions)</AdditionalOptions>
@@ -83,18 +84,19 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)Sentine
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Engine\bullet\src;$(SolutionDir)\Engine\freetype-2.5.1\include;$(SolutionDir)\Engine\libvorbis-1.3.3\include;$(SolutionDir)\Engine\openal-soft-1.15.1\include;$(SolutionDir)\Engine\zlib-1.2.8;$(SolutionDir)\Engine\tinyxml;$(SolutionDir)\Engine\glew\include;$(SolutionDir)\Engine\src\;$(SolutionDir)\Engine\DirectX11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Engine\bullet\src;$(SolutionDir)\Engine\freetype\include;$(SolutionDir)\Engine\libvorbis-1.3.3\include;$(SolutionDir)\Engine\openal-soft-1.15.1\include;$(SolutionDir)\Engine\zlib-1.2.8;$(SolutionDir)\Engine\tinyxml;$(SolutionDir)\Engine\glew\include;$(SolutionDir)\Engine\src\;$(SolutionDir)\Engine\DirectX11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAsManaged>false</CompileAsManaged>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_WINDLL;BUILD_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Engine\freetype-2.5.1;$(SolutionDir)\Engine\libvorbis-1.3.3\$(Configuration);$(SolutionDir)\Engine\openal-soft-1.15.1\$(Configuration);$(SolutionDir)\Engine\lib\$(Configuration);$(SolutionDir)\Engine\bullet\lib;$(SolutionDir)\Engine\glew\lib;$(SolutionDir)\Engine\DirectX11\$(Configuration);C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Engine\freetype\lib\;$(SolutionDir)\Engine\libvorbis-1.3.3\$(Configuration);$(SolutionDir)\Engine\openal-soft-1.15.1\$(Configuration);$(SolutionDir)\Engine\lib\$(Configuration);$(SolutionDir)\Engine\bullet\lib;$(SolutionDir)\Engine\glew\lib;$(SolutionDir)\Engine\DirectX11\$(Configuration);C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <AdditionalOptions>/NODEFAULTLIB:libc.lib /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrtd.lib %(AdditionalOptions)</AdditionalOptions>
@@ -114,6 +116,8 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)Sentine
   <ItemGroup>
     <ClInclude Include="..\Engine\src\Archive.h" />
     <ClInclude Include="..\Engine\src\AssetManager.h" />
+    <ClInclude Include="..\Engine\src\BlendState.h" />
+    <ClInclude Include="..\Engine\src\BlendStateManager.h" />
     <ClInclude Include="..\Engine\src\Component\AIController.h" />
     <ClInclude Include="..\Engine\src\Component\AudioSource.h" />
     <ClInclude Include="..\engine\src\component\Camera.h" />
@@ -130,20 +134,23 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)Sentine
     <ClInclude Include="..\Engine\src\Component\PlayerController.h" />
     <ClInclude Include="..\Engine\src\Component\PointLight.h" />
     <ClInclude Include="..\Engine\src\Component\SpriteDrawable.h" />
+    <ClInclude Include="..\Engine\src\Component\SpriteParticleEmitter.h" />
     <ClInclude Include="..\Engine\src\Component\Transform.h" />
     <ClInclude Include="..\Engine\src\Component\Trigger.h" />
     <ClInclude Include="..\Engine\src\Debug.h" />
     <ClInclude Include="..\Engine\src\DebugDraw.h" />
+    <ClInclude Include="..\Engine\src\DepthStencil.h" />
     <ClInclude Include="..\Engine\src\dirent.h" />
     <ClInclude Include="..\Engine\src\DX\BufferDX.h" />
     <ClInclude Include="..\Engine\src\DX\CommonDX.h" />
     <ClInclude Include="..\Engine\src\DX\ShaderDX.h" />
     <ClInclude Include="..\Engine\src\DX\TextureDX.h" />
     <ClInclude Include="..\Engine\src\DX\VertexLayoutDX.h" />
-    <ClInclude Include="..\Engine\src\EnumClass.h" />
     <ClInclude Include="..\Engine\src\Event.h" />
     <ClInclude Include="..\Engine\src\Exception.h" />
     <ClInclude Include="..\Engine\src\FileUtil.h" />
+    <ClInclude Include="..\Engine\src\Font.h" />
+    <ClInclude Include="..\Engine\src\FontManager.h" />
     <ClInclude Include="..\Engine\src\GL\BufferGL.h" />
     <ClInclude Include="..\Engine\src\GL\CommonGL.h" />
     <ClInclude Include="..\Engine\src\GL\ShaderGL.h" />
@@ -162,10 +169,11 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)Sentine
     <ClInclude Include="..\Engine\src\Network\Socket.h" />
     <ClInclude Include="..\Engine\src\PhysicsShape.h" />
     <ClInclude Include="..\Engine\src\Profile.h" />
+    <ClInclude Include="..\Engine\src\RenderLayer.h" />
     <ClInclude Include="..\Engine\src\RenderManager.h" />
+    <ClInclude Include="..\Engine\src\RenderTexture.h" />
     <ClInclude Include="..\Engine\src\StringStream.h" />
     <ClInclude Include="..\Engine\src\Tokenizer.h" />
-    <ClInclude Include="..\Engine\src\Types.h" />
     <ClInclude Include="..\Engine\src\VertexLayout.h" />
     <ClInclude Include="..\Engine\src\ListNode.h" />
     <ClInclude Include="..\Engine\src\Particle.h" />
@@ -193,14 +201,12 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)Sentine
     <ClInclude Include="..\Engine\src\MeshManager.h" />
     <ClInclude Include="..\Engine\src\Model.h" />
     <ClInclude Include="..\Engine\src\ModelManager.h" />
-    <ClInclude Include="..\Engine\src\ParticleSystem.h" />
     <ClInclude Include="..\Engine\src\PhysicsSystem.h" />
     <ClInclude Include="..\Engine\src\Quaternion.h" />
     <ClInclude Include="..\Engine\src\RandomValue.h" />
     <ClInclude Include="..\Engine\src\RefCounter.h" />
     <ClInclude Include="..\Engine\src\Renderer.h" />
     <ClInclude Include="..\Engine\src\GameWindow.h" />
-    <ClInclude Include="..\Engine\src\RendererTypes.h" />
     <ClInclude Include="..\Engine\src\Script.h" />
     <ClInclude Include="..\Engine\src\Serializable.h" />
     <ClInclude Include="..\Engine\src\Shader.h" />
@@ -217,11 +223,14 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)Sentine
     <ClInclude Include="..\Engine\src\Vector2.h" />
     <ClInclude Include="..\Engine\src\Vector3.h" />
     <ClInclude Include="..\Engine\src\Vector4.h" />
+    <ClInclude Include="..\Engine\src\WindowInfo.h" />
     <ClInclude Include="..\Engine\tinyxml\tinystr.h" />
     <ClInclude Include="..\Engine\tinyxml\tinyxml.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\src\Archive.cpp" />
+    <ClCompile Include="..\Engine\src\BlendState.cpp" />
+    <ClCompile Include="..\Engine\src\BlendStateManager.cpp" />
     <ClCompile Include="..\Engine\src\Component\Camera.cpp" />
     <ClCompile Include="..\Engine\src\Component\Controller.cpp" />
     <ClCompile Include="..\Engine\src\Component\Controller3D.cpp" />
@@ -236,16 +245,20 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)Sentine
     <ClCompile Include="..\Engine\src\Component\PlayerController.cpp" />
     <ClCompile Include="..\Engine\src\Component\PointLight.cpp" />
     <ClCompile Include="..\Engine\src\Component\SpriteDrawable.cpp" />
+    <ClCompile Include="..\Engine\src\Component\SpriteParticleEmitter.cpp" />
     <ClCompile Include="..\Engine\src\Component\Transform.cpp" />
     <ClCompile Include="..\Engine\src\Component\Trigger.cpp" />
     <ClCompile Include="..\Engine\src\Debug.cpp" />
     <ClCompile Include="..\Engine\src\DebugDraw.cpp" />
+    <ClCompile Include="..\Engine\src\DepthStencil.cpp" />
     <ClCompile Include="..\Engine\src\DX\BufferDX.cpp" />
     <ClCompile Include="..\Engine\src\DX\RendererDX.cpp" />
     <ClCompile Include="..\Engine\src\DX\ShaderDX.cpp" />
     <ClCompile Include="..\Engine\src\DX\TextureDX.cpp" />
     <ClCompile Include="..\Engine\src\DX\VertexLayoutDX.cpp" />
     <ClCompile Include="..\Engine\src\FileUtil.cpp" />
+    <ClCompile Include="..\Engine\src\Font.cpp" />
+    <ClCompile Include="..\Engine\src\FontManager.cpp" />
     <ClCompile Include="..\Engine\src\FontSystemFT.cpp" />
     <ClCompile Include="..\Engine\src\GL\BufferGL.cpp" />
     <ClCompile Include="..\Engine\src\GL\RendererGL.cpp" />
@@ -263,10 +276,10 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)Sentine
     <ClCompile Include="..\Engine\src\Network\Socket.cpp" />
     <ClCompile Include="..\Engine\src\Particle.cpp" />
     <ClCompile Include="..\Engine\src\ParticleEffect.cpp" />
-    <ClCompile Include="..\Engine\src\ParticleSystemNormal.cpp" />
     <ClCompile Include="..\Engine\src\PhysicsShape.cpp" />
     <ClCompile Include="..\Engine\src\PhysicsSystem.cpp" />
     <ClCompile Include="..\Engine\src\RenderManager.cpp" />
+    <ClCompile Include="..\Engine\src\RenderTexture.cpp" />
     <ClCompile Include="..\Engine\src\SoundManager.cpp" />
     <ClCompile Include="..\Engine\src\Sound.cpp" />
     <ClCompile Include="..\Engine\src\AudioSystemAL.cpp" />
@@ -286,7 +299,6 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)Sentine
     <ClCompile Include="..\Engine\src\ModelM3D.cpp" />
     <ClCompile Include="..\Engine\src\ModelManager.cpp" />
     <ClCompile Include="..\Engine\src\ModelOBJ.cpp" />
-    <ClCompile Include="..\Engine\src\ParticleSystem.cpp" />
     <ClCompile Include="..\Engine\src\PhysicsSystemBT.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\Engine\freetype-2.5.1\include;$(SolutionDir)\Engine\libvorbis-1.3.3\include;$(SolutionDir)\Engine\openal-soft-1.15.1\include;$(SolutionDir)\Engine\bullet\src;$(SolutionDir)\Engine\zlib-1.2.8;$(SolutionDir)\Engine\tinyxml;$(SolutionDir)\Engine\glew\include;$(SolutionDir)\Engine\src\;$(SolutionDir)\Engine\DirectX11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -319,6 +331,7 @@ xcopy "$(SolutionDir)$(Configuration)\SentinelEngine.dll" "$(SolutionDir)Sentine
     <ClCompile Include="..\Engine\src\Vector3.cpp" />
     <ClCompile Include="..\Engine\src\Vector4.cpp" />
     <ClCompile Include="..\Engine\src\VertexLayout.cpp" />
+    <ClCompile Include="..\Engine\src\WindowInfo.cpp" />
     <ClCompile Include="..\Engine\tinyxml\tinystr.cpp" />
     <ClCompile Include="..\Engine\tinyxml\tinyxml.cpp" />
     <ClCompile Include="..\Engine\tinyxml\tinyxmlerror.cpp" />

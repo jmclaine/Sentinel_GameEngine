@@ -16,36 +16,33 @@ namespace Component
 	{
 		mPhysics = mOwner->mPhysics;
 
-		if (mPhysics == NULL)
+		if (mPhysics == nullptr)
 			throw AppException("Controller::Startup()\n" + std::string(mOwner->mName) + " does not contain Physics");
 
 		///////////////////////////
 
 		mTransform = mOwner->mTransform;
 
-		if (mTransform == NULL)
+		if (mTransform == nullptr)
 			throw AppException("Controller::Startup()\n" + std::string(mOwner->mName) + " does not contain Transform");
 	}
 
-	void Controller::Update()
-	{}
-
 	void Controller::Shutdown()
 	{
-		mPhysics = NULL;
-		mTransform = NULL;
+		mPhysics = nullptr;
+		mTransform = nullptr;
 	}
 
 	//////////////////////////////
 
 	void Controller::Execute()
-	{}
+	{ }
 
 	void Controller::SetOwner(GameObject* owner)
 	{
 		GameComponent::SetOwner(owner);
 
-		if (owner->mController == NULL)
+		if (owner->mController == nullptr)
 			owner->mController = this;
 	}
 }}

@@ -1,4 +1,5 @@
 #include "ShaderGL.h"
+#include "Shader.h"
 #include "TextureGL.h"
 #include "VertexLayoutGL.h"
 #include "Archive.h"
@@ -10,20 +11,8 @@ namespace Sentinel
 #define S_OK 0
 #define S_FALSE 1
 
-#define APPLY_SAMPLER(target, pname, param)\
-	glTexParameteri(target, pname, param);
-
-	/*
-	#define APPLY_SAMPLER(target, pname, param)\
-	if (CURR_STATE.param != param)\
-	{\
-	glTexParameteri(target, pname, param);\
-	CURR_STATE.param = param;\
-	}
-	*/
-
 	GLenum ShaderGL::CURR_ACTIVE = -1;
-	Texture* ShaderGL::CURR_TEXTURE[32] = {};
+	Texture* ShaderGL::CURR_TEXTURE[32] = { };
 
 	ShaderGL::SamplerGL::SamplerGL(
 		GLint wrapS, GLint wrapT,
@@ -32,14 +21,14 @@ namespace Sentinel
 		mWrapT(wrapT),
 		mMinFilter(minFilter),
 		mMagFilter(magFilter)
-	{}
+	{ }
 
 	void ShaderGL::SamplerGL::Create(
-		SamplerMode::Type modeU, SamplerMode::Type modeV,
-		SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter)
+		SamplerMode modeU, SamplerMode modeV,
+		SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter)
 	{
-		mWrapS = SAMPLER_MODE[modeU];
-		mWrapT = SAMPLER_MODE[modeV];
+		mWrapS = SAMPLER_MODE[(BYTE)modeU];
+		mWrapT = SAMPLER_MODE[(BYTE)modeV];
 
 		if (minFilter == SamplerFilter::LINEAR)
 		{
@@ -84,15 +73,16 @@ namespace Sentinel
 
 	void ShaderGL::SamplerGL::Apply()
 	{
-		APPLY_SAMPLER(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mWrapS);
-		APPLY_SAMPLER(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mWrapT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mWrapS);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mWrapT);
 
-		APPLY_SAMPLER(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mMinFilter);
-		APPLY_SAMPLER(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mMagFilter);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mMinFilter);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mMagFilter);
 	}
 
-	ShaderGL::SamplerGL ShaderGL::SamplerGL::CURR_STATE(SamplerMode::UNKNOWN, SamplerMode::UNKNOWN,
-		SamplerFilter::UNKNOWN, SamplerFilter::UNKNOWN);
+	ShaderGL::SamplerGL ShaderGL::SamplerGL::CURR_STATE(
+		(GLint)SamplerMode::UNKNOWN, (GLint)SamplerMode::UNKNOWN,
+		(GLint)SamplerFilter::UNKNOWN, (GLint)SamplerFilter::UNKNOWN);
 
 	GLint ShaderGL::SamplerGL::SAMPLER_MODE[] =
 	{
@@ -116,27 +106,27 @@ namespace Sentinel
 	}
 
 	void ShaderGL::SamplerCubeGL::Create(
-		SamplerMode::Type modeU, SamplerMode::Type modeV, SamplerMode::Type modeW,
-		SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter)
+		SamplerMode modeU, SamplerMode modeV, SamplerMode modeW,
+		SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter)
 	{
 		SamplerGL::Create(modeU, modeV, minFilter, magFilter, mipFilter);
 
-		mWrapR = SamplerGL::SAMPLER_MODE[modeW];
+		mWrapR = SamplerGL::SAMPLER_MODE[(BYTE)modeW];
 	}
 
 	void ShaderGL::SamplerCubeGL::Apply()
 	{
-		APPLY_SAMPLER(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, mWrapS);
-		APPLY_SAMPLER(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, mWrapT);
-		APPLY_SAMPLER(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, mWrapR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, mWrapS);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, mWrapT);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, mWrapR);
 
-		APPLY_SAMPLER(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, mMinFilter);
-		APPLY_SAMPLER(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, mMagFilter);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, mMinFilter);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, mMagFilter);
 	}
 
 	ShaderGL::SamplerCubeGL ShaderGL::SamplerCubeGL::CURR_STATE(
-		SamplerMode::UNKNOWN, SamplerMode::UNKNOWN, SamplerMode::UNKNOWN,
-		SamplerFilter::UNKNOWN, SamplerFilter::UNKNOWN);
+		(GLint)SamplerMode::UNKNOWN, (GLint)SamplerMode::UNKNOWN, (GLint)SamplerMode::UNKNOWN,
+		(GLint)SamplerFilter::UNKNOWN, (GLint)SamplerFilter::UNKNOWN);
 
 	//////////////////////////////////////////////////////////////////////
 
@@ -147,7 +137,7 @@ namespace Sentinel
 		mFragmentShader(0),
 		mTextureLevel(0),
 		mAttributeSize(0)
-	{}
+	{ }
 
 	ShaderGL::~ShaderGL()
 	{
@@ -194,11 +184,11 @@ namespace Sentinel
 
 	///////////////////////////////////
 
-	bool ShaderGL::CreateAttribute(char* name, VertexAttribute::Type type)
+	bool ShaderGL::CreateAttribute(char* name, VertexAttribute type)
 	{
 		GLint attrib = glGetAttribLocation(mProgram, name);
 
-		mAttributeGL[type] = attrib;
+		mAttributeGL[(BYTE)type] = attrib;
 
 		if (attrib != -1)
 		{
@@ -212,7 +202,7 @@ namespace Sentinel
 		return false;
 	}
 
-	bool ShaderGL::CreateUniform(char* name, ShaderUniform::Type type)
+	bool ShaderGL::CreateUniform(char* name, ShaderUniform type)
 	{
 		GLint uniform = glGetUniformLocation(mProgram, name);
 
@@ -258,9 +248,8 @@ namespace Sentinel
 				"Shader Loader Error");
 		}
 
-		// Compile Vertex Shader.
-		//
-		if (strstr(mSource, "VERTEX_SHADER") != NULL)
+		
+		if (strstr(mSource, "VERTEX_SHADER") != nullptr)
 		{
 			const char *vshader[2] = { "#version 330\n#define VERSION_GL\n#define VERTEX_SHADER\n\0", mSource };
 
@@ -270,9 +259,8 @@ namespace Sentinel
 			glAttachShader(mProgram, mVertexShader);
 		}
 
-		// Compile Geometry Shader.
-		//
-		if (strstr(mSource, "GEOMETRY_SHADER") != NULL)
+		
+		if (strstr(mSource, "GEOMETRY_SHADER") != nullptr)
 		{
 			const char *gshader[2] = { "#version 330\n#define VERSION_GL\n#define GEOMETRY_SHADER\n\0", mSource };
 
@@ -282,9 +270,8 @@ namespace Sentinel
 			glAttachShader(mProgram, mGeometryShader);
 		}
 
-		// Compile Fragment Shader.
-		//
-		if (strstr(mSource, "FRAGMENT_SHADER") != NULL)
+		
+		if (strstr(mSource, "FRAGMENT_SHADER") != nullptr)
 		{
 			const char *fshader[2] = { "#version 330\n#define VERSION_GL\n#define FRAGMENT_SHADER\n\0", mSource };
 
@@ -296,15 +283,12 @@ namespace Sentinel
 
 		Debug::Log("Shader Compiled Successfully!");
 
-		// Link the shaders.
-		//
+		
 		int didCompile;
 
 		glLinkProgram(mProgram);
 		glGetProgramiv(mProgram, GL_LINK_STATUS, &didCompile);
 
-		// Report errors.
-		//
 		if (didCompile == GL_FALSE)
 		{
 			char* compileLog;
@@ -326,8 +310,6 @@ namespace Sentinel
 			return S_FALSE;
 		}
 
-		// Create attributes.
-		//
 		CreateAttribute("Position", VertexAttribute::POSITION);
 		CreateAttribute("TexCoord0", VertexAttribute::TEXCOORD0);
 		CreateAttribute("TexCoord1", VertexAttribute::TEXCOORD1);
@@ -345,8 +327,6 @@ namespace Sentinel
 		if (CreateAttribute("Matrix", VertexAttribute::MATRIX))
 			mAttributeSize += 3;
 
-		// Create layout.
-		//
 		VertexLayoutGL* layout = new VertexLayoutGL();
 
 		UINT size = (UINT)mAttributes.size();
@@ -357,8 +337,6 @@ namespace Sentinel
 
 		mLayout = std::shared_ptr< VertexLayout >(layout);
 
-		// Create uniforms.
-		//
 		CreateUniform("_WorldViewProj", ShaderUniform::WORLD_VIEW_PROJ);
 		CreateUniform("_WorldView", ShaderUniform::WORLD_VIEW);
 		CreateUniform("_World", ShaderUniform::WORLD);
@@ -381,8 +359,6 @@ namespace Sentinel
 		CreateUniform("_Bones", ShaderUniform::BONES);
 		CreateUniform("_DeltaTime", ShaderUniform::DELTA_TIME);
 
-		// Create texture samplers.
-		//
 		UINT numTextureCube = 0;
 		if (CreateUniform("_TextureCube", ShaderUniform::LIGHT_TEXTURE_CUBE))
 			++numTextureCube;
@@ -425,14 +401,12 @@ namespace Sentinel
 
 		shader = glCreateShader(type);
 
-		glShaderSource(shader, count, source, NULL);
+		glShaderSource(shader, count, source, nullptr);
 		glCompileShader(shader);
 
 		int didCompile = 0;
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &didCompile);
 
-		// Report compile errors.
-		//
 		if (didCompile == GL_FALSE)
 		{
 			int length;
@@ -500,7 +474,7 @@ namespace Sentinel
 
 	void ShaderGL::SetTexture(UINT uniform, Texture* texture)
 	{
-		_ASSERT(texture != NULL);
+		_ASSERT(texture != nullptr);
 
 		glUniform1i(mUniformsGL[uniform], mTextureLevel);
 
@@ -531,7 +505,7 @@ namespace Sentinel
 	{
 		glUniform1i(mUniformsGL[uniform], mTextureLevel);
 
-		static Texture* CURR_CUBE = NULL;
+		static Texture* CURR_CUBE = nullptr;
 
 		if (CURR_CUBE != texture)
 		{
@@ -553,8 +527,8 @@ namespace Sentinel
 	}
 
 	void ShaderGL::SetSampler(
-		UINT index, SamplerMode::Type modeU, SamplerMode::Type modeV,
-		SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter)
+		UINT index, SamplerMode modeU, SamplerMode modeV,
+		SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter)
 	{
 		_ASSERT(index < mNumSamplers);
 
@@ -562,8 +536,8 @@ namespace Sentinel
 	}
 
 	void ShaderGL::SetSamplerCube(
-		UINT index, SamplerMode::Type modeU, SamplerMode::Type modeV, SamplerMode::Type modeW,
-		SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter)
+		UINT index, SamplerMode modeU, SamplerMode modeV, SamplerMode modeW,
+		SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter)
 	{
 		_ASSERT(index < mNumSamplers);
 

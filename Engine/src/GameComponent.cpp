@@ -5,25 +5,20 @@
 namespace Sentinel
 {
 	GameComponent::GameComponent() :
-		mOwner(NULL),
+		mOwner(nullptr),
 		mEnabled(true)
-	{}
+	{
+		static UINT id = 0;
+		mID = id++;
+	}
 
 	GameComponent::~GameComponent()
-	{}
+	{ }
 
-	////////////////////////////////
-
-	void GameComponent::Startup()
-	{}
-
-	void GameComponent::Update()
-	{}
-
-	void GameComponent::Shutdown()
-	{}
-
-	////////////////////////////////
+	UINT GameComponent::ID()
+	{
+		return mID;
+	}
 
 	const GameObject* GameComponent::GetOwner()
 	{
@@ -37,15 +32,28 @@ namespace Sentinel
 
 	////////////////////////////////
 
+	void GameComponent::Startup()
+	{ }
+
+	void GameComponent::Update()
+	{ }
+
+	void GameComponent::Shutdown()
+	{ }
+
+	////////////////////////////////
+
 	void GameComponent::Save(Archive& archive)
-	{}
+	{ }
 
 	void GameComponent::Load(Archive& archive)
-	{}
+	{ }
+
+	////////////////////////////////
 
 	GameComponent* GameComponent::Copy()
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	void GameComponent::Copy(GameComponent* component)

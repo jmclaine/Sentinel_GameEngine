@@ -7,7 +7,7 @@ namespace Sentinel
 		mLifetime( 0 ),
 		mElapsedTime( 0 ),
 		mScale( Vector3( 1, 1, 1 ))
-	{}
+	{ }
 
 	void Particle::Update( float DT )
 	{
@@ -22,12 +22,12 @@ namespace Sentinel
 
 	//////////////////////////////////////////////////////////////////////
 
-	NormalParticle::NormalParticle() :
+	SpriteParticle::SpriteParticle() :
 		mFrame( 0 )
-	{}
+	{ }
 
 	//////////////////////////////////////////////////////////////////////
 
 	PhysicsParticle::PhysicsParticle()
-	{}
+	{ }
 }

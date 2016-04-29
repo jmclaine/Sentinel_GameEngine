@@ -8,7 +8,6 @@
 
 #pragma comment (lib, "libvorbis_static.lib" )
 
-#include "Types.h"
 #include "Util.h"
 #include "Debug.h"
 #include "AudioSystem.h"
@@ -18,7 +17,6 @@
 
 namespace Sentinel
 {
-
 #define CHECK_AUDIO_ERROR(msg)\
 	if (alGetError() != AL_NO_ERROR)\
 		AUDIO_ERROR(msg);
@@ -26,7 +24,7 @@ namespace Sentinel
 #define AUDIO_ERROR(msg)\
 {	delete audio;\
 	Debug::ShowError(STREAM(msg), STREAM("Audio Error"));\
-	return NULL; }
+	return nullptr; }
 
 #define CHECK_AUDIO_SOURCE_ERROR(msg)\
 	if (alGetError() != AL_NO_ERROR)\
@@ -39,12 +37,11 @@ namespace Sentinel
 		friend class AudioSystemAL;
 
 	public:
-
 		ALuint	mSource;
 		ALuint	mBuffer;
 
 		SoundAL()
-		{}
+		{ }
 
 		~SoundAL()
 		{
@@ -87,12 +84,10 @@ namespace Sentinel
 	class AudioSystemAL : public AudioSystem
 	{
 	private:
-
 		ALCdevice*		mDevice;
 		ALCcontext*		mContext;
 
 	public:
-
 		AudioSystemAL()
 		{
 			Init();
@@ -100,14 +95,14 @@ namespace Sentinel
 
 		~AudioSystemAL()
 		{
-			alcMakeContextCurrent(NULL);
+			alcMakeContextCurrent(nullptr);
 			alcDestroyContext(mContext);
 			alcCloseDevice(mDevice);
 		}
 
 		void Init()
 		{
-			mDevice = alcOpenDevice(NULL);
+			mDevice = alcOpenDevice(nullptr);
 			if (!mDevice)
 			{
 				Debug::ShowError(
@@ -117,10 +112,10 @@ namespace Sentinel
 				return;
 			}
 
-			mContext = alcCreateContext(mDevice, NULL);
-			if (mContext == NULL || alcMakeContextCurrent(mContext) == ALC_FALSE)
+			mContext = alcCreateContext(mDevice, nullptr);
+			if (mContext == nullptr || alcMakeContextCurrent(mContext) == ALC_FALSE)
 			{
-				if (mContext != NULL)
+				if (mContext != nullptr)
 					alcDestroyContext(mContext);
 
 				alcCloseDevice(mDevice);
@@ -146,10 +141,10 @@ namespace Sentinel
 					STREAM("Failed to load '" << filename << "'"),
 					STREAM("Audio Error"));
 
-				return NULL;
+				return nullptr;
 			}
 
-			Sound* audio = NULL;
+			Sound* audio = nullptr;
 
 			// Determine what file format to load by checking the last three chars.
 			//
@@ -169,7 +164,7 @@ namespace Sentinel
 					"Sound format not supported.", 
 					"Audio Error");
 
-				return NULL;
+				return nullptr;
 			}
 
 			archive.Close();
@@ -224,7 +219,7 @@ namespace Sentinel
 					"Invalid format.", 
 					"Audio Error");
 
-				return NULL;
+				return nullptr;
 			}
 
 			archive.Read(&size);
@@ -235,7 +230,7 @@ namespace Sentinel
 					"Invalid format.", 
 					"Audio Error");
 
-				return NULL;
+				return nullptr;
 			}
 
 			archive.Read(type, 4);
@@ -245,7 +240,7 @@ namespace Sentinel
 					"Invalid format.", 
 					"Audio Error");
 
-				return NULL;
+				return nullptr;
 			}
 
 			// Read WAV info.
@@ -265,7 +260,7 @@ namespace Sentinel
 					"Invalid format.", 
 					"Audio Error");
 
-				return NULL;
+				return nullptr;
 			}
 
 			// Create audio source.
@@ -350,10 +345,10 @@ namespace Sentinel
 			vorbis_info*	pInfo;
 			OggVorbis_File	oggFile;
 
-			if( ov_open( archive.mFile, &oggFile, NULL, 0 ) != 0 )
+			if( ov_open( archive.mFile, &oggFile, nullptr, 0 ) != 0 )
 			{
 			REPORT_ERROR( "Error decoding...", "Audio Error" );
-			return NULL;
+			return nullptr;
 			}
 
 			pInfo = ov_info( &oggFile, -1 );
@@ -373,7 +368,7 @@ namespace Sentinel
 			{
 			ov_clear( &oggFile );
 			REPORT_ERROR( "Error reading...", "Audio Error" );
-			return NULL;
+			return nullptr;
 			}
 
 			buffer.insert(buffer.end(), array, array + bytes);
@@ -382,7 +377,7 @@ namespace Sentinel
 
 			ov_clear( &oggFile );
 			*/
-			return NULL;
+			return nullptr;
 		}
 
 		void SetListenerPosition(const Vector3& position)

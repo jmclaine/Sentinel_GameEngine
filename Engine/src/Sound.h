@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Vector3.h"
-#include "Types.h"
 
 namespace Sentinel
 {
@@ -11,7 +10,6 @@ namespace Sentinel
 	class SENTINEL_DLL Sound
 	{
 	public:
-
 		float mPitch;
 		float mGain;
 
@@ -21,7 +19,6 @@ namespace Sentinel
 		bool mLoop;
 
 	protected:
-
 		UINT mFormat;
 		DWORD mSampleRate;
 
@@ -34,25 +31,19 @@ namespace Sentinel
 		Sound();
 
 	public:
-
 		virtual ~Sound();
 
 		///////////////////////////
 
 		virtual void Play() = 0;
-
 		virtual void Pause() = 0;
-
 		virtual void Stop() = 0;
 
 		///////////////////////////
 
 		UINT Format();
-
 		DWORD SampleRate();
-
 		UINT DataSize();
-
 		BYTE* Data();
 
 		///////////////////////////
@@ -62,7 +53,6 @@ namespace Sentinel
 		static Sound* Load(Archive& archive, AudioSystem* audio);
 
 	protected:
-
 		void Load(Archive& archive);
 	};
 }

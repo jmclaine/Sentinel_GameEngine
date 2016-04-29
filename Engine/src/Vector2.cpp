@@ -136,12 +136,12 @@ namespace Sentinel
 
 	Vector2 Vector2::Min(const Vector2& v) const
 	{
-		return Vector2(MIN(x, v.x), MIN(y, v.y));
+		return Vector2(std::fmin(x, v.x), std::fmin(y, v.y));
 	}
 
 	Vector2 Vector2::Max(const Vector2& v) const
 	{
-		return Vector2(MAX(x, v.x), MAX(y, v.y));
+		return Vector2(std::fmax(x, v.x), std::fmax(y, v.y));
 	}
 
 	float Vector2::Length() const

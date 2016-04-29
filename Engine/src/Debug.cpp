@@ -63,7 +63,7 @@ namespace Sentinel
 		GET_LOG_VAR("", msg, msgStr);
 		GET_LOG_VAR("", title, titleStr);
 
-		MessageBoxA(NULL, msgStr.c_str(), titleStr.c_str(), MB_OK | MB_ICONWARNING);
+		MessageBoxA(nullptr, msgStr.c_str(), titleStr.c_str(), MB_OK | MB_ICONWARNING);
 	}
 
 	void Debug::LogError(const std::string& text)
@@ -86,6 +86,6 @@ namespace Sentinel
 		GET_LOG_VAR("", msg, msgStr);
 		GET_LOG_VAR("", title, titleStr);
 
-		MessageBoxA(NULL, msgStr.c_str(), titleStr.c_str(), MB_OK | MB_ICONERROR);
+		MessageBoxA(nullptr, msgStr.c_str(), titleStr.c_str(), MB_OK | MB_ICONERROR);
 	}
 }

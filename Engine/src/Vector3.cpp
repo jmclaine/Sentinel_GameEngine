@@ -169,12 +169,12 @@ namespace Sentinel
 
 	Vector3 Vector3::Min(const Vector3& v) const
 	{
-		return Vector3(MIN(x, v.x), MIN(y, v.y), MIN(z, v.z));
+		return Vector3(std::fmin(x, v.x), std::fmin(y, v.y), std::fmin(z, v.z));
 	}
 
 	Vector3 Vector3::Max(const Vector3& v) const
 	{
-		return Vector3(MAX(x, v.x), MAX(y, v.y), MAX(z, v.z));
+		return Vector3(std::fmax(x, v.x), std::fmax(y, v.y), std::fmax(z, v.z));
 	}
 
 	float Vector3::Length() const

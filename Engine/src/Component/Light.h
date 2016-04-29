@@ -15,14 +15,11 @@ namespace Component
 {
 	class Transform;
 	class Drawable;
+	class Camera;
 
 	class SENTINEL_DLL Light : public GameComponent
 	{
 	protected:
-
-		virtual DECLARE_SERIAL_SAVE();
-		virtual DECLARE_SERIAL_LOAD();
-
 		Transform* mTransform;
 
 		std::vector<Drawable*> mDynamic;
@@ -31,16 +28,13 @@ namespace Component
 		RenderTexture* mRenderTexture;
 
 	public:
-
 		ColorRGBA mColor;
 		Vector4 mAttenuation; // radius = w
 
 	protected:
-
 		Light();
 
 	public:
-
 		virtual ~Light();
 
 		virtual void Startup();
@@ -48,7 +42,7 @@ namespace Component
 
 		///////////////////////////////////////
 
-		virtual void Present() = 0;
+		virtual void Draw(Camera* camera) = 0;
 
 		Transform* GetTransform();
 
@@ -56,7 +50,11 @@ namespace Component
 		RenderTexture* GetRenderTexture();
 
 	protected:
+		virtual void Save(Archive& archive);
+		virtual void Load(Archive& archive);
 
-		void Copy(GameComponent* component);
+		///////////////////////////////////////
+
+		virtual void Copy(GameComponent* component);
 	};
 }}

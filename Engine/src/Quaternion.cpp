@@ -10,7 +10,7 @@ namespace Sentinel
 
 	Quaternion::Quaternion() : 
 		x(0), y(0), z(0), w(1)
-	{}
+	{ }
 
 	Quaternion::Quaternion(float _pitch, float _yaw, float _roll)
 	{
@@ -24,7 +24,7 @@ namespace Sentinel
 
 	Quaternion::Quaternion(float _x, float _y, float _z, float _w) :
 		x(_x), y(_y), z(_z), w(_w)
-	{}
+	{ }
 
 	float* Quaternion::Ptr() const
 	{

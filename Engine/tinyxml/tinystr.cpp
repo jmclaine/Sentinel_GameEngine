@@ -30,8 +30,8 @@ distribution.
 const TiXmlString::size_type TiXmlString::npos = static_cast< TiXmlString::size_type >(-1);
 
 
-// Null rep.
-TiXmlString::Rep TiXmlString::nullrep_ = { 0, 0, { '\0' } };
+// nullptr rep.
+TiXmlString::Rep TiXmlString::nullptrrep_ = { 0, 0, { '\0' } };
 
 
 void TiXmlString::reserve (size_type cap)

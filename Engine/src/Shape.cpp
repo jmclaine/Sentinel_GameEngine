@@ -10,14 +10,14 @@ namespace Sentinel
 	Ray::Ray(const Vector3& pos, const Vector3& dir) :
 		mPosition(pos),
 		mDirection(dir)
-	{}
+	{ }
 
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	Plane::Plane(const Vector3& pos, const Vector3& normal) :
 		mPosition(pos),
 		mNormal(normal)
-	{}
+	{ }
 
 	float Plane::Distance(const Vector3& pos) const
 	{
@@ -53,7 +53,7 @@ namespace Sentinel
 	BoundingSphere::BoundingSphere(const Vector3& center, float radius) :
 		mCenter(center),
 		mRadius(radius)
-	{}
+	{ }
 
 	// Create a sphere based on points contained within it.
 	// Based on code by:
@@ -601,7 +601,7 @@ namespace Sentinel
 		const Vector3& maxBounds, 
 		const Matrix4x4& matWorld)
 	{
-		Vector3 center((maxBounds - minBounds) * 0.5f);
+		Vector3 center((maxBounds + minBounds) * 0.5f);
 		Vector3 extent(maxBounds - center);
 
 		Vector3 minPos(FLT_MAX, FLT_MAX, FLT_MAX);
@@ -700,25 +700,25 @@ namespace Sentinel
 		float tx1 = (minBounds.x - ray.mPosition.x)*dx;
 		float tx2 = (maxBounds.x - ray.mPosition.x)*dx;
 
-		float tmin = MIN(tx1, tx2);
-		float tmax = MAX(tx1, tx2);
+		float tmin = std::fmin(tx1, tx2);
+		float tmax = std::fmax(tx1, tx2);
 
 		float ty1 = (minBounds.y - ray.mPosition.y)*dy;
 		float ty2 = (maxBounds.y - ray.mPosition.y)*dy;
 
-		tmin = MAX(tmin, MIN(ty1, ty2));
-		tmax = MIN(tmax, MAX(ty1, ty2));
+		tmin = std::fmax(tmin, std::fmin(ty1, ty2));
+		tmax = std::fmin(tmax, std::fmax(ty1, ty2));
 
 		float tz1 = (minBounds.z - ray.mPosition.z)*dz;
 		float tz2 = (maxBounds.z - ray.mPosition.z)*dz;
 
-		tmin = MAX(tmin, MIN(tz1, tz2));
-		tmax = MIN(tmax, MAX(tz1, tz2));
+		tmin = std::fmax(tmin, std::fmin(tz1, tz2));
+		tmax = std::fmin(tmax, std::fmax(tz1, tz2));
 
-		if (intersection != NULL)
+		if (intersection != nullptr)
 			(*intersection) = ray.mPosition + ray.mDirection * tmin;
 
-		return tmax >= MAX(0.0f, tmin);// && tmin < tmax;
+		return tmax >= std::fmax(0.0f, tmin);// && tmin < tmax;
 	}
 
 	bool BoundingBox::Intersects(const BoundingSphere& sphere) const
@@ -735,7 +735,7 @@ namespace Sentinel
 	//////////////////////////////////////////////////////
 
 	BoundingFrustum::BoundingFrustum()
-	{}
+	{ }
 
 	BoundingFrustum::BoundingFrustum(const Vector3& nearCenter, const Vector3& farCenter,
 		const Vector2& nearExtent, const Vector2& farExtent)

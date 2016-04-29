@@ -18,7 +18,6 @@ namespace GUI
 		DECLARE_SERIAL();
 
 	public:
-
 		DECLARE_SERIAL_REGISTER_SAVE();
 
 		UINT mFrameUp;
@@ -31,11 +30,9 @@ namespace GUI
 		ColorRGBA mColorDown;
 
 	protected:
-
 		Component::SpriteDrawable* mSprite;
 
 	public:
-
 		SpriteButton();
 		virtual ~SpriteButton();
 

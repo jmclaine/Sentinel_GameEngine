@@ -4,52 +4,61 @@
 #include "Vector3.h"
 #include "Vector2.h"
 
-namespace Sentinel {
-namespace Component
+namespace Sentinel
 {
-	class SENTINEL_DLL PerspectiveCamera : public Camera
+	namespace Component
 	{
-		DECLARE_SERIAL();
+		class SENTINEL_DLL PerspectiveCamera : public Camera
+		{
+			static SerialRegister SERIAL_REGISTER;
+			static Serializable* Clone();
 
-	private:
+		private:
+			float mNearZ;
+			float mFarZ;
+			float mFOV;
+			float mAspectRatio;
 
-		float mNearZ;
-		float mFarZ;
-		float mFOV;
-		float mAspectRatio;
+			float mAngle;
 
-		float mAngle;
+		public:
+			PerspectiveCamera();
+			PerspectiveCamera(UINT windowWidth, UINT windowHeight);
+			PerspectiveCamera(UINT windowWidth, UINT windowHeight, float nearZ, float farZ, float FOV);
 
-	public:
+			//////////////////////////////
 
-		PerspectiveCamera();
-		PerspectiveCamera(UINT windowWidth, UINT windowHeight);
-		PerspectiveCamera(UINT windowWidth, UINT windowHeight, float nearZ, float farZ, float FOV);
+			void Execute();
 
-		//////////////////////////////
+			void Set(UINT windowWidth, UINT windowHeight);
+			void Set(UINT windowWidth, UINT windowHeight, float nearZ, float farZ, float FOV);
 
-		void Execute();
+			float NearZ();
+			float FarZ();
+			float FOV();
+			float AspectRatio();
 
-		void Set(UINT windowWidth, UINT windowHeight);
-		void Set(UINT windowWidth, UINT windowHeight, float nearZ, float farZ, float FOV);
+			float Angle();
 
-		float NearZ();
-		float FarZ();
-		float FOV();
-		float AspectRatio();
+			const Vector3& LookAt();
 
-		float Angle();
+			void GetFrustumSize(
+				Vector3& nearCenter, Vector3& farCenter,
+				Vector2& nearSize, Vector2& farSize);
 
-		const Vector3& LookAt();
+			Ray ScreenPointToRay(UINT mouseX, UINT mouseY, UINT screenWidth = 0, UINT screenHeight = 0);
 
-		void GetFrustumSize(
-			Vector3& nearCenter, Vector3& farCenter,
-			Vector2& nearSize, Vector2& farSize);
+			//////////////////////////////
 
-		Ray ScreenPointToRay(UINT mouseX, UINT mouseY, UINT screenWidth = 0, UINT screenHeight = 0);
+			void Save(Archive& archive);
+			void Load(Archive& archive);
 
-		//////////////////////////////
+			//////////////////////////////
 
-		GameComponent*	Copy();
-	};
-}}
+			GameComponent* Copy();
+
+		protected:
+			void Copy(GameComponent* component);
+		};
+	}
+}

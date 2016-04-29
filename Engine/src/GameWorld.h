@@ -2,9 +2,9 @@
 
 #include <vector>
 #include <map>
+#include <memory>
 
 #include "Sentinel.h"
-#include "Types.h"
 
 namespace Sentinel
 {
@@ -29,39 +29,44 @@ namespace Sentinel
 	class MeshManager;
 	class ModelManager;
 	class SoundManager;
+	class FontManager;
 	class RenderManager;
+	class BlendStateManager;
 
-	class SENTINEL_DLL GameWorld
+	class SENTINEL_DLL GameWorld final
 	{
 		friend class GameObject;
 		friend class Component::Light;
 		friend class Component::Camera;
 
-	protected:
-
+	private:
 		std::vector<GameObject*> mGameObject;
 		std::vector<Component::Camera*> mCamera;
 		std::vector<Component::Light*> mLight;
 
 	public:
-
 		Renderer* mRenderer; // must be deleted outside this class
 
-		Timing* mTiming;
-		PhysicsSystem* mPhysicsSystem;
-		AudioSystem* mAudioSystem;
-		SpriteSystem* mSpriteSystem;
-		FontSystem* mFontSystem;
+		std::unique_ptr<Timing> mTiming;
+		std::unique_ptr<PhysicsSystem> mPhysicsSystem;
 
-		TextureManager* mTextureManager;
-		ShaderManager* mShaderManager;
-		MaterialManager* mMaterialManager;
-		SpriteManager* mSpriteManager;
-		MeshManager* mMeshManager;
-		ModelManager* mModelManager;
-		SoundManager* mSoundManager;
+		std::unique_ptr<FontSystem> mFontSystem;
+		std::unique_ptr<FontManager> mFontManager;
+		
+		std::unique_ptr<TextureManager> mTextureManager;
+		std::unique_ptr<ShaderManager> mShaderManager;
+		std::unique_ptr<MaterialManager> mMaterialManager;
+		std::unique_ptr<BlendStateManager> mBlendStateManager;
 
-		RenderManager* mRenderManager;
+		std::unique_ptr<SpriteSystem> mSpriteSystem;
+		std::unique_ptr<SpriteManager> mSpriteManager;
+		std::unique_ptr<MeshManager> mMeshManager;
+		std::unique_ptr<ModelManager> mModelManager;
+		std::unique_ptr<RenderManager> mRenderManager;
+
+		std::unique_ptr<AudioSystem> mAudioSystem;
+		std::unique_ptr<SoundManager> mSoundManager;
+		
 		Component::Camera* mCurrentCamera;
 
 		/////////////////////////////////////////////////////
@@ -69,62 +74,41 @@ namespace Sentinel
 		GameWorld();
 		~GameWorld();
 
-		// Release all GameObjects and GameComponents.
-		//
 		void Release();
 
-		// All associated GameObjects and GameComponents also Startup().
-		//
 		void Startup();
 
-		// All associated GameObjects and GameComponents also Update().
-		//
 		void UpdateController();
 		void UpdatePhysics();
 		void UpdateTransform();
 		void UpdateComponents();
 		void UpdateCamera();
 		void UpdateLight();
-		void UpdateDrawable();
 
-		// All associated GameObjects and GameComponents also Shutdown().
-		//
 		void Shutdown();
 
 		/////////////////////////////////////////////////////
 
-		// Renders all cameras if set to NULL
-		//
-		void Present(Component::Camera* camera = NULL);
+		void Present(Component::Camera* camera = nullptr);
 
 	private:
-
 		void PresentCamera(Component::Camera* camera);
 
 	public:
+		void AddGameObject(GameObject* obj);
+		void RemoveGameObject(GameObject* obj);
 
-		GameObject* AddGameObject(GameObject* obj);
-		GameObject* RemoveGameObject(GameObject* obj);
-
+		UINT NumGameObjects();
 		GameObject* GetGameObject(UINT index);
 		GameObject* FindGameObject(const std::string& name);
 
 	private:
-
 		GameObject* FindGameObject(const std::string& name, GameObject* parent);
 
-	public:
-
-		UINT NumGameObjects();
-
-	protected:
-
-		Component::Camera* AddCamera(Component::Camera* camera);
-
-		Component::Light* AddLight(Component::Light* light);
+		void AddCamera(Component::Camera* camera);
+		void AddLight(Component::Light* light);
 
 	public:
-
 		Component::Light* GetLight(UINT index);
 		UINT NumLights();
 

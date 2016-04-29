@@ -2,7 +2,6 @@
 
 #include "Timing.h"
 #include "Debug.h"
-#include "Types.h"
 
 namespace Sentinel
 {

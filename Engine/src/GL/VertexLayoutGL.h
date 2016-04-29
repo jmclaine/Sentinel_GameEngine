@@ -34,6 +34,6 @@ namespace Sentinel
 
 	public:
 
-		void AddAttribute(VertexAttribute::Type type);
+		void AddAttribute(VertexAttribute type);
 	};
 }

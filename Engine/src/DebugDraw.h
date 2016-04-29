@@ -2,7 +2,6 @@
 
 #include "Memory.h"
 #include "Vector3.h"
-#include "Types.h"
 
 namespace Sentinel
 {

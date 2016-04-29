@@ -13,17 +13,17 @@ namespace Sentinel
 	// Base particle effect.
 	//
 	ParticleEffect::ParticleEffect()
-	{}
+	{ }
 
 	ParticleEffect::ParticleEffect(float startTime) :
 		mStartTime(startTime)
-	{}
+	{ }
 
 	void ParticleEffect::Startup(Particle& particle)
-	{}
+	{ }
 
 	void ParticleEffect::Update(Particle& particle)
-	{}
+	{ }
 
 	void ParticleEffect::Save(Archive& archive)
 	{
@@ -43,16 +43,16 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE(TextureEffect);
 
 	TextureEffect::TextureEffect()
-	{}
+	{ }
 
 	TextureEffect::TextureEffect(float startTime, UINT frame) :
 		ParticleEffect(startTime),
 		mFrame(frame)
-	{}
+	{ }
 
 	void TextureEffect::Startup(Particle& particle)
 	{
-		static_cast<NormalParticle&>(particle).mFrame = mFrame;
+		static_cast<SpriteParticle&>(particle).mFrame = mFrame;
 	}
 
 	void TextureEffect::Save(Archive& archive)
@@ -77,16 +77,16 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE(RandomTextureEffect);
 
 	RandomTextureEffect::RandomTextureEffect()
-	{}
+	{ }
 
 	RandomTextureEffect::RandomTextureEffect(float startTime, UINT minFrame, UINT maxFrame) :
 		TextureEffect(startTime, minFrame),
 		mMaxFrame(maxFrame)
-	{}
+	{ }
 
 	void RandomTextureEffect::Startup(Particle& particle)
 	{
-		static_cast<NormalParticle&>(particle).mFrame = RandomValue(mFrame, mMaxFrame);
+		static_cast<SpriteParticle&>(particle).mFrame = RandomValue(mFrame, mMaxFrame);
 	}
 
 	void RandomTextureEffect::Save(Archive& archive)
@@ -114,16 +114,16 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE(ColorEffect);
 
 	ColorEffect::ColorEffect()
-	{}
+	{ }
 
 	ColorEffect::ColorEffect(float startTime, const ColorRGBA& color) :
 		ParticleEffect(startTime),
 		mColor(color)
-	{}
+	{ }
 
 	void ColorEffect::Startup(Particle& particle)
 	{
-		static_cast<NormalParticle&>(particle).mColor = mColor;
+		static_cast<SpriteParticle&>(particle).mColor = mColor;
 	}
 
 	void ColorEffect::Save(Archive& archive)
@@ -132,14 +132,14 @@ namespace Sentinel
 
 		ParticleEffect::Save(archive);
 
-		archive.Write(mColor.Ptr(), ar_sizeof(mColor));
+		archive.Write(&mColor);
 	}
 
 	void ColorEffect::Load(Archive& archive)
 	{
 		ParticleEffect::Load(archive);
 
-		archive.Read(mColor.Ptr(), ar_sizeof(mColor));
+		archive.Read(&mColor);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -148,16 +148,16 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE(RandomColorEffect);
 
 	RandomColorEffect::RandomColorEffect()
-	{}
+	{ }
 
 	RandomColorEffect::RandomColorEffect(float startTime, const ColorRGBA& minColor, const ColorRGBA& maxColor) :
 		ColorEffect(startTime, minColor),
 		mMaxColor(maxColor)
-	{}
+	{ }
 
 	void RandomColorEffect::Startup(Particle& particle)
 	{
-		static_cast<NormalParticle&>(particle).mColor = RandomValue(mColor, mMaxColor);
+		static_cast<SpriteParticle&>(particle).mColor = RandomValue(mColor, mMaxColor);
 	}
 
 	void RandomColorEffect::Save(Archive& archive)
@@ -166,15 +166,15 @@ namespace Sentinel
 
 		ParticleEffect::Save(archive);
 
-		archive.Write(mColor.Ptr(), ar_sizeof(mColor));
-		archive.Write(mMaxColor.Ptr(), ar_sizeof(mMaxColor));
+		archive.Write(&mColor);
+		archive.Write(&mMaxColor);
 	}
 
 	void RandomColorEffect::Load(Archive& archive)
 	{
 		ColorEffect::Load(archive);
 
-		archive.Read(mMaxColor.Ptr(), ar_sizeof(mMaxColor));
+		archive.Read(&mMaxColor);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -183,7 +183,7 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE(FadeToColorEffect);
 
 	FadeToColorEffect::FadeToColorEffect()
-	{}
+	{ }
 
 	FadeToColorEffect::FadeToColorEffect(float startTime, float endTime, const ColorRGBA& color) :
 		ColorEffect(startTime, color),
@@ -202,7 +202,7 @@ namespace Sentinel
 	void FadeToColorEffect::Update(Particle& particle)
 	{
 		if (particle.mElapsedTime < mEndTime + Timing::DESIRED_FRAME_RATE)
-			static_cast<NormalParticle&>(particle).mColor = LERP(static_cast<NormalParticle&>(particle).mColor, mColor, (particle.mElapsedTime / mEndTime));
+			static_cast<SpriteParticle&>(particle).mColor = LERP(static_cast<SpriteParticle&>(particle).mColor, mColor, (particle.mElapsedTime / mEndTime));
 	}
 
 	void FadeToColorEffect::Save(Archive& archive)
@@ -211,7 +211,7 @@ namespace Sentinel
 
 		ParticleEffect::Save(archive);
 
-		archive.Write(mColor.Ptr(), ar_sizeof(mColor));
+		archive.Write(&mColor);
 		archive.Write(&mEndTime);
 	}
 
@@ -229,12 +229,12 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE(PositionEffect);
 
 	PositionEffect::PositionEffect()
-	{}
+	{ }
 
 	PositionEffect::PositionEffect(float startTime, const Vector3& position) :
 		ParticleEffect(startTime),
 		mPosition(position)
-	{}
+	{ }
 
 	void PositionEffect::Startup(Particle& particle)
 	{
@@ -247,14 +247,14 @@ namespace Sentinel
 
 		ParticleEffect::Save(archive);
 
-		archive.Write(mPosition.Ptr(), ar_sizeof(mPosition));
+		archive.Write(&mPosition);
 	}
 
 	void PositionEffect::Load(Archive& archive)
 	{
 		ParticleEffect::Load(archive);
 
-		archive.Read(mPosition.Ptr(), ar_sizeof(mPosition));
+		archive.Read(&mPosition);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -263,12 +263,12 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE(AreaPositionEffect);
 
 	AreaPositionEffect::AreaPositionEffect()
-	{}
+	{ }
 
 	AreaPositionEffect::AreaPositionEffect(float startTime, const Vector3& minPosition, const Vector3& maxPosition) :
 		PositionEffect(startTime, minPosition),
 		mMaxPosition(maxPosition)
-	{}
+	{ }
 
 	void AreaPositionEffect::Startup(Particle& particle)
 	{
@@ -281,15 +281,15 @@ namespace Sentinel
 
 		ParticleEffect::Save(archive);
 
-		archive.Write(mPosition.Ptr(), ar_sizeof(mPosition));
-		archive.Write(mMaxPosition.Ptr(), ar_sizeof(mMaxPosition));
+		archive.Write(&mPosition);
+		archive.Write(&mMaxPosition);
 	}
 
 	void AreaPositionEffect::Load(Archive& archive)
 	{
 		PositionEffect::Load(archive);
 
-		archive.Read(mMaxPosition.Ptr(), ar_sizeof(mMaxPosition));
+		archive.Read(&mMaxPosition);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -298,12 +298,12 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE(SpherePositionEffect);
 
 	SpherePositionEffect::SpherePositionEffect()
-	{}
+	{ }
 
 	SpherePositionEffect::SpherePositionEffect(float startTime, const Vector3& position, float radius) :
 		PositionEffect(startTime, position),
 		mRadius(radius)
-	{}
+	{ }
 
 	void SpherePositionEffect::Startup(Particle& particle)
 	{
@@ -316,7 +316,7 @@ namespace Sentinel
 
 		ParticleEffect::Save(archive);
 
-		archive.Write(mPosition.Ptr(), ar_sizeof(mPosition));
+		archive.Write(&mPosition);
 		archive.Write(&mRadius);
 	}
 
@@ -334,12 +334,12 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE(RotationEffect);
 
 	RotationEffect::RotationEffect()
-	{}
+	{ }
 
 	RotationEffect::RotationEffect(float startTime, const Vector3& rotation) :
 		ParticleEffect(startTime),
 		mRotation(rotation)
-	{}
+	{ }
 
 	void RotationEffect::Startup(Particle& particle)
 	{
@@ -352,14 +352,14 @@ namespace Sentinel
 
 		ParticleEffect::Save(archive);
 
-		archive.Write(mRotation.Ptr(), ar_sizeof(mRotation));
+		archive.Write(&mRotation);
 	}
 
 	void RotationEffect::Load(Archive& archive)
 	{
 		ParticleEffect::Load(archive);
 
-		archive.Read(mRotation.Ptr(), ar_sizeof(mRotation));
+		archive.Read(&mRotation);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -368,12 +368,12 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE(RandomRotationEffect);
 
 	RandomRotationEffect::RandomRotationEffect()
-	{}
+	{ }
 
 	RandomRotationEffect::RandomRotationEffect(float startTime, const Vector3& minRotation, const Vector3& maxRotation) :
 		RotationEffect(startTime, minRotation),
 		mMaxRotation(maxRotation)
-	{}
+	{ }
 
 	void RandomRotationEffect::Startup(Particle& particle)
 	{
@@ -386,15 +386,15 @@ namespace Sentinel
 
 		ParticleEffect::Save(archive);
 
-		archive.Write(mRotation.Ptr(), ar_sizeof(mRotation));
-		archive.Write(mMaxRotation.Ptr(), ar_sizeof(mMaxRotation));
+		archive.Write(&mRotation);
+		archive.Write(&mMaxRotation);
 	}
 
 	void RandomRotationEffect::Load(Archive& archive)
 	{
 		RotationEffect::Load(archive);
 
-		archive.Read(mMaxRotation.Ptr(), ar_sizeof(mMaxRotation));
+		archive.Read(&mMaxRotation);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -404,12 +404,12 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE(ScaleEffect);
 
 	ScaleEffect::ScaleEffect()
-	{}
+	{ }
 
 	ScaleEffect::ScaleEffect(float startTime, const Vector3& scale) :
 		ParticleEffect(startTime),
 		mScale(scale)
-	{}
+	{ }
 
 	void ScaleEffect::Startup(Particle& particle)
 	{
@@ -422,14 +422,14 @@ namespace Sentinel
 
 		ParticleEffect::Save(archive);
 
-		archive.Write(mScale.Ptr(), ar_sizeof(mScale));
+		archive.Write(&mScale);
 	}
 
 	void ScaleEffect::Load(Archive& archive)
 	{
 		ParticleEffect::Load(archive);
 
-		archive.Read(mScale.Ptr(), ar_sizeof(mScale));
+		archive.Read(&mScale);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -438,12 +438,12 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE(RandomScaleEffect);
 
 	RandomScaleEffect::RandomScaleEffect()
-	{}
+	{ }
 
 	RandomScaleEffect::RandomScaleEffect(float startTime, const Vector3& minScale, const Vector3& maxScale) :
 		ScaleEffect(startTime, minScale),
 		mMaxScale(maxScale)
-	{}
+	{ }
 
 	void RandomScaleEffect::Startup(Particle& particle)
 	{
@@ -456,15 +456,15 @@ namespace Sentinel
 
 		ParticleEffect::Save(archive);
 
-		archive.Write(mScale.Ptr(), ar_sizeof(mScale));
-		archive.Write(mMaxScale.Ptr(), ar_sizeof(mMaxScale));
+		archive.Write(&mScale);
+		archive.Write(&mMaxScale);
 	}
 
 	void RandomScaleEffect::Load(Archive& archive)
 	{
 		ScaleEffect::Load(archive);
 
-		archive.Read(mMaxScale.Ptr(), ar_sizeof(mMaxScale));
+		archive.Read(&mMaxScale);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -473,7 +473,7 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE(FadeToScaleEffect);
 
 	FadeToScaleEffect::FadeToScaleEffect()
-	{}
+	{ }
 
 	FadeToScaleEffect::FadeToScaleEffect(float startTime, float endTime, float scale) :
 		ScaleEffect(startTime, Vector3(scale, scale, scale)),
@@ -509,7 +509,7 @@ namespace Sentinel
 
 		ParticleEffect::Save(archive);
 
-		archive.Write(mScale.Ptr(), ar_sizeof(mScale));
+		archive.Write(&mScale);
 		archive.Write(&mEndTime);
 	}
 
@@ -527,12 +527,12 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE(VelocityEffect);
 
 	VelocityEffect::VelocityEffect()
-	{}
+	{ }
 
 	VelocityEffect::VelocityEffect(float startTime, const Vector3& velocity) :
 		ParticleEffect(startTime),
 		mVelocity(velocity)
-	{}
+	{ }
 
 	void VelocityEffect::Startup(Particle& particle)
 	{
@@ -545,14 +545,14 @@ namespace Sentinel
 
 		ParticleEffect::Save(archive);
 
-		archive.Write(mVelocity.Ptr(), ar_sizeof(mVelocity));
+		archive.Write(&mVelocity);
 	}
 
 	void VelocityEffect::Load(Archive& archive)
 	{
 		ParticleEffect::Load(archive);
 
-		archive.Read(mVelocity.Ptr(), ar_sizeof(mVelocity));
+		archive.Read(&mVelocity);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -561,12 +561,12 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE(RandomVelocityEffect);
 
 	RandomVelocityEffect::RandomVelocityEffect()
-	{}
+	{ }
 
 	RandomVelocityEffect::RandomVelocityEffect(float startTime, const Vector3& minVelocity, const Vector3& maxVelocity) :
 		VelocityEffect(startTime, minVelocity),
 		mMaxVelocity(maxVelocity)
-	{}
+	{ }
 
 	void RandomVelocityEffect::Startup(Particle& particle)
 	{
@@ -579,15 +579,15 @@ namespace Sentinel
 
 		ParticleEffect::Save(archive);
 
-		archive.Write(mVelocity.Ptr(), ar_sizeof(mVelocity));
-		archive.Write(mMaxVelocity.Ptr(), ar_sizeof(mMaxVelocity));
+		archive.Write(&mVelocity);
+		archive.Write(&mMaxVelocity);
 	}
 
 	void RandomVelocityEffect::Load(Archive& archive)
 	{
 		VelocityEffect::Load(archive);
 
-		archive.Read(mMaxVelocity.Ptr(), ar_sizeof(mMaxVelocity));
+		archive.Read(&mMaxVelocity);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -597,12 +597,12 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE(AngularVelocityEffect);
 
 	AngularVelocityEffect::AngularVelocityEffect()
-	{}
+	{ }
 
 	AngularVelocityEffect::AngularVelocityEffect(float startTime, const Vector3& angularVelocity) :
 		ParticleEffect(startTime),
 		mAngularVelocity(angularVelocity)
-	{}
+	{ }
 
 	void AngularVelocityEffect::Startup(Particle& particle)
 	{
@@ -615,14 +615,14 @@ namespace Sentinel
 
 		ParticleEffect::Save(archive);
 
-		archive.Write(mAngularVelocity.Ptr(), ar_sizeof(mAngularVelocity));
+		archive.Write(&mAngularVelocity);
 	}
 
 	void AngularVelocityEffect::Load(Archive& archive)
 	{
 		ParticleEffect::Load(archive);
 
-		archive.Read(mAngularVelocity.Ptr(), ar_sizeof(mAngularVelocity));
+		archive.Read(&mAngularVelocity);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -631,12 +631,12 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE(RandomAngularVelocityEffect);
 
 	RandomAngularVelocityEffect::RandomAngularVelocityEffect()
-	{}
+	{ }
 
 	RandomAngularVelocityEffect::RandomAngularVelocityEffect(float startTime, const Vector3& minAngularVelocity, const Vector3& maxAngularVelocity) :
 		AngularVelocityEffect(startTime, minAngularVelocity),
 		mMaxAngularVelocity(maxAngularVelocity)
-	{}
+	{ }
 
 	void RandomAngularVelocityEffect::Startup(Particle& particle)
 	{
@@ -649,15 +649,15 @@ namespace Sentinel
 
 		ParticleEffect::Save(archive);
 
-		archive.Write(mAngularVelocity.Ptr(), ar_sizeof(mAngularVelocity));
-		archive.Write(mMaxAngularVelocity.Ptr(), ar_sizeof(mMaxAngularVelocity));
+		archive.Write(&mAngularVelocity);
+		archive.Write(&mMaxAngularVelocity);
 	}
 
 	void RandomAngularVelocityEffect::Load(Archive& archive)
 	{
 		AngularVelocityEffect::Load(archive);
 
-		archive.Read(mMaxAngularVelocity.Ptr(), ar_sizeof(mMaxAngularVelocity));
+		archive.Read(&mMaxAngularVelocity);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -667,12 +667,12 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE(AccelEffect);
 
 	AccelEffect::AccelEffect()
-	{}
+	{ }
 
 	AccelEffect::AccelEffect(float startTime, const Vector3& accel) :
 		ParticleEffect(startTime),
 		mAccel(accel)
-	{}
+	{ }
 
 	void AccelEffect::Startup(Particle& particle)
 	{
@@ -685,14 +685,14 @@ namespace Sentinel
 
 		ParticleEffect::Save(archive);
 
-		archive.Write(mAccel.Ptr(), ar_sizeof(mAccel));
+		archive.Write(&mAccel);
 	}
 
 	void AccelEffect::Load(Archive& archive)
 	{
 		ParticleEffect::Load(archive);
 
-		archive.Read(mAccel.Ptr(), ar_sizeof(mAccel));
+		archive.Read(&mAccel);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -701,12 +701,12 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE(RandomAccelEffect);
 
 	RandomAccelEffect::RandomAccelEffect()
-	{}
+	{ }
 
 	RandomAccelEffect::RandomAccelEffect(float startTime, const Vector3& minAccel, const Vector3& maxAccel) :
 		AccelEffect(startTime, minAccel),
 		mMaxAccel(maxAccel)
-	{}
+	{ }
 
 	void RandomAccelEffect::Startup(Particle& particle)
 	{
@@ -719,15 +719,15 @@ namespace Sentinel
 
 		ParticleEffect::Save(archive);
 
-		archive.Write(mAccel.Ptr(), ar_sizeof(mAccel));
-		archive.Write(mMaxAccel.Ptr(), ar_sizeof(mMaxAccel));
+		archive.Write(&mAccel);
+		archive.Write(&mMaxAccel);
 	}
 
 	void RandomAccelEffect::Load(Archive& archive)
 	{
 		AccelEffect::Load(archive);
 
-		archive.Read(mMaxAccel.Ptr(), ar_sizeof(mMaxAccel));
+		archive.Read(&mMaxAccel);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -737,12 +737,12 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE(AngularAccelEffect);
 
 	AngularAccelEffect::AngularAccelEffect()
-	{}
+	{ }
 
 	AngularAccelEffect::AngularAccelEffect(float startTime, const Vector3& angularAccel) :
 		ParticleEffect(startTime),
 		mAngularAccel(angularAccel)
-	{}
+	{ }
 
 	void AngularAccelEffect::Startup(Particle& particle)
 	{
@@ -755,14 +755,14 @@ namespace Sentinel
 
 		ParticleEffect::Save(archive);
 
-		archive.Write(mAngularAccel.Ptr(), ar_sizeof(mAngularAccel));
+		archive.Write(&mAngularAccel);
 	}
 
 	void AngularAccelEffect::Load(Archive& archive)
 	{
 		ParticleEffect::Load(archive);
 
-		archive.Read(mAngularAccel.Ptr(), ar_sizeof(mAngularAccel));
+		archive.Read(&mAngularAccel);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -771,12 +771,12 @@ namespace Sentinel
 	DEFINE_SERIAL_CLONE(RandomAngularAccelEffect);
 
 	RandomAngularAccelEffect::RandomAngularAccelEffect()
-	{}
+	{ }
 
 	RandomAngularAccelEffect::RandomAngularAccelEffect(float startTime, const Vector3& minAngularAccel, const Vector3& maxAngularAccel) :
 		AngularAccelEffect(startTime, minAngularAccel),
 		mMaxAngularAccel(maxAngularAccel)
-	{}
+	{ }
 
 	void RandomAngularAccelEffect::Startup(Particle& particle)
 	{
@@ -789,14 +789,14 @@ namespace Sentinel
 
 		ParticleEffect::Save(archive);
 
-		archive.Write(mAngularAccel.Ptr(), ar_sizeof(mAngularAccel));
-		archive.Write(mMaxAngularAccel.Ptr(), ar_sizeof(mMaxAngularAccel));
+		archive.Write(&mAngularAccel);
+		archive.Write(&mMaxAngularAccel);
 	}
 
 	void RandomAngularAccelEffect::Load(Archive& archive)
 	{
 		AngularAccelEffect::Load(archive);
 
-		archive.Read(mMaxAngularAccel.Ptr(), ar_sizeof(mMaxAngularAccel));
+		archive.Read(&mMaxAngularAccel);
 	}
 }

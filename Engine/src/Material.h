@@ -4,7 +4,8 @@
 
 #include "Sentinel.h"
 #include "ColorRGBA.h"
-#include "RendererTypes.h"
+#include "Renderer.h"
+#include "DepthStencil.h"
 
 namespace Sentinel
 {
@@ -14,27 +15,34 @@ namespace Sentinel
 	class Archive;
 	class ShaderManager;
 	class TextureManager;
-	class Renderer;
+	class BlendStateManager;
+
+	enum class TextureIndex : BYTE
+	{
+		DIFFUSE,
+		NORMAL,
+		DEPTH,
+
+		COUNT
+	};
 
 	class SENTINEL_DLL Material
 	{
 	private:
-
 		static bool IS_MATERIAL_LOCKED;
 
 	public:
-
 		ColorRGBA mAmbient;
 		ColorRGBA mDiffuse;
 		ColorRGBA mSpecular;
 		float mSpecularComponent;
 
-		std::shared_ptr<Shader> mShader;
-		std::shared_ptr<Texture> mTexture[TextureIndex::COUNT];
-		std::shared_ptr<BlendState> mBlendState;
+		std::weak_ptr<Shader> mShader;
+		std::weak_ptr<Texture> mTexture[(BYTE)TextureIndex::COUNT];
+		std::weak_ptr<BlendState> mBlendState;
 
-		CullFormat::Type mCullMode;
-		DepthFormat::Type mDepthMode;
+		CullFormat mCullMode;
+		DepthFormat mDepthMode;
 		WORD mRenderQueue;
 
 		//////////////////////////////////////////////
@@ -46,8 +54,6 @@ namespace Sentinel
 
 		void CalculateRenderQueue();
 
-		// Prevent other drawables from changing the material.
-		//
 		static void Lock();
 		static void Unlock();
 
@@ -56,14 +62,14 @@ namespace Sentinel
 		static void Save(
 			Archive& archive,
 			Material* material,
-			Renderer* renderer,
 			ShaderManager* shaderManager,
-			TextureManager* textureManager);
+			TextureManager* textureManager,
+			BlendStateManager* blendManager);
 
 		static Material* Load(
 			Archive& archive,
-			Renderer* renderer,
 			ShaderManager* shaderManager,
-			TextureManager* textureManager);
+			TextureManager* textureManager,
+			BlendStateManager* blendManager);
 	};
 }

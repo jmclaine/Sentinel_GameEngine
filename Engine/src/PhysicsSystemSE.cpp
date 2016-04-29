@@ -10,14 +10,12 @@ namespace Sentinel
 	class SpherePhysicsShapeSE : public SpherePhysicsShape
 	{
 	private:
-
 		float mRadius;
 
 	public:
-
 		SpherePhysicsShapeSE() :
 			mRadius(0)
-		{}
+		{ }
 
 		SpherePhysicsShapeSE(float radius)
 		{
@@ -25,10 +23,9 @@ namespace Sentinel
 		}
 
 		~SpherePhysicsShapeSE()
-		{}
+		{ }
 
 	public:
-
 		float GetRadius()
 		{
 			return mRadius;
@@ -45,13 +42,11 @@ namespace Sentinel
 	class BoxPhysicsShapeSE : public BoxPhysicsShape
 	{
 	private:
-
 		Vector3 mScale;
 
 	public:
-
 		BoxPhysicsShapeSE()
-		{}
+		{ }
 
 		BoxPhysicsShapeSE(const Vector3& scale)
 		{
@@ -59,10 +54,9 @@ namespace Sentinel
 		}
 
 		~BoxPhysicsShapeSE()
-		{}
+		{ }
 
 	public:
-
 		Vector3 GetScale()
 		{
 			return mScale;
@@ -79,13 +73,11 @@ namespace Sentinel
 	class CylinderPhysicsShapeSE : public CylinderPhysicsShape
 	{
 	private:
-
 		Vector3 mScale;
 
 	public:
-
 		CylinderPhysicsShapeSE()
-		{}
+		{ }
 
 		CylinderPhysicsShapeSE(const Vector3& scale)
 		{
@@ -93,10 +85,9 @@ namespace Sentinel
 		}
 
 		~CylinderPhysicsShapeSE()
-		{}
+		{ }
 
 	public:
-
 		Vector3 GetScale()
 		{
 			return mScale;
@@ -113,14 +104,12 @@ namespace Sentinel
 	class MeshPhysicsShapeSE : public MeshPhysicsShape
 	{
 	private:
-
 		std::vector<Vector3> mVert;
 		Vector3 mScale;
 
 	public:
-
 		MeshPhysicsShapeSE()
-		{}
+		{ }
 
 		MeshPhysicsShapeSE(void* verts, UINT count, UINT stride, const Vector3& scale)
 		{
@@ -128,10 +117,9 @@ namespace Sentinel
 		}
 
 		~MeshPhysicsShapeSE()
-		{}
+		{ }
 
 	public:
-
 		int GetNumPoints()
 		{
 			return (int)mVert.size();
@@ -163,12 +151,11 @@ namespace Sentinel
 	class CompoundPhysicsShapeSE : public CompoundPhysicsShape
 	{
 	public:
-
 		CompoundPhysicsShapeSE()
-		{}
+		{ }
 
 		~CompoundPhysicsShapeSE()
-		{}
+		{ }
 	};
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -176,7 +163,6 @@ namespace Sentinel
 	class RigidBodySE : public RigidBody
 	{
 	private:
-
 		Vector3 mPosition;
 		Quaternion mOrientation;
 
@@ -192,7 +178,6 @@ namespace Sentinel
 		Vector3 mGravity;
 
 	public:
-
 		RigidBodySE()
 		{
 			mMass = 1.0f;
@@ -205,7 +190,7 @@ namespace Sentinel
 		}
 
 		~RigidBodySE()
-		{}
+		{ }
 
 		Vector3 GetPosition()
 		{
@@ -326,15 +311,13 @@ namespace Sentinel
 	class PhysicsSystemSE : public PhysicsSystem
 	{
 	public:
-
 		PhysicsSystemSE()
-		{}
+		{ }
 
 		~PhysicsSystemSE()
-		{}
+		{ }
 
 	public:
-
 		void Startup()
 		{
 			// unsupported

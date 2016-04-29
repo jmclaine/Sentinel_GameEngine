@@ -9,24 +9,24 @@ namespace GUI
 {
 	Controller2D::Controller2D() :
 		mIsOver(false)
-	{}
+	{ }
 
 	Controller2D::~Controller2D()
-	{}
+	{ }
 
 	void Controller2D::Startup()
 	{
 		mTransform = mOwner->GetComponent<Component::Transform>();
 
-		if (mTransform == NULL)
-			throw AppException("ControllerComponent::Startup()\n" + mOwner->mName + " does not contain TransformComponent");
+		if (mTransform == nullptr)
+			throw AppException("Controller2D::Startup()\n" + mOwner->mName + " does not contain TransformComponent");
 	}
 
 	void Controller2D::Save(Archive& archive)
-	{}
+	{ }
 
 	void Controller2D::Load(Archive& archive)
-	{}
+	{ }
 
 	///////////////////////////////
 

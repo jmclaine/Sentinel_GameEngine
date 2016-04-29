@@ -11,9 +11,9 @@
 namespace Sentinel
 {
 	ShaderDX::SamplerDX::SamplerDX() :
-		mContext(NULL),
-		mSampler(NULL)
-	{}
+		mContext(nullptr),
+		mSampler(nullptr)
+	{ }
 
 	ShaderDX::SamplerDX::~SamplerDX()
 	{
@@ -23,10 +23,10 @@ namespace Sentinel
 
 	bool ShaderDX::SamplerDX::Create(
 		ID3D11Device* device, ID3D11DeviceContext* context,
-		SamplerMode::Type modeU, SamplerMode::Type modeV,
-		SamplerFilter::Type minFilter,
-		SamplerFilter::Type magFilter,
-		SamplerFilter::Type mipFilter)
+		SamplerMode modeU, SamplerMode modeV,
+		SamplerFilter minFilter,
+		SamplerFilter magFilter,
+		SamplerFilter mipFilter)
 	{
 		mContext = context;
 
@@ -121,12 +121,12 @@ namespace Sentinel
 	ShaderDX::ShaderDX(ID3D11Device* device, ID3D11DeviceContext* context) :
 		mDevice(device),
 		mContext(context),
-		mVertexShader(NULL),
-		mGeometryShader(NULL),
-		mPixelShader(NULL),
-		mConstantBuffer(NULL),
+		mVertexShader(nullptr),
+		mGeometryShader(nullptr),
+		mPixelShader(nullptr),
+		mConstantBuffer(nullptr),
 		mTextureLevel(0)
-	{}
+	{ }
 
 	ShaderDX::~ShaderDX()
 	{
@@ -135,12 +135,12 @@ namespace Sentinel
 
 	void ShaderDX::Release()
 	{
-		mDevice = NULL;
-		mContext = NULL;
+		mDevice = nullptr;
+		mContext = nullptr;
 
-		mVertexShader = NULL;
-		mGeometryShader = NULL;
-		mPixelShader = NULL;
+		mVertexShader = nullptr;
+		mGeometryShader = nullptr;
+		mPixelShader = nullptr;
 
 		SAFE_RELEASE_PTR(mConstantBuffer);
 		SAFE_DELETE_MAP(mSamplers);
@@ -201,7 +201,7 @@ namespace Sentinel
 
 		// Compile Geometry Shader.
 		//
-		if (strstr(mSource, "GS_Main") != NULL)
+		if (strstr(mSource, "GS_Main") != nullptr)
 		{
 			ID3D10Blob* blobGS = Compile(GEOMETRY_SHADER);
 
@@ -229,7 +229,7 @@ namespace Sentinel
 
 		// Get shader reflection info.
 		//
-		ID3D11ShaderReflection* reflect = NULL;
+		ID3D11ShaderReflection* reflect = nullptr;
 		if (D3DReflect(blobVS->GetBufferPointer(), blobVS->GetBufferSize(), IID_ID3D11ShaderReflection, (void**)&reflect) == S_FALSE)
 		{
 			SAFE_RELEASE_PTR(blobVS);
@@ -317,11 +317,11 @@ namespace Sentinel
 
 		layout->Create(mDevice, blobVS);
 
-		mLayout = std::shared_ptr< VertexLayout >(layout);
+		mLayout = std::shared_ptr<VertexLayout>(layout);
 
 		// Create uniforms / constant buffers.
 		//
-		ID3D11ShaderReflectionConstantBuffer* cbuffer = NULL;
+		ID3D11ShaderReflectionConstantBuffer* cbuffer = nullptr;
 
 		if (desc.ConstantBuffers > 0)
 		{
@@ -488,15 +488,15 @@ namespace Sentinel
 
 	ID3D10Blob* ShaderDX::Compile(ShaderType type)
 	{
-		ID3D10Blob* shaderBlob = NULL;
-		ID3D10Blob* errorBlob = NULL;
+		ID3D10Blob* shaderBlob = nullptr;
+		ID3D10Blob* errorBlob = nullptr;
 
 		D3D10_SHADER_MACRO macro[2] = { { "VERSION_DX", 0 }, { 0, 0 } };
 
-		if (FAILED(D3DX11CompileFromMemory(mSource, strlen(mSource), 0, macro, NULL,
+		if (FAILED(D3DX11CompileFromMemory(mSource, strlen(mSource), 0, macro, nullptr,
 			(type == VERTEX_SHADER) ? "VS_Main" : (type == GEOMETRY_SHADER) ? "GS_Main" : (type == PIXEL_SHADER) ? "PS_Main" : 0,
 			(type == VERTEX_SHADER) ? "vs_4_0" : (type == GEOMETRY_SHADER) ? "gs_4_0" : (type == PIXEL_SHADER) ? "ps_4_0" : 0,
-			D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &shaderBlob, &errorBlob, NULL)))
+			D3D10_SHADER_ENABLE_STRICTNESS, 0, nullptr, &shaderBlob, &errorBlob, nullptr)))
 		{
 			if (errorBlob)
 				Debug::Log((char*)errorBlob->GetBufferPointer());
@@ -504,7 +504,7 @@ namespace Sentinel
 			SAFE_RELEASE_PTR(shaderBlob);
 			SAFE_RELEASE_PTR(errorBlob);
 
-			return NULL;
+			return nullptr;
 		}
 
 		SAFE_RELEASE_PTR(errorBlob);
@@ -549,7 +549,7 @@ namespace Sentinel
 		}
 		else
 		{
-			mContext->PSSetShaderResources(mTextureLevel, 1, NULL);
+			mContext->PSSetShaderResources(mTextureLevel, 1, nullptr);
 		}
 
 		++mTextureLevel;
@@ -562,12 +562,12 @@ namespace Sentinel
 
 	void ShaderDX::SetSampler(
 		UINT index,
-		SamplerMode::Type modeU, SamplerMode::Type modeV,
-		SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter)
+		SamplerMode modeU, SamplerMode modeV,
+		SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter)
 	{
 		_ASSERT(index < mNumSamplers);
 
-		SamplerDX* sampler = NULL;
+		SamplerDX* sampler = nullptr;
 
 		auto it = mSamplers.find(index);
 		if (it == mSamplers.end())
@@ -587,8 +587,8 @@ namespace Sentinel
 
 	void ShaderDX::SetSamplerCube(
 		UINT index,
-		SamplerMode::Type modeU, SamplerMode::Type modeV, SamplerMode::Type modeW,
-		SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter)
+		SamplerMode modeU, SamplerMode modeV, SamplerMode modeW,
+		SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter)
 	{
 		_ASSERT(0);	// TODO
 	}
@@ -599,9 +599,9 @@ namespace Sentinel
 	{
 		mTextureLevel = 0;
 
-		mContext->VSSetShader(mVertexShader, NULL, 0);
-		mContext->GSSetShader(mGeometryShader, NULL, 0);
-		mContext->PSSetShader(mPixelShader, NULL, 0);
+		mContext->VSSetShader(mVertexShader, nullptr, 0);
+		mContext->GSSetShader(mGeometryShader, nullptr, 0);
+		mContext->PSSetShader(mPixelShader, nullptr, 0);
 
 		if (mConstantBuffer)
 		{
@@ -620,5 +620,5 @@ namespace Sentinel
 	}
 
 	void ShaderDX::Disable()
-	{}
+	{ }
 }

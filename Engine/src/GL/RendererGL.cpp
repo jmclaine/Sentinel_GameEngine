@@ -10,25 +10,26 @@
 #include "TextureGL.h"
 #include "ShaderGL.h"
 #include "VertexLayoutGL.h"
+#include "DepthStencil.h"
+#include "RenderTexture.h"
+#include "WindowInfo.h"
+#include "BlendState.h"
 
 namespace Sentinel
 {
 	class RendererGL : public Renderer
 	{
 	private:
-
-		static const UINT PRIMITIVE[PrimitiveFormat::COUNT];
-		static const GLenum CULL_TYPE[CullFormat::COUNT];
-		static const UINT FILL_TYPE[FillFormat::COUNT];
+		static const UINT PRIMITIVE[(BYTE)PrimitiveFormat::COUNT];
+		static const GLenum CULL_TYPE[(BYTE)CullFormat::COUNT];
+		static const UINT FILL_TYPE[(BYTE)FillFormat::COUNT];
 
 	public:
-
 		class WindowInfoGL : public WindowInfo
 		{
 			friend class RendererGL;
 
 		public:
-
 			HDC mHDC;
 			HGLRC mContext;
 
@@ -40,13 +41,12 @@ namespace Sentinel
 		class RenderTextureGL : public RenderTexture
 		{
 		public:
-
 			GLuint mID;
 
 			RenderTextureGL(GLuint id, Texture* texture) :
 				mID(id),
 				RenderTexture(texture)
-			{}
+			{ }
 
 			~RenderTextureGL()
 			{
@@ -59,12 +59,10 @@ namespace Sentinel
 		class DepthStencilGL : public DepthStencil
 		{
 		private:
-
-			DepthFormat::Type mCurrDepth;
+			DepthFormat mCurrDepth;
 			bool mDepthEnabled;
 
 		public:
-
 			GLuint mID;
 
 			/////////////////////////
@@ -74,9 +72,9 @@ namespace Sentinel
 				mCurrDepth(DepthFormat::OFF),
 				mDepthEnabled(false),
 				DepthStencil(width, height)
-			{}
+			{ }
 
-			void SetDepth(DepthFormat::Type depth)
+			void SetDepth(DepthFormat depth)
 			{
 				if (mCurrDepth != depth)
 				{
@@ -116,7 +114,6 @@ namespace Sentinel
 						if (mDepthEnabled)
 						{
 							glDepthMask(GL_FALSE);
-
 							mDepthEnabled = false;
 						}
 						return;
@@ -130,7 +127,6 @@ namespace Sentinel
 				if (!mDepthEnabled)
 				{
 					glDepthMask(GL_TRUE);
-
 					mDepthEnabled = true;
 				}
 			}
@@ -141,46 +137,44 @@ namespace Sentinel
 		class BlendStateGL : public BlendState
 		{
 		private:
-
-			static GLenum BLEND_TYPE[BlendFormat::COUNT];
-			static GLenum BLEND_FUNC[BlendFunction::COUNT];
+			static GLenum BLEND_TYPE[(BYTE)BlendFormat::COUNT];
+			static GLenum BLEND_FUNC[(BYTE)BlendFunction::COUNT];
 
 			static BlendStateGL CURR_STATE;
 
 		public:
-
 			bool mEnable;
 
 			BlendStateGL(
 				bool enable,
-				BlendFormat::Type srcBlendColor, BlendFormat::Type dstBlendColor,
-				BlendFormat::Type srcBlendAlpha, BlendFormat::Type dstBlendAlpha,
-				BlendFunction::Type blendFuncColor, BlendFunction::Type blendFuncAlpha) :
+				BlendFormat srcBlendColor, BlendFormat dstBlendColor, BlendFunction blendFuncColor,
+				BlendFormat srcBlendAlpha, BlendFormat dstBlendAlpha, BlendFunction blendFuncAlpha) :
 				mEnable(enable),
-				BlendState(srcBlendColor, dstBlendColor,
-				srcBlendAlpha, dstBlendAlpha,
-				blendFuncColor, blendFuncAlpha)
-			{}
+				BlendState(
+					srcBlendColor, dstBlendColor, blendFuncColor,
+					srcBlendAlpha, dstBlendAlpha, blendFuncAlpha)
+			{ }
 
 			~BlendStateGL()
-			{}
+			{ }
 
 			void Apply()
 			{
 				if (mEnable)
 				{
-					//if( !CURR_STATE.mEnable )
+					//if(!CURR_STATE.mEnable)
 					{
 						glEnable(GL_BLEND);
 
 						CURR_STATE.mEnable = true;
 					}
 
-					//if( CURR_STATE.mSrcBlendColor != mSrcBlendColor || CURR_STATE.mDstBlendColor != mDstBlendColor ||
-					//	CURR_STATE.mSrcBlendAlpha != mSrcBlendAlpha || CURR_STATE.mDstBlendAlpha != mDstBlendAlpha )
+					//if (CURR_STATE.mSrcBlendColor != mSrcBlendColor || CURR_STATE.mDstBlendColor != mDstBlendColor ||
+					//	CURR_STATE.mSrcBlendAlpha != mSrcBlendAlpha || CURR_STATE.mDstBlendAlpha != mDstBlendAlpha)
 					{
-						glBlendFuncSeparate(BLEND_TYPE[mSrcBlendColor], BLEND_TYPE[mDstBlendColor], \
-							BLEND_TYPE[mSrcBlendAlpha], BLEND_TYPE[mDstBlendAlpha]);
+						glBlendFuncSeparate(
+							BLEND_TYPE[(BYTE)mSrcBlendColor], BLEND_TYPE[(BYTE)mDstBlendColor],
+							BLEND_TYPE[(BYTE)mSrcBlendAlpha], BLEND_TYPE[(BYTE)mDstBlendAlpha]);
 
 						CURR_STATE.mSrcBlendColor = mSrcBlendColor;
 						CURR_STATE.mDstBlendColor = mDstBlendColor;
@@ -188,9 +182,9 @@ namespace Sentinel
 						CURR_STATE.mDstBlendAlpha = mDstBlendAlpha;
 					}
 
-					//if( CURR_STATE.mBlendFuncColor != mBlendFuncColor || CURR_STATE.mBlendFuncAlpha != mBlendFuncAlpha )
+					//if (CURR_STATE.mBlendFuncColor != mBlendFuncColor || CURR_STATE.mBlendFuncAlpha != mBlendFuncAlpha)
 					{
-						glBlendEquationSeparate(BLEND_FUNC[mBlendFuncColor], BLEND_FUNC[mBlendFuncAlpha]);
+						glBlendEquationSeparate(BLEND_FUNC[(BYTE)mBlendFuncColor], BLEND_FUNC[(BYTE)mBlendFuncAlpha]);
 
 						CURR_STATE.mBlendFuncColor = mBlendFuncColor;
 						CURR_STATE.mBlendFuncAlpha = mBlendFuncAlpha;
@@ -198,7 +192,7 @@ namespace Sentinel
 				}
 				else
 				{
-					//if( CURR_STATE.mEnable )
+					//if (CURR_STATE.mEnable)
 					{
 						glDisable(GL_BLEND);
 
@@ -209,7 +203,6 @@ namespace Sentinel
 		};
 
 	private:
-
 		WindowInfoGL* mCurrWindow;
 		RenderTexture* mCurrRenderTexture;
 		DepthStencil* mCurrDepthStencil;
@@ -221,23 +214,19 @@ namespace Sentinel
 		float* mClearColor;
 
 	public:
-
 		RendererGL()
 		{
-			NULL_TEXTURE = NULL;
-			BASE_TEXTURE = NULL;
-
-			mCurrWindow = NULL;
-			mCurrRenderTexture = NULL;
-			mCurrDepthStencil = NULL;
+			mCurrWindow = nullptr;
+			mCurrRenderTexture = nullptr;
+			mCurrDepthStencil = nullptr;
 
 			mClearDepth = 1.0f;
 
-			mCurrShader = NULL;
+			mCurrShader = nullptr;
 		}
 
 		RendererGL::~RendererGL()
-		{}
+		{ }
 
 		WindowInfo* Startup(void* hWnd, bool fullscreen, UINT width, UINT height)
 		{
@@ -247,14 +236,14 @@ namespace Sentinel
 			mCurrWindow->mFullscreen = fullscreen;
 			mCurrWindow->mWidth = width;
 			mCurrWindow->mHeight = height;
-			mCurrWindow->mWidthRatio = (float)width / (float)WINDOW_WIDTH_BASE;
-			mCurrWindow->mHeightRatio = (float)height / (float)WINDOW_HEIGHT_BASE;
+			mCurrWindow->mWidthRatio = (float)width / (float)WindowInfo::BASE_WIDTH;
+			mCurrWindow->mHeightRatio = (float)height / (float)WindowInfo::BASE_HEIGHT;
 			mCurrWindow->mHDC = GetDC((HWND)hWnd);
 
 			if (!mCurrWindow->mHDC)
 			{
 				delete mCurrWindow;
-				return NULL;
+				return nullptr;
 			}
 
 			PIXELFORMATDESCRIPTOR pixelFormatDescriptor = { 0 };
@@ -270,7 +259,7 @@ namespace Sentinel
 			if (!pixelFormat)
 			{
 				delete mCurrWindow;
-				return NULL;
+				return nullptr;
 			}
 
 			SetPixelFormat(mCurrWindow->mHDC, pixelFormat, &pixelFormatDescriptor);
@@ -293,7 +282,7 @@ namespace Sentinel
 				if (ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
 				{
 					delete mCurrWindow;
-					return NULL;
+					return nullptr;
 				}
 			}
 
@@ -304,61 +293,17 @@ namespace Sentinel
 			glEnable(GL_DEPTH_TEST);
 
 			SetCull(CullFormat::CCW);
-
-			// Create NULL_TEXTURE
-			//
-			if (!NULL_TEXTURE.get())
-				NULL_TEXTURE = std::shared_ptr<Texture>(new TextureGL(0, 0, ImageFormat::RGBA, 0));
-
-			// Create white BASE_TEXTURE
-			//
-			if (!BASE_TEXTURE.get())
-			{
-				UCHAR* newTex = new UCHAR[4];
-
-				newTex[0] = 255;
-				newTex[1] = 255;
-				newTex[2] = 255;
-				newTex[3] = 255;
-
-				BASE_TEXTURE = std::shared_ptr<Texture>(CreateTexture(newTex, 1, 1, ImageFormat::RGBA, false));
-
-				if (!BASE_TEXTURE)
-				{
-					delete mCurrWindow;
-					return NULL;
-				}
-
-				delete newTex;
-			}
-
-			// Create non-blending state.
-			//
-			if (!BLEND_OFF.get())
-				BLEND_OFF = std::shared_ptr<BlendState>(
-					new BlendStateGL(
-						false, 
-						BlendFormat::ZERO, BlendFormat::ZERO,
-						BlendFormat::ZERO, BlendFormat::ZERO,
-						BlendFunction::ADD, BlendFunction::ADD));
-
-			// Create default alpha-blending state
-			//
-			if (!BLEND_ALPHA.get())
-				BLEND_ALPHA = std::shared_ptr<BlendState>(CreateBlendState());
-
-			SetBlendState(BLEND_ALPHA.get());
-
+				
 			return mCurrWindow;
 		}
 
 		void Shutdown()
 		{
-			mCurrShader = NULL;
+			mCurrShader = nullptr;
 
 			if (mCurrWindow)
 			{
-				wglMakeCurrent(NULL, NULL);
+				wglMakeCurrent(nullptr, nullptr);
 				wglDeleteContext(mCurrWindow->mContext);
 				mCurrWindow->mContext = 0;
 
@@ -366,9 +311,8 @@ namespace Sentinel
 			}
 		}
 
-		//
-		// Windows
-		//
+		#pragma region Windows
+
 		void SetWindow(WindowInfo* info)
 		{
 			_ASSERT(info);
@@ -391,10 +335,11 @@ namespace Sentinel
 			return wglShareLists(((WindowInfoGL*)info0)->mContext, ((WindowInfoGL*)info1)->mContext) != 0;
 		}
 
-		//
-		// Buffers
-		//
-		Buffer* CreateBuffer(void* data, UINT size, UINT stride, BufferFormat::Type type, BufferAccess::Type access)
+		#pragma endregion
+
+		#pragma region Buffers
+
+		Buffer* CreateBuffer(void* data, UINT size, UINT stride, BufferFormat type, BufferAccess access)
 		{
 			return new BufferGL(this, data, size, stride, type, access);
 		}
@@ -423,9 +368,10 @@ namespace Sentinel
 			}
 		}
 
-		//
-		// Textures
-		//
+		#pragma endregion
+
+		#pragma region Textures
+
 		Texture* CreateTextureFromFile(const char* filename, bool createMips = true)
 		{
 			// TODO: Check for compatible texture size.
@@ -447,7 +393,7 @@ namespace Sentinel
 					STREAM(filename << " failed to load."),
 					STREAM("Texture Load Error"));
 
-				return NULL;
+				return nullptr;
 			}
 
 			Texture* texture = CreateTexture(pixels, width, height, ImageFormat::RGBA, createMips);
@@ -457,7 +403,7 @@ namespace Sentinel
 			return texture;
 		}
 
-		Texture* CreateTexture(void* data, UINT width, UINT height, ImageFormat::Type format, bool createMips = true)
+		Texture* CreateTexture(void* data, UINT width, UINT height, ImageFormat format, bool createMips = true)
 		{
 			GLuint texID;
 			glGenTextures(1, &texID);
@@ -502,7 +448,7 @@ namespace Sentinel
 
 			default:
 				_ASSERT(0); // invalid image type
-				return NULL;
+				return nullptr;
 			}
 
 			if (createMips)
@@ -511,7 +457,7 @@ namespace Sentinel
 			return new TextureGL(width, height, format, texID);
 		}
 
-		Texture* CreateTextureCube(void* data, UINT width, UINT height, ImageFormat::Type format)
+		Texture* CreateTextureCube(void* data, UINT width, UINT height, ImageFormat format)
 		{
 			GLuint texID;
 			glGenTextures(1, &texID);
@@ -541,7 +487,7 @@ namespace Sentinel
 				else
 				{
 					for (UINT x = 0; x < 6; ++x)
-						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_R32F, width, height, 0, GL_RED, GL_FLOAT, NULL);
+						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_R32F, width, height, 0, GL_RED, GL_FLOAT, nullptr);
 				}
 				break;
 
@@ -557,7 +503,7 @@ namespace Sentinel
 				else
 				{
 					for (UINT x = 0; x < 6; ++x)
-						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RG32F, width, height, 0, GL_RG, GL_FLOAT, NULL);
+						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RG32F, width, height, 0, GL_RG, GL_FLOAT, nullptr);
 				}
 				break;
 
@@ -573,7 +519,7 @@ namespace Sentinel
 				else
 				{
 					for (UINT x = 0; x < 6; ++x)
-						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
 				}
 				break;
 
@@ -589,7 +535,7 @@ namespace Sentinel
 				else
 				{
 					for (UINT x = 0; x < 6; ++x)
-						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 				}
 				break;
 
@@ -605,7 +551,7 @@ namespace Sentinel
 				else
 				{
 					for (UINT x = 0; x < 6; ++x)
-						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
 				}
 				break;
 
@@ -621,13 +567,13 @@ namespace Sentinel
 				else
 				{
 					for (UINT x = 0; x < 6; ++x)
-						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+						glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 				}
 				break;
 
 			default:
 				_ASSERT(0); // invalid image type
-				return NULL;
+				return nullptr;
 			}
 
 			return new TextureGL(width, height, format, texID);
@@ -643,11 +589,13 @@ namespace Sentinel
 			return pixels;
 		}
 
-		// Special Rendering
-		//
+		#pragma endregion
+
+		#pragma region Render Settings
+
 		RenderTexture* CreateBackbuffer()
 		{
-			return new RenderTextureGL(0, NULL);
+			return new RenderTextureGL(0, nullptr);
 		}
 
 		RenderTexture* CreateRenderTexture(Texture* texture)
@@ -669,7 +617,7 @@ namespace Sentinel
 					"Failed to create Render Target",
 					"OpenGL Render Target");
 
-				return NULL;
+				return nullptr;
 			}
 
 			return new RenderTextureGL(id, texture);
@@ -687,14 +635,12 @@ namespace Sentinel
 		}
 
 		BlendState* CreateBlendState(
-			BlendFormat::Type srcBlendColor = BlendFormat::SRC_ALPHA, BlendFormat::Type dstBlendColor = BlendFormat::ONE_MINUS_SRC_ALPHA,
-			BlendFormat::Type srcBlendAlpha = BlendFormat::SRC_ALPHA, BlendFormat::Type dstBlendAlpha = BlendFormat::ONE_MINUS_SRC_ALPHA,
-			BlendFunction::Type blendFuncColor = BlendFunction::ADD, BlendFunction::Type blendFuncAlpha = BlendFunction::ADD)
+			BlendFormat srcBlendColor, BlendFormat dstBlendColor, BlendFunction blendFuncColor,
+			BlendFormat srcBlendAlpha, BlendFormat dstBlendAlpha, BlendFunction blendFuncAlpha)
 		{
 			return new BlendStateGL(true,
-				srcBlendColor, dstBlendColor,
-				srcBlendAlpha, dstBlendAlpha,
-				blendFuncColor, blendFuncAlpha);
+				srcBlendColor, dstBlendColor, blendFuncColor,
+				srcBlendAlpha, dstBlendAlpha, blendFuncAlpha);
 		}
 
 		UINT ResizeBuffers(UINT width, UINT height)
@@ -702,8 +648,8 @@ namespace Sentinel
 			mCurrWindow->mWidth = width;
 			mCurrWindow->mHeight = height;
 
-			mCurrWindow->mWidthRatio = (float)width / (float)WINDOW_WIDTH_BASE;
-			mCurrWindow->mHeightRatio = (float)height / (float)WINDOW_HEIGHT_BASE;
+			mCurrWindow->mWidthRatio = (float)width / (float)WindowInfo::BASE_WIDTH;
+			mCurrWindow->mHeightRatio = (float)height / (float)WindowInfo::BASE_HEIGHT;
 
 			return 1;
 		}
@@ -712,7 +658,7 @@ namespace Sentinel
 		{
 			if (mCurrRenderTexture != target)
 			{
-				glBindFramebuffer(GL_FRAMEBUFFER, (target) ? static_cast<RenderTextureGL*>(target)->mID : NULL);
+				glBindFramebuffer(GL_FRAMEBUFFER, (target) ? static_cast<RenderTextureGL*>(target)->mID : 0);
 
 				mCurrRenderTexture = target;
 			}
@@ -722,19 +668,19 @@ namespace Sentinel
 		{
 			if (mCurrDepthStencil != stencil)
 			{
-				glBindRenderbuffer(GL_RENDERBUFFER, (stencil) ? static_cast<DepthStencilGL*>(stencil)->mID : NULL);
+				glBindRenderbuffer(GL_RENDERBUFFER, (stencil) ? static_cast<DepthStencilGL*>(stencil)->mID : 0);
 
 				mCurrDepthStencil = stencil;
 			}
 		}
 
-		void SetDepthStencilType(DepthFormat::Type depth)
+		void SetDepthStencilType(DepthFormat depth)
 		{
 			//if( mCurrDepthStencil )
 			//	static_cast< DepthStencilGL* >(mCurrDepthStencil)->SetDepth( depth );
 			//else
 			{
-				static DepthFormat::Type CURR_DEPTH = DepthFormat::UNKNOWN;
+				static DepthFormat CURR_DEPTH = DepthFormat::UNKNOWN;
 				static bool DEPTH_ENABLED = true;
 
 				if (depth == DepthFormat::OFF)
@@ -820,9 +766,9 @@ namespace Sentinel
 			}
 		}
 
-		UINT SetCull(CullFormat::Type type)
+		UINT SetCull(CullFormat type)
 		{
-			static CullFormat::Type CURR_CULL = CullFormat::CCW;
+			static CullFormat CURR_CULL = CullFormat::CCW;
 
 			if (CURR_CULL != type)
 			{
@@ -839,11 +785,11 @@ namespace Sentinel
 						ENABLE_CULL = true;
 					}
 
-					static CullFormat::Type CURR_FACE = CullFormat::CCW;
+					static CullFormat CURR_FACE = CullFormat::CCW;
 
 					if (CURR_FACE != type)
 					{
-						glFrontFace(CULL_TYPE[type]);
+						glFrontFace(CULL_TYPE[(BYTE)type]);
 
 						CURR_FACE = type;
 					}
@@ -859,9 +805,9 @@ namespace Sentinel
 			return S_OK;
 		}
 
-		UINT SetFill(FillFormat::Type type)
+		UINT SetFill(FillFormat type)
 		{
-			glPolygonMode(GL_FRONT_AND_BACK, FILL_TYPE[type]);
+			glPolygonMode(GL_FRONT_AND_BACK, FILL_TYPE[(BYTE)type]);
 
 			return S_OK;
 		}
@@ -873,8 +819,10 @@ namespace Sentinel
 			static_cast<BlendStateGL*>(blend)->Apply();
 		}
 
-		// Shaders.
-		//
+		#pragma endregion
+
+		#pragma region Shaders
+
 		Shader* CreateShaderFromFile(const char* filename)
 		{
 			ShaderGL* shader = new ShaderGL();
@@ -882,7 +830,7 @@ namespace Sentinel
 			if (shader->CreateFromFile(filename) != S_OK)
 			{
 				delete shader;
-				return NULL;
+				return nullptr;
 			}
 
 			return shader;
@@ -895,15 +843,17 @@ namespace Sentinel
 			if (shader->CreateFromMemory(const_cast<char*>(source)) != S_OK)
 			{
 				delete shader;
-				return NULL;
+				return nullptr;
 			}
 
 			return shader;
 		}
 
-		// Vertex Layout.
-		//
-		VertexLayout* CreateVertexLayout(const std::vector<VertexAttribute::Type>& attrib)
+		#pragma endregion
+
+		#pragma region Vertex Layout
+
+		VertexLayout* CreateVertexLayout(const std::vector<VertexAttribute>& attrib)
 		{
 			VertexLayoutGL* layout = new VertexLayoutGL();
 
@@ -922,18 +872,18 @@ namespace Sentinel
 
 			ShaderGL* shaderGL = static_cast<ShaderGL*>(mCurrShader);
 
-			const std::vector<VertexAttribute::Type>& layout = vertexLayout->Layout();
+			const std::vector<VertexAttribute>& layout = vertexLayout->Layout();
 			UINT size = (UINT)layout.size();
 			UINT index = 0;
 
-			VertexAttribute::Type type;
+			VertexAttribute type;
 			GLint loc;
 
 			for (UINT x = 0; x < size; ++x)
 			{
 				type = layout[x];
 
-				loc = (GLint)shaderGL->mAttributeGL[type];
+				loc = (GLint)shaderGL->mAttributeGL[(BYTE)type];
 
 				if (type != VertexAttribute::MATRIX)
 				{
@@ -957,8 +907,10 @@ namespace Sentinel
 			}
 		}
 
-		// Rendering.
-		//
+		#pragma endregion
+
+		#pragma region Rendering
+
 		void Clear(float* color, float depth)
 		{
 			if (mClearColor != color)
@@ -1002,14 +954,15 @@ namespace Sentinel
 			glClear(GL_DEPTH_BUFFER_BIT);
 		}
 
-		void Draw(PrimitiveFormat::Type primitive, UINT count, UINT baseVertex)
+		void Draw(PrimitiveFormat primitive, UINT count, UINT baseVertex)
 		{
-			glDrawArrays(PRIMITIVE[primitive], baseVertex, count);
+			glDrawArrays(PRIMITIVE[(BYTE)primitive], baseVertex, count);
 		}
 
-		void DrawIndexed(PrimitiveFormat::Type primitive, UINT count, UINT startIndex, UINT baseVertex)
+		void DrawIndexed(PrimitiveFormat primitive, UINT count, UINT startIndex, UINT baseVertex)
 		{
-			glDrawRangeElementsBaseVertex(PRIMITIVE[primitive], startIndex, startIndex + count, count, GL_UNSIGNED_INT,
+			//glMultiDrawElementsBaseVertex
+			glDrawRangeElementsBaseVertex(PRIMITIVE[(BYTE)primitive], startIndex, startIndex + count, count, GL_UNSIGNED_INT,
 				reinterpret_cast<void*>(startIndex * sizeof(UINT)), baseVertex);
 		}
 
@@ -1020,6 +973,8 @@ namespace Sentinel
 			glFlush();
 			glFinish();
 		}
+
+		#pragma endregion
 	};
 
 	///////////////////////////////////////////////////
@@ -1048,10 +1003,12 @@ namespace Sentinel
 	{
 		GL_ZERO,
 		GL_ONE,
+
 		GL_SRC_COLOR,
 		GL_ONE_MINUS_SRC_COLOR,
 		GL_SRC_ALPHA,
 		GL_ONE_MINUS_SRC_ALPHA,
+
 		GL_DST_COLOR,
 		GL_ONE_MINUS_DST_COLOR,
 		GL_DST_ALPHA,
@@ -1071,8 +1028,8 @@ namespace Sentinel
 
 	RendererGL::BlendStateGL RendererGL::BlendStateGL::CURR_STATE(
 		false,
-		BlendFormat::UNKNOWN, BlendFormat::UNKNOWN, BlendFormat::UNKNOWN, BlendFormat::UNKNOWN,
-		BlendFunction::ADD, BlendFunction::ADD);
+		BlendFormat::UNKNOWN, BlendFormat::UNKNOWN, BlendFunction::ADD,
+		BlendFormat::UNKNOWN, BlendFormat::UNKNOWN, BlendFunction::ADD);
 
 	Renderer* BuildRendererGL()
 	{

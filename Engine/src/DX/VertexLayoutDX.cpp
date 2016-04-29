@@ -5,11 +5,11 @@
 namespace Sentinel
 {
 	VertexLayoutDX::VertexLayoutDX() :
-		mInputLayout(NULL)
-	{}
+		mInputLayout(nullptr)
+	{ }
 
 	VertexLayoutDX::~VertexLayoutDX()
-	{}
+	{ }
 
 	////////////////////////////////////
 
@@ -30,7 +30,7 @@ namespace Sentinel
 		mVertexSize += size;
 	}
 
-	void VertexLayoutDX::AddAttribute(VertexAttribute::Type type)
+	void VertexLayoutDX::AddAttribute(VertexAttribute type)
 	{
 		switch (type)
 		{
@@ -94,7 +94,7 @@ namespace Sentinel
 			break;
 
 		default:
-			Debug::Log(STREAM("Attempted to add unknown Attribute: " << type));
+			Debug::Log(STREAM("Attempted to add unknown Attribute: " << (WORD)type));
 			return;
 		}
 
@@ -176,11 +176,11 @@ namespace Sentinel
 		source += "};\n\n";
 		source += "VSInput VS_Main( VSInput input ) { return input; }\n";
 
-		ID3D10Blob* shaderBlob = NULL;
+		ID3D10Blob* shaderBlob = nullptr;
 
-		if (D3DX11CompileFromMemory(source.c_str(), source.size(), 0, 0, NULL,
+		if (D3DX11CompileFromMemory(source.c_str(), source.size(), 0, 0, nullptr,
 			"VS_Main", "vs_4_0",
-			D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &shaderBlob, NULL, NULL) == S_FALSE)
+			D3D10_SHADER_ENABLE_STRICTNESS, 0, nullptr, &shaderBlob, nullptr, nullptr) == S_FALSE)
 		{
 			SAFE_RELEASE_PTR(shaderBlob);
 

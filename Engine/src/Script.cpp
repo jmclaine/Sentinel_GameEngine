@@ -407,10 +407,10 @@ namespace Sentinel
 			if (_IP >= 0)
 				IP = _IP;
 
-			if (globalCopy == NULL)
+			if (globalCopy == nullptr)
 				globalCopy = &global;
 
-			if (stackCopy == NULL)
+			if (stackCopy == nullptr)
 				stackCopy = &stack;
 
 			((*globalCopy)[GLOBAL_DELTATIME]).num->data = Fixed16(deltaTime);
@@ -719,7 +719,7 @@ namespace Sentinel
 								break;
 
 							default:
-								THROW_SCRIPT_EXCEPTION(IP, "RUN-TIME_ERROR", "Invalid arg[%d] used in '%s'", x, func->name)
+								THROW_SCRIPT_EXCEPTION(IP, "RUN-TIME_ERROR", "Invalid arg[%d] used in '%s'", x, func->name.c_str())
 								break;
 						}
 					}
@@ -939,7 +939,7 @@ namespace Sentinel
 	Value::Value()
 	{
 		type = VALUE_UNDEFINED;
-		num = NULL;
+		num = nullptr;
 	}
 
 	Value::Value(Fixed16 _num)
@@ -962,7 +962,7 @@ namespace Sentinel
 			if (num && num->decRef() == 0)
 			{
 				delete num;
-				num = NULL;
+				num = nullptr;
 			}
 		}
 		else if (type == VALUE_STRING)
@@ -971,7 +971,7 @@ namespace Sentinel
 			if (str && str->decRef() == 0)
 			{
 				delete str;
-				str = NULL;
+				str = nullptr;
 			}
 		}
 		else if (type == VALUE_VECTOR)
@@ -985,7 +985,7 @@ namespace Sentinel
 					vec->data[x].Release();
 				}
 				delete vec;
-				vec = NULL;
+				vec = nullptr;
 			}
 		}
 

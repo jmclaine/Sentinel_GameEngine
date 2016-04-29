@@ -6,10 +6,10 @@
 namespace Sentinel
 {
 	Sprite::Sprite()
-	{}
+	{ }
 
 	Sprite::~Sprite()
-	{}
+	{ }
 
 	//////////////////////////////////////
 

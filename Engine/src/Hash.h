@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Sentinel.h"
-#include "Types.h"
 
 namespace Sentinel
 {
@@ -11,5 +10,5 @@ namespace Sentinel
 	// See http://programmers.stackexchange.com/questions/49550/which-hashing-algorithm-is-best-for-uniqueness-and-speed
 	// for a complete analysis of more hashing algorithms.
 	//
-	UINT SENTINEL_DLL HashString(const char* str);
+	UINT SENTINEL_DLL HashString(const std::string& hashString);
 }

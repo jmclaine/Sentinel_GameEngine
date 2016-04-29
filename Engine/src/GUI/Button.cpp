@@ -7,10 +7,10 @@ namespace GUI
 {
 	Button::Button() :
 		mState(UP)
-	{}
+	{ }
 
 	Button::~Button()
-	{}
+	{ }
 
 	void Button::Update(bool isOver)
 	{
@@ -51,5 +51,5 @@ namespace GUI
 	}
 
 	void Button::Load(Archive& archive)
-	{}
+	{ }
 }}

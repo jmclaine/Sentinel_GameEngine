@@ -3,46 +3,64 @@
 #include "Component/Physics.h"
 #include "Exception.h"
 
-namespace Sentinel {
-namespace Component
+namespace Sentinel
 {
-	DEFINE_SERIAL_REGISTER(Trigger);
-	DEFINE_SERIAL_CLONE(Trigger);
-
-	Trigger::Trigger() :
-		mPhysics(NULL)
-	{}
-
-	Trigger::~Trigger()
-	{}
-
-	void Trigger::Startup()
+	namespace Component
 	{
-		mPhysics = mOwner->GetComponent<Physics>();
+		SerialRegister Trigger::SERIAL_REGISTER("Trigger", Trigger::Clone);
+		Serializable* Trigger::Clone() { return new Trigger(); }
 
-		if (mPhysics == NULL)
-			throw AppException("Trigger::Startup()\n" + std::string(mOwner->mName) + " does not contain PhysicsComponent");
+		Trigger::Trigger() :
+			mPhysics(nullptr)
+		{ }
+
+		Trigger::~Trigger()
+		{ }
+
+		void Trigger::Startup()
+		{
+			mPhysics = mOwner->GetComponent<Physics>();
+
+			if (mPhysics == nullptr)
+				throw AppException("Trigger::Startup()\n" + std::string(mOwner->mName) + " does not contain PhysicsComponent");
+		}
+
+		void Trigger::Update()
+		{ }
+
+		void Trigger::Shutdown()
+		{
+			mPhysics = nullptr;
+		}
+
+		/////////////////////////////////
+
+		void Trigger::Save(Archive& archive)
+		{
+			SERIAL_REGISTER.Save(archive);
+
+			GameComponent::Save(archive);
+		}
+
+		void Trigger::Load(Archive& archive)
+		{
+			GameComponent::Load(archive);
+		}
+
+		/////////////////////////////////
+
+		GameComponent* Trigger::Copy()
+		{
+			Trigger* trigger = new Trigger();
+
+			Copy(trigger);
+
+			return trigger;
+		}
+
+		void Trigger::Copy(GameComponent* component)
+		{
+			GameComponent::Copy(component);
+		}
 	}
-
-	void Trigger::Update()
-	{}
-
-	void Trigger::Shutdown()
-	{
-		mPhysics = NULL;
-	}
-
-	/////////////////////////////////
-
-	void Trigger::Save(Archive& archive)
-	{
-		SERIAL_REGISTER.Save(archive);
-
-		GameComponent::Save(archive);
-	}
-
-	void Trigger::Load(Archive& archive)
-	{
-		GameComponent::Load(archive);
-	}
-}}
+}

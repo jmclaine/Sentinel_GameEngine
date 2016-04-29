@@ -303,27 +303,27 @@ static _WDIR*
 _wopendir(
     const wchar_t *dirname)
 {
-    _WDIR *dirp = NULL;
+    _WDIR *dirp = nullptr;
     int error;
 
     /* Must have directory name */
-    if (dirname == NULL  ||  dirname[0] == '\0') {
+    if (dirname == nullptr  ||  dirname[0] == '\0') {
         dirent_set_errno (ENOENT);
-        return NULL;
+        return nullptr;
     }
 
     /* Allocate new _WDIR structure */
     dirp = (_WDIR*) malloc (sizeof (struct _WDIR));
-    if (dirp != NULL) {
+    if (dirp != nullptr) {
         DWORD n;
 
         /* Reset _WDIR structure */
         dirp->handle = INVALID_HANDLE_VALUE;
-        dirp->patt = NULL;
+        dirp->patt = nullptr;
         dirp->cached = 0;
 
         /* Compute the length of full path plus zero terminator */
-        n = GetFullPathNameW (dirname, 0, NULL, NULL);
+        n = GetFullPathNameW (dirname, 0, nullptr, nullptr);
 
         /* Allocate room for absolute directory name and search pattern */
         dirp->patt = (wchar_t*) malloc (sizeof (wchar_t) * n + 16);
@@ -334,7 +334,7 @@ _wopendir(
              * allows rewinddir() to function correctly even when current
              * working directory is changed between opendir() and rewinddir().
              */
-            n = GetFullPathNameW (dirname, n, dirp->patt, NULL);
+            n = GetFullPathNameW (dirname, n, dirp->patt, nullptr);
             if (n > 0) {
                 wchar_t *p;
 
@@ -386,7 +386,7 @@ _wopendir(
     /* Clean up in case of error */
     if (error  &&  dirp) {
         _wclosedir (dirp);
-        dirp = NULL;
+        dirp = nullptr;
     }
 
     return dirp;
@@ -446,7 +446,7 @@ _wreaddir(
     } else {
 
         /* Last directory entry read */
-        entp = NULL;
+        entp = nullptr;
 
     }
 
@@ -474,7 +474,7 @@ _wclosedir(
         /* Release search pattern */
         if (dirp->patt) {
             free (dirp->patt);
-            dirp->patt = NULL;
+            dirp->patt = nullptr;
         }
 
         /* Release directory structure */
@@ -527,7 +527,7 @@ dirent_first(
 
         /* Failed to re-open directory: no directory entry in memory */
         dirp->cached = 0;
-        datap = NULL;
+        datap = nullptr;
 
     }
     return datap;
@@ -557,13 +557,13 @@ dirent_next(
             /* The very last entry has been processed or an error occured */
             FindClose (dirp->handle);
             dirp->handle = INVALID_HANDLE_VALUE;
-            p = NULL;
+            p = nullptr;
         }
 
     } else {
 
         /* End of directory stream reached */
-        p = NULL;
+        p = nullptr;
 
     }
 
@@ -581,9 +581,9 @@ opendir(
     int error;
 
     /* Must have directory name */
-    if (dirname == NULL  ||  dirname[0] == '\0') {
+    if (dirname == nullptr  ||  dirname[0] == '\0') {
         dirent_set_errno (ENOENT);
-        return NULL;
+        return nullptr;
     }
 
     /* Allocate memory for DIR structure */
@@ -625,7 +625,7 @@ opendir(
     /* Clean up in case of error */
     if (error  &&  dirp) {
         free (dirp);
-        dirp = NULL;
+        dirp = nullptr;
     }
 
     return dirp;
@@ -705,7 +705,7 @@ readdir(
             /* 
              * Cannot convert file name to multi-byte string so construct
              * an errornous directory entry and return that.  Note that
-             * we cannot return NULL as that would stop the processing
+             * we cannot return nullptr as that would stop the processing
              * of directory entries completely.
              */
             entp = &dirp->ent;
@@ -719,7 +719,7 @@ readdir(
 
     } else {
         /* No more directory entries */
-        entp = NULL;
+        entp = nullptr;
     }
 
     return entp;
@@ -737,7 +737,7 @@ closedir(
 
         /* Close wide-character directory stream */
         ok = _wclosedir (dirp->wdirp);
-        dirp->wdirp = NULL;
+        dirp->wdirp = nullptr;
 
         /* Release multi-byte character version */
         free (dirp);

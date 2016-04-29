@@ -1,69 +1,54 @@
 #include "RenderManager.h"
 #include "Component/Drawable.h"
-#include "RendererTypes.h"
+#include "RenderLayer.h"
+#include "GameObject.h"
+#include <algorithm>
 
 namespace Sentinel
 {
 	RenderManager::RenderManager()
-	{
-		for (WORD x = 0; x < (int)RenderLayer::LENGTH; ++x)
-		{
-			mBackground[(1 << x)] = std::multimap<WORD, Component::Drawable*>();
-		}
-	}
-
-	RenderManager::~RenderManager()
-	{
-		Clear();
-	}
+	{ }
 
 	////////////////////////////////////
 
 	void RenderManager::Clear()
 	{
-		WORD currLayer;
-
-		for (WORD x = 0; x < (int)RenderLayer::LENGTH; ++x)
-		{
-			currLayer = 1 << x;
-
-			mBackground[currLayer].clear();
-			mAlpha[currLayer].clear();
-			mForeground[currLayer].clear();
-		}
+		mDrawables.clear();
+		mDebugDraw.clear();
 	}
 
-	void RenderManager::Draw(Component::Drawable* drawable, WORD renderQueue, WORD layer)
+	void RenderManager::Add(Component::Drawable* drawable, WORD queue)
 	{
-		WORD currLayer;
+		WORD layer = (WORD)drawable->GetOwner()->mLayer;
 
-		for (WORD x = 0; x < (int)RenderLayer::LENGTH; ++x)
+		auto render_it = mDrawables.find(layer);
+
+		if (render_it == mDrawables.end())
 		{
-			currLayer = 1 << x;
-
-			if (layer & currLayer)
-			{
-				if (renderQueue < (WORD)(RenderQueue::ALPHA_BLEND))
-				{
-					mBackground[currLayer].insert(std::pair<WORD, Component::Drawable*>(renderQueue, drawable));
-				}
-				else if (renderQueue < (WORD)(RenderQueue::FOREGROUND))
-				{
-					mAlpha[currLayer].insert(std::pair<WORD, Component::Drawable*>(renderQueue, drawable));
-				}
-				else
-				{
-					mForeground[currLayer].insert(std::pair<WORD, Component::Drawable*>(renderQueue, drawable));
-				}
-			}
+			mDrawables[layer] = std::map<WORD, std::multimap<UINT, Component::Drawable*>>();
 		}
+		
+		auto& renderLayer = mDrawables[layer];
+		auto queue_it = renderLayer.find(queue);
+
+		if (queue_it == renderLayer.end())
+		{
+			renderLayer[queue] = std::multimap<UINT, Component::Drawable*>();
+		}
+
+		renderLayer[queue].insert(std::pair<UINT, Component::Drawable*>(drawable->ID(), drawable));
+	}
+
+	void RenderManager::Remove(Component::Drawable* drawable, WORD queue)
+	{
+		auto& renderLayer = mDrawables[(WORD)drawable->GetOwner()->mLayer];
+		renderLayer[queue].erase(drawable->ID());
 	}
 
 	void RenderManager::Present(Component::Camera* camera)
 	{
 		WORD layer = camera->mRenderLayer;
-		WORD currLayer = 0;
-		std::multimap<WORD, Component::Drawable*>* drawable;
+		WORD currLayer;
 
 		for (WORD x = 0; x < (int)RenderLayer::LENGTH; ++x)
 		{
@@ -71,20 +56,20 @@ namespace Sentinel
 
 			if (layer & currLayer)
 			{
-				drawable = &mBackground[currLayer];
-				for (auto it = drawable->begin(); it != drawable->end(); ++it)
-					if (it->second->CheckVisible(camera))
-						it->second->Draw();
+				auto drawable = mDrawables[currLayer];
 
-				drawable = &mAlpha[currLayer];
-				for (auto it = drawable->begin(); it != drawable->end(); ++it)
-					if (it->second->CheckVisible(camera))
-						it->second->Draw();
+				std::for_each(drawable.begin(), drawable.end(), [camera](const std::pair<WORD, std::multimap<UINT, Component::Drawable*>>& drawQueue)
+				{
+					auto queue = drawQueue.second;
 
-				drawable = &mForeground[currLayer];
-				for (auto it = drawable->begin(); it != drawable->end(); ++it)
-					if (it->second->CheckVisible(camera))
-						it->second->Draw();
+					std::for_each(queue.begin(), queue.end(), [camera](const std::pair<UINT, Component::Drawable*>& item)
+					{
+						auto component = item.second;
+
+						if (component->mEnabled && component->CheckVisible(camera))
+							component->Draw(camera);
+					});
+				});
 			}
 		}
 	}

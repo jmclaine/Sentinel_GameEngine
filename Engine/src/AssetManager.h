@@ -1,6 +1,6 @@
 #pragma once
 /*
-Each managed type saves and loads the string
+Each managed T saves and loads the string
 designation.  It should use an int to save
 memory and not require the unordered_map.
 A simple function to convert the string
@@ -17,14 +17,13 @@ See function for more details.
 
 namespace Sentinel
 {
-	template<class Type>
+	template<class T>
 	class AssetManager
 	{
 	protected:
+		std::unordered_map<std::string, std::shared_ptr<T>> mData;
 
-		std::unordered_map<std::string, std::shared_ptr<Type>> mData;
-
-		AssetManager() {}
+		AssetManager() { }
 
 		virtual ~AssetManager()
 		{
@@ -32,18 +31,13 @@ namespace Sentinel
 		}
 
 	public:
-
-		std::shared_ptr<Type> Add(const std::string& name, std::shared_ptr<Type> data)
+		void Add(const std::string& name, std::shared_ptr<T>& data)
 		{
-			if (!data)
-				return data;
+			auto found = mData.find(name);
+			if (found != mData.end())
+				throw std::exception("Duplicate name found");
 
-			if (mData.find(name) != mData.end())
-				return data;
-
-			mData.insert(std::pair<std::string, std::shared_ptr<Type>>(name, data));
-
-			return data;
+			mData.insert(std::pair<std::string, std::shared_ptr<T>>(name, data));
 		}
 
 		void Remove(const std::string& name)
@@ -59,28 +53,30 @@ namespace Sentinel
 			mData.clear();
 		}
 
-		std::shared_ptr<Type> Get(const std::string& name)
+		std::weak_ptr<T> Get(const std::string& name)
 		{
-			auto it = mData.find(name);
+			auto found = mData.find(name);
 
-			if (it != mData.end())
-				return it->second;
+			if (found != mData.end())
+				return std::move(std::weak_ptr<T>(found->second));
 
-			return NULL;
+			throw std::exception("Failed to get asset by name.");
 		}
 
-		std::string Get(std::shared_ptr<Type> data)
+		std::string Get(std::weak_ptr<T>& data)
 		{
-			TRAVERSE_LIST(it, mData)
+			auto search = data.lock().get();
+
+			for (const auto& it : mData)
 			{
-				if (it->second.get() == data.get())
-					return it->first;
+				if (it.second.get() == search)
+					return it.first;
 			}
 
 			return "";
 		}
 
-		void GetAll(std::vector<std::string>& names, std::vector<std::shared_ptr<Type>>& data)
+		void GetAll(std::vector<std::string>& names, std::vector<std::weak_ptr<T>>& data)
 		{
 			data.clear();
 			data.reserve(mData.size());
@@ -88,10 +84,10 @@ namespace Sentinel
 			names.clear();
 			names.reserve(mData.size());
 
-			for (auto kv = mData.begin(); kv != mData.end(); ++kv)
+			for (auto asset : mData)
 			{
-				names.push_back(kv->first);
-				data.push_back(kv->second);
+				names.push_back(asset.first);
+				data.push_back(asset.second);
 			}
 		}
 	};

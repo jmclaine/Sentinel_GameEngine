@@ -13,13 +13,12 @@
 
 namespace Sentinel
 {
-	SpriteSystem::SpriteSystem(Renderer* renderer, std::shared_ptr<VertexLayout> layout, UINT maxSprites) :
+	SpriteSystem::SpriteSystem(Renderer* renderer, std::weak_ptr<VertexLayout>& layout, UINT maxSprites) :
 		mRenderer(renderer),
 		mMaxSprites(maxSprites),
 		mNumSprites(0)
 	{
 		_ASSERT(renderer);
-		_ASSERT(layout.get());
 		_ASSERT(maxSprites > 0);
 
 		mStorage = new Storage[maxSprites];
@@ -44,7 +43,6 @@ namespace Sentinel
 	SpriteSystem::~SpriteSystem()
 	{
 		delete[] mStorage;
-
 		delete mMesh;
 	}
 
@@ -66,16 +64,16 @@ namespace Sentinel
 
 		Storage& store = mStorage[mNumSprites];
 
-		store.mFrame = mSprite->GetFrame(frame);
+		store.mFrame = mSprite.lock()->GetFrame(frame);
 		store.mColor = color.ToUINT();
 		store.mMatrixWorld = matWorld;
 
 		++mNumSprites;
 	}
 
-	void SpriteSystem::Present()
+	void SpriteSystem::Present(Component::Camera* camera)
 	{
-		_ASSERT(mCamera);
+		_ASSERT(camera);
 
 		memcpy(mMesh->mVertexBuffer->Lock(), mStorage, sizeof(Storage) * mNumSprites);
 
@@ -83,6 +81,6 @@ namespace Sentinel
 
 		mMesh->mMaterial = mMaterial;
 
-		mMesh->Draw(mRenderer, NULL, mCamera, mNumSprites);
+		mMesh->Draw(mRenderer, nullptr, camera, mNumSprites);
 	}
 }

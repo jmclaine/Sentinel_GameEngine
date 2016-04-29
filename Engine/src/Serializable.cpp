@@ -6,15 +6,15 @@ namespace Sentinel
 {
 	SerialFactory::SerialFactory()
 	{
-		Register(0, NullClone);
+		Register(0, nullptrClone);
 	}
 
 	SerialFactory::~SerialFactory()
-	{}
+	{ }
 
-	Serializable* SerialFactory::NullClone()
+	Serializable* SerialFactory::nullptrClone()
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	SerialFactory& SerialFactory::Get()
@@ -40,7 +40,7 @@ namespace Sentinel
 		if (it != mRegistry.end())
 			return it->second();
 
-		return NULL;
+		return nullptr;
 	}
 
 	////////////////////////////////////
@@ -57,13 +57,13 @@ namespace Sentinel
 
 	void SerialRegister::Save(Archive& archive)
 	{
-		archive.Write(&mID, 1, true);
+		archive.Write(&mID);
 	}
 
 	Serializable* SerialRegister::Load(Archive& archive)
 	{
 		UINT id;
-		archive.Read(&id, 1, true);
+		archive.Read(&id);
 
 		if (id != 0)
 		{
@@ -71,21 +71,21 @@ namespace Sentinel
 			return SerialFactory::Get().Create(id);
 		}
 
-		return NULL;
+		return nullptr;
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////
 
-	void SerialFunctionFactory::NullFunc()
-	{}
+	void SerialFunctionFactory::nullptrFunc()
+	{ }
 
-	std::function< void() > SerialFunctionFactory::NullFuncPtr = std::function< void() >(NullFunc);
+	std::function< void() > SerialFunctionFactory::nullptrFuncPtr = std::function< void() >(nullptrFunc);
 
 	SerialFunctionFactory::SerialFunctionFactory()
-	{}
+	{ }
 
 	SerialFunctionFactory::~SerialFunctionFactory()
-	{}
+	{ }
 
 	SerialFunctionFactory& SerialFunctionFactory::Get()
 	{
@@ -112,12 +112,12 @@ namespace Sentinel
 		if (it != mRegistry.end())
 			return it->second;
 
-		return NullFuncPtr;
+		return nullptrFuncPtr;
 	}
 
 	UINT SerialFunctionFactory::Find(Func func)
 	{
-		if (func.target_type() == NullFuncPtr.target_type())
+		if (func.target_type() == nullptrFuncPtr.target_type())
 			return 0;
 
 		TRAVERSE_LIST(it, mRegistry)

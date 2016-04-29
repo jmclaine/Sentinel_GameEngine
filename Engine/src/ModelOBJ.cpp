@@ -21,9 +21,6 @@ namespace Sentinel
 	class ModelOBJ : public Model
 	{
 	private:
-
-		// Create materials to map to their string names.
-		//
 		typedef std::unordered_map<std::string, MeshBuilder*> MeshBuilderMap;
 		typedef std::pair<std::string, MeshBuilder*> MeshBuilderPair;
 
@@ -31,16 +28,18 @@ namespace Sentinel
 		UINT mNumMeshes;
 
 	public:
-
 		ModelOBJ()
 		{
-			mMesh = NULL;
+			mMesh = nullptr;
 			mNumMeshes = 0;
 		}
 
 		~ModelOBJ()
 		{
-			Release();
+			for (UINT x = 0; x < mNumMeshes; ++x)
+				delete mMesh[x];
+
+			delete[] mMesh;
 		}
 
 		void Save(
@@ -48,7 +47,8 @@ namespace Sentinel
 			Renderer* renderer,
 			ShaderManager* shaderManager,
 			TextureManager* textureManager,
-			MaterialManager* materialManager)
+			MaterialManager* materialManager,
+			BlendStateManager* blendManager)
 		{
 			// Save the format type.
 			//
@@ -60,7 +60,7 @@ namespace Sentinel
 			archive.Write(&mNumMeshes);
 
 			for (UINT x = 0; x < mNumMeshes; ++x)
-				Mesh::Save(archive, mMesh[x], renderer, shaderManager, textureManager, materialManager);
+				Mesh::Save(archive, mMesh[x], renderer, materialManager);
 		}
 
 		void Create(
@@ -77,7 +77,7 @@ namespace Sentinel
 			mMesh = new Mesh*[mNumMeshes];
 
 			for (UINT x = 0; x < mNumMeshes; ++x)
-				mMesh[x] = Mesh::Load(archive, renderer, shaderManager, textureManager, materialManager);
+				mMesh[x] = Mesh::Load(archive, renderer, materialManager);
 		}
 
 		bool Create(
@@ -106,11 +106,8 @@ namespace Sentinel
 			const std::string defaultMaterialName = "~*Default*~";
 			builder.insert(MeshBuilderPair(defaultMaterialName, new MeshBuilder()));
 
-			std::shared_ptr<Shader> shaderColor = shaderManager->Get("Color");
-			std::shared_ptr<Shader> shaderTexture = shaderManager->Get("Texture");
-
-			if (shaderColor.get() == NULL || shaderTexture.get() == NULL)
-				return false;
+			auto shaderColor = shaderManager->Get("Color").lock();
+			auto shaderTexture = shaderManager->Get("Texture").lock();
 
 			MeshBuilder* meshBuilder = builder.begin()->second;
 
@@ -146,8 +143,8 @@ namespace Sentinel
 
 						for (UINT x = 0; x < 3; ++x)
 						{
-							maxPosition[x] = MAX(maxPosition[x], p[x]);
-							minPosition[x] = MIN(minPosition[x], p[x]);
+							maxPosition[x] = std::fmax(maxPosition[x], p[x]);
+							minPosition[x] = std::fmin(minPosition[x], p[x]);
 						}
 					}
 					// Texture coordinates.
@@ -192,12 +189,8 @@ namespace Sentinel
 
 								mtlParsehelper >> mtlToken;
 
-								// Create a new material.
-								//
 								if (mtlToken == "newmtl")
 								{
-									// Store the material name.
-									//
 									mtlParsehelper >> mtlName;
 									builder.insert(MeshBuilderPair(mtlName, new MeshBuilder()));
 
@@ -205,8 +198,6 @@ namespace Sentinel
 
 									meshBuilder->mLayout = shaderColor->Layout();
 								}
-								// Load a texture.
-								//
 								else if (mtlToken == "map_Kd")
 								{
 									const MeshBuilderMap::iterator& mtlIter = builder.find(mtlName);
@@ -215,9 +206,9 @@ namespace Sentinel
 									{
 										mtlParsehelper >> mtlToken;
 
-										std::shared_ptr<Texture> texture(textureManager->Add(mtlName, std::shared_ptr<Texture>(renderer->CreateTextureFromFile(mtlToken.c_str()))));
+										auto texture = std::shared_ptr<Texture>(renderer->CreateTextureFromFile(mtlToken.c_str()));
 
-										if (texture.get() == NULL)
+										if (texture.get() == nullptr)
 										{
 											Debug::ShowError(
 												STREAM("Failed to load image '" << mtlToken << "'"), 
@@ -225,38 +216,30 @@ namespace Sentinel
 
 											return false;
 										}
+										textureManager->Add(mtlName, texture);
 
 										MeshBuilder* meshBuilder = mtlIter->second;
-
 										meshBuilder->mLayout = shaderTexture->Layout();
 									}
 								}
 							}
 						}
 					}
-					// Use a loaded material.
-					//
 					else if (token == "usemtl")
 					{
-						// Reference the new material.
-						//
 						std::string mtlName;
 						parsehelper >> mtlName;
 
 						const MeshBuilderMap::iterator& mtl_iter = builder.find(mtlName);
 
-						// If the material was not found, reference the default material.
-						//
 						if (mtl_iter == builder.end())
 							meshBuilder = builder[defaultMaterialName];
 						else
 							meshBuilder = mtl_iter->second;
 					}
-					// Fat indices.
-					//
 					else if (token == "f")
 					{
-						if (meshBuilder == NULL)
+						if (meshBuilder == nullptr)
 						{
 							Debug::ShowError(
 								"Invalid syntax for OBJ file.", 
@@ -270,25 +253,19 @@ namespace Sentinel
 
 						for (;;)
 						{
-							// Convert this token into an index.
-							//
 							parsehelper >> token;
 
-							// Check if the last token has already been read.
-							//
 							if (parsehelper.fail())
 								break;
 
-							// Position.
-							// Texture coord.
-							// Normal.
-							//
+							// Position
+							// Texture coord
+							// Normal
+							
 							int vIndex[3];
 							int currType = 0;
 							std::string fatIndex;
 
-							// Convert the fat index into the three parts.
-							//
 							for (UINT x = 0; x < token.size(); ++x)
 							{
 								if (token[x] != '/')
@@ -304,13 +281,9 @@ namespace Sentinel
 							}
 							vIndex[currType] = atoi(fatIndex.c_str());
 
-							// Search for a duplicate vertex, and reference its index instead.
-							//
 							UINT currVertex = meshBuilder->FindVertex(positions[vIndex[0]], texCoords[vIndex[1]], normals[vIndex[2]]);
 							if (currVertex == UINT_MAX)
 							{
-								// Create this vertex.
-								//
 								currVertex = meshBuilder->mVertex.size();
 
 								meshVertex.mPosition = positions[vIndex[0]];
@@ -319,15 +292,11 @@ namespace Sentinel
 								meshBuilder->mVertex.push_back(meshVertex);
 							}
 
-							// Add the index.
-							//
 							meshBuilder->mIndex.push_back(currVertex);
 							++i;
 
 							if (i > 3)
 							{
-								// This is part of a triangle list, so add a couple more indices to complete the triangle.
-								//
 								UINT index = meshBuilder->mIndex.size();
 								meshBuilder->mIndex.push_back(meshBuilder->mIndex[index - 4]);
 								meshBuilder->mIndex.push_back(meshBuilder->mIndex[index - 2]);
@@ -338,11 +307,8 @@ namespace Sentinel
 
 				file.close();
 
-				_ASSERT(0);	// this requires a Material be created
+				_ASSERT(0);	// requires a Material be created
 
-				// All the information for the model has been retrieved.
-				// Now make the VBOs and IBOs for each material.
-				//
 				UINT i = 0;
 				mMesh = new Mesh*[builder.size()];
 
@@ -369,14 +335,6 @@ namespace Sentinel
 			}
 
 			return true;
-		}
-
-		void Release()
-		{
-			for (UINT x = 0; x < mNumMeshes; ++x)
-				SAFE_DELETE(mMesh[x]);
-
-			SAFE_DELETE_ARRAY(mMesh);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -424,7 +382,8 @@ namespace Sentinel
 		Renderer* renderer,
 		ShaderManager* shaderManager,
 		TextureManager* textureManager,
-		MaterialManager* materialManager)
+		MaterialManager* materialManager,
+		BlendStateManager* blendManager)
 	{
 		ModelOBJ* model = new ModelOBJ();
 
@@ -438,7 +397,8 @@ namespace Sentinel
 		Renderer* renderer,
 		ShaderManager* shaderManager,
 		TextureManager* textureManager,
-		MaterialManager* materialManager)
+		MaterialManager* materialManager,
+		BlendStateManager* blendManager)
 	{
 		ModelOBJ* model = new ModelOBJ();
 

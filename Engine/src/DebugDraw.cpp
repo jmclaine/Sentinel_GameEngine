@@ -27,12 +27,12 @@ namespace Sentinel
 		_ASSERT(renderer);
 		_ASSERT(camera);
 		_ASSERT(material.get());
-		_ASSERT(material->mShader.get());
 		_ASSERT(maxLines > 0);
 
-		MeshBuilder builder;
+		auto shader = material->mShader.lock();
 
-		builder.mLayout = material->mShader->Layout();
+		MeshBuilder builder;
+		builder.mLayout = shader->Layout();
 
 		for (UINT x = 0; x < maxLines; ++x)
 		{

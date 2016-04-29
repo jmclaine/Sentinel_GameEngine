@@ -8,26 +8,24 @@ namespace Sentinel
 {
 	class RigidBody;
 
-	// Base particle.
-	//
 	class SENTINEL_DLL Particle
 	{
 	public:
 
-		UINT		mEffectIndex;	// determines where in the effects this particle should startup
+		UINT mEffectIndex;
 
-		float		mLifetime;
-		float		mElapsedTime;
+		float mLifetime;
+		float mElapsedTime;
 
-		Vector3	mPosition;
-		Vector3	mRotation;
-		Vector3	mScale;
+		Vector3 mPosition;
+		Vector3 mRotation;
+		Vector3 mScale;
 
-		Vector3	mVelocity;
-		Vector3	mAngularVelocity;
+		Vector3 mVelocity;
+		Vector3 mAngularVelocity;
 
-		Vector3	mAccel;
-		Vector3	mAngularAccel;
+		Vector3 mAccel;
+		Vector3 mAngularAccel;
 
 	protected:
 
@@ -35,30 +33,26 @@ namespace Sentinel
 
 	public:
 
-		virtual void Update( float DT );
+		virtual void Update(float DT);
 	};
 
-	// A regular particle without collision.
-	//
-	class SENTINEL_DLL NormalParticle : public Particle
+	class SENTINEL_DLL SpriteParticle : public Particle
 	{
 	public:
 
-		UINT		mFrame;
-		ColorRGBA	mColor;
+		UINT mFrame;
+		ColorRGBA mColor;
 
 		///////////////////////////////////
 
-		NormalParticle();
+		SpriteParticle();
 	};
 
-	// A physics based particle.
-	//
 	class SENTINEL_DLL PhysicsParticle : public Particle
 	{
 	private:
 
-		RigidBody*	mRigidBody;
+		RigidBody* mRigidBody;
 
 	public:
 

@@ -12,51 +12,48 @@ namespace Sentinel
 	class SpriteSystem;
 	class Sprite;
 
-namespace Component
-{
-	class Transform;
-	class Camera;
-
-	class SENTINEL_DLL SpriteDrawable : public Drawable
+	namespace Component
 	{
-		DECLARE_SERIAL();
+		class Transform;
+		class Camera;
 
-	protected:
+		class SENTINEL_DLL SpriteDrawable : public Drawable
+		{
+			static SerialRegister SERIAL_REGISTER;
+			static Serializable* Clone();
 
-		SpriteSystem* mSpriteSystem;
+		public:
+			UINT mFrame;
+			ColorRGBA mColor;
 
-	public:
+			std::weak_ptr<Sprite> mSprite;
 
-		UINT mFrame;
-		ColorRGBA mColor;
+		public:
+			SpriteDrawable();
+			SpriteDrawable(std::weak_ptr<Sprite>& sprite);
+			SpriteDrawable(std::weak_ptr<Sprite>&& sprite);
+			~SpriteDrawable();
 
-		std::shared_ptr<Sprite> mSprite;
+			/////////////////////////////////
 
-	protected:
+			void Startup();
+			void Shutdown();
 
-		SpriteDrawable();
+			/////////////////////////////////
 
-	public:
+			void Draw(Camera* camera);
 
-		SpriteDrawable(std::shared_ptr<Sprite> sprite);
-		~SpriteDrawable();
+			///////////////////////////////////
 
-		void Set(std::shared_ptr<Sprite> sprite);
+			void Save(Archive& archive);
+			void Load(Archive& archive);
 
-		/////////////////////////////////
+			///////////////////////////////////
 
-		void Startup();
+			GameComponent* Copy();
 
-		/////////////////////////////////
-
-		bool CheckVisible(Camera* camera);
-
-		void CalculateBounds();
-
-		void Draw();
-
-		///////////////////////////////////
-
-		GameComponent* Copy();
-	};
-}}
+		protected:
+			void Copy(GameComponent* component);
+		};
+	}
+}

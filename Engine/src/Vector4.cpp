@@ -140,12 +140,12 @@ namespace Sentinel
 
 	Vector4 Vector4::Min(const Vector4& v) const
 	{
-		return Vector4(MIN(x, v.x), MIN(y, v.y), MIN(z, v.z), MIN(w, v.w));
+		return Vector4(std::fmin(x, v.x), std::fmin(y, v.y), std::fmin(z, v.z), std::fmin(w, v.w));
 	}
 
 	Vector4 Vector4::Max(const Vector4& v) const
 	{
-		return Vector4(MAX(x, v.x), MAX(y, v.y), MAX(z, v.z), MAX(w, v.w));
+		return Vector4(std::fmax(x, v.x), std::fmax(y, v.y), std::fmax(z, v.z), std::fmax(w, v.w));
 	}
 
 	float Vector4::Length() const

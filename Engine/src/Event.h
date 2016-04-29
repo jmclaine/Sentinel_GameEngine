@@ -22,7 +22,7 @@ namespace Sentinel
 	public:
 
 		Event()
-		{}
+		{ }
 
 		void operator += (Action right)
 		{

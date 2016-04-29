@@ -63,7 +63,7 @@ class TiXmlString
 
 
 	// TiXmlString empty constructor
-	TiXmlString () : rep_(&nullrep_)
+	TiXmlString () : rep_(&nullptrrep_)
 	{
 	}
 
@@ -124,10 +124,10 @@ class TiXmlString
 	}
 
 
-	// Convert a TiXmlString into a null-terminated char *
+	// Convert a TiXmlString into a nullptr-terminated char *
 	const char * c_str () const { return rep_->str; }
 
-	// Convert a TiXmlString into a char * (need not be null terminated).
+	// Convert a TiXmlString into a char * (need not be nullptr terminated).
 	const char * data () const { return rep_->str; }
 
 	// Return the length of a TiXmlString
@@ -232,13 +232,13 @@ class TiXmlString
 		}
 		else
 		{
-			rep_ = &nullrep_;
+			rep_ = &nullptrrep_;
 		}
 	}
 
 	void quit()
 	{
-		if (rep_ != &nullrep_)
+		if (rep_ != &nullptrrep_)
 		{
 			// The rep_ is really an array of ints. (see the allocator, above).
 			// Cast it back before delete, so the compiler won't incorrectly call destructors.
@@ -247,7 +247,7 @@ class TiXmlString
 	}
 
 	Rep * rep_;
-	static Rep nullrep_;
+	static Rep nullptrrep_;
 
 } ;
 

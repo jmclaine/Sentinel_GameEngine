@@ -4,7 +4,7 @@
 namespace Sentinel
 {
 	PhysicsShape::~PhysicsShape()
-	{}
+	{ }
 
 	void* PhysicsShape::GetData()
 	{
@@ -14,10 +14,10 @@ namespace Sentinel
 	///////////////////////////////////////////////
 
 	SpherePhysicsShape::SpherePhysicsShape()
-	{}
+	{ }
 
 	SpherePhysicsShape::~SpherePhysicsShape()
-	{}
+	{ }
 
 	void SpherePhysicsShape::Create(float radius)
 	{
@@ -48,10 +48,10 @@ namespace Sentinel
 	///////////////////////////////////////////////
 
 	BoxPhysicsShape::BoxPhysicsShape()
-	{}
+	{ }
 
 	BoxPhysicsShape::~BoxPhysicsShape()
-	{}
+	{ }
 
 	void BoxPhysicsShape::Create(const Vector3& scale)
 	{
@@ -63,13 +63,13 @@ namespace Sentinel
 		PhysicsSystem::SERIAL_CreateBox.Save(archive);
 
 		Vector3 scale(GetScale());
-		archive.Write(scale.Ptr(), ar_sizeof(scale));
+		archive.Write(&scale);
 	}
 
 	void BoxPhysicsShape::Load(Archive& archive)
 	{
 		Vector3 scale;
-		archive.Read(scale.Ptr(), ar_sizeof(scale));
+		archive.Read(&scale);
 
 		SetScale(scale);
 	}
@@ -82,10 +82,10 @@ namespace Sentinel
 	///////////////////////////////////////////////
 
 	CylinderPhysicsShape::CylinderPhysicsShape()
-	{}
+	{ }
 
 	CylinderPhysicsShape::~CylinderPhysicsShape()
-	{}
+	{ }
 
 	void CylinderPhysicsShape::Create(const Vector3& scale)
 	{
@@ -97,13 +97,13 @@ namespace Sentinel
 		PhysicsSystem::SERIAL_CreateCylinder.Save(archive);
 
 		Vector3 scale(GetScale());
-		archive.Write(scale.Ptr(), ar_sizeof(scale));
+		archive.Write(&scale);
 	}
 
 	void CylinderPhysicsShape::Load(Archive& archive)
 	{
 		Vector3 scale;
-		archive.Read(scale.Ptr(), ar_sizeof(scale));
+		archive.Read(&scale);
 
 		SetScale(scale);
 	}
@@ -116,10 +116,10 @@ namespace Sentinel
 	///////////////////////////////////////////////
 
 	MeshPhysicsShape::MeshPhysicsShape()
-	{}
+	{ }
 
 	MeshPhysicsShape::~MeshPhysicsShape()
-	{}
+	{ }
 
 	void MeshPhysicsShape::Create(void* verts, UINT count, UINT stride, const Vector3& scale)
 	{
@@ -151,7 +151,7 @@ namespace Sentinel
 		}
 
 		Vector3& scale = GetScale();
-		archive.Write(scale.Ptr(), ar_sizeof(scale));
+		archive.Write(&scale);
 	}
 
 	void MeshPhysicsShape::Load(Archive& archive)
@@ -162,11 +162,11 @@ namespace Sentinel
 		Vector3 v;
 		for (int x = 0; x < count; ++x)
 		{
-			archive.Read(v.Ptr(), ar_sizeof(v));
+			archive.Read(&v);
 			AddPoint(v);
 		}
 
-		archive.Read(v.Ptr(), ar_sizeof(v));
+		archive.Read(&v);
 		SetScale(v);
 	}
 
@@ -178,19 +178,19 @@ namespace Sentinel
 	///////////////////////////////////////////////
 
 	CompoundPhysicsShape::CompoundPhysicsShape()
-	{}
+	{ }
 
 	CompoundPhysicsShape::~CompoundPhysicsShape()
-	{}
+	{ }
 
 	void CompoundPhysicsShape::Save(Archive& archive)
-	{}
+	{ }
 
 	void CompoundPhysicsShape::Load(Archive& archive)
-	{}
+	{ }
 
 	PhysicsShape* CompoundPhysicsShape::Copy(PhysicsSystem* physics)
 	{
-		return NULL;
+		return nullptr;
 	}
 }

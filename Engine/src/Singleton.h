@@ -17,10 +17,10 @@ namespace Sentinel
 
 		/////////////////////////////////////////
 
-		Singleton() {}
-		Singleton(const Singleton&) {}
+		Singleton() { }
+		Singleton(const Singleton&) { }
 		Singleton& operator = (const Singleton&) { return *this; }
-		~Singleton() {}
+		~Singleton() { }
 
 	public:
 
@@ -45,12 +45,12 @@ namespace Sentinel
 			if (mSingle)
 			{
 				delete mSingle;
-				mSingle = NULL;
+				mSingle = nullptr;
 			}
 		}
 	};
 
-	template<class Type> Type* Singleton<Type>::mSingle = NULL;
+	template<class Type> Type* Singleton<Type>::mSingle = nullptr;
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -65,10 +65,10 @@ namespace Sentinel
 
 		/////////////////////////////////////////
 
-		SingletonAbstract() {}
-		SingletonAbstract(const SingletonAbstract&) {}
+		SingletonAbstract() { }
+		SingletonAbstract(const SingletonAbstract&) { }
 		SingletonAbstract& operator = (const SingletonAbstract&) { return *this; }
-		~SingletonAbstract() {}
+		~SingletonAbstract() { }
 
 	public:
 
@@ -90,12 +90,12 @@ namespace Sentinel
 			if (mSingle)
 			{
 				delete mSingle;
-				mSingle = NULL;
+				mSingle = nullptr;
 			}
 		}
 	};
 
-	template<class Type> Type* SingletonAbstract<Type>::mSingle = NULL;
+	template<class Type> Type* SingletonAbstract<Type>::mSingle = nullptr;
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -112,10 +112,10 @@ namespace Sentinel
 
 		/////////////////////////////////////////
 
-		SingletonSafe() {}
-		SingletonSafe(const SingletonSafe&) {}
+		SingletonSafe() { }
+		SingletonSafe(const SingletonSafe&) { }
 		SingletonSafe& operator = (const SingletonSafe&) { return *this; }
-		~SingletonSafe() {}
+		~SingletonSafe() { }
 
 	public:
 
@@ -156,14 +156,14 @@ namespace Sentinel
 				mCS.Lock();
 
 				delete mSingle;
-				mSingle = NULL;
+				mSingle = nullptr;
 
 				mCS.Unlock();
 			}
 		}
 	};
 
-	template<class Type> volatile Type* volatile SingletonSafe<Type>::mSingle = NULL;
+	template<class Type> volatile Type* volatile SingletonSafe<Type>::mSingle = nullptr;
 	template<class Type> CriticalSection SingletonSafe<Type>::mCS;
 
 	//////////////////////////////////////////////////////////////////////////
@@ -181,10 +181,10 @@ namespace Sentinel
 
 		/////////////////////////////////////////
 
-		SingletonAbstractSafe() {}
-		SingletonAbstractSafe(const SingletonAbstractSafe&) {}
+		SingletonAbstractSafe() { }
+		SingletonAbstractSafe(const SingletonAbstractSafe&) { }
 		SingletonAbstractSafe& operator = (const SingletonAbstractSafe&) { return *this; }
-		~SingletonAbstractSafe() {}
+		~SingletonAbstractSafe() { }
 
 	public:
 
@@ -215,14 +215,14 @@ namespace Sentinel
 				mCS.Lock();
 
 				delete mSingle;
-				mSingle = NULL;
+				mSingle = nullptr;
 
 				mCS.Unlock();
 			}
 		}
 	};
 
-	template<class Type> volatile Type* volatile SingletonAbstractSafe<Type>::mSingle = NULL;
+	template<class Type> volatile Type* volatile SingletonAbstractSafe<Type>::mSingle = nullptr;
 	template<class Type> CriticalSection SingletonAbstractSafe<Type>::mCS;
 
 	//////////////////////////////////////////////////////////////////////////
@@ -238,10 +238,10 @@ namespace Sentinel
 
 	protected:
 
-		SingletonThreaded() {}
-		SingletonThreaded(const SingletonThreaded&) {}
+		SingletonThreaded() { }
+		SingletonThreaded(const SingletonThreaded&) { }
 		SingletonThreaded& operator = (const SingletonThreaded&) { return *this; }
-		~SingletonThreaded() {}
+		~SingletonThreaded() { }
 
 	public:
 
@@ -282,10 +282,10 @@ namespace Sentinel
 
 	protected:
 
-		SingletonAbstractThreaded() {}
-		SingletonAbstractThreaded(const SingletonAbstractThreaded&) {}
+		SingletonAbstractThreaded() { }
+		SingletonAbstractThreaded(const SingletonAbstractThreaded&) { }
 		SingletonAbstractThreaded& operator = (const SingletonAbstractThreaded&) { return *this; }
-		~SingletonAbstractThreaded() {}
+		~SingletonAbstractThreaded() { }
 
 	public:
 

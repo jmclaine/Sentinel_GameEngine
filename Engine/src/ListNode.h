@@ -7,7 +7,6 @@ e.g. class GameObject : public ListNode<GameObject>
 #include <vector>
 
 #include "Memory.h"
-#include "Types.h"
 
 namespace Sentinel
 {
@@ -15,15 +14,13 @@ namespace Sentinel
 	class ListNode
 	{
 	protected:
-
 		T* mParent;
 		std::vector<T*>	mChild;
 
 	public:
-
 		ListNode() :
-			mParent(NULL)
-		{}
+			mParent(nullptr)
+		{ }
 
 		virtual ~ListNode()
 		{
@@ -31,38 +28,24 @@ namespace Sentinel
 				SAFE_DELETE(mChild[x]);
 		}
 
-		virtual T* AddChild(T* obj)
+		virtual void AddChild(T* obj)
 		{
-			// Check if the object is already a child.
-			//
-			TRAVERSE_VECTOR(x, mChild)
-				if (mChild[x] == obj)
-					return obj;
+			for (auto child : mChild)
+				if (child == obj)
+					return;
 
-			// Remove the object from its parent.
-			//
 			if (obj->mParent)
 				obj->mParent->RemoveChild(obj);
 
-			// Add the object as a child.
-			//
 			mChild.push_back(obj);
 			obj->mParent = (T*)this;
-
-			return obj;
 		}
 
 		virtual void RemoveChild(T* obj)
 		{
-			TRAVERSE_LIST(it, mChild)
-			{
-				if (*it == obj)
-				{
-					obj->mParent = NULL;
-					mChild.erase(it);
-					return;
-				}
-			}
+			mChild.erase(
+				std::remove(mChild.begin(), mChild.end(), obj),
+				mChild.end());
 		}
 
 		T* GetChild(UINT index)
@@ -78,14 +61,12 @@ namespace Sentinel
 		}
 
 	protected:
-
 		void SetParent(T* item)
 		{
 			mParent = item;
 		}
 
 	public:
-
 		T* GetParent()
 		{
 			return mParent;

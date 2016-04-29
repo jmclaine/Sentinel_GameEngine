@@ -3,10 +3,11 @@
 #include "Debug.h"
 #include "Input.h"
 #include "Renderer.h"
+#include "WindowInfo.h"
 
 namespace Sentinel
 {
-	Renderer* gRenderer = NULL;
+	Renderer* gRenderer = nullptr;
 
 	GameWindow::GameWindow(UINT icon, UINT iconSmall, UINT menu, LPCSTR cursor)
 	{
@@ -18,12 +19,12 @@ namespace Sentinel
 		memset(mTitle, 0, MAX_TITLE_LENGTH);
 		memset(mWindowClass, 0, MAX_CLASS_LENGTH);
 
-		mWindowInfo = NULL;
-		mRenderer = NULL;
+		mWindowInfo = nullptr;
+		mRenderer = nullptr;
 	}
 
 	GameWindow::~GameWindow()
-	{}
+	{ }
 
 	void GameWindow::Startup(
 		Renderer* renderer, 
@@ -45,7 +46,7 @@ namespace Sentinel
 			mRenderer = renderer;
 			gRenderer = renderer;
 
-			RECT rect = { 0, 0, info.Width(), info.Height() };
+			RECT rect = { 0, 0, static_cast<LONG>(info.Width()), static_cast<LONG>(info.Height()) };
 			DWORD exStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 			DWORD dwStyle = (!info.Fullscreen()) ? WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN: WS_POPUP;
 			AdjustWindowRectEx(&rect, dwStyle, FALSE, WS_EX_APPWINDOW | WS_EX_WINDOWEDGE);
@@ -53,7 +54,7 @@ namespace Sentinel
 			hWnd = CreateWindowEx(
 				exStyle, mWindowClass, mTitle, dwStyle,
 				0, 0, rect.right - rect.left, rect.bottom - rect.top,
-				NULL, NULL, mINST, NULL);
+				nullptr, nullptr, mINST, nullptr);
 
 			if (!hWnd)
 				throw AppException("Failed to initialize window: " + std::string(mTitle));
@@ -131,7 +132,7 @@ namespace Sentinel
 		wcex.hIcon = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(mIcon));
 		wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(mIconSmall));
 		wcex.lpszMenuName = MAKEINTRESOURCE(mMenu);
-		wcex.hCursor = LoadCursor(NULL, mCursor);
+		wcex.hCursor = LoadCursor(nullptr, mCursor);
 		wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 		wcex.lpszClassName = mWindowClass;
 

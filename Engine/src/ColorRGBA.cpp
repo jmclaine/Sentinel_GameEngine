@@ -12,11 +12,11 @@ namespace Sentinel
 
 	ColorRGBA::ColorRGBA() :
 		r(1), g(1), b(1), a(1)
-	{}
+	{ }
 
 	ColorRGBA::ColorRGBA(float red, float green, float blue, float alpha) :
 		r(red), g(green), b(blue), a(alpha)
-	{}
+	{ }
 
 	float* ColorRGBA::Ptr()
 	{

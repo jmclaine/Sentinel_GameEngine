@@ -6,15 +6,15 @@ namespace Sentinel
 {
 	Sound::Sound() :
 		mPitch(1.0f), mGain(1.0f), mLoop(false),
-		mFormat(0), mSampleRate(0), mDataSize(0), mData(NULL)
-	{}
+		mFormat(0), mSampleRate(0), mDataSize(0), mData(nullptr)
+	{ }
 
 	Sound::~Sound()
 	{
 		if (mData)
 		{
 			free(mData);
-			mData = NULL;
+			mData = nullptr;
 		}
 	}
 
@@ -46,8 +46,8 @@ namespace Sentinel
 	{
 		archive.Write(&source->mPitch);
 		archive.Write(&source->mGain);
-		archive.Write(source->mPosition.Ptr(), ar_sizeof(source->mPosition));
-		archive.Write(source->mVelocity.Ptr(), ar_sizeof(source->mVelocity));
+		archive.Write(&source->mPosition);
+		archive.Write(&source->mVelocity);
 
 		BYTE loop = (source->mLoop) ? 1 : 0;
 		archive.Write(&loop);
@@ -71,8 +71,8 @@ namespace Sentinel
 	{
 		archive.Read(&mPitch);
 		archive.Read(&mGain);
-		archive.Read(mPosition.Ptr(), ar_sizeof(mPosition));
-		archive.Read(mVelocity.Ptr(), ar_sizeof(mVelocity));
+		archive.Read(&mPosition);
+		archive.Read(&mVelocity);
 
 		BYTE loop;
 		archive.Read(&loop);

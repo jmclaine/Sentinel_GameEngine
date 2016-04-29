@@ -8,50 +8,47 @@
 #include "Texture.h"
 #include "Component/Drawable.h"
 
-namespace Sentinel {
-namespace Component
+namespace Sentinel
 {
-	DEFINE_SERIAL_REGISTER(PointLight);
-	DEFINE_SERIAL_CLONE(PointLight);
-
-	PointLight::PointLight() :
-		mResolution(1024)
-	{}
-
-	PointLight::PointLight(UINT resolution) :
-		mResolution(resolution)
-	{}
-
-	PointLight::~PointLight()
-	{}
-
-	void PointLight::Startup()
+	namespace Component
 	{
-		_ASSERT(mOwner);
+		SerialRegister PointLight::SERIAL_REGISTER("PointLight", PointLight::Clone);
+		Serializable* PointLight::Clone() { return new PointLight(); }
 
-		Light::Startup();
+		PointLight::PointLight() :
+			mResolution(1024)
+		{ }
 
-		Sentinel::GameWorld* world = mOwner->GetWorld();
+		PointLight::PointLight(UINT resolution) :
+			mResolution(resolution)
+		{ }
 
-		_ASSERT(world);
+		PointLight::~PointLight()
+		{ }
 
-		Renderer* renderer = world->mRenderer;
-
-		_ASSERT(renderer);
-
-		if (!mTexture)
-			mTexture = renderer->CreateTextureCube(NULL, mResolution, mResolution, ImageFormat::RG);
-
-		if (!mRenderTexture)
-			mRenderTexture = renderer->CreateRenderTexture(mTexture);
-	}
-
-	void PointLight::Update()
-	{
-		if (mMaterial.get())
+		void PointLight::Startup()
 		{
-			// Create view-projection matrices for each side of the cube.
-			//
+			_ASSERT(mOwner);
+
+			Light::Startup();
+
+			Sentinel::GameWorld* world = mOwner->GetWorld();
+
+			_ASSERT(world);
+
+			Renderer* renderer = world->mRenderer;
+
+			_ASSERT(renderer);
+
+			if (!mTexture)
+				mTexture = renderer->CreateTextureCube(nullptr, mResolution, mResolution, ImageFormat::RG);
+
+			if (!mRenderTexture)
+				mRenderTexture = renderer->CreateRenderTexture(mTexture);
+		}
+
+		void PointLight::Update()
+		{
 			float resolution = static_cast<float>(mResolution);
 			mMatrixProjection.ProjectionPerspective(resolution, resolution, 0.0f, mAttenuation.w, 90.0f);
 
@@ -75,8 +72,6 @@ namespace Component
 			mMatrixView[CAMERA_AXIS_NEG_Z].LookAtView(pos, pos + Vector3(0, 0, -1), Vector3(0, -1, 0));
 			mMatrixFinal[CAMERA_AXIS_NEG_Z] = mMatrixProjection * mMatrixView[CAMERA_AXIS_NEG_Z];
 
-			// Add all dynamic objects within range of the light.
-			//
 			GameWorld* world = mOwner->GetWorld();
 			UINT count = world->NumGameObjects();
 
@@ -87,110 +82,113 @@ namespace Component
 				AddDynamic(world->GetGameObject(x));
 			}
 		}
-	}
 
-	void PointLight::Shutdown()
-	{
-		Light::Shutdown();
-	}
-
-	///////////////////////////////////////
-
-	void PointLight::Present()
-	{
-		GameWorld* world = mOwner->GetWorld();
-		Renderer* renderer = world->mRenderer;
-
-		static float color[4] = { 1, 1, 1, 1 };
-
-		renderer->SetViewport(0, 0, mResolution, mResolution);
-		renderer->SetDepthStencil(NULL);
-		renderer->SetRenderTexture(mRenderTexture);
-		renderer->ClearColor(color);
-
-		mMaterial->Apply(renderer);
-
-		Material::Lock();
-
-		UINT count = (UINT)mDynamic.size();
-		for (UINT x = 0; x < count; ++x)
+		void PointLight::Shutdown()
 		{
-			mDynamic[x]->Draw();
+			Light::Shutdown();
 		}
 
-		Material::Unlock();
-	}
+		///////////////////////////////////////
 
-	const Matrix4x4& PointLight::GetMatrixFinal(CameraAxisType axis)
-	{
-		return mMatrixFinal[axis];
-	}
-
-	float* PointLight::PtrMatrixFinal()
-	{
-		return mMatrixFinal[0].Ptr();
-	}
-
-	// Adds Component::Drawables if they are dynamic,
-	// and within range of the light.
-	//
-	void PointLight::AddDynamic(GameObject* obj)
-	{
-		Drawable* drawable = obj->GetComponent<Drawable>();
-
-		if (drawable)
+		void PointLight::Draw(Camera* camera)
 		{
-			if (drawable->mIsDynamic)
+			auto world = mOwner->GetWorld();
+			auto renderer = world->mRenderer;
+
+			static float color[4] = { 1, 1, 1, 1 };
+
+			renderer->SetViewport(0, 0, mResolution, mResolution);
+			renderer->SetDepthStencil(nullptr);
+			renderer->SetRenderTexture(mRenderTexture);
+			renderer->ClearColor(color);
+
+			mMaterial.lock()->Apply(renderer);
+
+			Material::Lock();
+
+			UINT count = (UINT)mDynamic.size();
+			for (UINT x = 0; x < count; ++x)
 			{
-				if (drawable->mBounds.Intersects(BoundingSphere(mTransform->mPosition, mAttenuation.w)))
+				mDynamic[x]->Draw(camera);
+			}
+
+			Material::Unlock();
+		}
+
+		const Matrix4x4& PointLight::GetMatrixFinal(CameraAxisType axis)
+		{
+			return mMatrixFinal[axis];
+		}
+
+		float* PointLight::PtrMatrixFinal()
+		{
+			return mMatrixFinal[0].Ptr();
+		}
+
+		void PointLight::AddDynamic(GameObject* obj)
+		{
+			auto drawable = obj->GetComponent<Drawable>();
+
+			if (drawable)
+			{
+				if (drawable->mIsDynamic)
 				{
-					mDynamic.push_back(drawable);
+					if (drawable->mBounds.Intersects(BoundingSphere(mTransform->mPosition, mAttenuation.w)))
+					{
+						mDynamic.push_back(drawable);
+					}
 				}
+			}
+
+			UINT count = obj->NumChildren();
+			for (UINT x = 0; x < count; ++x)
+			{
+				AddDynamic(obj->GetChild(x));
 			}
 		}
 
-		UINT count = obj->NumChildren();
-		for (UINT x = 0; x < count; ++x)
+		///////////////////////////////////////
+
+		void PointLight::Save(Archive& archive)
 		{
-			AddDynamic(obj->GetChild(x));
+			SERIAL_REGISTER.Save(archive);
+
+			Light::Save(archive);
+
+			archive.Write(&mResolution);
+
+			archive.Write(&mOwner->GetWorld()->mMaterialManager->Get(mMaterial));
+		}
+
+		void PointLight::Load(Archive& archive)
+		{
+			Light::Load(archive);
+
+			archive.Read(&mResolution);
+
+			std::string material;
+			archive.Read(&material);
+
+			mMaterial = mOwner->GetWorld()->mMaterialManager->Get(material);
+		}
+
+		///////////////////////////////////////
+
+		GameComponent* PointLight::Copy()
+		{
+			auto light = new PointLight(mResolution);
+
+			Copy(light);
+
+			return light;
+		}
+
+		void PointLight::Copy(GameComponent* component)
+		{
+			Light::Copy(component);
+
+			auto light = static_cast<PointLight*>(component);
+			light->mMaterial = mMaterial;
 		}
 	}
-
-	///////////////////////////////////////
-
-	void PointLight::Save(Archive& archive)
-	{
-		SERIAL_REGISTER.Save(archive);
-
-		Light::Save(archive);
-
-		archive.Write(&mResolution);
-
-		archive.Write(&mOwner->GetWorld()->mMaterialManager->Get(mMaterial));
-	}
-
-	void PointLight::Load(Archive& archive)
-	{
-		Light::Load(archive);
-
-		archive.Read(&mResolution);
-
-		std::string material;
-		archive.Read(&material);
-
-		mMaterial = mOwner->GetWorld()->mMaterialManager->Get(material);
-	}
-
-	///////////////////////////////////////
-
-	GameComponent* PointLight::Copy()
-	{
-		PointLight* light = new PointLight(mResolution);
-
-		Light::Copy(light);
-
-		light->mMaterial = mMaterial;
-
-		return light;
-	}
-}}
+}

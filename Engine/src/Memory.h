@@ -7,10 +7,10 @@
 namespace Sentinel
 {
 	#define SAFE_DELETE(var)\
-		if (var) { delete (var); (var) = NULL; }
+		if (var) { delete (var); (var) = nullptr; }
 
 	#define SAFE_DELETE_ARRAY(var)\
-		if (var) { delete[] (var); (var) = NULL; }
+		if (var) { delete[] (var); (var) = nullptr; }
 
 	#define SAFE_DELETE_LIST(var)\
 		TRAVERSE_LIST(it, var)\
@@ -23,10 +23,10 @@ namespace Sentinel
 		var.clear();
 
 	#define SAFE_RELEASE_DELETE(var)\
-		if (var) { var->Release(); delete (var); (var) = NULL; }
+		if (var) { var->Release(); delete (var); (var) = nullptr; }
 
 	#define SAFE_RELEASE_PTR(var)\
-		if (var) { (var)->Release(); (var) = NULL; }
+		if (var) { (var)->Release(); (var) = nullptr; }
 
 	#define SAFE_RELEASE_PTR_LIST(var)\
 		TRAVERSE_LIST(it, var)\
@@ -43,7 +43,7 @@ namespace Sentinel
 		{\
 			var->Shutdown();\
 			delete var;\
-			var = NULL;\
+			var = nullptr;\
 		}
 
 	#define SHUTDOWN_ARRAY(count, var)\
@@ -52,10 +52,4 @@ namespace Sentinel
 			var[x].Shutdown();\
 		}\
 		if (count > 0) { delete[] var; }
-
-	template <class Type>
-	std::shared_ptr<Type> SHARED(Type* ptr)
-	{
-		return std::shared_ptr<Type>(ptr);
-	}
 }

@@ -66,7 +66,7 @@ namespace Sentinel
 			for (int x = 0; x < count; ++x)
 			{
 				Traverse(parser.nodes[x]);
-				parser.currVars = NULL;
+				parser.currVars = nullptr;
 			}
 
 			// Set all the function call positions.
@@ -279,7 +279,7 @@ namespace Sentinel
 	//
 	void ScriptCompiler::Traverse(ScriptNode* node)
 	{
-		if (node == NULL)
+		if (node == nullptr)
 		{
 			return;
 		}
@@ -467,7 +467,7 @@ namespace Sentinel
 				UCHAR storeType = (UCHAR)OP_STORE;
 				int index = 0;
 
-				if (parser.currVars != NULL)
+				if (parser.currVars != nullptr)
 				{
 					index = parser.GetVarOffset(node->child.child->child.stringData, parser.currVars);
 				}
@@ -512,7 +512,7 @@ namespace Sentinel
 				EmitN(storeType, index);
 				return;
 			}
-			else if (node->sibling != NULL)
+			else if (node->sibling != nullptr)
 			{
 				Traverse(node->sibling);
 			}
@@ -520,7 +520,7 @@ namespace Sentinel
 
 		// Traverse the child only if it is a node.
 		//
-		if (node->child.child != NULL && node->type != TOKEN_STRING && node->type != TOKEN_VAR && node->type != TOKEN_NUMBER &&
+		if (node->child.child != nullptr && node->type != TOKEN_STRING && node->type != TOKEN_VAR && node->type != TOKEN_NUMBER &&
 			node->type != TOKEN_LCURLY && node->type != TOKEN_VECTOR_LIST && node->type != TOKEN_RETURN &&
 			node->type != TOKEN_IF     && node->type != TOKEN_FOR         && node->type != TOKEN_WHILE  &&
 			node->type != TOKEN_PRINT  && node->type != TOKEN_SLEEP       && node->type != TOKEN_PAUSE)
@@ -540,7 +540,7 @@ namespace Sentinel
 		case TOKEN_STRING:
 			EmitC((UCHAR)OP_PUSH_STR);
 			EmitS(node->child.stringData);
-			// NULL terminated
+			// nullptr terminated
 			lastVar = TOKEN_STRING;
 			break;
 
@@ -610,7 +610,7 @@ namespace Sentinel
 			UCHAR pushType = (UCHAR)OP_PUSH_VAR;
 			int index = 0;
 
-			if (parser.currVars != NULL)
+			if (parser.currVars != nullptr)
 			{
 				index = parser.GetVarOffset(node->child.stringData, parser.currVars);
 			}
@@ -736,7 +736,7 @@ namespace Sentinel
 		int varCount = 0;
 		ScriptNode* n = node->sibling;
 
-		while (n != NULL)
+		while (n != nullptr)
 		{
 			++varCount;
 			n = n->sibling;

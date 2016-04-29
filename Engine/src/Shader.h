@@ -7,7 +7,6 @@
 #endif
 
 #include "VertexLayout.h"
-#include "Types.h"
 
 namespace Sentinel
 {
@@ -17,27 +16,70 @@ namespace Sentinel
 
 	class Texture;
 
+	enum class ShaderUniform : BYTE
+	{
+		WORLD_VIEW_PROJ,
+		WORLD_VIEW,
+		WORLD,
+		INV_WORLD,
+		VIEW,
+		INV_VIEW,
+		PROJ,
+		INV_PROJ,
+		TEXTURE,
+		AMBIENT,
+		DIFFUSE,
+		SPECULAR,
+		SPEC_COMP,
+		LIGHT_POS,
+		LIGHT_DIR,
+		LIGHT_COLOR,
+		LIGHT_ATTN,
+		LIGHT_TEXTURE_CUBE,
+		LIGHT_MATRIX,
+		LIGHT_CUBE_MATRIX,
+		SHADOW_BLEND,
+		SHADOW_QUALITY,
+		CAMERA_POS,
+		BONES,
+		DELTA_TIME,
+	};
+
+	enum class SamplerMode
+	{
+		WRAP,
+		CLAMP,
+		CLAMP_TO_EDGE,
+
+		COUNT,
+		UNKNOWN
+	};
+
+	enum class SamplerFilter
+	{
+		POINT,
+		LINEAR,
+
+		UNKNOWN
+	};
+
 	class SENTINEL_DLL Shader
 	{
 	public:
-
 		class Sampler
 		{
 		protected:
-
 			Sampler();
 
 		public:
-
 			virtual ~Sampler();
 		};
 
 	protected:
-
 		char* mSource;
 
-		std::vector<VertexAttribute::Type> mAttributes;
-		std::vector<ShaderUniform::Type> mUniforms;
+		std::vector<VertexAttribute> mAttributes;
+		std::vector<ShaderUniform> mUniforms;
 
 		std::shared_ptr<VertexLayout> mLayout;
 
@@ -49,13 +91,12 @@ namespace Sentinel
 		Shader();
 
 	public:
-
 		virtual ~Shader();
 
 		const char* Source();
-		const std::vector<VertexAttribute::Type>& Attributes();
-		const std::vector<ShaderUniform::Type>& Uniforms();
-		const std::shared_ptr<VertexLayout> Layout();
+		const std::vector<VertexAttribute>& Attributes();
+		const std::vector<ShaderUniform>& Uniforms();
+		std::weak_ptr<VertexLayout> Layout();
 
 		virtual void Release() = 0;
 
@@ -71,13 +112,13 @@ namespace Sentinel
 
 		virtual void SetSampler(
 			UINT index,
-			SamplerMode::Type modeU, SamplerMode::Type modeV,
-			SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter = SamplerFilter::UNKNOWN) = 0;
+			SamplerMode modeU, SamplerMode modeV,
+			SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter = SamplerFilter::UNKNOWN) = 0;
 
 		virtual void SetSamplerCube(
 			UINT index,
-			SamplerMode::Type modeU, SamplerMode::Type modeV, SamplerMode::Type modeW,
-			SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter = SamplerFilter::UNKNOWN) = 0;
+			SamplerMode modeU, SamplerMode modeV, SamplerMode modeW,
+			SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter = SamplerFilter::UNKNOWN) = 0;
 
 		////////////////////////////////////
 

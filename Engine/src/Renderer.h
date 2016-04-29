@@ -6,8 +6,8 @@ All objects drawn will scale according to the values set in
 the following variables for their final transformation to
 screen coordinates:
 
-Renderer::WINDOW_WIDTH_BASE  = 1920;
-Renderer::WINDOW_HEIGHT_BASE = 1080;
+WindowInfo::BASE_WIDTH  = 1920;
+WindowInfo::BASE_HEIGHT = 1080;
 
 For example:
 
@@ -119,13 +119,14 @@ renderer->CreateDepthStencil(...);
 For additional examples of more advanced types:
 
 http://www.opengl.org/wiki/Framebuffer_Object_Examples
-
 */
 #include "Sentinel.h"
-#include "Types.h"
 #include "Memory.h"
-#include "RendererTypes.h"
+#include "BlendState.h"
 #include "VertexLayout.h"
+#include "DepthStencil.h"
+#include "Buffer.h"
+#include "Texture.h"
 
 #define STBI_HEADER_FILE_ONLY
 #include "stb_image.c"
@@ -135,125 +136,36 @@ http://www.opengl.org/wiki/Framebuffer_Object_Examples
 
 namespace Sentinel
 {
-	class Texture;
-	class TextureCube;
+	class RenderTexture;
+	class BlendState;
+	class WindowInfo;
 	class Shader;
-	class Buffer;
-	class Mesh;
 
-	//////////////////////////////////
-
-	class SENTINEL_DLL WindowInfo
+	enum class PrimitiveFormat : BYTE
 	{
-		friend class Renderer;
+		POINTS,
+		LINES,
+		TRIANGLES,
 
-	protected:
-
-		void* mHandle;
-
-		bool mFullscreen;
-
-		UINT mWidth;
-		UINT mHeight;
-
-		float mWidthRatio;
-		float mHeightRatio;
-
-	public:
-
-		WindowInfo();
-		~WindowInfo();
-
-		bool Fullscreen() const;
-
-		UINT Width() const;
-		UINT Height() const;
-
-		float WidthRatio() const;
-		float HeightRatio() const;
-
-		void* Handle() const;
-
-		void Update();
+		COUNT
 	};
 
-	//////////////////////////////////
-
-	class RenderTexture
+	enum class CullFormat : BYTE
 	{
-	protected:
+		NONE,
+		CCW,
+		CW,
 
-		Texture* mTexture;
-
-		//////////////////
-
-		RenderTexture(Texture* texture);
-
-	public:
-
-		virtual ~RenderTexture();
-
-		Texture* GetTexture() const;
+		COUNT
 	};
 
-	//////////////////////////////////
-
-	class DepthStencil
+	enum class FillFormat : BYTE
 	{
-	protected:
+		SOLID,
+		WIREFRAME,
 
-		UINT mWidth;
-		UINT mHeight;
-
-		//////////////////
-
-		DepthStencil(UINT width, UINT height);
-
-	public:
-
-		virtual ~DepthStencil();
-
-		UINT Width() const;
-		UINT Height() const;
+		COUNT
 	};
-
-	//////////////////////////////////
-
-	class SENTINEL_DLL BlendState
-	{
-	protected:
-
-		BlendFormat::Type mSrcBlendColor;
-		BlendFormat::Type mDstBlendColor;
-
-		BlendFormat::Type mSrcBlendAlpha;
-		BlendFormat::Type mDstBlendAlpha;
-
-		BlendFunction::Type mBlendFuncColor;
-		BlendFunction::Type mBlendFuncAlpha;
-
-		//////////////////////////////////
-
-		BlendState(
-			BlendFormat::Type srcBlendColor, BlendFormat::Type dstBlendColor,
-			BlendFormat::Type srcBlendAlpha, BlendFormat::Type dstBlendAlpha,
-			BlendFunction::Type blendFuncColor, BlendFunction::Type blendFuncAlpha);
-
-	public:
-
-		virtual ~BlendState() {}
-
-		BlendFormat::Type SrcBlendColor();
-		BlendFormat::Type DstBlendColor();
-
-		BlendFormat::Type SrcBlendAlpha();
-		BlendFormat::Type DstBlendAlpha();
-
-		BlendFunction::Type BlendFuncColor();
-		BlendFunction::Type BlendFuncAlpha();
-	};
-
-	//////////////////////////////////
 
 	// Only one Renderer should be created as multiple instances
 	// of this particular object would unnecessarily complicate the
@@ -263,27 +175,13 @@ namespace Sentinel
 	class SENTINEL_DLL Renderer
 	{
 	protected:
-
 		Shader* mCurrShader;
 
-	public:
-
-		static UINT WINDOW_WIDTH_BASE;
-		static UINT WINDOW_HEIGHT_BASE;
-
-		std::shared_ptr<Texture> NULL_TEXTURE;	// black default texture
-		std::shared_ptr<Texture> BASE_TEXTURE;	// white default texture
-
-		std::shared_ptr<BlendState>	BLEND_OFF;
-		std::shared_ptr<BlendState>	BLEND_ALPHA;
-
 	protected:
-
 		Renderer();
 
 	public:
-
-		virtual ~Renderer() {}
+		virtual ~Renderer() { }
 
 		/////////////////////////////////
 
@@ -295,51 +193,44 @@ namespace Sentinel
 
 		virtual void Shutdown() = 0;
 
-
-		//
-		// Windows
-		//
+		#pragma region Windows
 
 		virtual void SetWindow(WindowInfo* info) = 0;
 		virtual WindowInfo* GetWindow() = 0;
 
 		virtual bool ShareResources(WindowInfo* info0, WindowInfo* info1) = 0;
 
+		#pragma endregion
 
-		//
-		// Buffers
-		//
+		#pragma region Buffers
 
-		virtual Buffer* CreateBuffer(void* data, UINT size, UINT stride, BufferFormat::Type type, BufferAccess::Type access = BufferAccess::READ_WRITE) = 0;
+		virtual Buffer* CreateBuffer(void* data, UINT size, UINT stride, BufferFormat type, BufferAccess access = BufferAccess::READ_WRITE) = 0;
 
 		virtual void SetVertexBuffer(Buffer* buffer) = 0;
 		virtual void SetIndexBuffer(Buffer* buffer) = 0;
 
+		#pragma endregion
 
-		//
-		// Textures
-		//
+		#pragma region Textures
 
 		Texture* CreateTextureFromResource(void* data, UINT length); // used for deserialization
 
 		virtual Texture* CreateTextureFromFile(const char* filename, bool createMips = true) = 0;
-		virtual Texture* CreateTexture(void* data, UINT width, UINT height, ImageFormat::Type format, bool createMips = true) = 0;
-		virtual Texture* CreateTextureCube(void* data, UINT width, UINT height, ImageFormat::Type format) = 0;
+		virtual Texture* CreateTexture(void* data, UINT width, UINT height, ImageFormat format, bool createMips = true) = 0;
+		virtual Texture* CreateTextureCube(void* data, UINT width, UINT height, ImageFormat format) = 0;
 
 		virtual void* GetTexturePixels(Texture* texture) = 0;
 
+		#pragma endregion
 
-		//
-		// Special Rendering
-		//
+		#pragma region Render Settings
 
 		virtual RenderTexture* CreateBackbuffer() = 0;
 		virtual RenderTexture* CreateRenderTexture(Texture* texture) = 0;
 		virtual DepthStencil* CreateDepthStencil(UINT width, UINT height) = 0;
 		virtual BlendState* CreateBlendState(
-			BlendFormat::Type srcBlendColor = BlendFormat::SRC_ALPHA, BlendFormat::Type dstBlendColor = BlendFormat::ONE_MINUS_SRC_ALPHA,
-			BlendFormat::Type srcBlendAlpha = BlendFormat::SRC_ALPHA, BlendFormat::Type dstBlendAlpha = BlendFormat::ONE_MINUS_SRC_ALPHA,
-			BlendFunction::Type blendFuncColor = BlendFunction::ADD, BlendFunction::Type blendFuncAlpha = BlendFunction::ADD) = 0;
+			BlendFormat srcBlendColor, BlendFormat dstBlendColor, BlendFunction blendFuncColor,
+			BlendFormat srcBlendAlpha, BlendFormat dstBlendAlpha, BlendFunction blendFuncAlpha) = 0;
 
 		virtual UINT ResizeBuffers(UINT width, UINT height) = 0;
 
@@ -347,15 +238,14 @@ namespace Sentinel
 		virtual void SetDepthStencil(DepthStencil* stencil) = 0;
 		virtual void SetBlendState(BlendState* blend) = 0;
 
-		virtual void SetDepthStencilType(DepthFormat::Type depth) = 0;
+		virtual void SetDepthStencilType(DepthFormat depth) = 0;
 		virtual void SetViewport(int x, int y, UINT width, UINT height) = 0;
-		virtual UINT SetCull(CullFormat::Type type) = 0;
-		virtual UINT SetFill(FillFormat::Type type) = 0;
+		virtual UINT SetCull(CullFormat type) = 0;
+		virtual UINT SetFill(FillFormat type) = 0;
 
+		#pragma endregion
 
-		//
-		// Shaders
-		//
+		#pragma region Shaders
 
 		virtual Shader* CreateShaderFromFile(const char* filename) = 0;
 		virtual Shader* CreateShaderFromMemory(const char* source) = 0;
@@ -363,28 +253,27 @@ namespace Sentinel
 		void SetShader(Shader* shader);
 		Shader* GetShader();
 
+		#pragma endregion
 
-		//
-		// Vertex Layout
-		//
+		#pragma region Vertex Layout
 
-		virtual VertexLayout* CreateVertexLayout(const std::vector< VertexAttribute::Type >& attrib) = 0;
-
+		virtual VertexLayout* CreateVertexLayout(const std::vector<VertexAttribute>& attrib) = 0;
 		virtual void SetVertexLayout(VertexLayout* vertexLayout) = 0;
 
+		#pragma endregion
 
-		//
-		// Rendering
-		//
+		#pragma region Rendering
 
 		virtual void Clear(float* color, float depth = 1.0f) = 0;
 		virtual void ClearColor(float* color) = 0;
 		virtual void ClearDepth(float depth) = 0;
 
-		virtual void Draw(PrimitiveFormat::Type primitive, UINT count, UINT baseVertex) = 0;
-		virtual void DrawIndexed(PrimitiveFormat::Type primitive, UINT count, UINT startIndex, UINT baseVertex) = 0;
+		virtual void Draw(PrimitiveFormat primitive, UINT count, UINT baseVertex) = 0;
+		virtual void DrawIndexed(PrimitiveFormat primitive, UINT count, UINT startIndex, UINT baseVertex) = 0;
 
 		virtual void Present() = 0;
+
+		#pragma endregion
 	};
 
 	////////////////////////////////////////////////////////////////////

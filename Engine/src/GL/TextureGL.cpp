@@ -2,10 +2,10 @@
 #include "ShaderGL.h"
 namespace Sentinel
 {
-	TextureGL::TextureGL(UINT width, UINT height, ImageFormat::Type format, GLuint id) :
+	TextureGL::TextureGL(UINT width, UINT height, ImageFormat format, GLuint id) :
 		Texture(width, height, format),
 		mID(id)
-	{}
+	{ }
 
 	TextureGL::~TextureGL()
 	{

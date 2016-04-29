@@ -38,7 +38,6 @@ Each Model has self contained Materials.
 */
 #include <vector>
 
-#include "Types.h"
 #include "Matrix4x4.h"
 
 namespace Sentinel
@@ -53,6 +52,7 @@ namespace Sentinel
 	class ShaderManager;
 	class TextureManager;
 	class MaterialManager;
+	class BlendStateManager;
 	class Shader;
 	class Mesh;
 	class GameWorld;
@@ -60,7 +60,6 @@ namespace Sentinel
 	class SENTINEL_DLL Model
 	{
 	protected:
-
 		enum Format
 		{
 			INVALID,
@@ -69,7 +68,6 @@ namespace Sentinel
 		};
 
 	public:
-
 		Matrix4x4 mMatrixWorld;
 
 		/////////////////////////////////////
@@ -81,30 +79,28 @@ namespace Sentinel
 			Renderer* renderer,
 			ShaderManager* shaderManager,
 			TextureManager* textureManager,
-			MaterialManager* materialManager);
+			MaterialManager* materialManager,
+			BlendStateManager* blendManager);
 
-		// The Archive format is specifically created to make 
-		// the model files easy to save and load for the engine.
-		//
 		virtual void Save(
 			Archive& archive,
 			Renderer* renderer,
 			ShaderManager* shaderManager,
 			TextureManager* textureManager,
-			MaterialManager* materialManager) = 0;
+			MaterialManager* materialManager,
+			BlendStateManager* blendManager) = 0;
 
 		static Model* Load(
 			Archive& archive,
 			Renderer* renderer,
 			ShaderManager* shaderManager,
 			TextureManager* textureManager,
-			MaterialManager* materialManager);
+			MaterialManager* materialManager,
+			BlendStateManager* blendManager);
 
 		/////////////////////////////////////
 
-		virtual void Release() = 0;
-
-		virtual void GetMeshList(std::vector< Mesh* >* meshList) = 0;
+		virtual void GetMeshList(std::vector<Mesh*>* meshList) = 0;
 
 		virtual void SetTime(float _time, UINT objIndex = 0) = 0;
 		virtual float GetTime(UINT objIndex = 0) = 0;
@@ -118,14 +114,16 @@ namespace Sentinel
 		Renderer* renderer,
 		ShaderManager* shaderManager,
 		TextureManager* textureManager,
-		MaterialManager* materialManager);
+		MaterialManager* materialManager,
+		BlendStateManager* blendManager);
 
 	extern SENTINEL_DLL Model* LoadModelM3DFromFile(
 		const char* filename,
 		Renderer* renderer,
 		ShaderManager* shaderManager,
 		TextureManager* textureManager,
-		MaterialManager* materialManager);
+		MaterialManager* materialManager,
+		BlendStateManager* blendManager);
 
 	// The Archive format is different than the native file format.
 	// It is designed specifically to be read quickly and easily
@@ -140,12 +138,14 @@ namespace Sentinel
 		Renderer* renderer,
 		ShaderManager* shaderManager,
 		TextureManager* textureManager,
-		MaterialManager* materialManager);
+		MaterialManager* materialManager,
+		BlendStateManager* blendManager);
 
 	extern SENTINEL_DLL Model* LoadModelM3DFromArchive(
 		Archive& archive,
 		Renderer* renderer,
 		ShaderManager* shaderManager,
 		TextureManager* textureManager,
-		MaterialManager* materialManager);
+		MaterialManager* materialManager,
+		BlendStateManager* blendManager);
 }

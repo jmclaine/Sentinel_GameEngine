@@ -4,46 +4,64 @@
 
 namespace Sentinel
 {
-	class ParticleSystem;
+	class Particle;
+	class ParticleEffect;
+	class Mesh;
 
-namespace Component
-{
-	class SENTINEL_DLL ParticleEmitter : public Drawable
+	namespace Component
 	{
-		DECLARE_SERIAL();
+		class SENTINEL_DLL ParticleEmitter : public Drawable
+		{
+		protected:
+			bool mIsActive;
 
-	protected:
+			UINT mNumParticles;
+			UINT mMaxParticles;
 
-		ParticleSystem* mParticleSystem;
+			float mSpawnTime;
 
-		/////////////////////////////////
+			std::unique_ptr<Mesh> mMesh;
 
-		ParticleEmitter();
+		public:
+			float mMinLifetime;
+			float mMaxLifetime;
 
-	public:
+			std::vector<ParticleEffect*> mEffects;
 
-		ParticleEmitter(ParticleSystem* particle);
-		~ParticleEmitter();
+			float mSpawnRate;
 
-		void Set(ParticleSystem* particle);
+		protected:
+			ParticleEmitter();
+			ParticleEmitter(UINT maxParticles);
 
-		/////////////////////////////////
+		public:
+			virtual ~ParticleEmitter();
 
-		void Startup();
-		void Shutdown();
+			/////////////////////////////////
 
-		/////////////////////////////////
+			virtual void SetMaxParticles(UINT maxParticles) = 0;
 
-		void Execute();
+			/////////////////////////////////
 
-		void CalculateBounds();
+			virtual void Startup();
+			virtual void Update();
+			virtual void Shutdown();
 
-		bool CheckVisible(Camera* camera);
+			/////////////////////////////////
 
-		void Draw();
+			void Draw(Camera* camera) = 0;
 
-		///////////////////////////////////
+		protected:
+			virtual void Save(Archive& archive);
+			virtual void Load(Archive& archive);
 
-		GameComponent* Copy();
-	};
-}}
+			/////////////////////////////////
+
+			virtual void Copy(GameComponent* component);
+
+			/////////////////////////////////
+
+			virtual Particle& GetParticle(UINT index) = 0;
+		};
+	}
+}

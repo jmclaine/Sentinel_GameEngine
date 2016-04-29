@@ -12,7 +12,6 @@ namespace GUI
 	class SENTINEL_DLL Button
 	{
 	public:
-
 		enum State
 		{
 			UP,
@@ -21,21 +20,17 @@ namespace GUI
 		};
 
 	protected:
-
 		State mState;
 
 	public:
-
 		Event mActionUp;
 		Event mActionDown;
 		Event mActionClick;
 
 	protected:
-
 		Button();
 
 	public:
-
 		virtual ~Button();
 
 		////////////////////////////////

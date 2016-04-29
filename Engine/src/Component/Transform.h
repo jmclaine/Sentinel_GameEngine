@@ -5,47 +5,54 @@
 #include "Vector3.h"
 #include "Quaternion.h"
 
-namespace Sentinel {
-namespace Component
+namespace Sentinel
 {
-	class SENTINEL_DLL Transform : public GameComponent
+	namespace Component
 	{
-		DECLARE_SERIAL();
+		class SENTINEL_DLL Transform final : public GameComponent
+		{
+			static SerialRegister SERIAL_REGISTER;
+			static Serializable* Clone();
 
-	protected:
+		private:
+			Transform* mParentTransform;
 
-		Transform* mParentTransform;
+			Matrix4x4 mMatrixWorld;
 
-		Matrix4x4 mMatrixWorld;
+		public:
+			Vector3 mPosition;
+			Quaternion mOrientation;
+			Vector3 mScale;
 
-	public:
+			///////////////////////////////////
 
-		Vector3 mPosition;
-		Quaternion mOrientation;
-		Vector3 mScale;
+			Transform();
+			~Transform();
 
-		///////////////////////////////////
+			void Startup();
+			void Update();
+			void Shutdown();
 
-		Transform();
-		~Transform();
+			///////////////////////////////////
 
-		virtual void Startup();
+			void Execute();
 
-		virtual void Update();
+			void SetOwner(GameObject* owner);
 
-		virtual void Shutdown();
+			const Matrix4x4& GetMatrixWorld() const;
+			const Matrix4x4& GetMatrixWorld(const Vector3& offset);
 
-		///////////////////////////////////
+			///////////////////////////////////
 
-		virtual void Execute();
+			void Save(Archive& archive);
+			void Load(Archive& archive);
 
-		virtual void SetOwner(GameObject* owner);
+			///////////////////////////////////
 
-		const Matrix4x4&	GetMatrixWorld() const;
-		const Matrix4x4&	GetMatrixWorld(const Vector3& offset);
+			GameComponent* Copy();
 
-		///////////////////////////////////
-
-		GameComponent* Copy();
-	};
-}}
+		private:
+			void Copy(GameComponent* component);
+		};
+	}
+}

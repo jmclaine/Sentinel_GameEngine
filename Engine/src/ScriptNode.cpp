@@ -9,22 +9,22 @@ namespace Sentinel
 	ScriptNode::ScriptNode()
 	{
 		type = TOKEN_NONE;
-		sibling = NULL;
-		child.child = NULL;
+		sibling = nullptr;
+		child.child = nullptr;
 	}
 
 	ScriptNode::ScriptNode(int type)
 	{
 		this->type = type;
-		sibling = NULL;
-		child.child = NULL;
+		sibling = nullptr;
+		child.child = nullptr;
 	}
 
 	ScriptNode::ScriptNode(int type, ScriptNode* sibling)
 	{
 		this->type = type;
 		this->sibling = sibling;
-		child.child = NULL;
+		child.child = nullptr;
 	}
 
 	ScriptNode::ScriptNode(int type, ScriptNode* sibling, ChildData child)
@@ -48,12 +48,12 @@ namespace Sentinel
 		{
 			SHUTDOWN_ARRAY(2, sibling);
 		}
-		else if (sibling != NULL)
+		else if (sibling != nullptr)
 		{
 			sibling->Shutdown();
 			delete sibling;
 		}
-		sibling = NULL;
+		sibling = nullptr;
 
 		if (type == TOKEN_VAR || type == TOKEN_STRING || type == TOKEN_FUNCTION || type == TOKEN_NATIVE_FUNC)
 		{
@@ -63,7 +63,7 @@ namespace Sentinel
 		{
 			delete child.numberData;
 		}
-		else if (child.child != NULL && type != TOKEN_LCURLY)
+		else if (child.child != nullptr && type != TOKEN_LCURLY)
 		{
 			if (type == TOKEN_IF)
 			{
@@ -75,7 +75,7 @@ namespace Sentinel
 				delete child.child;
 			}
 		}
-		child.child = NULL;
+		child.child = nullptr;
 	}
 
 	void ScriptNode::Output(std::fstream& file, int width)
@@ -87,7 +87,7 @@ namespace Sentinel
 
 		OUTPUT_INFO("%s\n", TokenToString(type));
 
-		if (sibling != NULL)
+		if (sibling != nullptr)
 		{
 			if (type == TOKEN_LCURLY || type == TOKEN_VECTOR_LIST)
 			{
@@ -109,7 +109,7 @@ namespace Sentinel
 
 		// Output the child only if it is a node.
 		//
-		if (child.child != NULL && type != TOKEN_STRING && type != TOKEN_VAR && type != TOKEN_NUMBER && type != TOKEN_BOOL &&
+		if (child.child != nullptr && type != TOKEN_STRING && type != TOKEN_VAR && type != TOKEN_NUMBER && type != TOKEN_BOOL &&
 			type != TOKEN_LCURLY && type != TOKEN_FUNCTION && type != TOKEN_VECTOR_LIST && type != TOKEN_NATIVE_FUNC)
 		{
 			if (type == TOKEN_IF)

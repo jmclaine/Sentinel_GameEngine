@@ -288,7 +288,7 @@ namespace Sentinel
 			//
 			loc = -1;
 
-			parent = NULL;
+			parent = nullptr;
 		}
 	};
 
@@ -630,7 +630,7 @@ namespace Sentinel
 
 		// Returns next instruction location to be executed; SCRIPT_END = end of script
 		//
-		int Execute(float deltaTime = 0, int _IP = SCRIPT_CONTINUE, std::vector<Value>* globalCopy = NULL, std::vector<Value>* stackCopy = NULL);
+		int Execute(float deltaTime = 0, int _IP = SCRIPT_CONTINUE, std::vector<Value>* globalCopy = nullptr, std::vector<Value>* stackCopy = nullptr);
 
 		void RegisterVar(const std::string& name, const Value& _value);
 

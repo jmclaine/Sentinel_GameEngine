@@ -10,7 +10,7 @@ namespace Sentinel
 		mSize(0),
 		mStride(0),
 		mCount(0)
-	{}
+	{ }
 
 	Buffer::~Buffer()
 	{
@@ -22,7 +22,7 @@ namespace Sentinel
 
 	//////////////////////////////
 
-	BufferFormat::Type Buffer::Format()
+	BufferFormat Buffer::Format()
 	{
 		return mFormat;
 	}
@@ -87,7 +87,7 @@ namespace Sentinel
 		BYTE* data = (BYTE*)malloc(size);
 		uncompress(data, (ULONG*)(&size), comp_data, bound);
 
-		Buffer* buffer = renderer->CreateBuffer(data, size, stride, (BufferFormat::Type)format);
+		Buffer* buffer = renderer->CreateBuffer(data, size, stride, (BufferFormat)format);
 
 		free(comp_data);
 		free(data);

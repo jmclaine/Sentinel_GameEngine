@@ -38,10 +38,10 @@ namespace Sentinel
 
 			bool Create(
 				ID3D11Device* device, ID3D11DeviceContext* context,
-				SamplerMode::Type modeU, SamplerMode::Type modeV,
-				SamplerFilter::Type minFilter,
-				SamplerFilter::Type magFilter,
-				SamplerFilter::Type mipFilter);
+				SamplerMode modeU, SamplerMode modeV,
+				SamplerFilter minFilter,
+				SamplerFilter magFilter,
+				SamplerFilter mipFilter);
 
 			void Apply();
 		};
@@ -98,13 +98,13 @@ namespace Sentinel
 
 		void SetSampler(
 			UINT index,
-			SamplerMode::Type modeU, SamplerMode::Type modeV,
-			SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter);
+			SamplerMode modeU, SamplerMode modeV,
+			SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter);
 
 		void SetSamplerCube(
 			UINT index,
-			SamplerMode::Type modeU, SamplerMode::Type modeV, SamplerMode::Type modeW,
-			SamplerFilter::Type minFilter, SamplerFilter::Type magFilter, SamplerFilter::Type mipFilter);
+			SamplerMode modeU, SamplerMode modeV, SamplerMode modeW,
+			SamplerFilter minFilter, SamplerFilter magFilter, SamplerFilter mipFilter);
 
 		///////////////////////////////////
 

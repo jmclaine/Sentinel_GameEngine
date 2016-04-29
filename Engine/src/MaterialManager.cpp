@@ -7,37 +7,34 @@
 namespace Sentinel
 {
 	MaterialManager::MaterialManager()
-	{}
-
-	MaterialManager::~MaterialManager()
-	{}
+	{ }
 
 	/////////////////////////////////
 
 	void MaterialManager::Save(
 		Archive& archive,
-		Renderer* renderer,
 		ShaderManager* shaderManager,
-		TextureManager* textureManager)
+		TextureManager* textureManager,
+		BlendStateManager* blendManager)
 	{
 		UINT count = mData.size();
 		archive.Write(&count);
 
-		TRAVERSE_LIST(it, mData)
+		for (auto it : mData)
 		{
-			std::shared_ptr<Material> material = it->second;
+			std::shared_ptr<Material> material = it.second;
 
-			archive.Write(&it->first);
+			archive.Write(&it.first);
 
-			Material::Save(archive, material.get(), renderer, shaderManager, textureManager);
+			Material::Save(archive, material.get(), shaderManager, textureManager, blendManager);
 		}
 	}
 
 	void MaterialManager::Load(
 		Archive& archive,
-		Renderer* renderer,
 		ShaderManager* shaderManager,
-		TextureManager* textureManager)
+		TextureManager* textureManager,
+		BlendStateManager* blendManager)
 	{
 		RemoveAll();
 
@@ -49,10 +46,9 @@ namespace Sentinel
 		{
 			archive.Read(&name);
 
-			std::shared_ptr<Material> material = std::shared_ptr<Material>(Material::Load(archive, renderer, shaderManager, textureManager));
+			auto material = std::shared_ptr<Material>(Material::Load(archive, shaderManager, textureManager, blendManager));
 
-			if (!Add(name, material))
-				throw std::exception("Failed to load material.");
+			Add(name, material);
 		}
 	}
 }

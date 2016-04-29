@@ -7,9 +7,9 @@ http://www.freetype.org/
 #include FT_GLYPH_H
 
 #ifdef NDEBUG
-#pragma comment (lib, "freetype251.lib")
+#pragma comment (lib, "Release/freetype.lib")
 #else
-#pragma comment (lib, "freetype251_D.lib")
+#pragma comment (lib, "Debug/freetype.lib")
 #endif
 
 #include "FontSystem.h"
@@ -17,9 +17,9 @@ http://www.freetype.org/
 #include "Sprite.h"
 #include "Texture.h"
 #include "Material.h"
-#include "Types.h"
 #include "Exception.h"
 #include "Debug.h"
+#include "Font.h"
 
 namespace Sentinel
 {
@@ -36,8 +36,6 @@ namespace Sentinel
 		{
 			FT_Error error;
 
-			// Initialize the FreeType font library.
-			//
 			error = FT_Init_FreeType(&mLibrary);
 			if (error)
 				throw AppException("Error: Failed to create font library.");
@@ -52,36 +50,28 @@ namespace Sentinel
 		{
 			FT_Error error;
 
-			// Access and load a single type of font.
-			//
 			error = FT_New_Face(mLibrary, filename, 0, &mFace);
-
+			
 			if (error == FT_Err_Unknown_File_Format)
-				throw AppException("Error: Unsupported font format.");
+				throw AppException("Error: Unsupported font format '" + std::string(filename) + "'");
 			else if (error)
 				throw AppException("Error: Failed to open font '" + std::string(filename) + "'");
 		}
 
-		std::shared_ptr< Font > Build(UINT glyphWidth, UINT glyphHeight)
+		Font* Build(UINT glyphWidth, UINT glyphHeight)
 		{
 			FT_Error error;
 
-			// Set the font size.
-			//
 			error = FT_Set_Char_Size(mFace, glyphWidth << 6, glyphHeight << 6, 96, 96);
 			if (error)
-				return NULL;
+				throw std::exception("Failed to create font.");
 
-			// Create font.
-			//
+			Font* font(new Font());
 			std::shared_ptr<Sprite> sprite(new Sprite());
-			std::shared_ptr<Font> font(new Font());
 
 			font->mSprite = sprite;
 			font->mSize = Vector2((float)glyphWidth, (float)glyphHeight);
 
-			// 16x16 cells.
-			//
 			UINT textureWidth = glyphWidth << 4;
 			UINT textureHeight = glyphHeight << 4;
 			UINT textureSize = ((textureWidth * textureHeight) << 2); // RGBA
@@ -89,19 +79,13 @@ namespace Sentinel
 			float textureRatioX = glyphWidth / static_cast<float>(textureWidth);
 			float textureRatioY = glyphHeight / static_cast<float>(textureHeight);
 
-			// Allocate memory for texture.
-			//
 			BYTE* pixels = (BYTE*)malloc(textureSize);
 			memset(pixels, 0, textureSize);
 
-			// Build texture from each glyph.
-			//
 			FT_Glyph glyph;
 
 			for (FT_ULong x = 0; x < NUM_CHARS; ++x)
 			{
-				// Create the glyph.
-				//
 				error = FT_Load_Glyph(mFace, FT_Get_Char_Index(mFace, x), FT_LOAD_DEFAULT);
 				if (error)
 					continue;
@@ -112,14 +96,10 @@ namespace Sentinel
 
 				FT_Glyph_Metrics& metrics = mFace->glyph->metrics;
 
-				// Set the metrics.
-				//
 				font->mOffsetX[x] = static_cast<float>(metrics.horiBearingX) / 64.0f;
 				font->mOffsetY[x] = static_cast<float>(metrics.horiBearingY) / 64.0f;
 				font->mAdvance[x] = static_cast<float>(metrics.horiAdvance) / 64.0f;
 
-				// Convert to Bitmap.
-				//
 				error = FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, 0, 1);
 				if (error)
 					continue;
@@ -127,15 +107,11 @@ namespace Sentinel
 				FT_BitmapGlyph bitmap_glyph = (FT_BitmapGlyph)glyph;
 				FT_Bitmap& bitmap = bitmap_glyph->bitmap;
 
-				// Add glyph frame to Sprite.
-				//
 				float posX = static_cast<float>(x & 15) * textureRatioX;
 				float posY = static_cast<float>(x >> 4) * textureRatioY;
 
 				sprite->AddFrame(Quad(posX, posY, posX + textureRatioX, posY + textureRatioY));
 
-				// Copy glyph to texture.
-				//
 				int bitmapWidth = bitmap.width;
 				int bitmapHeight = bitmap.rows;
 
@@ -168,32 +144,22 @@ namespace Sentinel
 
 				FT_Done_Glyph(glyph);
 			}
-
+			
 			std::shared_ptr<Texture> texture(mSpriteSystem->GetRenderer()->CreateTexture(pixels, textureWidth, textureHeight, ImageFormat::RGBA));
-
 			free(pixels);
-
-			if (texture.get() == NULL)
-			{
-				Debug::ShowError(
-					"Failed to create texture for font.",
-					"Texture Creation Error");
-
-				return NULL;
-			}
+			font->mTexture = texture;
 
 			std::shared_ptr<Material> material(new Material());
-			material->mTexture[TextureIndex::DIFFUSE] = texture;
-
+			material->mTexture[(BYTE)TextureIndex::DIFFUSE] = texture;
 			font->mMaterial = material;
 
 			return font;
 		}
 
-		void Draw(char text, const ColorRGBA& color, const Matrix4x4& matWorld)
+		void Draw(const Font* font, char text, const ColorRGBA& color, const Matrix4x4& matWorld)
 		{
-			mSpriteSystem->mSprite = mFont->mSprite;
-			mSpriteSystem->mMaterial = mFont->mMaterial;
+			mSpriteSystem->mSprite = font->mSprite;
+			mSpriteSystem->mMaterial = font->mMaterial;
 
 			mSpriteSystem->Draw(text, color, matWorld);
 		}
